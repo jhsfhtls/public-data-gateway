@@ -149,6 +149,17 @@ class MCPDispatcher:
                                     "required": ["source_id"],
                                 },
                             },
+                            {
+                                "name": "bdg_get_simples_status",
+                                "description": "Resolve Simples Nacional and MEI tax regime for a given CNPJ.",
+                                "inputSchema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "cnpj": {"type": "string"},
+                                    },
+                                    "required": ["cnpj"],
+                                },
+                            },
                         ]
                     },
                 }
@@ -250,6 +261,20 @@ class MCPDispatcher:
                 output_path=Path(args["output_path"]),
             )
             wrapped = wrap_untrusted_gov_data(report.model_dump(), source_id="bdg_enrichment")
+            return {
+                "jsonrpc": "2.0",
+                "id": req_id,
+                "result": {"content": [{"type": "text", "text": wrapped}], "isError": False},
+            }
+
+        if tool_name == "bdg_get_simples_status":
+            from public_data_gateway.connectors.empresarial.rfb_simples_mei import (
+                RFBSimplesMEIConnector,
+            )
+
+            conn = RFBSimplesMEIConnector(settings=self.settings)
+            status_data = conn.get_simples_mei_status(args["cnpj"])
+            wrapped = wrap_untrusted_gov_data(status_data, source_id="rfb_simples_mei")
             return {
                 "jsonrpc": "2.0",
                 "id": req_id,

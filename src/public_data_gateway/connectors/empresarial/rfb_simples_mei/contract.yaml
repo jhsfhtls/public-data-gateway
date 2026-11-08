@@ -1,0 +1,70 @@
+contract_id: "ODCS-BR-RFB-SIMPLES-001"
+source_id: "rfb_simples_mei"
+version: "1.0.0"
+grain: "One row per CNPJ basic (8 digits) or legal domain / calendar year state sublimity"
+primary_keys:
+  - "cnpj_basico"
+canonical_keys:
+  - "cnpj_basico"
+  - "sigla_uf"
+  - "codigo_evento"
+  - "codigo_anexo"
+reference_date_column: "reference_date"
+lgpd_legal_basis: "Art. 7, § 3º e 4º LGPD (Dados Cadastrais Públicos Tributários do Simples Nacional e MEI)"
+min_expected_rows: 5
+max_volume_drop_pct: 1.0
+sentinel_values:
+  - "-1"
+  - "99"
+  - "999"
+  - "SEM INFORMACAO"
+  - "IGNORADO"
+  - "N/A"
+  - "-"
+  - "00000000"
+columns:
+  - name: "cnpj_basico"
+    data_type: "string"
+    required: true
+    is_primary_key: true
+    description: "Raiz do CNPJ com 8 dígitos canônicos da entidade jurídica optante ou não"
+  - name: "opcao_simples"
+    data_type: "string"
+    required: true
+    description: "Indicador oficial de opção pelo Simples Nacional (S para Sim, N para Não)"
+  - name: "data_opcao_simples"
+    data_type: "string"
+    required: false
+    description: "Data canônica de início dos efeitos da opção pelo Simples Nacional (AAAA-MM-DD)"
+  - name: "data_exclusao_simples"
+    data_type: "string"
+    required: false
+    description: "Data de exclusão dos efeitos do Simples Nacional ou NULL se ativo"
+  - name: "status_simples_atual"
+    data_type: "string"
+    required: true
+    description: "Classificação derivada da situação no Simples (OPTANTE, EXCLUIDO, NAO_OPTANTE)"
+  - name: "opcao_simei"
+    data_type: "string"
+    required: true
+    description: "Indicador de enquadramento no SIMEI como Microempreendedor Individual (S para Sim, N para Não)"
+  - name: "data_opcao_simei"
+    data_type: "string"
+    required: false
+    description: "Data de início do enquadramento no SIMEI (AAAA-MM-DD)"
+  - name: "data_exclusao_simei"
+    data_type: "string"
+    required: false
+    description: "Data de desenquadramento do SIMEI ou NULL se ativo"
+  - name: "status_simei_atual"
+    data_type: "string"
+    required: true
+    description: "Classificação derivada da situação no SIMEI (ENQUADRADO, DESENQUADRADO, NAO_ENQUADRADO)"
+  - name: "sigla_uf"
+    data_type: "string"
+    required: false
+    description: "Sigla oficial de 2 letras maiúsculas da Unidade Federativa para sublimites"
+  - name: "sublimite_icms_iss_anual"
+    data_type: "float"
+    required: false
+    description: "Valor anual em R$ do sublimite estadual do Simples Nacional (R$ 3.6M ou R$ 4.8M)"

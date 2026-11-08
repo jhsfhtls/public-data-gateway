@@ -99,6 +99,15 @@ class BrazilData:
         """Execute read-only SQL via DuckDB engine."""
         return self.storage.query_sql(sql=sql, params=params)
 
+    def get_simples_status(self, cnpj: str) -> dict[str, Any]:
+        """Resolve Simples Nacional and MEI tax status for a CNPJ."""
+        from public_data_gateway.connectors.empresarial.rfb_simples_mei import (
+            RFBSimplesMEIConnector,
+        )
+
+        conn = RFBSimplesMEIConnector(settings=self.settings)
+        return conn.get_simples_mei_status(cnpj)
+
     def resolve_municipality(
         self, code_or_name: str | int, uf: str | None = None
     ) -> dict[str, Any] | None:

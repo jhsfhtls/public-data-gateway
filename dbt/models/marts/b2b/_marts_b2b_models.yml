@@ -57,3 +57,53 @@ models:
         description: "Data em que o mart analítico foi compilado e materializado (YYYY-MM-DD)."
         tests:
           - not_null
+
+  - name: mart_regimes_tributarios_brasil
+    description: "Mart analítico tributário agregando dados de opção pelo Simples Nacional, SIMEI, sublimites fiscais e taxas de adesão por UF."
+    columns:
+      - name: sigla_uf
+        description: "Sigla de 2 letras maiúsculas da Unidade Federativa (chave primária analítica)."
+        tests:
+          - unique
+          - not_null
+      - name: total_empresas_cadastradas
+        description: "Quantidade total de empresas registradas na UF analisada."
+        tests:
+          - not_null
+      - name: total_optantes_simples_ativos
+        description: "Quantidade de empresas com opção ativa pelo Simples Nacional na UF."
+        tests:
+          - not_null
+      - name: total_meis_enquadrados_ativos
+        description: "Quantidade de microempreendedores individuais ativamente enquadrados no SIMEI na UF."
+        tests:
+          - not_null
+      - name: total_historico_excluidos_simples
+        description: "Quantidade de empresas com registro histórico de exclusão do Simples Nacional na UF."
+        tests:
+          - not_null
+      - name: total_historico_desenquadrados_mei
+        description: "Quantidade de empresas com registro histórico de desenquadramento do SIMEI na UF."
+        tests:
+          - not_null
+      - name: taxa_adesao_simples_pct
+        description: "Percentual de empresas da UF que são optantes ativas pelo Simples Nacional (0 a 100%)."
+        tests:
+          - not_null
+      - name: taxa_mei_sobre_simples_pct
+        description: "Percentual de MEIs em relação ao total de optantes pelo Simples Nacional na UF (0 a 100%)."
+        tests:
+          - not_null
+      - name: sublimite_icms_vigente_reais
+        description: "Valor do sublimite estadual de ICMS/ISS vigente para o ano-calendário em Reais."
+        tests:
+          - not_null
+      - name: categoria_sublimite_estadual
+        description: "Classificação da política fiscal do estado quanto ao sublimite (SUBLIMITE_REDUZIDO_3_6M ou TETO_NACIONAL_4_8M)."
+        tests:
+          - not_null
+      - name: data_processamento
+        description: "Data em que o mart tributário foi compilado e materializado (YYYY-MM-DD)."
+        tests:
+          - not_null
+

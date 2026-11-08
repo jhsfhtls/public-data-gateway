@@ -607,6 +607,99 @@ models:
         tests:
           - not_null
 
+  - name: dim_simples_nacional
+    description: "Dimensão conformatória de regime tributário do Simples Nacional por raiz de CNPJ (8D)."
+    columns:
+      - name: cnpj_basico
+        description: "Radical de 8 dígitos numéricos da empresa."
+        tests:
+          - unique
+          - not_null
+      - name: opcao_simples
+        description: "Indicador oficial de opção pelo Simples Nacional (S para Sim, N para Não)."
+        tests:
+          - not_null
+          - accepted_values:
+              values: ['S', 'N']
+      - name: data_opcao_simples
+        description: "Data canônica de início dos efeitos da opção pelo Simples Nacional (AAAA-MM-DD)."
+      - name: data_exclusao_simples
+        description: "Data de exclusão dos efeitos do Simples Nacional ou NULL para optantes ativos."
+      - name: motivo_exclusao_simples
+        description: "Motivo e fundamentação legal da exclusão do regime do Simples Nacional."
+      - name: status_simples_atual
+        description: "Classificação consolidada do status tributário atual (OPTANTE, EXCLUIDO, NAO_OPTANTE)."
+        tests:
+          - not_null
+          - accepted_values:
+              values: ['OPTANTE', 'EXCLUIDO', 'NAO_OPTANTE']
+      - name: is_optante_ativo
+        description: "Flag booleano que indica se a empresa é optante ativa pelo Simples Nacional."
+        tests:
+          - not_null
+
+  - name: dim_simei
+    description: "Dimensão conformatória de enquadramento no SIMEI (Microempreendedor Individual) por CNPJ básico."
+    columns:
+      - name: cnpj_basico
+        description: "Radical de 8 dígitos numéricos da empresa."
+        tests:
+          - unique
+          - not_null
+      - name: opcao_simei
+        description: "Indicador oficial de enquadramento no SIMEI como MEI (S para Sim, N para Não)."
+        tests:
+          - not_null
+          - accepted_values:
+              values: ['S', 'N']
+      - name: data_opcao_simei
+        description: "Data canônica de início do enquadramento no SIMEI (AAAA-MM-DD)."
+      - name: data_exclusao_simei
+        description: "Data de desenquadramento do SIMEI ou NULL para MEIs ativos."
+      - name: motivo_desenquadramento_simei
+        description: "Motivo legal do desenquadramento do SIMEI."
+      - name: status_simei_atual
+        description: "Classificação consolidada do status atual no SIMEI (ENQUADRADO, DESENQUADRADO, NAO_ENQUADRADO)."
+        tests:
+          - not_null
+          - accepted_values:
+              values: ['ENQUADRADO', 'DESENQUADRADO', 'NAO_ENQUADRADO']
+      - name: is_mei_ativo
+        description: "Flag booleano que indica se o microempreendedor individual está ativamente enquadrado no SIMEI."
+        tests:
+          - not_null
+
+  - name: dim_sublimites_icms
+    description: "Dimensão fiscal oficial de sublimites estaduais para apuração de ICMS e ISS no Simples Nacional."
+    columns:
+      - name: ano_calendario
+        description: "Ano-calendário de vigência fiscal do sublimite estadual."
+        tests:
+          - not_null
+      - name: sigla_uf
+        description: "Sigla oficial de 2 letras maiúsculas da Unidade Federativa."
+        tests:
+          - not_null
+      - name: sublimite_icms_iss_anual
+        description: "Valor anual em R$ do sublimite estadual para recolhimento simplificado de ICMS e ISS."
+        tests:
+          - not_null
+      - name: adotou_sublimite_diferenciado
+        description: "Flag booleano que indica se a Unidade Federativa adotou sublimite diferenciado reduzido (R$ 3.6M)."
+        tests:
+          - not_null
+      - name: base_legal_portaria
+        description: "Resolução ou Portaria CGSN instituidora do sublimite para o respectivo ano."
+        tests:
+          - not_null
+      - name: categoria_sublimite_estadual
+        description: "Classificação da faixa de sublimite (SUBLIMITE_REDUZIDO_3_6M ou TETO_NACIONAL_4_8M)."
+        tests:
+          - not_null
+          - accepted_values:
+              values: ['SUBLIMITE_REDUZIDO_3_6M', 'TETO_NACIONAL_4_8M']
+
+
 
 
 
