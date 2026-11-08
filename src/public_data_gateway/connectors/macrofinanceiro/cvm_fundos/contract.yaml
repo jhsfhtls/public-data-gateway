@@ -1,0 +1,104 @@
+contract_id: "ODCS-BR-CVM-FUNDOS-001"
+source_id: "cvm_fundos"
+version: "1.0.0"
+grain: "One row per investment fund registered at CVM (Cadastro Geral) and daily operational reports"
+primary_keys:
+  - "cnpj_14"
+canonical_keys:
+  - "cnpj_14"
+  - "codigo_cvm"
+reference_date_column: "data_competencia"
+update_frequency: "daily"
+freshness_sla_hours: 24
+freshness_evaluation_criteria: "CVM publishes daily operational report files on D+1 business day; Cadastral registry is updated daily after trading close"
+lgpd_legal_basis: "Instrução CVM nº 555/2014, Resolução CVM nº 175/2022, Lei nº 6.385/1976 e Art. 7º, § 3º da Lei nº 13.709/2018 (LGPD - Transparência Pública Mandatória dos Fundos de Investimento)"
+min_expected_rows: 5
+max_volume_drop_pct: 1.0
+sentinel_values:
+  - "NA"
+  - "N/A"
+  - "NULL"
+  - "00000000"
+  - "-"
+  - "SEM INFORMACAO"
+columns:
+  - name: "cnpj_14"
+    data_type: "string"
+    nullable: false
+    description: "CNPJ do fundo de investimento ou classe com 14 dígitos normalizados."
+    classification: "PUBLIC_IDENTIFIER"
+  - name: "codigo_cvm"
+    data_type: "string"
+    nullable: true
+    description: "Código numérico oficial de registro do fundo perante a CVM."
+    classification: "PUBLIC_REGULATORY"
+  - name: "razao_social"
+    data_type: "string"
+    nullable: false
+    description: "Denominação social oficial do fundo de investimento arquivada na CVM."
+    classification: "PUBLIC_LEGAL_NAME"
+  - name: "tipo_fundo"
+    data_type: "string"
+    nullable: false
+    description: "Tipo de fundo ou classe segundo taxonomia CVM (e.g. FI, FACFIF, FIF)."
+    classification: "PUBLIC_CLASSIFICATION"
+  - name: "classe_cvm"
+    data_type: "string"
+    nullable: false
+    description: "Classe regulatória do fundo segundo Instrução CVM 555 / Resolução 175 (Renda Fixa, Ações, Multimercado, Cambial)."
+    classification: "PUBLIC_CLASSIFICATION"
+  - name: "classe_anbima"
+    data_type: "string"
+    nullable: true
+    description: "Classificação setorial detalhada segundo a ANBIMA."
+    classification: "PUBLIC_CLASSIFICATION"
+  - name: "situacao_registro"
+    data_type: "string"
+    nullable: false
+    description: "Situação cadastral do fundo na CVM (EM FUNCIONAMENTO NORMAL, CANCELADA, EM LIQUIDACAO)."
+    classification: "PUBLIC_STATUS"
+  - name: "tipo_condominio"
+    data_type: "string"
+    nullable: false
+    description: "Tipo de condomínio do fundo (ABERTO ou FECHADO)."
+    classification: "PUBLIC_STRUCTURE"
+  - name: "fundo_cotas"
+    data_type: "string"
+    nullable: false
+    description: "Indicador se o fundo é Fundo de Investimento em Cotas - FIC (S ou N)."
+    classification: "PUBLIC_STRUCTURE"
+  - name: "fundo_exclusivo"
+    data_type: "string"
+    nullable: false
+    description: "Indicador se o fundo é exclusivo para cotista único ou grupo restrito (S ou N)."
+    classification: "PUBLIC_STRUCTURE"
+  - name: "publico_alvo"
+    data_type: "string"
+    nullable: false
+    description: "Segmento de investidores elegíveis (INVESTIDORES EM GERAL, QUALIFICADOS, PROFISSIONAIS)."
+    classification: "PUBLIC_REGULATORY"
+  - name: "cnpj_administrador"
+    data_type: "string"
+    nullable: false
+    description: "CNPJ do Administrador Fiduciário do fundo com 14 dígitos normalizados."
+    classification: "PUBLIC_IDENTIFIER"
+  - name: "nome_administrador"
+    data_type: "string"
+    nullable: false
+    description: "Razão social da instituição financeira administradora fiduciária."
+    classification: "PUBLIC_LEGAL_NAME"
+  - name: "cnpj_gestor"
+    data_type: "string"
+    nullable: false
+    description: "CNPJ da sociedade gestora de recursos / Asset Management responsável pela gestão da carteira."
+    classification: "PUBLIC_IDENTIFIER"
+  - name: "nome_gestor"
+    data_type: "string"
+    nullable: false
+    description: "Razão social da Gestora de Recursos (Asset Management)."
+    classification: "PUBLIC_LEGAL_NAME"
+  - name: "patrimonio_liquido"
+    data_type: "float"
+    nullable: false
+    description: "Patrimônio líquido (PL) mais recente do fundo apurado em reais (R$)."
+    classification: "PUBLIC_FINANCIAL"

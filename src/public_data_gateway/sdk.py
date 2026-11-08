@@ -335,6 +335,44 @@ class TradeFacade:
         return self.comex_connector.get_trade_balance_profile()
 
 
+class FundsFacade:
+    """Investment funds regulatory registry, daily reports, asset managers and liquidity (CVM ICVM 555 / Resolução 175)."""
+
+    def __init__(self, sdk: "BrazilData") -> None:
+        self._sdk = sdk
+        self._fundos_connector: Any = None
+
+    @property
+    def fundos_connector(self) -> Any:
+        if self._fundos_connector is None:
+            from public_data_gateway.connectors.macrofinanceiro.cvm_fundos.connector import (
+                CvmFundosConnector,
+            )
+
+            self._fundos_connector = CvmFundosConnector(settings=self._sdk.settings)
+        return self._fundos_connector
+
+    def get_fund_by_cnpj(self, cnpj: str) -> dict[str, Any] | None:
+        """Lookup an investment fund by 14-digit CNPJ."""
+        return self.fundos_connector.get_fund_by_cnpj(cnpj)
+
+    def get_daily_reports(
+        self, cnpj: str, start_date: str | None = None, end_date: str | None = None
+    ) -> list[dict[str, Any]]:
+        """Retrieve daily reports for an investment fund."""
+        return self.fundos_connector.get_daily_reports(cnpj, start_date=start_date, end_date=end_date)
+
+    def get_asset_managers(
+        self, query: str | None = None, min_aum: float = 0.0
+    ) -> list[dict[str, Any]]:
+        """Retrieve Asset Management firms ranked by AuM with optional filter."""
+        return self.fundos_connector.get_asset_managers(query=query, min_aum=min_aum)
+
+    def get_fund_features(self, cnpj: str) -> dict[str, Any] | None:
+        """Retrieve pre-computed Gold feature vector and resilience score for a fund."""
+        return self.fundos_connector.get_fund_features(cnpj)
+
+
 class BrazilData:
     """Unified developer SDK facade for querying, normalizing, and enriching Brazilian public datasets."""
 
@@ -356,6 +394,7 @@ class BrazilData:
         self.company = CompanyFacade(self)
         self.finance = FinanceFacade(self)
         self.trade = TradeFacade(self)
+        self.funds = FundsFacade(self)
 
     def list_sources(
         self,
@@ -461,6 +500,26 @@ class BrazilData:
     def get_trade_balance(self) -> dict[str, Any]:
         """Obter o panorama macro da balança comercial brasileira (MDIC)."""
         return self.trade.trade_balance_profile()
+
+    def get_fund_profile(self, cnpj: str) -> dict[str, Any] | None:
+        """Consultar cadastro regulatório de um fundo de investimento (CVM)."""
+        return self.funds.get_fund_by_cnpj(cnpj)
+
+    def get_fund_daily_reports(
+        self, cnpj: str, start_date: str | None = None, end_date: str | None = None
+    ) -> list[dict[str, Any]]:
+        """Consultar informes operacionais diários de um fundo de investimento (CVM)."""
+        return self.funds.get_daily_reports(cnpj, start_date=start_date, end_date=end_date)
+
+    def get_asset_managers(
+        self, query: str | None = None, min_aum: float = 0.0
+    ) -> list[dict[str, Any]]:
+        """Consultar ranking de sociedades gestoras de recursos por AuM (CVM)."""
+        return self.funds.get_asset_managers(query=query, min_aum=min_aum)
+
+    def get_fund_features(self, cnpj: str) -> dict[str, Any] | None:
+        """Consultar features e score de resiliência e liquidez de um fundo de investimento (CVM)."""
+        return self.funds.get_fund_features(cnpj)
 
     def resolve_municipality(
         self, code_or_name: str | int, uf: str | None = None

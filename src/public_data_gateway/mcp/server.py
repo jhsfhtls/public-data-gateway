@@ -307,6 +307,28 @@ class MCPDispatcher:
                                     "required": ["codigo_ncm"],
                                 },
                             },
+                            {
+                                "name": "bdg_get_fund_profile",
+                                "description": "Query investment fund regulatory registration, status, class, manager, administrator, NAV, and liquidity profile from CVM (Tier 1).",
+                                "inputSchema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "cnpj": {"type": "string", "description": "14-digit CNPJ of the investment fund (e.g. 03243208000158)"},
+                                    },
+                                    "required": ["cnpj"],
+                                },
+                            },
+                            {
+                                "name": "bdg_get_asset_manager_funds",
+                                "description": "Query Asset Management firms (Gestoras de Recursos) ranking by AuM and managed fund classes from CVM (Tier 1).",
+                                "inputSchema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "gestor_query": {"type": "string", "description": "Optional search filter for asset manager name or CNPJ"},
+                                        "min_aum": {"type": "number", "description": "Minimum AuM filter in BRL"},
+                                    },
+                                },
+                            },
                         ]
                     },
                 }
@@ -625,6 +647,40 @@ class MCPDispatcher:
             ncm_code = str(args.get("codigo_ncm") or args.get("ncm_8") or "").strip()
             res = comex_conn.get_ncm_trade(ncm_code)
             wrapped = wrap_untrusted_gov_data(res, source_id="mdic_comexstat")
+            return {
+                "jsonrpc": "2.0",
+                "id": req_id,
+                "result": {"content": [{"type": "text", "text": wrapped}], "isError": False},
+            }
+
+        if tool_name in {"bdg_get_fund_profile", "pdg_get_fund_profile"}:
+            from public_data_gateway.connectors.macrofinanceiro.cvm_fundos.connector import (
+                CvmFundosConnector,
+            )
+
+            fund_conn = CvmFundosConnector(settings=self.settings)
+            cnpj_val = str(args.get("cnpj") or "").strip()
+            res = fund_conn.get_fund_by_cnpj(cnpj_val) or {}
+            features = fund_conn.get_fund_features(cnpj_val)
+            if features:
+                res["gold_features"] = features
+            wrapped = wrap_untrusted_gov_data(res, source_id="cvm_fundos")
+            return {
+                "jsonrpc": "2.0",
+                "id": req_id,
+                "result": {"content": [{"type": "text", "text": wrapped}], "isError": False},
+            }
+
+        if tool_name in {"bdg_get_asset_manager_funds", "pdg_get_asset_manager_funds"}:
+            from public_data_gateway.connectors.macrofinanceiro.cvm_fundos.connector import (
+                CvmFundosConnector,
+            )
+
+            fund_conn = CvmFundosConnector(settings=self.settings)
+            q = args.get("gestor_query")
+            min_aum = float(args.get("min_aum") or 0.0)
+            managers = fund_conn.get_asset_managers(query=q, min_aum=min_aum)
+            wrapped = wrap_untrusted_gov_data(managers, source_id="cvm_fundos")
             return {
                 "jsonrpc": "2.0",
                 "id": req_id,

@@ -461,4 +461,52 @@ def create_app(settings: GatewaySettings | None = None) -> FastAPI:
         conn = MDICComexStatConnector(settings=app_settings)
         return conn.get_ncm_trade(codigo_ncm)
 
+    # 13. Investment Funds (CVM Fundos de Investimento)
+    @app.get("/api/v1/funds/profile/{cnpj}")
+    @app.get("/api/v1/cvm-fundos/profile/{cnpj}")
+    async def get_fund_profile(cnpj: str) -> dict[str, Any]:
+        from public_data_gateway.connectors.macrofinanceiro.cvm_fundos.connector import (
+            CvmFundosConnector,
+        )
+
+        conn = CvmFundosConnector(settings=app_settings)
+        res = conn.get_fund_by_cnpj(cnpj)
+        if not res:
+            raise HTTPException(status_code=404, detail=f"Investment fund not found for CNPJ {cnpj}")
+        return res
+
+    @app.get("/api/v1/funds/daily/{cnpj}")
+    async def get_fund_daily(
+        cnpj: str, start: str | None = None, end: str | None = None
+    ) -> list[dict[str, Any]]:
+        from public_data_gateway.connectors.macrofinanceiro.cvm_fundos.connector import (
+            CvmFundosConnector,
+        )
+
+        conn = CvmFundosConnector(settings=app_settings)
+        return conn.get_daily_reports(cnpj, start_date=start, end_date=end)
+
+    @app.get("/api/v1/funds/managers")
+    async def get_fund_managers(
+        query: str | None = None, min_aum: float = 0.0
+    ) -> list[dict[str, Any]]:
+        from public_data_gateway.connectors.macrofinanceiro.cvm_fundos.connector import (
+            CvmFundosConnector,
+        )
+
+        conn = CvmFundosConnector(settings=app_settings)
+        return conn.get_asset_managers(query=query, min_aum=min_aum)
+
+    @app.get("/api/v1/funds/features/{cnpj}")
+    async def get_fund_features(cnpj: str) -> dict[str, Any]:
+        from public_data_gateway.connectors.macrofinanceiro.cvm_fundos.connector import (
+            CvmFundosConnector,
+        )
+
+        conn = CvmFundosConnector(settings=app_settings)
+        res = conn.get_fund_features(cnpj)
+        if not res:
+            raise HTTPException(status_code=404, detail=f"Features not found for fund CNPJ {cnpj}")
+        return res
+
     return app

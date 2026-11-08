@@ -1,0 +1,134 @@
+version: 2
+
+models:
+  - name: stg_cvm_cadastro_fundos
+    description: "Visão de staging para o Cadastro Geral de Fundos de Investimento CVM (ICVM 555 / Resolução 175)."
+    columns:
+      - name: cnpj_14
+        description: "CNPJ do fundo de investimento ou classe com 14 dígitos normalizados."
+        tests:
+          - not_null
+      - name: codigo_cvm
+        description: "Código numérico oficial de registro do fundo perante a CVM."
+      - name: razao_social
+        description: "Denominação social oficial do fundo de investimento arquivada na CVM."
+        tests:
+          - not_null
+      - name: tipo_fundo
+        description: "Tipo de fundo segundo taxonomia regulatória CVM (e.g. FI, FACFIF)."
+      - name: classe_cvm
+        description: "Classe regulatória do fundo (Renda Fixa, Ações, Multimercado, Cambial)."
+        tests:
+          - not_null
+      - name: classe_anbima
+        description: "Classificação setorial padronizada pela ANBIMA."
+      - name: situacao_registro
+        description: "Situação cadastral do fundo na CVM (EM FUNCIONAMENTO NORMAL, CANCELADA)."
+        tests:
+          - not_null
+      - name: tipo_condominio
+        description: "Tipo de condomínio societário do fundo (ABERTO ou FECHADO)."
+      - name: fundo_cotas
+        description: "Indicador se o fundo aplica em cotas de outros fundos - FIC (S/N)."
+      - name: fundo_exclusivo
+        description: "Indicador se o fundo é exclusivo para investidor único (S/N)."
+      - name: tributacao_longo_prazo
+        description: "Indicador se o fundo persegue tratamento tributário de longo prazo (S/N)."
+      - name: publico_alvo
+        description: "Classificação de público-alvo (INVESTIDORES EM GERAL, QUALIFICADOS, PROFISSIONAIS)."
+      - name: cnpj_administrador
+        description: "CNPJ da instituição administradora fiduciária."
+      - name: nome_administrador
+        description: "Razão social da instituição administradora fiduciária."
+      - name: cnpj_gestor
+        description: "CNPJ da sociedade gestora de recursos (Asset Management)."
+      - name: nome_gestor
+        description: "Razão social da gestora de recursos (Asset Management)."
+      - name: cnpj_custodiante
+        description: "CNPJ da instituição financeira custodiante dos ativos."
+      - name: nome_custodiante
+        description: "Razão social da instituição custodiante."
+      - name: nome_auditor
+        description: "Firma de auditoria independente registrada na CVM."
+      - name: patrimonio_liquido
+        description: "Patrimônio líquido de referência apurado em reais (R$)."
+      - name: data_patrimonio_liquido
+        description: "Data em que o patrimônio líquido de referência foi apurado."
+      - name: data_registro
+        description: "Data do registro inicial do fundo na CVM."
+      - name: data_constituicao
+        description: "Data de constituição formal do fundo."
+      - name: data_inicio_atividade
+        description: "Data de início efetivo das atividades operacionais."
+      - name: data_cancelamento
+        description: "Data de cancelamento do registro CVM se aplicável."
+
+  - name: stg_cvm_informe_diario
+    description: "Visão de staging para a série histórica de Informes Diários de Fundos de Investimento."
+    columns:
+      - name: cnpj_14
+        description: "CNPJ do fundo com 14 dígitos normalizados."
+        tests:
+          - not_null
+      - name: tipo_fundo
+        description: "Tipo de fundo segundo informe diário (FI)."
+      - name: id_subclasse
+        description: "Identificador de subclasse conforme Resolução CVM 175 se houver."
+      - name: data_competencia
+        description: "Data de competência do informe operacional diário."
+        tests:
+          - not_null
+      - name: valor_total
+        description: "Valor total da carteira do fundo em reais (R$)."
+      - name: valor_cota
+        description: "Valor unitário da cota apurado no encerramento do dia."
+        tests:
+          - not_null
+      - name: patrimonio_liquido
+        description: "Patrimônio líquido contábil do fundo no dia (R$)."
+        tests:
+          - not_null
+      - name: captacao_dia
+        description: "Volume financeiro total de aplicações/subscrições no dia (R$)."
+      - name: resgate_dia
+        description: "Volume financeiro total de resgates pagos no dia (R$)."
+      - name: captacao_liquida_dia
+        description: "Captação líquida do dia (Aplicações menos Resgates em R$)."
+      - name: numero_cotistas
+        description: "Quantidade total de cotistas do fundo na data de competência."
+
+  - name: stg_cvm_gestores_fundos
+    description: "Visão de staging consolidando sociedades gestoras de fundos de investimento."
+    columns:
+      - name: cnpj_gestor
+        description: "CNPJ da gestora de recursos com 14 dígitos normalizados."
+        tests:
+          - not_null
+      - name: nome_gestor
+        description: "Razão social da gestora de recursos / Asset Management."
+        tests:
+          - not_null
+      - name: total_fundos_geridos
+        description: "Quantidade total de fundos sob gestão da gestora."
+      - name: patrimonio_liquido_total
+        description: "Somatório do patrimônio líquido sob gestão (AuM) em reais (R$)."
+      - name: captacao_liquida_recente_total
+        description: "Captação líquida consolidada recente de todos os fundos geridos (R$)."
+      - name: principais_classes
+        description: "Classes de fundos preponderantes geridas pela instituição."
+
+  - name: stg_cvm_administradores_fundos
+    description: "Visão de staging consolidando administradores fiduciários de fundos."
+    columns:
+      - name: cnpj_administrador
+        description: "CNPJ da administradora fiduciária com 14 dígitos normalizados."
+        tests:
+          - not_null
+      - name: nome_administrador
+        description: "Razão social da administradora fiduciária."
+        tests:
+          - not_null
+      - name: total_fundos_administrados
+        description: "Quantidade de fundos sob administração fiduciária."
+      - name: patrimonio_liquido_total
+        description: "Patrimônio líquido total sob administração fiduciária (R$)."

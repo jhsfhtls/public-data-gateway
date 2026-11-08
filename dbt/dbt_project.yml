@@ -19,6 +19,7 @@ model-paths:
   - "../src/public_data_gateway/connectors/empresarial/suframa_pim_zfm/dbt"
   - "../src/public_data_gateway/connectors/macrofinanceiro/cvm_dfp_itr/dbt"
   - "../src/public_data_gateway/connectors/comercio_exterior/mdic_comexstat/dbt"
+  - "../src/public_data_gateway/connectors/macrofinanceiro/cvm_fundos/dbt"
   - "models"
 
 analysis-paths: ["analyses"]

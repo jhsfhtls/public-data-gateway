@@ -1,0 +1,16 @@
+version: 2
+
+sources:
+  - name: cvm_fundos
+    description: "Fontes de dados normalizados de Fundos de Investimento (Cadastro Geral e Informes Diários) da CVM."
+    meta:
+      external_location: "data/cvm_fundos/silver/{name}.parquet"
+    tables:
+      - name: cvm_cadastro_fundos
+        description: "Cadastro Geral de Fundos de Investimento registrados na CVM com CNPJ, razão social, classe e participantes."
+      - name: cvm_informe_diario
+        description: "Série histórica diária de cotas, patrimônio líquido, captações, resgates e cotistas de fundos."
+      - name: cvm_gestores_fundos
+        description: "Dimensão consolidada de sociedades gestoras de recursos (Asset Management) e AuM sob gestão."
+      - name: cvm_administradores_fundos
+        description: "Dimensão consolidada de instituições administradoras fiduciárias de fundos de investimento."

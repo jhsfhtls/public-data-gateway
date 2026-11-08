@@ -1,6 +1,6 @@
 {
   "schema_version": "1.0.0",
-  "last_updated": "2026-11-08",
+  "last_updated": "2026-11-08T09:27:50.705623+00:00",
   "project_name": "public-data-gateway",
   "ecosystem": "C.O.R.E. (core, operations, career, studies)",
   "governing_pops": [
@@ -15,8 +15,8 @@
   "current_macro_phase_id": "05",
   "current_macro_phase": "Fase 05 - Ingestão Wave 3 (Mercado de Capitais & Finanças Públicas: cvm_dfp_itr, mdic_comexstat, cvm_fundos, bcb_ifdata, stn_tesouro, comprasgov_catmat)",
   "overall_status": "ON_TRACK",
-  "active_connector": "cvm_fundos",
-  "next_connector": "bcb_ifdata",
+  "active_connector": "bcb_ifdata",
+  "next_connector": "stn_tesouro_transparente",
   "structural_phases": [
     {
       "phase_id": "00",
@@ -360,6 +360,12 @@
       "phase_id": "05",
       "milestone": "Homologação do Conector mdic_comexstat (6 Tabelas, dbt, Marts de Balança Comercial & Live Fail-Hard)",
       "summary": "Implementação completa do conector mdic_comexstat (Ministério do Desenvolvimento, Indústria, Comércio e Serviços - Estatísticas de Comércio Exterior do Brasil, Decreto nº 660/1992 e Portaria SECEX nº 44/2020) consolidando a Wave 3: 6 tabelas (comex_ncm_exportacao, comex_ncm_importacao, comex_municipios_exportacao, comex_municipios_importacao, comex_ncm_tabela, comex_paises) materializadas em data/mdic_comexstat/{bronze,silver,gold}/; 13 novos modelos dbt (6 staging views, dim_ncm, dim_pais_comex, fct_exportacao_mensal, fct_importacao_mensal, fct_comercio_exterior_municipio, mart_balanca_comercial_municipios_brasil, mart_comercio_exterior_ncm_brasil) totalizando 138 modelos e 1391 testes dbt 100% aprovados; 1544 colunas 100% documentadas no linter; feature store features_comercio_exterior_brasil.parquet gerada com corrente de comércio, taxa de cobertura, saldo líquido, ranking exportador municipal e score contínuo de 0 a 100 de competitividade exportadora; testes reais de 1 linha com fail-hard contra os portais oficiais do MDIC Comex Stat e 11 testes pytest aprovados; multi-interface completa via SDK (PublicData.trade.municipality_trade, ncm_trade, trade_balance_profile), CLI (pdg trade municipality, ncm, balance e comex shortcut), REST API (/api/v1/trade/municipality, ncm, balance) e MCP (bdg_get_municipality_trade, bdg_get_ncm_trade_profile)."
+    },
+    {
+      "date": "2026-11-08",
+      "phase_id": "05",
+      "milestone": "Homologação do Conector cvm_fundos (4 Tabelas, dbt, Marts de Performance e Gestoras & Live Fail-Hard)",
+      "summary": "Implementação completa do conector cvm_fundos (Comissão de Valores Mobiliários - Cadastro Geral e Informes Diários de Fundos de Investimento ICVM 555 / Resolução CVM 175) consolidando o terceiro conector da Wave 3: 4 tabelas (cvm_cadastro_fundos, cvm_informe_diario, cvm_gestores_fundos, cvm_administradores_fundos) materializadas em data/cvm_fundos/{bronze,silver,gold}/; 10 novos modelos dbt (4 staging views, dim_fundo_investimento, dim_gestor_fundo, dim_administrador_fundo, fct_informe_diario_fundos, mart_performance_liquidez_fundos, mart_ranking_gestoras_assets) totalizando 148 modelos e 1443 testes dbt 100% aprovados; 1671 colunas 100% documentadas no linter; feature store features_fundos_investimento_brasil.parquet gerada com métricas de PL, cotistas, captação líquida 30d, volatilidade diária, classificação de liquidez e score contínuo de 0 a 100 de resiliência do fundo; testes reais com fail-hard contra os portais da CVM e 11 testes pytest aprovados; multi-interface completa via SDK (PublicData.funds.* e aliases), CLI (pdg funds e cvm-fundos), REST API (/api/v1/funds/*) e MCP (bdg_get_fund_profile, bdg_get_asset_manager_funds)."
     }
   ]
 }

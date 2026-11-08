@@ -248,6 +248,36 @@ def build_parser() -> argparse.ArgumentParser:
     comex_p.add_argument("termo", type=str, help="IBGE 7D municipality code or NCM 8D")
     comex_p.add_argument("--json", action="store_true", help="Output in JSON format")
 
+    # Subcommand: funds (CVM Fundos de Investimento)
+    funds_p = subparsers.add_parser(
+        "funds", help="Query investment funds registration, daily NAV and asset managers (CVM)."
+    )
+    funds_sub = funds_p.add_subparsers(dest="funds_action", required=True)
+
+    f_prof_p = funds_sub.add_parser("profile", help="Query investment fund registration profile.")
+    f_prof_p.add_argument("cnpj", type=str, help="Investment fund CNPJ (14 digits)")
+    f_prof_p.add_argument("--json", action="store_true", help="Output in JSON format")
+
+    f_daily_p = funds_sub.add_parser("daily", help="Query daily NAV operational reports.")
+    f_daily_p.add_argument("cnpj", type=str, help="Investment fund CNPJ")
+    f_daily_p.add_argument("--start", type=str, default=None, help="Start date (YYYY-MM-DD)")
+    f_daily_p.add_argument("--end", type=str, default=None, help="End date (YYYY-MM-DD)")
+    f_daily_p.add_argument("--json", action="store_true", help="Output in JSON format")
+
+    f_mgr_p = funds_sub.add_parser("managers", help="Query Asset Management firms ranked by AuM.")
+    f_mgr_p.add_argument("--query", type=str, default=None, help="Filter by manager name or CNPJ")
+    f_mgr_p.add_argument("--min-aum", type=float, default=0.0, help="Minimum AuM in BRL")
+    f_mgr_p.add_argument("--json", action="store_true", help="Output in JSON format")
+
+    f_feat_p = funds_sub.add_parser("features", help="Query Gold resilience and liquidity features.")
+    f_feat_p.add_argument("cnpj", type=str, help="Investment fund CNPJ")
+    f_feat_p.add_argument("--json", action="store_true", help="Output in JSON format")
+
+    # Direct shortcut: cvm-fundos
+    cvm_f_p = subparsers.add_parser("cvm-fundos", help="Shortcut to query investment fund profile or features.")
+    cvm_f_p.add_argument("cnpj", type=str, help="Investment fund CNPJ")
+    cvm_f_p.add_argument("--json", action="store_true", help="Output in JSON format")
+
     return parser
 
 
@@ -775,6 +805,79 @@ def main(argv: Sequence[str] | None = None) -> int:
                     print("Brazilian Foreign Trade Balance Profile:")
                     for k, v in res.items():
                         print(f"  {k}: {v}")
+                return 0
+
+        elif args.command in {"funds", "cvm-fundos"}:
+            from public_data_gateway.connectors.macrofinanceiro.cvm_fundos.connector import (
+                CvmFundosConnector,
+            )
+
+            fund_conn = CvmFundosConnector(settings=settings)
+
+            if args.command == "cvm-fundos":
+                res = fund_conn.get_fund_by_cnpj(args.cnpj)
+                if not res:
+                    print(f"Investment fund not found for CNPJ '{args.cnpj}'", file=sys.stderr)
+                    return 1
+                if args.json:
+                    print(json.dumps(res, indent=2, ensure_ascii=False))
+                else:
+                    print(f"CVM Investment Fund: {res.get('razao_social')} [{res.get('cnpj_14')}]")
+                    print(f"  Classe:        {res.get('classe_cvm')} ({res.get('classe_anbima')})")
+                    print(f"  Situação:      {res.get('situacao_registro')}")
+                    print(f"  Gestor:        {res.get('nome_gestor')}")
+                    print(f"  Administrador: {res.get('nome_administrador')}")
+                    print(f"  PL Referência: R$ {res.get('patrimonio_liquido', 0.0):,.2f}")
+                return 0
+
+            funds_action = getattr(args, "funds_action", None)
+            if funds_action == "profile":
+                res = fund_conn.get_fund_by_cnpj(args.cnpj)
+                if not res:
+                    print(f"Investment fund not found for CNPJ '{args.cnpj}'", file=sys.stderr)
+                    return 1
+                if args.json:
+                    print(json.dumps(res, indent=2, ensure_ascii=False))
+                else:
+                    print(f"CVM Investment Fund Profile: {res.get('razao_social')}")
+                    for k, v in res.items():
+                        print(f"  {k}: {v}")
+                return 0
+
+            if funds_action == "daily":
+                reports = fund_conn.get_daily_reports(args.cnpj, start_date=args.start, end_date=args.end)
+                if args.json:
+                    print(json.dumps(reports, indent=2, ensure_ascii=False))
+                else:
+                    print(f"Daily Reports for Fund {args.cnpj} ({len(reports)} records):")
+                    for rep in reports:
+                        print(f"  {rep.get('data_competencia')}: Cota={rep.get('valor_cota')} | PL=R$ {rep.get('patrimonio_liquido', 0.0):,.2f} | Captação Liq=R$ {rep.get('captacao_liquida_dia', 0.0):,.2f} | Cotistas={rep.get('numero_cotistas')}")
+                return 0
+
+            if funds_action == "managers":
+                managers = fund_conn.get_asset_managers(query=args.query, min_aum=args.min_aum)
+                if args.json:
+                    print(json.dumps(managers, indent=2, ensure_ascii=False))
+                else:
+                    print(f"Asset Managers Ranking ({len(managers)} firms):")
+                    for idx, m in enumerate(managers, 1):
+                        print(f"  {idx}. {m.get('nome_gestor')} | AuM: R$ {m.get('patrimonio_liquido_total', 0.0):,.2f} | Fundos: {m.get('total_fundos_geridos')}")
+                return 0
+
+            if funds_action == "features":
+                feat = fund_conn.get_fund_features(args.cnpj)
+                if not feat:
+                    print(f"Feature profile not found for fund CNPJ '{args.cnpj}'", file=sys.stderr)
+                    return 1
+                if args.json:
+                    print(json.dumps(feat, indent=2, ensure_ascii=False))
+                else:
+                    print(f"Gold Features for {feat.get('razao_social')} [{feat.get('cnpj_14')}]:")
+                    print(f"  Score Resiliência: {feat.get('score_resiliencia_fundo')}/100.0")
+                    print(f"  Perfil Liquidez:   {feat.get('classificacao_liquidez')}")
+                    print(f"  Rentabilidade 30d: {feat.get('rentabilidade_30d_pct')}%")
+                    print(f"  Volatilidade:      {feat.get('volatilidade_diaria')}%")
+                    print(f"  Captação Liq 30d:  R$ {feat.get('captacao_liquida_30d', 0.0):,.2f}")
                 return 0
 
     except Exception as exc:
