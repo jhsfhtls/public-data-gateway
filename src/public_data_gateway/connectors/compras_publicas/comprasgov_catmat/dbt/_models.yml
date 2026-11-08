@@ -1,0 +1,296 @@
+version: 2
+
+models:
+  - name: stg_catmat_itens_material
+    description: "Visão staging de itens de material cadastrados no catálogo CATMAT/SIASG."
+    columns:
+      - name: codigo_item
+        description: "Código unificado do item no catálogo de materiais CATMAT."
+        tests:
+          - not_null
+          - unique
+      - name: codigo_pdm
+        description: "Código numérico do Padrão Descritivo de Material (PDM)."
+        tests:
+          - not_null
+      - name: nome_pdm
+        description: "Denominação padronizada do Padrão Descritivo de Material."
+        tests:
+          - not_null
+      - name: codigo_classe
+        description: "Código da classe de fornecimento do material."
+        tests:
+          - not_null
+      - name: nome_classe
+        description: "Nome descritivo da classe de material."
+        tests:
+          - not_null
+      - name: codigo_grupo
+        description: "Código do grupo superior de materiais."
+        tests:
+          - not_null
+      - name: nome_grupo
+        description: "Nome do grupo de material."
+        tests:
+          - not_null
+      - name: descricao_item
+        description: "Especificação técnica e descrição detalhada do item de material."
+        tests:
+          - not_null
+      - name: status_item
+        description: "Flag indicativa se o item está ativo no catálogo oficial."
+        tests:
+          - not_null
+      - name: item_sustentavel
+        description: "Flag de atendimento a critérios socioambientais de sustentabilidade."
+        tests:
+          - not_null
+      - name: codigo_ncm
+        description: "Código da Nomenclatura Comum do Mercosul associada ao material."
+      - name: descricao_ncm
+        description: "Descrição oficial da NCM vinculada."
+      - name: data_hora_atualizacao
+        description: "Data e hora da última modificação cadastral no SIASG."
+      - name: reference_date
+        description: "Data canônica de referência da ingestão."
+        tests:
+          - not_null
+      - name: extracted_at
+        description: "Timestamp ISO UTC do momento da ingestão."
+        tests:
+          - not_null
+
+  - name: stg_catser_itens_servico
+    description: "Visão staging de itens de serviço cadastrados no catálogo CATSER/SIASG."
+    columns:
+      - name: codigo_servico
+        description: "Código unificado identificador do serviço no CATSER."
+        tests:
+          - not_null
+          - unique
+      - name: nome_servico
+        description: "Denominação e escopo do serviço padronizado."
+        tests:
+          - not_null
+      - name: codigo_classe
+        description: "Código numérico da classe de serviço."
+        tests:
+          - not_null
+      - name: nome_classe
+        description: "Nome da classe de serviço."
+        tests:
+          - not_null
+      - name: codigo_grupo
+        description: "Código do grupo de serviço."
+        tests:
+          - not_null
+      - name: nome_grupo
+        description: "Nome do grupo de serviço."
+        tests:
+          - not_null
+      - name: codigo_divisao
+        description: "Código da divisão econômica do serviço."
+        tests:
+          - not_null
+      - name: nome_divisao
+        description: "Nome da divisão econômica do serviço."
+        tests:
+          - not_null
+      - name: codigo_secao
+        description: "Código da seção econômica superior do serviço."
+        tests:
+          - not_null
+      - name: nome_secao
+        description: "Nome da seção do serviço."
+        tests:
+          - not_null
+      - name: codigo_cpc
+        description: "Código da Classificação Central de Produtos (CPC/ONU)."
+        tests:
+          - not_null
+      - name: status_servico
+        description: "Flag booleana indicando se o serviço está ativo no catálogo."
+        tests:
+          - not_null
+      - name: exclusivo_central_compras
+        description: "Indicador se a contratação é de uso exclusivo da Central de Compras do MGI."
+        tests:
+          - not_null
+      - name: data_hora_atualizacao
+        description: "Timestamp ISO da última atualização cadastral do serviço."
+      - name: reference_date
+        description: "Data de referência da extração dos serviços."
+        tests:
+          - not_null
+      - name: extracted_at
+        description: "Timestamp ISO UTC da ingestão da tabela."
+        tests:
+          - not_null
+
+  - name: stg_catmat_grupos_classes
+    description: "Visão staging da hierarquia de grupos e classes de materiais e serviços."
+    columns:
+      - name: codigo_grupo
+        description: "Código numérico do grupo hierárquico."
+        tests:
+          - not_null
+      - name: nome_grupo
+        description: "Nome descritivo do grupo."
+        tests:
+          - not_null
+      - name: status_grupo
+        description: "Indicador se o grupo hierárquico está ativo."
+        tests:
+          - not_null
+      - name: codigo_classe
+        description: "Código numérico da classe de fornecimento."
+        tests:
+          - not_null
+      - name: nome_classe
+        description: "Nome descritivo da classe."
+        tests:
+          - not_null
+      - name: status_classe
+        description: "Indicador se a classe está ativa."
+        tests:
+          - not_null
+      - name: tipo_catalogo
+        description: "Tipo de catálogo associado (MATERIAL ou SERVICO)."
+        tests:
+          - not_null
+      - name: reference_date
+        description: "Data de referência da hierarquia de grupos e classes."
+        tests:
+          - not_null
+      - name: extracted_at
+        description: "Timestamp ISO UTC do momento da captura da hierarquia."
+        tests:
+          - not_null
+
+  - name: stg_catmat_precos_praticados
+    description: "Visão staging de preços unitários e contratações reais praticadas na Administração Pública."
+    columns:
+      - name: id_compra_item
+        description: "Identificador único do item contratado no certame."
+        tests:
+          - not_null
+          - unique
+      - name: id_compra
+        description: "Identificador da compra ou licitação pública de origem."
+        tests:
+          - not_null
+      - name: data_compra
+        description: "Data de homologação ou adjudicação da compra pública."
+        tests:
+          - not_null
+      - name: codigo_item_catalogo
+        description: "Código do item de material no padrão CATMAT contratado."
+        tests:
+          - not_null
+      - name: codigo_pdm
+        description: "Código do Padrão Descritivo de Material (PDM)."
+        tests:
+          - not_null
+      - name: nome_pdm
+        description: "Nome do Padrão Descritivo de Material contratado."
+        tests:
+          - not_null
+      - name: descricao_item
+        description: "Descrição detalhada do item fornecido no certame."
+        tests:
+          - not_null
+      - name: quantidade
+        description: "Quantidade física adjudicada e fornecida."
+        tests:
+          - not_null
+      - name: preco_unitario
+        description: "Preço unitário homologado em Reais (R$)."
+        tests:
+          - not_null
+      - name: valor_total
+        description: "Valor financeiro total do item adjudicado em Reais (R$)."
+        tests:
+          - not_null
+      - name: sigla_unidade_fornecimento
+        description: "Sigla da unidade física de fornecimento (ex: UN, RESMA, CX)."
+        tests:
+          - not_null
+      - name: cnpj_fornecedor
+        description: "CNPJ de 14 dígitos do fornecedor vencedor da licitação."
+        tests:
+          - not_null
+      - name: nome_fornecedor
+        description: "Razão social da empresa fornecedora contratada."
+        tests:
+          - not_null
+      - name: marca
+        description: "Marca comercial do produto cotado e aceito."
+      - name: codigo_uasg
+        description: "Código da Unidade Administrativa de Serviços Gerais (UASG) compradora."
+        tests:
+          - not_null
+      - name: nome_uasg
+        description: "Nome da unidade compradora ou órgão público adquirente."
+        tests:
+          - not_null
+      - name: codigo_municipio_ibge
+        description: "Código IBGE de 7 dígitos do município da unidade compradora."
+        tests:
+          - not_null
+      - name: municipio
+        description: "Nome do município onde a compra foi homologada."
+        tests:
+          - not_null
+      - name: sigla_uf
+        description: "Sigla de 2 letras da Unidade Federativa da compra."
+        tests:
+          - not_null
+      - name: reference_date
+        description: "Data de referência da extração dos preços praticados."
+        tests:
+          - not_null
+      - name: extracted_at
+        description: "Timestamp ISO UTC do processamento da tabela de preços."
+        tests:
+          - not_null
+
+  - name: stg_catmat_fornecedores_compras
+    description: "Visão staging de indicadores consolidados de fornecedores em compras públicas."
+    columns:
+      - name: cnpj_fornecedor
+        description: "CNPJ de 14 dígitos do fornecedor de compras públicas."
+        tests:
+          - not_null
+          - unique
+      - name: nome_fornecedor
+        description: "Razão social da empresa participante."
+        tests:
+          - not_null
+      - name: total_itens_fornecidos
+        description: "Quantidade total de itens adjudicados pelo fornecedor."
+        tests:
+          - not_null
+      - name: valor_total_fornecido
+        description: "Valor financeiro total homologado para o fornecedor em Reais (R$)."
+        tests:
+          - not_null
+      - name: ticket_medio_unitario
+        description: "Preço médio unitário ponderado dos itens fornecidos em R$."
+        tests:
+          - not_null
+      - name: total_uasgs_atendidas
+        description: "Número total de unidades compradoras (UASGs) distintas atendidas."
+        tests:
+          - not_null
+      - name: sigla_uf_principal
+        description: "Unidade Federativa de principal atuação nas vendas públicas."
+        tests:
+          - not_null
+      - name: reference_date
+        description: "Data de referência da consolidação de fornecedores."
+        tests:
+          - not_null
+      - name: extracted_at
+        description: "Timestamp ISO UTC da ingestão dos fornecedores."
+        tests:
+          - not_null

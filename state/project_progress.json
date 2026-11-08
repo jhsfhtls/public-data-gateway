@@ -1,6 +1,6 @@
 {
   "schema_version": "1.0.0",
-  "last_updated": "2026-11-08T10:25:00.000000+00:00",
+  "last_updated": "2026-11-08T10:55:00.000000+00:00",
   "project_name": "public-data-gateway",
   "ecosystem": "C.O.R.E. (core, operations, career, studies)",
   "governing_pops": [
@@ -13,10 +13,10 @@
     "POP_T_148"
   ],
   "current_macro_phase_id": "05",
-  "current_macro_phase": "Fase 05 - Ingestão Wave 3 (Mercado de Capitais & Finanças Públicas: cvm_dfp_itr, mdic_comexstat, cvm_fundos, bcb_ifdata, stn_tesouro, comprasgov_catmat)",
+  "current_macro_phase": "Fase 05 - Ingestão Wave 3 Concluída (Mercado de Capitais & Finanças Públicas: cvm_dfp_itr, mdic_comexstat, cvm_fundos, bcb_ifdata, stn_tesouro, comprasgov_catmat) -> Avançando para Wave 4",
   "overall_status": "ON_TRACK",
-  "active_connector": "comprasgov_catmat",
-  "next_connector": "ibge_sidra",
+  "active_connector": "ibge_sidra",
+  "next_connector": "inep_censo_escolar",
   "structural_phases": [
     {
       "phase_id": "00",
@@ -378,6 +378,12 @@
       "phase_id": "05",
       "milestone": "Homologação do Conector stn_tesouro_transparente (5 Tabelas, dbt, Marts de Saúde Fiscal e Crédito SADIPEM & Live Fail-Hard)",
       "summary": "Implementação completa do conector stn_tesouro_transparente (Secretaria do Tesouro Nacional / Ministério da Fazenda — SADIPEM PVL, Capacidade de Pagamento CAPAG, Dívida Consolidada Líquida e Transferências Constitucionais FPM/FPE, Lei Complementar nº 101/2000 - LRF, Portaria STN nº 447/2018 e Art. 159 da CF/88) consolidando o quinto conector da Wave 3: 5 tabelas (stn_sadipem_pvl, stn_transferencias_fpm, stn_transferencias_fpe, stn_capag_municipios, stn_divida_consolidada) materializadas em data/stn_tesouro_transparente/{bronze,silver,gold}/; 11 novos modelos dbt (5 staging views, dim_ente_federativo_stn, fct_operacao_credito_pvl, fct_transferencia_constitucional_fpm, fct_capacidade_pagamento_capag, mart_saude_fiscal_municipios_brasil, mart_operacoes_credito_sadipem) totalizando 170 modelos e 1658 testes dbt 100% aprovados; 1943 colunas 100% documentadas no linter (100% coverage); feature store features_fiscal_municipios_brasil.parquet gerada com indicadores fiscais LRF (Dívida Consolidada / RCL, Despesa de Pessoal / RCL, Poupança Corrente, Rating CAPAG A/B/C/D) e score contínuo de 0 a 100 de saúde fiscal municipal; testes reais com fail-hard contra a API SADIPEM do Tesouro Nacional e CKAN do Tesouro Transparente com 11 testes pytest aprovados (150 testes offline totais no repositório); multi-interface completa via SDK (PublicData.treasury.* e aliases), CLI (pdg treasury e sadipem), REST API (/api/v1/treasury/* e /api/v1/sadipem/*) e MCP (bdg_get_municipality_fiscal_health, bdg_get_sadipem_credit_operations) com contenção de prompt injection."
+    },
+    {
+      "date": "2026-11-08",
+      "phase_id": "05",
+      "milestone": "Conclusão da Wave 3 & Homologação do Conector comprasgov_catmat (5 Tabelas, dbt, Marts de Benchmark de Preços e Fornecedores & Live Fail-Hard)",
+      "summary": "Implementação e homologação completa do conector comprasgov_catmat (Compras.gov.br Catálogo Unificado de Materiais e Serviços CATMAT/CATSER e Pesquisa de Preços Praticados, Lei nº 14.133/2021, Decreto nº 11.462/2023, IN SEGES nº 65/2021 e Portaria SEGES nº 938/2022) finalizando com 100% de sucesso a Wave 3 da plataforma: 5 tabelas (catmat_itens_material, catser_itens_servico, catmat_grupos_classes, catmat_precos_praticados, catmat_fornecedores_compras) materializadas em data/comprasgov_catmat/{bronze,silver,gold}/; 11 novos modelos dbt (5 staging views, dim_item_material_catmat, dim_item_servico_catser, fct_preco_praticado_comprasgov, fct_fornecedor_compras_catalogo, mart_benchmark_precos_catmat, mart_fornecedores_destaque_comprasgov) totalizando 181 modelos dbt (86 tabelas, 95 views) e 1809 testes dbt 100% aprovados com 0 erros; 2094 colunas 100% documentadas no linter (100% documentation coverage); feature store features_compras_catalogo_brasil.parquet gerada com métricas de benchmark de preços, dispersão de cotações, índice de competitividade de fornecedores e rating de risco de sobrepreço; testes reais de 1 linha com fail-hard contra a API oficial do Compras.gov.br (dadosabertos.compras.gov.br) com 11 testes pytest aprovados (147 testes offline totais no repositório); multi-interface completa via SDK (PublicData.procurement.*, search_catmat, search_catser, get_procurement_benchmark, get_procurement_supplier), CLI (pdg procurement materials, services, benchmark, supplier e atalho direto pdg catmat), REST API (/api/v1/procurement/* e atalho /api/v1/catmat/*) e MCP (bdg_search_catmat_materials, bdg_get_procurement_price_benchmark) com proteção contra prompt injection."
     }
   ]
 }

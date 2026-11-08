@@ -374,6 +374,29 @@ class MCPDispatcher:
                                     "required": ["termo"],
                                 },
                             },
+                            {
+                                "name": "bdg_search_catmat_materials",
+                                "description": "Search materials and catalog descriptions in Compras.gov.br CATMAT/SIASG with PDM, class, and sustainability flags (Tier 1).",
+                                "inputSchema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "query": {"type": "string", "description": "Search keyword for materials (e.g. CADEIRA, NOTEBOOK)"},
+                                        "limit": {"type": "integer", "description": "Maximum number of items to return (default: 10)"},
+                                    },
+                                    "required": ["query"],
+                                },
+                            },
+                            {
+                                "name": "bdg_get_procurement_price_benchmark",
+                                "description": "Query official price benchmark, market dispersion, and overpricing risk rating from Compras.gov.br procurement price records (Tier 1).",
+                                "inputSchema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "termo": {"type": "string", "description": "PDM code (e.g. 00313), item code (e.g. 206504), or description"},
+                                    },
+                                    "required": ["termo"],
+                                },
+                            },
                         ]
                     },
                 }
@@ -823,6 +846,51 @@ class MCPDispatcher:
             st = args.get("status")
             pvls = treas_conn.get_credit_operations_pvl(termo, status=st)
             wrapped = wrap_untrusted_gov_data(pvls, source_id="stn_tesouro_transparente")
+            return {
+                "jsonrpc": "2.0",
+                "id": req_id,
+                "result": {"content": [{"type": "text", "text": wrapped}], "isError": False},
+            }
+
+        if tool_name in {"bdg_search_catmat_materials", "pdg_search_catmat_materials"}:
+            from public_data_gateway.connectors.compras_publicas.comprasgov_catmat.connector import (
+                ComprasGovCatmatConnector,
+            )
+
+            cat_conn = ComprasGovCatmatConnector(settings=self.settings)
+            query = args.get("query", "")
+            limit = args.get("limit", 10)
+            items = cat_conn.search_materials(query=query, limit=limit)
+            wrapped = wrap_untrusted_gov_data(items, source_id="comprasgov_catmat")
+            return {
+                "jsonrpc": "2.0",
+                "id": req_id,
+                "result": {"content": [{"type": "text", "text": wrapped}], "isError": False},
+            }
+
+        if tool_name in {"bdg_get_procurement_price_benchmark", "pdg_get_procurement_price_benchmark"}:
+            from public_data_gateway.connectors.compras_publicas.comprasgov_catmat.connector import (
+                ComprasGovCatmatConnector,
+            )
+
+            cat_conn = ComprasGovCatmatConnector(settings=self.settings)
+            termo = args.get("termo", "")
+            bench = cat_conn.get_price_benchmark(termo)
+            if not bench:
+                return {
+                    "jsonrpc": "2.0",
+                    "id": req_id,
+                    "result": {
+                        "content": [
+                            {
+                                "type": "text",
+                                "text": f"Price benchmark not found for '{termo}'",
+                            }
+                        ],
+                        "isError": True,
+                    },
+                }
+            wrapped = wrap_untrusted_gov_data(bench, source_id="comprasgov_catmat")
             return {
                 "jsonrpc": "2.0",
                 "id": req_id,

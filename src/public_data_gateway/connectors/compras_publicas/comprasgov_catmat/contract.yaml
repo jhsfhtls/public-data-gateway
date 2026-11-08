@@ -1,0 +1,134 @@
+schema_version: "3.1.0"
+contract_id: "ODCS-BR-MGI-CATMAT-001"
+source_id: "comprasgov_catmat"
+version: "1.0.0"
+name: "Compras.gov.br Catálogo Unificado de Materiais e Serviços (CATMAT/CATSER) e Pesquisa de Preços Praticados"
+agency: "Ministério da Gestão e Inovação em Serviços Públicos (MGI) / Secretaria de Gestão e Inovação (SEGES)"
+official_url: "https://dadosabertos.compras.gov.br"
+
+legal_framework:
+  statutes:
+    - name: "Lei nº 14.133/2021"
+      description: "Nova Lei de Licitações e Contratos Administrativos que institui a obrigatoriedade da padronização dos catálogos de compras públicas"
+    - name: "Decreto nº 11.462/2023"
+      description: "Regulamenta os procedimentos para o Sistema de Registro de Preços no âmbito da administração pública federal direta, autárquica e fundacional"
+    - name: "Instrução Normativa SEGES/ME nº 65/2021"
+      description: "Dispõe sobre o procedimento administrativo para a realização de pesquisa de preços para a aquisição de bens e contratação de serviços"
+    - name: "Portaria SEGES nº 938/2022"
+      description: "Estabelece diretrizes de governança do Catálogo Eletrônico de Padronização de Materiais e Serviços do Poder Executivo Federal"
+
+data_governance:
+  grain: "item_material_ou_servico"
+  primary_keys:
+    - "codigo_item"
+  reference_date_column: "reference_date"
+  min_expected_rows: 10
+  max_volume_drop_pct: 20.0
+  freshness_sla_hours: 168
+  lgpd_tier: "PUBLIC_NON_PERSONAL"
+  ml_feature_domains:
+    - "item_catalog"
+    - "procurement_pricing"
+    - "supplier_competitiveness"
+
+columns:
+  - name: "codigo_item"
+    data_type: "string"
+    required: true
+    nullable: false
+    max_null_pct: 0.0
+    description: "Código unificado identificador do material no padrão CATMAT/SIASG"
+  - name: "codigo_pdm"
+    data_type: "string"
+    required: true
+    nullable: false
+    max_null_pct: 0.0
+    description: "Código do Padrão Descritivo de Material (PDM)"
+  - name: "nome_pdm"
+    data_type: "string"
+    required: true
+    nullable: false
+    max_null_pct: 0.0
+    description: "Nome descritivo padronizado do PDM"
+  - name: "codigo_classe"
+    data_type: "string"
+    required: true
+    nullable: false
+    max_null_pct: 0.0
+    description: "Código numérico da classe de material"
+  - name: "nome_classe"
+    data_type: "string"
+    required: true
+    nullable: false
+    max_null_pct: 0.0
+    description: "Denominação da classe de material"
+  - name: "codigo_grupo"
+    data_type: "string"
+    required: true
+    nullable: false
+    max_null_pct: 0.0
+    description: "Código do grupo superior de fornecimento"
+  - name: "nome_grupo"
+    data_type: "string"
+    required: true
+    nullable: false
+    max_null_pct: 0.0
+    description: "Nome do grupo de material"
+  - name: "descricao_item"
+    data_type: "string"
+    required: true
+    nullable: false
+    max_null_pct: 0.0
+    description: "Descrição técnica completa e especificações do item do material"
+  - name: "status_item"
+    data_type: "boolean"
+    required: true
+    nullable: false
+    max_null_pct: 0.0
+    description: "Indicador booleano se o item de material está ativo no catálogo SIASG"
+  - name: "item_sustentavel"
+    data_type: "boolean"
+    required: true
+    nullable: false
+    max_null_pct: 0.0
+    description: "Indicador se o material atende a critérios oficiais de sustentabilidade socioambiental"
+  - name: "codigo_ncm"
+    data_type: "string"
+    required: false
+    nullable: true
+    max_null_pct: 1.0
+    description: "Código Nomenclatura Comum do Mercosul (NCM) associado quando aplicável"
+  - name: "descricao_ncm"
+    data_type: "string"
+    required: false
+    nullable: true
+    max_null_pct: 1.0
+    description: "Descrição oficial da NCM correlacionada"
+  - name: "data_hora_atualizacao"
+    data_type: "string"
+    required: false
+    nullable: true
+    max_null_pct: 0.2
+    description: "Timestamp ISO da última atualização cadastral no catálogo do SIASG"
+  - name: "reference_date"
+    data_type: "string"
+    required: true
+    nullable: false
+    max_null_pct: 0.0
+    description: "Data canônica de referência da extração"
+  - name: "extracted_at"
+    data_type: "string"
+    required: true
+    nullable: false
+    max_null_pct: 0.0
+    description: "Timestamp ISO UTC do momento da ingestão pela plataforma"
+
+quality_rules:
+  - rule_type: "non_null"
+    column: "codigo_item"
+  - rule_type: "non_null"
+    column: "nome_pdm"
+  - rule_type: "non_null"
+    column: "descricao_item"
+  - rule_type: "non_null"
+    column: "reference_date"

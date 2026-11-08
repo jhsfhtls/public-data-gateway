@@ -335,6 +335,36 @@ def build_parser() -> argparse.ArgumentParser:
     sadipem_p.add_argument("termo", type=str, help="IBGE 7-digit code, UF acronym or municipality name")
     sadipem_p.add_argument("--json", action="store_true", help="Output in JSON format")
 
+    # Subcommand: procurement (Compras.gov.br CATMAT/CATSER & Preços)
+    proc_p = subparsers.add_parser(
+        "procurement", help="Query Compras.gov.br CATMAT/CATSER catalogs and procurement price benchmarks."
+    )
+    proc_sub = proc_p.add_subparsers(dest="procurement_action", required=True)
+
+    pr_mat_p = proc_sub.add_parser("materials", help="Search CATMAT materials by description or PDM.")
+    pr_mat_p.add_argument("termo", type=str, help="Search query (e.g. CADEIRA, NOTEBOOK)")
+    pr_mat_p.add_argument("--limit", type=int, default=10, help="Maximum number of items")
+    pr_mat_p.add_argument("--json", action="store_true", help="Output in JSON format")
+
+    pr_serv_p = proc_sub.add_parser("services", help="Search CATSER services by description or name.")
+    pr_serv_p.add_argument("termo", type=str, help="Search query (e.g. SOFTWARE, VIGILANCIA)")
+    pr_serv_p.add_argument("--limit", type=int, default=10, help="Maximum number of items")
+    pr_serv_p.add_argument("--json", action="store_true", help="Output in JSON format")
+
+    pr_bench_p = proc_sub.add_parser("benchmark", help="Query price benchmark, dispersion, and risk rating for a PDM/Item.")
+    pr_bench_p.add_argument("termo", type=str, help="PDM code (e.g. 00313), item code (e.g. 206504) or name")
+    pr_bench_p.add_argument("--json", action="store_true", help="Output in JSON format")
+
+    pr_sup_p = proc_sub.add_parser("supplier", help="Query supplier sales volume and government procurement history.")
+    pr_sup_p.add_argument("cnpj", type=str, help="Supplier 14-digit CNPJ")
+    pr_sup_p.add_argument("--json", action="store_true", help="Output in JSON format")
+
+    # Direct shortcut: catmat
+    catmat_p = subparsers.add_parser("catmat", help="Shortcut to search CATMAT materials or get price benchmarks.")
+    catmat_p.add_argument("termo", type=str, help="Material keyword or PDM code")
+    catmat_p.add_argument("--limit", type=int, default=10, help="Maximum number of items")
+    catmat_p.add_argument("--json", action="store_true", help="Output in JSON format")
+
     return parser
 
 
@@ -1119,6 +1149,88 @@ def main(argv: Sequence[str] | None = None) -> int:
                     print(f"  Ind 1 (Endividamento):   {cap.get('indicador_1_endividamento_pct')}% (Nota {cap.get('nota_indicador_1')})")
                     print(f"  Ind 2 (Poupança Corr):   {cap.get('indicador_2_poupanca_corrente_pct')}% (Nota {cap.get('nota_indicador_2')})")
                     print(f"  Ind 3 (Liquidez Rel):    {cap.get('indicador_3_liquidez_relativa_pct')}% (Nota {cap.get('nota_indicador_3')})")
+                return 0
+
+        elif args.command in {"procurement", "catmat"}:
+            from public_data_gateway.connectors.compras_publicas.comprasgov_catmat import (
+                ComprasGovCatmatConnector,
+            )
+
+            cat_conn = ComprasGovCatmatConnector(settings=settings)
+
+            if args.command == "catmat":
+                results = cat_conn.search_materials(args.termo, limit=args.limit)
+                if not results:
+                    bench = cat_conn.get_price_benchmark(args.termo)
+                    if bench:
+                        results = [bench]
+
+                if args.json:
+                    print(json.dumps(results, indent=2, ensure_ascii=False))
+                else:
+                    print(f"Compras.gov.br CATMAT results for '{args.termo}' ({len(results)} found):")
+                    for idx, r in enumerate(results, 1):
+                        if "codigo_item" in r:
+                            print(f"  {idx}. Item {r.get('codigo_item')} | PDM: {r.get('nome_pdm')} | {r.get('descricao_item')[:60]}")
+                        else:
+                            print(f"  {idx}. PDM/Item: {r.get('codigo_item_ou_pdm')} | R$ {r.get('preco_medio_praticado', 0.0):,.2f} | Risco: {r.get('rating_risco_sobrepreco')}")
+                return 0
+
+            proc_action = getattr(args, "procurement_action", None)
+
+            if proc_action == "materials":
+                mats = cat_conn.search_materials(args.termo, limit=args.limit)
+                if args.json:
+                    print(json.dumps(mats, indent=2, ensure_ascii=False))
+                else:
+                    print(f"CATMAT Materials for '{args.termo}' ({len(mats)} records):")
+                    for idx, m in enumerate(mats, 1):
+                        sust = " [SUSTENTÁVEL]" if m.get("item_sustentavel") else ""
+                        print(f"  {idx}. Item {m.get('codigo_item')} | PDM: {m.get('nome_pdm')} | {m.get('descricao_item')[:70]}{sust}")
+                return 0
+
+            if proc_action == "services":
+                servs = cat_conn.search_services(args.termo, limit=args.limit)
+                if args.json:
+                    print(json.dumps(servs, indent=2, ensure_ascii=False))
+                else:
+                    print(f"CATSER Services for '{args.termo}' ({len(servs)} records):")
+                    for idx, s in enumerate(servs, 1):
+                        print(f"  {idx}. Serv {s.get('codigo_servico')} | {s.get('nome_servico')[:80]}")
+                return 0
+
+            if proc_action == "benchmark":
+                bench = cat_conn.get_price_benchmark(args.termo)
+                if not bench:
+                    print(f"Price benchmark not found for '{args.termo}'", file=sys.stderr)
+                    return 1
+                if args.json:
+                    print(json.dumps(bench, indent=2, ensure_ascii=False))
+                else:
+                    print(f"Compras.gov.br Price Benchmark: {bench.get('descricao_padronizada')} ({bench.get('codigo_item_ou_pdm')}):")
+                    print(f"  Preço Médio:             R$ {bench.get('preco_medio_praticado', 0.0):,.2f}")
+                    print(f"  Faixa de Preço:          R$ {bench.get('preco_minimo', 0.0):,.2f} - R$ {bench.get('preco_maximo', 0.0):,.2f}")
+                    print(f"  Coef. Variação (CV):     {bench.get('coeficiente_variacao_preco_pct')}%")
+                    print(f"  Risco de Sobrepreço:     {bench.get('rating_risco_sobrepreco')}")
+                    print(f"  Volume Financeiro Total: R$ {bench.get('volume_financeiro_total', 0.0):,.2f}")
+                    print(f"  Total Contratações:      {bench.get('total_contratacoes')}")
+                    print(f"  Fornecedores Distintos:  {bench.get('total_fornecedores_distintos')}")
+                return 0
+
+            if proc_action == "supplier":
+                sup = cat_conn.get_supplier_procurement_history(args.cnpj)
+                if not sup:
+                    print(f"Supplier not found for CNPJ '{args.cnpj}'", file=sys.stderr)
+                    return 1
+                if args.json:
+                    print(json.dumps(sup, indent=2, ensure_ascii=False))
+                else:
+                    print(f"Government Procurement Supplier: {sup.get('nome_fornecedor')} ({sup.get('cnpj_fornecedor')}):")
+                    print(f"  Total Itens Fornecidos:  {sup.get('total_itens_fornecidos')}")
+                    print(f"  Valor Total Fornecido:   R$ {sup.get('valor_total_fornecido', 0.0):,.2f}")
+                    print(f"  Ticket Médio Unitário:   R$ {sup.get('ticket_medio_unitario', 0.0):,.2f}")
+                    print(f"  UASGs Atendidas:         {sup.get('total_uasgs_atendidas')}")
+                    print(f"  UF Principal:            {sup.get('sigla_uf_principal')}")
                 return 0
 
     except Exception as exc:
