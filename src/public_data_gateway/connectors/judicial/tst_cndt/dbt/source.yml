@@ -1,0 +1,16 @@
+version: 2
+
+sources:
+  - name: tst_cndt
+    description: "Bases oficiais da Certidão Negativa de Débitos Trabalhistas (CNDT) e Banco Nacional de Devedores Trabalhistas (BNDT) do TST."
+    meta:
+      external_location: "data/tst_cndt/silver/{name}.parquet"
+    tables:
+      - name: tst_cndt_certidoes
+        description: "Certidões trabalhistas emitidas pelo TST (Negativa, Positiva com Efeito de Negativa, Positiva)."
+      - name: tst_cndt_debitos_bndt
+        description: "Registros e execuções ativas no Banco Nacional de Devedores Trabalhistas (BNDT)."
+      - name: tst_cndt_tribunais_regionais
+        description: "Catálogo dos Tribunais Regionais do Trabalho (TRTs 1 a 24) e Tribunal Superior do Trabalho (TST)."
+      - name: tst_cndt_status_dominio
+        description: "Tabela de domínio de situações da CNDT e autorização legal para licitações e contratos públicos."

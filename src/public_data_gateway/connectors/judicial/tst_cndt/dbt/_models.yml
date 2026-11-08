@@ -1,0 +1,163 @@
+version: 2
+
+models:
+  - name: stg_tst_cndt_certidoes
+    description: "Visão de staging para as certidões trabalhistas emitidas pelo TST (CNDT)."
+    columns:
+      - name: numero_certidao
+        description: "Número oficial da certidão no padrão número/ano."
+        tests:
+          - not_null
+          - unique
+      - name: ano_certidao
+        description: "Ano civil de expedição da certidão."
+        tests:
+          - not_null
+      - name: cnpj_ou_cpf
+        description: "Documento da entidade ou pessoa consultada."
+        tests:
+          - not_null
+      - name: cnpj_raiz
+        description: "Raiz do CNPJ com os 8 primeiros dígitos."
+      - name: razao_social_ou_nome
+        description: "Nome empresarial ou civil cadastrado."
+        tests:
+          - not_null
+      - name: tipo_documento
+        description: "Tipo do documento (CNPJ ou CPF)."
+        tests:
+          - not_null
+          - accepted_values:
+              values: ['CNPJ', 'CPF']
+      - name: status_certidao
+        description: "Situação da certidão: NEGATIVA, POSITIVA_COM_EFEITO_DE_NEGATIVA ou POSITIVA."
+        tests:
+          - not_null
+          - accepted_values:
+              values: ['NEGATIVA', 'POSITIVA_COM_EFEITO_DE_NEGATIVA', 'POSITIVA']
+      - name: is_regular
+        description: "Booleano indicando regularidade para fins licitatórios."
+        tests:
+          - not_null
+      - name: data_expedicao
+        description: "Data de emissão oficial da certidão."
+        tests:
+          - not_null
+      - name: hora_expedicao
+        description: "Horário oficial de Brasília da emissão."
+        tests:
+          - not_null
+      - name: data_validade
+        description: "Data de vencimento da certidão (180 dias de vigência)."
+        tests:
+          - not_null
+      - name: codigo_autenticidade
+        description: "Código criptográfico de autenticidade no TST."
+        tests:
+          - not_null
+          - unique
+      - name: orgao_emissor
+        description: "Órgão emissor judiciário (Tribunal Superior do Trabalho)."
+        tests:
+          - not_null
+      - name: ingestion_timestamp
+        description: "Carimbo de data/hora da ingestão no repositório."
+        tests:
+          - not_null
+
+  - name: stg_tst_cndt_debitos_bndt
+    description: "Visão de staging para os registros de inadimplência inscritos no Banco Nacional de Devedores Trabalhistas (BNDT)."
+    columns:
+      - name: id_debito_bndt
+        description: "Identificador único do registro no BNDT."
+        tests:
+          - not_null
+          - unique
+      - name: numero_certidao
+        description: "Número da certidão correlacionada onde o débito foi apontado."
+        tests:
+          - not_null
+      - name: cnpj_ou_cpf
+        description: "Documento do devedor trabalhista."
+        tests:
+          - not_null
+      - name: numero_processo_nup
+        description: "Número Único de Processo (NUP) do processo em fase de execução trabalhista."
+        tests:
+          - not_null
+      - name: tribunal_origem
+        description: "Sigla do TRT de origem da execução."
+        tests:
+          - not_null
+      - name: vara_trabalho
+        description: "Identificação da Vara do Trabalho prolatora da execução."
+        tests:
+          - not_null
+      - name: tipo_divida_trabalhista
+        description: "Natureza da dívida trabalhista (ex.: condenação, acordo não cumprido, execução previdenciária)."
+        tests:
+          - not_null
+      - name: valor_debito
+        description: "Valor consolidado do débito trabalhista em Reais (BRL)."
+        tests:
+          - not_null
+      - name: situacao_exigibilidade
+        description: "Situação da exigibilidade da obrigação (EXIGIVEL, SUSPENSA, GARANTIDA_POR_PENHORA)."
+        tests:
+          - not_null
+          - accepted_values:
+              values: ['EXIGIVEL', 'SUSPENSA', 'GARANTIDA_POR_PENHORA']
+      - name: data_inclusao_bndt
+        description: "Data em que a dívida foi incluída no Banco Nacional de Devedores Trabalhistas."
+        tests:
+          - not_null
+      - name: ingestion_timestamp
+        description: "Carimbo de data/hora da ingestão da linha."
+        tests:
+          - not_null
+
+  - name: stg_tst_cndt_tribunais_regionais
+    description: "Visão de staging para o catálogo de Tribunais Regionais do Trabalho (TRTs) e TST."
+    columns:
+      - name: sigla_trt
+        description: "Sigla do tribunal do trabalho (ex.: TRT01 a TRT24, TST)."
+        tests:
+          - not_null
+          - unique
+      - name: nome_tribunal
+        description: "Nome por extenso do Tribunal Regional do Trabalho."
+        tests:
+          - not_null
+      - name: jurisdicao_uf
+        description: "Unidade Federativa de jurisdição do tribunal."
+        tests:
+          - not_null
+      - name: sede_municipio
+        description: "Município sede do Tribunal Regional."
+        tests:
+          - not_null
+      - name: regiao_brasil
+        description: "Macrorregião geográfica brasileira."
+        tests:
+          - not_null
+
+  - name: stg_tst_cndt_status_dominio
+    description: "Visão de staging para a tabela de domínio dos status da CNDT e implicações licitatórias."
+    columns:
+      - name: codigo_status
+        description: "Código do status da certidão."
+        tests:
+          - not_null
+          - unique
+      - name: descricao_status
+        description: "Significado jurídico do status emitido."
+        tests:
+          - not_null
+      - name: permite_licitar
+        description: "Indica se o status habilita a empresa perante as leis de licitação (8.666/1993 e 14.133/2021)."
+        tests:
+          - not_null
+      - name: nivel_risco_trabalhista
+        description: "Classificação preliminar de risco trabalhista (BAIXO, MEDIO, ALTO)."
+        tests:
+          - not_null

@@ -331,7 +331,7 @@ sources:
   - P07
   rice_score: 700
   roadmap_wave: 2
-  status: CATALOGED
+  status: HOMOLOGATED
 - source_id: suframa_pim_zfm
   name: 'SUFRAMA: Cadastro de Empresas Incentivadas do PIM / ZFM'
   agency: Superintendência da Zona Franca de Manaus (SUFRAMA)

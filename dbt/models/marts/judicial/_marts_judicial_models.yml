@@ -55,3 +55,80 @@ models:
           - not_null
       - name: data_ultima_carga
         description: "Data e hora da carga mais recente de dados processuais do tribunal."
+
+  - name: mart_compliance_trabalhista_brasil
+    description: "Datamart analítico consolidando o status de CNDT, passivo trabalhista do BNDT e risco de inadimplência trabalhista para licitações e compliance corporativo."
+    columns:
+      - name: cnpj_ou_cpf
+        description: "Documento (CNPJ ou CPF) da entidade ou pessoa consultada."
+        tests:
+          - not_null
+      - name: razao_social_ou_nome
+        description: "Nome empresarial ou civil cadastrado perante o Judiciário Trabalhista."
+        tests:
+          - not_null
+      - name: tipo_documento
+        description: "Tipo do documento (CNPJ ou CPF)."
+        tests:
+          - not_null
+      - name: ultima_certidao_numero
+        description: "Número oficial da certidão mais recente emitida pelo TST."
+        tests:
+          - not_null
+      - name: situacao_cndt
+        description: "Situação da CNDT: NEGATIVA, POSITIVA_COM_EFEITO_DE_NEGATIVA ou POSITIVA."
+        tests:
+          - not_null
+      - name: is_regular_trabalhista
+        description: "Indicador de regularidade perante a Justiça do Trabalho."
+        tests:
+          - not_null
+      - name: is_habilitado_licitacao
+        description: "Indicador se a empresa está autorizada a participar de licitações públicas conforme Leis 8.666/93 e 14.133/21."
+        tests:
+          - not_null
+      - name: is_certidao_ativa_valida
+        description: "Indica se a certidão está vigente (dentro de 180 dias) e com situação regular."
+        tests:
+          - not_null
+      - name: data_expedicao
+        description: "Data de emissão oficial da certidão."
+        tests:
+          - not_null
+      - name: data_validade
+        description: "Data limite de validade da certidão trabalhista."
+        tests:
+          - not_null
+      - name: total_debitos_bndt
+        description: "Quantidade total de processos e dívidas inscritas no BNDT."
+        tests:
+          - not_null
+      - name: total_debitos_exigiveis
+        description: "Quantidade de dívidas com exigibilidade ativa e sem garantia por penhora."
+        tests:
+          - not_null
+      - name: valor_total_passivo_bndt
+        description: "Montante financeiro total de dívidas trabalhistas inscritas no BNDT em Reais (BRL)."
+        tests:
+          - not_null
+      - name: maior_debito_bndt
+        description: "Maior valor individual de débito trabalhista identificado."
+        tests:
+          - not_null
+      - name: qtd_trts_com_passivo
+        description: "Quantidade de Tribunais Regionais do Trabalho com execuções ativas."
+        tests:
+          - not_null
+      - name: labor_risk_score
+        description: "Pontuação contínua de risco trabalhista de 0 a 100."
+        tests:
+          - not_null
+      - name: classe_risco_trabalhista
+        description: "Classificação categórica de risco trabalhista (BAIXO, MEDIO, ALTO)."
+        tests:
+          - not_null
+      - name: mart_generated_at
+        description: "Carimbo de data/hora da compilação do datamart analítico."
+        tests:
+          - not_null
+

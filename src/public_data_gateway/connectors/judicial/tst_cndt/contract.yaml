@@ -1,0 +1,76 @@
+contract_id: "ODCS-BR-TST-CNDT-001"
+source_id: "tst_cndt"
+version: "1.0.0"
+grain: "One row per labor compliance certificate (CNDT) or BNDT labor debtor proceeding record"
+primary_keys:
+  - "numero_certidao"
+canonical_keys:
+  - "numero_certidao"
+  - "cnpj_ou_cpf"
+  - "codigo_autenticidade"
+reference_date_column: "data_expedicao"
+lgpd_legal_basis: "Lei Federal nº 12.440/2011, Resolução Administrativa TST nº 1.470/2011, Art. 642-A da CLT e Art. 7º, § 3º e 4º da Lei nº 13.709/2018 (LGPD - Cumprimento de Obrigação Legal e Transparência Pública)"
+min_expected_rows: 5
+max_volume_drop_pct: 1.0
+sentinel_values:
+  - "-1"
+  - "99"
+  - "999"
+  - "SEM INFORMACAO"
+  - "IGNORADO"
+  - "N/A"
+  - "-"
+columns:
+  - name: "numero_certidao"
+    data_type: "string"
+    required: true
+    is_primary_key: true
+    description: "Número oficial da Certidão Negativa de Débitos Trabalhistas emitida pelo TST"
+  - name: "ano_certidao"
+    data_type: "int32"
+    required: true
+    description: "Ano civil de expedição da certidão pelo TST"
+  - name: "cnpj_ou_cpf"
+    data_type: "string"
+    required: true
+    description: "Número do CNPJ (14 dígitos) ou CPF sanitizado do empregador ou devedor consultado"
+  - name: "cnpj_raiz"
+    data_type: "string"
+    required: false
+    description: "Primeiros 8 dígitos do CNPJ para consolidação matriz e filiais"
+  - name: "razao_social_ou_nome"
+    data_type: "string"
+    required: true
+    description: "Razão social da pessoa jurídica ou nome da pessoa física conforme cadastro na RFB/TST"
+  - name: "tipo_documento"
+    data_type: "string"
+    required: true
+    description: "Tipo do documento consultado: CNPJ ou CPF"
+  - name: "status_certidao"
+    data_type: "string"
+    required: true
+    description: "Situação jurídica da certidão: NEGATIVA, POSITIVA_COM_EFEITO_DE_NEGATIVA ou POSITIVA"
+  - name: "is_regular"
+    data_type: "boolean"
+    required: true
+    description: "Indicador booleano de regularidade trabalhista para habilitação em licitações e contratações públicas"
+  - name: "data_expedicao"
+    data_type: "date"
+    required: true
+    description: "Data em que a certidão trabalhista foi expedida pelo Tribunal Superior do Trabalho"
+  - name: "hora_expedicao"
+    data_type: "string"
+    required: true
+    description: "Horário oficial de Brasília no momento da expedição da certidão (HH:MM:SS)"
+  - name: "data_validade"
+    data_type: "date"
+    required: true
+    description: "Data final de vigência da certidão (180 dias contados da expedição conforme Res. TST 1470/2011)"
+  - name: "codigo_autenticidade"
+    data_type: "string"
+    required: true
+    description: "Código criptográfico alfanumérico para verificação pública de autenticidade no TST"
+  - name: "orgao_emissor"
+    data_type: "string"
+    required: true
+    description: "Órgão do Poder Judiciário responsável pela emissão (Tribunal Superior do Trabalho - TST)"
