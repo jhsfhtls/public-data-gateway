@@ -1,0 +1,291 @@
+version: 2
+
+models:
+  - name: stg_pncp_contratacoes
+    description: "Visão staging com tipagem canônica e normalização de processos licitatórios e contratações do PNCP."
+    columns:
+      - name: numero_controle_pncp
+        description: "Identificador único universal canônico do processo licitatório no PNCP."
+        tests:
+          - not_null
+          - unique
+      - name: ano_compra
+        description: "Ano civil de exercício da contratação pública."
+        tests:
+          - not_null
+      - name: sequencial_compra
+        description: "Número sequencial da compra dentro do ano e órgão contratante."
+        tests:
+          - not_null
+      - name: numero_compra
+        description: "Número oficial de identificação interna do processo da compra no órgão."
+      - name: numero_processo
+        description: "Número do processo administrativo correspondente da contratação."
+      - name: cnpj_orgao
+        description: "CNPJ canônico com 14 dígitos numéricos do órgão comprador."
+        tests:
+          - not_null
+      - name: razao_social_orgao
+        description: "Razão social ou denominação oficial da entidade contratante."
+        tests:
+          - not_null
+      - name: poder_id
+        description: "Identificador do Poder federativo (E=Executivo, L=Legislativo, J=Judiciário, N=Ministério Público/Defensoria)."
+        tests:
+          - not_null
+      - name: esfera_id
+        description: "Esfera federativa da contratação (F=Federal, E=Estadual, M=Municipal, D=Distrital)."
+        tests:
+          - not_null
+      - name: codigo_unidade_orgao
+        description: "Código da unidade administrativa ou UASG compradora."
+      - name: nome_unidade_orgao
+        description: "Nome descritivo da unidade administrativa requisitante."
+      - name: id_municipio
+        description: "Código canônico IBGE com 7 dígitos do município da unidade compradora."
+      - name: nome_municipio
+        description: "Nome oficial do município onde o certame é executado."
+      - name: sigla_uf
+        description: "Sigla de 2 caracteres da Unidade Federativa da execução."
+      - name: modalidade_id
+        description: "Código identificador numérico da modalidade de contratação da Lei 14.133/2021."
+        tests:
+          - not_null
+      - name: modalidade_nome
+        description: "Denominação da modalidade licitatória (ex: Pregão Eletrônico, Concorrência)."
+        tests:
+          - not_null
+      - name: modo_disputa_id
+        description: "Código numérico do modo de disputa (1=Aberto, 2=Fechado, 3=Aberto/Fechado)."
+      - name: modo_disputa_nome
+        description: "Nome descritivo do modo de disputa adotado."
+      - name: tipo_instrumento_convocatorio_codigo
+        description: "Código do tipo de instrumento convocatório (1=Edital, 2=Aviso de Contratação Direta)."
+      - name: tipo_instrumento_convocatorio_nome
+        description: "Denominação do instrumento convocatório."
+      - name: objeto_compra
+        description: "Descrição detalhada do objeto licitado ou contratado."
+        tests:
+          - not_null
+      - name: informacao_complementar
+        description: "Informações adicionais e observações administrativas do edital."
+      - name: is_srp
+        description: "Indicador booleano se o procedimento adota Sistema de Registro de Preços."
+        tests:
+          - not_null
+      - name: valor_total_estimado
+        description: "Valor orçado estimado pela Administração em Reais (R$)."
+      - name: valor_total_homologado
+        description: "Valor final adjudicado e homologado após fase de lances em Reais (R$)."
+      - name: situacao_compra_id
+        description: "Código numérico da situação atual do certame."
+      - name: situacao_compra_nome
+        description: "Descrição da situação da contratação (ex: Divulgada no PNCP, Revogada, Homologada)."
+      - name: data_publicacao_pncp
+        description: "Timestamp de publicação oficial da contratação no PNCP."
+        tests:
+          - not_null
+      - name: data_abertura_proposta
+        description: "Data e horário de início da sessão de recebimento de propostas."
+      - name: data_encerramento_proposta
+        description: "Data e horário limite de encerramento do recebimento de propostas."
+      - name: link_sistema_origem
+        description: "URL direta para o sistema eletrônico ou portal de compras de origem."
+
+  - name: stg_pncp_contratos
+    description: "Visão staging com tipagem canônica e normalização de contratos administrativos formalizados no PNCP."
+    columns:
+      - name: numero_controle_pncp
+        description: "Identificador único universal canônico do contrato no PNCP."
+        tests:
+          - not_null
+          - unique
+      - name: numero_controle_pncp_compra
+        description: "Identificador PNCP da contratação ou licitação de origem do contrato."
+      - name: ano_contrato
+        description: "Ano civil de celebração ou exercício do contrato administrativo."
+        tests:
+          - not_null
+      - name: sequencial_contrato
+        description: "Sequencial do contrato dentro do ano no órgão."
+        tests:
+          - not_null
+      - name: numero_contrato_empenho
+        description: "Número do contrato ou nota de empenho gerada no sistema financeiro."
+      - name: numero_processo
+        description: "Processo administrativo de contratação associado."
+      - name: cnpj_orgao
+        description: "CNPJ canônico com 14 dígitos numéricos do órgão contratante."
+        tests:
+          - not_null
+      - name: razao_social_orgao
+        description: "Razão social ou denominação da entidade pública contratante."
+        tests:
+          - not_null
+      - name: esfera_id
+        description: "Esfera federativa do órgão contratante (F=Federal, E=Estadual, M=Municipal, D=Distrital)."
+        tests:
+          - not_null
+      - name: poder_id
+        description: "Poder da República ao qual o órgão contratante pertence."
+        tests:
+          - not_null
+      - name: codigo_unidade_orgao
+        description: "Código da unidade gestora compradora."
+      - name: nome_unidade_orgao
+        description: "Nome da unidade gestora responsável pela execução do contrato."
+      - name: id_municipio
+        description: "Código canônico IBGE com 7 dígitos do município da unidade contratante."
+      - name: nome_municipio
+        description: "Nome do município do órgão contratante."
+      - name: sigla_uf
+        description: "Sigla de 2 caracteres da Unidade Federativa do órgão contratante."
+      - name: tipo_contrato_id
+        description: "Código numérico do tipo de instrumento contratual (ex: 1=Contrato, 7=Empenho)."
+      - name: tipo_contrato_nome
+        description: "Nome descritivo do instrumento (ex: Contrato, Termo Aditivo, Empenho)."
+      - name: categoria_processo_id
+        description: "Código numérico da categoria do objeto (ex: 1=Compras, 2=Obras, 8=Serviços)."
+      - name: categoria_processo_nome
+        description: "Nome da categoria de contratação (ex: Compras, Obras, Serviços)."
+      - name: tipo_pessoa_fornecedor
+        description: "Natureza jurídica da pessoa contratada (PJ=Pessoa Jurídica, PF=Pessoa Física, ID=Estrangeiro)."
+        tests:
+          - not_null
+      - name: ni_fornecedor
+        description: "Número de Identificação do fornecedor (CNPJ 14 dígitos ou CPF 11 dígitos higienizado)."
+        tests:
+          - not_null
+      - name: nome_fornecedor
+        description: "Razão social ou nome civil completo do fornecedor contratado."
+        tests:
+          - not_null
+      - name: codigo_pais_fornecedor
+        description: "Código ISO de 3 letras do país de origem do contratado (ex: BRA)."
+      - name: objeto_contrato
+        description: "Descrição formal do escopo e obrigações do contrato administrativo."
+        tests:
+          - not_null
+      - name: valor_inicial
+        description: "Valor financeiro pactuado inicialmente na assinatura em Reais (R$)."
+      - name: valor_global
+        description: "Valor financeiro global total atualizado do contrato em Reais (R$)."
+      - name: valor_parcela
+        description: "Valor financeiro médio ou mensal por parcela de pagamento em Reais (R$)."
+      - name: valor_acumulado
+        description: "Valor financeiro acumulado total empenhado/executado até o momento."
+      - name: numero_parcelas
+        description: "Quantidade total de parcelas de pagamento pactuadas no contrato."
+      - name: data_assinatura
+        description: "Data oficial de assinatura do termo contratual (AAAA-MM-DD)."
+      - name: data_vigencia_inicio
+        description: "Data de início da vigência do contrato administrativo (AAAA-MM-DD)."
+      - name: data_vigencia_fim
+        description: "Data final de encerramento da vigência do contrato (AAAA-MM-DD)."
+      - name: data_publicacao_pncp
+        description: "Timestamp de publicação oficial do extrato do contrato no PNCP."
+        tests:
+          - not_null
+
+  - name: stg_pncp_atas
+    description: "Visão staging com tipagem canônica e normalização de Atas de Registro de Preços do PNCP."
+    columns:
+      - name: numero_controle_pncp_ata
+        description: "Identificador único universal canônico da Ata de Registro de Preços no PNCP."
+        tests:
+          - not_null
+          - unique
+      - name: numero_controle_pncp_compra
+        description: "Identificador da licitação pública da qual a ata se originou."
+      - name: numero_ata_registro_preco
+        description: "Número de registro oficial da ata no órgão gerenciador."
+      - name: ano_ata
+        description: "Ano civil de homologação e vigência da ata."
+        tests:
+          - not_null
+      - name: cnpj_orgao
+        description: "CNPJ canônico com 14 dígitos numéricos do órgão gerenciador da ata."
+        tests:
+          - not_null
+      - name: nome_orgao
+        description: "Nome oficial do órgão gerenciador responsável pelo registro."
+        tests:
+          - not_null
+      - name: codigo_unidade_orgao
+        description: "Código da unidade gestora gerenciadora da ata."
+      - name: nome_unidade_orgao
+        description: "Nome da unidade gestora da ata."
+      - name: objeto_contratacao
+        description: "Descrição sintética dos bens ou serviços registrados na ata."
+        tests:
+          - not_null
+      - name: vigencia_inicio
+        description: "Data inicial da vigência da ata de registro de preços (AAAA-MM-DD)."
+      - name: vigencia_fim
+        description: "Data final limite para consumo e contratações decorrentes da ata."
+      - name: data_assinatura
+        description: "Data de assinatura formal da ata pelo órgão e fornecedores."
+      - name: data_publicacao_pncp
+        description: "Timestamp de publicação da ata no PNCP."
+        tests:
+          - not_null
+      - name: is_cancelada
+        description: "Indicador booleano se a ata de registro de preços foi revogada ou cancelada."
+        tests:
+          - not_null
+
+  - name: stg_pncp_orgaos
+    description: "Visão staging do catálogo normalizado de órgãos e entidades compradoras do PNCP."
+    columns:
+      - name: cnpj_orgao
+        description: "CNPJ canônico com 14 dígitos numéricos da entidade pública compradora."
+        tests:
+          - not_null
+          - unique
+      - name: razao_social
+        description: "Razão social ou denominação oficial da entidade."
+        tests:
+          - not_null
+      - name: esfera_id
+        description: "Esfera federativa de governo (F=Federal, E=Estadual, M=Municipal, D=Distrital)."
+        tests:
+          - not_null
+      - name: poder_id
+        description: "Poder de Estado ao qual pertence (Executivo, Legislativo, Judiciário ou Ministério Público)."
+        tests:
+          - not_null
+      - name: id_municipio
+        description: "Código canônico IBGE com 7 dígitos do município da sede do órgão."
+      - name: nome_municipio
+        description: "Nome do município sede do órgão."
+      - name: sigla_uf
+        description: "Sigla de 2 caracteres maiúsculos da UF do órgão."
+      - name: total_compras_registradas
+        description: "Contagem total histórica de certames divulgados pelo órgão no PNCP."
+      - name: total_contratos_registrados
+        description: "Contagem total de contratos administrativos cadastrados no PNCP."
+
+  - name: stg_pncp_modalidades
+    description: "Visão staging da tabela de domínio normativo de modalidades da Lei 14.133/2021."
+    columns:
+      - name: modalidade_id
+        description: "Código identificador numérico da modalidade licitatória da Nova Lei de Licitações."
+        tests:
+          - not_null
+          - unique
+      - name: modalidade_nome
+        description: "Denominação legal da modalidade ou procedimento auxiliar de licitação."
+        tests:
+          - not_null
+      - name: amparo_legal
+        description: "Artigo e dispositivos correspondentes da Lei Federal nº 14.133/2021."
+        tests:
+          - not_null
+      - name: descricao
+        description: "Definição operacional, finalidade e hipótese legal de aplicação da modalidade."
+        tests:
+          - not_null
+      - name: is_exige_disputa
+        description: "Indicador se a modalidade envolve fase competitiva ou se constitui contratação direta."
+        tests:
+          - not_null

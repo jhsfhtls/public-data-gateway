@@ -11,6 +11,7 @@ model-paths:
   - "../src/public_data_gateway/connectors/agregadores/brasilapi_core/dbt"
   - "../src/public_data_gateway/connectors/empresarial/rfb_cnpj_lakehouse/dbt"
   - "../src/public_data_gateway/connectors/empresarial/rfb_simples_mei/dbt"
+  - "../src/public_data_gateway/connectors/compras_publicas/pncp_contratacoes/dbt"
   - "models"
 
 analysis-paths: ["analyses"]

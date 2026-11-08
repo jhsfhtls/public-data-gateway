@@ -160,6 +160,32 @@ class MCPDispatcher:
                                     "required": ["cnpj"],
                                 },
                             },
+                            {
+                                "name": "bdg_get_pncp_contratacoes",
+                                "description": "Query public procurement processes and tenders from PNCP (Lei nº 14.133/2021).",
+                                "inputSchema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "uf": {"type": "string"},
+                                        "modalidade_id": {"type": "integer"},
+                                        "ano": {"type": "integer"},
+                                        "limit": {"type": "integer"},
+                                    },
+                                },
+                            },
+                            {
+                                "name": "bdg_get_pncp_contratos",
+                                "description": "Query formal administrative contracts and commitments from PNCP.",
+                                "inputSchema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "cnpj_orgao": {"type": "string"},
+                                        "ni_fornecedor": {"type": "string"},
+                                        "ano": {"type": "integer"},
+                                        "limit": {"type": "integer"},
+                                    },
+                                },
+                            },
                         ]
                     },
                 }
@@ -275,6 +301,44 @@ class MCPDispatcher:
             conn = RFBSimplesMEIConnector(settings=self.settings)
             status_data = conn.get_simples_mei_status(args["cnpj"])
             wrapped = wrap_untrusted_gov_data(status_data, source_id="rfb_simples_mei")
+            return {
+                "jsonrpc": "2.0",
+                "id": req_id,
+                "result": {"content": [{"type": "text", "text": wrapped}], "isError": False},
+            }
+
+        if tool_name == "bdg_get_pncp_contratacoes":
+            from public_data_gateway.connectors.compras_publicas.pncp_contratacoes import (
+                PNCPContratacoesConnector,
+            )
+
+            conn = PNCPContratacoesConnector(settings=self.settings)
+            res = conn.list_contratacoes(
+                uf=args.get("uf"),
+                modalidade_id=args.get("modalidade_id"),
+                ano=args.get("ano"),
+                limit=args.get("limit", 10),
+            )
+            wrapped = wrap_untrusted_gov_data(res, source_id="pncp_contratacoes")
+            return {
+                "jsonrpc": "2.0",
+                "id": req_id,
+                "result": {"content": [{"type": "text", "text": wrapped}], "isError": False},
+            }
+
+        if tool_name == "bdg_get_pncp_contratos":
+            from public_data_gateway.connectors.compras_publicas.pncp_contratacoes import (
+                PNCPContratacoesConnector,
+            )
+
+            conn = PNCPContratacoesConnector(settings=self.settings)
+            res = conn.list_contratos(
+                cnpj_orgao=args.get("cnpj_orgao"),
+                ni_fornecedor=args.get("ni_fornecedor"),
+                ano=args.get("ano"),
+                limit=args.get("limit", 10),
+            )
+            wrapped = wrap_untrusted_gov_data(res, source_id="pncp_contratacoes")
             return {
                 "jsonrpc": "2.0",
                 "id": req_id,

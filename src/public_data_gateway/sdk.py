@@ -59,6 +59,48 @@ class GeoFacade:
         return self.connector.extract()
 
 
+class ProcurementFacade:
+    """Public procurement query interface powered by PNCP (Lei nº 14.133/2021)."""
+
+    def __init__(self, sdk: "BrazilData") -> None:
+        self._sdk = sdk
+        self._connector: Any = None
+
+    @property
+    def connector(self) -> Any:
+        if self._connector is None:
+            from public_data_gateway.connectors.compras_publicas.pncp_contratacoes import (
+                PNCPContratacoesConnector,
+            )
+
+            self._connector = PNCPContratacoesConnector(settings=self._sdk.settings)
+        return self._connector
+
+    def contratacoes(
+        self,
+        uf: str | None = None,
+        modalidade_id: int | None = None,
+        ano: int | None = None,
+        limit: int | None = None,
+    ) -> list[dict[str, Any]]:
+        """List procurement processes with optional filters."""
+        return self.connector.list_contratacoes(
+            uf=uf, modalidade_id=modalidade_id, ano=ano, limit=limit
+        )
+
+    def contratos(
+        self,
+        cnpj_orgao: str | None = None,
+        ni_fornecedor: str | None = None,
+        ano: int | None = None,
+        limit: int | None = None,
+    ) -> list[dict[str, Any]]:
+        """List administrative contracts with optional filters."""
+        return self.connector.list_contratos(
+            cnpj_orgao=cnpj_orgao, ni_fornecedor=ni_fornecedor, ano=ano, limit=limit
+        )
+
+
 class BrazilData:
     """Unified developer SDK facade for querying, normalizing, and enriching Brazilian public datasets."""
 
@@ -74,6 +116,7 @@ class BrazilData:
             normalizer=self.normalizer,
         )
         self.geo = GeoFacade(self)
+        self.procurement = ProcurementFacade(self)
 
     def list_sources(
         self,
@@ -107,6 +150,30 @@ class BrazilData:
 
         conn = RFBSimplesMEIConnector(settings=self.settings)
         return conn.get_simples_mei_status(cnpj)
+
+    def get_contratacoes_pncp(
+        self,
+        uf: str | None = None,
+        modalidade_id: int | None = None,
+        ano: int | None = None,
+        limit: int | None = None,
+    ) -> list[dict[str, Any]]:
+        """Query public procurements published in PNCP."""
+        return self.procurement.contratacoes(
+            uf=uf, modalidade_id=modalidade_id, ano=ano, limit=limit
+        )
+
+    def get_contratos_pncp(
+        self,
+        cnpj_orgao: str | None = None,
+        ni_fornecedor: str | None = None,
+        ano: int | None = None,
+        limit: int | None = None,
+    ) -> list[dict[str, Any]]:
+        """Query administrative contracts registered in PNCP."""
+        return self.procurement.contratos(
+            cnpj_orgao=cnpj_orgao, ni_fornecedor=ni_fornecedor, ano=ano, limit=limit
+        )
 
     def resolve_municipality(
         self, code_or_name: str | int, uf: str | None = None

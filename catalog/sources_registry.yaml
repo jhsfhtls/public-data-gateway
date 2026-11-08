@@ -210,7 +210,7 @@ sources:
   - P04
   rice_score: 790
   roadmap_wave: 2
-  status: CATALOGED
+  status: HOMOLOGATED
 - source_id: cnj_datajud
   name: 'CNJ: Base Nacional do Poder Judiciário (DataJud)'
   agency: Conselho Nacional de Justiça (CNJ)

@@ -1,6 +1,6 @@
 {
   "schema_version": "1.0.0",
-  "last_updated": "2026-11-08",
+  "last_updated": "2026-11-08T05:39:41.687464+00:00",
   "project_name": "public-data-gateway",
   "ecosystem": "C.O.R.E. (core, operations, career, studies)",
   "governing_pops": [
@@ -15,8 +15,8 @@
   "current_macro_phase_id": "04",
   "current_macro_phase": "Fase 04 — Ingestão Wave 2 (B2B, Compras Públicas & Compliance: rfb_cnpj_lakehouse, rfb_simples_mei, pncp_contratacoes, etc.)",
   "overall_status": "ON_TRACK",
-  "active_connector": "pncp_contratacoes",
-  "next_connector": "cgu_ceis_cnep",
+  "active_connector": "cgu_ceis_cnep",
+  "next_connector": "cgu_pep",
   "structural_phases": [
     {
       "phase_id": "00",
@@ -147,7 +147,8 @@
       "deliverables": [
         "Data Marts analíticos multidisciplinares (B2B x Território x Macro x Compras Públicas)",
         "Feature Store consolidada para modelos preditivos de propensão e risco",
-        "Extração de insights comerciais e operacionais acoplados aos 10 Produtos Modulares C.O.R.E."
+        "Extração de insights comerciais e operacionais acoplados aos 10 Produtos Modulares C.O.R.E.",
+        "Bateria de Regressão Live Global com Rotação Sistemática de IDs: Re-execução obrigatória de testes reais ao vivo contra todos os órgãos públicos, alternando e rotacionando os IDs de consulta (novos CNPJs, novos municípios IBGE, novas moedas, séries BACEN e novos contratos PNCP) para validar a resiliência contínua contra drift em produção sem overfitting a registros pontuais"
       ]
     },
     {
@@ -296,6 +297,12 @@
       "phase_id": "04",
       "milestone": "Homologação do Conector rfb_simples_mei (5 Tabelas, dbt, Mart Tributário & Live Fail-Hard)",
       "summary": "Implementação de ponta a ponta do conector rfb_simples_mei consolidando a Wave 2: 5 tabelas (simples_nacional_cadastral, simei_cadastral, simples_sublimites_estaduais, simples_eventos_historico, simples_tabelas_anexos) materializadas em data/rfb_simples_mei/{bronze,silver,gold}/; 9 novos modelos dbt (5 staging, dim_simples_nacional, dim_simei, dim_sublimites_icms, mart_regimes_tributarios_brasil) totalizando 57 modelos e 477 testes dbt 100% aprovados; 541 colunas 100% documentadas no linter; testes reais de 1 linha com fail-hard contra o endpoint oficial de CNPJ/Simples e suíte offline com 60 testes pytest 100% verde; registro formal da expansão de escopo da Fase 10 para inclusão de APIs públicas globais e geoespaciais (Google APIs, OpenStreetMap, Mapbox)."
+    },
+    {
+      "date": "2026-11-08",
+      "phase_id": "04",
+      "milestone": "Homologação do Conector pncp_contratacoes (5 Tabelas, dbt, Mart de Compras Públicas & Live Fail-Hard)",
+      "summary": "Implementação completa do conector pncp_contratacoes (Lei nº 14.133/2021): 5 tabelas (pncp_contratacoes, pncp_contratos, pncp_atas, pncp_orgaos, pncp_modalidades) materializadas em data/pncp_contratacoes/{bronze,silver,gold}/; 10 novos modelos dbt (5 staging views, dim_modalidade_licitacao, dim_orgao_publico, fct_contratacao_publica, fct_contrato_administrativo, mart_compras_publicas_brasil) totalizando 67 modelos e 576 testes dbt 100% aprovados; 730 colunas 100% documentadas no linter; testes reais de 1 linha com fail-hard estrito contra a API oficial de produção do PNCP e 65 testes offline aprovados; feature store features_compras_publicas_brasil.parquet gerada com score de maturidade licitatória."
     }
   ]
 }

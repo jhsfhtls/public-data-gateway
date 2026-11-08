@@ -1,0 +1,18 @@
+version: 2
+
+sources:
+  - name: pncp_contratacoes
+    description: "Fontes brutas normalizadas do Portal Nacional de Contratações Públicas (PNCP / Lei nº 14.133/2021) em formato Parquet ZSTD."
+    meta:
+      external_location: "data/pncp_contratacoes/silver/{name}.parquet"
+    tables:
+      - name: pncp_contratacoes
+        description: "Contratações públicas, editais licitatórios e avisos de contratação direta publicados no PNCP."
+      - name: pncp_contratos
+        description: "Contratos administrativos formalizados, termos aditivos e instrumentos contratuais cadastrados no PNCP."
+      - name: pncp_atas
+        description: "Atas de registro de preços ativas e canceladas decorrentes de procedimentos licitatórios (SRP)."
+      - name: pncp_orgaos
+        description: "Cadastro consolidado de órgãos e entidades compradoras da administração pública federal, estadual e municipal."
+      - name: pncp_modalidades
+        description: "Tabela de domínio normativo das modalidades e procedimentos licitatórios previstos na Lei Federal nº 14.133/2021."
