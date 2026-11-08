@@ -305,6 +305,36 @@ class FinanceFacade:
         return self.cvm_connector.list_companies(setor=setor, situacao=situacao)
 
 
+class TradeFacade:
+    """Foreign trade statistics, export/import flows and trade balance (MDIC Comex Stat)."""
+
+    def __init__(self, sdk: "BrazilData") -> None:
+        self._sdk = sdk
+        self._comex_connector: Any = None
+
+    @property
+    def comex_connector(self) -> Any:
+        if self._comex_connector is None:
+            from public_data_gateway.connectors.comercio_exterior.mdic_comexstat.connector import (
+                MDICComexStatConnector,
+            )
+
+            self._comex_connector = MDICComexStatConnector(settings=self._sdk.settings)
+        return self._comex_connector
+
+    def municipality_trade(self, id_municipio: str) -> dict[str, Any]:
+        """Obter fluxo de comércio exterior e saldo comercial por município (7 dígitos IBGE)."""
+        return self.comex_connector.get_municipality_trade(id_municipio)
+
+    def ncm_trade(self, codigo_ncm: str) -> dict[str, Any]:
+        """Consultar histórico e fluxo estatístico de uma mercadoria NCM de 8 dígitos."""
+        return self.comex_connector.get_ncm_trade(codigo_ncm)
+
+    def trade_balance_profile(self) -> dict[str, Any]:
+        """Obter o panorama macro da balança comercial brasileira."""
+        return self.comex_connector.get_trade_balance_profile()
+
+
 class BrazilData:
     """Unified developer SDK facade for querying, normalizing, and enriching Brazilian public datasets."""
 
@@ -325,6 +355,7 @@ class BrazilData:
         self.judicial = JudicialFacade(self)
         self.company = CompanyFacade(self)
         self.finance = FinanceFacade(self)
+        self.trade = TradeFacade(self)
 
     def list_sources(
         self,
@@ -418,6 +449,18 @@ class BrazilData:
     def get_financial_ratios(self, cnpj_or_codigo: str) -> dict[str, Any]:
         """Assess corporate financial health, solvency score, and fundamental ratios from CVM."""
         return self.finance.financial_ratios(cnpj_or_codigo)
+
+    def get_municipality_trade(self, id_municipio: str) -> dict[str, Any]:
+        """Obter estatísticas de comércio exterior e balança comercial de um município (MDIC)."""
+        return self.trade.municipality_trade(id_municipio)
+
+    def get_ncm_trade(self, codigo_ncm: str) -> dict[str, Any]:
+        """Consultar histórico e fluxo estatístico de uma mercadoria NCM de 8 dígitos (MDIC)."""
+        return self.trade.ncm_trade(codigo_ncm)
+
+    def get_trade_balance(self) -> dict[str, Any]:
+        """Obter o panorama macro da balança comercial brasileira (MDIC)."""
+        return self.trade.trade_balance_profile()
 
     def resolve_municipality(
         self, code_or_name: str | int, uf: str | None = None

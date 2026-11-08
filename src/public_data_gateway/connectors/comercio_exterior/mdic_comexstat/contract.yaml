@@ -1,0 +1,80 @@
+contract_id: "ODCS-BR-MDIC-COMEXSTAT-001"
+source_id: "mdic_comexstat"
+version: "1.0.0"
+grain: "One row per foreign trade flow aggregation (NCM, Country, Municipality and Month)"
+primary_keys:
+  - "ano"
+  - "mes"
+  - "ncm_8"
+  - "codigo_pais"
+canonical_keys:
+  - "ncm_8"
+  - "id_municipio_7"
+  - "sigla_uf"
+reference_date_column: "mes"
+lgpd_legal_basis: "Decreto nº 660/1992, Portaria SECEX nº 44/2020, Lei nº 12.527/2011 (LAI) e Art. 7º, § 3º da Lei nº 13.709/2018 (LGPD - Estatísticas Públicas Agregadas de Comércio Exterior sem Dados Pessoais)"
+min_expected_rows: 5
+max_volume_drop_pct: 1.0
+sentinel_values:
+  - "NA"
+  - "N/A"
+  - "NULL"
+  - "00000000"
+  - "-"
+  - "SEM INFORMACAO"
+columns:
+  - name: "ano"
+    data_type: "string"
+    nullable: false
+    description: "Ano do fluxo comercial de importação ou exportação (YYYY)."
+    classification: "PUBLIC_TEMPORAL"
+  - name: "mes"
+    data_type: "string"
+    nullable: false
+    description: "Mês do fluxo comercial (MM com 2 dígitos de 01 a 12)."
+    classification: "PUBLIC_TEMPORAL"
+  - name: "ncm_8"
+    data_type: "string"
+    nullable: false
+    description: "Código da Nomenclatura Comum do Mercosul (NCM) com 8 dígitos numéricos."
+    classification: "PUBLIC_CLASSIFICATION"
+  - name: "codigo_unidade"
+    data_type: "string"
+    nullable: true
+    description: "Código da unidade de medida estatística da mercadoria."
+    classification: "PUBLIC_METRIC"
+  - name: "codigo_pais"
+    data_type: "string"
+    nullable: false
+    description: "Código numérico de 3 dígitos do país parceiro comercial (origem ou destino)."
+    classification: "PUBLIC_IDENTIFIER"
+  - name: "sigla_uf"
+    data_type: "string"
+    nullable: false
+    description: "Sigla da Unidade Federativa brasileira de origem ou destino da mercadoria."
+    classification: "PUBLIC_GEOGRAPHIC"
+  - name: "codigo_via"
+    data_type: "string"
+    nullable: true
+    description: "Código do modal de transporte internacional (marítimo, aéreo, rodoviário, etc.)."
+    classification: "PUBLIC_LOGISTIC"
+  - name: "codigo_urf"
+    data_type: "string"
+    nullable: true
+    description: "Código da Unidade da Receita Federal de despacho aduaneiro."
+    classification: "PUBLIC_CUSTOMS"
+  - name: "quantidade_estatistica"
+    data_type: "float"
+    nullable: false
+    description: "Quantidade física transacionada na unidade de medida estatística."
+    classification: "PUBLIC_QUANTITY"
+  - name: "peso_liquido_kg"
+    data_type: "float"
+    nullable: false
+    description: "Peso líquido total da mercadoria exportada ou importada em quilogramas (kg)."
+    classification: "PUBLIC_WEIGHT"
+  - name: "valor_fob_usd"
+    data_type: "float"
+    nullable: false
+    description: "Valor financeiro Free on Board (FOB) transacionado em dólares americanos (USD)."
+    classification: "PUBLIC_FINANCIAL"

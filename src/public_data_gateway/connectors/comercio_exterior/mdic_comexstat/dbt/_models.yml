@@ -1,0 +1,214 @@
+version: 2
+
+models:
+  - name: stg_comex_ncm_exportacao
+    description: "Staging view normalizada das exportações brasileiras por NCM e país de destino."
+    columns:
+      - name: ano
+        description: "Ano do fluxo comercial de exportação (YYYY)."
+        tests:
+          - not_null
+      - name: mes
+        description: "Mês do fluxo comercial de exportação (MM)."
+        tests:
+          - not_null
+      - name: ncm_8
+        description: "Código da Nomenclatura Comum do Mercosul com 8 dígitos."
+        tests:
+          - not_null
+      - name: codigo_unidade
+        description: "Código da unidade de medida estatística da exportação."
+      - name: codigo_pais
+        description: "Código numérico do país de destino das mercadorias."
+        tests:
+          - not_null
+      - name: sigla_uf
+        description: "Sigla da Unidade Federativa brasileira produtora/exportadora."
+        tests:
+          - not_null
+      - name: codigo_via
+        description: "Código do modal de transporte internacional de saída."
+      - name: codigo_urf
+        description: "Código da Unidade da Receita Federal de despacho de exportação."
+      - name: quantidade_estatistica
+        description: "Quantidade física transacionada na unidade de medida estatística."
+        tests:
+          - not_null
+      - name: peso_liquido_kg
+        description: "Peso líquido total da mercadoria exportada em quilogramas."
+        tests:
+          - not_null
+      - name: valor_fob_usd
+        description: "Valor Free on Board (FOB) exportado em dólares americanos (USD)."
+        tests:
+          - not_null
+
+  - name: stg_comex_ncm_importacao
+    description: "Staging view normalizada das importações brasileiras por NCM e país de origem."
+    columns:
+      - name: ano
+        description: "Ano do fluxo comercial de importação (YYYY)."
+        tests:
+          - not_null
+      - name: mes
+        description: "Mês do fluxo comercial de importação (MM)."
+        tests:
+          - not_null
+      - name: ncm_8
+        description: "Código da Nomenclatura Comum do Mercosul com 8 dígitos."
+        tests:
+          - not_null
+      - name: codigo_unidade
+        description: "Código da unidade de medida estatística da importação."
+      - name: codigo_pais
+        description: "Código numérico do país de origem das mercadorias."
+        tests:
+          - not_null
+      - name: sigla_uf
+        description: "Sigla da Unidade Federativa brasileira destinatária da importação."
+        tests:
+          - not_null
+      - name: codigo_via
+        description: "Código do modal de transporte internacional de entrada."
+      - name: codigo_urf
+        description: "Código da Unidade da Receita Federal de despacho de importação."
+      - name: quantidade_estatistica
+        description: "Quantidade física transacionada na unidade de medida estatística."
+        tests:
+          - not_null
+      - name: peso_liquido_kg
+        description: "Peso líquido total da mercadoria importada em quilogramas."
+        tests:
+          - not_null
+      - name: valor_fob_usd
+        description: "Valor Free on Board (FOB) importado em dólares americanos (USD)."
+        tests:
+          - not_null
+      - name: valor_frete_usd
+        description: "Valor do frete internacional em dólares americanos (USD)."
+      - name: valor_seguro_usd
+        description: "Valor do seguro internacional em dólares americanos (USD)."
+
+  - name: stg_comex_municipios_exportacao
+    description: "Staging view normalizada das exportações brasileiras agregadas por município IBGE."
+    columns:
+      - name: ano
+        description: "Ano do fluxo de exportação municipal (YYYY)."
+        tests:
+          - not_null
+      - name: mes
+        description: "Mês do fluxo de exportação municipal (MM)."
+        tests:
+          - not_null
+      - name: sh4
+        description: "Código do Sistema Harmonizado no nível de 4 dígitos."
+        tests:
+          - not_null
+      - name: codigo_pais
+        description: "Código numérico do país de destino."
+        tests:
+          - not_null
+      - name: sigla_uf
+        description: "Sigla da Unidade Federativa do município exportador."
+        tests:
+          - not_null
+      - name: id_municipio_7
+        description: "Código IBGE de 7 dígitos do município exportador."
+        tests:
+          - not_null
+      - name: nome_municipio
+        description: "Nome oficial do município exportador."
+        tests:
+          - not_null
+      - name: peso_liquido_kg
+        description: "Peso líquido total exportado pelo município em kg."
+        tests:
+          - not_null
+      - name: valor_fob_usd
+        description: "Valor total FOB exportado pelo município em dólares (USD)."
+        tests:
+          - not_null
+
+  - name: stg_comex_municipios_importacao
+    description: "Staging view normalizada das importações brasileiras agregadas por município IBGE."
+    columns:
+      - name: ano
+        description: "Ano do fluxo de importação municipal (YYYY)."
+        tests:
+          - not_null
+      - name: mes
+        description: "Mês do fluxo de importação municipal (MM)."
+        tests:
+          - not_null
+      - name: sh4
+        description: "Código do Sistema Harmonizado no nível de 4 dígitos."
+        tests:
+          - not_null
+      - name: codigo_pais
+        description: "Código numérico do país de origem."
+        tests:
+          - not_null
+      - name: sigla_uf
+        description: "Sigla da Unidade Federativa do município importador."
+        tests:
+          - not_null
+      - name: id_municipio_7
+        description: "Código IBGE de 7 dígitos do município importador."
+        tests:
+          - not_null
+      - name: nome_municipio
+        description: "Nome oficial do município importador."
+        tests:
+          - not_null
+      - name: peso_liquido_kg
+        description: "Peso líquido total importado pelo município em kg."
+        tests:
+          - not_null
+      - name: valor_fob_usd
+        description: "Valor total FOB importado pelo município em dólares (USD)."
+        tests:
+          - not_null
+
+  - name: stg_comex_ncm_tabela
+    description: "Staging view cadastral das mercadorias da Nomenclatura Comum do Mercosul (NCM)."
+    columns:
+      - name: ncm_8
+        description: "Código canônico da NCM de 8 dígitos."
+        tests:
+          - not_null
+          - unique
+      - name: codigo_unidade
+        description: "Código da unidade de medida padrão da NCM."
+      - name: sh6
+        description: "Código do Sistema Harmonizado no nível de 6 dígitos."
+        tests:
+          - not_null
+      - name: descricao_ncm
+        description: "Descrição oficial da mercadoria em língua portuguesa."
+        tests:
+          - not_null
+      - name: descricao_ncm_ing
+        description: "Descrição oficial da mercadoria em língua inglesa."
+      - name: descricao_ncm_esp
+        description: "Descrição oficial da mercadoria em língua espanhola."
+
+  - name: stg_comex_paises
+    description: "Staging view cadastral dos países parceiros comerciais do MDIC."
+    columns:
+      - name: codigo_pais
+        description: "Código numérico de 3 dígitos do país no MDIC."
+        tests:
+          - not_null
+          - unique
+      - name: iso_alpha3
+        description: "Código internacional do país no padrão ISO 3166-1 Alpha-3."
+        tests:
+          - not_null
+      - name: nome_pais
+        description: "Nome oficial do país parceiro comercial em português."
+        tests:
+          - not_null
+      - name: bloco_economico
+        description: "Bloco econômico ou região geopolítica do país parceiro."
+        tests:
+          - not_null

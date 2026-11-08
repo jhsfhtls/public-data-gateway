@@ -1,0 +1,20 @@
+version: 2
+
+sources:
+  - name: mdic_comexstat
+    description: "Fontes de dados normalizados de comércio exterior (exportações, importações, NCMs e municípios) do MDIC Comex Stat."
+    meta:
+      external_location: "data/mdic_comexstat/silver/{name}.parquet"
+    tables:
+      - name: comex_ncm_exportacao
+        description: "Exportações brasileiras detalhadas por código NCM de 8 dígitos, país de destino, modal e valor FOB."
+      - name: comex_ncm_importacao
+        description: "Importações brasileiras detalhadas por código NCM de 8 dígitos, país de origem, modal e valor FOB."
+      - name: comex_municipios_exportacao
+        description: "Exportações brasileiras agregadas por município IBGE, código SH4 e valor FOB."
+      - name: comex_municipios_importacao
+        description: "Importações brasileiras agregadas por município IBGE, código SH4 e valor FOB."
+      - name: comex_ncm_tabela
+        description: "Tabela cadastral de mercadorias da Nomenclatura Comum do Mercosul (NCM) com 8 dígitos e SH6."
+      - name: comex_paises
+        description: "Tabela cadastral de países parceiros comerciais com código oficial MDIC e ISO Alpha-3."
