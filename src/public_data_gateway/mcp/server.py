@@ -217,6 +217,28 @@ class MCPDispatcher:
                                         "documento": {"type": "string", "description": "CNPJ or CPF to evaluate"},
                                     },
                                     "required": ["documento"],
+                                    },
+                            },
+                            {
+                                "name": "bdg_get_cndt_certificate",
+                                "description": "Query official CNDT labor compliance certificate from TST (Tier 1).",
+                                "inputSchema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "documento": {"type": "string", "description": "CNPJ or CPF to query"},
+                                    },
+                                    "required": ["documento"],
+                                },
+                            },
+                            {
+                                "name": "bdg_get_labor_risk",
+                                "description": "Assess labor compliance risk score and BNDT debtor exposure from TST (Tier 1).",
+                                "inputSchema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "documento": {"type": "string", "description": "CNPJ or CPF to evaluate"},
+                                    },
+                                    "required": ["documento"],
                                 },
                             },
                         ]
@@ -417,6 +439,36 @@ class MCPDispatcher:
             doc = args.get("documento") or args.get("cnpj_or_cpf") or ""
             res = conn.get_litigation_risk(doc)
             wrapped = wrap_untrusted_gov_data(res, source_id="cnj_datajud")
+            return {
+                "jsonrpc": "2.0",
+                "id": req_id,
+                "result": {"content": [{"type": "text", "text": wrapped}], "isError": False},
+            }
+
+        if tool_name in {"bdg_get_cndt_certificate", "pdg_get_cndt_certificate"}:
+            from public_data_gateway.connectors.judicial.tst_cndt.connector import (
+                TstCndtConnector,
+            )
+
+            tst_conn = TstCndtConnector(settings=self.settings)
+            doc = args.get("documento") or args.get("cnpj_or_cpf") or ""
+            res = tst_conn.get_cndt(doc)
+            wrapped = wrap_untrusted_gov_data(res, source_id="tst_cndt")
+            return {
+                "jsonrpc": "2.0",
+                "id": req_id,
+                "result": {"content": [{"type": "text", "text": wrapped}], "isError": False},
+            }
+
+        if tool_name in {"bdg_get_labor_risk", "pdg_get_labor_risk"}:
+            from public_data_gateway.connectors.judicial.tst_cndt.connector import (
+                TstCndtConnector,
+            )
+
+            tst_conn = TstCndtConnector(settings=self.settings)
+            doc = args.get("documento") or args.get("cnpj_or_cpf") or ""
+            res = tst_conn.get_labor_risk(doc)
+            wrapped = wrap_untrusted_gov_data(res, source_id="tst_cndt")
             return {
                 "jsonrpc": "2.0",
                 "id": req_id,

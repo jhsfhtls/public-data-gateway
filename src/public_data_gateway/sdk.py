@@ -209,6 +209,27 @@ class JudicialFacade:
         """Search judicial processes by process number (NUP), party name, or court."""
         return self.connector.search_processos(termo=termo, tribunal=tribunal, limit=limit)
 
+    @property
+    def tst_connector(self) -> Any:
+        if not hasattr(self, "_tst_connector") or getattr(self, "_tst_connector", None) is None:
+            from public_data_gateway.connectors.judicial.tst_cndt.connector import (
+                TstCndtConnector,
+            )
+            self._tst_connector = TstCndtConnector(settings=self._sdk.settings)
+        return self._tst_connector
+
+    def cndt(self, cnpj_or_cpf: str) -> dict[str, Any]:
+        """Query official CNDT labor compliance certificate from TST."""
+        return self.tst_connector.get_cndt(cnpj_or_cpf)
+
+    def labor_risk(self, cnpj_or_cpf: str) -> dict[str, Any]:
+        """Assess labor compliance risk score and BNDT debtor exposure."""
+        return self.tst_connector.get_labor_risk(cnpj_or_cpf)
+
+    def search_debitos_trabalhistas(self, termo: str) -> list[dict[str, Any]]:
+        """Search Banco Nacional de Devedores Trabalhistas (BNDT) records."""
+        return self.tst_connector.search_debitos(termo)
+
 
 class BrazilData:
     """Unified developer SDK facade for querying, normalizing, and enriching Brazilian public datasets."""
@@ -297,6 +318,14 @@ class BrazilData:
     def get_litigation_risk(self, cnpj_or_cpf: str) -> dict[str, Any]:
         """Assess corporate or individual litigation risk profile across all courts (CNJ DataJud)."""
         return self.judicial.litigation_risk(cnpj_or_cpf)
+
+    def get_cndt(self, cnpj_or_cpf: str) -> dict[str, Any]:
+        """Query official CNDT labor compliance certificate (TST)."""
+        return self.judicial.cndt(cnpj_or_cpf)
+
+    def get_labor_risk(self, cnpj_or_cpf: str) -> dict[str, Any]:
+        """Assess labor compliance and BNDT risk profile (TST)."""
+        return self.judicial.labor_risk(cnpj_or_cpf)
 
     def resolve_municipality(
         self, code_or_name: str | int, uf: str | None = None

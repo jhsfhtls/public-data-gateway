@@ -334,4 +334,32 @@ def create_app(settings: GatewaySettings | None = None) -> FastAPI:
         conn = CNJDataJudConnector(settings=app_settings)
         return conn.search_processos(termo=termo, tribunal=tribunal, limit=limit)
 
+    # 9. Labor Compliance & CNDT Routes (TST CNDT & BNDT)
+    @app.get("/api/v1/judicial/cndt/{cnpj_or_cpf}")
+    async def get_tst_cndt_certificate(cnpj_or_cpf: str) -> dict[str, Any]:
+        from public_data_gateway.connectors.judicial.tst_cndt.connector import (
+            TstCndtConnector,
+        )
+
+        conn = TstCndtConnector(settings=app_settings)
+        return conn.get_cndt(cnpj_or_cpf)
+
+    @app.get("/api/v1/judicial/labor-risk/{cnpj_or_cpf}")
+    async def get_tst_labor_risk(cnpj_or_cpf: str) -> dict[str, Any]:
+        from public_data_gateway.connectors.judicial.tst_cndt.connector import (
+            TstCndtConnector,
+        )
+
+        conn = TstCndtConnector(settings=app_settings)
+        return conn.get_labor_risk(cnpj_or_cpf)
+
+    @app.get("/api/v1/judicial/debitos")
+    async def search_tst_debitos(termo: str) -> list[dict[str, Any]]:
+        from public_data_gateway.connectors.judicial.tst_cndt.connector import (
+            TstCndtConnector,
+        )
+
+        conn = TstCndtConnector(settings=app_settings)
+        return conn.search_debitos(termo)
+
     return app

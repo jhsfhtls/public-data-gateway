@@ -1457,6 +1457,194 @@ models:
         tests:
           - not_null
 
+  - name: dim_tribunal_regional_trabalho
+    description: "Dimensão com o catálogo dos Tribunais Regionais do Trabalho (TRT 1 a 24) e TST com jurisdição, sede e porte de volume processual."
+    columns:
+      - name: sigla_trt
+        description: "Sigla oficial do tribunal do trabalho (ex.: TRT01, TRT02, ..., TST)."
+        tests:
+          - unique
+          - not_null
+      - name: nome_tribunal
+        description: "Nome por extenso do Tribunal Regional do Trabalho."
+        tests:
+          - not_null
+      - name: jurisdicao_uf
+        description: "Unidade Federativa sob jurisdição do TRT."
+        tests:
+          - not_null
+      - name: sede_municipio
+        description: "Município sede do Tribunal Regional do Trabalho."
+        tests:
+          - not_null
+      - name: regiao_brasil
+        description: "Região geográfica brasileira do tribunal."
+        tests:
+          - not_null
+      - name: porte_tribunal_trabalho
+        description: "Classificação do volume processual trabalhista (ALTO_VOLUME_PROCESSUAL, MEDIO_VOLUME_PROCESSUAL, PADRAO_REGIONAL)."
+        tests:
+          - not_null
+
+  - name: dim_status_cndt
+    description: "Dimensão de domínio das situações jurídicas da CNDT e implicações para contratações públicas."
+    columns:
+      - name: codigo_status
+        description: "Código oficial da situação da CNDT perante a CLT e Res. TST 1470/2011."
+        tests:
+          - unique
+          - not_null
+      - name: descricao_status
+        description: "Descrição pormenorizada do significado jurídico da certidão."
+        tests:
+          - not_null
+      - name: permite_licitar
+        description: "Booleano determinando se a empresa está legalmente apta para participar de compras públicas."
+        tests:
+          - not_null
+      - name: nivel_risco_trabalhista
+        description: "Classificação preliminar de risco da situação trabalhista (BAIXO, MEDIO, ALTO)."
+        tests:
+          - not_null
+
+  - name: fct_certidao_trabalhista
+    description: "Tabela fato registrando as Certidões Negativas de Débitos Trabalhistas (CNDT) emitidas pelo TST."
+    columns:
+      - name: numero_certidao
+        description: "Número da certidão de débitos trabalhistas emitida pelo TST."
+        tests:
+          - unique
+          - not_null
+      - name: ano_certidao
+        description: "Ano civil de emissão da certidão."
+        tests:
+          - not_null
+      - name: cnpj_ou_cpf
+        description: "CNPJ ou CPF do devedor/contribuinte consultado."
+        tests:
+          - not_null
+      - name: cnpj_raiz
+        description: "Raiz do CNPJ com os 8 primeiros dígitos para pessoas jurídicas."
+      - name: razao_social_ou_nome
+        description: "Nome empresarial ou civil constante no cadastro judicial."
+        tests:
+          - not_null
+      - name: tipo_documento
+        description: "Tipo do documento (CNPJ ou CPF)."
+        tests:
+          - not_null
+      - name: status_certidao
+        description: "Situação jurídica da certidão (NEGATIVA, POSITIVA_COM_EFEITO_DE_NEGATIVA, POSITIVA)."
+        tests:
+          - not_null
+      - name: is_regular
+        description: "Flag booleana de regularidade jurídica no momento da emissão."
+        tests:
+          - not_null
+      - name: data_expedicao
+        description: "Data de emissão oficial no TST."
+        tests:
+          - not_null
+      - name: hora_expedicao
+        description: "Horário de Brasília da expedição da certidão."
+        tests:
+          - not_null
+      - name: data_validade
+        description: "Data de expiração da certidão (vigência legal de 180 dias)."
+        tests:
+          - not_null
+      - name: codigo_autenticidade
+        description: "Código alfanumérico para verificação pública de autenticidade no TST."
+        tests:
+          - unique
+          - not_null
+      - name: orgao_emissor
+        description: "Tribunal emissor (Tribunal Superior do Trabalho)."
+        tests:
+          - not_null
+      - name: permite_licitar
+        description: "Indicador se a certidão autoriza habilitação em licitações públicas."
+        tests:
+          - not_null
+      - name: nivel_risco_trabalhista
+        description: "Classificação de risco trabalhista associada ao status."
+        tests:
+          - not_null
+      - name: is_certidao_ativa_valida
+        description: "Indicador de que a certidão está vigente e com situação regular hoje."
+        tests:
+          - not_null
+      - name: ingestion_timestamp
+        description: "Timestamp ISO-8601 da ingestão dos dados."
+        tests:
+          - not_null
+
+  - name: fct_debito_trabalhista_bndt
+    description: "Tabela fato com dívidas e execuções ativas inscritas no Banco Nacional de Devedores Trabalhistas (BNDT)."
+    columns:
+      - name: id_debito_bndt
+        description: "Identificador único do débito trabalhista inscrito no BNDT."
+        tests:
+          - unique
+          - not_null
+      - name: numero_certidao
+        description: "Número da certidão onde o apontamento de dívida se originou."
+        tests:
+          - not_null
+      - name: cnpj_ou_cpf
+        description: "Documento do devedor trabalhista inscrito."
+        tests:
+          - not_null
+      - name: numero_processo_nup
+        description: "Número Único de Processo (NUP) da execução trabalhista."
+        tests:
+          - not_null
+      - name: tribunal_origem
+        description: "Sigla do Tribunal Regional do Trabalho de origem."
+        tests:
+          - not_null
+      - name: nome_tribunal
+        description: "Nome por extenso do tribunal do trabalho."
+        tests:
+          - not_null
+      - name: jurisdicao_uf
+        description: "Unidade Federativa da execução trabalhista."
+        tests:
+          - not_null
+      - name: regiao_brasil
+        description: "Macrorregião geográfica brasileira da execução."
+        tests:
+          - not_null
+      - name: vara_trabalho
+        description: "Vara do Trabalho onde tramita a execução."
+        tests:
+          - not_null
+      - name: tipo_divida_trabalhista
+        description: "Natureza jurídica da dívida trabalhista inscrita."
+        tests:
+          - not_null
+      - name: valor_debito
+        description: "Valor financeiro do débito trabalhista em Reais (BRL)."
+        tests:
+          - not_null
+      - name: situacao_exigibilidade
+        description: "Condição de exigibilidade da obrigação (EXIGIVEL, SUSPENSA, GARANTIDA_POR_PENHORA)."
+        tests:
+          - not_null
+      - name: data_inclusao_bndt
+        description: "Data de inclusão do devedor no Banco Nacional de Devedores Trabalhistas."
+        tests:
+          - not_null
+      - name: is_debito_exigivel
+        description: "Flag booleana indicando se o débito está com exigibilidade ativa."
+        tests:
+          - not_null
+      - name: ingestion_timestamp
+        description: "Timestamp da carga dos dados."
+        tests:
+          - not_null
+
+
 
 
 

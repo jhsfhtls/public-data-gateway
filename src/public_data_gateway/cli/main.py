@@ -158,6 +158,18 @@ def build_parser() -> argparse.ArgumentParser:
     jud_search_p.add_argument("--limit", type=int, default=10, help="Max rows to return")
     jud_search_p.add_argument("--json", action="store_true", help="Output in JSON format")
 
+    jud_cndt_p = jud_sub.add_parser("cndt", help="Query official CNDT certificate by CNPJ or CPF.")
+    jud_cndt_p.add_argument("documento", type=str, help="CNPJ or CPF to query")
+    jud_cndt_p.add_argument("--json", action="store_true", help="Output in JSON format")
+
+    jud_lrisk_p = jud_sub.add_parser("labor-risk", help="Assess labor compliance and BNDT debtor risk score.")
+    jud_lrisk_p.add_argument("documento", type=str, help="CNPJ or CPF to evaluate")
+    jud_lrisk_p.add_argument("--json", action="store_true", help="Output in JSON format")
+
+    jud_deb_p = jud_sub.add_parser("debitos", help="Search Banco Nacional de Devedores Trabalhistas (BNDT).")
+    jud_deb_p.add_argument("termo", type=str, help="Document, court, or NUP")
+    jud_deb_p.add_argument("--json", action="store_true", help="Output in JSON format")
+
     return parser
 
 
@@ -487,6 +499,57 @@ def main(argv: Sequence[str] | None = None) -> int:
                     print(f"DataJud Processos ({len(rows)} found):")
                     for r in rows:
                         print(f"  {r['numero_processo']} | {r['tribunal_sigla']} ({r['grau_jurisdicao']}) | {r['classe_nome']} | R$ {r.get('valor_causa', 0.0):,.2f} | {r['polo_passivo_nome']}")
+                return 0
+
+            if args.jud_action == "cndt":
+                from public_data_gateway.connectors.judicial.tst_cndt.connector import (
+                    TstCndtConnector,
+                )
+                tst_conn = TstCndtConnector(settings=settings)
+                res = tst_conn.get_cndt(args.documento)
+                if args.json:
+                    print(json.dumps(res, indent=2, ensure_ascii=False))
+                else:
+                    print(f"CNDT Certificate for '{args.documento}':")
+                    print(f"  Certidão Número:   {res.get('numero_certidao', 'N/A')}")
+                    print(f"  Razão Social/Nome: {res.get('razao_social_ou_nome', 'N/A')}")
+                    print(f"  Situação:          {res.get('status_certidao', 'N/A')}")
+                    print(f"  Regular:           {res.get('is_regular', False)}")
+                    print(f"  Validade:          {res.get('data_validade', 'N/A')}")
+                    print(f"  Autenticidade:     {res.get('codigo_autenticidade', 'N/A')}")
+                return 0
+
+            if args.jud_action == "labor-risk":
+                from public_data_gateway.connectors.judicial.tst_cndt.connector import (
+                    TstCndtConnector,
+                )
+                tst_conn = TstCndtConnector(settings=settings)
+                res = tst_conn.get_labor_risk(args.documento)
+                if args.json:
+                    print(json.dumps(res, indent=2, ensure_ascii=False))
+                else:
+                    print(f"Labor Compliance Risk Profile for '{args.documento}':")
+                    print(f"  Razão Social/Nome: {res.get('razao_social_ou_nome', 'N/A')}")
+                    print(f"  Status CNDT:       {res.get('ultimo_status_cndt', 'N/A')}")
+                    print(f"  Certidão Válida:   {res.get('is_cndt_valida', False)}")
+                    print(f"  Risco Trabalhista: {res.get('labor_risk_class', 'N/A')}")
+                    print(f"  Labor Risk Score:  {res.get('labor_risk_score', 0.0)}")
+                    print(f"  Processos BNDT:    {res.get('qtd_processos_bndt_ativos', 0)}")
+                    print(f"  Passivo Total:     R$ {res.get('valor_total_passivo_trabalhista', 0.0):,.2f}")
+                return 0
+
+            if args.jud_action == "debitos":
+                from public_data_gateway.connectors.judicial.tst_cndt.connector import (
+                    TstCndtConnector,
+                )
+                tst_conn = TstCndtConnector(settings=settings)
+                rows = tst_conn.search_debitos(args.termo)
+                if args.json:
+                    print(json.dumps(rows, indent=2, ensure_ascii=False))
+                else:
+                    print(f"Found {len(rows)} BNDT debtor entries matching '{args.termo}':")
+                    for r in rows:
+                        print(f"  - [{r.get('tribunal_origem')}] NUP: {r.get('numero_processo_nup')} | R$ {r.get('valor_debito', 0.0):,.2f} | {r.get('situacao_exigibilidade')}")
                 return 0
 
     except Exception as exc:
