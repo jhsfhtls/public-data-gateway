@@ -1,0 +1,107 @@
+schema_version: "3.1.0"
+contract_id: "ODCS-BR-IBGE-CENSO2022-001"
+source_id: "ibge_censo2022"
+version: "1.0.0"
+name: "IBGE Censo Demográfico 2022 - População, Domicílios, Estrutura Etária, Alfabetização e Urbanização"
+agency: "Instituto Brasileiro de Geografia e Estatística (IBGE)"
+official_url: "https://censo2022.ibge.gov.br"
+
+legal_framework:
+  statutes:
+    - name: "Lei nº 5.534/1968"
+      description: "Dispõe sobre a obrigatoriedade da prestação de informações estatísticas ao IBGE e assegura o sigilo censitário"
+    - name: "Lei nº 5.878/1973"
+      description: "Define os objetivos e competências da Fundação Instituto Brasileiro de Geografia e Estatística (IBGE)"
+    - name: "Decreto nº 73.177/1973"
+      description: "Aprova o regulamento geral do IBGE e fixa suas atribuições no Sistema Estatístico e Censitário Nacional"
+    - name: "Portaria IBGE nº 123/2021"
+      description: "Institui a Política de Dados Abertos e Governança Censitária do IBGE"
+
+data_governance:
+  grain: "municipio_censo"
+  primary_keys:
+    - "id_municipio"
+    - "ano_censo"
+  reference_date_column: "reference_date"
+  min_expected_rows: 5
+  max_volume_drop_pct: 20.0
+  freshness_sla_hours: 87600
+  lgpd_tier: "ANONYMIZED_MICRODATA"
+  ml_feature_domains:
+    - "census_tracts"
+    - "socioeconomic_profile"
+    - "demographic_transition"
+
+columns:
+  - name: "id_municipio"
+    data_type: "string"
+    required: true
+    nullable: false
+    max_null_pct: 0.0
+    description: "Código IBGE de 7 dígitos identificador único do município"
+  - name: "nome_municipio"
+    data_type: "string"
+    required: true
+    nullable: false
+    max_null_pct: 0.0
+    description: "Nome oficial do município brasileiro"
+  - name: "sigla_uf"
+    data_type: "string"
+    required: true
+    nullable: false
+    max_null_pct: 0.0
+    description: "Sigla de 2 letras da Unidade Federativa"
+  - name: "ano_censo"
+    data_type: "integer"
+    required: true
+    nullable: false
+    max_null_pct: 0.0
+    description: "Ano do recenseamento geral oficial (2022)"
+  - name: "populacao_residente"
+    data_type: "integer"
+    required: true
+    nullable: false
+    max_null_pct: 0.0
+    description: "População total residente apurada no Censo Demográfico"
+  - name: "total_domicilios_particulares_ocupados"
+    data_type: "integer"
+    required: true
+    nullable: false
+    max_null_pct: 0.0
+    description: "Quantidade total de domicílios particulares permanentes ocupados"
+  - name: "total_moradores_domicilios_ocupados"
+    data_type: "integer"
+    required: true
+    nullable: false
+    max_null_pct: 0.0
+    description: "Número total de pessoas residentes em domicílios ocupados"
+  - name: "media_moradores_por_domicilio"
+    data_type: "float"
+    required: true
+    nullable: false
+    max_null_pct: 0.0
+    description: "Média de moradores por domicílio particular ocupado"
+  - name: "area_territorial_km2"
+    data_type: "float"
+    required: true
+    nullable: false
+    max_null_pct: 0.0
+    description: "Área territorial da unidade municipal em quilômetros quadrados"
+  - name: "densidade_demografica_hab_km2"
+    data_type: "float"
+    required: true
+    nullable: false
+    max_null_pct: 0.0
+    description: "Densidade demográfica em habitantes por quilômetro quadrado"
+  - name: "reference_date"
+    data_type: "string"
+    required: true
+    nullable: false
+    max_null_pct: 0.0
+    description: "Data de referência da consolidação censitária (AAAA-MM-DD)"
+  - name: "extracted_at"
+    data_type: "string"
+    required: true
+    nullable: false
+    max_null_pct: 0.0
+    description: "Timestamp ISO-8601 UTC do momento da ingestão estatística"

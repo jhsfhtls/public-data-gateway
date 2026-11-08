@@ -3368,3 +3368,137 @@ models:
         description: "Timestamp ISO-8601 da extração estatística."
         tests:
           - not_null
+
+  - name: fct_censo_demografico_municipios
+    description: "Tabela fato consolidada das características populacionais, domiciliares, etárias, educacionais e territoriais apuradas no Censo Demográfico 2022."
+    columns:
+      - name: id_municipio
+        description: "Código IBGE de 7 dígitos do município."
+        tests:
+          - not_null
+      - name: nome_municipio
+        description: "Nome oficial do município."
+        tests:
+          - not_null
+      - name: sigla_uf
+        description: "Sigla de 2 letras da Unidade Federativa."
+        tests:
+          - not_null
+      - name: regiao
+        description: "Grande região geográfica do Brasil."
+      - name: is_capital
+        description: "Flag indicando se o município é capital estadual ou federal."
+        tests:
+          - not_null
+      - name: ano_censo
+        description: "Ano censitário oficial (2022)."
+        tests:
+          - not_null
+      - name: populacao_residente
+        description: "População residente apurada no Censo 2022."
+        tests:
+          - not_null
+      - name: total_domicilios_particulares_ocupados
+        description: "Quantidade de domicílios particulares permanentes ocupados."
+        tests:
+          - not_null
+      - name: total_moradores_domicilios_ocupados
+        description: "Total de residentes em domicílios particulares permanentes ocupados."
+        tests:
+          - not_null
+      - name: media_moradores_por_domicilio
+        description: "Média de moradores por domicílio particular permanente ocupado."
+        tests:
+          - not_null
+      - name: area_territorial_km2
+        description: "Área territorial oficial do município em quilômetros quadrados."
+        tests:
+          - not_null
+      - name: densidade_demografica_hab_km2
+        description: "Densidade demográfica em habitantes por km²."
+        tests:
+          - not_null
+      - name: idade_mediana_anos
+        description: "Idade que divide a população municipal em duas partes iguais."
+      - name: indice_envelhecimento_razao
+        description: "Número de idosos (65+ anos) por 100 jovens (0 a 14 anos)."
+      - name: razao_sexo_homens_por_100_mulheres
+        description: "Número de homens residentes para cada 100 mulheres."
+      - name: populacao_homens
+        description: "População total residente do sexo masculino."
+      - name: populacao_mulheres
+        description: "População total residente do sexo feminino."
+      - name: populacao_15_anos_ou_mais
+        description: "População residente em idade de alfabetização (15+ anos)."
+      - name: populacao_alfabetizada
+        description: "População residente de 15+ anos com capacidade de ler e escrever."
+      - name: taxa_alfabetizacao_pct
+        description: "Percentual de alfabetização da população de 15+ anos."
+      - name: taxa_analfabetismo_pct
+        description: "Percentual de analfabetismo da população de 15+ anos."
+      - name: populacao_urbana
+        description: "População municipal residente em área urbana."
+      - name: populacao_rural
+        description: "População municipal residente em área rural."
+      - name: taxa_urbanizacao_pct
+        description: "Percentual da população municipal residente em áreas urbanas."
+      - name: predominancia_territorial
+        description: "Classificação territorial predominante (URBANA ou RURAL)."
+      - name: reference_date
+        description: "Data de referência da coleta dos dados."
+        tests:
+          - not_null
+      - name: extracted_at
+        description: "Timestamp ISO-8601 UTC de ingestão."
+        tests:
+          - not_null
+
+  - name: fct_censo_diversidade_etnico_racial
+    description: "Tabela fato da distribuição e proporção de povos indígenas e comunidades quilombolas apurados no Censo 2022."
+    columns:
+      - name: id_municipio
+        description: "Código IBGE de 7 dígitos do município."
+        tests:
+          - not_null
+      - name: nome_municipio
+        description: "Nome oficial do município."
+        tests:
+          - not_null
+      - name: sigla_uf
+        description: "Sigla de 2 letras da Unidade Federativa."
+        tests:
+          - not_null
+      - name: regiao
+        description: "Grande região geográfica do Brasil."
+      - name: is_capital
+        description: "Flag booleana indicando se o município é capital."
+        tests:
+          - not_null
+      - name: ano_censo
+        description: "Ano censitário oficial (2022)."
+        tests:
+          - not_null
+      - name: populacao_indigena
+        description: "População residente autodeclarada indígena no Censo 2022."
+        tests:
+          - not_null
+      - name: populacao_quilombola
+        description: "População residente que se autodeclarou quilombola no Censo 2022."
+        tests:
+          - not_null
+      - name: percentual_indigena_pct
+        description: "Proporção percentual da população indígena sobre o total do município."
+        tests:
+          - not_null
+      - name: percentual_quilombola_pct
+        description: "Proporção percentual da população quilombola sobre o total do município."
+        tests:
+          - not_null
+      - name: reference_date
+        description: "Data de referência da consolidação censitária."
+        tests:
+          - not_null
+      - name: extracted_at
+        description: "Timestamp ISO-8601 UTC da ingestão dos dados."
+        tests:
+          - not_null

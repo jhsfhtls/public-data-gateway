@@ -396,6 +396,33 @@ def build_parser() -> argparse.ArgumentParser:
     pib_p.add_argument("id_municipio", type=str, help="IBGE 7-digit municipality code")
     pib_p.add_argument("--json", action="store_true", help="Output in JSON format")
 
+    # Subcommand: censo (IBGE Censo Demográfico 2022)
+    censo_p = subparsers.add_parser(
+        "censo", help="Query official IBGE Censo Demográfico 2022 population, households, aging, and literacy."
+    )
+    censo_sub = censo_p.add_subparsers(dest="censo_action", required=True)
+
+    c_sum_p = censo_sub.add_parser("summary", help="Query population, households, and density by municipality ID.")
+    c_sum_p.add_argument("id_municipio", type=str, help="IBGE 7-digit municipality code")
+    c_sum_p.add_argument("--json", action="store_true", help="Output in JSON format")
+
+    c_prof_p = censo_sub.add_parser("profile", help="Query Gold demographic profile, social maturity, and aging index.")
+    c_prof_p.add_argument("id_municipio", type=str, help="IBGE 7-digit municipality code")
+    c_prof_p.add_argument("--json", action="store_true", help="Output in JSON format")
+
+    c_lit_p = censo_sub.add_parser("literacy", help="Query literacy rate and literate population counts.")
+    c_lit_p.add_argument("id_municipio", type=str, help="IBGE 7-digit municipality code")
+    c_lit_p.add_argument("--json", action="store_true", help="Output in JSON format")
+
+    c_age_p = censo_sub.add_parser("aging", help="List municipalities with highest aging index ratio.")
+    c_age_p.add_argument("--limit", type=int, default=10, help="Max municipalities to list")
+    c_age_p.add_argument("--json", action="store_true", help="Output in JSON format")
+
+    # Direct shortcut: censo2022
+    censo_s_p = subparsers.add_parser("censo2022", help="Shortcut to query Censo 2022 demographic profile.")
+    censo_s_p.add_argument("id_municipio", type=str, help="IBGE 7-digit municipality code")
+    censo_s_p.add_argument("--json", action="store_true", help="Output in JSON format")
+
     return parser
 
 
@@ -1358,6 +1385,91 @@ def main(argv: Sequence[str] | None = None) -> int:
                     print(f"Top {len(ranks)} Municipalities by GDP (IBGE SIDRA):")
                     for idx, r in enumerate(ranks, 1):
                         print(f"  {idx}. {r.get('nome_municipio')} ({r.get('sigla_uf')}): R$ {r.get('pib_mil_reais', 0.0):,.2f} mil | Per Capita: R$ {r.get('pib_per_capita_reais', 0.0):,.2f}")
+                return 0
+
+        elif args.command in ("censo", "censo2022"):
+            from public_data_gateway.connectors.demografico.ibge_censo2022.connector import (
+                IBGECenso2022Connector,
+            )
+
+            censo_conn = IBGECenso2022Connector(settings=settings)
+
+            if args.command == "censo2022":
+                prof = censo_conn.get_demographic_profile(args.id_municipio)
+                if not prof:
+                    print(f"Demographic profile not found for ID '{args.id_municipio}'", file=sys.stderr)
+                    return 1
+                if args.json:
+                    print(json.dumps(prof, indent=2, ensure_ascii=False))
+                else:
+                    print(f"IBGE Censo 2022 Profile: {prof.get('nome_municipio')} ({prof.get('sigla_uf')} - {prof.get('id_municipio')}):")
+                    print(f"  População Residente:     {prof.get('populacao_residente'):,} habitantes")
+                    print(f"  Domicílios Ocupados:     {prof.get('total_domicilios_particulares_ocupados'):,}")
+                    print(f"  Idade Mediana:           {prof.get('idade_mediana_anos')} anos")
+                    print(f"  Índice Envelhecimento:   {prof.get('indice_envelhecimento_razao')}")
+                    print(f"  Taxa de Alfabetização:   {prof.get('taxa_alfabetizacao_pct')}%")
+                    print(f"  Taxa de Urbanização:     {prof.get('taxa_urbanizacao_pct')}%")
+                    print(f"  Score Maturidade Social: {prof.get('score_maturidade_social')}/100")
+                return 0
+
+            censo_action = getattr(args, "censo_action", None)
+
+            if censo_action == "summary":
+                data = censo_conn.get_census_summary(args.id_municipio)
+                if not data:
+                    print(f"Census summary not found for ID '{args.id_municipio}'", file=sys.stderr)
+                    return 1
+                if args.json:
+                    print(json.dumps(data, indent=2, ensure_ascii=False))
+                else:
+                    print(f"IBGE Censo 2022 Summary: {data.get('nome_municipio')} ({data.get('sigla_uf')} - {data.get('id_municipio')}):")
+                    print(f"  População Residente:     {data.get('populacao_residente'):,} habitantes")
+                    print(f"  Domicílios Ocupados:     {data.get('total_domicilios_particulares_ocupados'):,}")
+                    print(f"  Média Moradores/Domic.:  {data.get('media_moradores_por_domicilio')}")
+                    print(f"  Densidade Demográfica:   {data.get('densidade_demografica_hab_km2')} hab/km²")
+                return 0
+
+            if censo_action == "profile":
+                prof = censo_conn.get_demographic_profile(args.id_municipio)
+                if not prof:
+                    print(f"Demographic profile not found for ID '{args.id_municipio}'", file=sys.stderr)
+                    return 1
+                if args.json:
+                    print(json.dumps(prof, indent=2, ensure_ascii=False))
+                else:
+                    print(f"IBGE Censo 2022 Profile: {prof.get('nome_municipio')} ({prof.get('sigla_uf')} - {prof.get('id_municipio')}):")
+                    print(f"  População Residente:     {prof.get('populacao_residente'):,} habitantes")
+                    print(f"  Domicílios Ocupados:     {prof.get('total_domicilios_particulares_ocupados'):,}")
+                    print(f"  Idade Mediana:           {prof.get('idade_mediana_anos')} anos")
+                    print(f"  Índice Envelhecimento:   {prof.get('indice_envelhecimento_razao')}")
+                    print(f"  Taxa de Alfabetização:   {prof.get('taxa_alfabetizacao_pct')}%")
+                    print(f"  Taxa de Urbanização:     {prof.get('taxa_urbanizacao_pct')}%")
+                    print(f"  Score Maturidade Social: {prof.get('score_maturidade_social')}/100")
+                return 0
+
+            if censo_action == "literacy":
+                data = censo_conn.get_literacy_indicators(args.id_municipio)
+                if not data:
+                    print(f"Literacy indicators not found for ID '{args.id_municipio}'", file=sys.stderr)
+                    return 1
+                if args.json:
+                    print(json.dumps(data, indent=2, ensure_ascii=False))
+                else:
+                    print(f"IBGE Censo 2022 Literacy: {data.get('nome_municipio')} ({data.get('sigla_uf')} - {data.get('id_municipio')}):")
+                    print(f"  População 15+ Anos:      {data.get('populacao_15_anos_ou_mais'):,}")
+                    print(f"  População Alfabetizada:  {data.get('populacao_alfabetizada'):,}")
+                    print(f"  Taxa de Alfabetização:   {data.get('taxa_alfabetizacao_pct')}%")
+                    print(f"  Taxa de Analfabetismo:   {data.get('taxa_analfabetismo_pct')}%")
+                return 0
+
+            if censo_action == "aging":
+                ranks = censo_conn.list_highest_aging_municipalities(limit=args.limit)
+                if args.json:
+                    print(json.dumps(ranks, indent=2, ensure_ascii=False))
+                else:
+                    print(f"Top {len(ranks)} Municipalities by Aging Index (Censo 2022):")
+                    for idx, r in enumerate(ranks, 1):
+                        print(f"  {idx}. {r.get('nome_municipio')} ({r.get('sigla_uf')}): Índice {r.get('indice_envelhecimento_razao')} | Idade Mediana: {r.get('idade_mediana_anos')} anos | {r.get('classificacao_etaria')}")
                 return 0
 
     except Exception as exc:

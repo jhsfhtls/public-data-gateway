@@ -569,7 +569,7 @@ sources:
   - P03
   rice_score: 570
   roadmap_wave: 4
-  status: CATALOGED
+  status: HOMOLOGATED
 - source_id: mte_novo_caged
   name: 'MTE: Microdados do Novo CAGED'
   agency: Ministério do Trabalho e Emprego (MTE)

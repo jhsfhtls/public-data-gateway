@@ -1,6 +1,6 @@
 {
   "schema_version": "1.0.0",
-  "last_updated": "2026-11-08T11:16:57.924695+00:00",
+  "last_updated": "2026-11-08T11:45:00.000000+00:00",
   "project_name": "public-data-gateway",
   "ecosystem": "C.O.R.E. (core, operations, career, studies)",
   "governing_pops": [
@@ -13,10 +13,10 @@
     "POP_T_148"
   ],
   "current_macro_phase_id": "06",
-  "current_macro_phase": "Fase 06 - Ingestão Wave 4 em Andamento (Censo, Trabalho, Logística & Telecom: ibge_sidra homologado)",
+  "current_macro_phase": "Fase 06 - Ingestão Wave 4 em Andamento (Censo, Trabalho, Logística & Telecom: ibge_sidra e ibge_censo2022 homologados)",
   "overall_status": "ON_TRACK",
-  "active_connector": "ibge_censo2022",
-  "next_connector": "mte_novo_caged",
+  "active_connector": "mte_novo_caged",
+  "next_connector": "ibge_pnad_continua",
   "structural_phases": [
     {
       "phase_id": "00",
@@ -114,8 +114,8 @@
       "completion_date": null,
       "deliverables": [
         "Conector ibge_sidra (PIB municipal, Censo demográfico, PAM, IPCA e Gini) - CONCLUÍDO",
-        "Conectores ibge_censo2022 & ibge_pnad_continua",
-        "Conectores mte_novo_caged & mte_rais",
+        "Conector ibge_censo2022 (Microdados, Domicílios, Estrutura Etária, Alfabetização, Diversidade) - CONCLUÍDO",
+        "Conectores ibge_pnad_continua, mte_novo_caged & mte_rais",
         "Conectores ibge_cnefe, ibge_malhas, anatel_mosaico, antt_malha_transporte"
       ]
     },
@@ -385,6 +385,12 @@
       "phase_id": "05",
       "milestone": "Conclusão da Wave 3 & Homologação do Conector comprasgov_catmat (5 Tabelas, dbt, Marts de Benchmark de Preços e Fornecedores & Live Fail-Hard)",
       "summary": "Implementação e homologação completa do conector comprasgov_catmat (Compras.gov.br Catálogo Unificado de Materiais e Serviços CATMAT/CATSER e Pesquisa de Preços Praticados, Lei nº 14.133/2021, Decreto nº 11.462/2023, IN SEGES nº 65/2021 e Portaria SEGES nº 938/2022) finalizando com 100% de sucesso a Wave 3 da plataforma: 5 tabelas (catmat_itens_material, catser_itens_servico, catmat_grupos_classes, catmat_precos_praticados, catmat_fornecedores_compras) materializadas em data/comprasgov_catmat/{bronze,silver,gold}/; 11 novos modelos dbt (5 staging views, dim_item_material_catmat, dim_item_servico_catser, fct_preco_praticado_comprasgov, fct_fornecedor_compras_catalogo, mart_benchmark_precos_catmat, mart_fornecedores_destaque_comprasgov) totalizando 181 modelos dbt (86 tabelas, 95 views) e 1809 testes dbt 100% aprovados com 0 erros; 2094 colunas 100% documentadas no linter (100% documentation coverage); feature store features_compras_catalogo_brasil.parquet gerada com métricas de benchmark de preços, dispersão de cotações, índice de competitividade de fornecedores e rating de risco de sobrepreço; testes reais de 1 linha com fail-hard contra a API oficial do Compras.gov.br (dadosabertos.compras.gov.br) com 11 testes pytest aprovados (147 testes offline totais no repositório); multi-interface completa via SDK (PublicData.procurement.*, search_catmat, search_catser, get_procurement_benchmark, get_procurement_supplier), CLI (pdg procurement materials, services, benchmark, supplier e atalho direto pdg catmat), REST API (/api/v1/procurement/* e atalho /api/v1/catmat/*) e MCP (bdg_search_catmat_materials, bdg_get_procurement_price_benchmark) com proteção contra prompt injection."
+    },
+    {
+      "date": "2026-11-08",
+      "phase_id": "06",
+      "milestone": "Homologação do Conector ibge_censo2022 (5 Tabelas, dbt, Mart de Transição Demográfica & Live Fail-Hard)",
+      "summary": "Implementação e homologação completa do conector ibge_censo2022 (IBGE Censo Demográfico 2022 — Microdados, Domicílios Ocupados, Estrutura Etária, Alfabetização e Diversidade Étnico-Racial, Leis nº 5.534/1968, 5.878/1973 e Portaria IBGE nº 123/2021) consolidando o segundo conector da Wave 4: 5 tabelas (censo_populacao_domicilios, censo_estrutura_etaria, censo_educacao_alfabetizacao, censo_urbanizacao_situacao, censo_diversidade_quilombola_indigena) materializadas em data/ibge_censo2022/{bronze,silver,gold}/; 8 novos modelos dbt (5 staging views, fct_censo_demografico_municipios, fct_censo_diversidade_etnico_racial, mart_censo_transicao_demografica_brasil) totalizando 201 modelos dbt (96 tabelas, 105 views) e 1967 testes dbt 100% aprovados com 0 erros; 2374 colunas 100% documentadas no linter (100% coverage); feature store features_censo2022_municipios_brasil.parquet gerada com indicadores demográficos (idade mediana, índice de envelhecimento, razão de sexo, taxa de alfabetização/analfabetismo, urbanização, população indígena/quilombola), score de maturidade social (0 a 100) e score de vulnerabilidade demográfica; testes reais com fail-hard estrito contra as APIs oficiais do IBGE SIDRA Censo 2022 (Tabelas 4712, 9515 e 9543) com 9 testes pytest aprovados (175 testes offline totais no repositório); multi-interface completa via SDK (PublicData.socioeconomic.*, census_summary, demographic_profile, literacy_indicators, highest_aging_municipalities), CLI (pdg censo summary/profile/literacy/aging e atalho direto pdg censo2022), REST API (/api/v1/census/* e atalho /api/v1/censo/*) e MCP (bdg_get_census_summary, bdg_get_demographic_profile, bdg_list_highest_aging_municipalities) com contenção de prompt injection."
     }
   ]
 }
