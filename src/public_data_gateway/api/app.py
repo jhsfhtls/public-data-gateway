@@ -770,4 +770,52 @@ def create_app(settings: GatewaySettings | None = None) -> FastAPI:
         conn = IBGESidraConnector(settings=app_settings)
         return conn.list_top_municipalities_by_gdp(limit=limit)
 
+    @app.get("/api/v1/census/municipality/{id_municipio}/summary")
+    async def get_census_summary(id_municipio: str) -> dict[str, Any]:
+        from public_data_gateway.connectors.demografico.ibge_censo2022.connector import (
+            IBGECenso2022Connector,
+        )
+
+        conn = IBGECenso2022Connector(settings=app_settings)
+        res = conn.get_census_summary(id_municipio)
+        if not res:
+            raise HTTPException(status_code=404, detail=f"Census summary not found for municipality '{id_municipio}'")
+        return res
+
+    @app.get("/api/v1/census/municipality/{id_municipio}/profile")
+    @app.get("/api/v1/censo/{id_municipio}")
+    async def get_census_demographic_profile(id_municipio: str) -> dict[str, Any]:
+        from public_data_gateway.connectors.demografico.ibge_censo2022.connector import (
+            IBGECenso2022Connector,
+        )
+
+        conn = IBGECenso2022Connector(settings=app_settings)
+        res = conn.get_demographic_profile(id_municipio)
+        if not res:
+            raise HTTPException(status_code=404, detail=f"Census demographic profile not found for municipality '{id_municipio}'")
+        return res
+
+    @app.get("/api/v1/census/municipality/{id_municipio}/literacy")
+    async def get_census_literacy(id_municipio: str) -> dict[str, Any]:
+        from public_data_gateway.connectors.demografico.ibge_censo2022.connector import (
+            IBGECenso2022Connector,
+        )
+
+        conn = IBGECenso2022Connector(settings=app_settings)
+        res = conn.get_literacy_indicators(id_municipio)
+        if not res:
+            raise HTTPException(status_code=404, detail=f"Literacy indicators not found for municipality '{id_municipio}'")
+        return res
+
+    @app.get("/api/v1/census/aging/highest")
+    async def get_census_highest_aging(
+        limit: int = Query(10, ge=1, le=50, description="Top N municipalities by aging index ratio"),
+    ) -> list[dict[str, Any]]:
+        from public_data_gateway.connectors.demografico.ibge_censo2022.connector import (
+            IBGECenso2022Connector,
+        )
+
+        conn = IBGECenso2022Connector(settings=app_settings)
+        return conn.list_highest_aging_municipalities(limit=limit)
+
     return app

@@ -1,0 +1,18 @@
+version: 2
+
+sources:
+  - name: ibge_censo2022_silver
+    description: "Tabelas normalizadas da camada Silver do Censo Demográfico 2022 do IBGE."
+    meta:
+      external_location: "data/ibge_censo2022/silver/{name}.parquet"
+    tables:
+      - name: censo_populacao_domicilios
+        description: "População residente, total de domicílios particulares ocupados e densidade demográfica (Censo 2022)."
+      - name: censo_estrutura_etaria
+        description: "Estrutura etária, idade mediana, índice de envelhecimento e razão de sexo (Censo 2022)."
+      - name: censo_educacao_alfabetizacao
+        description: "Taxas de alfabetização e analfabetismo da população de 15 anos ou mais (Censo 2022)."
+      - name: censo_urbanizacao_situacao
+        description: "População urbana, rural e taxa de urbanização dos municípios (Censo 2022)."
+      - name: censo_diversidade_quilombola_indigena
+        description: "Contagem e proporção de populações indígenas e quilombolas residentes (Censo 2022)."

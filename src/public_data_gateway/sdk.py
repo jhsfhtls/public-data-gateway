@@ -512,6 +512,32 @@ class SocioeconomicFacade:
         """List top municipalities ranked by total GDP."""
         return self.connector.list_top_municipalities_by_gdp(limit=limit)
 
+    @property
+    def censo_connector(self) -> Any:
+        if not hasattr(self, "_censo_conn") or self._censo_conn is None:
+            from public_data_gateway.connectors.demografico.ibge_censo2022.connector import (
+                IBGECenso2022Connector,
+            )
+
+            self._censo_conn = IBGECenso2022Connector(settings=self._sdk.settings)
+        return self._censo_conn
+
+    def census_summary(self, id_municipio: str) -> dict[str, Any] | None:
+        """Get official Censo 2022 population and household counts by 7-digit IBGE code."""
+        return self.censo_connector.get_census_summary(id_municipio)
+
+    def demographic_profile(self, id_municipio: str) -> dict[str, Any] | None:
+        """Get comprehensive Gold demographic profile (age structure, literacy, scores) from Censo 2022."""
+        return self.censo_connector.get_demographic_profile(id_municipio)
+
+    def literacy_indicators(self, id_municipio: str) -> dict[str, Any] | None:
+        """Get official literacy rates and literate population counts from Censo 2022."""
+        return self.censo_connector.get_literacy_indicators(id_municipio)
+
+    def highest_aging_municipalities(self, limit: int = 10) -> list[dict[str, Any]]:
+        """List municipalities with highest aging index ratio from Censo 2022."""
+        return self.censo_connector.list_highest_aging_municipalities(limit=limit)
+
 
 class BrazilData:
     """Unified developer SDK facade for querying, normalizing, and enriching Brazilian public datasets."""
@@ -735,6 +761,18 @@ class BrazilData:
     def get_top_municipalities_by_gdp(self, limit: int = 10) -> list[dict[str, Any]]:
         """Consultar ranking dos municípios com maior PIB do Brasil (IBGE SIDRA)."""
         return self.socioeconomic.top_municipalities_by_gdp(limit=limit)
+
+    def get_census_summary(self, id_municipio: str) -> dict[str, Any] | None:
+        """Consultar contagem oficial de população residente e domicílios (Censo 2022)."""
+        return self.socioeconomic.census_summary(id_municipio)
+
+    def get_demographic_profile(self, id_municipio: str) -> dict[str, Any] | None:
+        """Consultar perfil demográfico Gold, envelhecimento e maturidade social (Censo 2022)."""
+        return self.socioeconomic.demographic_profile(id_municipio)
+
+    def get_highest_aging_municipalities(self, limit: int = 10) -> list[dict[str, Any]]:
+        """Consultar ranking de municípios com maior índice de envelhecimento (Censo 2022)."""
+        return self.socioeconomic.highest_aging_municipalities(limit=limit)
 
     def resolve_municipality(
         self, code_or_name: str | int, uf: str | None = None

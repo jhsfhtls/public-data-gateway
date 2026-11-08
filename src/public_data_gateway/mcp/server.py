@@ -429,6 +429,38 @@ class MCPDispatcher:
                                     },
                                 },
                             },
+                            {
+                                "name": "bdg_get_census_summary",
+                                "description": "Query official Censo Demográfico 2022 population, occupied households, and density by municipality ID from IBGE (Tier 1).",
+                                "inputSchema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "id_municipio": {"type": "string", "description": "IBGE 7-digit municipality code (e.g. 3550308)"},
+                                    },
+                                    "required": ["id_municipio"],
+                                },
+                            },
+                            {
+                                "name": "bdg_get_demographic_profile",
+                                "description": "Query Gold demographic profile: age structure, median age, aging index, literacy, and social maturity from Censo 2022 (Tier 1).",
+                                "inputSchema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "id_municipio": {"type": "string", "description": "IBGE 7-digit municipality code (e.g. 3550308)"},
+                                    },
+                                    "required": ["id_municipio"],
+                                },
+                            },
+                            {
+                                "name": "bdg_list_highest_aging_municipalities",
+                                "description": "List municipalities with the highest aging index ratio from IBGE Censo 2022 (Tier 1).",
+                                "inputSchema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "limit": {"type": "integer", "description": "Max municipalities to retrieve (default: 10)"},
+                                    },
+                                },
+                            },
                         ]
                     },
                 }
@@ -999,6 +1031,69 @@ class MCPDispatcher:
             lim = args.get("limit", 12)
             ipca_res = sidra_conn.get_ipca_history(limit=lim)
             wrapped = wrap_untrusted_gov_data(ipca_res, source_id="ibge_sidra")
+            return {
+                "jsonrpc": "2.0",
+                "id": req_id,
+                "result": {"content": [{"type": "text", "text": wrapped}], "isError": False},
+            }
+
+        if tool_name in {"bdg_get_census_summary", "pdg_get_census_summary"}:
+            from public_data_gateway.connectors.demografico.ibge_censo2022.connector import (
+                IBGECenso2022Connector,
+            )
+
+            censo_conn = IBGECenso2022Connector(settings=self.settings)
+            id_mun = str(args.get("id_municipio", "")).strip()
+            summary_res = censo_conn.get_census_summary(id_mun)
+            if not summary_res:
+                return {
+                    "jsonrpc": "2.0",
+                    "id": req_id,
+                    "result": {
+                        "content": [{"type": "text", "text": f"Municipality census summary not found for ID '{id_mun}'."}],
+                        "isError": True,
+                    },
+                }
+            wrapped = wrap_untrusted_gov_data(summary_res, source_id="ibge_censo2022")
+            return {
+                "jsonrpc": "2.0",
+                "id": req_id,
+                "result": {"content": [{"type": "text", "text": wrapped}], "isError": False},
+            }
+
+        if tool_name in {"bdg_get_demographic_profile", "pdg_get_demographic_profile"}:
+            from public_data_gateway.connectors.demografico.ibge_censo2022.connector import (
+                IBGECenso2022Connector,
+            )
+
+            censo_conn = IBGECenso2022Connector(settings=self.settings)
+            id_mun = str(args.get("id_municipio", "")).strip()
+            profile_res = censo_conn.get_demographic_profile(id_mun)
+            if not profile_res:
+                return {
+                    "jsonrpc": "2.0",
+                    "id": req_id,
+                    "result": {
+                        "content": [{"type": "text", "text": f"Municipality demographic profile not found for ID '{id_mun}'."}],
+                        "isError": True,
+                    },
+                }
+            wrapped = wrap_untrusted_gov_data(profile_res, source_id="ibge_censo2022")
+            return {
+                "jsonrpc": "2.0",
+                "id": req_id,
+                "result": {"content": [{"type": "text", "text": wrapped}], "isError": False},
+            }
+
+        if tool_name in {"bdg_list_highest_aging_municipalities", "pdg_list_highest_aging_municipalities"}:
+            from public_data_gateway.connectors.demografico.ibge_censo2022.connector import (
+                IBGECenso2022Connector,
+            )
+
+            censo_conn = IBGECenso2022Connector(settings=self.settings)
+            lim = int(args.get("limit", 10))
+            aging_res = censo_conn.list_highest_aging_municipalities(limit=lim)
+            wrapped = wrap_untrusted_gov_data(aging_res, source_id="ibge_censo2022")
             return {
                 "jsonrpc": "2.0",
                 "id": req_id,

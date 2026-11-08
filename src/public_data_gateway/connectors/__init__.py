@@ -11,6 +11,7 @@ import public_data_gateway.connectors.compliance.cgu_ceis_cnep  # noqa: F401
 import public_data_gateway.connectors.compliance.cgu_pep  # noqa: F401
 import public_data_gateway.connectors.compras_publicas.comprasgov_catmat  # noqa: F401
 import public_data_gateway.connectors.compras_publicas.pncp_contratacoes  # noqa: F401
+import public_data_gateway.connectors.demografico.ibge_censo2022  # noqa: F401
 import public_data_gateway.connectors.demografico.ibge_localidades  # noqa: F401
 import public_data_gateway.connectors.demografico.ibge_sidra  # noqa: F401
 import public_data_gateway.connectors.empresarial.rfb_cnpj_lakehouse  # noqa: F401

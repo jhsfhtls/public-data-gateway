@@ -198,3 +198,115 @@ models:
         description: "Timestamp ISO-8601 da extração dos indicadores."
         tests:
           - not_null
+
+  - name: mart_censo_transicao_demografica_brasil
+    description: "Data Mart analítico da transição demográfica, envelhecimento, alfabetização, diversidade e vulnerabilidade social dos municípios segundo o Censo 2022."
+    columns:
+      - name: id_municipio
+        description: "Código IBGE de 7 dígitos do município."
+        tests:
+          - not_null
+      - name: nome_municipio
+        description: "Nome oficial do município."
+        tests:
+          - not_null
+      - name: sigla_uf
+        description: "Sigla de 2 letras da Unidade Federativa."
+        tests:
+          - not_null
+      - name: regiao
+        description: "Grande região geográfica do Brasil."
+      - name: is_capital
+        description: "Flag booleana indicando se o município é capital."
+        tests:
+          - not_null
+      - name: ano_censo
+        description: "Ano censitário oficial (2022)."
+        tests:
+          - not_null
+      - name: populacao_residente
+        description: "População residente apurada no Censo 2022."
+        tests:
+          - not_null
+      - name: total_domicilios_particulares_ocupados
+        description: "Quantidade de domicílios particulares permanentes ocupados."
+        tests:
+          - not_null
+      - name: total_moradores_domicilios_ocupados
+        description: "Total de residentes em domicílios particulares ocupados."
+        tests:
+          - not_null
+      - name: media_moradores_por_domicilio
+        description: "Média de moradores por domicílio particular permanente ocupado."
+        tests:
+          - not_null
+      - name: area_territorial_km2
+        description: "Área territorial oficial do município em km²."
+        tests:
+          - not_null
+      - name: densidade_demografica_hab_km2
+        description: "Densidade demográfica em habitantes por km²."
+        tests:
+          - not_null
+      - name: classificacao_densidade
+        description: "Enquadramento da densidade demográfica (ALTA_DENSIDADE, MEDIA_DENSIDADE, BAIXA_DENSIDADE)."
+        tests:
+          - not_null
+      - name: idade_mediana_anos
+        description: "Idade que divide a população municipal ao meio."
+      - name: indice_envelhecimento_razao
+        description: "Número de idosos (65+ anos) por 100 jovens (0 a 14 anos)."
+      - name: classificacao_etaria
+        description: "Classificação etária do município (JOVEM, TRANSICAO_AVANCADA, ENVELHECIDA)."
+        tests:
+          - not_null
+      - name: razao_sexo_homens_por_100_mulheres
+        description: "Número de homens residentes para cada 100 mulheres."
+      - name: populacao_homens
+        description: "População total residente do sexo masculino."
+      - name: populacao_mulheres
+        description: "População total residente do sexo feminino."
+      - name: populacao_15_anos_ou_mais
+        description: "População residente com 15 anos ou mais de idade."
+      - name: populacao_alfabetizada
+        description: "População residente de 15+ anos alfabetizada."
+      - name: taxa_alfabetizacao_pct
+        description: "Taxa de alfabetização das pessoas de 15+ anos em percentual."
+      - name: taxa_analfabetismo_pct
+        description: "Taxa de analfabetismo apurada em percentual."
+      - name: populacao_urbana
+        description: "População residente em perímetro urbano."
+      - name: populacao_rural
+        description: "População residente em perímetro rural."
+      - name: taxa_urbanizacao_pct
+        description: "Percentual da população que vive em áreas urbanas."
+      - name: predominancia_territorial
+        description: "Predominância da ocupação territorial (URBANA ou RURAL)."
+      - name: populacao_indigena
+        description: "Contagem de residentes autodeclarados indígenas."
+      - name: populacao_quilombola
+        description: "Contagem de residentes autodeclarados quilombolas."
+      - name: percentual_indigena_pct
+        description: "Percentual da população indígena sobre o total do município."
+      - name: percentual_quilombola_pct
+        description: "Percentual da população quilombola sobre o total do município."
+      - name: score_maturidade_social
+        description: "Score composto sintético (0 a 100) ponderando alfabetização e infraestrutura urbana."
+        tests:
+          - not_null
+      - name: score_vulnerabilidade_demografica
+        description: "Score composto sintético de vulnerabilidade demográfica e isolamento."
+        tests:
+          - not_null
+      - name: classificacao_porte_censo
+        description: "Classificação oficial de porte censitário (METROPOLE, GRANDE_PORTE, MEDIO_PORTE, PEQUENO_PORTE)."
+        tests:
+          - not_null
+      - name: reference_date
+        description: "Data de referência da consolidação analítica."
+        tests:
+          - not_null
+      - name: extracted_at
+        description: "Timestamp ISO-8601 UTC da extração dos dados."
+        tests:
+          - not_null

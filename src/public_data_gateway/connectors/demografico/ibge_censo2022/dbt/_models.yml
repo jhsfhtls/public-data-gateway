@@ -1,0 +1,214 @@
+version: 2
+
+models:
+  - name: stg_censo_populacao_domicilios
+    description: "Visão de staging da população residente e contagem de domicílios do Censo Demográfico 2022."
+    columns:
+      - name: id_municipio
+        description: "Código IBGE de 7 dígitos identificador do município."
+        tests:
+          - not_null
+      - name: nome_municipio
+        description: "Nome oficial do município brasileiro."
+        tests:
+          - not_null
+      - name: sigla_uf
+        description: "Sigla da Unidade Federativa correspondente."
+        tests:
+          - not_null
+      - name: ano_censo
+        description: "Ano censitário de referência (2022)."
+        tests:
+          - not_null
+      - name: populacao_residente
+        description: "População residente total apurada no Censo 2022."
+        tests:
+          - not_null
+      - name: total_domicilios_particulares_ocupados
+        description: "Quantidade de domicílios particulares permanentes ocupados."
+        tests:
+          - not_null
+      - name: total_moradores_domicilios_ocupados
+        description: "Número total de pessoas que residem em domicílios particulares ocupados."
+        tests:
+          - not_null
+      - name: media_moradores_por_domicilio
+        description: "Média de moradores por domicílio particular ocupado."
+        tests:
+          - not_null
+      - name: area_territorial_km2
+        description: "Área territorial oficial da municipalidade em quilômetros quadrados."
+        tests:
+          - not_null
+      - name: densidade_demografica_hab_km2
+        description: "Densidade demográfica expressa em habitantes por quilômetro quadrado."
+        tests:
+          - not_null
+      - name: reference_date
+        description: "Data de referência da apuração censitária no formato AAAA-MM-DD."
+      - name: extracted_at
+        description: "Timestamp ISO-8601 UTC da ingestão dos dados."
+
+  - name: stg_censo_estrutura_etaria
+    description: "Visão de staging da composição etária, idade mediana e envelhecimento do Censo 2022."
+    columns:
+      - name: id_municipio
+        description: "Código IBGE de 7 dígitos do município."
+        tests:
+          - not_null
+      - name: nome_municipio
+        description: "Nome oficial do município."
+        tests:
+          - not_null
+      - name: sigla_uf
+        description: "Sigla da Unidade Federativa."
+        tests:
+          - not_null
+      - name: ano_censo
+        description: "Ano censitário de apuração (2022)."
+        tests:
+          - not_null
+      - name: idade_mediana_anos
+        description: "Idade mediana da população municipal em anos completos."
+        tests:
+          - not_null
+      - name: indice_envelhecimento_razao
+        description: "Índice de envelhecimento: número de pessoas de 65+ anos para cada 100 de 0 a 14 anos."
+        tests:
+          - not_null
+      - name: razao_sexo_homens_por_100_mulheres
+        description: "Razão de sexo expressa pelo número de homens para cada 100 mulheres."
+        tests:
+          - not_null
+      - name: populacao_homens
+        description: "População residente do sexo masculino apurada no Censo."
+        tests:
+          - not_null
+      - name: populacao_mulheres
+        description: "População residente do sexo feminino apurada no Censo."
+        tests:
+          - not_null
+      - name: reference_date
+        description: "Data de referência da apuração."
+      - name: extracted_at
+        description: "Timestamp ISO-8601 UTC de ingestão."
+
+  - name: stg_censo_educacao_alfabetizacao
+    description: "Visão de staging da alfabetização e letramento da população de 15 anos ou mais do Censo 2022."
+    columns:
+      - name: id_municipio
+        description: "Código IBGE de 7 dígitos do município."
+        tests:
+          - not_null
+      - name: nome_municipio
+        description: "Nome oficial do município."
+        tests:
+          - not_null
+      - name: sigla_uf
+        description: "Sigla da Unidade Federativa."
+        tests:
+          - not_null
+      - name: ano_censo
+        description: "Ano de apuração (2022)."
+        tests:
+          - not_null
+      - name: populacao_15_anos_ou_mais
+        description: "População residente com 15 anos ou mais de idade."
+        tests:
+          - not_null
+      - name: populacao_alfabetizada
+        description: "População de 15 anos ou mais que sabe ler e escrever um bilhete simples."
+        tests:
+          - not_null
+      - name: taxa_alfabetizacao_pct
+        description: "Taxa de alfabetização percentual das pessoas de 15 anos ou mais."
+        tests:
+          - not_null
+      - name: taxa_analfabetismo_pct
+        description: "Taxa de analfabetismo percentual calculada (100 - taxa de alfabetização)."
+        tests:
+          - not_null
+      - name: reference_date
+        description: "Data de referência da apuração."
+      - name: extracted_at
+        description: "Timestamp ISO-8601 UTC da ingestão."
+
+  - name: stg_censo_urbanizacao_situacao
+    description: "Visão de staging da distribuição da população por situação de domicílio (urbana vs rural) do Censo 2022."
+    columns:
+      - name: id_municipio
+        description: "Código IBGE de 7 dígitos do município."
+        tests:
+          - not_null
+      - name: nome_municipio
+        description: "Nome oficial do município."
+        tests:
+          - not_null
+      - name: sigla_uf
+        description: "Sigla da Unidade Federativa."
+        tests:
+          - not_null
+      - name: ano_censo
+        description: "Ano de apuração censitária (2022)."
+        tests:
+          - not_null
+      - name: populacao_urbana
+        description: "População residente em áreas classificadas como urbanas."
+        tests:
+          - not_null
+      - name: populacao_rural
+        description: "População residente em áreas classificadas como rurais."
+        tests:
+          - not_null
+      - name: taxa_urbanizacao_pct
+        description: "Percentual da população que reside em áreas urbanas."
+        tests:
+          - not_null
+      - name: predominancia_territorial
+        description: "Classificação territorial predominante (URBANA ou RURAL)."
+        tests:
+          - not_null
+      - name: reference_date
+        description: "Data de referência da apuração."
+      - name: extracted_at
+        description: "Timestamp ISO-8601 UTC da ingestão."
+
+  - name: stg_censo_diversidade_quilombola_indigena
+    description: "Visão de staging de povos originários e comunidades tradicionais quilombolas do Censo 2022."
+    columns:
+      - name: id_municipio
+        description: "Código IBGE de 7 dígitos do município."
+        tests:
+          - not_null
+      - name: nome_municipio
+        description: "Nome oficial do município."
+        tests:
+          - not_null
+      - name: sigla_uf
+        description: "Sigla da Unidade Federativa."
+        tests:
+          - not_null
+      - name: ano_censo
+        description: "Ano censitário (2022)."
+        tests:
+          - not_null
+      - name: populacao_indigena
+        description: "População residente autodeclarada indígena no Censo 2022."
+        tests:
+          - not_null
+      - name: populacao_quilombola
+        description: "População residente que se autodeclarou quilombola no Censo 2022."
+        tests:
+          - not_null
+      - name: percentual_indigena_pct
+        description: "Proporção percentual da população indígena sobre o total residente."
+        tests:
+          - not_null
+      - name: percentual_quilombola_pct
+        description: "Proporção percentual da população quilombola sobre o total residente."
+        tests:
+          - not_null
+      - name: reference_date
+        description: "Data de referência da apuração."
+      - name: extracted_at
+        description: "Timestamp ISO-8601 UTC da ingestão."
