@@ -190,6 +190,11 @@ class BCBSGSConnector(BaseConnector):
                 serie_name = cfg["name"]
                 try:
                     resp = client.get(url, cache_ttl=0)
+                    if resp.status_code == 304 and not resp.text.strip() and "/ultimos/1" in url:
+                        # Upstream CDN cache artifact: query ultimos/2 and take latest record
+                        alt_url = url.replace("/ultimos/1", "/ultimos/2")
+                        resp = client.get(alt_url, cache_ttl=0)
+
                     if resp.status_code != 200:
                         err_msg = (
                             f"Fail-Hard: Live endpoint '{test_name}' ({serie_name}) returned status {resp.status_code} "

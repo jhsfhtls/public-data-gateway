@@ -109,7 +109,7 @@ sources:
   - P04
   rice_score: 880
   roadmap_wave: 1
-  status: CATALOGED
+  status: HOMOLOGATED
 - source_id: bcb_sgs
   name: 'Banco Central: Sistema Gerenciador de Séries Temporais (SGS)'
   agency: Banco Central do Brasil (BACEN)

@@ -292,4 +292,99 @@ models:
       - name: libra_venda
         description: "Taxa de câmbio oficial de venda da Libra Esterlina em Reais (BRL)."
 
+  - name: dim_instituicao_financeira
+    description: "Dimensão conformatória de instituições financeiras no Brasil integrando catálogo bancário e adesão ao arranjo PIX."
+    columns:
+      - name: ispb
+        description: "Identificador do Sistema de Pagamentos Brasileiro (ISPB) com 8 dígitos."
+        tests:
+          - unique
+          - not_null
+      - name: codigo_compensacao
+        description: "Código COMPE de 3 dígitos de compensação bancária ou NULL para fintechs/instituições de pagamento."
+      - name: nome_reduzido
+        description: "Nome comercial resumido da instituição financeira."
+        tests:
+          - not_null
+      - name: nome_completo
+        description: "Razão social oficial completa registrada no Banco Central."
+        tests:
+          - not_null
+      - name: cidade_sede
+        description: "Município da sede administrativa da instituição financeira."
+      - name: uf_sede
+        description: "Sigla de 2 letras da Unidade Federativa da sede."
+      - name: participa_pix
+        description: "Flag booleana indicando homologação ativa no arranjo de pagamentos instantâneos PIX."
+        tests:
+          - not_null
+      - name: modalidade_pix
+        description: "Modalidade de participação no PIX (Provedor de Conta Transacional, Liquidante Especial, etc.)."
+        tests:
+          - not_null
+      - name: tipo_participacao_pix
+        description: "Forma de conexão ao Sistema de Pagamentos Instantâneos (Direta ou Indireta)."
+        tests:
+          - not_null
+      - name: inicio_operacao_pix
+        description: "Data ou timestamp de início da operação no PIX."
+      - name: is_banco_comercial
+        description: "Flag booleana indicando se a instituição possui código COMPE bancário para operações de câmara compensatória."
+        tests:
+          - not_null
+      - name: reference_date
+        description: "Competência cadastral de referência (YYYY-MM-DD)."
+        tests:
+          - not_null
+      - name: extracted_at
+        description: "Timestamp ISO-8601 da extração dos dados."
+        tests:
+          - not_null
+
+  - name: dim_calendario_nacional
+    description: "Dimensão de calendário oficial com marcação de feriados nacionais bancários e civis do Brasil."
+    columns:
+      - name: data_feriado
+        description: "Data do feriado no formato YYYY-MM-DD."
+        tests:
+          - unique
+          - not_null
+      - name: data_referencia
+        description: "Data em formato DATE para indexação e joins de séries temporais."
+        tests:
+          - not_null
+      - name: ano
+        description: "Ano do calendário civil."
+        tests:
+          - not_null
+      - name: mes
+        description: "Mês numérico de 1 a 12."
+        tests:
+          - not_null
+      - name: nome_feriado
+        description: "Nome do feriado nacional oficial."
+        tests:
+          - not_null
+      - name: tipo_feriado
+        description: "Classificação jurídica do feriado (nacional, estadual, ponto facultativo)."
+        tests:
+          - not_null
+      - name: dia_semana
+        description: "Nome do dia da semana por extenso em português."
+        tests:
+          - not_null
+      - name: is_dia_util_bancario
+        description: "Flag booleana indicando se há expediente bancário na data (FALSE para feriados)."
+        tests:
+          - not_null
+      - name: reference_date
+        description: "Data de referência do calendário (YYYY-MM-DD)."
+        tests:
+          - not_null
+      - name: extracted_at
+        description: "Timestamp ISO-8601 da captura."
+        tests:
+          - not_null
+
+
 

@@ -1,0 +1,20 @@
+version: 2
+
+sources:
+  - name: brasilapi_core
+    description: "Fontes brutas normalizadas da BrasilAPI (Bancos, PIX, Corretoras CVM, Feriados Nacionais, DDDs e CEPs) em Parquet ZSTD."
+    meta:
+      external_location: "data/brasilapi_core/silver/{name}.parquet"
+    tables:
+      - name: brasilapi_bancos
+        description: "Catálogo completo de instituições bancárias autorizadas pelo Banco Central."
+      - name: brasilapi_pix_participantes
+        description: "Relação de participantes diretos e indiretos do arranjo de pagamentos instantâneos PIX."
+      - name: brasilapi_corretoras
+        description: "Registro cadastral de corretoras e distribuidoras de títulos e valores mobiliários (DTVMs) junto à CVM."
+      - name: brasilapi_feriados
+        description: "Histórico e calendário de feriados nacionais bancários e civis."
+      - name: brasilapi_ddds
+        description: "Mapeamento dos prefixos de discagem direta à distância (DDDs) por UF e municípios."
+      - name: brasilapi_ceps
+        description: "Amostra cadastral e geocodificada de códigos de endereçamento postal (CEPs)."

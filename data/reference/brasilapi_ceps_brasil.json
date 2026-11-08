@@ -1,0 +1,202 @@
+[
+  {
+    "cep": "01310100",
+    "state": "SP",
+    "city": "São Paulo",
+    "neighborhood": "Bela Vista",
+    "street": "Avenida Paulista",
+    "service": "open-cep",
+    "ibge": {
+      "city": "3550308",
+      "state": "35"
+    },
+    "timezoneName": "America/Sao_Paulo",
+    "location": {
+      "type": "Point",
+      "coordinates": {
+        "longitude": "-46.6553299",
+        "latitude": "-23.5617698"
+      }
+    }
+  },
+  {
+    "cep": "70040912",
+    "state": "DF",
+    "city": "Brasília",
+    "neighborhood": "Asa Norte",
+    "street": "SAUN Quadra 5 Lote B Torres I, II e III",
+    "service": "open-cep",
+    "ibge": {
+      "city": "5300108",
+      "state": "53"
+    },
+    "timezoneName": "America/Sao_Paulo",
+    "location": {
+      "type": "Point",
+      "coordinates": {
+        "longitude": "-47.92972",
+        "latitude": "-15.77972"
+      }
+    }
+  },
+  {
+    "cep": "20040002",
+    "state": "RJ",
+    "city": "Rio de Janeiro",
+    "neighborhood": "Centro",
+    "street": "Avenida Rio Branco",
+    "service": "open-cep",
+    "ibge": {
+      "city": "3304557",
+      "state": "33"
+    },
+    "timezoneName": "America/Sao_Paulo",
+    "location": {
+      "type": "Point",
+      "coordinates": {
+        "longitude": "-43.18223",
+        "latitude": "-22.90642"
+      }
+    }
+  },
+  {
+    "cep": "40020000",
+    "state": "BA",
+    "city": "Salvador",
+    "neighborhood": "Centro",
+    "street": "Rua Chile",
+    "service": "open-cep",
+    "ibge": {
+      "city": "2927408",
+      "state": "29"
+    },
+    "timezoneName": "America/Bahia",
+    "location": {
+      "type": "Point",
+      "coordinates": {
+        "longitude": "-38.49096",
+        "latitude": "-12.97563"
+      }
+    }
+  },
+  {
+    "cep": "80420210",
+    "state": "PR",
+    "city": "Curitiba",
+    "neighborhood": "Centro",
+    "street": "Rua Visconde do Rio Branco",
+    "service": "open-cep",
+    "ibge": {
+      "city": "4106902",
+      "state": "41"
+    },
+    "timezoneName": "America/Sao_Paulo",
+    "location": {
+      "type": "Point",
+      "coordinates": {
+        "longitude": "-49.27306",
+        "latitude": "-25.42778"
+      }
+    }
+  },
+  {
+    "cep": "69005040",
+    "state": "AM",
+    "city": "Manaus",
+    "neighborhood": "Centro",
+    "street": "Rua Miranda Leão",
+    "service": "open-cep",
+    "ibge": {
+      "city": "1302603",
+      "state": "13"
+    },
+    "timezoneName": "America/Manaus",
+    "location": {
+      "type": "Point",
+      "coordinates": {
+        "longitude": "-60.025",
+        "latitude": "-3.10194"
+      }
+    }
+  },
+  {
+    "cep": "60060000",
+    "state": "CE",
+    "city": "Fortaleza",
+    "neighborhood": "Centro",
+    "street": "Rua Rodrigues Júnior",
+    "service": "open-cep",
+    "ibge": {
+      "city": "2304400",
+      "state": "23"
+    },
+    "timezoneName": "America/Fortaleza",
+    "location": {
+      "type": "Point",
+      "coordinates": {
+        "longitude": "-38.54306",
+        "latitude": "-3.71722"
+      }
+    }
+  },
+  {
+    "cep": "90010000",
+    "state": "RS",
+    "city": "Porto Alegre",
+    "neighborhood": "Centro Histórico",
+    "street": "Rua Siqueira Campos",
+    "service": "open-cep",
+    "ibge": {
+      "city": "4314902",
+      "state": "43"
+    },
+    "timezoneName": "America/Sao_Paulo",
+    "location": {
+      "type": "Point",
+      "coordinates": {
+        "longitude": "-51.23019",
+        "latitude": "-30.03283"
+      }
+    }
+  },
+  {
+    "cep": "30130000",
+    "state": "MG",
+    "city": "Belo Horizonte",
+    "neighborhood": "Centro",
+    "street": "Avenida Afonso Pena",
+    "service": "open-cep",
+    "ibge": {
+      "city": "3106200",
+      "state": "31"
+    },
+    "timezoneName": "America/Sao_Paulo",
+    "location": {
+      "type": "Point",
+      "coordinates": {
+        "longitude": "-43.93778",
+        "latitude": "-19.92083"
+      }
+    }
+  },
+  {
+    "cep": "66010000",
+    "state": "PA",
+    "city": "Belém",
+    "neighborhood": "Campina",
+    "street": "Avenida Presidente Vargas",
+    "service": "open-cep",
+    "ibge": {
+      "city": "1501402",
+      "state": "15"
+    },
+    "timezoneName": "America/Belem",
+    "location": {
+      "type": "Point",
+      "coordinates": {
+        "longitude": "-48.50444",
+        "latitude": "-1.45583"
+      }
+    }
+  }
+]

@@ -1,0 +1,31 @@
+version: 2
+
+models:
+  - name: mart_infraestrutura_bancaria_brasil
+    description: "Data mart analítico agregando a malha de sedes de instituições financeiras, bancos comerciais e adesão ao arranjo PIX por Unidade Federativa."
+    columns:
+      - name: uf_sede
+        description: "Sigla de 2 letras maiúsculas da Unidade Federativa sede da instituição."
+        tests:
+          - unique
+          - not_null
+      - name: total_instituicoes_sede
+        description: "Contagem total de instituições financeiras sediadas na UF."
+        tests:
+          - not_null
+      - name: total_bancos_comerciais
+        description: "Contagem de instituições com código COMPE bancário sediadas na UF."
+        tests:
+          - not_null
+      - name: total_participantes_pix
+        description: "Contagem de instituições homologadas no arranjo PIX sediadas na UF."
+        tests:
+          - not_null
+      - name: pct_adesao_pix
+        description: "Percentual de adesão ao PIX sobre o total de instituições sediadas na UF (0.00% a 100.00%)."
+        tests:
+          - not_null
+      - name: polo_financeiro_tier
+        description: "Classificação da UF quanto à densidade do ecossistema financeiro (HUB_FINANCEIRO_NACIONAL, POLO_FINANCEIRO_REGIONAL, PRESENCA_DISPERSA)."
+        tests:
+          - not_null

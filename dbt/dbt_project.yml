@@ -8,6 +8,7 @@ model-paths:
   - "../src/brazil_data_gateway/connectors/demografico/ibge_localidades/dbt"
   - "../src/brazil_data_gateway/connectors/macrofinanceiro/bcb_sgs/dbt"
   - "../src/brazil_data_gateway/connectors/macrofinanceiro/bcb_olinda_ptax/dbt"
+  - "../src/brazil_data_gateway/connectors/agregadores/brasilapi_core/dbt"
   - "models"
 
 analysis-paths: ["analyses"]
