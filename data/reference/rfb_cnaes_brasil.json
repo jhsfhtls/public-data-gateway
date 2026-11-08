@@ -1,0 +1,34 @@
+[
+  {
+    "codigo_cnae": "6422100",
+    "descricao_cnae": "Bancos múltiplos, com carteira comercial"
+  },
+  {
+    "codigo_cnae": "0600001",
+    "descricao_cnae": "Extração de petróleo e gás natural"
+  },
+  {
+    "codigo_cnae": "0710301",
+    "descricao_cnae": "Extração de minério de ferro"
+  },
+  {
+    "codigo_cnae": "6201501",
+    "descricao_cnae": "Desenvolvimento de programas de computador sob encomenda"
+  },
+  {
+    "codigo_cnae": "6202300",
+    "descricao_cnae": "Desenvolvimento e licenciamento de programas de computador customizáveis"
+  },
+  {
+    "codigo_cnae": "4711302",
+    "descricao_cnae": "Comércio varejista de mercadorias em geral, com predominância de produtos alimentícios - supermercados"
+  },
+  {
+    "codigo_cnae": "6920601",
+    "descricao_cnae": "Atividades de contabilidade"
+  },
+  {
+    "codigo_cnae": "7020400",
+    "descricao_cnae": "Atividades de consultoria em gestão empresarial"
+  }
+]

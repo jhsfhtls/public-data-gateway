@@ -386,5 +386,227 @@ models:
         tests:
           - not_null
 
+  - name: dim_empresa
+    description: "Dimensão conformatória de empresas brasileiras a nível de CNPJ básico (raiz de 8 dígitos) com atributos societários e fiscais."
+    columns:
+      - name: cnpj_basico
+        description: "Radical de 8 dígitos numéricos que identifica a empresa na Receita Federal (chave primária natural)."
+        tests:
+          - unique
+          - not_null
+      - name: razao_social
+        description: "Nome empresarial ou razão social registrada da pessoa jurídica."
+        tests:
+          - not_null
+      - name: natureza_juridica
+        description: "Código de 4 dígitos da natureza jurídica CONCLA/RFB."
+        tests:
+          - not_null
+      - name: descricao_natureza_juridica
+        description: "Descrição textual da natureza jurídica da empresa."
+        tests:
+          - not_null
+      - name: qualificacao_responsavel
+        description: "Código de qualificação do responsável legal pela empresa."
+        tests:
+          - not_null
+      - name: descricao_qualificacao_responsavel
+        description: "Descrição da qualificação do responsável legal perante a RFB."
+        tests:
+          - not_null
+      - name: capital_social
+        description: "Valor monetário do capital social declarado da empresa em Reais (BRL)."
+        tests:
+          - not_null
+      - name: porte_empresa
+        description: "Código do porte da empresa segundo a Receita Federal (01: Não informado, 03: ME, 05: EPP, Demais)."
+        tests:
+          - not_null
+      - name: descricao_porte_empresa
+        description: "Classificação padronizada do porte empresarial (MICRO_EMPRESA, EMPRESA_DE_PEQUENO_PORTE, DEMAIS)."
+        tests:
+          - not_null
+      - name: ente_federativo_responsavel
+        description: "Ente federativo responsável no caso de empresas públicas ou sociedades de economia mista."
+      - name: opcao_pelo_simples
+        description: "Indicador de opção pelo regime tributário do Simples Nacional (S/N)."
+        tests:
+          - not_null
+      - name: is_simples_nacional
+        description: "Flag booleana indicando se a empresa é optante pelo Simples Nacional."
+        tests:
+          - not_null
+      - name: data_opcao_simples
+        description: "Data em que a empresa optou pelo Simples Nacional (YYYY-MM-DD)."
+      - name: data_exclusao_simples
+        description: "Data de exclusão do Simples Nacional caso tenha ocorrido (YYYY-MM-DD)."
+      - name: opcao_mei
+        description: "Indicador de enquadramento como Microempreendedor Individual - MEI (S/N)."
+        tests:
+          - not_null
+      - name: is_mei
+        description: "Flag booleana indicando se a empresa está enquadrada como MEI."
+        tests:
+          - not_null
+      - name: data_opcao_mei
+        description: "Data de enquadramento no regime do SIMEI/MEI (YYYY-MM-DD)."
+      - name: data_exclusao_mei
+        description: "Data de desenquadramento do regime SIMEI/MEI (YYYY-MM-DD)."
+      - name: reference_date
+        description: "Data de referência do processamento cadastral (YYYY-MM-DD)."
+        tests:
+          - not_null
+      - name: extracted_at
+        description: "Timestamp ISO-8601 da extração do registro."
+        tests:
+          - not_null
+
+  - name: dim_estabelecimento
+    description: "Dimensão conformatória de estabelecimentos (matrizes e filiais) a nível de CNPJ de 14 dígitos com localização e CNAE."
+    columns:
+      - name: cnpj_14
+        description: "Número completo de 14 dígitos do CNPJ do estabelecimento (chave primária natural)."
+        tests:
+          - unique
+          - not_null
+      - name: cnpj_basico
+        description: "Radical de 8 dígitos numéricos da empresa controladora."
+        tests:
+          - not_null
+      - name: cnpj_ordem
+        description: "Número de ordem do estabelecimento (0001 para matriz, 0002+ para filiais)."
+        tests:
+          - not_null
+      - name: cnpj_dv
+        description: "Dígitos verificadores do CNPJ completo."
+        tests:
+          - not_null
+      - name: identificador_matriz_filial
+        description: "Código indicador de matriz (1) ou filial (2)."
+        tests:
+          - not_null
+      - name: tipo_estabelecimento
+        description: "Classificação padronizada da unidade (MATRIZ ou FILIAL)."
+        tests:
+          - not_null
+      - name: nome_fantasia
+        description: "Nome de fantasia comercial do estabelecimento."
+      - name: situacao_cadastral
+        description: "Código numérico da situação cadastral perante a RFB (01: Nula, 02: Ativa, 03: Suspensa, 04: Inapta, 08: Baixada)."
+        tests:
+          - not_null
+      - name: descricao_situacao_cadastral
+        description: "Descrição textual da situação cadastral perante o Fisco."
+        tests:
+          - not_null
+      - name: is_ativo
+        description: "Flag booleana indicando se o estabelecimento está com situação cadastral ATIVA."
+        tests:
+          - not_null
+      - name: data_situacao_cadastral
+        description: "Data em que a situação cadastral atual foi homologada (YYYY-MM-DD)."
+        tests:
+          - not_null
+      - name: motivo_situacao_cadastral
+        description: "Código do motivo da situação cadastral perante a RFB."
+        tests:
+          - not_null
+      - name: descricao_motivo_cadastral
+        description: "Descrição padronizada do motivo da situação cadastral."
+        tests:
+          - not_null
+      - name: data_inicio_atividade
+        description: "Data de abertura e início das atividades do estabelecimento (YYYY-MM-DD)."
+        tests:
+          - not_null
+      - name: cnae_fiscal_principal
+        description: "Código de 7 dígitos da atividade econômica principal (CNAE Subclasses)."
+        tests:
+          - not_null
+      - name: descricao_cnae_fiscal_principal
+        description: "Descrição oficial da subclasse de atividade econômica principal."
+        tests:
+          - not_null
+      - name: tipo_logradouro
+        description: "Tipo do logradouro (Rua, Avenida, Praça, Alameda, etc.)."
+      - name: logradouro
+        description: "Nome do logradouro onde o estabelecimento está sediado."
+      - name: numero
+        description: "Número predial do endereço do estabelecimento."
+      - name: complemento
+        description: "Complemento do endereço cadastral."
+      - name: bairro
+        description: "Nome do bairro ou distrito de localização."
+      - name: cep_8
+        description: "Código de Endereçamento Postal oficial com 8 dígitos."
+      - name: sigla_uf
+        description: "Sigla de 2 letras maiúsculas da Unidade Federativa da sede."
+      - name: id_municipio_rf
+        description: "Código de 4 dígitos do município segundo tabela própria da Receita Federal."
+      - name: nome_municipio_rf
+        description: "Nome do município correspondente segundo o cadastro da Receita Federal."
+      - name: reference_date
+        description: "Data de referência do lote de dados (YYYY-MM-DD)."
+        tests:
+          - not_null
+      - name: extracted_at
+        description: "Timestamp ISO-8601 da extração cadastral."
+        tests:
+          - not_null
+
+  - name: dim_socio_qsa
+    description: "Dimensão de sócios e administradores do Quadro Societário (QSA) com proteção e mascaramento de CPF perante a LGPD."
+    columns:
+      - name: id_socio_hash
+        description: "Hash MD5 determinístico composto por CNPJ básico, CPF/CNPJ mascarado e qualificação (chave primária surrogate)."
+        tests:
+          - unique
+          - not_null
+      - name: cnpj_basico
+        description: "Radical de 8 dígitos numéricos da empresa participante do QSA."
+        tests:
+          - not_null
+      - name: identificador_socio
+        description: "Código de tipo de sócio (1: PJ, 2: PF, 3: Estrangeiro)."
+        tests:
+          - not_null
+      - name: tipo_socio
+        description: "Classificação padronizada do tipo de sócio (PESSOA_JURIDICA, PESSOA_FISICA, ESTRANGEIRO)."
+        tests:
+          - not_null
+      - name: nome_socio
+        description: "Nome completo do sócio ou razão social da pessoa jurídica cotista."
+        tests:
+          - not_null
+      - name: cpf_cnpj_socio_mascarado
+        description: "Documento oficial do sócio com mascaramento estrito de 6 dígitos centrais para pessoas físicas conforme a LGPD."
+        tests:
+          - not_null
+      - name: qualificacao_socio
+        description: "Código da qualificação societária do membro do QSA."
+        tests:
+          - not_null
+      - name: descricao_qualificacao_socio
+        description: "Descrição da qualificação do sócio perante a RFB."
+        tests:
+          - not_null
+      - name: data_entrada_sociedade
+        description: "Data em que o sócio ingressou na sociedade (YYYY-MM-DD)."
+        tests:
+          - not_null
+      - name: faixa_etaria
+        description: "Código de faixa etária do sócio pessoa física na Receita Federal."
+        tests:
+          - not_null
+      - name: reference_date
+        description: "Data de referência do lote cadastral (YYYY-MM-DD)."
+        tests:
+          - not_null
+      - name: extracted_at
+        description: "Timestamp ISO-8601 da extração do lote."
+        tests:
+          - not_null
+
+
 
 

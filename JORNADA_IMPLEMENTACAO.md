@@ -16,8 +16,8 @@ Este artefato constitui a **Fonte Única da Verdade Operacional (SSOT)** do stat
 
 - **Macrofase Ativa:** `Fase 04 — Ingestão Wave 2 (B2B, Compras Públicas & Compliance: rfb_cnpj_lakehouse, rfb_simples_mei, pncp_contratacoes, etc.)`
 - **Status Geral de Governança:** `🟢 ON_TRACK`
-- **Conector Ativo em Desenvolvimento:** `brasilapi_core`
-- **Próximo Conector na Fila de Execução:** `rfb_cnpj_lakehouse` (Wave 1 — Prioridade RICE 950)
+- **Conector Ativo em Desenvolvimento:** `rfb_cnpj_lakehouse`
+- **Próximo Conector na Fila de Execução:** `rfb_simples_mei` (Wave 1 — Prioridade RICE 950)
 - **Progresso Estrutural das Macrofases:** **5 de 11 Concluídas (45.5%)**
 - **Universo de Fontes Homologadas no Catálogo:** **49 fontes públicas** nos 13 macrosegmentos
 
@@ -51,21 +51,21 @@ flowchart LR
 
 ## 3. Checklist dos 9 Gates de Qualidade do Conector Ativo
 
-Todo conector integrado ao `brazil-data-gateway` deve percorrer rigorosamente os **9 Gates de Qualidade** antes de ser promovido a `HOMOLOGATED`. O alvo atual do ciclo de vida é o conector `brasilapi_core` (Wave 1):
+Todo conector integrado ao `brazil-data-gateway` deve percorrer rigorosamente os **9 Gates de Qualidade** antes de ser promovido a `HOMOLOGATED`. O alvo atual do ciclo de vida é o conector `rfb_cnpj_lakehouse` (Wave 2):
 
 | Gate | Nome do Gate de Homologação | Critério Operacional de Aceite (`POP_T_070` / `POP_T_074` / `POP_T_177`) | Status |
 | :---: | :--- | :--- | :---: |
-| **GATE_01** | **Contrato Declarativo ODCS v3.1 das N Tabelas da API** | Schema tipado, chaves primárias STRING e regras para bancos, pix_participantes, corretoras, feriados, ddds e ceps. | ⚪ NÃO INICIADO |
-| **GATE_02** | **Ingestão Bronze Isolada (Todas as Tabelas) & Cache WAL** | Download resiliente das 6 tabelas em data/brasilapi_core/bronze/ com cache SQLite WAL. | ⚪ NÃO INICIADO |
+| **GATE_01** | **Contrato Declarativo ODCS v3.1 das N Tabelas da API** | Schema tipado, chaves primárias STRING e regras para cnaes, motivos, municipios, naturezas, paises, qualificacoes, empresas, estabelecimentos, socios e simples. | ⚪ NÃO INICIADO |
+| **GATE_02** | **Ingestão Bronze Isolada (Todas as Tabelas) & Cache WAL** | Download resiliente das 10 tabelas em data/rfb_cnpj_lakehouse/bronze/ com cache SQLite WAL. | ⚪ NÃO INICIADO |
 | **GATE_03** | **Sanitização de Sentinelas & Nulls** | Conversão determinística de códigos sentinela e hífens em NULLs reais em todas as tabelas. | ⚪ NÃO INICIADO |
-| **GATE_04** | **Materialização Silver Parquet Isolada (Todas as Tabelas)** | Gravação de brasilapi_bancos.parquet, brasilapi_pix_participantes.parquet, etc., em data/brasilapi_core/silver/ com SHA-256. | ⚪ NÃO INICIADO |
-| **GATE_05** | **Validação dos 5 Pilares & Quarentena** | Aprovação em Freshness, Volume, Schema, Null Ceiling e Lineage; desvio para data/brasilapi_core/quarantine/ se violado. | ⚪ NÃO INICIADO |
-| **GATE_06** | **Gold Feature View Isolada & ASOF Join ML** | Features analíticas agregadas em data/brasilapi_core/gold/features_infraestrutura_brasil.parquet com agregação bancária e densidade por UF. | ⚪ NÃO INICIADO |
-| **GATE_07** | **Integração ao EnrichmentEngine** | Disponibilização para enriquecimento cadastral e geográfico batch/online respeitando o Client Path Shield (POP_T_154). | ⚪ NÃO INICIADO |
+| **GATE_04** | **Materialização Silver Parquet Isolada (Todas as Tabelas)** | Gravação de rfb_empresas.parquet, rfb_estabelecimentos.parquet, rfb_socios.parquet, etc., em data/rfb_cnpj_lakehouse/silver/ com SHA-256. | ⚪ NÃO INICIADO |
+| **GATE_05** | **Validação dos 5 Pilares & Quarentena** | Aprovação em Freshness, Volume, Schema, Null Ceiling e Lineage; desvio para data/rfb_cnpj_lakehouse/quarantine/ se violado. | ⚪ NÃO INICIADO |
+| **GATE_06** | **Gold Feature View Isolada & ASOF Join ML** | Features analíticas agregadas em data/rfb_cnpj_lakehouse/gold/features_empresariais_brasil.parquet com agregação de densidade corporativa e capital social por UF. | ⚪ NÃO INICIADO |
+| **GATE_07** | **Integração ao EnrichmentEngine** | Disponibilização para enriquecimento cadastral e geográfico batch/online respeitando o Client Path Shield (POP_T_154) e mascaramento LGPD de sócios. | ⚪ NÃO INICIADO |
 | **GATE_08** | **Exposição Multi-Interface** | Exposição síncrona/analítica simultânea via Python SDK (BrazilData), REST (/api/v1), CLI (bdg) e Servidor MCP (bdg-mcp). | ⚪ NÃO INICIADO |
-| **GATE_09** | **Bateria de Testes Offline com Períodos Diversos** | Testes unitários offline com fixtures cobrindo bancos, PIX participantes, corretoras CVM, feriados nacionais, DDDs e CEPs. | ⚪ NÃO INICIADO |
-| **GATE_10** | **dbt Staging, source.yml e 100% Colunas Documentadas** | Pasta connectors/.../brasilapi_core/dbt/ com source.yml próprio, 6 modelos staging, dim_instituicao_financeira, dim_calendario_nacional, mart_infraestrutura_bancaria_brasil e 100% colunas documentadas. | ⚪ NÃO INICIADO |
-| **GATE_11** | **Teste Real de 1 Linha com API ao Vivo (Fail-Hard)** | Execução obrigatória contra os 6 endpoints oficiais da BrasilAPI ao vivo limitados a 1 registro; falha reprova o pipeline. | ⚪ NÃO INICIADO |
+| **GATE_09** | **Bateria de Testes Offline com Períodos Diversos** | Testes unitários offline com fixtures cobrindo as 10 tabelas da Receita Federal, mascaramento LGPD e features firmográficas. | ⚪ NÃO INICIADO |
+| **GATE_10** | **dbt Staging, source.yml e 100% Colunas Documentadas** | Pasta connectors/.../rfb_cnpj_lakehouse/dbt/ com source.yml próprio, 10 modelos staging, dim_empresa, dim_estabelecimento, dim_socio_qsa, mart_densidade_empresarial_brasil e 100% colunas documentadas. | ⚪ NÃO INICIADO |
+| **GATE_11** | **Teste Real de 1 Linha com API ao Vivo (Fail-Hard)** | Execução obrigatória contra o endpoint oficial de resolução de CNPJ ao vivo limitado a 1 registro; falha reprova o pipeline. | ⚪ NÃO INICIADO |
 
 ---
 
@@ -114,6 +114,7 @@ O `brazil-data-gateway` atua como barramento alimentador de dados para os **10 P
 | `2026-11-07` | **Fase 03** | **Homologação do Conector bcb_sgs (6 Tabelas, dbt, Mart Macroeconômico & Live Fail-Hard)** | Implementação de ponta a ponta do conector bcb_sgs: 6 tabelas (sgs_catalogo, sgs_ipca, sgs_igpm, sgs_selic, sgs_cdi, sgs_ibcbr) materializadas em data/bcb_sgs/{bronze,silver,gold}/; 9 novos modelos dbt (6 staging, dim_serie_macroeconomica, fct_macro_indicadores_mensal, mart_cenario_macroeconomico_brasil) com 167 testes dbt 100% aprovados; 195 colunas 100% documentadas no linter; testes reais de 1 linha com fail-hard contra os 7 endpoints oficiais do BACEN e suíte offline com 37 testes pytest 100% verde. |
 | `2026-11-07` | **Fase 03** | **Homologação do Conector bcb_olinda_ptax (4 Tabelas, dbt, Mart de Volatilidade Cambial & Live Fail-Hard)** | Implementação de ponta a ponta do conector bcb_olinda_ptax: 4 tabelas (ptax_moedas, ptax_cotacao_dolar, ptax_cotacao_moedas, ptax_boletins) materializadas em data/bcb_olinda_ptax/{bronze,silver,gold}/; 7 novos modelos dbt (4 staging, dim_moeda, fct_cambio_ptax_diario, mart_cambio_volatilidade_brasil) com 220 testes dbt 100% aprovados; 260 colunas 100% documentadas no linter; testes reais de 1 linha com fail-hard contra os endpoints oficiais Olinda PTAX e suíte offline com 42 testes pytest 100% verde. |
 | `2026-11-07` | **Fase 03** | **Homologação do Conector brasilapi_core & Conclusão da Wave 1 (6 Tabelas, dbt, Mart Bancário & Live Fail-Hard)** | Implementação de ponta a ponta do conector brasilapi_core concluindo com sucesso 100% da Wave 1: 6 tabelas (brasilapi_bancos, brasilapi_pix_participantes, brasilapi_corretoras, brasilapi_feriados, brasilapi_ddds, brasilapi_ceps) materializadas em data/brasilapi_core/{bronze,silver,gold}/; 9 novos modelos dbt (6 staging, dim_instituicao_financeira, dim_calendario_nacional, mart_infraestrutura_bancaria_brasil) totalizando 34 modelos e 288 testes dbt 100% aprovados; 337 colunas 100% documentadas no linter; testes reais de 1 linha com fail-hard contra os 6 endpoints da BrasilAPI e suíte offline com 47 testes pytest 100% verde. |
+| `2026-11-08` | **Fase 04** | **Homologação do Conector rfb_cnpj_lakehouse (10 Tabelas, dbt, Mart B2B & Live Fail-Hard)** | Implementação de ponta a ponta do conector rfb_cnpj_lakehouse iniciando a Wave 2: 10 tabelas (rfb_cnaes, rfb_motivos, rfb_municipios, rfb_naturezas, rfb_paises, rfb_qualificacoes, rfb_empresas, rfb_estabelecimentos, rfb_socios, rfb_simples) materializadas em data/rfb_cnpj_lakehouse/{bronze,silver,gold}/; 14 novos modelos dbt (10 staging, dim_empresa, dim_estabelecimento, dim_socio_qsa, mart_densidade_empresarial_brasil) totalizando 48 modelos e 416 testes dbt 100% aprovados; 481 colunas 100% documentadas no linter; testes reais de 1 linha com fail-hard contra o endpoint oficial de CNPJ e suíte offline com 54 testes pytest 100% verde. |
 
 ---
 

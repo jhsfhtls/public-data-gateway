@@ -15,8 +15,8 @@
   "current_macro_phase_id": "04",
   "current_macro_phase": "Fase 04 — Ingestão Wave 2 (B2B, Compras Públicas & Compliance: rfb_cnpj_lakehouse, rfb_simples_mei, pncp_contratacoes, etc.)",
   "overall_status": "ON_TRACK",
-  "active_connector": "brasilapi_core",
-  "next_connector": "rfb_cnpj_lakehouse",
+  "active_connector": "rfb_cnpj_lakehouse",
+  "next_connector": "rfb_simples_mei",
   "structural_phases": [
     {
       "phase_id": "00",
@@ -152,20 +152,20 @@
     }
   ],
   "active_connector_gates": {
-    "target_connector": "brasilapi_core",
-    "target_wave": 1,
+    "target_connector": "rfb_cnpj_lakehouse",
+    "target_wave": 2,
     "gates": [
       {
         "gate_id": "GATE_01",
         "name": "Contrato Declarativo ODCS v3.1 das N Tabelas da API",
         "status": "COMPLETED",
-        "criteria": "Schema tipado, chaves primárias STRING e regras para bancos, pix_participantes, corretoras, feriados, ddds e ceps."
+        "criteria": "Schema tipado, chaves primárias STRING e regras para cnaes, motivos, municipios, naturezas, paises, qualificacoes, empresas, estabelecimentos, socios e simples."
       },
       {
         "gate_id": "GATE_02",
         "name": "Ingestão Bronze Isolada (Todas as Tabelas) & Cache WAL",
         "status": "COMPLETED",
-        "criteria": "Download resiliente das 6 tabelas em data/brasilapi_core/bronze/ com cache SQLite WAL."
+        "criteria": "Download resiliente das 10 tabelas em data/rfb_cnpj_lakehouse/bronze/ com cache SQLite WAL."
       },
       {
         "gate_id": "GATE_03",
@@ -177,25 +177,25 @@
         "gate_id": "GATE_04",
         "name": "Materialização Silver Parquet Isolada (Todas as Tabelas)",
         "status": "COMPLETED",
-        "criteria": "Gravação de brasilapi_bancos.parquet, brasilapi_pix_participantes.parquet, etc., em data/brasilapi_core/silver/ com SHA-256."
+        "criteria": "Gravação de rfb_empresas.parquet, rfb_estabelecimentos.parquet, rfb_socios.parquet, etc., em data/rfb_cnpj_lakehouse/silver/ com SHA-256."
       },
       {
         "gate_id": "GATE_05",
         "name": "Validação dos 5 Pilares & Quarentena",
         "status": "COMPLETED",
-        "criteria": "Aprovação em Freshness, Volume, Schema, Null Ceiling e Lineage; desvio para data/brasilapi_core/quarantine/ se violado."
+        "criteria": "Aprovação em Freshness, Volume, Schema, Null Ceiling e Lineage; desvio para data/rfb_cnpj_lakehouse/quarantine/ se violado."
       },
       {
         "gate_id": "GATE_06",
         "name": "Gold Feature View Isolada & ASOF Join ML",
         "status": "COMPLETED",
-        "criteria": "Features analíticas agregadas em data/brasilapi_core/gold/features_infraestrutura_brasil.parquet com agregação bancária e densidade por UF."
+        "criteria": "Features analíticas agregadas em data/rfb_cnpj_lakehouse/gold/features_empresariais_brasil.parquet com agregação de densidade corporativa e capital social por UF."
       },
       {
         "gate_id": "GATE_07",
         "name": "Integração ao EnrichmentEngine",
         "status": "COMPLETED",
-        "criteria": "Disponibilização para enriquecimento cadastral e geográfico batch/online respeitando o Client Path Shield (POP_T_154)."
+        "criteria": "Disponibilização para enriquecimento cadastral e geográfico batch/online respeitando o Client Path Shield (POP_T_154) e mascaramento LGPD de sócios."
       },
       {
         "gate_id": "GATE_08",
@@ -207,19 +207,19 @@
         "gate_id": "GATE_09",
         "name": "Bateria de Testes Offline com Períodos Diversos",
         "status": "COMPLETED",
-        "criteria": "Testes unitários offline com fixtures cobrindo bancos, PIX participantes, corretoras CVM, feriados nacionais, DDDs e CEPs."
+        "criteria": "Testes unitários offline com fixtures cobrindo as 10 tabelas da Receita Federal, mascaramento LGPD e features firmográficas."
       },
       {
         "gate_id": "GATE_10",
         "name": "dbt Staging, source.yml e 100% Colunas Documentadas",
         "status": "COMPLETED",
-        "criteria": "Pasta connectors/.../brasilapi_core/dbt/ com source.yml próprio, 6 modelos staging, dim_instituicao_financeira, dim_calendario_nacional, mart_infraestrutura_bancaria_brasil e 100% colunas documentadas."
+        "criteria": "Pasta connectors/.../rfb_cnpj_lakehouse/dbt/ com source.yml próprio, 10 modelos staging, dim_empresa, dim_estabelecimento, dim_socio_qsa, mart_densidade_empresarial_brasil e 100% colunas documentadas."
       },
       {
         "gate_id": "GATE_11",
         "name": "Teste Real de 1 Linha com API ao Vivo (Fail-Hard)",
         "status": "COMPLETED",
-        "criteria": "Execução obrigatória contra os 6 endpoints oficiais da BrasilAPI ao vivo limitados a 1 registro; falha reprova o pipeline."
+        "criteria": "Execução obrigatória contra o endpoint oficial de resolução de CNPJ ao vivo limitado a 1 registro; falha reprova o pipeline."
       }
     ]
   },
@@ -265,6 +265,12 @@
       "phase_id": "03",
       "milestone": "Homologação do Conector brasilapi_core & Conclusão da Wave 1 (6 Tabelas, dbt, Mart Bancário & Live Fail-Hard)",
       "summary": "Implementação de ponta a ponta do conector brasilapi_core concluindo com sucesso 100% da Wave 1: 6 tabelas (brasilapi_bancos, brasilapi_pix_participantes, brasilapi_corretoras, brasilapi_feriados, brasilapi_ddds, brasilapi_ceps) materializadas em data/brasilapi_core/{bronze,silver,gold}/; 9 novos modelos dbt (6 staging, dim_instituicao_financeira, dim_calendario_nacional, mart_infraestrutura_bancaria_brasil) totalizando 34 modelos e 288 testes dbt 100% aprovados; 337 colunas 100% documentadas no linter; testes reais de 1 linha com fail-hard contra os 6 endpoints da BrasilAPI e suíte offline com 47 testes pytest 100% verde."
+    },
+    {
+      "date": "2026-11-08",
+      "phase_id": "04",
+      "milestone": "Homologação do Conector rfb_cnpj_lakehouse (10 Tabelas, dbt, Mart B2B & Live Fail-Hard)",
+      "summary": "Implementação de ponta a ponta do conector rfb_cnpj_lakehouse iniciando a Wave 2: 10 tabelas (rfb_cnaes, rfb_motivos, rfb_municipios, rfb_naturezas, rfb_paises, rfb_qualificacoes, rfb_empresas, rfb_estabelecimentos, rfb_socios, rfb_simples) materializadas em data/rfb_cnpj_lakehouse/{bronze,silver,gold}/; 14 novos modelos dbt (10 staging, dim_empresa, dim_estabelecimento, dim_socio_qsa, mart_densidade_empresarial_brasil) totalizando 48 modelos e 416 testes dbt 100% aprovados; 481 colunas 100% documentadas no linter; testes reais de 1 linha com fail-hard contra o endpoint oficial de CNPJ e suíte offline com 54 testes pytest 100% verde."
     }
   ]
 }
