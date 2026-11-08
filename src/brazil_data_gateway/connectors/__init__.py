@@ -6,4 +6,5 @@ energia, saude, transito, etc.
 
 # Ensure built-in connectors are imported and registered
 import brazil_data_gateway.connectors.demografico.ibge_localidades  # noqa: F401
+import brazil_data_gateway.connectors.macrofinanceiro.bcb_olinda_ptax  # noqa: F401
 import brazil_data_gateway.connectors.macrofinanceiro.bcb_sgs  # noqa: F401

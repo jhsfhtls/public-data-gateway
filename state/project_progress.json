@@ -15,8 +15,8 @@
   "current_macro_phase_id": "03",
   "current_macro_phase": "Fase 03 — Ingestão Wave 1 (Macroeconomia & Borda: bcb_sgs, bcb_olinda_ptax, brasilapi_core)",
   "overall_status": "ON_TRACK",
-  "active_connector": "bcb_sgs",
-  "next_connector": "bcb_olinda_ptax",
+  "active_connector": "bcb_olinda_ptax",
+  "next_connector": "brasilapi_core",
   "structural_phases": [
     {
       "phase_id": "00",
@@ -152,20 +152,20 @@
     }
   ],
   "active_connector_gates": {
-    "target_connector": "bcb_sgs",
+    "target_connector": "bcb_olinda_ptax",
     "target_wave": 1,
     "gates": [
       {
         "gate_id": "GATE_01",
         "name": "Contrato Declarativo ODCS v3.1 das N Tabelas da API",
         "status": "COMPLETED",
-        "criteria": "Schema tipado, chaves primárias STRING e regras para catalogo, ipca, igpm, selic, cdi e ibcbr."
+        "criteria": "Schema tipado, chaves primárias STRING e regras para ptax_moedas, ptax_cotacao_dolar, ptax_cotacao_moedas e ptax_boletins."
       },
       {
         "gate_id": "GATE_02",
         "name": "Ingestão Bronze Isolada (Todas as Tabelas) & Cache WAL",
         "status": "COMPLETED",
-        "criteria": "Download resiliente das 6 tabelas em data/bcb_sgs/bronze/ com cache SQLite WAL."
+        "criteria": "Download resiliente das 4 tabelas em data/bcb_olinda_ptax/bronze/ com cache SQLite WAL."
       },
       {
         "gate_id": "GATE_03",
@@ -177,25 +177,25 @@
         "gate_id": "GATE_04",
         "name": "Materialização Silver Parquet Isolada (Todas as Tabelas)",
         "status": "COMPLETED",
-        "criteria": "Gravação de sgs_catalogo.parquet, sgs_ipca.parquet, etc., em data/bcb_sgs/silver/ com SHA-256."
+        "criteria": "Gravação de ptax_moedas.parquet, ptax_cotacao_dolar.parquet, etc., em data/bcb_olinda_ptax/silver/ com SHA-256."
       },
       {
         "gate_id": "GATE_05",
         "name": "Validação dos 5 Pilares & Quarentena",
         "status": "COMPLETED",
-        "criteria": "Aprovação em Freshness, Volume, Schema, Null Ceiling e Lineage; desvio para data/bcb_sgs/quarantine/ se violado."
+        "criteria": "Aprovação em Freshness, Volume, Schema, Null Ceiling e Lineage; desvio para data/bcb_olinda_ptax/quarantine/ se violado."
       },
       {
         "gate_id": "GATE_06",
         "name": "Gold Feature View Isolada & ASOF Join ML",
         "status": "COMPLETED",
-        "criteria": "Features analíticas agregadas em data/bcb_sgs/gold/features_macro_brasil.parquet com cálculo de juros reais e spreads."
+        "criteria": "Features analíticas agregadas em data/bcb_olinda_ptax/gold/features_cambio_brasil.parquet com volatilidade e spreads."
       },
       {
         "gate_id": "GATE_07",
         "name": "Integração ao EnrichmentEngine",
         "status": "COMPLETED",
-        "criteria": "Disponibilização para enriquecimento econômico batch/online respeitando o Client Path Shield (POP_T_154)."
+        "criteria": "Disponibilização para enriquecimento cambial batch/online respeitando o Client Path Shield (POP_T_154)."
       },
       {
         "gate_id": "GATE_08",
@@ -207,19 +207,19 @@
         "gate_id": "GATE_09",
         "name": "Bateria de Testes Offline com Períodos Diversos",
         "status": "COMPLETED",
-        "criteria": "Testes unitários offline com fixtures cobrindo ciclos de crise (2020), inflação alta (2021-2022) e recente (2024-2026)."
+        "criteria": "Testes unitários offline com fixtures cobrindo ciclos de câmbio (2024-2026), moedas múltiplas e boletins intradiários."
       },
       {
         "gate_id": "GATE_10",
         "name": "dbt Staging, source.yml e 100% Colunas Documentadas",
         "status": "COMPLETED",
-        "criteria": "Pasta connectors/.../bcb_sgs/dbt/ com source.yml próprio, 6 modelos staging e _models.yml com 100% de colunas documentadas."
+        "criteria": "Pasta connectors/.../bcb_olinda_ptax/dbt/ com source.yml próprio, 4 modelos staging, dim_moeda, fct_cambio_ptax_diario, mart_cambio_volatilidade_brasil e _models.yml com 100% de colunas documentadas."
       },
       {
         "gate_id": "GATE_11",
         "name": "Teste Real de 1 Linha com API ao Vivo (Fail-Hard)",
         "status": "COMPLETED",
-        "criteria": "Execução obrigatória contra os 7 endpoints oficiais do BACEN SGS ao vivo limitados a 1 registro; falha reprova o pipeline."
+        "criteria": "Execução obrigatória contra os endpoints oficiais da API Olinda PTAX ao vivo limitados a 1 registro; falha reprova o pipeline."
       }
     ]
   },
@@ -253,6 +253,12 @@
       "phase_id": "03",
       "milestone": "Homologação do Conector bcb_sgs (6 Tabelas, dbt, Mart Macroeconômico & Live Fail-Hard)",
       "summary": "Implementação de ponta a ponta do conector bcb_sgs: 6 tabelas (sgs_catalogo, sgs_ipca, sgs_igpm, sgs_selic, sgs_cdi, sgs_ibcbr) materializadas em data/bcb_sgs/{bronze,silver,gold}/; 9 novos modelos dbt (6 staging, dim_serie_macroeconomica, fct_macro_indicadores_mensal, mart_cenario_macroeconomico_brasil) com 167 testes dbt 100% aprovados; 195 colunas 100% documentadas no linter; testes reais de 1 linha com fail-hard contra os 7 endpoints oficiais do BACEN e suíte offline com 37 testes pytest 100% verde."
+    },
+    {
+      "date": "2026-11-07",
+      "phase_id": "03",
+      "milestone": "Homologação do Conector bcb_olinda_ptax (4 Tabelas, dbt, Mart de Volatilidade Cambial & Live Fail-Hard)",
+      "summary": "Implementação de ponta a ponta do conector bcb_olinda_ptax: 4 tabelas (ptax_moedas, ptax_cotacao_dolar, ptax_cotacao_moedas, ptax_boletins) materializadas em data/bcb_olinda_ptax/{bronze,silver,gold}/; 7 novos modelos dbt (4 staging, dim_moeda, fct_cambio_ptax_diario, mart_cambio_volatilidade_brasil) com 220 testes dbt 100% aprovados; 260 colunas 100% documentadas no linter; testes reais de 1 linha com fail-hard contra os endpoints oficiais Olinda PTAX e suíte offline com 42 testes pytest 100% verde."
     }
   ]
 }

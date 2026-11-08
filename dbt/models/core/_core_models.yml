@@ -230,3 +230,66 @@ models:
       - name: ibcbr_indice
         description: "Número índice dessazonalizado do IBC-Br divulgado pelo Banco Central para a competência."
 
+  - name: dim_moeda
+    description: "Dimensão conformada de moedas estrangeiras cadastradas no sistema PTAX do Banco Central."
+    columns:
+      - name: simbolo_moeda
+        description: "Código ISO 4217 de 3 letras da moeda estrangeira (chave primária da dimensão)."
+        tests:
+          - unique
+          - not_null
+      - name: nome_moeda
+        description: "Nome oficial formatado da moeda estrangeira."
+        tests:
+          - not_null
+      - name: tipo_moeda
+        description: "Classificação PTAX do tipo de cotação da moeda (Tipo A ou Tipo B)."
+        tests:
+          - not_null
+      - name: reference_date
+        description: "Data de referência do cadastro (YYYY-MM-DD)."
+        tests:
+          - not_null
+      - name: extracted_at
+        description: "Timestamp ISO-8601 da extração dos dados."
+        tests:
+          - not_null
+
+  - name: fct_cambio_ptax_diario
+    description: "Tabela fato conformatória diária de cotações PTAX de fechamento para as principais moedas globais (USD, EUR, GBP)."
+    columns:
+      - name: data_cotacao
+        description: "Data do dia útil da cotação no formato YYYY-MM-DD."
+        tests:
+          - unique
+          - not_null
+      - name: data_referencia
+        description: "Data de referência em formato DATE para indexação e joins temporais."
+        tests:
+          - not_null
+      - name: ano_mes
+        description: "Competência do ano e mês no formato YYYY-MM."
+        tests:
+          - not_null
+      - name: dolar_compra
+        description: "Taxa de câmbio oficial de compra do Dólar americano em Reais (BRL)."
+        tests:
+          - not_null
+      - name: dolar_venda
+        description: "Taxa de câmbio oficial de venda do Dólar americano em Reais (BRL)."
+        tests:
+          - not_null
+      - name: dolar_spread
+        description: "Diferença absoluta em Reais entre a taxa de venda e de compra do Dólar (spread cambial oficial)."
+        tests:
+          - not_null
+      - name: euro_compra
+        description: "Taxa de câmbio oficial de compra do Euro em Reais (BRL)."
+      - name: euro_venda
+        description: "Taxa de câmbio oficial de venda do Euro em Reais (BRL)."
+      - name: libra_compra
+        description: "Taxa de câmbio oficial de compra da Libra Esterlina em Reais (BRL)."
+      - name: libra_venda
+        description: "Taxa de câmbio oficial de venda da Libra Esterlina em Reais (BRL)."
+
+
