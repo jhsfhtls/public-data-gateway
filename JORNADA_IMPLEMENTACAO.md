@@ -1,7 +1,7 @@
 <div align="center">
   <h2>Jornada de Implementação — Brazil Data Gateway</h2>
   <p><i>Painel Vivo de Evolução Arquitetural, Ciclo de Vida de Conectores & Habilitação de Produtos C.O.R.E.</i></p>
-  <p><b>Versão:</b> 1.0.0 &nbsp;|&nbsp; <b>Última Atualização:</b> 2026-11-08T06:10:00.000000+00:00 &nbsp;|&nbsp; <b>Governança:</b> POP_T_177 • POP_T_176 • POP_T_175 • POP_T_070 • POP_T_074 • POP_T_148</p>
+  <p><b>Versão:</b> 1.0.0 &nbsp;|&nbsp; <b>Última Atualização:</b> 2026-11-08T06:30:00.000000+00:00 &nbsp;|&nbsp; <b>Governança:</b> POP_T_177 • POP_T_176 • POP_T_175 • POP_T_070 • POP_T_074 • POP_T_148</p>
   <hr/>
 </div>
 <br/>
@@ -16,8 +16,8 @@ Este artefato constitui a **Fonte Única da Verdade Operacional (SSOT)** do stat
 
 - **Macrofase Ativa:** `Fase 04 — Ingestão Wave 2 (B2B, Compras Públicas & Compliance: rfb_cnpj_lakehouse, rfb_simples_mei, pncp_contratacoes, etc.)`
 - **Status Geral de Governança:** `🟢 ON_TRACK`
-- **Conector Ativo em Desenvolvimento:** `cgu_pep`
-- **Próximo Conector na Fila de Execução:** `cnj_datajud` (Wave 1 — Prioridade RICE 950)
+- **Conector Ativo em Desenvolvimento:** `cnj_datajud`
+- **Próximo Conector na Fila de Execução:** `tst_cndt` (Wave 1 — Prioridade RICE 950)
 - **Progresso Estrutural das Macrofases:** **5 de 12 Concluídas (41.7%)**
 - **Universo de Fontes Homologadas no Catálogo:** **49 fontes públicas** nos 13 macrosegmentos
 
@@ -120,6 +120,7 @@ O `public-data-gateway` atua como barramento alimentador de dados para os **10 P
 | `2026-11-08` | **Fase 04** | **Homologação do Conector rfb_simples_mei (5 Tabelas, dbt, Mart Tributário & Live Fail-Hard)** | Implementação de ponta a ponta do conector rfb_simples_mei consolidando a Wave 2: 5 tabelas (simples_nacional_cadastral, simei_cadastral, simples_sublimites_estaduais, simples_eventos_historico, simples_tabelas_anexos) materializadas em data/rfb_simples_mei/{bronze,silver,gold}/; 9 novos modelos dbt (5 staging, dim_simples_nacional, dim_simei, dim_sublimites_icms, mart_regimes_tributarios_brasil) totalizando 57 modelos e 477 testes dbt 100% aprovados; 541 colunas 100% documentadas no linter; testes reais de 1 linha com fail-hard contra o endpoint oficial de CNPJ/Simples e suíte offline com 60 testes pytest 100% verde; registro formal da expansão de escopo da Fase 10 para inclusão de APIs públicas globais e geoespaciais (Google APIs, OpenStreetMap, Mapbox). |
 | `2026-11-08` | **Fase 04** | **Homologação do Conector pncp_contratacoes (5 Tabelas, dbt, Mart de Compras Públicas & Live Fail-Hard)** | Implementação completa do conector pncp_contratacoes (Lei nº 14.133/2021): 5 tabelas (pncp_contratacoes, pncp_contratos, pncp_atas, pncp_orgaos, pncp_modalidades) materializadas em data/pncp_contratacoes/{bronze,silver,gold}/; 10 novos modelos dbt (5 staging views, dim_modalidade_licitacao, dim_orgao_publico, fct_contratacao_publica, fct_contrato_administrativo, mart_compras_publicas_brasil) totalizando 67 modelos e 576 testes dbt 100% aprovados; 730 colunas 100% documentadas no linter; testes reais de 1 linha com fail-hard estrito contra a API oficial de produção do PNCP e 65 testes offline aprovados; feature store features_compras_publicas_brasil.parquet gerada com score de maturidade licitatória. |
 | `2026-11-08` | **Fase 04** | **Homologação do Conector cgu_ceis_cnep (5 Tabelas, dbt, Mart de Sanções & Compliance & Live Fail-Hard)** | Implementação completa do conector cgu_ceis_cnep (Leis nº 12.846/2013 e 14.133/2021): 5 tabelas (cgu_ceis, cgu_cnep, cgu_cepim, cgu_acordos_leniencia, cgu_orgaos_sancionadores) materializadas em data/cgu_ceis_cnep/{bronze,silver,gold}/; 9 novos modelos dbt (5 staging views, dim_tipo_sancao, dim_empresa_sancionada, fct_sancao_administrativa, mart_compliance_sancoes_brasil) totalizando 76 modelos e 672 testes dbt 100% aprovados; 846 colunas 100% documentadas no linter; testes reais de 1 linha com fail-hard estrito contra a OpenAPI e endpoints oficiais da CGU; feature store features_compliance_risco_brasil.parquet gerada com score de risco de compliance; multi-interface completa via SDK (PublicData.compliance), CLI (pdg compliance), REST API (/api/v1/compliance) e MCP (bdg_get_compliance_status). |
+| `2026-11-08` | **Fase 04** | **Homologação do Conector cgu_pep (5 Tabelas, dbt, Mart de Exposição Política & Live Fail-Hard)** | Implementação completa do conector cgu_pep (Resolução COAF nº 40/2021 & Circular BACEN nº 3.978/2020 / PLD/FTP): 5 tabelas (cgu_pep, cgu_pep_orgaos, cgu_pep_funcoes, cgu_pep_historico_carencia, cgu_pep_relacionados) materializadas em data/cgu_pep/{bronze,silver,gold}/; 9 novos modelos dbt (5 staging views, dim_pep, dim_funcao_pep, fct_mandato_pep, mart_pep_distribuicao_brasil) totalizando 85 modelos e 759 testes dbt 100% aprovados; 931 colunas 100% documentadas no linter; feature store features_pep_exposicao_politica_brasil.parquet gerada com score de risco PLD e categorização de quarentena de 5 anos; testes reais de 1 linha com fail-hard contra a API oficial da CGU (/api-de-dados/peps) e 11 testes pytest aprovados; multi-interface completa via SDK (PublicData.compliance.pep_status), CLI (pdg pep status), REST API (/api/v1/pep) e MCP (bdg_get_pep_status). |
 
 ---
 

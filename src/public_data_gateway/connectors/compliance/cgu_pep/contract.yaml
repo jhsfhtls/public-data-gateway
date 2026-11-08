@@ -1,0 +1,73 @@
+contract_id: "ODCS-BR-CGU-PEP-001"
+source_id: "cgu_pep"
+version: "1.0.0"
+grain: "One row per Politically Exposed Person (PEP), public office tenure and regulatory cooling-off record"
+primary_keys:
+  - "id_registro_pep"
+canonical_keys:
+  - "id_registro_pep"
+  - "cpf_pep"
+  - "sigla_uf"
+reference_date_column: "reference_date"
+lgpd_legal_basis: "Art. 7º, § 3º e 4º LGPD c/c Resolução COAF nº 40/2021, Circular BACEN nº 3.978/2020 e Lei nº 12.846/2013 (Transparência Ativa e Prevenção à Lavagem de Dinheiro - PLD/FTP)"
+min_expected_rows: 5
+max_volume_drop_pct: 1.0
+sentinel_values:
+  - "-1"
+  - "99"
+  - "999"
+  - "SEM INFORMACAO"
+  - "IGNORADO"
+  - "N/A"
+  - "-"
+  - "00000000000"
+columns:
+  - name: "id_registro_pep"
+    data_type: "string"
+    required: true
+    is_primary_key: true
+    description: "Identificador hash unívoco do mandato ou exercício de função pública PEP"
+  - name: "cpf_pep"
+    data_type: "string"
+    required: true
+    description: "Número do CPF com máscara oficial de privacidade LGPD (***.123.456-**)"
+  - name: "nome_pep"
+    data_type: "string"
+    required: true
+    description: "Nome completo do titular da função pública enquadrado como PEP"
+  - name: "sigla_funcao"
+    data_type: "string"
+    required: true
+    description: "Sigla cadastral do cargo ou mandato exercido (ex: DEP-FED, SEN, MIN-EST, PREF, GOV)"
+  - name: "descricao_funcao"
+    data_type: "string"
+    required: true
+    description: "Denominação oficial por extenso da função ou cargo público exercido"
+  - name: "nivel_funcao"
+    data_type: "string"
+    required: false
+    description: "Nível hierárquico governamental da função (ex: 1, 2, NES, DAS-101.6, CCE-17)"
+  - name: "nome_orgao"
+    data_type: "string"
+    required: true
+    description: "Órgão, entidade pública, autarquia, tribunal ou poder ao qual o cargo é vinculado"
+  - name: "sigla_uf_orgao"
+    data_type: "string"
+    required: false
+    description: "Unidade da Federação de lotação ou exercício da autoridade pública"
+  - name: "data_inicio_exercicio"
+    data_type: "date"
+    required: true
+    description: "Data formal de posse, diplomação ou início do exercício do cargo público"
+  - name: "data_fim_exercicio"
+    data_type: "date"
+    required: false
+    description: "Data formal de exoneração, término do mandato ou cessação do exercício"
+  - name: "data_fim_carencia"
+    data_type: "date"
+    required: true
+    description: "Data de expiração do período de carência regulatória PEP de 5 anos (Resolução COAF nº 40/2021)"
+  - name: "is_pep_ativo"
+    data_type: "boolean"
+    required: true
+    description: "Indicador se a autoridade encontra-se atualmente em exercício ou em período de carência regulatória ativa"

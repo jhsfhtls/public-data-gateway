@@ -197,6 +197,17 @@ class MCPDispatcher:
                                     "required": ["documento"],
                                 },
                             },
+                            {
+                                "name": "bdg_get_pep_status",
+                                "description": "Check whether an individual is registered as Politically Exposed Person (PEP) under COAF Resolução nº 40/2021 (Tier 1).",
+                                "inputSchema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "termo": {"type": "string", "description": "CPF (masked or digits) or name to search"},
+                                    },
+                                    "required": ["termo"],
+                                },
+                            },
                         ]
                     },
                 }
@@ -365,6 +376,21 @@ class MCPDispatcher:
             doc = args.get("documento") or args.get("cnpj_or_cpf") or ""
             res = conn.get_compliance_status(doc)
             wrapped = wrap_untrusted_gov_data(res, source_id="cgu_ceis_cnep")
+            return {
+                "jsonrpc": "2.0",
+                "id": req_id,
+                "result": {"content": [{"type": "text", "text": wrapped}], "isError": False},
+            }
+
+        if tool_name in {"bdg_get_pep_status", "pdg_get_pep_status"}:
+            from public_data_gateway.connectors.compliance.cgu_pep.connector import (
+                CGUPEPConnector,
+            )
+
+            conn = CGUPEPConnector(settings=self.settings)
+            termo = args.get("termo") or args.get("cpf_or_name") or ""
+            res = conn.get_pep_status(termo)
+            wrapped = wrap_untrusted_gov_data(res, source_id="cgu_pep")
             return {
                 "jsonrpc": "2.0",
                 "id": req_id,

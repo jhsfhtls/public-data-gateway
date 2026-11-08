@@ -284,7 +284,7 @@ sources:
   - P07
   rice_score: 750
   roadmap_wave: 2
-  status: CATALOGED
+  status: HOMOLOGATED
 - source_id: rfb_simples_mei
   name: 'Receita Federal: Opção pelo Simples Nacional & MEI'
   agency: Receita Federal do Brasil

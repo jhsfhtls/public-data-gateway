@@ -1,0 +1,183 @@
+version: 2
+
+models:
+  - name: stg_cgu_pep
+    description: "Visão de staging de Pessoas Expostas Politicamente (PEP) do cadastro oficial mantido pela CGU."
+    columns:
+      - name: id_registro_pep
+        description: "Identificador hash unívoco do mandato ou período de exercício de função pública PEP."
+        tests:
+          - not_null
+          - unique
+      - name: cpf_pep
+        description: "Número de inscrição no CPF com máscara de proteção à privacidade LGPD (***.123.456-**)."
+        tests:
+          - not_null
+      - name: nome_pep
+        description: "Nome completo do titular da função pública enquadrado como PEP."
+        tests:
+          - not_null
+      - name: sigla_funcao
+        description: "Sigla cadastral do cargo ou mandato exercido (ex: MIN-EST, SEN, GOV, PREF)."
+        tests:
+          - not_null
+      - name: descricao_funcao
+        description: "Denominação oficial por extenso da função pública exercida."
+        tests:
+          - not_null
+      - name: nivel_funcao
+        description: "Nível hierárquico governamental da função (ex: NES, 1, DAS-101.5, CCE-18)."
+      - name: nome_orgao
+        description: "Nome oficial do órgão público, ministério, tribunal ou poder de exercício."
+        tests:
+          - not_null
+      - name: sigla_uf_orgao
+        description: "Sigla da Unidade da Federação de lotação ou exercício da autoridade pública."
+        tests:
+          - not_null
+      - name: data_inicio_exercicio
+        description: "Data formal de posse, diplomação ou início do exercício do cargo público."
+        tests:
+          - not_null
+      - name: data_fim_exercicio
+        description: "Data formal de exoneração, término do mandato ou cessação do exercício (se ocorrido)."
+      - name: data_fim_carencia
+        description: "Data final de vigência do período de carência regulatória de 5 anos (Resolução COAF nº 40/2021)."
+        tests:
+          - not_null
+      - name: is_pep_ativo
+        description: "Indicador se a autoridade encontra-se em exercício ou em período de carência regulatória ativa."
+        tests:
+          - not_null
+
+  - name: stg_cgu_pep_orgaos
+    description: "Visão de staging dos órgãos e entidades da administração pública com cargos de liderança PEP."
+    columns:
+      - name: codigo_orgao
+        description: "Código identificador ou sigla unívoca do órgão público no cadastro da CGU."
+        tests:
+          - not_null
+          - unique
+      - name: nome_orgao
+        description: "Nome oficial por extenso da pasta, tribunal ou entidade pública."
+        tests:
+          - not_null
+      - name: sigla_uf
+        description: "UF de localização da sede do órgão público."
+        tests:
+          - not_null
+      - name: poder
+        description: "Poder institucional ao qual o órgão pertence (E=Executivo, L=Legislativo, J=Judiciário)."
+        tests:
+          - not_null
+      - name: esfera
+        description: "Esfera de governo de atuação do órgão (F=Federal, E=Estadual, M=Municipal)."
+        tests:
+          - not_null
+      - name: total_cargos_pep
+        description: "Quantidade estimada de cargos e postos de liderança enquadrados como PEP no órgão."
+        tests:
+          - not_null
+
+  - name: stg_cgu_pep_funcoes
+    description: "Visão de staging da taxonomia e enquadramento normativo de cargos PEP conforme o COAF."
+    columns:
+      - name: sigla_funcao
+        description: "Código mnemônico ou sigla padronizada do cargo ou função pública."
+        tests:
+          - not_null
+          - unique
+      - name: descricao_funcao
+        description: "Descrição formal por extenso do cargo público."
+        tests:
+          - not_null
+      - name: categoria_exposicao
+        description: "Classificação institucional da exposição política (ex: ALTO_EXECUTIVO_FEDERAL, MEMBRO_LEGISLATIVO_FEDERAL)."
+        tests:
+          - not_null
+      - name: nivel_hierarquico
+        description: "Nível hierárquico formal na estrutura do Estado brasileiro."
+        tests:
+          - not_null
+      - name: amparo_coaf
+        description: "Dispositivo normativo de enquadramento na Resolução COAF nº 40/2021."
+        tests:
+          - not_null
+      - name: grau_risco_pld
+        description: "Grau de risco regulatório para fins de Prevenção à Lavagem de Dinheiro (CRITICO, ALTO, MODERADO)."
+        tests:
+          - not_null
+
+  - name: stg_cgu_pep_historico_carencia
+    description: "Visão de staging de acompanhamento do período de carência regulatória de 5 anos de ex-ocupantes PEP."
+    columns:
+      - name: id_historico
+        description: "Identificador unívoco do registro de término de mandato e carência regulatória."
+        tests:
+          - not_null
+          - unique
+      - name: cpf_pep
+        description: "CPF com máscara LGPD do ex-ocupante do cargo público."
+        tests:
+          - not_null
+      - name: nome_pep
+        description: "Nome completo do titular que encerrou mandato ou foi exonerado."
+        tests:
+          - not_null
+      - name: descricao_funcao
+        description: "Cargo público outrora exercido pelo indivíduo."
+        tests:
+          - not_null
+      - name: nome_orgao
+        description: "Órgão público onde o cargo foi exercido."
+        tests:
+          - not_null
+      - name: data_termino_mandato
+        description: "Data em que o indivíduo formalmente deixou de exercer a função pública."
+        tests:
+          - not_null
+      - name: data_fim_carencia
+        description: "Data em que expira a condição de PEP residual (5 anos após a saída do cargo)."
+        tests:
+          - not_null
+      - name: anos_carencia_regulatoria
+        description: "Quantidade de anos da carência estipulada pela legislação de PLD (5 anos)."
+        tests:
+          - not_null
+      - name: is_em_carencia
+        description: "Indicador booleano se o indivíduo encontra-se atualmente sob o período de carência ativa."
+        tests:
+          - not_null
+
+  - name: stg_cgu_pep_relacionados
+    description: "Visão de staging de pessoas estreitamente relacionadas e pessoas jurídicas vinculadas a PEPs."
+    columns:
+      - name: id_relacionamento
+        description: "Identificador único do vínculo de estreita relação pessoal ou societária com autoridade PEP."
+        tests:
+          - not_null
+          - unique
+      - name: cpf_pep
+        description: "CPF com máscara LGPD da autoridade PEP originária do vínculo."
+        tests:
+          - not_null
+      - name: nome_pep
+        description: "Nome da autoridade pública PEP de referência."
+        tests:
+          - not_null
+      - name: tipo_relacao
+        description: "Natureza jurídica ou de parentesco do vínculo (ex: CONJUGE_COMPANHEIRO, SOCIO_EMPRESARIAL)."
+        tests:
+          - not_null
+      - name: nome_pessoa_relacionada
+        description: "Nome completo da pessoa física ou razão social da pessoa jurídica vinculada."
+        tests:
+          - not_null
+      - name: cpf_pessoa_relacionada
+        description: "CPF com máscara LGPD da pessoa física vinculada (se aplicável)."
+      - name: cnpj_empresa_vinculada
+        description: "CNPJ da empresa vinculada à autoridade pública ou familiares (se aplicável)."
+      - name: grau_exposicao
+        description: "Grau de exposição e extensão regulatória de conformidade (ESTREITA_RELACAO, PESSOA_JURIDICA_VINCULADA)."
+        tests:
+          - not_null

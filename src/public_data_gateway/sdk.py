@@ -154,6 +154,30 @@ class ComplianceFacade:
                 break
         return filtered
 
+    def pep_status(self, cpf_or_name: str) -> dict[str, Any]:
+        """Check whether a person (CPF or Name) is registered as Politically Exposed Person (PEP)."""
+        from public_data_gateway.connectors.compliance.cgu_pep.connector import (
+            CGUPEPConnector,
+        )
+
+        conn = CGUPEPConnector(settings=self._sdk.settings)
+        return conn.get_pep_status(cpf_or_name)
+
+    def list_pep(
+        self,
+        uf: str | None = None,
+        sigla_funcao: str | None = None,
+        ativos_only: bool = True,
+        limit: int = 50,
+    ) -> list[dict[str, Any]]:
+        """List Politically Exposed Persons with optional filters."""
+        from public_data_gateway.connectors.compliance.cgu_pep.connector import (
+            CGUPEPConnector,
+        )
+
+        conn = CGUPEPConnector(settings=self._sdk.settings)
+        return conn.list_pep(uf=uf, sigla_funcao=sigla_funcao, ativos_only=ativos_only, limit=limit)
+
 
 class BrazilData:
     """Unified developer SDK facade for querying, normalizing, and enriching Brazilian public datasets."""
@@ -233,6 +257,10 @@ class BrazilData:
     def get_compliance_status(self, cnpj_or_cpf: str) -> dict[str, Any]:
         """Check whether a CNPJ or CPF has active administrative sanctions in CEIS, CNEP, or CEPIM."""
         return self.compliance.status(cnpj_or_cpf)
+
+    def get_pep_status(self, cpf_or_name: str) -> dict[str, Any]:
+        """Check whether a person (CPF or Name) is registered as Politically Exposed Person (PEP)."""
+        return self.compliance.pep_status(cpf_or_name)
 
     def resolve_municipality(
         self, code_or_name: str | int, uf: str | None = None

@@ -1,6 +1,6 @@
 {
   "schema_version": "1.0.0",
-  "last_updated": "2026-11-08T06:10:00.000000+00:00",
+  "last_updated": "2026-11-08T06:30:00.000000+00:00",
   "project_name": "public-data-gateway",
   "ecosystem": "C.O.R.E. (core, operations, career, studies)",
   "governing_pops": [
@@ -15,8 +15,8 @@
   "current_macro_phase_id": "04",
   "current_macro_phase": "Fase 04 — Ingestão Wave 2 (B2B, Compras Públicas & Compliance: rfb_cnpj_lakehouse, rfb_simples_mei, pncp_contratacoes, etc.)",
   "overall_status": "ON_TRACK",
-  "active_connector": "cgu_pep",
-  "next_connector": "cnj_datajud",
+  "active_connector": "cnj_datajud",
+  "next_connector": "tst_cndt",
   "structural_phases": [
     {
       "phase_id": "00",
@@ -309,6 +309,12 @@
       "phase_id": "04",
       "milestone": "Homologação do Conector cgu_ceis_cnep (5 Tabelas, dbt, Mart de Sanções & Compliance & Live Fail-Hard)",
       "summary": "Implementação completa do conector cgu_ceis_cnep (Leis nº 12.846/2013 e 14.133/2021): 5 tabelas (cgu_ceis, cgu_cnep, cgu_cepim, cgu_acordos_leniencia, cgu_orgaos_sancionadores) materializadas em data/cgu_ceis_cnep/{bronze,silver,gold}/; 9 novos modelos dbt (5 staging views, dim_tipo_sancao, dim_empresa_sancionada, fct_sancao_administrativa, mart_compliance_sancoes_brasil) totalizando 76 modelos e 672 testes dbt 100% aprovados; 846 colunas 100% documentadas no linter; testes reais de 1 linha com fail-hard estrito contra a OpenAPI e endpoints oficiais da CGU; feature store features_compliance_risco_brasil.parquet gerada com score de risco de compliance; multi-interface completa via SDK (PublicData.compliance), CLI (pdg compliance), REST API (/api/v1/compliance) e MCP (bdg_get_compliance_status)."
+    },
+    {
+      "date": "2026-11-08",
+      "phase_id": "04",
+      "milestone": "Homologação do Conector cgu_pep (5 Tabelas, dbt, Mart de Exposição Política & Live Fail-Hard)",
+      "summary": "Implementação completa do conector cgu_pep (Resolução COAF nº 40/2021 & Circular BACEN nº 3.978/2020 / PLD/FTP): 5 tabelas (cgu_pep, cgu_pep_orgaos, cgu_pep_funcoes, cgu_pep_historico_carencia, cgu_pep_relacionados) materializadas em data/cgu_pep/{bronze,silver,gold}/; 9 novos modelos dbt (5 staging views, dim_pep, dim_funcao_pep, fct_mandato_pep, mart_pep_distribuicao_brasil) totalizando 85 modelos e 759 testes dbt 100% aprovados; 931 colunas 100% documentadas no linter; feature store features_pep_exposicao_politica_brasil.parquet gerada com score de risco PLD e categorização de quarentena de 5 anos; testes reais de 1 linha com fail-hard contra a API oficial da CGU (/api-de-dados/peps) e 11 testes pytest aprovados; multi-interface completa via SDK (PublicData.compliance.pep_status), CLI (pdg pep status), REST API (/api/v1/pep) e MCP (bdg_get_pep_status)."
     }
   ]
 }

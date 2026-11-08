@@ -1132,6 +1132,153 @@ models:
         tests:
           - not_null
 
+  - name: dim_funcao_pep
+    description: "Dimensão normativa conformada de cargos e funções públicas enquadradas como PEP pela Resolução COAF nº 40/2021."
+    columns:
+      - name: sigla_funcao
+        description: "Sigla cadastral padronizada da função pública de liderança."
+        tests:
+          - not_null
+          - unique
+      - name: descricao_funcao
+        description: "Nome oficial por extenso da função pública."
+        tests:
+          - not_null
+      - name: categoria_exposicao
+        description: "Classificação institucional da categoria de exposição política."
+        tests:
+          - not_null
+      - name: nivel_hierarquico
+        description: "Nível hierárquico governamental da função."
+        tests:
+          - not_null
+      - name: amparo_coaf
+        description: "Dispositivo normativo da Resolução COAF nº 40/2021 fundamentando o enquadramento PEP."
+        tests:
+          - not_null
+      - name: grau_risco_pld
+        description: "Grau de risco regulatório de PLD/FTP atribuído ao cargo (CRITICO, ALTO, MODERADO)."
+        tests:
+          - not_null
+      - name: ranking_risco_pld
+        description: "Classificação ordinal numérica do risco (1 = mais crítico)."
+        tests:
+          - not_null
+
+  - name: fct_mandato_pep
+    description: "Tabela de fatos de mandatos, cargos públicos e períodos de exercício de Pessoas Expostas Politicamente."
+    columns:
+      - name: id_registro_pep
+        description: "Identificador unívoco do mandato ou exercício de função pública PEP."
+        tests:
+          - not_null
+          - unique
+      - name: cpf_pep
+        description: "CPF com máscara oficial LGPD da autoridade pública (***.123.456-**)."
+        tests:
+          - not_null
+      - name: nome_pep
+        description: "Nome completo do titular da função pública."
+        tests:
+          - not_null
+      - name: sigla_funcao
+        description: "Sigla da função ou cargo público exercido."
+        tests:
+          - not_null
+      - name: descricao_funcao
+        description: "Descrição por extenso do cargo público."
+        tests:
+          - not_null
+      - name: categoria_exposicao
+        description: "Categoria institucional de exposição política perante o COAF."
+        tests:
+          - not_null
+      - name: grau_risco_pld
+        description: "Grau de risco regulatório de PLD/FTP."
+        tests:
+          - not_null
+      - name: ranking_risco_pld
+        description: "Ranking ordinal numérico de risco de exposição."
+        tests:
+          - not_null
+      - name: nivel_funcao
+        description: "Nível governamental da função exercida."
+      - name: nome_orgao
+        description: "Nome do órgão, tribunal ou ministério de lotação da função pública."
+        tests:
+          - not_null
+      - name: sigla_uf_orgao
+        description: "UF de exercício da autoridade pública."
+        tests:
+          - not_null
+      - name: data_inicio_exercicio
+        description: "Data em que a autoridade assumiu ou foi diplomada no cargo."
+        tests:
+          - not_null
+      - name: data_fim_exercicio
+        description: "Data de exoneração, renúncia ou término de mandato."
+      - name: data_fim_carencia
+        description: "Data de expiração da carência regulatória de 5 anos após a saída do cargo."
+        tests:
+          - not_null
+      - name: is_pep_ativo
+        description: "Indicador se o cargo está em exercício ativo ou sob carência regulatória vigente."
+        tests:
+          - not_null
+
+  - name: dim_pep
+    description: "Catálogo dimensional unificado de Pessoas Expostas Politicamente (PEP) com score de risco de integridade regulatória."
+    columns:
+      - name: cpf_pep
+        description: "CPF com máscara oficial LGPD do indivíduo enquadrado como autoridade PEP."
+        tests:
+          - not_null
+          - unique
+      - name: nome_pep
+        description: "Nome completo do titular enquadrado como PEP."
+        tests:
+          - not_null
+      - name: sigla_uf_referencia
+        description: "UF de referência principal da autoridade pública."
+        tests:
+          - not_null
+      - name: ultimo_orgao_exercido
+        description: "Órgão público do mandato mais recente ou em exercício."
+        tests:
+          - not_null
+      - name: ultima_funcao_exercida
+        description: "Cargo público do mandato mais recente ou em exercício."
+        tests:
+          - not_null
+      - name: total_mandatos_registrados
+        description: "Contagem total histórica de mandatos e cargos exercidos pelo indivíduo."
+        tests:
+          - not_null
+      - name: total_mandatos_ativos
+        description: "Quantidade de mandatos atualmente em exercício ou em carência ativa."
+        tests:
+          - not_null
+      - name: is_pep_ativo
+        description: "Indicador consolidado se o indivíduo é atualmente considerado PEP pela regulação."
+        tests:
+          - not_null
+      - name: data_limite_carencia
+        description: "Data final consolidada até a qual o indivíduo mantém a condição regulatória de PEP."
+        tests:
+          - not_null
+      - name: score_risco_pld
+        description: "Pontuação ponderada de risco de Prevenção à Lavagem de Dinheiro (0 a 100)."
+        tests:
+          - not_null
+      - name: categoria_risco_pld
+        description: "Classificação categórica do risco regulatório (CRITICO, ALTO, MODERADO, BAIXO)."
+        tests:
+          - not_null
+      - name: status_exposicao_politica
+        description: "Situação cadastral de exposição política do indivíduo (PEP_ATIVO_OU_EM_CARENCIA ou PEP_HISTORICO_REGULARIZADO)."
+        tests:
+          - not_null
+
 
 
 

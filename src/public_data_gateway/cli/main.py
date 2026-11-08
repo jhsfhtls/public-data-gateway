@@ -126,6 +126,23 @@ def build_parser() -> argparse.ArgumentParser:
     comp_sanc_p.add_argument("--limit", type=int, default=10, help="Max rows to return")
     comp_sanc_p.add_argument("--json", action="store_true", help="Output in JSON format")
 
+    # Subcommand: pep
+    pep_parser = subparsers.add_parser(
+        "pep", help="Query Politically Exposed Persons (PEP) under COAF Resolução nº 40/2021."
+    )
+    pep_sub = pep_parser.add_subparsers(dest="pep_action", required=True)
+
+    pep_status_p = pep_sub.add_parser("status", help="Check PEP status by CPF or name.")
+    pep_status_p.add_argument("termo", type=str, help="CPF (masked or digits) or name substring to search")
+    pep_status_p.add_argument("--json", action="store_true", help="Output in JSON format")
+
+    pep_list_p = pep_sub.add_parser("list", help="List Politically Exposed Persons with optional filters.")
+    pep_list_p.add_argument("--uf", type=str, help="Filter by organ UF state code")
+    pep_list_p.add_argument("--funcao", type=str, help="Filter by role code (e.g. MIN-EST, SEN, GOV)")
+    pep_list_p.add_argument("--todos", action="store_true", help="Include historical PEP with expired cooling-off")
+    pep_list_p.add_argument("--limit", type=int, default=10, help="Max rows to return")
+    pep_list_p.add_argument("--json", action="store_true", help="Output in JSON format")
+
     return parser
 
 
@@ -386,6 +403,41 @@ def main(argv: Sequence[str] | None = None) -> int:
                         tipo = r.get("tipo_sancao") or r.get("motivo_impedimento")
                         org = r.get("orgao_sancionador") or r.get("orgao_concedente")
                         print(f"  [{r['_fonte_tabela']}] {doc} | {nome} | {tipo} | Org: {org}")
+                return 0
+
+        if args.command == "pep":
+            from public_data_gateway.connectors.compliance.cgu_pep.connector import (
+                CGUPEPConnector,
+            )
+
+            conn = CGUPEPConnector(settings=settings)
+            if args.pep_action == "status":
+                res = conn.get_pep_status(args.termo)
+                if args.json:
+                    print(json.dumps(res, indent=2, ensure_ascii=False))
+                else:
+                    print(f"PEP Status for '{args.termo}':")
+                    print(f"  Status Exposição:     {res['status_exposicao_politica']}")
+                    print(f"  É PEP Ativo/Carência: {res['is_pep_ativo']}")
+                    print(f"  Score Risco PLD:      {res['score_risco_pld']} ({res['categoria_risco_pld']})")
+                    print(f"  Total Mandatos:       {res['total_mandatos_encontrados']}")
+                    for m in res.get("mandatos", []):
+                        print(f"    - {m['cpf_pep']} | {m['nome_pep']} | {m['descricao_funcao']} | Org: {m['nome_orgao']} | Ativo: {m['is_pep_ativo']}")
+                return 0
+
+            if args.pep_action == "list":
+                rows = conn.list_pep(
+                    uf=args.uf,
+                    sigla_funcao=args.funcao,
+                    ativos_only=not args.todos,
+                    limit=args.limit,
+                )
+                if args.json:
+                    print(json.dumps(rows, indent=2, ensure_ascii=False))
+                else:
+                    print(f"PEP Registros ({len(rows)} found):")
+                    for r in rows:
+                        print(f"  {r['cpf_pep']} | {r['nome_pep']} | {r['sigla_funcao']} ({r['descricao_funcao']}) | {r['nome_orgao']} ({r['sigla_uf_orgao']})")
                 return 0
 
     except Exception as exc:
