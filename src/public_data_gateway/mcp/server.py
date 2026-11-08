@@ -186,6 +186,17 @@ class MCPDispatcher:
                                     },
                                 },
                             },
+                            {
+                                "name": "bdg_get_compliance_status",
+                                "description": "Check whether a Brazilian company (CNPJ) or person (CPF) has active sanctions in CGU CEIS, CNEP, or CEPIM (Tier 1).",
+                                "inputSchema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "documento": {"type": "string", "description": "CNPJ or CPF to check"},
+                                    },
+                                    "required": ["documento"],
+                                },
+                            },
                         ]
                     },
                 }
@@ -339,6 +350,21 @@ class MCPDispatcher:
                 limit=args.get("limit", 10),
             )
             wrapped = wrap_untrusted_gov_data(res, source_id="pncp_contratacoes")
+            return {
+                "jsonrpc": "2.0",
+                "id": req_id,
+                "result": {"content": [{"type": "text", "text": wrapped}], "isError": False},
+            }
+
+        if tool_name in {"bdg_get_compliance_status", "pdg_get_compliance_status"}:
+            from public_data_gateway.connectors.compliance.cgu_ceis_cnep.connector import (
+                CGUCEISCNEPConnector,
+            )
+
+            conn = CGUCEISCNEPConnector(settings=self.settings)
+            doc = args.get("documento") or args.get("cnpj_or_cpf") or ""
+            res = conn.get_compliance_status(doc)
+            wrapped = wrap_untrusted_gov_data(res, source_id="cgu_ceis_cnep")
             return {
                 "jsonrpc": "2.0",
                 "id": req_id,

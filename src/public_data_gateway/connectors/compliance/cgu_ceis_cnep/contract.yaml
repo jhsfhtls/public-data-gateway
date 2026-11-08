@@ -1,0 +1,73 @@
+contract_id: "ODCS-BR-CGU-CEIS-CNEP-001"
+source_id: "cgu_ceis_cnep"
+version: "1.0.0"
+grain: "One row per administrative sanction record, anticorruption fine or leniency agreement"
+primary_keys:
+  - "id_sancao"
+canonical_keys:
+  - "id_sancao"
+  - "cnpj_sancionado"
+  - "sigla_uf"
+reference_date_column: "reference_date"
+lgpd_legal_basis: "Art. 7º, § 3º e 4º LGPD c/c Lei nº 12.846/2013 (Lei Anticorrupção) e Lei nº 14.133/2021 (Publicidade e Transparência de Sanções Administrativas)"
+min_expected_rows: 5
+max_volume_drop_pct: 1.0
+sentinel_values:
+  - "-1"
+  - "99"
+  - "999"
+  - "SEM INFORMACAO"
+  - "IGNORADO"
+  - "N/A"
+  - "-"
+  - "00000000000000"
+columns:
+  - name: "id_sancao"
+    data_type: "string"
+    required: true
+    is_primary_key: true
+    description: "Identificador numérico ou alfanumérico único do registro sancionador na CGU"
+  - name: "cadastro_origem"
+    data_type: "string"
+    required: true
+    description: "Cadastro de origem da sanção governamental (CEIS, CNEP, CEPIM, LENIENCIA)"
+  - name: "tipo_pessoa"
+    data_type: "string"
+    required: true
+    description: "Natureza jurídica da pessoa sancionada (PJ=Pessoa Jurídica, PF=Pessoa Física)"
+  - name: "cpf_cnpj_sancionado"
+    data_type: "string"
+    required: true
+    description: "Identificador formatado ou higienizado do sancionado (CNPJ 14 dígitos ou CPF mascarado)"
+  - name: "nome_sancionado"
+    data_type: "string"
+    required: true
+    description: "Razão social ou nome completo da pessoa jurídica ou física sancionada"
+  - name: "tipo_sancao"
+    data_type: "string"
+    required: true
+    description: "Descrição padronizada da sanção aplicada (ex: Declaração de Inidoneidade, Suspensão, Multa)"
+  - name: "orgao_sancionador"
+    data_type: "string"
+    required: true
+    description: "Nome do órgão ou entidade pública sancionadora que julgou o processo administrativo"
+  - name: "sigla_uf_orgao"
+    data_type: "string"
+    required: false
+    description: "Sigla de 2 caracteres da Unidade Federativa da autoridade sancionadora"
+  - name: "data_inicio_sancao"
+    data_type: "string"
+    required: false
+    description: "Data inicial de eficácia dos efeitos da penalidade administrativa (AAAA-MM-DD)"
+  - name: "data_fim_sancao"
+    data_type: "string"
+    required: false
+    description: "Data final de vigência da sanção ou NULL caso prazo indeterminado/indefinido"
+  - name: "valor_multa"
+    data_type: "float"
+    required: false
+    description: "Valor financeiro pecuniário da multa sancionatória aplicada em Reais (R$)"
+  - name: "is_sancao_ativa"
+    data_type: "boolean"
+    required: true
+    description: "Indicador booleano se a sanção administrativa está com efeitos ativos e vigentes"

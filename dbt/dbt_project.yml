@@ -12,6 +12,7 @@ model-paths:
   - "../src/public_data_gateway/connectors/empresarial/rfb_cnpj_lakehouse/dbt"
   - "../src/public_data_gateway/connectors/empresarial/rfb_simples_mei/dbt"
   - "../src/public_data_gateway/connectors/compras_publicas/pncp_contratacoes/dbt"
+  - "../src/public_data_gateway/connectors/compliance/cgu_ceis_cnep/dbt"
   - "models"
 
 analysis-paths: ["analyses"]

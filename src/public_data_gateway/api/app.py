@@ -240,4 +240,49 @@ def create_app(settings: GatewaySettings | None = None) -> FastAPI:
             cnpj_orgao=cnpj_orgao, ni_fornecedor=ni_fornecedor, ano=ano, limit=limit
         )
 
+    # 6. Compliance & Sanctions / CGU Routes
+    @app.get("/api/v1/compliance/status/{cnpj_or_cpf}")
+    async def get_compliance_status(cnpj_or_cpf: str) -> dict[str, Any]:
+        from public_data_gateway.connectors.compliance.cgu_ceis_cnep.connector import (
+            CGUCEISCNEPConnector,
+        )
+
+        conn = CGUCEISCNEPConnector(settings=app_settings)
+        return conn.get_compliance_status(cnpj_or_cpf)
+
+    @app.get("/api/v1/compliance/sancoes")
+    async def list_compliance_sancoes(
+        cadastro: str | None = None,
+        uf: str | None = None,
+        ativas_only: bool = True,
+        limit: int = 50,
+    ) -> list[dict[str, Any]]:
+        from public_data_gateway.connectors.compliance.cgu_ceis_cnep.connector import (
+            CGUCEISCNEPConnector,
+        )
+
+        conn = CGUCEISCNEPConnector(settings=app_settings)
+        table_map = {
+            "ceis": ["cgu_ceis"],
+            "cnep": ["cgu_cnep"],
+            "cepim": ["cgu_cepim"],
+        }
+        tables = table_map.get(cadastro, ["cgu_ceis", "cgu_cnep", "cgu_cepim"])
+        results = []
+        for t in tables:
+            rows = conn.extract_table(t)
+            for r in rows:
+                if ativas_only and not r.get("is_sancao_ativa", r.get("is_ativo", False)):
+                    continue
+                if uf and r.get("sigla_uf_orgao") != uf.upper():
+                    continue
+                item = dict(r)
+                item["_origem"] = t
+                results.append(item)
+                if len(results) >= limit:
+                    break
+            if len(results) >= limit:
+                break
+        return results
+
     return app
