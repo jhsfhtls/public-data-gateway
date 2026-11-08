@@ -18,11 +18,9 @@ build/
 htmlcov/
 
 # Medallion Lakehouse, Quarantine & Local Cache (Keep only data/reference/ versioned)
-data/bronze/
-data/silver/
-data/gold/
-data/quarantine/
-data/cache/
+data/*
+!data/reference/
+!data/reference/**
 *.parquet
 *.duckdb
 *.duckdb.wal
@@ -30,6 +28,12 @@ data/cache/
 *.sqlite-wal
 *.sqlite-shm
 *.dbc
+
+# dbt Artifacts & Logs
+dbt/target/
+dbt/dbt_packages/
+dbt/logs/
+dbt/.user.yml
 
 # Runtime Telemetry & Locks
 .logs/

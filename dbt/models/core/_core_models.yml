@@ -1,0 +1,163 @@
+version: 2
+
+models:
+  - name: dim_municipio
+    description: "Dimensão conformatória de municípios brasileiros com suporte a SCD2 e atributos para análise regional."
+    columns:
+      - name: id_municipio
+        description: "Código oficial do município IBGE com 7 dígitos numéricos (chave primária natural)."
+        tests:
+          - unique
+          - not_null
+      - name: id_municipio_6
+        description: "Código alternativo de 6 dígitos numéricos para junção com bases legadas do governo."
+        tests:
+          - not_null
+      - name: nome_municipio
+        description: "Nome oficial do município brasileiro."
+        tests:
+          - not_null
+      - name: sigla_uf
+        description: "Sigla de 2 letras maiúsculas da Unidade Federativa."
+        tests:
+          - not_null
+      - name: id_uf
+        description: "Código numérico da UF com 2 dígitos."
+        tests:
+          - not_null
+      - name: nome_uf
+        description: "Nome por extenso da Unidade Federativa."
+        tests:
+          - not_null
+      - name: regiao
+        description: "Nome da macrorregião geográfica oficial."
+        tests:
+          - not_null
+      - name: sigla_regiao
+        description: "Sigla da macrorregião geográfica (N, NE, SE, S, CO)."
+        tests:
+          - not_null
+      - name: mesorregiao
+        description: "Mesorregião geográfica do IBGE."
+      - name: microrregiao
+        description: "Microrregião geográfica do IBGE."
+      - name: regiao_intermediaria
+        description: "Região geográfica intermediária do IBGE."
+      - name: regiao_imediata
+        description: "Região geográfica imediata do IBGE."
+      - name: is_capital
+        description: "Flag booleana indicando se o município é capital."
+        tests:
+          - not_null
+      - name: is_amazonia_legal
+        description: "Flag booleana indicando enquadramento territorial na Amazônia Legal (Lei 5.173/1966)."
+        tests:
+          - not_null
+      - name: valid_from
+        description: "Data de início de vigência do registro para suporte a Slowly Changing Dimensions (SCD2)."
+        tests:
+          - not_null
+      - name: valid_to
+        description: "Data de término de vigência do registro (nulo enquanto ativo)."
+      - name: is_current
+        description: "Flag indicando se o registro é o registro ativo corrente no tempo."
+        tests:
+          - not_null
+      - name: reference_date
+        description: "Competência temporal de referência dos dados municipais (YYYY-MM-DD)."
+        tests:
+          - not_null
+      - name: extracted_at
+        description: "Timestamp ISO-8601 da extração dos dados."
+        tests:
+          - not_null
+
+  - name: dim_distrito
+    description: "Dimensão de distritos municipais brasileiros vinculada à hierarquia municipal."
+    columns:
+      - name: id_distrito
+        description: "Código oficial do distrito municipal com 9 dígitos numéricos (chave primária)."
+        tests:
+          - unique
+          - not_null
+      - name: nome_distrito
+        description: "Nome oficial do distrito municipal."
+        tests:
+          - not_null
+      - name: id_municipio
+        description: "Código oficial do município ao qual o distrito pertence (7 dígitos)."
+        tests:
+          - not_null
+          - relationships:
+              to: ref('dim_municipio')
+              field: id_municipio
+      - name: nome_municipio
+        description: "Nome do município de subordinação."
+        tests:
+          - not_null
+      - name: sigla_uf
+        description: "Sigla de 2 letras maiúsculas da Unidade Federativa."
+        tests:
+          - not_null
+      - name: id_uf
+        description: "Código numérico da UF com 2 dígitos."
+        tests:
+          - not_null
+      - name: nome_uf
+        description: "Nome por extenso da Unidade Federativa."
+        tests:
+          - not_null
+      - name: regiao
+        description: "Nome da macrorregião geográfica."
+        tests:
+          - not_null
+      - name: sigla_regiao
+        description: "Sigla da macrorregião geográfica (N, NE, SE, S, CO)."
+        tests:
+          - not_null
+      - name: is_distrito_sede
+        description: "Flag booleana indicando se o distrito é a sede administrativa do município."
+        tests:
+          - not_null
+      - name: reference_date
+        description: "Competência temporal de referência (YYYY-MM-DD)."
+        tests:
+          - not_null
+      - name: extracted_at
+        description: "Timestamp ISO-8601 da extração dos dados."
+        tests:
+          - not_null
+
+  - name: xwalk_ibge_6d_7d
+    description: "Tabela de crosswalk oficial para conversão bidirecional entre códigos IBGE de 6 e 7 dígitos."
+    columns:
+      - name: id_municipio_6
+        description: "Código do município com 6 dígitos numéricos sem dígito verificador."
+        tests:
+          - unique
+          - not_null
+      - name: id_municipio_7
+        description: "Código oficial do município com 7 dígitos numéricos incluindo dígito verificador."
+        tests:
+          - unique
+          - not_null
+      - name: nome_municipio
+        description: "Nome oficial do município registrado no IBGE."
+        tests:
+          - not_null
+      - name: sigla_uf
+        description: "Sigla de 2 letras maiúsculas da UF."
+        tests:
+          - not_null
+      - name: digito_verificador
+        description: "Dígito verificador calculado via algoritmo Módulo 11 oficial do IBGE."
+        tests:
+          - not_null
+      - name: reference_date
+        description: "Competência temporal de referência (YYYY-MM-DD)."
+        tests:
+          - not_null
+      - name: extracted_at
+        description: "Timestamp ISO-8601 da extração."
+        tests:
+          - not_null

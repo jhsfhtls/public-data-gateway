@@ -14,11 +14,11 @@ Este artefato constitui a **Fonte Única da Verdade Operacional (SSOT)** do stat
 
 ## 1. Painel de Status Executivo em Tempo Real
 
-- **Macrofase Ativa:** `Fase 03 — Ingestão Wave 1 — APIs de Borda & Macroeconomia (Piloto: ibge_localidades Homologado)`
+- **Macrofase Ativa:** `Fase 03-SPIKE — Golden Spike ibge_localidades (5 Tabelas, dbt, Negócio Territorial & Live Fail-Hard)`
 - **Status Geral de Governança:** `🟢 ON_TRACK`
 - **Conector Ativo em Desenvolvimento:** `ibge_localidades`
 - **Próximo Conector na Fila de Execução:** `bcb_sgs` (Wave 1 — Prioridade RICE 950)
-- **Progresso Estrutural das Macrofases:** **3 de 9 Concluídas (33.3%)**
+- **Progresso Estrutural das Macrofases:** **4 de 11 Concluídas (36.4%)**
 - **Universo de Fontes Homologadas no Catálogo:** **49 fontes públicas** nos 13 macrosegmentos
 
 ```mermaid
@@ -37,13 +37,15 @@ flowchart LR
 | :---: | :--- | :---: | :---: | :--- |
 | **Fase 00** | **Arquitetura, Governança & Decisões Fundacionais (ADRs)** | 🟢 CONCLUÍDO | `2026-11-07` | • ADR-001: Storage Híbrido Medallion (SQLite WAL + DuckDB Parquet ZSTD)<br/>• ADR-002: Chaves Canônicas STRING, Contratos ODCS v3.1 & Quarentena<br/>• ADR-003: Hardening DevSecOps, Proteção LGPD & Client Path Shield |
 | **Fase 01** | **Estrutura do Repositório Satélite, CI/CD & DevSecOps** | 🟢 CONCLUÍDO | `2026-11-07` | • Repositório satélite brazil-data-gateway inicializado<br/>• Isolamento Python 3.12 (.venv) e dependências pinadas (requirements.txt, requirements-dev.txt)<br/>• Configuração de CI (.github/workflows/ci.yml e pr-lint.yml)<br/>• Templates padronizados de Pull Request (feature, bugfix, docs) |
-| **Fase 02** | **Fundação do Catálogo (45+ Fontes), Normalização Canônica & Interfaces Unificadas** | 🟢 CONCLUÍDO | `2026-11-07` | • Base de referência sanitizada dos 5.571 municípios brasileiros (zero falhas de UF)<br/>• Catálogo formal de 49 fontes governamentais nos 13 macrosegmentos (catalog/sources_registry.yaml)<br/>• Renderizador determinístico do catálogo (scripts/render_catalog.py & CATALOG.md)<br/>• Tracker vivo da jornada de implementação (state/project_progress.json, scripts/render_progress.py & JORNADA_IMPLEMENTACAO.md)<br/>• Validação de integridade (--check) e conformidade ruff 100% verde |
-| **Fase 03** | **Ingestão Wave 1 — APIs de Borda & Macroeconomia** | 🟡 EM ANDAMENTO | `—` | • [HOMOLOGADO] Conector ibge_localidades (5.571 municípios, 27 UFs, 5 regiões, features territoriais ML)<br/>• Conector brasilapi_core (CEPs, bancos, DDDs, borda síncrona)<br/>• Conector bcb_sgs (Séries macroeconômicas: IPCA, Selic, IGP-M)<br/>• Conector bcb_olinda_ptax (Cotações PTAX diárias OData v4) |
+| **Fase 02** | **Fundação do Catálogo (49 Fontes), Normalização Canônica & Interfaces Unificadas** | 🟢 CONCLUÍDO | `2026-11-07` | • Base de referência sanitizada dos 5.571 municípios brasileiros (zero falhas de UF)<br/>• Catálogo formal de 49 fontes governamentais nos 13 macrosegmentos (catalog/sources_registry.yaml)<br/>• Renderizador determinístico do catálogo (scripts/render_catalog.py & CATALOG.md)<br/>• Tracker vivo da jornada de implementação (state/project_progress.json, scripts/render_progress.py & JORNADA_IMPLEMENTACAO.md)<br/>• Validação de integridade (--check) e conformidade ruff 100% verde |
+| **Fase 03-SPIKE** | **Golden Spike: Piloto ibge_localidades com Todas as Tabelas & Camada de Negócio Territorial** | 🟢 CONCLUÍDO | `2026-11-07` | • Ingestão e normalização das 5 tabelas da API (municipios, distritos, subdistritos, estados, regioes)<br/>• Estrutura física isolada data/ibge_localidades/{bronze,silver,gold,quarantine}/<br/>• Encapsulamento dbt no conector (source.yml + 5 staging models + _models.yml com 100% colunas documentadas)<br/>• Camada de negócio territorial (dim_municipio SCD2, dim_distrito, crosswalk 6D/7D, mart_hierarquia_territorial)<br/>• Bateria de testes ao vivo de 1 linha com fail-hard e suite offline com cidades diversas |
+| **Fase 03** | **Ingestão Wave 1 — APIs de Borda & Macroeconomia** | ⚪ PENDENTE | `—` | • Conector bcb_sgs (Séries macroeconômicas: IPCA, Selic, IGP-M)<br/>• Conector bcb_olinda_ptax (Cotações PTAX diárias OData v4)<br/>• Conector brasilapi_core (CEPs, bancos, DDDs, borda síncrona) |
 | **Fase 04** | **Ingestão Wave 2 — B2B, Compras Públicas & Compliance** | ⚪ PENDENTE | `—` | • Conector rfb_cnpj_lakehouse (55M CNPJs em streaming DuckDB)<br/>• Conector rfb_simples_mei (Enquadramento tributário Simples/MEI)<br/>• Conector pncp_contratacoes (Licitações Lei 14.133)<br/>• Conector cgu_ceis_cnep & cgu_pep (Sanções e autoridades PEP)<br/>• Conector cnj_datajud (Metadados processuais de 90+ tribunais)<br/>• Conector tst_cndt (Certidões trabalhistas negativas)<br/>• Conector suframa_pim_zfm (Empresas incentivadas Polo Industrial) |
 | **Fase 05** | **Ingestão Wave 3 — Mercado de Capitais & Finanças Públicas** | ⚪ PENDENTE | `—` | • Conector cvm_dfp_itr (Balanços e DRE de companhias abertas)<br/>• Conector cvm_fundos (Informes diários de fundos)<br/>• Conector bcb_ifdata (Balanços de instituições financeiras)<br/>• Conector stn_tesouro_transparente (SADIPEM e dívida pública)<br/>• Conector mdic_comexstat (Balança comercial por NCM e município)<br/>• Conector comprasgov_catmat (Catálogo unificado de compras públicas) |
 | **Fase 06** | **Ingestão Wave 4 — Censo, Trabalho, Logística & Telecom** | ⚪ PENDENTE | `—` | • Conectores ibge_sidra, ibge_pib_municipal, ibge_censo2022, ibge_pnad_continua<br/>• Conectores mte_novo_caged & mte_rais<br/>• Conectores ibge_cnefe, ibge_malhas, anatel_mosaico, antt_malha_transporte |
 | **Fase 07** | **Ingestão Wave 5 — Saúde, Educação & Setor Notarial** | ⚪ PENDENTE | `—` | • Conectores DataSUS (CNES, SIH, SIM, SINASC, OpenDataSUS) & anvisa_cmed<br/>• Conectores INEP (Censo Escolar, Superior, IDEB, ENEM) & capes_sucupira<br/>• Conectores Notariais (cnj_justica_aberta, onr_registro_imoveis, capitais_iptu_itbi) |
 | **Fase 08** | **Ingestão Wave 6 — Meio Ambiente, Agro & Metaportais** | ⚪ PENDENTE | `—` | • Conectores Ambientais (ana_hidroweb, inpe_terrabrasilis, mapbiomas, sfb_sicar, mapa_zarc)<br/>• Conectores Metaportais (basedosdados_bq, dadosgov_ckan) |
+| **Fase 09** | **Pós-Ingestão Total — Tabelas Gold Analíticas Cross-Domain, Datamarts & Insights** | ⚪ PENDENTE | `—` | • Data Marts analíticos multidisciplinares (B2B x Território x Macro x Compras Públicas)<br/>• Feature Store consolidada para modelos preditivos de propensão e risco<br/>• Extração de insights comerciais e operacionais acoplados aos 10 Produtos Modulares C.O.R.E. |
 
 ---
 
@@ -53,15 +55,17 @@ Todo conector integrado ao `brazil-data-gateway` deve percorrer rigorosamente os
 
 | Gate | Nome do Gate de Homologação | Critério Operacional de Aceite (`POP_T_070` / `POP_T_074` / `POP_T_177`) | Status |
 | :---: | :--- | :--- | :---: |
-| **GATE_01** | **Contrato Declarativo ODCS v3.1** | Schema tipado, chaves primárias STRING, regras de qualidade e limites de volume declarados em contract.yaml. | ⚪ NÃO INICIADO |
-| **GATE_02** | **Ingestão Bronze & Cache WAL** | Download resiliente com circuit breaker, backoff exponencial e cache SQLite WAL com suporte a Stale-While-Error. | ⚪ NÃO INICIADO |
-| **GATE_03** | **Sanitização de Sentinelas & Nulls** | Conversão determinística de códigos sentinela (99, 999, -1, 'SEM INFORMACAO') em NULLs reais. | ⚪ NÃO INICIADO |
-| **GATE_04** | **Materialização Silver Parquet & Manifesto** | Gravação colunar Parquet ZSTD via atomic swap (.tmp.parquet -> rename) com selagem criptográfica SHA-256. | ⚪ NÃO INICIADO |
-| **GATE_05** | **Validação dos 5 Pilares de Observabilidade** | Aprovação em Freshness, Volume, Schema, Null Ceiling e Lineage; desvio automático para data/quarantine/ se violado. | ⚪ NÃO INICIADO |
-| **GATE_06** | **Gold Feature View & ASOF Join ML** | Features analíticas agregadas com suporte a point-in-time join evitando data leakage para modelos preditivos. | ⚪ NÃO INICIADO |
+| **GATE_01** | **Contrato Declarativo ODCS v3.1 das N Tabelas da API** | Schema tipado, chaves primárias STRING e regras para municipios, distritos, subdistritos, estados e regioes. | ⚪ NÃO INICIADO |
+| **GATE_02** | **Ingestão Bronze Isolada (Todas as Tabelas) & Cache WAL** | Download resiliente das 5 tabelas em data/ibge_localidades/bronze/ com cache SQLite WAL. | ⚪ NÃO INICIADO |
+| **GATE_03** | **Sanitização de Sentinelas & Nulls** | Conversão determinística de códigos sentinela em NULLs reais em todas as tabelas. | ⚪ NÃO INICIADO |
+| **GATE_04** | **Materialização Silver Parquet Isolada (Todas as Tabelas)** | Gravação de municipios.parquet, distritos.parquet, etc., em data/ibge_localidades/silver/ com SHA-256. | ⚪ NÃO INICIADO |
+| **GATE_05** | **Validação dos 5 Pilares & Quarentena** | Aprovação em Freshness, Volume, Schema, Null Ceiling e Lineage; desvio para data/ibge_localidades/quarantine/ se violado. | ⚪ NÃO INICIADO |
+| **GATE_06** | **Gold Feature View Isolada & ASOF Join ML** | Features analíticas agregadas em data/ibge_localidades/gold/ com suporte comprovado a point-in-time join para modelos preditivos. | ⚪ NÃO INICIADO |
 | **GATE_07** | **Integração ao EnrichmentEngine** | Disponibilização para enriquecimento cadastral batch/online respeitando o Client Path Shield (POP_T_154). | ⚪ NÃO INICIADO |
 | **GATE_08** | **Exposição Multi-Interface** | Exposição síncrona/analítica simultânea via Python SDK (BrazilData), REST (/api/v1), CLI (bdg) e Servidor MCP (bdg-mcp). | ⚪ NÃO INICIADO |
-| **GATE_09** | **Bateria de Testes Offline & Documentação** | Testes unitários offline com fixtures locais, documentação no CATALOG.md e passagem limpa nos linters. | ⚪ NÃO INICIADO |
+| **GATE_09** | **Bateria de Testes Offline com Cidades Diversas** | Testes unitários offline com fixtures locais cobrindo cidades de todas as 5 macrorregiões nas 5 tabelas. | ⚪ NÃO INICIADO |
+| **GATE_10** | **dbt Staging, source.yml e 100% Colunas Documentadas** | Pasta connectors/.../ibge_localidades/dbt/ com source.yml próprio, 5 modelos staging e _models.yml com 100% de colunas documentadas. | ⚪ NÃO INICIADO |
+| **GATE_11** | **Teste Real de 1 Linha com API ao Vivo (Fail-Hard)** | Execução obrigatória contra os 5 endpoints oficiais ao vivo limitados a 1 registro; falha de qualquer endpoint reprova o pipeline. | ⚪ NÃO INICIADO |
 
 ---
 
@@ -106,7 +110,7 @@ O `brazil-data-gateway` atua como barramento alimentador de dados para os **10 P
 | `2026-11-07` | **Fase 00** | **Arquitetura & Governança Fundacional** | Elaboração das ADR-001 (Storage Híbrido Medallion), ADR-002 (Chaves Canônicas e Quarentena) e ADR-003 (DevSecOps e LGPD) fundamentadas nos POP_T_177, POP_T_176, POP_T_175, POP_T_070 e POP_T_074. |
 | `2026-11-07` | **Fase 01** | **Setup do Repositório Satélite & Workflows CI** | Inicialização do repositório satélite brazil-data-gateway com isolamento venv Python 3.12, pyproject.toml, requirements.txt pinados, templates de PR e workflows de CI (pr-lint e ci.yml). |
 | `2026-11-07` | **Fase 02** | **Catálogo Mestre (49 Fontes), Normalização Canônica & Interfaces Unificadas** | Catalogação formal de 49 fontes públicas nos 13 macrosegmentos e Ondas 1..6; sanitização da base de referência dos 5.571 municípios brasileiros; implementação dos motores determinísticos render_catalog.py e render_progress.py com verificação --check. |
-| `2026-11-07` | **Fase 03** | **Homologação do Conector Piloto ibge_localidades (Bronze a Gold)** | Implementação e homologação ponta a ponta do primeiro conector do gateway (ibge_localidades). Normalização dos 5.571 municípios e 27 UFs com validação de dígitos verificadores Mod-11, resolução de novas emancipações (ex: Boa Esperança do Norte 5101837), observabilidade de 5 pilares, feature view ML para ASOF joins e exposição completa em Python SDK (bd.geo), REST API (/api/v1/geo/ibge), CLI (bdg geo/sync) e MCP (bdg_list_ufs, bdg_list_municipalities, bdg_sync_dataset com HITL Tier 3 guard). |
+| `2026-11-07` | **Fase 03-SPIKE** | **Homologação do Golden Spike ibge_localidades (5 Tabelas, dbt, Negócio & Live Fail-Hard)** | Execução completa do Golden Spike: 5 tabelas da API do IBGE (5.571 municípios, 10.751 distritos, 646 subdistritos, 27 UFs, 5 regiões) materializadas em data/ibge_localidades/{bronze,silver,gold}/; 9 modelos dbt (5 staging, dim_municipio, dim_distrito, xwalk_ibge_6d_7d, mart_hierarquia_territorial_brasil) com 109 testes 100% aprovados; 108 colunas 100% documentadas no linter; testes reais de 1 linha com fail-hard e suite com 35 testes unitários/integração 100% verde. |
 
 ---
 

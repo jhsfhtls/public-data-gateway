@@ -1,0 +1,222 @@
+version: 2
+
+models:
+  - name: stg_ibge_municipios
+    description: "Modelo staging dos 5.571 municípios brasileiros normalizados segundo padrão IBGE."
+    columns:
+      - name: id_municipio
+        description: "Código oficial do município IBGE com 7 dígitos numéricos incluindo dígito verificador."
+        tests:
+          - unique
+          - not_null
+      - name: id_municipio_6
+        description: "Código legado do município IBGE com 6 dígitos numéricos (usado em DataSUS, RAIS, etc.)."
+        tests:
+          - not_null
+      - name: nome_municipio
+        description: "Nome oficial do município registrado perante o IBGE."
+        tests:
+          - not_null
+      - name: sigla_uf
+        description: "Sigla de 2 letras maiúsculas da Unidade Federativa."
+        tests:
+          - not_null
+      - name: id_uf
+        description: "Código numérico oficial da UF no IBGE com 2 dígitos."
+        tests:
+          - not_null
+      - name: nome_uf
+        description: "Nome por extenso da Unidade Federativa."
+        tests:
+          - not_null
+      - name: regiao
+        description: "Nome oficial da macrorregião geográfica brasileira."
+        tests:
+          - not_null
+      - name: sigla_regiao
+        description: "Sigla oficial da macrorregião geográfica (N, NE, SE, S, CO)."
+        tests:
+          - not_null
+      - name: mesorregiao
+        description: "Nome da mesorregião geográfica do IBGE (nulo para municípios de emancipação recente)."
+      - name: microrregiao
+        description: "Nome da microrregião geográfica do IBGE (nulo para municípios de emancipação recente)."
+      - name: regiao_intermediaria
+        description: "Nome da região geográfica intermediária segundo nova classificação territorial do IBGE."
+      - name: regiao_imediata
+        description: "Nome da região geográfica imediata segundo nova classificação territorial do IBGE."
+      - name: is_capital
+        description: "Flag booleana indicando se o município é capital estadual ou federal."
+        tests:
+          - not_null
+      - name: reference_date
+        description: "Data de corte ou competência territorial oficial no formato YYYY-MM-DD."
+        tests:
+          - not_null
+      - name: extracted_at
+        description: "Timestamp ISO-8601 da extração e materialização dos dados."
+        tests:
+          - not_null
+
+  - name: stg_ibge_distritos
+    description: "Modelo staging de todos os distritos municipais do Brasil normalizados."
+    columns:
+      - name: id_distrito
+        description: "Código numérico oficial do distrito municipal com 9 dígitos."
+        tests:
+          - unique
+          - not_null
+      - name: nome_distrito
+        description: "Nome oficial do distrito municipal."
+        tests:
+          - not_null
+      - name: id_municipio
+        description: "Código do município de subordinação com 7 dígitos."
+        tests:
+          - not_null
+      - name: nome_municipio
+        description: "Nome oficial do município de subordinação."
+        tests:
+          - not_null
+      - name: sigla_uf
+        description: "Sigla de 2 letras maiúsculas da Unidade Federativa do distrito."
+        tests:
+          - not_null
+      - name: id_uf
+        description: "Código numérico da UF com 2 dígitos."
+        tests:
+          - not_null
+      - name: nome_uf
+        description: "Nome por extenso da Unidade Federativa."
+        tests:
+          - not_null
+      - name: regiao
+        description: "Nome da macrorregião geográfica do distrito."
+        tests:
+          - not_null
+      - name: sigla_regiao
+        description: "Sigla da macrorregião geográfica (N, NE, SE, S, CO)."
+        tests:
+          - not_null
+      - name: reference_date
+        description: "Data de competência da malha distrital (YYYY-MM-DD)."
+        tests:
+          - not_null
+      - name: extracted_at
+        description: "Timestamp ISO-8601 da extração do registro."
+        tests:
+          - not_null
+
+  - name: stg_ibge_subdistritos
+    description: "Modelo staging dos subdistritos municipais do Brasil."
+    columns:
+      - name: id_subdistrito
+        description: "Código numérico oficial do subdistrito municipal com 11 dígitos."
+        tests:
+          - unique
+          - not_null
+      - name: nome_subdistrito
+        description: "Nome oficial do subdistrito municipal."
+        tests:
+          - not_null
+      - name: id_distrito
+        description: "Código do distrito municipal de subordinação com 9 dígitos."
+        tests:
+          - not_null
+      - name: nome_distrito
+        description: "Nome do distrito municipal de subordinação."
+        tests:
+          - not_null
+      - name: id_municipio
+        description: "Código do município de subordinação com 7 dígitos."
+        tests:
+          - not_null
+      - name: nome_municipio
+        description: "Nome do município de subordinação."
+        tests:
+          - not_null
+      - name: sigla_uf
+        description: "Sigla de 2 letras maiúsculas da Unidade Federativa."
+        tests:
+          - not_null
+      - name: id_uf
+        description: "Código numérico da UF com 2 dígitos."
+        tests:
+          - not_null
+      - name: nome_uf
+        description: "Nome por extenso da Unidade Federativa."
+        tests:
+          - not_null
+      - name: reference_date
+        description: "Data de competência da malha de subdistritos (YYYY-MM-DD)."
+        tests:
+          - not_null
+      - name: extracted_at
+        description: "Timestamp ISO-8601 da extração do registro."
+        tests:
+          - not_null
+
+  - name: stg_ibge_estados
+    description: "Modelo staging das 27 Unidades Federativas do Brasil."
+    columns:
+      - name: id_uf
+        description: "Código numérico oficial da UF no IBGE com 2 dígitos."
+        tests:
+          - unique
+          - not_null
+      - name: sigla_uf
+        description: "Sigla oficial de 2 letras maiúsculas da UF."
+        tests:
+          - unique
+          - not_null
+      - name: nome_uf
+        description: "Nome oficial completo da Unidade Federativa."
+        tests:
+          - not_null
+      - name: regiao
+        description: "Nome oficial da macrorregião geográfica à qual a UF pertence."
+        tests:
+          - not_null
+      - name: sigla_regiao
+        description: "Sigla da macrorregião geográfica (N, NE, SE, S, CO)."
+        tests:
+          - not_null
+      - name: id_regiao
+        description: "Código numérico da macrorregião geográfica com 1 dígito."
+        tests:
+          - not_null
+      - name: reference_date
+        description: "Data de competência da malha estadual oficial (YYYY-MM-DD)."
+        tests:
+          - not_null
+      - name: extracted_at
+        description: "Timestamp ISO-8601 da extração do registro."
+        tests:
+          - not_null
+
+  - name: stg_ibge_regioes
+    description: "Modelo staging das 5 macrorregiões geográficas brasileiras."
+    columns:
+      - name: id_regiao
+        description: "Código numérico oficial da macrorregião no IBGE (1 a 5)."
+        tests:
+          - unique
+          - not_null
+      - name: sigla_regiao
+        description: "Sigla oficial da macrorregião (N, NE, SE, S, CO)."
+        tests:
+          - unique
+          - not_null
+      - name: nome_regiao
+        description: "Nome por extenso da macrorregião geográfica oficial."
+        tests:
+          - unique
+          - not_null
+      - name: reference_date
+        description: "Data de competência territorial de referência (YYYY-MM-DD)."
+        tests:
+          - not_null
+      - name: extracted_at
+        description: "Timestamp ISO-8601 da extração do registro."
+        tests:
+          - not_null

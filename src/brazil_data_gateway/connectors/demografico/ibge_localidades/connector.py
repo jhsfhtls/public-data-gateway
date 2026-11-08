@@ -1,7 +1,8 @@
 """IBGE Localidades & Malha Territorial Connector.
 
-Ingests, normalizes, validates, and materializes Brazilian municipalities and UFs
-across Bronze, Silver, and Gold layers per POP_T_177, POP_T_070, and POP_T_074.
+Ingests, normalizes, validates, and materializes all 5 official territorial tables
+from IBGE (municípios, distritos, subdistritos, estados, regiões) across isolated
+Medallion Bronze, Silver, and Gold layers per POP_T_177, POP_T_070, and POP_T_074.
 """
 
 from __future__ import annotations
@@ -24,8 +25,44 @@ from brazil_data_gateway.core.storage import HybridStorageEngine
 
 logger = logging.getLogger(__name__)
 
-IBGE_MUNICIPIOS_API = "https://servicodados.ibge.gov.br/api/v1/localidades/municipios"
-IBGE_ESTADOS_API = "https://servicodados.ibge.gov.br/api/v1/localidades/estados"
+IBGE_BASE_API = "https://servicodados.ibge.gov.br/api/v1/localidades"
+
+IBGE_ENDPOINTS: dict[str, str] = {
+    "municipios": f"{IBGE_BASE_API}/municipios",
+    "distritos": f"{IBGE_BASE_API}/distritos?view=nivelado",
+    "subdistritos": f"{IBGE_BASE_API}/subdistritos?view=nivelado",
+    "estados": f"{IBGE_BASE_API}/estados?view=nivelado",
+    "regioes": f"{IBGE_BASE_API}/regioes",
+}
+
+# Live 1-line verification targets for fail-hard testing (low latency, ~1KB response)
+IBGE_LIVE_1LINE_ENDPOINTS: dict[str, dict[str, Any]] = {
+    "regioes": {
+        "url": f"{IBGE_BASE_API}/regioes/1",
+        "expected_key": "sigla",
+        "expected_val": "N",
+    },
+    "estados": {
+        "url": f"{IBGE_BASE_API}/estados/13",
+        "expected_key": "sigla",
+        "expected_val": "AM",
+    },
+    "municipios": {
+        "url": f"{IBGE_BASE_API}/municipios/1302603",
+        "expected_key": "nome",
+        "expected_val": "Manaus",
+    },
+    "distritos": {
+        "url": f"{IBGE_BASE_API}/distritos/130260305",
+        "expected_key": "nome",
+        "expected_val": "Manaus",
+    },
+    "subdistritos": {
+        "url": f"{IBGE_BASE_API}/subdistritos/43004060506",
+        "expected_key": "nome",
+        "expected_val": "Zona Central",
+    },
+}
 
 CAPITAIS_IBGE_7: frozenset[str] = frozenset(
     {
@@ -77,7 +114,7 @@ REGIAO_SIGLA_MAP: dict[str, str] = {
 
 
 class IBGELocalidadesConnector(BaseConnector):
-    """Production connector for IBGE Municipalities, UFs, and Territorial Hierarchies."""
+    """Production connector for IBGE Municipalities, Districts, Subdistricts, UFs, and Regions."""
 
     def __init__(
         self,
@@ -107,83 +144,159 @@ class IBGELocalidadesConnector(BaseConnector):
         try:
             with self.http_client as client:
                 resp = client.get(
-                    "https://servicodados.ibge.gov.br/api/v1/localidades/estados/13"
+                    f"{IBGE_BASE_API}/estados/13"
                 )
                 return resp.status_code == 200 and resp.json().get("sigla") == "AM"
         except Exception as exc:
             logger.warning("IBGE connectivity test failed: %s", exc)
             return False
 
-    def _load_offline_reference(self) -> list[dict[str, Any]]:
-        """Load deterministic reference municipalities seed."""
-        ref_file = self.settings.repo_root / "data" / "reference" / "municipios_brasil.json"
+    def test_live_endpoints(self, fail_hard: bool = True) -> dict[str, bool]:
+        """Execute mandatory 1-line real HTTP query against all 5 IBGE endpoints.
+
+        If fail_hard is True, any HTTP failure, 429 rate-limit, 5xx error, or payload mismatch
+        IMMEDIATELY raises RuntimeError to fail the test and allow human inspection.
+        """
+        results: dict[str, bool] = {}
+        with self.http_client as client:
+            for table_name, cfg in IBGE_LIVE_1LINE_ENDPOINTS.items():
+                url = cfg["url"]
+                expected_key = cfg["expected_key"]
+                expected_val = cfg["expected_val"]
+                try:
+                    resp = client.get(url, cache_ttl=0)
+                    if resp.status_code != 200:
+                        err_msg = (
+                            f"Fail-Hard: Live endpoint '{table_name}' returned status {resp.status_code} "
+                            f"(URL: {url}). Payload: {resp.text[:200]}"
+                        )
+                        if fail_hard:
+                            raise RuntimeError(err_msg)
+                        logger.error(err_msg)
+                        results[table_name] = False
+                        continue
+
+                    data = resp.json()
+                    # Handle both direct dict and 1-element list
+                    row = data[0] if isinstance(data, list) and data else data
+                    actual_val = row.get(expected_key)
+                    if actual_val != expected_val:
+                        err_msg = (
+                            f"Fail-Hard: Live endpoint '{table_name}' schema mismatch! "
+                            f"Expected {expected_key}='{expected_val}', got '{actual_val}'. "
+                            f"Full payload: {row}"
+                        )
+                        if fail_hard:
+                            raise RuntimeError(err_msg)
+                        logger.error(err_msg)
+                        results[table_name] = False
+                        continue
+
+                    results[table_name] = True
+                    logger.info("Live 1-line test passed for '%s': %s=%s", table_name, expected_key, actual_val)
+                except Exception as exc:
+                    if fail_hard and not isinstance(exc, RuntimeError):
+                        raise RuntimeError(f"Fail-Hard: Live endpoint '{table_name}' query failed: {exc}") from exc
+                    if isinstance(exc, RuntimeError) and fail_hard:
+                        raise
+                    logger.error("Live test failed for '%s': %s", table_name, exc)
+                    results[table_name] = False
+
+        return results
+
+    def _load_offline_reference(self, table_name: str) -> list[dict[str, Any]]:
+        """Load deterministic reference JSON seed for a given table."""
+        ref_filename = f"{table_name}_brasil.json"
+        ref_file = self.settings.repo_root / "data" / "reference" / ref_filename
+        if not ref_file.exists():
+            ref_file = self.settings.data_dir / "reference" / ref_filename
         if not ref_file.exists():
             ref_file = (
                 self.settings.repo_root.parent
-                / "core"
+                / "brazil-data-gateway"
                 / "data"
-                / "referencia"
-                / "municipios_brasil.json"
+                / "reference"
+                / ref_filename
             )
 
         if not ref_file.exists():
-            raise FileNotFoundError(f"Reference municipalities seed not found at {ref_file}")
+            raise FileNotFoundError(f"Reference seed '{ref_filename}' not found for table '{table_name}'. Checked {ref_file}")
 
         with open(ref_file, encoding="utf-8") as f:
             ref_data = json.load(f)
 
-        self._persist_bronze_snapshot(ref_data)
+        self._persist_bronze_snapshot(ref_data, table_name=table_name)
         return ref_data
 
     def fetch_raw_bronze(
-        self, offline_fallback: bool = True, force_offline: bool = False
+        self,
+        table_name: str = "municipios",
+        offline_fallback: bool = True,
+        force_offline: bool = False,
     ) -> list[dict[str, Any]]:
-        """Fetch raw JSON list of all municipalities from IBGE API or reference fallback."""
+        """Fetch raw JSON payload for any of the 5 tables and store in data/ibge_localidades/bronze/."""
         if force_offline or os.environ.get("BDG_OFFLINE_MODE") == "1":
-            return self._load_offline_reference()
+            return self._load_offline_reference(table_name)
+
+        endpoint_url = IBGE_ENDPOINTS.get(table_name)
+        if not endpoint_url:
+            raise ValueError(f"Unknown table '{table_name}'. Must be one of {list(IBGE_ENDPOINTS.keys())}")
 
         try:
             with self.http_client as client:
-                resp = client.get(IBGE_MUNICIPIOS_API, cache_ttl=self.settings.cache_ttl_seconds)
+                resp = client.get(endpoint_url, cache_ttl=self.settings.cache_ttl_seconds)
                 if resp.status_code == 200:
                     data = resp.json()
-                    if isinstance(data, list) and len(data) >= 5000:
-                        self._persist_bronze_snapshot(data)
+                    if isinstance(data, list) and len(data) > 0:
+                        self._persist_bronze_snapshot(data, table_name=table_name)
                         return data
         except Exception as exc:
-            logger.warning("Remote IBGE fetch failed (%s). Triggering offline fallback.", exc)
+            logger.warning("Remote IBGE fetch failed for '%s' (%s). Triggering offline fallback.", table_name, exc)
 
         if not offline_fallback:
-            raise RuntimeError("Failed to fetch IBGE municipalities and fallback is disabled.")
+            raise RuntimeError(f"Failed to fetch IBGE table '{table_name}' and fallback is disabled.")
 
-        return self._load_offline_reference()
+        return self._load_offline_reference(table_name)
 
-    def _persist_bronze_snapshot(self, data: list[dict[str, Any]]) -> Path:
-        """Save raw JSON payload in data/bronze with manifest."""
-        bronze_dir = self.settings.data_dir / "bronze" / self.source_id
-        bronze_dir.mkdir(parents=True, exist_ok=True)
-        raw_file = bronze_dir / "raw_municipios.json"
+    def _persist_bronze_snapshot(self, data: list[dict[str, Any]], table_name: str = "municipios") -> Path:
+        """Save raw JSON payload in data/ibge_localidades/bronze/raw_<table_name>.json and legacy bronze."""
+        bronze_dir = self.settings.get_source_layer_dir(self.source_id, "bronze")
+        raw_file = bronze_dir / f"raw_{table_name}.json"
         with open(raw_file, "w", encoding="utf-8", newline="\n") as f:
             json.dump(data, f, ensure_ascii=False, indent=2)
+
+        # Maintain backward compatibility for primary table in data/bronze/ibge_localidades/
+        if table_name == "municipios":
+            legacy_dir = self.settings.data_dir / "bronze" / self.source_id
+            legacy_dir.mkdir(parents=True, exist_ok=True)
+            legacy_file = legacy_dir / "raw_municipios.json"
+            try:
+                import shutil
+                shutil.copy2(raw_file, legacy_file)
+            except Exception as exc:
+                logger.debug("Failed copying legacy bronze file: %s", exc)
+
         return raw_file
 
-    def transform_silver_rows(self, raw_items: list[dict[str, Any]]) -> list[dict[str, Any]]:
-        """Normalize raw items into strict canonical Silver structure."""
+    # -------------------------------------------------------------------------
+    # Transformations to Canonical Silver
+    # -------------------------------------------------------------------------
+
+    def transform_municipios(self, raw_items: list[dict[str, Any]]) -> list[dict[str, Any]]:
+        """Normalize raw items into strict canonical Silver structure for municípios."""
         extracted_at = datetime.now(UTC).isoformat()
         reference_date = "2024-01-01"
         silver_rows: list[dict[str, Any]] = []
 
         for item in raw_items:
-            # Handle both live IBGE API format and sanitized reference JSON format
             raw_id = str(item.get("id") or item.get("id_municipio") or "").strip()
             if not raw_id:
                 continue
 
             id_7 = raw_id.zfill(7)
             id_6 = item.get("id_municipio_6") or id_7[:6]
-            nome = str(item.get("nome") or "").strip()
+            nome = str(item.get("nome") or item.get("nome_municipio") or "").strip()
 
-            # Resolve UF & Região from nested structures or reference fields
             sigla_uf = ""
             id_uf = ""
             nome_uf = ""
@@ -194,7 +307,6 @@ class IBGELocalidadesConnector(BaseConnector):
             reg_inter_nome = None
             reg_imed_nome = None
 
-            # 1. Check nested microrregiao / mesorregiao (classic IBGE structure)
             micro = item.get("microrregiao")
             if isinstance(micro, dict):
                 micro_nome = micro.get("nome")
@@ -211,7 +323,6 @@ class IBGELocalidadesConnector(BaseConnector):
                             regiao = reg_dict.get("nome", "")
                             sigla_regiao = reg_dict.get("sigla", "")
 
-            # 2. Check regiao-imediata / regiao-intermediaria (recent emancipations e.g. Boa Esperança do Norte)
             imed = item.get("regiao-imediata")
             if isinstance(imed, dict):
                 reg_imed_nome = imed.get("nome")
@@ -229,7 +340,6 @@ class IBGELocalidadesConnector(BaseConnector):
                                 regiao = reg_dict.get("nome", "")
                                 sigla_regiao = reg_dict.get("sigla", "")
 
-            # 3. Fallback to flat reference attributes
             if not sigla_uf:
                 sigla_uf = str(item.get("sigla_uf") or "").strip().upper()
             if not id_uf:
@@ -247,7 +357,6 @@ class IBGELocalidadesConnector(BaseConnector):
             if not reg_inter_nome:
                 reg_inter_nome = item.get("regiao_intermediaria")
 
-            # 4. Ultimate prefix-based fallback if UF is still missing
             if not sigla_uf or not id_uf:
                 uf_code = id_7[:2]
                 id_uf = uf_code
@@ -282,61 +391,362 @@ class IBGELocalidadesConnector(BaseConnector):
                 }
             )
 
-        cleaned_rows = apply_sentinel_cleaning(silver_rows, self.contract)
-        return cleaned_rows
+        return apply_sentinel_cleaning(silver_rows, self.contract)
 
-    def extract(self) -> pa.Table:
-        """Full pipeline: Bronze fetch -> Silver normalizer/observability -> Gold features."""
-        raw_items = self.fetch_raw_bronze()
-        silver_rows = self.transform_silver_rows(raw_items)
+    transform_silver_rows = transform_municipios
 
-        # Build PyArrow Table for Silver
-        fields = [
-            pa.field("id_municipio", pa.string(), nullable=False),
-            pa.field("id_municipio_6", pa.string(), nullable=False),
-            pa.field("nome_municipio", pa.string(), nullable=False),
-            pa.field("sigla_uf", pa.string(), nullable=False),
-            pa.field("id_uf", pa.string(), nullable=False),
-            pa.field("nome_uf", pa.string(), nullable=False),
-            pa.field("regiao", pa.string(), nullable=False),
-            pa.field("sigla_regiao", pa.string(), nullable=False),
-            pa.field("mesorregiao", pa.string(), nullable=True),
-            pa.field("microrregiao", pa.string(), nullable=True),
-            pa.field("regiao_intermediaria", pa.string(), nullable=True),
-            pa.field("regiao_imediata", pa.string(), nullable=True),
-            pa.field("is_capital", pa.bool_(), nullable=False),
-            pa.field("reference_date", pa.string(), nullable=False),
-            pa.field("extracted_at", pa.string(), nullable=False),
-        ]
+    def transform_distritos(self, raw_items: list[dict[str, Any]]) -> list[dict[str, Any]]:
+        """Normalize raw items into strict canonical Silver structure for distritos."""
+        extracted_at = datetime.now(UTC).isoformat()
+        reference_date = "2024-01-01"
+        rows: list[dict[str, Any]] = []
+
+        for item in raw_items:
+            # Supports both nivelado keys ("distrito-id") and standard nested keys
+            raw_id = str(item.get("distrito-id") or item.get("id") or "").strip()
+            if not raw_id:
+                continue
+
+            id_distrito = raw_id.zfill(9)
+            nome_distrito = str(item.get("distrito-nome") or item.get("nome") or "").strip()
+
+            id_mun = str(item.get("municipio-id") or "").strip()
+            nome_mun = str(item.get("municipio-nome") or "").strip()
+            sigla_uf = str(item.get("UF-sigla") or "").strip().upper()
+            id_uf = str(item.get("UF-id") or "").strip().zfill(2)
+            nome_uf = str(item.get("UF-nome") or "").strip()
+            regiao = str(item.get("regiao-nome") or "").strip()
+            sigla_regiao = str(item.get("regiao-sigla") or "").strip().upper()
+
+            # Handle nested structure if not nivelado
+            if not id_mun:
+                mun_obj = item.get("municipio")
+                if isinstance(mun_obj, dict):
+                    id_mun = str(mun_obj.get("id") or "").strip()
+                    nome_mun = str(mun_obj.get("nome") or "").strip()
+                    micro = mun_obj.get("microrregiao")
+                    if isinstance(micro, dict):
+                        meso = micro.get("mesorregiao")
+                        if isinstance(meso, dict):
+                            uf_obj = meso.get("UF")
+                            if isinstance(uf_obj, dict):
+                                sigla_uf = str(uf_obj.get("sigla") or "").upper()
+                                id_uf = str(uf_obj.get("id") or "").zfill(2)
+                                nome_uf = str(uf_obj.get("nome") or "")
+                                reg_obj = uf_obj.get("regiao")
+                                if isinstance(reg_obj, dict):
+                                    regiao = str(reg_obj.get("nome") or "")
+                                    sigla_regiao = str(reg_obj.get("sigla") or "").upper()
+
+            if not id_mun and len(id_distrito) >= 7:
+                id_mun = id_distrito[:7]
+
+            id_mun_7 = id_mun.zfill(7)
+            if not sigla_uf and id_mun_7:
+                uf_code = id_mun_7[:2]
+                id_uf = uf_code
+                uf_meta = CanonicalNormalizer.UF_MAP.get(uf_code)
+                if uf_meta:
+                    sigla_uf = uf_meta["sigla"]
+                    nome_uf = uf_meta["nome"]
+                    regiao = uf_meta["regiao"]
+                    sigla_regiao = REGIAO_SIGLA_MAP.get(regiao, "")
+
+            rows.append(
+                {
+                    "id_distrito": id_distrito,
+                    "nome_distrito": nome_distrito,
+                    "id_municipio": id_mun_7,
+                    "nome_municipio": nome_mun,
+                    "sigla_uf": sigla_uf,
+                    "id_uf": id_uf,
+                    "nome_uf": nome_uf,
+                    "regiao": regiao,
+                    "sigla_regiao": sigla_regiao,
+                    "reference_date": reference_date,
+                    "extracted_at": extracted_at,
+                }
+            )
+
+        return rows
+
+    def transform_subdistritos(self, raw_items: list[dict[str, Any]]) -> list[dict[str, Any]]:
+        """Normalize raw items into strict canonical Silver structure for subdistritos."""
+        extracted_at = datetime.now(UTC).isoformat()
+        reference_date = "2024-01-01"
+        rows: list[dict[str, Any]] = []
+
+        for item in raw_items:
+            raw_id = str(item.get("subdistrito-id") or item.get("id") or "").strip()
+            if not raw_id:
+                continue
+
+            id_subdistrito = raw_id
+            nome_subdistrito = str(item.get("subdistrito-nome") or item.get("nome") or "").strip()
+
+            id_distrito = str(item.get("distrito-id") or "").strip()
+            nome_distrito = str(item.get("distrito-nome") or "").strip()
+            id_mun = str(item.get("municipio-id") or "").strip()
+            nome_mun = str(item.get("municipio-nome") or "").strip()
+            sigla_uf = str(item.get("UF-sigla") or "").strip().upper()
+            id_uf = str(item.get("UF-id") or "").strip().zfill(2)
+            nome_uf = str(item.get("UF-nome") or "").strip()
+
+            # Handle nested structure if not nivelado
+            if not id_distrito:
+                dist_obj = item.get("distrito")
+                if isinstance(dist_obj, dict):
+                    id_distrito = str(dist_obj.get("id") or "").strip()
+                    nome_distrito = str(dist_obj.get("nome") or "").strip()
+                    mun_obj = dist_obj.get("municipio")
+                    if isinstance(mun_obj, dict):
+                        id_mun = str(mun_obj.get("id") or "").strip()
+                        nome_mun = str(mun_obj.get("nome") or "").strip()
+                        micro = mun_obj.get("microrregiao")
+                        if isinstance(micro, dict):
+                            meso = micro.get("mesorregiao")
+                            if isinstance(meso, dict):
+                                uf_obj = meso.get("UF")
+                                if isinstance(uf_obj, dict):
+                                    sigla_uf = str(uf_obj.get("sigla") or "").upper()
+                                    id_uf = str(uf_obj.get("id") or "").zfill(2)
+                                    nome_uf = str(uf_obj.get("nome") or "")
+
+            if not id_distrito and len(id_subdistrito) >= 9:
+                id_distrito = id_subdistrito[:9]
+            if not id_mun and len(id_subdistrito) >= 7:
+                id_mun = id_subdistrito[:7]
+
+            id_mun_7 = id_mun.zfill(7)
+            if not sigla_uf and id_mun_7:
+                uf_code = id_mun_7[:2]
+                id_uf = uf_code
+                uf_meta = CanonicalNormalizer.UF_MAP.get(uf_code)
+                if uf_meta:
+                    sigla_uf = uf_meta["sigla"]
+                    nome_uf = uf_meta["nome"]
+
+            rows.append(
+                {
+                    "id_subdistrito": id_subdistrito,
+                    "nome_subdistrito": nome_subdistrito,
+                    "id_distrito": id_distrito.zfill(9) if id_distrito else "",
+                    "nome_distrito": nome_distrito,
+                    "id_municipio": id_mun_7,
+                    "nome_municipio": nome_mun,
+                    "sigla_uf": sigla_uf,
+                    "id_uf": id_uf,
+                    "nome_uf": nome_uf,
+                    "reference_date": reference_date,
+                    "extracted_at": extracted_at,
+                }
+            )
+
+        return rows
+
+    def transform_estados(self, raw_items: list[dict[str, Any]]) -> list[dict[str, Any]]:
+        """Normalize raw items into strict canonical Silver structure for estados/UFs."""
+        extracted_at = datetime.now(UTC).isoformat()
+        reference_date = "2024-01-01"
+        rows: list[dict[str, Any]] = []
+
+        for item in raw_items:
+            raw_id = str(item.get("UF-id") or item.get("id") or "").strip()
+            if not raw_id:
+                continue
+
+            id_uf = raw_id.zfill(2)
+            sigla_uf = str(item.get("UF-sigla") or item.get("sigla") or "").strip().upper()
+            nome_uf = str(item.get("UF-nome") or item.get("nome") or "").strip()
+            regiao = str(item.get("regiao-nome") or "").strip()
+            sigla_regiao = str(item.get("regiao-sigla") or "").strip().upper()
+            id_regiao = str(item.get("regiao-id") or "").strip()
+
+            if not regiao:
+                reg_obj = item.get("regiao")
+                if isinstance(reg_obj, dict):
+                    regiao = str(reg_obj.get("nome") or "").strip()
+                    sigla_regiao = str(reg_obj.get("sigla") or "").strip().upper()
+                    id_regiao = str(reg_obj.get("id") or "").strip()
+
+            if not regiao and id_uf in CanonicalNormalizer.UF_MAP:
+                meta = CanonicalNormalizer.UF_MAP[id_uf]
+                regiao = meta["regiao"]
+                sigla_regiao = REGIAO_SIGLA_MAP.get(regiao, "")
+
+            if not id_regiao and regiao in REGIOES_CODIGO:
+                id_regiao = str(REGIOES_CODIGO[regiao])
+
+            rows.append(
+                {
+                    "id_uf": id_uf,
+                    "sigla_uf": sigla_uf,
+                    "nome_uf": nome_uf,
+                    "regiao": regiao,
+                    "sigla_regiao": sigla_regiao,
+                    "id_regiao": id_regiao,
+                    "reference_date": reference_date,
+                    "extracted_at": extracted_at,
+                }
+            )
+
+        return rows
+
+    def transform_regioes(self, raw_items: list[dict[str, Any]]) -> list[dict[str, Any]]:
+        """Normalize raw items into strict canonical Silver structure for regiões."""
+        extracted_at = datetime.now(UTC).isoformat()
+        reference_date = "2024-01-01"
+        rows: list[dict[str, Any]] = []
+
+        for item in raw_items:
+            raw_id = str(item.get("id") or "").strip()
+            if not raw_id:
+                continue
+
+            id_regiao = raw_id
+            sigla_regiao = str(item.get("sigla") or "").strip().upper()
+            nome_regiao = str(item.get("nome") or "").strip()
+
+            rows.append(
+                {
+                    "id_regiao": id_regiao,
+                    "sigla_regiao": sigla_regiao,
+                    "nome_regiao": nome_regiao,
+                    "reference_date": reference_date,
+                    "extracted_at": extracted_at,
+                }
+            )
+
+        return rows
+
+    # -------------------------------------------------------------------------
+    # End-to-End Extraction & Pipeline
+    # -------------------------------------------------------------------------
+
+    def extract_table(self, table_name: str) -> pa.Table:
+        """Extract and normalize a single table, writing to data/ibge_localidades/silver/<table_name>.parquet."""
+        raw_items = self.fetch_raw_bronze(table_name=table_name)
+
+        if table_name == "municipios":
+            rows = self.transform_municipios(raw_items)
+            fields = [
+                pa.field("id_municipio", pa.string(), nullable=False),
+                pa.field("id_municipio_6", pa.string(), nullable=False),
+                pa.field("nome_municipio", pa.string(), nullable=False),
+                pa.field("sigla_uf", pa.string(), nullable=False),
+                pa.field("id_uf", pa.string(), nullable=False),
+                pa.field("nome_uf", pa.string(), nullable=False),
+                pa.field("regiao", pa.string(), nullable=False),
+                pa.field("sigla_regiao", pa.string(), nullable=False),
+                pa.field("mesorregiao", pa.string(), nullable=True),
+                pa.field("microrregiao", pa.string(), nullable=True),
+                pa.field("regiao_intermediaria", pa.string(), nullable=True),
+                pa.field("regiao_imediata", pa.string(), nullable=True),
+                pa.field("is_capital", pa.bool_(), nullable=False),
+                pa.field("reference_date", pa.string(), nullable=False),
+                pa.field("extracted_at", pa.string(), nullable=False),
+            ]
+            contract_to_use = self.contract
+        elif table_name == "distritos":
+            rows = self.transform_distritos(raw_items)
+            fields = [
+                pa.field("id_distrito", pa.string(), nullable=False),
+                pa.field("nome_distrito", pa.string(), nullable=False),
+                pa.field("id_municipio", pa.string(), nullable=False),
+                pa.field("nome_municipio", pa.string(), nullable=False),
+                pa.field("sigla_uf", pa.string(), nullable=False),
+                pa.field("id_uf", pa.string(), nullable=False),
+                pa.field("nome_uf", pa.string(), nullable=False),
+                pa.field("regiao", pa.string(), nullable=False),
+                pa.field("sigla_regiao", pa.string(), nullable=False),
+                pa.field("reference_date", pa.string(), nullable=False),
+                pa.field("extracted_at", pa.string(), nullable=False),
+            ]
+            contract_to_use = None
+        elif table_name == "subdistritos":
+            rows = self.transform_subdistritos(raw_items)
+            fields = [
+                pa.field("id_subdistrito", pa.string(), nullable=False),
+                pa.field("nome_subdistrito", pa.string(), nullable=False),
+                pa.field("id_distrito", pa.string(), nullable=False),
+                pa.field("nome_distrito", pa.string(), nullable=False),
+                pa.field("id_municipio", pa.string(), nullable=False),
+                pa.field("nome_municipio", pa.string(), nullable=False),
+                pa.field("sigla_uf", pa.string(), nullable=False),
+                pa.field("id_uf", pa.string(), nullable=False),
+                pa.field("nome_uf", pa.string(), nullable=False),
+                pa.field("reference_date", pa.string(), nullable=False),
+                pa.field("extracted_at", pa.string(), nullable=False),
+            ]
+            contract_to_use = None
+        elif table_name == "estados":
+            rows = self.transform_estados(raw_items)
+            fields = [
+                pa.field("id_uf", pa.string(), nullable=False),
+                pa.field("sigla_uf", pa.string(), nullable=False),
+                pa.field("nome_uf", pa.string(), nullable=False),
+                pa.field("regiao", pa.string(), nullable=False),
+                pa.field("sigla_regiao", pa.string(), nullable=False),
+                pa.field("id_regiao", pa.string(), nullable=False),
+                pa.field("reference_date", pa.string(), nullable=False),
+                pa.field("extracted_at", pa.string(), nullable=False),
+            ]
+            contract_to_use = None
+        elif table_name == "regioes":
+            rows = self.transform_regioes(raw_items)
+            fields = [
+                pa.field("id_regiao", pa.string(), nullable=False),
+                pa.field("sigla_regiao", pa.string(), nullable=False),
+                pa.field("nome_regiao", pa.string(), nullable=False),
+                pa.field("reference_date", pa.string(), nullable=False),
+                pa.field("extracted_at", pa.string(), nullable=False),
+            ]
+            contract_to_use = None
+        else:
+            raise ValueError(f"Unsupported table: {table_name}")
+
         schema = pa.schema(fields)
-
         pydict: dict[str, list[Any]] = {f.name: [] for f in fields}
-        for r in silver_rows:
+        for r in rows:
             for f in fields:
                 pydict[f.name].append(r.get(f.name))
 
-        silver_table = pa.Table.from_pydict(pydict, schema=schema)
+        table = pa.Table.from_pydict(pydict, schema=schema)
 
-        # Materialize Silver with 5-Pillar evaluation (auto quarantine if invalid)
+        # Write to isolated data/ibge_localidades/silver/<table_name>.parquet
         _, _, obs_report = self.storage.write_medallion_table(
-            silver_table,
+            table,
             source_id=self.source_id,
             layer="silver",
-            contract=self.contract,
+            table_name=table_name,
+            contract=contract_to_use,
+            use_source_subfolder=True,
         )
 
         if obs_report and not obs_report.passed:
             raise RuntimeError(
-                f"IBGE Localidades Silver observability checks failed: {obs_report.violations}"
+                f"IBGE Localidades Silver observability checks failed for '{table_name}': {obs_report.violations}"
             )
 
-        # Build and materialize Gold ML Feature Views
-        self._build_and_write_gold_features(silver_table)
-        return silver_table
+        return table
+
+    def extract_all(self) -> dict[str, pa.Table]:
+        """Full execution across all 5 tables from Bronze to Silver and Gold."""
+        tables: dict[str, pa.Table] = {}
+        for tbl_name in ["municipios", "distritos", "subdistritos", "estados", "regioes"]:
+            tables[tbl_name] = self.extract_table(tbl_name)
+
+        # Build and materialize Gold ML Feature Views based on municipalities
+        self._build_and_write_gold_features(tables["municipios"])
+        return tables
+
+    def extract(self) -> pa.Table:
+        """Backwards-compatible primary entrypoint extracting all tables and returning municípios."""
+        all_tables = self.extract_all()
+        return all_tables["municipios"]
 
     def _build_and_write_gold_features(self, silver_table: pa.Table) -> pa.Table:
-        """Construct ML feature view for territorial entities."""
-        # Regional counts
+        """Construct ML feature view for territorial entities in data/ibge_localidades/gold/."""
         uf_counts: dict[str, int] = {}
         imediata_counts: dict[str, int] = {}
 
@@ -392,24 +802,41 @@ class IBGELocalidadesConnector(BaseConnector):
 
         gold_table = pa.Table.from_pydict(gold_pydict, schema=gold_schema)
 
-        self.storage.write_medallion_table(
+        gold_path, _, _ = self.storage.write_medallion_table(
             gold_table,
             source_id=self.source_id,
             layer="gold",
+            table_name="features_municipio_ml",
             contract=None,
+            use_source_subfolder=True,
         )
+
+        # Maintain legacy flat gold alias
+        legacy_gold = self.settings.gold_dir / f"{self.source_id}.parquet"
+        try:
+            import shutil
+            shutil.copy2(gold_path, legacy_gold)
+        except Exception as exc:
+            logger.debug("Failed copying legacy flat gold file: %s", exc)
+
         return gold_table
 
-    # Query methods for SDK, API, CLI, and MCP
+    # -------------------------------------------------------------------------
+    # Public Query Methods for SDK, API, CLI, and MCP
+    # -------------------------------------------------------------------------
+
     def get_municipio(self, id_or_name: str, uf: str | None = None) -> dict[str, Any] | None:
         """Resolve a single municipality by IBGE code (7D/6D) or name with optional UF."""
         id_7 = self.normalizer.to_ibge_7(id_or_name, uf=uf)
         if not id_7:
             return None
 
-        # Try reading from silver Parquet first
+        # Try reading from isolated silver Parquet first
         try:
-            silver_path = self.settings.silver_dir / f"{self.source_id}.parquet"
+            silver_path = self.settings.data_dir / self.source_id / "silver" / "municipios.parquet"
+            if not silver_path.exists():
+                silver_path = self.settings.silver_dir / f"{self.source_id}.parquet"
+
             if silver_path.exists():
                 sql = (
                     f"SELECT * FROM read_parquet('{silver_path}') WHERE id_municipio = '{id_7}'"
@@ -446,7 +873,10 @@ class IBGELocalidadesConnector(BaseConnector):
         offset: int = 0,
     ) -> list[dict[str, Any]]:
         """List municipalities filtered by UF, region, or capitals."""
-        silver_path = self.settings.silver_dir / f"{self.source_id}.parquet"
+        silver_path = self.settings.data_dir / self.source_id / "silver" / "municipios.parquet"
+        if not silver_path.exists():
+            silver_path = self.settings.silver_dir / f"{self.source_id}.parquet"
+
         if silver_path.exists():
             clauses = []
             if uf:
@@ -489,8 +919,53 @@ class IBGELocalidadesConnector(BaseConnector):
             results = results[:limit]
         return results
 
+    def list_distritos(
+        self,
+        id_municipio: str | None = None,
+        uf: str | None = None,
+        limit: int | None = None,
+    ) -> list[dict[str, Any]]:
+        """List distritos filtered by municipality ID or UF."""
+        silver_path = self.settings.data_dir / self.source_id / "silver" / "distritos.parquet"
+        if silver_path.exists():
+            clauses = []
+            if id_municipio:
+                clauses.append(f"id_municipio = '{id_municipio.zfill(7)}'")
+            if uf:
+                clauses.append(f"sigla_uf = '{uf.upper()}'")
+            where = f"WHERE {' AND '.join(clauses)}" if clauses else ""
+            limit_clause = f"LIMIT {limit}" if limit else ""
+            sql = f"SELECT * FROM read_parquet('{silver_path}') {where} ORDER BY id_distrito {limit_clause}"
+            return self.storage.query_sql(sql).to_pylist()
+        return []
+
+    def list_subdistritos(
+        self,
+        id_municipio: str | None = None,
+        id_distrito: str | None = None,
+        limit: int | None = None,
+    ) -> list[dict[str, Any]]:
+        """List subdistritos filtered by municipality ID or distrito ID."""
+        silver_path = self.settings.data_dir / self.source_id / "silver" / "subdistritos.parquet"
+        if silver_path.exists():
+            clauses = []
+            if id_municipio:
+                clauses.append(f"id_municipio = '{id_municipio.zfill(7)}'")
+            if id_distrito:
+                clauses.append(f"id_distrito = '{id_distrito.zfill(9)}'")
+            where = f"WHERE {' AND '.join(clauses)}" if clauses else ""
+            limit_clause = f"LIMIT {limit}" if limit else ""
+            sql = f"SELECT * FROM read_parquet('{silver_path}') {where} ORDER BY id_subdistrito {limit_clause}"
+            return self.storage.query_sql(sql).to_pylist()
+        return []
+
     def list_ufs(self) -> list[dict[str, Any]]:
         """List the 27 Brazilian Federative Units."""
+        silver_path = self.settings.data_dir / self.source_id / "silver" / "estados.parquet"
+        if silver_path.exists():
+            sql = f"SELECT * FROM read_parquet('{silver_path}') ORDER BY sigla_uf"
+            return self.storage.query_sql(sql).to_pylist()
+
         ufs = []
         for code, meta in sorted(CanonicalNormalizer.UF_MAP.items(), key=lambda x: x[1]["sigla"]):
             ufs.append(
@@ -503,6 +978,18 @@ class IBGELocalidadesConnector(BaseConnector):
                 }
             )
         return ufs
+
+    def list_regioes(self) -> list[dict[str, Any]]:
+        """List the 5 Brazilian macro-regions."""
+        silver_path = self.settings.data_dir / self.source_id / "silver" / "regioes.parquet"
+        if silver_path.exists():
+            sql = f"SELECT * FROM read_parquet('{silver_path}') ORDER BY id_regiao"
+            return self.storage.query_sql(sql).to_pylist()
+
+        return [
+            {"id_regiao": str(cod), "sigla_regiao": REGIAO_SIGLA_MAP[nome], "nome_regiao": nome}
+            for nome, cod in sorted(REGIOES_CODIGO.items(), key=lambda x: x[1])
+        ]
 
 
 # Register connector globally
