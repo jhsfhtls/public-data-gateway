@@ -137,4 +137,67 @@ def create_app(settings: GatewaySettings | None = None) -> FastAPI:
             "report": report.model_dump(),
         }
 
+    # 4. Geo / Territorial IBGE Routes
+    @app.get("/api/v1/geo/ibge/ufs")
+    async def list_ufs() -> list[dict[str, Any]]:
+        from brazil_data_gateway.connectors.demografico.ibge_localidades import (
+            IBGELocalidadesConnector,
+        )
+
+        conn = IBGELocalidadesConnector(settings=app_settings)
+        return conn.list_ufs()
+
+    @app.get("/api/v1/geo/ibge/municipios")
+    async def list_municipios(
+        uf: str | None = None,
+        regiao: str | None = None,
+        capitais_only: bool = False,
+        limit: int = 100,
+        offset: int = 0,
+    ) -> list[dict[str, Any]]:
+        from brazil_data_gateway.connectors.demografico.ibge_localidades import (
+            IBGELocalidadesConnector,
+        )
+
+        conn = IBGELocalidadesConnector(settings=app_settings)
+        return conn.list_municipios(
+            uf=uf,
+            regiao=regiao,
+            capitais_only=capitais_only,
+            limit=limit,
+            offset=offset,
+        )
+
+    @app.get("/api/v1/geo/ibge/municipio/{id_or_name}")
+    async def get_municipio(
+        id_or_name: str, uf: str | None = None
+    ) -> dict[str, Any]:
+        from brazil_data_gateway.connectors.demografico.ibge_localidades import (
+            IBGELocalidadesConnector,
+        )
+
+        conn = IBGELocalidadesConnector(settings=app_settings)
+        rec = conn.get_municipio(id_or_name, uf=uf)
+        if not rec:
+            raise HTTPException(
+                status_code=404,
+                detail=f"Municipality '{id_or_name}' could not be found or resolved.",
+            )
+        return rec
+
+    @app.post("/api/v1/geo/ibge/sync")
+    async def sync_ibge_localidades() -> dict[str, Any]:
+        from brazil_data_gateway.connectors.demografico.ibge_localidades import (
+            IBGELocalidadesConnector,
+        )
+
+        conn = IBGELocalidadesConnector(settings=app_settings)
+        table = conn.extract()
+        return {
+            "status": "success",
+            "source_id": "ibge_localidades",
+            "rows_materialized": table.num_rows,
+            "layers": ["bronze", "silver", "gold"],
+        }
+
     return app

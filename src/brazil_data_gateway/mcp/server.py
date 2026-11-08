@@ -91,6 +91,27 @@ class MCPDispatcher:
                                 },
                             },
                             {
+                                "name": "bdg_list_ufs",
+                                "description": "List all 27 Brazilian Federative Units with codes and regions (Tier 1).",
+                                "inputSchema": {
+                                    "type": "object",
+                                    "properties": {},
+                                },
+                            },
+                            {
+                                "name": "bdg_list_municipalities",
+                                "description": "List Brazilian municipalities with optional filters by UF, region, or capitals (Tier 1).",
+                                "inputSchema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "uf": {"type": "string"},
+                                        "regiao": {"type": "string"},
+                                        "capitais_only": {"type": "boolean"},
+                                        "limit": {"type": "integer"},
+                                    },
+                                },
+                            },
+                            {
                                 "name": "bdg_profile_dataset",
                                 "description": "Compute compact summary metrics for a Parquet dataset (Tier 1).",
                                 "inputSchema": {
@@ -177,6 +198,39 @@ class MCPDispatcher:
                 "result": {"content": [{"type": "text", "text": wrapped}], "isError": False},
             }
 
+        if tool_name == "bdg_list_ufs":
+            from brazil_data_gateway.connectors.demografico.ibge_localidades import (
+                IBGELocalidadesConnector,
+            )
+
+            conn = IBGELocalidadesConnector(settings=self.settings, storage=self.storage)
+            ufs = conn.list_ufs()
+            wrapped = wrap_untrusted_gov_data(ufs, source_id="ibge_localidades_ufs")
+            return {
+                "jsonrpc": "2.0",
+                "id": req_id,
+                "result": {"content": [{"type": "text", "text": wrapped}], "isError": False},
+            }
+
+        if tool_name == "bdg_list_municipalities":
+            from brazil_data_gateway.connectors.demografico.ibge_localidades import (
+                IBGELocalidadesConnector,
+            )
+
+            conn = IBGELocalidadesConnector(settings=self.settings, storage=self.storage)
+            items = conn.list_municipios(
+                uf=args.get("uf"),
+                regiao=args.get("regiao"),
+                capitais_only=args.get("capitais_only", False),
+                limit=args.get("limit", 50),
+            )
+            wrapped = wrap_untrusted_gov_data(items, source_id="ibge_localidades_municipios")
+            return {
+                "jsonrpc": "2.0",
+                "id": req_id,
+                "result": {"content": [{"type": "text", "text": wrapped}], "isError": False},
+            }
+
         if tool_name == "bdg_profile_dataset":
             parquet_path = Path(args["parquet_path"])
             summary = self.storage.profile_parquet(parquet_path)
@@ -221,6 +275,27 @@ class MCPDispatcher:
                 }
 
             source_id = args["source_id"]
+            if source_id == "ibge_localidades":
+                from brazil_data_gateway.connectors.demografico.ibge_localidades import (
+                    IBGELocalidadesConnector,
+                )
+
+                conn = IBGELocalidadesConnector(settings=self.settings, storage=self.storage)
+                table = conn.extract()
+                return {
+                    "jsonrpc": "2.0",
+                    "id": req_id,
+                    "result": {
+                        "content": [
+                            {
+                                "type": "text",
+                                "text": f"Bulk sync for '{source_id}' completed successfully: {table.num_rows} records materialized into Bronze, Silver, and Gold.",
+                            }
+                        ],
+                        "isError": False,
+                    },
+                }
+
             return {
                 "jsonrpc": "2.0",
                 "id": req_id,
