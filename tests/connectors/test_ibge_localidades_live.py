@@ -20,11 +20,13 @@ def live_connector() -> IBGELocalidadesConnector:
     return IBGELocalidadesConnector()
 
 
+@pytest.mark.live
 def test_live_connection_ibge(live_connector: IBGELocalidadesConnector) -> None:
     """Connection check against IBGE API must succeed live."""
     assert live_connector.test_connection() is True, "Live connection to IBGE API failed"
 
 
+@pytest.mark.live
 def test_live_1line_fail_hard_all_5_endpoints(live_connector: IBGELocalidadesConnector) -> None:
     """Verify all 5 endpoints live with 1-line limit. Must fail hard on any disruption."""
     results = live_connector.test_live_endpoints(fail_hard=True)
