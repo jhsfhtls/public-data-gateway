@@ -209,4 +209,35 @@ def create_app(settings: GatewaySettings | None = None) -> FastAPI:
         conn = RFBSimplesMEIConnector(settings=app_settings)
         return conn.get_simples_mei_status(cnpj)
 
+    # 5. Public Procurement / PNCP Routes
+    @app.get("/api/v1/pncp/contratacoes")
+    async def list_pncp_contratacoes(
+        uf: str | None = None,
+        modalidade_id: int | None = None,
+        ano: int | None = None,
+        limit: int = 50,
+    ) -> list[dict[str, Any]]:
+        from public_data_gateway.connectors.compras_publicas.pncp_contratacoes import (
+            PNCPContratacoesConnector,
+        )
+
+        conn = PNCPContratacoesConnector(settings=app_settings)
+        return conn.list_contratacoes(uf=uf, modalidade_id=modalidade_id, ano=ano, limit=limit)
+
+    @app.get("/api/v1/pncp/contratos")
+    async def list_pncp_contratos(
+        cnpj_orgao: str | None = None,
+        ni_fornecedor: str | None = None,
+        ano: int | None = None,
+        limit: int = 50,
+    ) -> list[dict[str, Any]]:
+        from public_data_gateway.connectors.compras_publicas.pncp_contratacoes import (
+            PNCPContratacoesConnector,
+        )
+
+        conn = PNCPContratacoesConnector(settings=app_settings)
+        return conn.list_contratos(
+            cnpj_orgao=cnpj_orgao, ni_fornecedor=ni_fornecedor, ano=ano, limit=limit
+        )
+
     return app

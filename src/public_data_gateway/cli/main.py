@@ -89,6 +89,26 @@ def build_parser() -> argparse.ArgumentParser:
     simples_parser.add_argument("cnpj", type=str, help="14-digit CNPJ or 8-digit root")
     simples_parser.add_argument("--json", action="store_true", help="Output in JSON format")
 
+    # Subcommand: pncp
+    pncp_parser = subparsers.add_parser(
+        "pncp", help="Query public procurement and contracts from PNCP (Lei nº 14.133/2021)."
+    )
+    pncp_sub = pncp_parser.add_subparsers(dest="pncp_action", required=True)
+
+    pncp_cont_p = pncp_sub.add_parser("contratacoes", help="List public procurement processes.")
+    pncp_cont_p.add_argument("--uf", type=str, help="Filter by UF state code (e.g. PI, SP, MG)")
+    pncp_cont_p.add_argument("--modalidade-id", type=int, help="Filter by modalidade ID (e.g. 6=Pregão)")
+    pncp_cont_p.add_argument("--ano", type=int, help="Filter by procurement year (e.g. 2024)")
+    pncp_cont_p.add_argument("--limit", type=int, default=10, help="Max rows to return")
+    pncp_cont_p.add_argument("--json", action="store_true", help="Output in JSON format")
+
+    pncp_ct_p = pncp_sub.add_parser("contratos", help="List administrative contracts.")
+    pncp_ct_p.add_argument("--cnpj", type=str, help="Filter by contracting agency CNPJ (14 digits)")
+    pncp_ct_p.add_argument("--ni", type=str, help="Filter by vendor CNPJ/CPF")
+    pncp_ct_p.add_argument("--ano", type=int, help="Filter by contract year")
+    pncp_ct_p.add_argument("--limit", type=int, default=10, help="Max rows to return")
+    pncp_ct_p.add_argument("--json", action="store_true", help="Output in JSON format")
+
     return parser
 
 
@@ -255,6 +275,48 @@ def main(argv: Sequence[str] | None = None) -> int:
                 print(f"  Data Opção MEI:    {res['data_opcao_simei'] or '-'}")
                 print(f"  Data Exclusão MEI: {res['data_exclusao_simei'] or '-'}")
             return 0
+
+        if args.command == "pncp":
+            from public_data_gateway.connectors.compras_publicas.pncp_contratacoes import (
+                PNCPContratacoesConnector,
+            )
+
+            conn = PNCPContratacoesConnector(settings=settings)
+            if args.pncp_action == "contratacoes":
+                rows = conn.list_contratacoes(
+                    uf=args.uf,
+                    modalidade_id=args.modalidade_id,
+                    ano=args.ano,
+                    limit=args.limit,
+                )
+                if args.json:
+                    print(json.dumps(rows, indent=2, ensure_ascii=False))
+                else:
+                    print(f"PNCP Contratações ({len(rows)} found):")
+                    for r in rows:
+                        print(
+                            f"  {r['numero_controle_pncp']} | {r['sigla_uf']} | {r['modalidade_nome']} | "
+                            f"Est: R$ {r['valor_total_estimado']:,.2f} | {r['razao_social_orgao']}"
+                        )
+                return 0
+
+            if args.pncp_action == "contratos":
+                ct_rows = conn.list_contratos(
+                    cnpj_orgao=args.cnpj,
+                    ni_fornecedor=args.ni,
+                    ano=args.ano,
+                    limit=args.limit,
+                )
+                if args.json:
+                    print(json.dumps(ct_rows, indent=2, ensure_ascii=False))
+                else:
+                    print(f"PNCP Contratos ({len(ct_rows)} found):")
+                    for r in ct_rows:
+                        print(
+                            f"  {r['numero_controle_pncp']} | {r['sigla_uf']} | Forn: {r['nome_fornecedor']} ({r['ni_fornecedor']}) | "
+                            f"R$ {r['valor_global']:,.2f} | {r['razao_social_orgao']}"
+                        )
+                return 0
 
     except Exception as exc:
         print(f"Error executing command '{args.command}': {exc}", file=sys.stderr)

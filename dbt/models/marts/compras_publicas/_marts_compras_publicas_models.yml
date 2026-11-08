@@ -1,0 +1,54 @@
+version: 2
+
+models:
+  - name: mart_compras_publicas_brasil
+    description: "Datamart analítico intra-domínio consolidando indicadores agregados de compras públicas e contratações do PNCP por UF, esfera federativa, modalidade e ano."
+    columns:
+      - name: sigla_uf
+        description: "Sigla de 2 letras maiúsculas da Unidade Federativa da contratação ou ND para âmbito nacional/indefinido."
+        tests:
+          - not_null
+      - name: esfera_id
+        description: "Esfera de governo da contratação (F=Federal, E=Estadual, M=Municipal, D=Distrital)."
+        tests:
+          - not_null
+      - name: modalidade_nome
+        description: "Denominação da modalidade de contratação da Lei 14.133/2021."
+        tests:
+          - not_null
+      - name: ano_compra
+        description: "Ano civil de exercício da contratação pública."
+        tests:
+          - not_null
+      - name: total_contratacoes
+        description: "Quantidade total de processos e licitações públicas distintos."
+        tests:
+          - not_null
+      - name: total_contratacoes_srp
+        description: "Quantidade total de licitações sob o Sistema de Registro de Preços."
+        tests:
+          - not_null
+      - name: valor_total_estimado
+        description: "Soma do valor financeiro estimado orçado pela Administração em Reais (R$)."
+        tests:
+          - not_null
+      - name: valor_total_homologado
+        description: "Soma do valor financeiro final adjudicado e homologado em Reais (R$)."
+        tests:
+          - not_null
+      - name: economia_estimada_homologada_absoluta
+        description: "Economia orçamentária total obtida na fase competitiva (estimado - homologado) em R$."
+        tests:
+          - not_null
+      - name: taxa_economia_licitatoria_pct
+        description: "Taxa percentual de economia / deságio obtida sobre o valor estimado."
+        tests:
+          - not_null
+      - name: ticket_medio_contratacao
+        description: "Valor financeiro médio homologado por certame licitatório em Reais (R$)."
+        tests:
+          - not_null
+      - name: total_orgaos_distintos
+        description: "Contagem de órgãos e entidades compradoras distintas com certames no grupo."
+        tests:
+          - not_null
