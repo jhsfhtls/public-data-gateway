@@ -373,6 +373,40 @@ class FundsFacade:
         return self.fundos_connector.get_fund_features(cnpj)
 
 
+class BankingFacade:
+    """Prudential banking, regulatory capital, balances, and solidity metrics (BACEN IF.data / Resolução CMN 4.966 / 4.553)."""
+
+    def __init__(self, sdk: "BrazilData") -> None:
+        self._sdk = sdk
+        self._banking_connector: Any = None
+
+    @property
+    def banking_connector(self) -> Any:
+        if self._banking_connector is None:
+            from public_data_gateway.connectors.macrofinanceiro.bcb_ifdata.connector import (
+                BcbIfDataConnector,
+            )
+
+            self._banking_connector = BcbIfDataConnector(settings=self._sdk.settings)
+        return self._banking_connector
+
+    def get_bank_by_cnpj(self, cnpj: str) -> dict[str, Any] | None:
+        """Lookup prudential financial institution profile by 8 or 14-digit CNPJ."""
+        return self.banking_connector.get_bank_by_cnpj(cnpj)
+
+    def get_bank_balance_sheet(self, cnpj: str) -> dict[str, Any] | None:
+        """Retrieve quarterly balance sheet and P&L (Ativo, Passivo, DRE) for a financial institution."""
+        return self.banking_connector.get_bank_balance_sheet(cnpj)
+
+    def get_banking_ranking(self, limit: int = 10) -> list[dict[str, Any]]:
+        """Retrieve top financial institutions in Brazil ranked by Total Assets with Basiléia index."""
+        return self.banking_connector.get_banking_ranking(limit=limit)
+
+    def get_bank_solidity(self, cnpj: str) -> dict[str, Any] | None:
+        """Retrieve pre-computed Gold feature vector and banking solidity score (0-100) for an institution."""
+        return self.banking_connector.get_bank_solidity(cnpj)
+
+
 class BrazilData:
     """Unified developer SDK facade for querying, normalizing, and enriching Brazilian public datasets."""
 
@@ -395,6 +429,7 @@ class BrazilData:
         self.finance = FinanceFacade(self)
         self.trade = TradeFacade(self)
         self.funds = FundsFacade(self)
+        self.banking = BankingFacade(self)
 
     def list_sources(
         self,
@@ -520,6 +555,22 @@ class BrazilData:
     def get_fund_features(self, cnpj: str) -> dict[str, Any] | None:
         """Consultar features e score de resiliência e liquidez de um fundo de investimento (CVM)."""
         return self.funds.get_fund_features(cnpj)
+
+    def get_bank_profile(self, cnpj: str) -> dict[str, Any] | None:
+        """Consultar cadastro regulatório prudencial e segmento (S1 a S5) de uma instituição financeira (BACEN)."""
+        return self.banking.get_bank_by_cnpj(cnpj)
+
+    def get_bank_balance_sheet(self, cnpj: str) -> dict[str, Any] | None:
+        """Consultar balanço patrimonial e DRE trimestral de uma instituição financeira (BACEN IF.data)."""
+        return self.banking.get_bank_balance_sheet(cnpj)
+
+    def get_banking_ranking(self, limit: int = 10) -> list[dict[str, Any]]:
+        """Consultar ranking das maiores instituições financeiras do Brasil por Ativo Total e Índice de Basiléia (BACEN)."""
+        return self.banking.get_banking_ranking(limit=limit)
+
+    def get_bank_solidity(self, cnpj: str) -> dict[str, Any] | None:
+        """Consultar features Gold e score contínuo de solidez prudencial (0 a 100) de uma instituição bancária (BACEN)."""
+        return self.banking.get_bank_solidity(cnpj)
 
     def resolve_municipality(
         self, code_or_name: str | int, uf: str | None = None

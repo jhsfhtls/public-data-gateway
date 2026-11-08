@@ -1,6 +1,6 @@
 {
   "schema_version": "1.0.0",
-  "last_updated": "2026-11-08T09:27:50.705623+00:00",
+  "last_updated": "2026-11-08T10:05:00.000000+00:00",
   "project_name": "public-data-gateway",
   "ecosystem": "C.O.R.E. (core, operations, career, studies)",
   "governing_pops": [
@@ -15,8 +15,8 @@
   "current_macro_phase_id": "05",
   "current_macro_phase": "Fase 05 - Ingestão Wave 3 (Mercado de Capitais & Finanças Públicas: cvm_dfp_itr, mdic_comexstat, cvm_fundos, bcb_ifdata, stn_tesouro, comprasgov_catmat)",
   "overall_status": "ON_TRACK",
-  "active_connector": "bcb_ifdata",
-  "next_connector": "stn_tesouro_transparente",
+  "active_connector": "stn_tesouro_transparente",
+  "next_connector": "comprasgov_catmat",
   "structural_phases": [
     {
       "phase_id": "00",
@@ -366,6 +366,12 @@
       "phase_id": "05",
       "milestone": "Homologação do Conector cvm_fundos (4 Tabelas, dbt, Marts de Performance e Gestoras & Live Fail-Hard)",
       "summary": "Implementação completa do conector cvm_fundos (Comissão de Valores Mobiliários - Cadastro Geral e Informes Diários de Fundos de Investimento ICVM 555 / Resolução CVM 175) consolidando o terceiro conector da Wave 3: 4 tabelas (cvm_cadastro_fundos, cvm_informe_diario, cvm_gestores_fundos, cvm_administradores_fundos) materializadas em data/cvm_fundos/{bronze,silver,gold}/; 10 novos modelos dbt (4 staging views, dim_fundo_investimento, dim_gestor_fundo, dim_administrador_fundo, fct_informe_diario_fundos, mart_performance_liquidez_fundos, mart_ranking_gestoras_assets) totalizando 148 modelos e 1443 testes dbt 100% aprovados; 1671 colunas 100% documentadas no linter; feature store features_fundos_investimento_brasil.parquet gerada com métricas de PL, cotistas, captação líquida 30d, volatilidade diária, classificação de liquidez e score contínuo de 0 a 100 de resiliência do fundo; testes reais com fail-hard contra os portais da CVM e 11 testes pytest aprovados; multi-interface completa via SDK (PublicData.funds.* e aliases), CLI (pdg funds e cvm-fundos), REST API (/api/v1/funds/*) e MCP (bdg_get_fund_profile, bdg_get_asset_manager_funds)."
+    },
+    {
+      "date": "2026-11-08",
+      "phase_id": "05",
+      "milestone": "Homologação do Conector bcb_ifdata (5 Tabelas, dbt, Marts de Ranking Bancário e Basiléia & Live Fail-Hard)",
+      "summary": "Implementação completa do conector bcb_ifdata (Banco Central do Brasil — Informações Financeiras e Balanços de Instituições Financeiras e Conglomerados Prudenciais S1 a S5, Lei nº 4.595/1964, Resoluções CMN nº 4.966/2021 e nº 4.553/2017) consolidando o quarto conector da Wave 3: 5 tabelas (bcb_ifdata_cadastro, bcb_ifdata_ativo, bcb_ifdata_passivo, bcb_ifdata_dre, bcb_ifdata_indicadores) materializadas em data/bcb_ifdata/{bronze,silver,gold}/; 11 novos modelos dbt (5 staging views, dim_instituicao_prudencial_bcb, fct_balanco_bancario_trimestral, fct_resultado_bancario_trimestral, fct_indicadores_prudenciais_bcb, mart_ranking_bancario_brasil, mart_saude_prudencial_basileia) totalizando 159 modelos e 1530 testes dbt 100% aprovados; 1810 colunas 100% documentadas no linter (100% coverage); feature store features_sistema_financeiro_brasil.parquet gerada com indicadores prudenciais (Índice de Basiléia, Índice de Imobilização, ROE Bancário, Inadimplência > 90d, classificação de porte CONGLOMERADO_S1, BANCO_MEDIO_S2_S3, INSTITUICAO_REGIONAL_S4_S5) e score contínuo de 0 a 100 de solidez bancária; testes reais com fail-hard estrito contra a API Olinda OData e portal do BACEN e 11 testes pytest aprovados (142 testes totais no repositório); multi-interface completa via SDK (PublicData.banking.* e aliases), CLI (pdg banking e ifdata), REST API (/api/v1/banking/*) e MCP (bdg_get_bank_financial_profile, bdg_get_banking_ranking) com proteção contra prompt injection."
     }
   ]
 }

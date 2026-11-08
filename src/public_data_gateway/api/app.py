@@ -4,7 +4,7 @@ import uuid
 from typing import Any
 
 import pyarrow as pa
-from fastapi import FastAPI, HTTPException, Request, Response
+from fastapi import FastAPI, HTTPException, Query, Request, Response
 from fastapi.responses import JSONResponse
 from pydantic import BaseModel
 
@@ -507,6 +507,67 @@ def create_app(settings: GatewaySettings | None = None) -> FastAPI:
         res = conn.get_fund_features(cnpj)
         if not res:
             raise HTTPException(status_code=404, detail=f"Features not found for fund CNPJ {cnpj}")
+        return res
+
+    @app.get("/api/v1/banking/profile/{cnpj}")
+    @app.get("/api/v1/ifdata/profile/{cnpj}")
+    async def get_bank_profile(cnpj: str) -> dict[str, Any]:
+        from public_data_gateway.connectors.macrofinanceiro.bcb_ifdata.connector import (
+            BcbIfdataConnector,
+        )
+
+        conn = BcbIfdataConnector(settings=app_settings)
+        res = conn.get_bank_by_cnpj(cnpj)
+        if not res:
+            raise HTTPException(
+                status_code=404,
+                detail=f"Financial institution not found for CNPJ/Code '{cnpj}'",
+            )
+        return res
+
+    @app.get("/api/v1/banking/balance/{cnpj}")
+    @app.get("/api/v1/ifdata/balance/{cnpj}")
+    async def get_bank_balance(cnpj: str) -> dict[str, Any]:
+        from public_data_gateway.connectors.macrofinanceiro.bcb_ifdata.connector import (
+            BcbIfdataConnector,
+        )
+
+        conn = BcbIfdataConnector(settings=app_settings)
+        res = conn.get_bank_balance_sheet(cnpj)
+        if not res:
+            raise HTTPException(
+                status_code=404,
+                detail=f"Balance sheet not found for institution '{cnpj}'",
+            )
+        return res
+
+    @app.get("/api/v1/banking/ranking")
+    @app.get("/api/v1/ifdata/ranking")
+    async def get_banking_ranking(
+        segmento: str | None = Query(None, description="Prudential segment filter (S1 to S5)"),
+        top: int = Query(10, ge=1, le=100, description="Top N institutions to return"),
+    ) -> list[dict[str, Any]]:
+        from public_data_gateway.connectors.macrofinanceiro.bcb_ifdata.connector import (
+            BcbIfdataConnector,
+        )
+
+        conn = BcbIfdataConnector(settings=app_settings)
+        return conn.get_banking_ranking(segmento=segmento, top=top)
+
+    @app.get("/api/v1/banking/solidity/{cnpj}")
+    @app.get("/api/v1/ifdata/solidity/{cnpj}")
+    async def get_bank_solidity(cnpj: str) -> dict[str, Any]:
+        from public_data_gateway.connectors.macrofinanceiro.bcb_ifdata.connector import (
+            BcbIfdataConnector,
+        )
+
+        conn = BcbIfdataConnector(settings=app_settings)
+        res = conn.get_bank_solidity(cnpj)
+        if not res:
+            raise HTTPException(
+                status_code=404,
+                detail=f"Solidity features not found for institution '{cnpj}'",
+            )
         return res
 
     return app

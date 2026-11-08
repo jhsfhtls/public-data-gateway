@@ -1,0 +1,115 @@
+contract_id: "ODCS-BR-BCB-IFDATA-001"
+source_id: "bcb_ifdata"
+version: "1.0.0"
+grain: "One row per financial institution or prudential conglomerate balance sheet and quarterly report (IF.data)"
+primary_keys:
+  - "cnpj_14_lider"
+  - "data_base"
+canonical_keys:
+  - "cnpj_14_lider"
+  - "cod_inst"
+reference_date_column: "data_base"
+update_frequency: "quarterly"
+freshness_sla_hours: 1440
+freshness_evaluation_criteria: "BACEN publishes consolidated quarterly IF.data approximately 60 days after quarter close (e.g. Q1 in May, Q2 in August, Q3 in November, Q4 in March)"
+lgpd_legal_basis: "Lei nº 4.595/1964, Resolução CMN nº 4.966/2021, Resolução CMN nº 4.553/2017 (Segmentação S1 a S5), Resolução BCB nº 200/2022 e Art. 7º, § 3º da Lei nº 13.709/2018 (LGPD - Transparência Pública Mandatória do SFN)"
+min_expected_rows: 5
+max_volume_drop_pct: 1.0
+sentinel_values:
+  - "NA"
+  - "N/A"
+  - "NULL"
+  - "00000000"
+  - "-"
+  - "SEM INFORMACAO"
+columns:
+  - name: "cnpj_14_lider"
+    data_type: "string"
+    nullable: false
+    description: "CNPJ de 14 dígitos normalizados da instituição líder do conglomerado financeiro ou prudencial."
+    classification: "PUBLIC_IDENTIFIER"
+  - name: "cod_inst"
+    data_type: "string"
+    nullable: false
+    description: "Código numérico ou alfanumérico identificador único atribuído pelo BACEN à instituição no IF.data."
+    classification: "PUBLIC_REGULATORY"
+  - name: "nome_instituicao"
+    data_type: "string"
+    nullable: false
+    description: "Nome oficial ou denominação social da instituição financeira ou conglomerado prudencial."
+    classification: "PUBLIC_LEGAL_NAME"
+  - name: "data_base"
+    data_type: "string"
+    nullable: false
+    description: "Data-base trimestral do balanço patrimonial e demonstrações contábeis (formato YYYYMM, e.g. 202406)."
+    classification: "PUBLIC_TEMPORAL"
+  - name: "segmento_prudencial"
+    data_type: "string"
+    nullable: false
+    description: "Classificação prudencial da instituição conforme Resolução CMN nº 4.553/2017 (S1, S2, S3, S4, S5)."
+    classification: "PUBLIC_REGULATORY"
+  - name: "tipo_instituicao"
+    data_type: "string"
+    nullable: false
+    description: "Tipo de consolidação ou natureza da instituição (Conglomerado Prudencial, Conglomerado Financeiro, Instituição Individual)."
+    classification: "PUBLIC_CLASSIFICATION"
+  - name: "atividade"
+    data_type: "string"
+    nullable: true
+    description: "Modalidade preponderante de atividade operacional (Banco Comercial, Banco Múltiplo, Crédito Imobiliário, Crédito Atacado)."
+    classification: "PUBLIC_CLASSIFICATION"
+  - name: "uf_sede"
+    data_type: "string"
+    nullable: false
+    description: "Sigla da Unidade Federativa da sede da instituição financeira."
+    classification: "PUBLIC_GEOGRAPHIC"
+  - name: "municipio_sede"
+    data_type: "string"
+    nullable: false
+    description: "Município da sede da instituição financeira."
+    classification: "PUBLIC_GEOGRAPHIC"
+  - name: "ativo_total"
+    data_type: "float"
+    nullable: false
+    description: "Ativo total consolidado da instituição apurado no encerramento do trimestre em reais (R$)."
+    classification: "PUBLIC_FINANCIAL"
+  - name: "carteira_credito_classificada"
+    data_type: "float"
+    nullable: false
+    description: "Volume financeiro total da carteira de crédito classificada em reais (R$)."
+    classification: "PUBLIC_FINANCIAL"
+  - name: "depositos_totais"
+    data_type: "float"
+    nullable: false
+    description: "Soma de depósitos à vista, a prazo (CDB) e de poupança captados (R$)."
+    classification: "PUBLIC_FINANCIAL"
+  - name: "patrimonio_liquido"
+    data_type: "float"
+    nullable: false
+    description: "Patrimônio líquido contábil consolidado apurado em reais (R$)."
+    classification: "PUBLIC_FINANCIAL"
+  - name: "patrimonio_referencia"
+    data_type: "float"
+    nullable: false
+    description: "Patrimônio de Referência (PR) regulatório para apuração dos limites prudenciais de capital (R$)."
+    classification: "PUBLIC_REGULATORY"
+  - name: "lucro_liquido_trimestral"
+    data_type: "float"
+    nullable: false
+    description: "Lucro líquido do exercício apurado na Demonstração do Resultado no trimestre (R$)."
+    classification: "PUBLIC_FINANCIAL"
+  - name: "indice_basileia_pct"
+    data_type: "float"
+    nullable: false
+    description: "Índice de Basiléia percentual (Patrimônio de Referência sobre Ativos Ponderados pelo Risco - RWA). Mínimo regulatório: 10.5%."
+    classification: "PUBLIC_REGULATORY"
+  - name: "indice_imobilizacao_pct"
+    data_type: "float"
+    nullable: false
+    description: "Índice de Imobilização percentual (Ativo Permanente sobre Patrimônio de Referência). Teto regulatório: 50.0%."
+    classification: "PUBLIC_REGULATORY"
+  - name: "taxa_inadimplencia_pct"
+    data_type: "float"
+    nullable: false
+    description: "Taxa de inadimplência da carteira de crédito com atraso superior a 90 dias (%)."
+    classification: "PUBLIC_RISK"
