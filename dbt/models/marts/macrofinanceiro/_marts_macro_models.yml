@@ -207,3 +207,105 @@ models:
         tests:
           - not_null
 
+
+  - name: mart_performance_liquidez_fundos
+    description: "Datamart analítico de performance, liquidez e fluxo de captação de Fundos de Investimento no Brasil."
+    columns:
+      - name: cnpj_14
+        description: "CNPJ do fundo de investimento com 14 dígitos normalizados."
+        tests:
+          - not_null
+          - unique
+      - name: codigo_cvm
+        description: "Código numérico de registro CVM."
+      - name: razao_social
+        description: "Razão social oficial do fundo de investimento."
+        tests:
+          - not_null
+      - name: classe_cvm
+        description: "Classe regulatória do fundo segundo taxonomia CVM."
+        tests:
+          - not_null
+      - name: classe_anbima
+        description: "Classificação setorial detalhada ANBIMA."
+      - name: situacao_registro
+        description: "Situação cadastral do fundo na CVM."
+        tests:
+          - not_null
+      - name: tipo_condominio
+        description: "Tipo de condomínio do fundo (ABERTO ou FECHADO)."
+      - name: publico_alvo
+        description: "Segmento de investidores elegíveis (GERAL, QUALIFICADO, PROFISSIONAL)."
+      - name: cnpj_gestor
+        description: "CNPJ da sociedade gestora de recursos (Asset Management)."
+      - name: nome_gestor
+        description: "Razão social da gestora de recursos."
+      - name: cnpj_administrador
+        description: "CNPJ da instituição administradora fiduciária."
+      - name: nome_administrador
+        description: "Razão social da administradora fiduciária."
+      - name: patrimonio_liquido_atual
+        description: "Patrimônio líquido contábil mais recente apurado em reais (R$)."
+        tests:
+          - not_null
+      - name: menor_cota_periodo
+        description: "Menor valor de cota registrado na série temporal recente."
+      - name: maior_cota_periodo
+        description: "Maior valor de cota registrado na série temporal recente."
+      - name: total_captacao_periodo
+        description: "Soma das aplicações e subscrições no período apurado (R$)."
+      - name: total_resgate_periodo
+        description: "Soma dos resgates pagos aos cotistas no período (R$)."
+      - name: saldo_liquido_captacao
+        description: "Captação líquida total no período (Aplicações - Resgates em R$)."
+        tests:
+          - not_null
+      - name: media_cotistas
+        description: "Média de cotistas ativos no período analisado."
+      - name: dias_apurados
+        description: "Quantidade de dias úteis com informes diários apurados no período."
+        tests:
+          - not_null
+      - name: status_fluxo_captacao
+        description: "Classificação do fluxo líquido (CAPTAÇÃO LÍQUIDA POSITIVA, RESGATE LÍQUIDO NEGATIVO, EQUILIBRADO)."
+        tests:
+          - not_null
+      - name: perfil_liquidez
+        description: "Classificação de liquidez estimada (ALTA_LIQUIDEZ, MEDIA_LIQUIDEZ, RESTRITA)."
+        tests:
+          - not_null
+
+  - name: mart_ranking_gestoras_assets
+    description: "Datamart consolidado do ranking de sociedades gestoras de recursos (Asset Management) por AuM sob gestão."
+    columns:
+      - name: cnpj_gestor
+        description: "CNPJ da gestora de recursos com 14 dígitos normalizados."
+        tests:
+          - not_null
+          - unique
+      - name: nome_gestor
+        description: "Razão social da gestora de recursos / Asset Management."
+        tests:
+          - not_null
+      - name: total_fundos_geridos
+        description: "Quantidade total de fundos de investimento sob gestão da casa."
+        tests:
+          - not_null
+      - name: aum_total
+        description: "Patrimônio líquido total consolidado sob gestão (Assets under Management - AuM) em reais (R$)."
+        tests:
+          - not_null
+      - name: captacao_liquida_recente_total
+        description: "Captação líquida recente consolidada de todos os fundos geridos (R$)."
+        tests:
+          - not_null
+      - name: principais_classes
+        description: "Classes de fundos preponderantes geridas pela instituição."
+      - name: market_share_aum_pct
+        description: "Percentual de participação de mercado no AuM total apurado (%)."
+        tests:
+          - not_null
+      - name: ranking_aum
+        description: "Posição ordinal no ranking geral de gestoras ordenado por AuM decrescente."
+        tests:
+          - not_null

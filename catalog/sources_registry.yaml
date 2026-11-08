@@ -427,7 +427,7 @@ sources:
   - P05
   rice_score: 650
   roadmap_wave: 3
-  status: CATALOGED
+  status: HOMOLOGATED
 - source_id: bcb_ifdata
   name: 'Banco Central: Informações Financeiras das IFs (IF.data)'
   agency: Banco Central do Brasil (BACEN)
