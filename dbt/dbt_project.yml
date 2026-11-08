@@ -23,6 +23,7 @@ model-paths:
   - "../src/public_data_gateway/connectors/macrofinanceiro/bcb_ifdata/dbt"
   - "../src/public_data_gateway/connectors/macrofinanceiro/stn_tesouro_transparente/dbt"
   - "../src/public_data_gateway/connectors/compras_publicas/comprasgov_catmat/dbt"
+  - "../src/public_data_gateway/connectors/demografico/ibge_sidra/dbt"
   - "models"
 
 analysis-paths: ["analyses"]

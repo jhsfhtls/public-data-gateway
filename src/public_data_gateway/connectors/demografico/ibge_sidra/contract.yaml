@@ -1,0 +1,126 @@
+schema_version: "3.1.0"
+contract_id: "ODCS-BR-IBGE-SIDRA-001"
+source_id: "ibge_sidra"
+version: "1.0.0"
+name: "IBGE Sistema de Recuperação Automática (SIDRA) - PIB Municipal, Censo Demográfico, PAM Agropecuária, IPCA e Rendimento Domiciliar"
+agency: "Instituto Brasileiro de Geografia e Estatística (IBGE)"
+official_url: "https://apisidra.ibge.gov.br"
+
+legal_framework:
+  statutes:
+    - name: "Lei nº 5.534/1968"
+      description: "Dispõe sobre a obrigatoriedade da prestação de informações estatísticas ao IBGE e assegura o sigilo estatístico"
+    - name: "Lei nº 5.878/1973"
+      description: "Define os objetivos e competências da Fundação Instituto Brasileiro de Geografia e Estatística (IBGE)"
+    - name: "Decreto nº 73.177/1973"
+      description: "Aprova o regulamento geral do IBGE e fixa suas atribuições no Sistema Estatístico Nacional"
+    - name: "Portaria IBGE nº 123/2021"
+      description: "Institui a Política de Dados Abertos e Governança Estatística do IBGE"
+
+data_governance:
+  grain: "municipio_ano_variavel"
+  primary_keys:
+    - "id_municipio"
+    - "ano"
+  reference_date_column: "reference_date"
+  min_expected_rows: 5
+  max_volume_drop_pct: 20.0
+  freshness_sla_hours: 720
+  lgpd_tier: "PUBLIC_NON_PERSONAL"
+  ml_feature_domains:
+    - "aggregate_indicators"
+    - "demographic_series"
+    - "economic_structure"
+    - "socioeconomic_development"
+
+columns:
+  - name: "id_municipio"
+    data_type: "string"
+    required: true
+    nullable: false
+    max_null_pct: 0.0
+    description: "Código IBGE de 7 dígitos identificador único do município brasileiro"
+  - name: "nome_municipio"
+    data_type: "string"
+    required: true
+    nullable: false
+    max_null_pct: 0.0
+    description: "Nome oficial do município"
+  - name: "sigla_uf"
+    data_type: "string"
+    required: true
+    nullable: false
+    max_null_pct: 0.0
+    description: "Sigla da Unidade Federativa correspondente ao município"
+  - name: "ano"
+    data_type: "integer"
+    required: true
+    nullable: false
+    max_null_pct: 0.0
+    description: "Ano civil de referência da apuração estatística do PIB"
+  - name: "pib_mil_reais"
+    data_type: "float"
+    required: true
+    nullable: false
+    max_null_pct: 0.0
+    description: "Produto Interno Bruto a preços correntes apurado pelo IBGE em milhares de reais"
+  - name: "vab_total_mil_reais"
+    data_type: "float"
+    required: true
+    nullable: false
+    max_null_pct: 0.0
+    description: "Valor adicionado bruto a preços correntes total em milhares de reais"
+  - name: "vab_agropecuaria_mil_reais"
+    data_type: "float"
+    required: true
+    nullable: false
+    max_null_pct: 0.0
+    description: "Valor adicionado bruto da agropecuária em milhares de reais"
+  - name: "vab_industria_mil_reais"
+    data_type: "float"
+    required: true
+    nullable: false
+    max_null_pct: 0.0
+    description: "Valor adicionado bruto da indústria em milhares de reais"
+  - name: "vab_servicos_mil_reais"
+    data_type: "float"
+    required: true
+    nullable: false
+    max_null_pct: 0.0
+    description: "Valor adicionado bruto dos serviços exclusivo administração pública em milhares de reais"
+  - name: "vab_administracao_publica_mil_reais"
+    data_type: "float"
+    required: true
+    nullable: false
+    max_null_pct: 0.0
+    description: "Valor adicionado bruto da administração defesa educação e saúde públicas em milhares de reais"
+  - name: "impostos_liquidos_mil_reais"
+    data_type: "float"
+    required: true
+    nullable: false
+    max_null_pct: 0.0
+    description: "Impostos líquidos de subsídios sobre produtos a preços correntes em milhares de reais"
+  - name: "participacao_pib_brasil_pct"
+    data_type: "float"
+    required: true
+    nullable: false
+    max_null_pct: 0.0
+    description: "Participação percentual do PIB do município no Produto Interno Bruto nacional"
+  - name: "participacao_pib_uf_pct"
+    data_type: "float"
+    required: true
+    nullable: false
+    max_null_pct: 0.0
+    description: "Participação percentual do PIB do município no Produto Interno Bruto da UF"
+  - name: "reference_date"
+    data_type: "string"
+    required: true
+    nullable: false
+    max_null_pct: 0.0
+    description: "Data de referência da extração no formato AAAA-MM-DD"
+  - name: "extracted_at"
+    data_type: "string"
+    required: true
+    nullable: false
+    max_null_pct: 0.0
+    description: "Timestamp ISO-8601 UTC do momento da ingestão do lote estatístico"

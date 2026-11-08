@@ -1,0 +1,172 @@
+version: 2
+
+models:
+  - name: stg_sidra_pib_municipal
+    description: "Visão de staging com tipagem canônica do PIB municipal e valores adicionados brutos do IBGE SIDRA."
+    columns:
+      - name: id_municipio
+        description: "Código IBGE de 7 dígitos identificador único do município."
+        tests:
+          - not_null
+      - name: nome_municipio
+        description: "Nome oficial do município brasileiro."
+        tests:
+          - not_null
+      - name: sigla_uf
+        description: "Sigla da Unidade Federativa correspondente."
+        tests:
+          - not_null
+      - name: ano
+        description: "Ano civil de referência da apuração do PIB."
+        tests:
+          - not_null
+      - name: pib_mil_reais
+        description: "Produto Interno Bruto a preços correntes em milhares de reais."
+        tests:
+          - not_null
+      - name: vab_total_mil_reais
+        description: "Valor adicionado bruto total a preços correntes em milhares de reais."
+      - name: vab_agropecuaria_mil_reais
+        description: "Valor adicionado bruto da agropecuária em milhares de reais."
+      - name: vab_industria_mil_reais
+        description: "Valor adicionado bruto da indústria em milhares de reais."
+      - name: vab_servicos_mil_reais
+        description: "Valor adicionado bruto dos serviços exclusivo administração pública em milhares de reais."
+      - name: vab_administracao_publica_mil_reais
+        description: "Valor adicionado bruto da administração pública em milhares de reais."
+      - name: impostos_liquidos_mil_reais
+        description: "Impostos líquidos de subsídios sobre produtos em milhares de reais."
+      - name: participacao_pib_brasil_pct
+        description: "Participação percentual do município no PIB nacional."
+      - name: participacao_pib_uf_pct
+        description: "Participação percentual do município no PIB da sua UF."
+      - name: reference_date
+        description: "Data de referência da extração no formato AAAA-MM-DD."
+      - name: extracted_at
+        description: "Timestamp ISO-8601 UTC do momento da ingestão."
+
+  - name: stg_sidra_populacao_censo
+    description: "Visão de staging da contagem populacional e densidade demográfica dos municípios pelo IBGE SIDRA."
+    columns:
+      - name: id_municipio
+        description: "Código IBGE de 7 dígitos do município."
+        tests:
+          - not_null
+      - name: nome_municipio
+        description: "Nome do município correspondente."
+        tests:
+          - not_null
+      - name: sigla_uf
+        description: "Sigla da Unidade Federativa."
+        tests:
+          - not_null
+      - name: ano
+        description: "Ano do Censo Demográfico ou estimativa populacional."
+        tests:
+          - not_null
+      - name: populacao_residente
+        description: "Quantidade total de pessoas residentes no município apurada no Censo."
+        tests:
+          - not_null
+      - name: unidade_medida
+        description: "Unidade de medida oficial da contagem (ex: Pessoas)."
+      - name: densidade_demografica_hab_km2
+        description: "Densidade demográfica calculada em habitantes por quilômetro quadrado."
+      - name: reference_date
+        description: "Data de referência da extração no formato AAAA-MM-DD."
+      - name: extracted_at
+        description: "Timestamp ISO-8601 UTC do momento da ingestão."
+
+  - name: stg_sidra_agropecuaria_pam
+    description: "Visão de staging da Produção Agrícola Municipal (PAM) com safras e valores agrícolas pelo IBGE SIDRA."
+    columns:
+      - name: id_municipio
+        description: "Código IBGE de 7 dígitos do município produtor."
+        tests:
+          - not_null
+      - name: nome_municipio
+        description: "Nome do município agrícola."
+        tests:
+          - not_null
+      - name: sigla_uf
+        description: "Sigla da Unidade Federativa."
+        tests:
+          - not_null
+      - name: ano
+        description: "Ano civil de referência da safra agrícola."
+        tests:
+          - not_null
+      - name: quantidade_produzida_toneladas
+        description: "Volume total colhido das lavouras em toneladas."
+      - name: valor_producao_mil_reais
+        description: "Valor total da produção agrícola municipal em milhares de reais."
+      - name: area_plantada_hectares
+        description: "Área total destinada ao plantio em hectares."
+      - name: area_colhida_hectares
+        description: "Área efetivamente colhida em hectares."
+      - name: principal_cultura
+        description: "Denominação da principal cultura agrícola cultivada no município."
+      - name: reference_date
+        description: "Data de referência da extração no formato AAAA-MM-DD."
+      - name: extracted_at
+        description: "Timestamp ISO-8601 UTC da ingestão estatística."
+
+  - name: stg_sidra_ipca_mensal
+    description: "Visão de staging do Índice Nacional de Preços ao Consumidor Amplo (IPCA) apurado pelo IBGE SIDRA."
+    columns:
+      - name: ano_mes
+        description: "Identificador cronológico no formato AAAAMM."
+        tests:
+          - not_null
+      - name: ano
+        description: "Ano do índice de inflação."
+        tests:
+          - not_null
+      - name: mes
+        description: "Mês numérico de referência (1 a 12)."
+        tests:
+          - not_null
+      - name: mes_ano_extenso
+        description: "Mês e ano por extenso correspondentes."
+      - name: ipca_variacao_mensal_pct
+        description: "Variação percentual mensal do IPCA."
+        tests:
+          - not_null
+      - name: ipca_acumulado_ano_pct
+        description: "Variação percentual acumulada no ano civil."
+      - name: ipca_acumulado_12m_pct
+        description: "Variação percentual acumulada nos últimos 12 meses."
+      - name: indice_geral
+        description: "Nome do agrupamento estatístico do índice geral."
+      - name: reference_date
+        description: "Data de referência da extração no formato AAAA-MM-DD."
+      - name: extracted_at
+        description: "Timestamp ISO-8601 UTC do momento da ingestão."
+
+  - name: stg_sidra_gini_rendimento_uf
+    description: "Visão de staging do Índice de Gini de desigualdade e rendimento médio domiciliar per capita por UF do IBGE SIDRA."
+    columns:
+      - name: id_uf
+        description: "Código IBGE de 2 dígitos da Unidade Federativa."
+        tests:
+          - not_null
+      - name: sigla_uf
+        description: "Sigla de 2 caracteres da Unidade Federativa."
+        tests:
+          - not_null
+      - name: nome_uf
+        description: "Nome oficial da Unidade Federativa."
+      - name: ano
+        description: "Ano de apuração da PNAD Contínua."
+        tests:
+          - not_null
+      - name: indice_gini_rendimento
+        description: "Índice de Gini do rendimento domiciliar per capita variando de 0 a 1."
+        tests:
+          - not_null
+      - name: rendimento_medio_domiciliar_reais
+        description: "Valor do rendimento médio mensal domiciliar per capita a preços médios do ano em reais."
+      - name: reference_date
+        description: "Data de referência da extração no formato AAAA-MM-DD."
+      - name: extracted_at
+        description: "Timestamp ISO-8601 UTC da extração estatística."

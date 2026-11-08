@@ -475,6 +475,44 @@ class TreasuryFacade:
         return self.treasury_connector.get_capag_rating(id_municipio)
 
 
+class SocioeconomicFacade:
+    """Socioeconomic, GDP and demographic query interface powered by IBGE SIDRA."""
+
+    def __init__(self, sdk: "BrazilData") -> None:
+        self._sdk = sdk
+        self._connector: Any = None
+
+    @property
+    def connector(self) -> Any:
+        if self._connector is None:
+            from public_data_gateway.connectors.demografico.ibge_sidra.connector import (
+                IBGESidraConnector,
+            )
+
+            self._connector = IBGESidraConnector(settings=self._sdk.settings)
+        return self._connector
+
+    def gdp(self, id_municipio: str) -> dict[str, Any] | None:
+        """Get official municipal GDP indicators by 7-digit IBGE code."""
+        return self.connector.get_municipality_gdp(id_municipio)
+
+    def profile(self, id_municipio: str) -> dict[str, Any] | None:
+        """Get comprehensive Gold socioeconomic profile and indicators for a municipality."""
+        return self.connector.get_municipality_socioeconomic_profile(id_municipio)
+
+    def ipca_history(self, limit: int = 12) -> list[dict[str, Any]]:
+        """Get IPCA inflation historical series."""
+        return self.connector.get_ipca_history(limit=limit)
+
+    def gini_uf(self, sigla_uf: str) -> dict[str, Any] | None:
+        """Get Gini index and household income by State (UF)."""
+        return self.connector.get_gini_uf(sigla_uf)
+
+    def top_municipalities_by_gdp(self, limit: int = 10) -> list[dict[str, Any]]:
+        """List top municipalities ranked by total GDP."""
+        return self.connector.list_top_municipalities_by_gdp(limit=limit)
+
+
 class BrazilData:
     """Unified developer SDK facade for querying, normalizing, and enriching Brazilian public datasets."""
 
@@ -499,6 +537,7 @@ class BrazilData:
         self.funds = FundsFacade(self)
         self.banking = BankingFacade(self)
         self.treasury = TreasuryFacade(self)
+        self.socioeconomic = SocioeconomicFacade(self)
 
     def list_sources(
         self,
@@ -676,6 +715,26 @@ class BrazilData:
     def get_procurement_supplier(self, cnpj: str) -> dict[str, Any] | None:
         """Consultar histórico e volume de fornecimento de uma empresa ao poder público."""
         return self.procurement.get_supplier_history(cnpj)
+
+    def get_municipality_gdp(self, id_municipio: str) -> dict[str, Any] | None:
+        """Consultar PIB municipal e valor adicionado por setor (IBGE SIDRA)."""
+        return self.socioeconomic.gdp(id_municipio)
+
+    def get_municipality_socioeconomic_profile(self, id_municipio: str) -> dict[str, Any] | None:
+        """Consultar perfil socioeconômico completo, PIB per capita e dinâmica produtiva (IBGE SIDRA)."""
+        return self.socioeconomic.profile(id_municipio)
+
+    def get_ipca_history(self, limit: int = 12) -> list[dict[str, Any]]:
+        """Consultar série histórica e evolução do índice de inflação IPCA (IBGE SIDRA)."""
+        return self.socioeconomic.ipca_history(limit=limit)
+
+    def get_gini_uf(self, sigla_uf: str) -> dict[str, Any] | None:
+        """Consultar índice de Gini e rendimento médio domiciliar por UF (IBGE SIDRA / PNADC)."""
+        return self.socioeconomic.gini_uf(sigla_uf)
+
+    def get_top_municipalities_by_gdp(self, limit: int = 10) -> list[dict[str, Any]]:
+        """Consultar ranking dos municípios com maior PIB do Brasil (IBGE SIDRA)."""
+        return self.socioeconomic.top_municipalities_by_gdp(limit=limit)
 
     def resolve_municipality(
         self, code_or_name: str | int, uf: str | None = None

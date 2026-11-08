@@ -77,3 +77,124 @@ models:
         description: "Timestamp ISO-8601 da extração dos dados originais."
         tests:
           - not_null
+
+  - name: mart_perfil_socioeconomico_municipios
+    description: "Data Mart estratégico consolidando o perfil socioeconômico completo dos municípios brasileiros: PIB per capita, composição do valor adicionado, porte populacional, vocação produtiva e distribuição de renda."
+    columns:
+      - name: id_municipio
+        description: "Código IBGE de 7 dígitos identificador único do município."
+        tests:
+          - unique
+          - not_null
+      - name: nome_municipio
+        description: "Nome oficial do município brasileiro."
+        tests:
+          - not_null
+      - name: sigla_uf
+        description: "Sigla de 2 letras da Unidade Federativa."
+        tests:
+          - not_null
+      - name: regiao
+        description: "Grande região geográfica do município."
+      - name: is_capital
+        description: "Flag booleana indicando se o município é capital de estado."
+      - name: is_amazonia_legal
+        description: "Flag booleana indicando se o município pertence à Amazônia Legal."
+      - name: ano_referencia_pib
+        description: "Ano de apuração estatística do Produto Interno Bruto."
+        tests:
+          - not_null
+      - name: ano_referencia_populacao
+        description: "Ano do Censo Demográfico oficial de contagem de habitantes."
+        tests:
+          - not_null
+      - name: pib_mil_reais
+        description: "Valor do PIB a preços correntes em milhares de reais."
+        tests:
+          - not_null
+      - name: populacao_residente
+        description: "Número total de habitantes residentes apurado pelo IBGE."
+        tests:
+          - not_null
+      - name: pib_per_capita_reais
+        description: "PIB per capita do município em reais correntes anuais."
+        tests:
+          - not_null
+      - name: participacao_pib_brasil_pct
+        description: "Participação percentual do município no PIB total do Brasil."
+      - name: participacao_pib_uf_pct
+        description: "Participação percentual do município no PIB do seu respectivo estado."
+      - name: share_vab_agropecuaria_pct
+        description: "Participação percentual da agropecuária no valor adicionado bruto total."
+      - name: share_vab_industria_pct
+        description: "Participação percentual da indústria no valor adicionado bruto total."
+      - name: share_vab_servicos_pct
+        description: "Participação percentual dos serviços de mercado no valor adicionado bruto total."
+      - name: share_vab_administracao_publica_pct
+        description: "Participação percentual da administração pública no valor adicionado bruto total."
+      - name: perfil_economico_dominante
+        description: "Classificação do perfil produtivo dominante (AGROPECUARIO, INDUSTRIAL, SERVICOS, ADMINISTRACAO_PUBLICA)."
+        tests:
+          - not_null
+      - name: classificacao_porte_municipio
+        description: "Classificação do porte populacional (METROPOLE, GRANDE_PORTE, MEDIO_PORTE, PEQUENO_PORTE)."
+        tests:
+          - not_null
+      - name: valor_producao_agricola_mil_reais
+        description: "Valor total anual da produção agrícola segundo a PAM em milhares de reais."
+      - name: principal_cultura_agricola
+        description: "Denominação da cultura agrícola de maior destaque no município."
+      - name: indice_gini_uf
+        description: "Índice de Gini estadual de concentração de renda domiciliar per capita."
+      - name: rendimento_medio_domiciliar_uf_reais
+        description: "Rendimento médio domiciliar per capita mensal da Unidade Federativa em reais."
+      - name: reference_date
+        description: "Data de referência da consolidação analítica."
+        tests:
+          - not_null
+      - name: extracted_at
+        description: "Timestamp ISO-8601 da extração das fontes estatísticas."
+        tests:
+          - not_null
+
+  - name: mart_indicadores_inflacao_desigualdade
+    description: "Data Mart macroeconômico correlacionando a evolução cronológica da inflação oficial (IPCA) com desigualdade de renda e rendimento domiciliar nacional."
+    columns:
+      - name: ano_mes
+        description: "Identificador cronológico da série no formato AAAAMM."
+        tests:
+          - not_null
+      - name: ano
+        description: "Ano civil de referência da apuração."
+        tests:
+          - not_null
+      - name: mes
+        description: "Mês numérico de referência (1 a 12)."
+        tests:
+          - not_null
+      - name: mes_ano_extenso
+        description: "Mês e ano descritos por extenso."
+      - name: ipca_variacao_mensal_pct
+        description: "Variação mensal do IPCA em percentual."
+        tests:
+          - not_null
+      - name: ipca_acumulado_ano_pct
+        description: "Inflação acumulada no ano civil em percentual."
+      - name: ipca_acumulado_12m_pct
+        description: "Inflação acumulada na janela móvel de 12 meses em percentual."
+      - name: regime_inflacionario_mensal
+        description: "Classificação analítica do regime de preços (DEFLACAO, ESTABILIDADE, MODERADA, ALTA)."
+      - name: media_gini_nacional
+        description: "Média aritmética nacional dos índices de Gini estaduais no ano."
+      - name: media_rendimento_domiciliar_nacional_reais
+        description: "Média nacional do rendimento médio domiciliar per capita em reais correntes."
+      - name: classificacao_clima_macroeconomico
+        description: "Enquadramento sintético de risco social e estabilidade macroeconômica."
+      - name: reference_date
+        description: "Data de referência da consolidação analítica."
+        tests:
+          - not_null
+      - name: extracted_at
+        description: "Timestamp ISO-8601 da extração dos indicadores."
+        tests:
+          - not_null

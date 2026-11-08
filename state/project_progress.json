@@ -1,6 +1,6 @@
 {
   "schema_version": "1.0.0",
-  "last_updated": "2026-11-08T10:55:00.000000+00:00",
+  "last_updated": "2026-11-08T11:16:57.924695+00:00",
   "project_name": "public-data-gateway",
   "ecosystem": "C.O.R.E. (core, operations, career, studies)",
   "governing_pops": [
@@ -12,11 +12,11 @@
     "POP_T_074",
     "POP_T_148"
   ],
-  "current_macro_phase_id": "05",
-  "current_macro_phase": "Fase 05 - Ingestão Wave 3 Concluída (Mercado de Capitais & Finanças Públicas: cvm_dfp_itr, mdic_comexstat, cvm_fundos, bcb_ifdata, stn_tesouro, comprasgov_catmat) -> Avançando para Wave 4",
+  "current_macro_phase_id": "06",
+  "current_macro_phase": "Fase 06 - Ingestão Wave 4 em Andamento (Censo, Trabalho, Logística & Telecom: ibge_sidra homologado)",
   "overall_status": "ON_TRACK",
-  "active_connector": "ibge_sidra",
-  "next_connector": "inep_censo_escolar",
+  "active_connector": "ibge_censo2022",
+  "next_connector": "mte_novo_caged",
   "structural_phases": [
     {
       "phase_id": "00",
@@ -96,8 +96,8 @@
     {
       "phase_id": "05",
       "name": "Ingestão Wave 3 — Mercado de Capitais & Finanças Públicas",
-      "status": "IN_PROGRESS",
-      "completion_date": null,
+      "status": "COMPLETED",
+      "completion_date": "2026-11-08",
       "deliverables": [
         "Conector cvm_dfp_itr (Balanços e DRE de companhias abertas)",
         "Conector cvm_fundos (Informes diários de fundos)",
@@ -110,10 +110,11 @@
     {
       "phase_id": "06",
       "name": "Ingestão Wave 4 — Censo, Trabalho, Logística & Telecom",
-      "status": "PENDING",
+      "status": "IN_PROGRESS",
       "completion_date": null,
       "deliverables": [
-        "Conectores ibge_sidra, ibge_pib_municipal, ibge_censo2022, ibge_pnad_continua",
+        "Conector ibge_sidra (PIB municipal, Censo demográfico, PAM, IPCA e Gini) - CONCLUÍDO",
+        "Conectores ibge_censo2022 & ibge_pnad_continua",
         "Conectores mte_novo_caged & mte_rais",
         "Conectores ibge_cnefe, ibge_malhas, anatel_mosaico, antt_malha_transporte"
       ]

@@ -365,6 +365,37 @@ def build_parser() -> argparse.ArgumentParser:
     catmat_p.add_argument("--limit", type=int, default=10, help="Maximum number of items")
     catmat_p.add_argument("--json", action="store_true", help="Output in JSON format")
 
+    # Subcommand: sidra (IBGE SIDRA Socioeconômico)
+    sidra_p = subparsers.add_parser(
+        "sidra", help="Query IBGE SIDRA indicators: municipal GDP, socioeconomic profile, IPCA inflation and Gini."
+    )
+    sidra_sub = sidra_p.add_subparsers(dest="sidra_action", required=True)
+
+    s_gdp_p = sidra_sub.add_parser("gdp", help="Query official municipal GDP and sectoral VAB.")
+    s_gdp_p.add_argument("id_municipio", type=str, help="IBGE 7-digit municipality code")
+    s_gdp_p.add_argument("--json", action="store_true", help="Output in JSON format")
+
+    s_prof_p = sidra_sub.add_parser("profile", help="Query Gold socioeconomic profile, GDP per capita, and economic profile.")
+    s_prof_p.add_argument("id_municipio", type=str, help="IBGE 7-digit municipality code")
+    s_prof_p.add_argument("--json", action="store_true", help="Output in JSON format")
+
+    s_ipca_p = sidra_sub.add_parser("ipca", help="Query IPCA inflation monthly time series.")
+    s_ipca_p.add_argument("--limit", type=int, default=12, help="Number of months to retrieve")
+    s_ipca_p.add_argument("--json", action="store_true", help="Output in JSON format")
+
+    s_gini_p = sidra_sub.add_parser("gini", help="Query Gini inequality index and household income by UF.")
+    s_gini_p.add_argument("sigla_uf", type=str, help="State 2-letter acronym (e.g. SP, RJ, DF)")
+    s_gini_p.add_argument("--json", action="store_true", help="Output in JSON format")
+
+    s_rank_p = sidra_sub.add_parser("ranking", help="List top municipalities ranked by GDP.")
+    s_rank_p.add_argument("--limit", type=int, default=10, help="Max municipalities to list")
+    s_rank_p.add_argument("--json", action="store_true", help="Output in JSON format")
+
+    # Direct shortcut: pib
+    pib_p = subparsers.add_parser("pib", help="Shortcut to query municipal GDP or socioeconomic profile.")
+    pib_p.add_argument("id_municipio", type=str, help="IBGE 7-digit municipality code")
+    pib_p.add_argument("--json", action="store_true", help="Output in JSON format")
+
     return parser
 
 
@@ -1231,6 +1262,102 @@ def main(argv: Sequence[str] | None = None) -> int:
                     print(f"  Ticket Médio Unitário:   R$ {sup.get('ticket_medio_unitario', 0.0):,.2f}")
                     print(f"  UASGs Atendidas:         {sup.get('total_uasgs_atendidas')}")
                     print(f"  UF Principal:            {sup.get('sigla_uf_principal')}")
+                return 0
+
+        elif args.command in ("sidra", "pib"):
+            from public_data_gateway.connectors.demografico.ibge_sidra.connector import (
+                IBGESidraConnector,
+            )
+
+            sidra_conn = IBGESidraConnector()
+
+            if args.command == "pib":
+                prof = sidra_conn.get_municipality_socioeconomic_profile(args.id_municipio)
+                if not prof:
+                    print(f"Municipality not found for ID '{args.id_municipio}'", file=sys.stderr)
+                    return 1
+                if args.json:
+                    print(json.dumps(prof, indent=2, ensure_ascii=False))
+                else:
+                    print(f"IBGE SIDRA Socioeconomic Profile: {prof.get('nome_municipio')} ({prof.get('sigla_uf')} - {prof.get('id_municipio')}):")
+                    print(f"  PIB Total:               R$ {prof.get('pib_mil_reais', 0.0):,.2f} mil")
+                    print(f"  População Residente:     {prof.get('populacao_residente'):,} habitantes")
+                    print(f"  PIB per Capita:          R$ {prof.get('pib_per_capita_reais', 0.0):,.2f}")
+                    print(f"  Perfil Econômico:        {prof.get('perfil_economico_dominante')}")
+                    print(f"  Porte do Município:      {prof.get('classificacao_porte_municipio')}")
+                    print(f"  Participação PIB Brasil: {prof.get('participacao_pib_brasil_pct')}%")
+                    print(f"  Score de Dinamismo:      {prof.get('score_dinamismo_economico')}/100")
+                return 0
+
+            sidra_action = getattr(args, "sidra_action", None)
+
+            if sidra_action == "gdp":
+                gdp_data = sidra_conn.get_municipality_gdp(args.id_municipio)
+                if not gdp_data:
+                    print(f"GDP data not found for ID '{args.id_municipio}'", file=sys.stderr)
+                    return 1
+                if args.json:
+                    print(json.dumps(gdp_data, indent=2, ensure_ascii=False))
+                else:
+                    print(f"IBGE Municipal GDP: {gdp_data.get('nome_municipio')} ({gdp_data.get('sigla_uf')} - {gdp_data.get('id_municipio')}):")
+                    print(f"  Ano:                     {gdp_data.get('ano')}")
+                    print(f"  PIB Total:               R$ {gdp_data.get('pib_mil_reais', 0.0):,.2f} mil")
+                    print(f"  VAB Agropecuária:        R$ {gdp_data.get('vab_agropecuaria_mil_reais', 0.0):,.2f} mil")
+                    print(f"  VAB Indústria:           R$ {gdp_data.get('vab_industria_mil_reais', 0.0):,.2f} mil")
+                    print(f"  VAB Serviços:            R$ {gdp_data.get('vab_servicos_mil_reais', 0.0):,.2f} mil")
+                    print(f"  VAB Administração Públ.: R$ {gdp_data.get('vab_administracao_publica_mil_reais', 0.0):,.2f} mil")
+                    print(f"  Participação Brasil:     {gdp_data.get('participacao_pib_brasil_pct')}%")
+                return 0
+
+            if sidra_action == "profile":
+                prof = sidra_conn.get_municipality_socioeconomic_profile(args.id_municipio)
+                if not prof:
+                    print(f"Municipality not found for ID '{args.id_municipio}'", file=sys.stderr)
+                    return 1
+                if args.json:
+                    print(json.dumps(prof, indent=2, ensure_ascii=False))
+                else:
+                    print(f"IBGE SIDRA Socioeconomic Profile: {prof.get('nome_municipio')} ({prof.get('sigla_uf')} - {prof.get('id_municipio')}):")
+                    print(f"  PIB Total:               R$ {prof.get('pib_mil_reais', 0.0):,.2f} mil")
+                    print(f"  População Residente:     {prof.get('populacao_residente'):,} habitantes")
+                    print(f"  PIB per Capita:          R$ {prof.get('pib_per_capita_reais', 0.0):,.2f}")
+                    print(f"  Perfil Econômico:        {prof.get('perfil_economico_dominante')}")
+                    print(f"  Porte do Município:      {prof.get('classificacao_porte_municipio')}")
+                    print(f"  Participação PIB Brasil: {prof.get('participacao_pib_brasil_pct')}%")
+                    print(f"  Score de Dinamismo:      {prof.get('score_dinamismo_economico')}/100")
+                return 0
+
+            if sidra_action == "ipca":
+                ipca_data = sidra_conn.get_ipca_history(limit=args.limit)
+                if args.json:
+                    print(json.dumps(ipca_data, indent=2, ensure_ascii=False))
+                else:
+                    print(f"IBGE IPCA Inflation Series (Latest {len(ipca_data)} months):")
+                    for row in ipca_data:
+                        print(f"  {row.get('ano_mes')} ({row.get('mes_ano_extenso')}): Mensal {row.get('ipca_variacao_mensal_pct')}% | 12 Meses {row.get('ipca_acumulado_12m_pct')}% | Ano {row.get('ipca_acumulado_ano_pct')}%")
+                return 0
+
+            if sidra_action == "gini":
+                gini_data = sidra_conn.get_gini_uf(args.sigla_uf)
+                if not gini_data:
+                    print(f"State not found for acronym '{args.sigla_uf}'", file=sys.stderr)
+                    return 1
+                if args.json:
+                    print(json.dumps(gini_data, indent=2, ensure_ascii=False))
+                else:
+                    print(f"IBGE PNADC Gini Index & Income: {gini_data.get('nome_uf')} ({gini_data.get('sigla_uf')}):")
+                    print(f"  Índice de Gini:          {gini_data.get('indice_gini_rendimento')}")
+                    print(f"  Rendimento Domiciliar:   R$ {gini_data.get('rendimento_medio_domiciliar_reais', 0.0):,.2f}")
+                return 0
+
+            if sidra_action == "ranking":
+                ranks = sidra_conn.list_top_municipalities_by_gdp(limit=args.limit)
+                if args.json:
+                    print(json.dumps(ranks, indent=2, ensure_ascii=False))
+                else:
+                    print(f"Top {len(ranks)} Municipalities by GDP (IBGE SIDRA):")
+                    for idx, r in enumerate(ranks, 1):
+                        print(f"  {idx}. {r.get('nome_municipio')} ({r.get('sigla_uf')}): R$ {r.get('pib_mil_reais', 0.0):,.2f} mil | Per Capita: R$ {r.get('pib_per_capita_reais', 0.0):,.2f}")
                 return 0
 
     except Exception as exc:

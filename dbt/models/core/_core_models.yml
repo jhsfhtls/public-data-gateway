@@ -3162,3 +3162,209 @@ models:
           - not_null
 
 
+
+  - name: fct_pib_municipal_sidra
+    description: "Fato do Produto Interno Bruto a preços correntes e composição setorial do valor adicionado dos municípios brasileiros."
+    columns:
+      - name: id_municipio
+        description: "Código IBGE de 7 dígitos do município."
+        tests:
+          - not_null
+      - name: nome_municipio
+        description: "Nome oficial do município brasileiro."
+        tests:
+          - not_null
+      - name: sigla_uf
+        description: "Sigla da Unidade Federativa."
+        tests:
+          - not_null
+      - name: regiao
+        description: "Grande região geográfica do Brasil."
+      - name: is_capital
+        description: "Indicador booleano se o município é a capital do seu estado."
+      - name: is_amazonia_legal
+        description: "Indicador booleano de pertencimento à Amazônia Legal brasileira."
+      - name: ano
+        description: "Ano civil de apuração das Contas Regionais do IBGE."
+        tests:
+          - not_null
+      - name: pib_mil_reais
+        description: "Produto Interno Bruto a preços correntes apurado em milhares de reais."
+        tests:
+          - not_null
+      - name: vab_total_mil_reais
+        description: "Valor adicionado bruto total a preços correntes em milhares de reais."
+      - name: vab_agropecuaria_mil_reais
+        description: "Valor adicionado bruto da agropecuária em milhares de reais."
+      - name: vab_industria_mil_reais
+        description: "Valor adicionado bruto da indústria em milhares de reais."
+      - name: vab_servicos_mil_reais
+        description: "Valor adicionado bruto dos serviços exclusivo administração pública em milhares de reais."
+      - name: vab_administracao_publica_mil_reais
+        description: "Valor adicionado bruto da administração pública em milhares de reais."
+      - name: impostos_liquidos_mil_reais
+        description: "Impostos líquidos de subsídios sobre produtos a preços correntes em milhares de reais."
+      - name: participacao_pib_brasil_pct
+        description: "Participação percentual do município no PIB nacional."
+      - name: participacao_pib_uf_pct
+        description: "Participação percentual do município no PIB da Unidade Federativa."
+      - name: reference_date
+        description: "Data de referência da consolidação estatística."
+        tests:
+          - not_null
+      - name: extracted_at
+        description: "Timestamp ISO-8601 da extração dos dados."
+        tests:
+          - not_null
+
+  - name: fct_populacao_censo_sidra
+    description: "Fato da contagem populacional residente e densidade demográfica municipal conforme Censo Demográfico do IBGE."
+    columns:
+      - name: id_municipio
+        description: "Código IBGE de 7 dígitos do município."
+        tests:
+          - not_null
+      - name: nome_municipio
+        description: "Nome oficial do município."
+        tests:
+          - not_null
+      - name: sigla_uf
+        description: "Sigla da Unidade Federativa."
+        tests:
+          - not_null
+      - name: regiao
+        description: "Grande região geográfica do município."
+      - name: is_capital
+        description: "Indicador se o município é a capital estadual."
+      - name: ano
+        description: "Ano de referência do Censo Demográfico."
+        tests:
+          - not_null
+      - name: populacao_residente
+        description: "Total de habitantes residentes apurado pelo IBGE."
+        tests:
+          - not_null
+      - name: unidade_medida
+        description: "Unidade de medida censitária oficial."
+      - name: densidade_demografica_hab_km2
+        description: "Habitantes por quilômetro quadrado de área territorial."
+      - name: reference_date
+        description: "Data de referência da consolidação censitária."
+        tests:
+          - not_null
+      - name: extracted_at
+        description: "Timestamp ISO-8601 da extração estatística."
+        tests:
+          - not_null
+
+  - name: fct_producao_agricola_pam_sidra
+    description: "Fato da Produção Agrícola Municipal (PAM) com áreas, safras e valores agrícolas colhidos."
+    columns:
+      - name: id_municipio
+        description: "Código IBGE de 7 dígitos do município agrícola."
+        tests:
+          - not_null
+      - name: nome_municipio
+        description: "Nome oficial do município produtor."
+        tests:
+          - not_null
+      - name: sigla_uf
+        description: "Sigla da Unidade Federativa correspondente."
+        tests:
+          - not_null
+      - name: regiao
+        description: "Grande região geográfica do município."
+      - name: ano
+        description: "Ano civil de referência da safra agrícola apurada."
+        tests:
+          - not_null
+      - name: quantidade_produzida_toneladas
+        description: "Volume total colhido das culturas agrícolas em toneladas métricas."
+      - name: valor_producao_mil_reais
+        description: "Valor monetário total da colheita agrícola em milhares de reais."
+      - name: area_plantada_hectares
+        description: "Área cultivada destinada ao plantio em hectares."
+      - name: area_colhida_hectares
+        description: "Área efetivamente colhida em hectares."
+      - name: principal_cultura
+        description: "Denominação agronômica da principal cultura do município."
+      - name: reference_date
+        description: "Data de referência da extração agrícola."
+        tests:
+          - not_null
+      - name: extracted_at
+        description: "Timestamp ISO-8601 da extração estatística."
+        tests:
+          - not_null
+
+  - name: fct_ipca_mensal_sidra
+    description: "Fato da série cronológica do Índice Nacional de Preços ao Consumidor Amplo (IPCA) com enquadramento de regime inflacionário."
+    columns:
+      - name: ano_mes
+        description: "Identificador cronológico no formato AAAAMM."
+        tests:
+          - not_null
+      - name: ano
+        description: "Ano civil de apuração da inflação."
+        tests:
+          - not_null
+      - name: mes
+        description: "Mês civil de apuração da inflação."
+        tests:
+          - not_null
+      - name: mes_ano_extenso
+        description: "Mês e ano descritos por extenso."
+      - name: ipca_variacao_mensal_pct
+        description: "Variação percentual apurada no mês de referência."
+        tests:
+          - not_null
+      - name: ipca_acumulado_ano_pct
+        description: "Variação percentual acumulada no ano civil corrente."
+      - name: ipca_acumulado_12m_pct
+        description: "Variação percentual acumulada na janela móvel de 12 meses."
+      - name: indice_geral
+        description: "Denominação do agrupamento geral do IPCA."
+      - name: regime_inflacionario_mensal
+        description: "Classificação analítica do regime inflacionário no mês."
+      - name: reference_date
+        description: "Data de referência da extração de preços."
+        tests:
+          - not_null
+      - name: extracted_at
+        description: "Timestamp ISO-8601 da extração do índice."
+        tests:
+          - not_null
+
+  - name: fct_desigualdade_gini_uf
+    description: "Fato da distribuição de renda e índice de Gini por Unidade Federativa segundo a PNAD Contínua do IBGE."
+    columns:
+      - name: id_uf
+        description: "Código IBGE de 2 dígitos da Unidade Federativa."
+        tests:
+          - not_null
+      - name: sigla_uf
+        description: "Sigla de 2 letras da Unidade Federativa."
+        tests:
+          - not_null
+      - name: nome_uf
+        description: "Nome oficial da Unidade Federativa."
+      - name: ano
+        description: "Ano de referência da apuração da PNADC."
+        tests:
+          - not_null
+      - name: indice_gini_rendimento
+        description: "Coeficiente de Gini do rendimento domiciliar per capita."
+        tests:
+          - not_null
+      - name: rendimento_medio_domiciliar_reais
+        description: "Rendimento médio mensal domiciliar per capita em reais correntes."
+      - name: faixa_desigualdade_renda
+        description: "Classificação qualitativa do nível de concentração de renda na UF."
+      - name: reference_date
+        description: "Data de referência da consolidação do rendimento."
+        tests:
+          - not_null
+      - name: extracted_at
+        description: "Timestamp ISO-8601 da extração estatística."
+        tests:
+          - not_null

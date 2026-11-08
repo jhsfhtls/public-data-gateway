@@ -397,6 +397,38 @@ class MCPDispatcher:
                                     "required": ["termo"],
                                 },
                             },
+                            {
+                                "name": "bdg_get_municipality_gdp",
+                                "description": "Query official municipal GDP, agricultural, industrial, and services gross value added (VAB) from IBGE SIDRA (Tier 1).",
+                                "inputSchema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "id_municipio": {"type": "string", "description": "IBGE 7-digit municipality code (e.g. 3550308)"},
+                                    },
+                                    "required": ["id_municipio"],
+                                },
+                            },
+                            {
+                                "name": "bdg_get_municipality_socioeconomic_profile",
+                                "description": "Query comprehensive Gold socioeconomic indicators: GDP per capita, economic profile, dynamism score, and inequality from IBGE SIDRA (Tier 1).",
+                                "inputSchema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "id_municipio": {"type": "string", "description": "IBGE 7-digit municipality code (e.g. 3550308)"},
+                                    },
+                                    "required": ["id_municipio"],
+                                },
+                            },
+                            {
+                                "name": "bdg_get_ipca_history",
+                                "description": "Query official IPCA inflation series (monthly, 12-month accumulated, year-to-date) from IBGE SIDRA (Tier 1).",
+                                "inputSchema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "limit": {"type": "integer", "description": "Number of months to retrieve (default: 12)"},
+                                    },
+                                },
+                            },
                         ]
                     },
                 }
@@ -891,6 +923,82 @@ class MCPDispatcher:
                     },
                 }
             wrapped = wrap_untrusted_gov_data(bench, source_id="comprasgov_catmat")
+            return {
+                "jsonrpc": "2.0",
+                "id": req_id,
+                "result": {"content": [{"type": "text", "text": wrapped}], "isError": False},
+            }
+
+        if tool_name in {"bdg_get_municipality_gdp", "pdg_get_municipality_gdp"}:
+            from public_data_gateway.connectors.demografico.ibge_sidra.connector import (
+                IBGESidraConnector,
+            )
+
+            sidra_conn = IBGESidraConnector(settings=self.settings)
+            id_mun = args.get("id_municipio", "")
+            gdp_res = sidra_conn.get_municipality_gdp(id_mun)
+            if not gdp_res:
+                return {
+                    "jsonrpc": "2.0",
+                    "id": req_id,
+                    "result": {
+                        "content": [
+                            {
+                                "type": "text",
+                                "text": f"Municipal GDP not found for ID '{id_mun}'",
+                            }
+                        ],
+                        "isError": True,
+                    },
+                }
+            wrapped = wrap_untrusted_gov_data(gdp_res, source_id="ibge_sidra")
+            return {
+                "jsonrpc": "2.0",
+                "id": req_id,
+                "result": {"content": [{"type": "text", "text": wrapped}], "isError": False},
+            }
+
+        if tool_name in {
+            "bdg_get_municipality_socioeconomic_profile",
+            "pdg_get_municipality_socioeconomic_profile",
+        }:
+            from public_data_gateway.connectors.demografico.ibge_sidra.connector import (
+                IBGESidraConnector,
+            )
+
+            sidra_conn = IBGESidraConnector(settings=self.settings)
+            id_mun = args.get("id_municipio", "")
+            prof_res = sidra_conn.get_municipality_socioeconomic_profile(id_mun)
+            if not prof_res:
+                return {
+                    "jsonrpc": "2.0",
+                    "id": req_id,
+                    "result": {
+                        "content": [
+                            {
+                                "type": "text",
+                                "text": f"Socioeconomic profile not found for ID '{id_mun}'",
+                            }
+                        ],
+                        "isError": True,
+                    },
+                }
+            wrapped = wrap_untrusted_gov_data(prof_res, source_id="ibge_sidra")
+            return {
+                "jsonrpc": "2.0",
+                "id": req_id,
+                "result": {"content": [{"type": "text", "text": wrapped}], "isError": False},
+            }
+
+        if tool_name in {"bdg_get_ipca_history", "pdg_get_ipca_history"}:
+            from public_data_gateway.connectors.demografico.ibge_sidra.connector import (
+                IBGESidraConnector,
+            )
+
+            sidra_conn = IBGESidraConnector(settings=self.settings)
+            lim = args.get("limit", 12)
+            ipca_res = sidra_conn.get_ipca_history(limit=lim)
+            wrapped = wrap_untrusted_gov_data(ipca_res, source_id="ibge_sidra")
             return {
                 "jsonrpc": "2.0",
                 "id": req_id,
