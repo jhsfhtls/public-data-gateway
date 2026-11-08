@@ -1,0 +1,45 @@
+version: 2
+
+models:
+  - name: mart_cenario_macroeconomico_brasil
+    description: "Datamart analítico conformatório de conjuntura macroeconômica brasileira, calculando juros reais ex-post, deflatores, spreads bancários e crescimento de atividade."
+    columns:
+      - name: ano_mes
+        description: "Competência temporal no formato YYYY-MM."
+        tests:
+          - unique
+          - not_null
+      - name: data_competencia
+        description: "Data do primeiro dia da competência de referência (YYYY-MM-01)."
+        tests:
+          - not_null
+      - name: ipca_mensal_pct
+        description: "Variação mensal oficial do IPCA (% a.m.)."
+      - name: ipca_acumulado_12m_pct
+        description: "Inflação oficial acumulada nos últimos 12 meses (% a.a.)."
+      - name: igpm_mensal_pct
+        description: "Variação mensal oficial do IGP-M apurada pelo FGV/IBRE (% a.m.)."
+      - name: selic_meta_fim_mes_pct
+        description: "Meta Selic anualizada estipulada pelo COPOM vigente no encerramento do mês (% a.a.)."
+      - name: selic_diaria_media_mensal_pct
+        description: "Taxa Selic média efetiva apurada ao longo do mês (% a.a.)."
+      - name: cdi_diario_medio_mensal_pct
+        description: "Taxa CDI média apurada nos dias úteis da competência (% a.a.)."
+      - name: ibcbr_indice
+        description: "Número índice dessazonalizado da atividade econômica brasileira apurado pelo Banco Central."
+      - name: juros_real_ex_post_pct
+        description: "Taxa de juros real ex-post anualizada calculada pela diferença entre a Selic Meta e a inflação IPCA 12m (% a.a.)."
+      - name: spread_cdi_selic_pct
+        description: "Diferencial de taxa entre o CDI médio de mercado e a Selic média diária apurada (% a.a.)."
+      - name: crescimento_ibcbr_mom_pct
+        description: "Variação percentual mês a mês (MoM) do índice de atividade econômica IBC-Br."
+      - name: crescimento_ibcbr_yoy_pct
+        description: "Variação percentual ano a ano (YoY) do índice de atividade econômica IBC-Br frente ao mesmo mês do ano anterior."
+      - name: regime_politica_monetaria
+        description: "Classificação analítica da postura da política monetária (CONTRACIONISTA, NEUTRO, EXPANSIONISTA)."
+        tests:
+          - not_null
+      - name: classificacao_inflacao_meta
+        description: "Enquadramento da inflação acumulada de 12 meses frente às metas e bandas de tolerância do CMN."
+        tests:
+          - not_null

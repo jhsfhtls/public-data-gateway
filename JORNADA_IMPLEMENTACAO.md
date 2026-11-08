@@ -14,10 +14,10 @@ Este artefato constitui a **Fonte Única da Verdade Operacional (SSOT)** do stat
 
 ## 1. Painel de Status Executivo em Tempo Real
 
-- **Macrofase Ativa:** `Fase 03-SPIKE — Golden Spike ibge_localidades (5 Tabelas, dbt, Negócio Territorial & Live Fail-Hard)`
+- **Macrofase Ativa:** `Fase 03 — Ingestão Wave 1 (Macroeconomia & Borda: bcb_sgs, bcb_olinda_ptax, brasilapi_core)`
 - **Status Geral de Governança:** `🟢 ON_TRACK`
-- **Conector Ativo em Desenvolvimento:** `ibge_localidades`
-- **Próximo Conector na Fila de Execução:** `bcb_sgs` (Wave 1 — Prioridade RICE 950)
+- **Conector Ativo em Desenvolvimento:** `bcb_sgs`
+- **Próximo Conector na Fila de Execução:** `bcb_olinda_ptax` (Wave 1 — Prioridade RICE 950)
 - **Progresso Estrutural das Macrofases:** **4 de 11 Concluídas (36.4%)**
 - **Universo de Fontes Homologadas no Catálogo:** **49 fontes públicas** nos 13 macrosegmentos
 
@@ -51,21 +51,21 @@ flowchart LR
 
 ## 3. Checklist dos 9 Gates de Qualidade do Conector Ativo
 
-Todo conector integrado ao `brazil-data-gateway` deve percorrer rigorosamente os **9 Gates de Qualidade** antes de ser promovido a `HOMOLOGATED`. O alvo atual do ciclo de vida é o conector `ibge_localidades` (Wave 1):
+Todo conector integrado ao `brazil-data-gateway` deve percorrer rigorosamente os **9 Gates de Qualidade** antes de ser promovido a `HOMOLOGATED`. O alvo atual do ciclo de vida é o conector `bcb_sgs` (Wave 1):
 
 | Gate | Nome do Gate de Homologação | Critério Operacional de Aceite (`POP_T_070` / `POP_T_074` / `POP_T_177`) | Status |
 | :---: | :--- | :--- | :---: |
-| **GATE_01** | **Contrato Declarativo ODCS v3.1 das N Tabelas da API** | Schema tipado, chaves primárias STRING e regras para municipios, distritos, subdistritos, estados e regioes. | ⚪ NÃO INICIADO |
-| **GATE_02** | **Ingestão Bronze Isolada (Todas as Tabelas) & Cache WAL** | Download resiliente das 5 tabelas em data/ibge_localidades/bronze/ com cache SQLite WAL. | ⚪ NÃO INICIADO |
-| **GATE_03** | **Sanitização de Sentinelas & Nulls** | Conversão determinística de códigos sentinela em NULLs reais em todas as tabelas. | ⚪ NÃO INICIADO |
-| **GATE_04** | **Materialização Silver Parquet Isolada (Todas as Tabelas)** | Gravação de municipios.parquet, distritos.parquet, etc., em data/ibge_localidades/silver/ com SHA-256. | ⚪ NÃO INICIADO |
-| **GATE_05** | **Validação dos 5 Pilares & Quarentena** | Aprovação em Freshness, Volume, Schema, Null Ceiling e Lineage; desvio para data/ibge_localidades/quarantine/ se violado. | ⚪ NÃO INICIADO |
-| **GATE_06** | **Gold Feature View Isolada & ASOF Join ML** | Features analíticas agregadas em data/ibge_localidades/gold/ com suporte comprovado a point-in-time join para modelos preditivos. | ⚪ NÃO INICIADO |
-| **GATE_07** | **Integração ao EnrichmentEngine** | Disponibilização para enriquecimento cadastral batch/online respeitando o Client Path Shield (POP_T_154). | ⚪ NÃO INICIADO |
+| **GATE_01** | **Contrato Declarativo ODCS v3.1 das N Tabelas da API** | Schema tipado, chaves primárias STRING e regras para catalogo, ipca, igpm, selic, cdi e ibcbr. | ⚪ NÃO INICIADO |
+| **GATE_02** | **Ingestão Bronze Isolada (Todas as Tabelas) & Cache WAL** | Download resiliente das 6 tabelas em data/bcb_sgs/bronze/ com cache SQLite WAL. | ⚪ NÃO INICIADO |
+| **GATE_03** | **Sanitização de Sentinelas & Nulls** | Conversão determinística de códigos sentinela e hífens em NULLs reais em todas as tabelas. | ⚪ NÃO INICIADO |
+| **GATE_04** | **Materialização Silver Parquet Isolada (Todas as Tabelas)** | Gravação de sgs_catalogo.parquet, sgs_ipca.parquet, etc., em data/bcb_sgs/silver/ com SHA-256. | ⚪ NÃO INICIADO |
+| **GATE_05** | **Validação dos 5 Pilares & Quarentena** | Aprovação em Freshness, Volume, Schema, Null Ceiling e Lineage; desvio para data/bcb_sgs/quarantine/ se violado. | ⚪ NÃO INICIADO |
+| **GATE_06** | **Gold Feature View Isolada & ASOF Join ML** | Features analíticas agregadas em data/bcb_sgs/gold/features_macro_brasil.parquet com cálculo de juros reais e spreads. | ⚪ NÃO INICIADO |
+| **GATE_07** | **Integração ao EnrichmentEngine** | Disponibilização para enriquecimento econômico batch/online respeitando o Client Path Shield (POP_T_154). | ⚪ NÃO INICIADO |
 | **GATE_08** | **Exposição Multi-Interface** | Exposição síncrona/analítica simultânea via Python SDK (BrazilData), REST (/api/v1), CLI (bdg) e Servidor MCP (bdg-mcp). | ⚪ NÃO INICIADO |
-| **GATE_09** | **Bateria de Testes Offline com Cidades Diversas** | Testes unitários offline com fixtures locais cobrindo cidades de todas as 5 macrorregiões nas 5 tabelas. | ⚪ NÃO INICIADO |
-| **GATE_10** | **dbt Staging, source.yml e 100% Colunas Documentadas** | Pasta connectors/.../ibge_localidades/dbt/ com source.yml próprio, 5 modelos staging e _models.yml com 100% de colunas documentadas. | ⚪ NÃO INICIADO |
-| **GATE_11** | **Teste Real de 1 Linha com API ao Vivo (Fail-Hard)** | Execução obrigatória contra os 5 endpoints oficiais ao vivo limitados a 1 registro; falha de qualquer endpoint reprova o pipeline. | ⚪ NÃO INICIADO |
+| **GATE_09** | **Bateria de Testes Offline com Períodos Diversos** | Testes unitários offline com fixtures cobrindo ciclos de crise (2020), inflação alta (2021-2022) e recente (2024-2026). | ⚪ NÃO INICIADO |
+| **GATE_10** | **dbt Staging, source.yml e 100% Colunas Documentadas** | Pasta connectors/.../bcb_sgs/dbt/ com source.yml próprio, 6 modelos staging e _models.yml com 100% de colunas documentadas. | ⚪ NÃO INICIADO |
+| **GATE_11** | **Teste Real de 1 Linha com API ao Vivo (Fail-Hard)** | Execução obrigatória contra os 7 endpoints oficiais do BACEN SGS ao vivo limitados a 1 registro; falha reprova o pipeline. | ⚪ NÃO INICIADO |
 
 ---
 
@@ -111,6 +111,7 @@ O `brazil-data-gateway` atua como barramento alimentador de dados para os **10 P
 | `2026-11-07` | **Fase 01** | **Setup do Repositório Satélite & Workflows CI** | Inicialização do repositório satélite brazil-data-gateway com isolamento venv Python 3.12, pyproject.toml, requirements.txt pinados, templates de PR e workflows de CI (pr-lint e ci.yml). |
 | `2026-11-07` | **Fase 02** | **Catálogo Mestre (49 Fontes), Normalização Canônica & Interfaces Unificadas** | Catalogação formal de 49 fontes públicas nos 13 macrosegmentos e Ondas 1..6; sanitização da base de referência dos 5.571 municípios brasileiros; implementação dos motores determinísticos render_catalog.py e render_progress.py com verificação --check. |
 | `2026-11-07` | **Fase 03-SPIKE** | **Homologação do Golden Spike ibge_localidades (5 Tabelas, dbt, Negócio & Live Fail-Hard)** | Execução completa do Golden Spike: 5 tabelas da API do IBGE (5.571 municípios, 10.751 distritos, 646 subdistritos, 27 UFs, 5 regiões) materializadas em data/ibge_localidades/{bronze,silver,gold}/; 9 modelos dbt (5 staging, dim_municipio, dim_distrito, xwalk_ibge_6d_7d, mart_hierarquia_territorial_brasil) com 109 testes 100% aprovados; 108 colunas 100% documentadas no linter; testes reais de 1 linha com fail-hard e suite com 35 testes unitários/integração 100% verde. |
+| `2026-11-07` | **Fase 03** | **Homologação do Conector bcb_sgs (6 Tabelas, dbt, Mart Macroeconômico & Live Fail-Hard)** | Implementação de ponta a ponta do conector bcb_sgs: 6 tabelas (sgs_catalogo, sgs_ipca, sgs_igpm, sgs_selic, sgs_cdi, sgs_ibcbr) materializadas em data/bcb_sgs/{bronze,silver,gold}/; 9 novos modelos dbt (6 staging, dim_serie_macroeconomica, fct_macro_indicadores_mensal, mart_cenario_macroeconomico_brasil) com 167 testes dbt 100% aprovados; 195 colunas 100% documentadas no linter; testes reais de 1 linha com fail-hard contra os 7 endpoints oficiais do BACEN e suíte offline com 37 testes pytest 100% verde. |
 
 ---
 

@@ -1,0 +1,65 @@
+[
+  {
+    "id_serie": "433",
+    "nome_serie": "IPCA - Variação mensal (%)",
+    "periodicidade": "MENSAL",
+    "unidade_medida": "% a.m.",
+    "orgao_gestor": "BACEN / IBGE",
+    "categoria": "INFLACAO",
+    "data_inicio_historico": "1980-01-01"
+  },
+  {
+    "id_serie": "13522",
+    "nome_serie": "IPCA - Acumulado 12 meses (%)",
+    "periodicidade": "MENSAL",
+    "unidade_medida": "% a.a.",
+    "orgao_gestor": "BACEN / IBGE",
+    "categoria": "INFLACAO",
+    "data_inicio_historico": "1980-12-01"
+  },
+  {
+    "id_serie": "189",
+    "nome_serie": "IGP-M - Variação mensal (%)",
+    "periodicidade": "MENSAL",
+    "unidade_medida": "% a.m.",
+    "orgao_gestor": "BACEN / FGV",
+    "categoria": "INFLACAO",
+    "data_inicio_historico": "1989-06-01"
+  },
+  {
+    "id_serie": "11",
+    "nome_serie": "Taxa Selic diária anualizada base 252 (%)",
+    "periodicidade": "DIARIA",
+    "unidade_medida": "% a.a.",
+    "orgao_gestor": "BACEN / COPOM",
+    "categoria": "JUROS",
+    "data_inicio_historico": "1986-06-04"
+  },
+  {
+    "id_serie": "432",
+    "nome_serie": "Taxa Selic - Meta definida pelo Copom (% a.a.)",
+    "periodicidade": "REUNIAO_COPOM",
+    "unidade_medida": "% a.a.",
+    "orgao_gestor": "BACEN / COPOM",
+    "categoria": "JUROS",
+    "data_inicio_historico": "1999-03-05"
+  },
+  {
+    "id_serie": "12",
+    "nome_serie": "Taxa CDI diária anualizada base 252 (%)",
+    "periodicidade": "DIARIA",
+    "unidade_medida": "% a.a.",
+    "orgao_gestor": "BACEN / B3",
+    "categoria": "JUROS",
+    "data_inicio_historico": "1986-03-06"
+  },
+  {
+    "id_serie": "24363",
+    "nome_serie": "Índice de Atividade Econômica do Banco Central (IBC-Br dessazonalizado)",
+    "periodicidade": "MENSAL",
+    "unidade_medida": "Número Índice",
+    "orgao_gestor": "BACEN",
+    "categoria": "ATIVIDADE_ECONOMICA",
+    "data_inicio_historico": "2003-01-01"
+  }
+]

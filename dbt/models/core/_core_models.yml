@@ -161,3 +161,72 @@ models:
         description: "Timestamp ISO-8601 da extração."
         tests:
           - not_null
+
+  - name: dim_serie_macroeconomica
+    description: "Dimensão conformada de séries temporais macroeconômicas gerenciadas pelo Banco Central e parceiros (IBGE, FGV, B3)."
+    columns:
+      - name: id_serie
+        description: "Código numérico identificador exclusivo da série no SGS do Banco Central."
+        tests:
+          - unique
+          - not_null
+      - name: nome_serie
+        description: "Nome oficial descritivo da série macroeconômica cadastrada."
+        tests:
+          - not_null
+      - name: periodicidade
+        description: "Periodicidade oficial de apuração da série (ex: MENSAL, DIARIA, REUNIAO_COPOM)."
+        tests:
+          - not_null
+      - name: unidade_medida
+        description: "Unidade de medida oficial da série (ex: % a.m., % a.a., Número Índice)."
+        tests:
+          - not_null
+      - name: orgao_gestor
+        description: "Entidade ou autarquia responsável pela apuração primária ou compilação da série."
+        tests:
+          - not_null
+      - name: categoria
+        description: "Segmentação temática analítica da série (ex: INFLACAO, JUROS, ATIVIDADE_ECONOMICA)."
+        tests:
+          - not_null
+      - name: data_inicio_historico
+        description: "Data da primeira observação registrada no histórico oficial da série temporal."
+        tests:
+          - not_null
+      - name: reference_date
+        description: "Ano/Data de competência do catálogo cadastral (YYYY-MM-DD)."
+        tests:
+          - not_null
+      - name: extracted_at
+        description: "Timestamp ISO-8601 do momento da extração dos metadados."
+        tests:
+          - not_null
+
+  - name: fct_macro_indicadores_mensal
+    description: "Tabela fato conformatória mensal unificando inflação (IPCA, IGP-M), juros (Selic Meta, Selic média, CDI) e atividade econômica (IBC-Br)."
+    columns:
+      - name: ano_mes
+        description: "Ano e mês de competência das observações macroeconômicas (YYYY-MM)."
+        tests:
+          - unique
+          - not_null
+      - name: data_competencia
+        description: "Primeiro dia do mês de competência das observações macroeconômicas (YYYY-MM-01)."
+        tests:
+          - not_null
+      - name: ipca_mensal_pct
+        description: "Taxa mensal de variação do IPCA apurada pelo IBGE para a competência (% a.m.)."
+      - name: ipca_acumulado_12m_pct
+        description: "Taxa acumulada em 12 meses do IPCA na competência de referência (% a.a.)."
+      - name: igpm_mensal_pct
+        description: "Taxa mensal de variação do IGP-M apurada pela FGV para a competência (% a.m.)."
+      - name: selic_meta_fim_mes_pct
+        description: "Meta para a Taxa Selic anual fixada pelo Copom vigente no encerramento da competência (% a.a.)."
+      - name: selic_diaria_media_mensal_pct
+        description: "Média aritmética simples das taxas Selic diárias apuradas nos dias úteis da competência (% a.a.)."
+      - name: cdi_diario_medio_mensal_pct
+        description: "Média aritmética simples das taxas CDI diárias apuradas pela B3 nos dias úteis da competência (% a.a.)."
+      - name: ibcbr_indice
+        description: "Número índice dessazonalizado do IBC-Br divulgado pelo Banco Central para a competência."
+
