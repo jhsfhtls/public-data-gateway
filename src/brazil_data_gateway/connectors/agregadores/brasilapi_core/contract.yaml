@@ -1,0 +1,56 @@
+contract_id: "ODCS-BR-BRASILAPI-CORE-001"
+source_id: "brasilapi_core"
+version: "1.0.0"
+grain: "One row per banking institution / participant / broker / holiday / ddd / cep"
+primary_keys:
+  - "ispb"
+canonical_keys:
+  - "cep_8"
+  - "cnpj_14"
+  - "sigla_uf"
+reference_date_column: "reference_date"
+lgpd_legal_basis: "Art. 7, § 3 (Public Data - LAI Law 12.527/2011 & BrasilAPI Community)"
+min_expected_rows: 10
+max_volume_drop_pct: 1.0
+sentinel_values:
+  - "-1"
+  - "99"
+  - "999"
+  - "SEM INFORMACAO"
+  - "IGNORADO"
+  - "N/A"
+  - "-"
+columns:
+  - name: "ispb"
+    data_type: "string"
+    required: true
+    is_primary_key: true
+    description: "Identificador do Sistema de Pagamentos Brasileiro com 8 dígitos canônicos"
+  - name: "codigo_compensacao"
+    data_type: "string"
+    required: false
+    description: "Código COMPE de compensação bancária com 3 dígitos"
+  - name: "nome_reduzido"
+    data_type: "string"
+    required: true
+    description: "Nome comercial resumido da instituição bancária"
+  - name: "nome_completo"
+    data_type: "string"
+    required: true
+    description: "Razão social completa cadastrada no Banco Central"
+  - name: "cidade_sede"
+    data_type: "string"
+    required: false
+    description: "Município sede administrativa da instituição"
+  - name: "uf_sede"
+    data_type: "string"
+    required: false
+    description: "Sigla de 2 letras da UF da sede"
+  - name: "reference_date"
+    data_type: "string"
+    required: true
+    description: "Data/Competência de referência da base cadastral (YYYY-MM-DD)"
+  - name: "extracted_at"
+    data_type: "string"
+    required: true
+    description: "Timestamp ISO-8601 da extração dos dados"

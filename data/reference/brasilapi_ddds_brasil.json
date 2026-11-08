@@ -1,0 +1,3127 @@
+[
+  {
+    "ddd": "11",
+    "sigla_uf": "SP",
+    "nome_municipio": "EMBU"
+  },
+  {
+    "ddd": "11",
+    "sigla_uf": "SP",
+    "nome_municipio": "VÁRZEA PAULISTA"
+  },
+  {
+    "ddd": "11",
+    "sigla_uf": "SP",
+    "nome_municipio": "VARGEM GRANDE PAULISTA"
+  },
+  {
+    "ddd": "11",
+    "sigla_uf": "SP",
+    "nome_municipio": "VARGEM"
+  },
+  {
+    "ddd": "11",
+    "sigla_uf": "SP",
+    "nome_municipio": "TUIUTI"
+  },
+  {
+    "ddd": "11",
+    "sigla_uf": "SP",
+    "nome_municipio": "TABOÃO DA SERRA"
+  },
+  {
+    "ddd": "11",
+    "sigla_uf": "SP",
+    "nome_municipio": "SUZANO"
+  },
+  {
+    "ddd": "11",
+    "sigla_uf": "SP",
+    "nome_municipio": "SÃO ROQUE"
+  },
+  {
+    "ddd": "11",
+    "sigla_uf": "SP",
+    "nome_municipio": "SÃO PAULO"
+  },
+  {
+    "ddd": "11",
+    "sigla_uf": "SP",
+    "nome_municipio": "SÃO LOURENÇO DA SERRA"
+  },
+  {
+    "ddd": "11",
+    "sigla_uf": "SP",
+    "nome_municipio": "SÃO CAETANO DO SUL"
+  },
+  {
+    "ddd": "11",
+    "sigla_uf": "SP",
+    "nome_municipio": "SÃO BERNARDO DO CAMPO"
+  },
+  {
+    "ddd": "11",
+    "sigla_uf": "SP",
+    "nome_municipio": "SANTO ANDRÉ"
+  },
+  {
+    "ddd": "11",
+    "sigla_uf": "SP",
+    "nome_municipio": "SANTANA DE PARNAÍBA"
+  },
+  {
+    "ddd": "11",
+    "sigla_uf": "SP",
+    "nome_municipio": "SANTA ISABEL"
+  },
+  {
+    "ddd": "11",
+    "sigla_uf": "SP",
+    "nome_municipio": "SALTO"
+  },
+  {
+    "ddd": "11",
+    "sigla_uf": "SP",
+    "nome_municipio": "SALESÓPOLIS"
+  },
+  {
+    "ddd": "11",
+    "sigla_uf": "SP",
+    "nome_municipio": "RIO GRANDE DA SERRA"
+  },
+  {
+    "ddd": "11",
+    "sigla_uf": "SP",
+    "nome_municipio": "RIBEIRÃO PIRES"
+  },
+  {
+    "ddd": "11",
+    "sigla_uf": "SP",
+    "nome_municipio": "POÁ"
+  },
+  {
+    "ddd": "11",
+    "sigla_uf": "SP",
+    "nome_municipio": "PIRAPORA DO BOM JESUS"
+  },
+  {
+    "ddd": "11",
+    "sigla_uf": "SP",
+    "nome_municipio": "PIRACAIA"
+  },
+  {
+    "ddd": "11",
+    "sigla_uf": "SP",
+    "nome_municipio": "PINHALZINHO"
+  },
+  {
+    "ddd": "11",
+    "sigla_uf": "SP",
+    "nome_municipio": "PEDRA BELA"
+  },
+  {
+    "ddd": "11",
+    "sigla_uf": "SP",
+    "nome_municipio": "OSASCO"
+  },
+  {
+    "ddd": "11",
+    "sigla_uf": "SP",
+    "nome_municipio": "NAZARÉ PAULISTA"
+  },
+  {
+    "ddd": "11",
+    "sigla_uf": "SP",
+    "nome_municipio": "MORUNGABA"
+  },
+  {
+    "ddd": "11",
+    "sigla_uf": "SP",
+    "nome_municipio": "MOGI DAS CRUZES"
+  },
+  {
+    "ddd": "11",
+    "sigla_uf": "SP",
+    "nome_municipio": "MAUÁ"
+  },
+  {
+    "ddd": "11",
+    "sigla_uf": "SP",
+    "nome_municipio": "MAIRIPORÃ"
+  },
+  {
+    "ddd": "11",
+    "sigla_uf": "SP",
+    "nome_municipio": "MAIRINQUE"
+  },
+  {
+    "ddd": "11",
+    "sigla_uf": "SP",
+    "nome_municipio": "JUQUITIBA"
+  },
+  {
+    "ddd": "11",
+    "sigla_uf": "SP",
+    "nome_municipio": "JUNDIAÍ"
+  },
+  {
+    "ddd": "11",
+    "sigla_uf": "SP",
+    "nome_municipio": "JOANÓPOLIS"
+  },
+  {
+    "ddd": "11",
+    "sigla_uf": "SP",
+    "nome_municipio": "JARINU"
+  },
+  {
+    "ddd": "11",
+    "sigla_uf": "SP",
+    "nome_municipio": "JANDIRA"
+  },
+  {
+    "ddd": "11",
+    "sigla_uf": "SP",
+    "nome_municipio": "ITUPEVA"
+  },
+  {
+    "ddd": "11",
+    "sigla_uf": "SP",
+    "nome_municipio": "ITU"
+  },
+  {
+    "ddd": "11",
+    "sigla_uf": "SP",
+    "nome_municipio": "ITATIBA"
+  },
+  {
+    "ddd": "11",
+    "sigla_uf": "SP",
+    "nome_municipio": "ITAQUAQUECETUBA"
+  },
+  {
+    "ddd": "11",
+    "sigla_uf": "SP",
+    "nome_municipio": "ITAPEVI"
+  },
+  {
+    "ddd": "11",
+    "sigla_uf": "SP",
+    "nome_municipio": "ITAPECERICA DA SERRA"
+  },
+  {
+    "ddd": "11",
+    "sigla_uf": "SP",
+    "nome_municipio": "IGARATÁ"
+  },
+  {
+    "ddd": "11",
+    "sigla_uf": "SP",
+    "nome_municipio": "GUARULHOS"
+  },
+  {
+    "ddd": "11",
+    "sigla_uf": "SP",
+    "nome_municipio": "GUARAREMA"
+  },
+  {
+    "ddd": "11",
+    "sigla_uf": "SP",
+    "nome_municipio": "FRANCO DA ROCHA"
+  },
+  {
+    "ddd": "11",
+    "sigla_uf": "SP",
+    "nome_municipio": "FRANCISCO MORATO"
+  },
+  {
+    "ddd": "11",
+    "sigla_uf": "SP",
+    "nome_municipio": "FERRAZ DE VASCONCELOS"
+  },
+  {
+    "ddd": "11",
+    "sigla_uf": "SP",
+    "nome_municipio": "EMBU-GUAÇU"
+  },
+  {
+    "ddd": "11",
+    "sigla_uf": "SP",
+    "nome_municipio": "DIADEMA"
+  },
+  {
+    "ddd": "11",
+    "sigla_uf": "SP",
+    "nome_municipio": "COTIA"
+  },
+  {
+    "ddd": "11",
+    "sigla_uf": "SP",
+    "nome_municipio": "CARAPICUÍBA"
+  },
+  {
+    "ddd": "11",
+    "sigla_uf": "SP",
+    "nome_municipio": "CAMPO LIMPO PAULISTA"
+  },
+  {
+    "ddd": "11",
+    "sigla_uf": "SP",
+    "nome_municipio": "CAJAMAR"
+  },
+  {
+    "ddd": "11",
+    "sigla_uf": "SP",
+    "nome_municipio": "CAIEIRAS"
+  },
+  {
+    "ddd": "11",
+    "sigla_uf": "SP",
+    "nome_municipio": "CABREÚVA"
+  },
+  {
+    "ddd": "11",
+    "sigla_uf": "SP",
+    "nome_municipio": "BRAGANÇA PAULISTA"
+  },
+  {
+    "ddd": "11",
+    "sigla_uf": "SP",
+    "nome_municipio": "BOM JESUS DOS PERDÕES"
+  },
+  {
+    "ddd": "11",
+    "sigla_uf": "SP",
+    "nome_municipio": "BIRITIBA-MIRIM"
+  },
+  {
+    "ddd": "11",
+    "sigla_uf": "SP",
+    "nome_municipio": "BARUERI"
+  },
+  {
+    "ddd": "11",
+    "sigla_uf": "SP",
+    "nome_municipio": "ATIBAIA"
+  },
+  {
+    "ddd": "11",
+    "sigla_uf": "SP",
+    "nome_municipio": "ARUJÁ"
+  },
+  {
+    "ddd": "11",
+    "sigla_uf": "SP",
+    "nome_municipio": "ARAÇARIGUAMA"
+  },
+  {
+    "ddd": "11",
+    "sigla_uf": "SP",
+    "nome_municipio": "ALUMÍNIO"
+  },
+  {
+    "ddd": "21",
+    "sigla_uf": "RJ",
+    "nome_municipio": "TERESÓPOLIS"
+  },
+  {
+    "ddd": "21",
+    "sigla_uf": "RJ",
+    "nome_municipio": "TANGUÁ"
+  },
+  {
+    "ddd": "21",
+    "sigla_uf": "RJ",
+    "nome_municipio": "SEROPÉDICA"
+  },
+  {
+    "ddd": "21",
+    "sigla_uf": "RJ",
+    "nome_municipio": "SÃO JOÃO DE MERITI"
+  },
+  {
+    "ddd": "21",
+    "sigla_uf": "RJ",
+    "nome_municipio": "SÃO GONÇALO"
+  },
+  {
+    "ddd": "21",
+    "sigla_uf": "RJ",
+    "nome_municipio": "RIO DE JANEIRO"
+  },
+  {
+    "ddd": "21",
+    "sigla_uf": "RJ",
+    "nome_municipio": "RIO BONITO"
+  },
+  {
+    "ddd": "21",
+    "sigla_uf": "RJ",
+    "nome_municipio": "QUEIMADOS"
+  },
+  {
+    "ddd": "21",
+    "sigla_uf": "RJ",
+    "nome_municipio": "PARACAMBI"
+  },
+  {
+    "ddd": "21",
+    "sigla_uf": "RJ",
+    "nome_municipio": "NOVA IGUAÇU"
+  },
+  {
+    "ddd": "21",
+    "sigla_uf": "RJ",
+    "nome_municipio": "NITERÓI"
+  },
+  {
+    "ddd": "21",
+    "sigla_uf": "RJ",
+    "nome_municipio": "NILÓPOLIS"
+  },
+  {
+    "ddd": "21",
+    "sigla_uf": "RJ",
+    "nome_municipio": "MESQUITA"
+  },
+  {
+    "ddd": "21",
+    "sigla_uf": "RJ",
+    "nome_municipio": "MARICÁ"
+  },
+  {
+    "ddd": "21",
+    "sigla_uf": "RJ",
+    "nome_municipio": "MANGARATIBA"
+  },
+  {
+    "ddd": "21",
+    "sigla_uf": "RJ",
+    "nome_municipio": "MAGÉ"
+  },
+  {
+    "ddd": "21",
+    "sigla_uf": "RJ",
+    "nome_municipio": "JAPERI"
+  },
+  {
+    "ddd": "21",
+    "sigla_uf": "RJ",
+    "nome_municipio": "ITAGUAÍ"
+  },
+  {
+    "ddd": "21",
+    "sigla_uf": "RJ",
+    "nome_municipio": "ITABORAÍ"
+  },
+  {
+    "ddd": "21",
+    "sigla_uf": "RJ",
+    "nome_municipio": "GUAPIMIRIM"
+  },
+  {
+    "ddd": "21",
+    "sigla_uf": "RJ",
+    "nome_municipio": "DUQUE DE CAXIAS"
+  },
+  {
+    "ddd": "21",
+    "sigla_uf": "RJ",
+    "nome_municipio": "CACHOEIRAS DE MACACU"
+  },
+  {
+    "ddd": "21",
+    "sigla_uf": "RJ",
+    "nome_municipio": "BELFORD ROXO"
+  },
+  {
+    "ddd": "31",
+    "sigla_uf": "MG",
+    "nome_municipio": "QUELUZITA"
+  },
+  {
+    "ddd": "31",
+    "sigla_uf": "MG",
+    "nome_municipio": "VIÇOSA"
+  },
+  {
+    "ddd": "31",
+    "sigla_uf": "MG",
+    "nome_municipio": "VESPASIANO"
+  },
+  {
+    "ddd": "31",
+    "sigla_uf": "MG",
+    "nome_municipio": "URUCÂNIA"
+  },
+  {
+    "ddd": "31",
+    "sigla_uf": "MG",
+    "nome_municipio": "TIMÓTEO"
+  },
+  {
+    "ddd": "31",
+    "sigla_uf": "MG",
+    "nome_municipio": "TEIXEIRAS"
+  },
+  {
+    "ddd": "31",
+    "sigla_uf": "MG",
+    "nome_municipio": "TAQUARAÇU DE MINAS"
+  },
+  {
+    "ddd": "31",
+    "sigla_uf": "MG",
+    "nome_municipio": "SETE LAGOAS"
+  },
+  {
+    "ddd": "31",
+    "sigla_uf": "MG",
+    "nome_municipio": "SERICITA"
+  },
+  {
+    "ddd": "31",
+    "sigla_uf": "MG",
+    "nome_municipio": "SENHORA DE OLIVEIRA"
+  },
+  {
+    "ddd": "31",
+    "sigla_uf": "MG",
+    "nome_municipio": "SEM-PEIXE"
+  },
+  {
+    "ddd": "31",
+    "sigla_uf": "MG",
+    "nome_municipio": "SARZEDO"
+  },
+  {
+    "ddd": "31",
+    "sigla_uf": "MG",
+    "nome_municipio": "SÃO SEBASTIÃO DO RIO PRETO"
+  },
+  {
+    "ddd": "31",
+    "sigla_uf": "MG",
+    "nome_municipio": "SÃO MIGUEL DO ANTA"
+  },
+  {
+    "ddd": "31",
+    "sigla_uf": "MG",
+    "nome_municipio": "SÃO JOSÉ DO GOIABAL"
+  },
+  {
+    "ddd": "31",
+    "sigla_uf": "MG",
+    "nome_municipio": "SÃO JOSÉ DA LAPA"
+  },
+  {
+    "ddd": "31",
+    "sigla_uf": "MG",
+    "nome_municipio": "SÃO JOAQUIM DE BICAS"
+  },
+  {
+    "ddd": "31",
+    "sigla_uf": "MG",
+    "nome_municipio": "SÃO GONÇALO DO RIO ABAIXO"
+  },
+  {
+    "ddd": "31",
+    "sigla_uf": "MG",
+    "nome_municipio": "SÃO DOMINGOS DO PRATA"
+  },
+  {
+    "ddd": "31",
+    "sigla_uf": "MG",
+    "nome_municipio": "SÃO BRÁS DO SUAÇUÍ"
+  },
+  {
+    "ddd": "31",
+    "sigla_uf": "MG",
+    "nome_municipio": "SANTO ANTÔNIO DO RIO ABAIXO"
+  },
+  {
+    "ddd": "31",
+    "sigla_uf": "MG",
+    "nome_municipio": "SANTO ANTÔNIO DO GRAMA"
+  },
+  {
+    "ddd": "31",
+    "sigla_uf": "MG",
+    "nome_municipio": "SANTANA DOS MONTES"
+  },
+  {
+    "ddd": "31",
+    "sigla_uf": "MG",
+    "nome_municipio": "SANTANA DO RIACHO"
+  },
+  {
+    "ddd": "31",
+    "sigla_uf": "MG",
+    "nome_municipio": "SANTANA DO PARAÍSO"
+  },
+  {
+    "ddd": "31",
+    "sigla_uf": "MG",
+    "nome_municipio": "SANTANA DE PIRAPAMA"
+  },
+  {
+    "ddd": "31",
+    "sigla_uf": "MG",
+    "nome_municipio": "SANTA MARIA DE ITABIRA"
+  },
+  {
+    "ddd": "31",
+    "sigla_uf": "MG",
+    "nome_municipio": "SANTA MARGARIDA"
+  },
+  {
+    "ddd": "31",
+    "sigla_uf": "MG",
+    "nome_municipio": "SANTA LUZIA"
+  },
+  {
+    "ddd": "31",
+    "sigla_uf": "MG",
+    "nome_municipio": "SANTA CRUZ DO ESCALVADO"
+  },
+  {
+    "ddd": "31",
+    "sigla_uf": "MG",
+    "nome_municipio": "SANTA BÁRBARA"
+  },
+  {
+    "ddd": "31",
+    "sigla_uf": "MG",
+    "nome_municipio": "SABARÁ"
+  },
+  {
+    "ddd": "31",
+    "sigla_uf": "MG",
+    "nome_municipio": "RIO PIRACICABA"
+  },
+  {
+    "ddd": "31",
+    "sigla_uf": "MG",
+    "nome_municipio": "RIO MANSO"
+  },
+  {
+    "ddd": "31",
+    "sigla_uf": "MG",
+    "nome_municipio": "RIO ESPERA"
+  },
+  {
+    "ddd": "31",
+    "sigla_uf": "MG",
+    "nome_municipio": "RIO DOCE"
+  },
+  {
+    "ddd": "31",
+    "sigla_uf": "MG",
+    "nome_municipio": "RIO CASCA"
+  },
+  {
+    "ddd": "31",
+    "sigla_uf": "MG",
+    "nome_municipio": "RIO ACIMA"
+  },
+  {
+    "ddd": "31",
+    "sigla_uf": "MG",
+    "nome_municipio": "RIBEIRÃO DAS NEVES"
+  },
+  {
+    "ddd": "31",
+    "sigla_uf": "MG",
+    "nome_municipio": "RAPOSOS"
+  },
+  {
+    "ddd": "31",
+    "sigla_uf": "MG",
+    "nome_municipio": "PRUDENTE DE MORAIS"
+  },
+  {
+    "ddd": "31",
+    "sigla_uf": "MG",
+    "nome_municipio": "PORTO FIRME"
+  },
+  {
+    "ddd": "31",
+    "sigla_uf": "MG",
+    "nome_municipio": "PONTE NOVA"
+  },
+  {
+    "ddd": "31",
+    "sigla_uf": "MG",
+    "nome_municipio": "PIRANGA"
+  },
+  {
+    "ddd": "31",
+    "sigla_uf": "MG",
+    "nome_municipio": "PIEDADE DOS GERAIS"
+  },
+  {
+    "ddd": "31",
+    "sigla_uf": "MG",
+    "nome_municipio": "PIEDADE DE PONTE NOVA"
+  },
+  {
+    "ddd": "31",
+    "sigla_uf": "MG",
+    "nome_municipio": "PEDRO LEOPOLDO"
+  },
+  {
+    "ddd": "31",
+    "sigla_uf": "MG",
+    "nome_municipio": "PEDRA DO ANTA"
+  },
+  {
+    "ddd": "31",
+    "sigla_uf": "MG",
+    "nome_municipio": "PEDRA BONITA"
+  },
+  {
+    "ddd": "31",
+    "sigla_uf": "MG",
+    "nome_municipio": "PASSABÉM"
+  },
+  {
+    "ddd": "31",
+    "sigla_uf": "MG",
+    "nome_municipio": "PARAOPEBA"
+  },
+  {
+    "ddd": "31",
+    "sigla_uf": "MG",
+    "nome_municipio": "OURO PRETO"
+  },
+  {
+    "ddd": "31",
+    "sigla_uf": "MG",
+    "nome_municipio": "OURO BRANCO"
+  },
+  {
+    "ddd": "31",
+    "sigla_uf": "MG",
+    "nome_municipio": "ORATÓRIOS"
+  },
+  {
+    "ddd": "31",
+    "sigla_uf": "MG",
+    "nome_municipio": "NOVA LIMA"
+  },
+  {
+    "ddd": "31",
+    "sigla_uf": "MG",
+    "nome_municipio": "NOVA ERA"
+  },
+  {
+    "ddd": "31",
+    "sigla_uf": "MG",
+    "nome_municipio": "MORRO DO PILAR"
+  },
+  {
+    "ddd": "31",
+    "sigla_uf": "MG",
+    "nome_municipio": "MOEDA"
+  },
+  {
+    "ddd": "31",
+    "sigla_uf": "MG",
+    "nome_municipio": "MATOZINHOS"
+  },
+  {
+    "ddd": "31",
+    "sigla_uf": "MG",
+    "nome_municipio": "MATIPÓ"
+  },
+  {
+    "ddd": "31",
+    "sigla_uf": "MG",
+    "nome_municipio": "MATEUS LEME"
+  },
+  {
+    "ddd": "31",
+    "sigla_uf": "MG",
+    "nome_municipio": "MARLIÉRIA"
+  },
+  {
+    "ddd": "31",
+    "sigla_uf": "MG",
+    "nome_municipio": "MÁRIO CAMPOS"
+  },
+  {
+    "ddd": "31",
+    "sigla_uf": "MG",
+    "nome_municipio": "MARIANA"
+  },
+  {
+    "ddd": "31",
+    "sigla_uf": "MG",
+    "nome_municipio": "LAMIM"
+  },
+  {
+    "ddd": "31",
+    "sigla_uf": "MG",
+    "nome_municipio": "LAGOA SANTA"
+  },
+  {
+    "ddd": "31",
+    "sigla_uf": "MG",
+    "nome_municipio": "JUATUBA"
+  },
+  {
+    "ddd": "31",
+    "sigla_uf": "MG",
+    "nome_municipio": "NOVA UNIÃO"
+  },
+  {
+    "ddd": "31",
+    "sigla_uf": "MG",
+    "nome_municipio": "JOÃO MONLEVADE"
+  },
+  {
+    "ddd": "31",
+    "sigla_uf": "MG",
+    "nome_municipio": "JEQUITIBÁ"
+  },
+  {
+    "ddd": "31",
+    "sigla_uf": "MG",
+    "nome_municipio": "JEQUERI"
+  },
+  {
+    "ddd": "31",
+    "sigla_uf": "MG",
+    "nome_municipio": "JECEABA"
+  },
+  {
+    "ddd": "31",
+    "sigla_uf": "MG",
+    "nome_municipio": "JAGUARAÇU"
+  },
+  {
+    "ddd": "31",
+    "sigla_uf": "MG",
+    "nome_municipio": "JABOTICATUBAS"
+  },
+  {
+    "ddd": "31",
+    "sigla_uf": "MG",
+    "nome_municipio": "ITAVERAVA"
+  },
+  {
+    "ddd": "31",
+    "sigla_uf": "MG",
+    "nome_municipio": "ITATIAIUÇU"
+  },
+  {
+    "ddd": "31",
+    "sigla_uf": "MG",
+    "nome_municipio": "ITAMBÉ DO MATO DENTRO"
+  },
+  {
+    "ddd": "31",
+    "sigla_uf": "MG",
+    "nome_municipio": "ITAGUARA"
+  },
+  {
+    "ddd": "31",
+    "sigla_uf": "MG",
+    "nome_municipio": "ITABIRITO"
+  },
+  {
+    "ddd": "31",
+    "sigla_uf": "MG",
+    "nome_municipio": "ITABIRA"
+  },
+  {
+    "ddd": "31",
+    "sigla_uf": "MG",
+    "nome_municipio": "IPATINGA"
+  },
+  {
+    "ddd": "31",
+    "sigla_uf": "MG",
+    "nome_municipio": "IPABA"
+  },
+  {
+    "ddd": "31",
+    "sigla_uf": "MG",
+    "nome_municipio": "INHAÚMA"
+  },
+  {
+    "ddd": "31",
+    "sigla_uf": "MG",
+    "nome_municipio": "IGARAPÉ"
+  },
+  {
+    "ddd": "31",
+    "sigla_uf": "MG",
+    "nome_municipio": "IBIRITÉ"
+  },
+  {
+    "ddd": "31",
+    "sigla_uf": "MG",
+    "nome_municipio": "GUARACIABA"
+  },
+  {
+    "ddd": "31",
+    "sigla_uf": "MG",
+    "nome_municipio": "FUNILÂNDIA"
+  },
+  {
+    "ddd": "31",
+    "sigla_uf": "MG",
+    "nome_municipio": "FORTUNA DE MINAS"
+  },
+  {
+    "ddd": "31",
+    "sigla_uf": "MG",
+    "nome_municipio": "FLORESTAL"
+  },
+  {
+    "ddd": "31",
+    "sigla_uf": "MG",
+    "nome_municipio": "FERROS"
+  },
+  {
+    "ddd": "31",
+    "sigla_uf": "MG",
+    "nome_municipio": "ESMERALDAS"
+  },
+  {
+    "ddd": "31",
+    "sigla_uf": "MG",
+    "nome_municipio": "ENTRE RIOS DE MINAS"
+  },
+  {
+    "ddd": "31",
+    "sigla_uf": "MG",
+    "nome_municipio": "DOM SILVÉRIO"
+  },
+  {
+    "ddd": "31",
+    "sigla_uf": "MG",
+    "nome_municipio": "DOM JOAQUIM"
+  },
+  {
+    "ddd": "31",
+    "sigla_uf": "MG",
+    "nome_municipio": "DIONÍSIO"
+  },
+  {
+    "ddd": "31",
+    "sigla_uf": "MG",
+    "nome_municipio": "DIOGO DE VASCONCELOS"
+  },
+  {
+    "ddd": "31",
+    "sigla_uf": "MG",
+    "nome_municipio": "DESTERRO DE ENTRE RIOS"
+  },
+  {
+    "ddd": "31",
+    "sigla_uf": "MG",
+    "nome_municipio": "CRUCILÂNDIA"
+  },
+  {
+    "ddd": "31",
+    "sigla_uf": "MG",
+    "nome_municipio": "CRISTIANO OTONI"
+  },
+  {
+    "ddd": "31",
+    "sigla_uf": "MG",
+    "nome_municipio": "CORONEL FABRICIANO"
+  },
+  {
+    "ddd": "31",
+    "sigla_uf": "MG",
+    "nome_municipio": "CORDISBURGO"
+  },
+  {
+    "ddd": "31",
+    "sigla_uf": "MG",
+    "nome_municipio": "CONTAGEM"
+  },
+  {
+    "ddd": "31",
+    "sigla_uf": "MG",
+    "nome_municipio": "CONSELHEIRO LAFAIETE"
+  },
+  {
+    "ddd": "31",
+    "sigla_uf": "MG",
+    "nome_municipio": "CONGONHAS DO NORTE"
+  },
+  {
+    "ddd": "31",
+    "sigla_uf": "MG",
+    "nome_municipio": "CONGONHAS"
+  },
+  {
+    "ddd": "31",
+    "sigla_uf": "MG",
+    "nome_municipio": "CONFINS"
+  },
+  {
+    "ddd": "31",
+    "sigla_uf": "MG",
+    "nome_municipio": "CONCEIÇÃO DO MATO DENTRO"
+  },
+  {
+    "ddd": "31",
+    "sigla_uf": "MG",
+    "nome_municipio": "CATAS ALTAS DA NORUEGA"
+  },
+  {
+    "ddd": "31",
+    "sigla_uf": "MG",
+    "nome_municipio": "CATAS ALTAS"
+  },
+  {
+    "ddd": "31",
+    "sigla_uf": "MG",
+    "nome_municipio": "CASA GRANDE"
+  },
+  {
+    "ddd": "31",
+    "sigla_uf": "MG",
+    "nome_municipio": "CARMÉSIA"
+  },
+  {
+    "ddd": "31",
+    "sigla_uf": "MG",
+    "nome_municipio": "CARANAÍBA"
+  },
+  {
+    "ddd": "31",
+    "sigla_uf": "MG",
+    "nome_municipio": "CAPUTIRA"
+  },
+  {
+    "ddd": "31",
+    "sigla_uf": "MG",
+    "nome_municipio": "CAPIM BRANCO"
+  },
+  {
+    "ddd": "31",
+    "sigla_uf": "MG",
+    "nome_municipio": "CAPELA NOVA"
+  },
+  {
+    "ddd": "31",
+    "sigla_uf": "MG",
+    "nome_municipio": "CANAÃ"
+  },
+  {
+    "ddd": "31",
+    "sigla_uf": "MG",
+    "nome_municipio": "CAJURI"
+  },
+  {
+    "ddd": "31",
+    "sigla_uf": "MG",
+    "nome_municipio": "CAETÉ"
+  },
+  {
+    "ddd": "31",
+    "sigla_uf": "MG",
+    "nome_municipio": "CAETANÓPOLIS"
+  },
+  {
+    "ddd": "31",
+    "sigla_uf": "MG",
+    "nome_municipio": "CACHOEIRA DA PRATA"
+  },
+  {
+    "ddd": "31",
+    "sigla_uf": "MG",
+    "nome_municipio": "BRUMADINHO"
+  },
+  {
+    "ddd": "31",
+    "sigla_uf": "MG",
+    "nome_municipio": "BONFIM"
+  },
+  {
+    "ddd": "31",
+    "sigla_uf": "MG",
+    "nome_municipio": "BOM JESUS DO AMPARO"
+  },
+  {
+    "ddd": "31",
+    "sigla_uf": "MG",
+    "nome_municipio": "BETIM"
+  },
+  {
+    "ddd": "31",
+    "sigla_uf": "MG",
+    "nome_municipio": "BELO VALE"
+  },
+  {
+    "ddd": "31",
+    "sigla_uf": "MG",
+    "nome_municipio": "BELO ORIENTE"
+  },
+  {
+    "ddd": "31",
+    "sigla_uf": "MG",
+    "nome_municipio": "BELO HORIZONTE"
+  },
+  {
+    "ddd": "31",
+    "sigla_uf": "MG",
+    "nome_municipio": "BELA VISTA DE MINAS"
+  },
+  {
+    "ddd": "31",
+    "sigla_uf": "MG",
+    "nome_municipio": "BARRA LONGA"
+  },
+  {
+    "ddd": "31",
+    "sigla_uf": "MG",
+    "nome_municipio": "BARÃO DE COCAIS"
+  },
+  {
+    "ddd": "31",
+    "sigla_uf": "MG",
+    "nome_municipio": "BALDIM"
+  },
+  {
+    "ddd": "31",
+    "sigla_uf": "MG",
+    "nome_municipio": "ARAPONGA"
+  },
+  {
+    "ddd": "31",
+    "sigla_uf": "MG",
+    "nome_municipio": "ARAÇAÍ"
+  },
+  {
+    "ddd": "31",
+    "sigla_uf": "MG",
+    "nome_municipio": "ANTÔNIO DIAS"
+  },
+  {
+    "ddd": "31",
+    "sigla_uf": "MG",
+    "nome_municipio": "AMPARO DO SERRA"
+  },
+  {
+    "ddd": "31",
+    "sigla_uf": "MG",
+    "nome_municipio": "ALVORADA DE MINAS"
+  },
+  {
+    "ddd": "31",
+    "sigla_uf": "MG",
+    "nome_municipio": "ALVINÓPOLIS"
+  },
+  {
+    "ddd": "31",
+    "sigla_uf": "MG",
+    "nome_municipio": "ACAIACA"
+  },
+  {
+    "ddd": "31",
+    "sigla_uf": "MG",
+    "nome_municipio": "ABRE CAMPO"
+  },
+  {
+    "ddd": "41",
+    "sigla_uf": "PR",
+    "nome_municipio": "DOUTOR ULYSSES"
+  },
+  {
+    "ddd": "41",
+    "sigla_uf": "PR",
+    "nome_municipio": "TUNAS DO PARANÁ"
+  },
+  {
+    "ddd": "41",
+    "sigla_uf": "PR",
+    "nome_municipio": "TIJUCAS DO SUL"
+  },
+  {
+    "ddd": "41",
+    "sigla_uf": "PR",
+    "nome_municipio": "SÃO JOSÉ DOS PINHAIS"
+  },
+  {
+    "ddd": "41",
+    "sigla_uf": "PR",
+    "nome_municipio": "RIO BRANCO DO SUL"
+  },
+  {
+    "ddd": "41",
+    "sigla_uf": "PR",
+    "nome_municipio": "QUITANDINHA"
+  },
+  {
+    "ddd": "41",
+    "sigla_uf": "PR",
+    "nome_municipio": "QUATRO BARRAS"
+  },
+  {
+    "ddd": "41",
+    "sigla_uf": "PR",
+    "nome_municipio": "PONTAL DO PARANÁ"
+  },
+  {
+    "ddd": "41",
+    "sigla_uf": "PR",
+    "nome_municipio": "PIRAQUARA"
+  },
+  {
+    "ddd": "41",
+    "sigla_uf": "PR",
+    "nome_municipio": "PINHAIS"
+  },
+  {
+    "ddd": "41",
+    "sigla_uf": "PR",
+    "nome_municipio": "PIÊN"
+  },
+  {
+    "ddd": "41",
+    "sigla_uf": "PR",
+    "nome_municipio": "PARANAGUÁ"
+  },
+  {
+    "ddd": "41",
+    "sigla_uf": "PR",
+    "nome_municipio": "MORRETES"
+  },
+  {
+    "ddd": "41",
+    "sigla_uf": "PR",
+    "nome_municipio": "MATINHOS"
+  },
+  {
+    "ddd": "41",
+    "sigla_uf": "PR",
+    "nome_municipio": "MANDIRITUBA"
+  },
+  {
+    "ddd": "41",
+    "sigla_uf": "PR",
+    "nome_municipio": "LAPA"
+  },
+  {
+    "ddd": "41",
+    "sigla_uf": "PR",
+    "nome_municipio": "ITAPERUÇU"
+  },
+  {
+    "ddd": "41",
+    "sigla_uf": "PR",
+    "nome_municipio": "GUARATUBA"
+  },
+  {
+    "ddd": "41",
+    "sigla_uf": "PR",
+    "nome_municipio": "GUARAQUEÇABA"
+  },
+  {
+    "ddd": "41",
+    "sigla_uf": "PR",
+    "nome_municipio": "FAZENDA RIO GRANDE"
+  },
+  {
+    "ddd": "41",
+    "sigla_uf": "PR",
+    "nome_municipio": "CURITIBA"
+  },
+  {
+    "ddd": "41",
+    "sigla_uf": "PR",
+    "nome_municipio": "CONTENDA"
+  },
+  {
+    "ddd": "41",
+    "sigla_uf": "PR",
+    "nome_municipio": "COLOMBO"
+  },
+  {
+    "ddd": "41",
+    "sigla_uf": "PR",
+    "nome_municipio": "CERRO AZUL"
+  },
+  {
+    "ddd": "41",
+    "sigla_uf": "PR",
+    "nome_municipio": "CAMPO MAGRO"
+  },
+  {
+    "ddd": "41",
+    "sigla_uf": "PR",
+    "nome_municipio": "CAMPO LARGO"
+  },
+  {
+    "ddd": "41",
+    "sigla_uf": "PR",
+    "nome_municipio": "CAMPO DO TENENTE"
+  },
+  {
+    "ddd": "41",
+    "sigla_uf": "PR",
+    "nome_municipio": "CAMPINA GRANDE DO SUL"
+  },
+  {
+    "ddd": "41",
+    "sigla_uf": "PR",
+    "nome_municipio": "BOCAIÚVA DO SUL"
+  },
+  {
+    "ddd": "41",
+    "sigla_uf": "PR",
+    "nome_municipio": "BALSA NOVA"
+  },
+  {
+    "ddd": "41",
+    "sigla_uf": "PR",
+    "nome_municipio": "ARAUCÁRIA"
+  },
+  {
+    "ddd": "41",
+    "sigla_uf": "PR",
+    "nome_municipio": "ANTONINA"
+  },
+  {
+    "ddd": "41",
+    "sigla_uf": "PR",
+    "nome_municipio": "ALMIRANTE TAMANDARÉ"
+  },
+  {
+    "ddd": "41",
+    "sigla_uf": "PR",
+    "nome_municipio": "AGUDOS DO SUL"
+  },
+  {
+    "ddd": "41",
+    "sigla_uf": "PR",
+    "nome_municipio": "ADRIANÓPOLIS"
+  },
+  {
+    "ddd": "51",
+    "sigla_uf": "RS",
+    "nome_municipio": "SAO JOSE DO SUL"
+  },
+  {
+    "ddd": "51",
+    "sigla_uf": "RS",
+    "nome_municipio": "PÂNTANO GRANDE"
+  },
+  {
+    "ddd": "51",
+    "sigla_uf": "RS",
+    "nome_municipio": "XANGRI-LÁ"
+  },
+  {
+    "ddd": "51",
+    "sigla_uf": "RS",
+    "nome_municipio": "WESTFALIA"
+  },
+  {
+    "ddd": "51",
+    "sigla_uf": "RS",
+    "nome_municipio": "VIAMÃO"
+  },
+  {
+    "ddd": "51",
+    "sigla_uf": "RS",
+    "nome_municipio": "VESPASIANO CORREA"
+  },
+  {
+    "ddd": "51",
+    "sigla_uf": "RS",
+    "nome_municipio": "VERA CRUZ"
+  },
+  {
+    "ddd": "51",
+    "sigla_uf": "RS",
+    "nome_municipio": "VENÂNCIO AIRES"
+  },
+  {
+    "ddd": "51",
+    "sigla_uf": "RS",
+    "nome_municipio": "VALE REAL"
+  },
+  {
+    "ddd": "51",
+    "sigla_uf": "RS",
+    "nome_municipio": "VALE DO SOL"
+  },
+  {
+    "ddd": "51",
+    "sigla_uf": "RS",
+    "nome_municipio": "VALE VERDE"
+  },
+  {
+    "ddd": "51",
+    "sigla_uf": "RS",
+    "nome_municipio": "TUPANDI"
+  },
+  {
+    "ddd": "51",
+    "sigla_uf": "RS",
+    "nome_municipio": "TUNAS"
+  },
+  {
+    "ddd": "51",
+    "sigla_uf": "RS",
+    "nome_municipio": "TRIUNFO"
+  },
+  {
+    "ddd": "51",
+    "sigla_uf": "RS",
+    "nome_municipio": "TRÊS FORQUILHAS"
+  },
+  {
+    "ddd": "51",
+    "sigla_uf": "RS",
+    "nome_municipio": "TRÊS COROAS"
+  },
+  {
+    "ddd": "51",
+    "sigla_uf": "RS",
+    "nome_municipio": "TRÊS CACHOEIRAS"
+  },
+  {
+    "ddd": "51",
+    "sigla_uf": "RS",
+    "nome_municipio": "TRAVESSEIRO"
+  },
+  {
+    "ddd": "51",
+    "sigla_uf": "RS",
+    "nome_municipio": "TRAMANDAÍ"
+  },
+  {
+    "ddd": "51",
+    "sigla_uf": "RS",
+    "nome_municipio": "TORRES"
+  },
+  {
+    "ddd": "51",
+    "sigla_uf": "RS",
+    "nome_municipio": "TEUTÔNIA"
+  },
+  {
+    "ddd": "51",
+    "sigla_uf": "RS",
+    "nome_municipio": "TERRA DE AREIA"
+  },
+  {
+    "ddd": "51",
+    "sigla_uf": "RS",
+    "nome_municipio": "TAVARES"
+  },
+  {
+    "ddd": "51",
+    "sigla_uf": "RS",
+    "nome_municipio": "TAQUARI"
+  },
+  {
+    "ddd": "51",
+    "sigla_uf": "RS",
+    "nome_municipio": "TAQUARA"
+  },
+  {
+    "ddd": "51",
+    "sigla_uf": "RS",
+    "nome_municipio": "TAPES"
+  },
+  {
+    "ddd": "51",
+    "sigla_uf": "RS",
+    "nome_municipio": "TABAÍ"
+  },
+  {
+    "ddd": "51",
+    "sigla_uf": "RS",
+    "nome_municipio": "SOBRADINHO"
+  },
+  {
+    "ddd": "51",
+    "sigla_uf": "RS",
+    "nome_municipio": "SINIMBU"
+  },
+  {
+    "ddd": "51",
+    "sigla_uf": "RS",
+    "nome_municipio": "SERTÃO SANTANA"
+  },
+  {
+    "ddd": "51",
+    "sigla_uf": "RS",
+    "nome_municipio": "SÉRIO"
+  },
+  {
+    "ddd": "51",
+    "sigla_uf": "RS",
+    "nome_municipio": "SENTINELA DO SUL"
+  },
+  {
+    "ddd": "51",
+    "sigla_uf": "RS",
+    "nome_municipio": "SEGREDO"
+  },
+  {
+    "ddd": "51",
+    "sigla_uf": "RS",
+    "nome_municipio": "SAPUCAIA DO SUL"
+  },
+  {
+    "ddd": "51",
+    "sigla_uf": "RS",
+    "nome_municipio": "SAPIRANGA"
+  },
+  {
+    "ddd": "51",
+    "sigla_uf": "RS",
+    "nome_municipio": "SÃO VENDELINO"
+  },
+  {
+    "ddd": "51",
+    "sigla_uf": "RS",
+    "nome_municipio": "SÃO SEBASTIÃO DO CAÍ"
+  },
+  {
+    "ddd": "51",
+    "sigla_uf": "RS",
+    "nome_municipio": "SÃO PEDRO DA SERRA"
+  },
+  {
+    "ddd": "51",
+    "sigla_uf": "RS",
+    "nome_municipio": "SÃO LEOPOLDO"
+  },
+  {
+    "ddd": "51",
+    "sigla_uf": "RS",
+    "nome_municipio": "SÃO JOSÉ DO HORTÊNCIO"
+  },
+  {
+    "ddd": "51",
+    "sigla_uf": "RS",
+    "nome_municipio": "SÃO JERÔNIMO"
+  },
+  {
+    "ddd": "51",
+    "sigla_uf": "RS",
+    "nome_municipio": "SANTO ANTÔNIO DA PATRULHA"
+  },
+  {
+    "ddd": "51",
+    "sigla_uf": "RS",
+    "nome_municipio": "SANTA MARIA DO HERVAL"
+  },
+  {
+    "ddd": "51",
+    "sigla_uf": "RS",
+    "nome_municipio": "SANTA CRUZ DO SUL"
+  },
+  {
+    "ddd": "51",
+    "sigla_uf": "RS",
+    "nome_municipio": "SANTA CLARA DO SUL"
+  },
+  {
+    "ddd": "51",
+    "sigla_uf": "RS",
+    "nome_municipio": "SALVADOR DO SUL"
+  },
+  {
+    "ddd": "51",
+    "sigla_uf": "RS",
+    "nome_municipio": "ROLANTE"
+  },
+  {
+    "ddd": "51",
+    "sigla_uf": "RS",
+    "nome_municipio": "ROCA SALES"
+  },
+  {
+    "ddd": "51",
+    "sigla_uf": "RS",
+    "nome_municipio": "RIOZINHO"
+  },
+  {
+    "ddd": "51",
+    "sigla_uf": "RS",
+    "nome_municipio": "RIO PARDO"
+  },
+  {
+    "ddd": "51",
+    "sigla_uf": "RS",
+    "nome_municipio": "RELVADO"
+  },
+  {
+    "ddd": "51",
+    "sigla_uf": "RS",
+    "nome_municipio": "PUTINGA"
+  },
+  {
+    "ddd": "51",
+    "sigla_uf": "RS",
+    "nome_municipio": "PROGRESSO"
+  },
+  {
+    "ddd": "51",
+    "sigla_uf": "RS",
+    "nome_municipio": "PRESIDENTE LUCENA"
+  },
+  {
+    "ddd": "51",
+    "sigla_uf": "RS",
+    "nome_municipio": "POUSO NOVO"
+  },
+  {
+    "ddd": "51",
+    "sigla_uf": "RS",
+    "nome_municipio": "PORTO ALEGRE"
+  },
+  {
+    "ddd": "51",
+    "sigla_uf": "RS",
+    "nome_municipio": "PORTÃO"
+  },
+  {
+    "ddd": "51",
+    "sigla_uf": "RS",
+    "nome_municipio": "POÇO DAS ANTAS"
+  },
+  {
+    "ddd": "51",
+    "sigla_uf": "RS",
+    "nome_municipio": "PAVERAMA"
+  },
+  {
+    "ddd": "51",
+    "sigla_uf": "RS",
+    "nome_municipio": "PASSO DO SOBRADO"
+  },
+  {
+    "ddd": "51",
+    "sigla_uf": "RS",
+    "nome_municipio": "PASSA SETE"
+  },
+  {
+    "ddd": "51",
+    "sigla_uf": "RS",
+    "nome_municipio": "PAROBÉ"
+  },
+  {
+    "ddd": "51",
+    "sigla_uf": "RS",
+    "nome_municipio": "PARECI NOVO"
+  },
+  {
+    "ddd": "51",
+    "sigla_uf": "RS",
+    "nome_municipio": "PALMARES DO SUL"
+  },
+  {
+    "ddd": "51",
+    "sigla_uf": "RS",
+    "nome_municipio": "OSÓRIO"
+  },
+  {
+    "ddd": "51",
+    "sigla_uf": "RS",
+    "nome_municipio": "NOVO HAMBURGO"
+  },
+  {
+    "ddd": "51",
+    "sigla_uf": "RS",
+    "nome_municipio": "NOVO CABRAIS"
+  },
+  {
+    "ddd": "51",
+    "sigla_uf": "RS",
+    "nome_municipio": "NOVA SANTA RITA"
+  },
+  {
+    "ddd": "51",
+    "sigla_uf": "RS",
+    "nome_municipio": "NOVA HARTZ"
+  },
+  {
+    "ddd": "51",
+    "sigla_uf": "RS",
+    "nome_municipio": "NOVA BRÉSCIA"
+  },
+  {
+    "ddd": "51",
+    "sigla_uf": "RS",
+    "nome_municipio": "MUÇUM"
+  },
+  {
+    "ddd": "51",
+    "sigla_uf": "RS",
+    "nome_municipio": "MOSTARDAS"
+  },
+  {
+    "ddd": "51",
+    "sigla_uf": "RS",
+    "nome_municipio": "MORRO REUTER"
+  },
+  {
+    "ddd": "51",
+    "sigla_uf": "RS",
+    "nome_municipio": "MORRINHOS DO SUL"
+  },
+  {
+    "ddd": "51",
+    "sigla_uf": "RS",
+    "nome_municipio": "MONTENEGRO"
+  },
+  {
+    "ddd": "51",
+    "sigla_uf": "RS",
+    "nome_municipio": "MINAS DO LEÃO"
+  },
+  {
+    "ddd": "51",
+    "sigla_uf": "RS",
+    "nome_municipio": "MATO LEITÃO"
+  },
+  {
+    "ddd": "51",
+    "sigla_uf": "RS",
+    "nome_municipio": "MARQUES DE SOUZA"
+  },
+  {
+    "ddd": "51",
+    "sigla_uf": "RS",
+    "nome_municipio": "MARIANA PIMENTEL"
+  },
+  {
+    "ddd": "51",
+    "sigla_uf": "RS",
+    "nome_municipio": "MARATÁ"
+  },
+  {
+    "ddd": "51",
+    "sigla_uf": "RS",
+    "nome_municipio": "MAQUINÉ"
+  },
+  {
+    "ddd": "51",
+    "sigla_uf": "RS",
+    "nome_municipio": "MAMPITUBA"
+  },
+  {
+    "ddd": "51",
+    "sigla_uf": "RS",
+    "nome_municipio": "LINHA NOVA"
+  },
+  {
+    "ddd": "51",
+    "sigla_uf": "RS",
+    "nome_municipio": "LINDOLFO COLLOR"
+  },
+  {
+    "ddd": "51",
+    "sigla_uf": "RS",
+    "nome_municipio": "LAJEADO"
+  },
+  {
+    "ddd": "51",
+    "sigla_uf": "RS",
+    "nome_municipio": "LAGOÃO"
+  },
+  {
+    "ddd": "51",
+    "sigla_uf": "RS",
+    "nome_municipio": "LAGOA BONITA DO SUL"
+  },
+  {
+    "ddd": "51",
+    "sigla_uf": "RS",
+    "nome_municipio": "IVOTI"
+  },
+  {
+    "ddd": "51",
+    "sigla_uf": "RS",
+    "nome_municipio": "ITATI"
+  },
+  {
+    "ddd": "51",
+    "sigla_uf": "RS",
+    "nome_municipio": "ITAPUCA"
+  },
+  {
+    "ddd": "51",
+    "sigla_uf": "RS",
+    "nome_municipio": "IMIGRANTE"
+  },
+  {
+    "ddd": "51",
+    "sigla_uf": "RS",
+    "nome_municipio": "IMBÉ"
+  },
+  {
+    "ddd": "51",
+    "sigla_uf": "RS",
+    "nome_municipio": "ILÓPOLIS"
+  },
+  {
+    "ddd": "51",
+    "sigla_uf": "RS",
+    "nome_municipio": "IGREJINHA"
+  },
+  {
+    "ddd": "51",
+    "sigla_uf": "RS",
+    "nome_municipio": "IBARAMA"
+  },
+  {
+    "ddd": "51",
+    "sigla_uf": "RS",
+    "nome_municipio": "HERVEIRAS"
+  },
+  {
+    "ddd": "51",
+    "sigla_uf": "RS",
+    "nome_municipio": "HARMONIA"
+  },
+  {
+    "ddd": "51",
+    "sigla_uf": "RS",
+    "nome_municipio": "GUAÍBA"
+  },
+  {
+    "ddd": "51",
+    "sigla_uf": "RS",
+    "nome_municipio": "GRAVATAÍ"
+  },
+  {
+    "ddd": "51",
+    "sigla_uf": "RS",
+    "nome_municipio": "GRAMADO XAVIER"
+  },
+  {
+    "ddd": "51",
+    "sigla_uf": "RS",
+    "nome_municipio": "GLORINHA"
+  },
+  {
+    "ddd": "51",
+    "sigla_uf": "RS",
+    "nome_municipio": "GENERAL CÂMARA"
+  },
+  {
+    "ddd": "51",
+    "sigla_uf": "RS",
+    "nome_municipio": "FORQUETINHA"
+  },
+  {
+    "ddd": "51",
+    "sigla_uf": "RS",
+    "nome_municipio": "FELIZ"
+  },
+  {
+    "ddd": "51",
+    "sigla_uf": "RS",
+    "nome_municipio": "FAZENDA VILANOVA"
+  },
+  {
+    "ddd": "51",
+    "sigla_uf": "RS",
+    "nome_municipio": "ESTRELA VELHA"
+  },
+  {
+    "ddd": "51",
+    "sigla_uf": "RS",
+    "nome_municipio": "ESTRELA"
+  },
+  {
+    "ddd": "51",
+    "sigla_uf": "RS",
+    "nome_municipio": "ESTEIO"
+  },
+  {
+    "ddd": "51",
+    "sigla_uf": "RS",
+    "nome_municipio": "ESTÂNCIA VELHA"
+  },
+  {
+    "ddd": "51",
+    "sigla_uf": "RS",
+    "nome_municipio": "ENCRUZILHADA DO SUL"
+  },
+  {
+    "ddd": "51",
+    "sigla_uf": "RS",
+    "nome_municipio": "ENCANTADO"
+  },
+  {
+    "ddd": "51",
+    "sigla_uf": "RS",
+    "nome_municipio": "ELDORADO DO SUL"
+  },
+  {
+    "ddd": "51",
+    "sigla_uf": "RS",
+    "nome_municipio": "DOUTOR RICARDO"
+  },
+  {
+    "ddd": "51",
+    "sigla_uf": "RS",
+    "nome_municipio": "DOM PEDRO DE ALCÂNTARA"
+  },
+  {
+    "ddd": "51",
+    "sigla_uf": "RS",
+    "nome_municipio": "DOM FELICIANO"
+  },
+  {
+    "ddd": "51",
+    "sigla_uf": "RS",
+    "nome_municipio": "DOIS IRMÃOS"
+  },
+  {
+    "ddd": "51",
+    "sigla_uf": "RS",
+    "nome_municipio": "CRUZEIRO DO SUL"
+  },
+  {
+    "ddd": "51",
+    "sigla_uf": "RS",
+    "nome_municipio": "CRISTAL"
+  },
+  {
+    "ddd": "51",
+    "sigla_uf": "RS",
+    "nome_municipio": "COQUEIRO BAIXO"
+  },
+  {
+    "ddd": "51",
+    "sigla_uf": "RS",
+    "nome_municipio": "COLINAS"
+  },
+  {
+    "ddd": "51",
+    "sigla_uf": "RS",
+    "nome_municipio": "CIDREIRA"
+  },
+  {
+    "ddd": "51",
+    "sigla_uf": "RS",
+    "nome_municipio": "CHUVISCA"
+  },
+  {
+    "ddd": "51",
+    "sigla_uf": "RS",
+    "nome_municipio": "CHARQUEADAS"
+  },
+  {
+    "ddd": "51",
+    "sigla_uf": "RS",
+    "nome_municipio": "CERRO GRANDE DO SUL"
+  },
+  {
+    "ddd": "51",
+    "sigla_uf": "RS",
+    "nome_municipio": "CERRO BRANCO"
+  },
+  {
+    "ddd": "51",
+    "sigla_uf": "RS",
+    "nome_municipio": "CARAÁ"
+  },
+  {
+    "ddd": "51",
+    "sigla_uf": "RS",
+    "nome_municipio": "CAPITÃO"
+  },
+  {
+    "ddd": "51",
+    "sigla_uf": "RS",
+    "nome_municipio": "CAPELA DE SANTANA"
+  },
+  {
+    "ddd": "51",
+    "sigla_uf": "RS",
+    "nome_municipio": "CAPIVARI DO SUL"
+  },
+  {
+    "ddd": "51",
+    "sigla_uf": "RS",
+    "nome_municipio": "CAPÃO DA CANOA"
+  },
+  {
+    "ddd": "51",
+    "sigla_uf": "RS",
+    "nome_municipio": "CANUDOS DO VALE"
+  },
+  {
+    "ddd": "51",
+    "sigla_uf": "RS",
+    "nome_municipio": "CANOAS"
+  },
+  {
+    "ddd": "51",
+    "sigla_uf": "RS",
+    "nome_municipio": "CANDELÁRIA"
+  },
+  {
+    "ddd": "51",
+    "sigla_uf": "RS",
+    "nome_municipio": "CAMPO BOM"
+  },
+  {
+    "ddd": "51",
+    "sigla_uf": "RS",
+    "nome_municipio": "CAMAQUÃ"
+  },
+  {
+    "ddd": "51",
+    "sigla_uf": "RS",
+    "nome_municipio": "CACHOEIRINHA"
+  },
+  {
+    "ddd": "51",
+    "sigla_uf": "RS",
+    "nome_municipio": "CACHOEIRA DO SUL"
+  },
+  {
+    "ddd": "51",
+    "sigla_uf": "RS",
+    "nome_municipio": "BUTIÁ"
+  },
+  {
+    "ddd": "51",
+    "sigla_uf": "RS",
+    "nome_municipio": "BROCHIER"
+  },
+  {
+    "ddd": "51",
+    "sigla_uf": "RS",
+    "nome_municipio": "BOQUEIRÃO DO LEÃO"
+  },
+  {
+    "ddd": "51",
+    "sigla_uf": "RS",
+    "nome_municipio": "BOM RETIRO DO SUL"
+  },
+  {
+    "ddd": "51",
+    "sigla_uf": "RS",
+    "nome_municipio": "BOM PRINCÍPIO"
+  },
+  {
+    "ddd": "51",
+    "sigla_uf": "RS",
+    "nome_municipio": "BARRA DO RIBEIRO"
+  },
+  {
+    "ddd": "51",
+    "sigla_uf": "RS",
+    "nome_municipio": "BARÃO DO TRIUNFO"
+  },
+  {
+    "ddd": "51",
+    "sigla_uf": "RS",
+    "nome_municipio": "BARÃO"
+  },
+  {
+    "ddd": "51",
+    "sigla_uf": "RS",
+    "nome_municipio": "BALNEÁRIO PINHAL"
+  },
+  {
+    "ddd": "51",
+    "sigla_uf": "RS",
+    "nome_municipio": "ARVOREZINHA"
+  },
+  {
+    "ddd": "51",
+    "sigla_uf": "RS",
+    "nome_municipio": "ARROIO DO TIGRE"
+  },
+  {
+    "ddd": "51",
+    "sigla_uf": "RS",
+    "nome_municipio": "ARROIO DOS RATOS"
+  },
+  {
+    "ddd": "51",
+    "sigla_uf": "RS",
+    "nome_municipio": "ARROIO DO SAL"
+  },
+  {
+    "ddd": "51",
+    "sigla_uf": "RS",
+    "nome_municipio": "ARROIO DO MEIO"
+  },
+  {
+    "ddd": "51",
+    "sigla_uf": "RS",
+    "nome_municipio": "ARARICÁ"
+  },
+  {
+    "ddd": "51",
+    "sigla_uf": "RS",
+    "nome_municipio": "ARAMBARÉ"
+  },
+  {
+    "ddd": "51",
+    "sigla_uf": "RS",
+    "nome_municipio": "ANTA GORDA"
+  },
+  {
+    "ddd": "51",
+    "sigla_uf": "RS",
+    "nome_municipio": "AMARAL FERRADOR"
+  },
+  {
+    "ddd": "51",
+    "sigla_uf": "RS",
+    "nome_municipio": "ALVORADA"
+  },
+  {
+    "ddd": "51",
+    "sigla_uf": "RS",
+    "nome_municipio": "ALTO FELIZ"
+  },
+  {
+    "ddd": "61",
+    "sigla_uf": "DF",
+    "nome_municipio": "BRASÍLIA"
+  },
+  {
+    "ddd": "61",
+    "sigla_uf": "DF",
+    "nome_municipio": "VILA BOA"
+  },
+  {
+    "ddd": "61",
+    "sigla_uf": "DF",
+    "nome_municipio": "VALPARAÍSO DE GOIÁS"
+  },
+  {
+    "ddd": "61",
+    "sigla_uf": "DF",
+    "nome_municipio": "SANTO ANTÔNIO DO DESCOBERTO"
+  },
+  {
+    "ddd": "61",
+    "sigla_uf": "DF",
+    "nome_municipio": "PLANALTINA"
+  },
+  {
+    "ddd": "61",
+    "sigla_uf": "DF",
+    "nome_municipio": "PADRE BERNARDO"
+  },
+  {
+    "ddd": "61",
+    "sigla_uf": "DF",
+    "nome_municipio": "NOVO GAMA"
+  },
+  {
+    "ddd": "61",
+    "sigla_uf": "DF",
+    "nome_municipio": "LUZIÂNIA"
+  },
+  {
+    "ddd": "61",
+    "sigla_uf": "DF",
+    "nome_municipio": "FORMOSA"
+  },
+  {
+    "ddd": "61",
+    "sigla_uf": "DF",
+    "nome_municipio": "CRISTALINA"
+  },
+  {
+    "ddd": "61",
+    "sigla_uf": "DF",
+    "nome_municipio": "CIDADE OCIDENTAL"
+  },
+  {
+    "ddd": "61",
+    "sigla_uf": "DF",
+    "nome_municipio": "CABECEIRAS"
+  },
+  {
+    "ddd": "61",
+    "sigla_uf": "DF",
+    "nome_municipio": "ÁGUAS LINDAS DE GOIÁS"
+  },
+  {
+    "ddd": "71",
+    "sigla_uf": "BA",
+    "nome_municipio": "VERA CRUZ"
+  },
+  {
+    "ddd": "71",
+    "sigla_uf": "BA",
+    "nome_municipio": "SIMÕES FILHO"
+  },
+  {
+    "ddd": "71",
+    "sigla_uf": "BA",
+    "nome_municipio": "SAUBARA"
+  },
+  {
+    "ddd": "71",
+    "sigla_uf": "BA",
+    "nome_municipio": "SÃO SEBASTIÃO DO PASSÉ"
+  },
+  {
+    "ddd": "71",
+    "sigla_uf": "BA",
+    "nome_municipio": "SÃO FRANCISCO DO CONDE"
+  },
+  {
+    "ddd": "71",
+    "sigla_uf": "BA",
+    "nome_municipio": "SALVADOR"
+  },
+  {
+    "ddd": "71",
+    "sigla_uf": "BA",
+    "nome_municipio": "POJUCA"
+  },
+  {
+    "ddd": "71",
+    "sigla_uf": "BA",
+    "nome_municipio": "MATA DE SÃO JOÃO"
+  },
+  {
+    "ddd": "71",
+    "sigla_uf": "BA",
+    "nome_municipio": "MADRE DE DEUS"
+  },
+  {
+    "ddd": "71",
+    "sigla_uf": "BA",
+    "nome_municipio": "LAURO DE FREITAS"
+  },
+  {
+    "ddd": "71",
+    "sigla_uf": "BA",
+    "nome_municipio": "ITAPARICA"
+  },
+  {
+    "ddd": "71",
+    "sigla_uf": "BA",
+    "nome_municipio": "DIAS D'ÁVILA"
+  },
+  {
+    "ddd": "71",
+    "sigla_uf": "BA",
+    "nome_municipio": "CATU"
+  },
+  {
+    "ddd": "71",
+    "sigla_uf": "BA",
+    "nome_municipio": "CANDEIAS"
+  },
+  {
+    "ddd": "71",
+    "sigla_uf": "BA",
+    "nome_municipio": "CAMAÇARI"
+  },
+  {
+    "ddd": "81",
+    "sigla_uf": "PE",
+    "nome_municipio": "ITAMARACÁ"
+  },
+  {
+    "ddd": "81",
+    "sigla_uf": "PE",
+    "nome_municipio": "XEXÉU"
+  },
+  {
+    "ddd": "81",
+    "sigla_uf": "PE",
+    "nome_municipio": "VITÓRIA DE SANTO ANTÃO"
+  },
+  {
+    "ddd": "81",
+    "sigla_uf": "PE",
+    "nome_municipio": "VICÊNCIA"
+  },
+  {
+    "ddd": "81",
+    "sigla_uf": "PE",
+    "nome_municipio": "VERTENTES"
+  },
+  {
+    "ddd": "81",
+    "sigla_uf": "PE",
+    "nome_municipio": "VERTENTE DO LÉRIO"
+  },
+  {
+    "ddd": "81",
+    "sigla_uf": "PE",
+    "nome_municipio": "TRACUNHAÉM"
+  },
+  {
+    "ddd": "81",
+    "sigla_uf": "PE",
+    "nome_municipio": "TORITAMA"
+  },
+  {
+    "ddd": "81",
+    "sigla_uf": "PE",
+    "nome_municipio": "TIMBAÚBA"
+  },
+  {
+    "ddd": "81",
+    "sigla_uf": "PE",
+    "nome_municipio": "TAQUARITINGA DO NORTE"
+  },
+  {
+    "ddd": "81",
+    "sigla_uf": "PE",
+    "nome_municipio": "TAMANDARÉ"
+  },
+  {
+    "ddd": "81",
+    "sigla_uf": "PE",
+    "nome_municipio": "TACAIMBÓ"
+  },
+  {
+    "ddd": "81",
+    "sigla_uf": "PE",
+    "nome_municipio": "SURUBIM"
+  },
+  {
+    "ddd": "81",
+    "sigla_uf": "PE",
+    "nome_municipio": "SIRINHAÉM"
+  },
+  {
+    "ddd": "81",
+    "sigla_uf": "PE",
+    "nome_municipio": "SÃO VICENTE FERRER"
+  },
+  {
+    "ddd": "81",
+    "sigla_uf": "PE",
+    "nome_municipio": "SÃO LOURENÇO DA MATA"
+  },
+  {
+    "ddd": "81",
+    "sigla_uf": "PE",
+    "nome_municipio": "SÃO JOSÉ DA COROA GRANDE"
+  },
+  {
+    "ddd": "81",
+    "sigla_uf": "PE",
+    "nome_municipio": "SÃO JOAQUIM DO MONTE"
+  },
+  {
+    "ddd": "81",
+    "sigla_uf": "PE",
+    "nome_municipio": "SÃO CAITANO"
+  },
+  {
+    "ddd": "81",
+    "sigla_uf": "PE",
+    "nome_municipio": "SÃO BENTO DO UNA"
+  },
+  {
+    "ddd": "81",
+    "sigla_uf": "PE",
+    "nome_municipio": "SÃO BENEDITO DO SUL"
+  },
+  {
+    "ddd": "81",
+    "sigla_uf": "PE",
+    "nome_municipio": "SANTA MARIA DO CAMBUCÁ"
+  },
+  {
+    "ddd": "81",
+    "sigla_uf": "PE",
+    "nome_municipio": "SANTA CRUZ DO CAPIBARIBE"
+  },
+  {
+    "ddd": "81",
+    "sigla_uf": "PE",
+    "nome_municipio": "SALGADINHO"
+  },
+  {
+    "ddd": "81",
+    "sigla_uf": "PE",
+    "nome_municipio": "SAIRÉ"
+  },
+  {
+    "ddd": "81",
+    "sigla_uf": "PE",
+    "nome_municipio": "RIO FORMOSO"
+  },
+  {
+    "ddd": "81",
+    "sigla_uf": "PE",
+    "nome_municipio": "RIBEIRÃO"
+  },
+  {
+    "ddd": "81",
+    "sigla_uf": "PE",
+    "nome_municipio": "RIACHO DAS ALMAS"
+  },
+  {
+    "ddd": "81",
+    "sigla_uf": "PE",
+    "nome_municipio": "RECIFE"
+  },
+  {
+    "ddd": "81",
+    "sigla_uf": "PE",
+    "nome_municipio": "QUIPAPÁ"
+  },
+  {
+    "ddd": "81",
+    "sigla_uf": "PE",
+    "nome_municipio": "PRIMAVERA"
+  },
+  {
+    "ddd": "81",
+    "sigla_uf": "PE",
+    "nome_municipio": "POMBOS"
+  },
+  {
+    "ddd": "81",
+    "sigla_uf": "PE",
+    "nome_municipio": "PAULISTA"
+  },
+  {
+    "ddd": "81",
+    "sigla_uf": "PE",
+    "nome_municipio": "PAUDALHO"
+  },
+  {
+    "ddd": "81",
+    "sigla_uf": "PE",
+    "nome_municipio": "PASSIRA"
+  },
+  {
+    "ddd": "81",
+    "sigla_uf": "PE",
+    "nome_municipio": "PANELAS"
+  },
+  {
+    "ddd": "81",
+    "sigla_uf": "PE",
+    "nome_municipio": "PALMARES"
+  },
+  {
+    "ddd": "81",
+    "sigla_uf": "PE",
+    "nome_municipio": "OROBÓ"
+  },
+  {
+    "ddd": "81",
+    "sigla_uf": "PE",
+    "nome_municipio": "OLINDA"
+  },
+  {
+    "ddd": "81",
+    "sigla_uf": "PE",
+    "nome_municipio": "NAZARÉ DA MATA"
+  },
+  {
+    "ddd": "81",
+    "sigla_uf": "PE",
+    "nome_municipio": "MORENO"
+  },
+  {
+    "ddd": "81",
+    "sigla_uf": "PE",
+    "nome_municipio": "MARAIAL"
+  },
+  {
+    "ddd": "81",
+    "sigla_uf": "PE",
+    "nome_municipio": "MACHADOS"
+  },
+  {
+    "ddd": "81",
+    "sigla_uf": "PE",
+    "nome_municipio": "MACAPARANA"
+  },
+  {
+    "ddd": "81",
+    "sigla_uf": "PE",
+    "nome_municipio": "LIMOEIRO"
+  },
+  {
+    "ddd": "81",
+    "sigla_uf": "PE",
+    "nome_municipio": "LAGOA DOS GATOS"
+  },
+  {
+    "ddd": "81",
+    "sigla_uf": "PE",
+    "nome_municipio": "LAGOA DO CARRO"
+  },
+  {
+    "ddd": "81",
+    "sigla_uf": "PE",
+    "nome_municipio": "LAGOA DO ITAENGA"
+  },
+  {
+    "ddd": "81",
+    "sigla_uf": "PE",
+    "nome_municipio": "JOAQUIM NABUCO"
+  },
+  {
+    "ddd": "81",
+    "sigla_uf": "PE",
+    "nome_municipio": "JOÃO ALFREDO"
+  },
+  {
+    "ddd": "81",
+    "sigla_uf": "PE",
+    "nome_municipio": "JATAÚBA"
+  },
+  {
+    "ddd": "81",
+    "sigla_uf": "PE",
+    "nome_municipio": "JAQUEIRA"
+  },
+  {
+    "ddd": "81",
+    "sigla_uf": "PE",
+    "nome_municipio": "JABOATÃO DOS GUARARAPES"
+  },
+  {
+    "ddd": "81",
+    "sigla_uf": "PE",
+    "nome_municipio": "ITAQUITINGA"
+  },
+  {
+    "ddd": "81",
+    "sigla_uf": "PE",
+    "nome_municipio": "ITAPISSUMA"
+  },
+  {
+    "ddd": "81",
+    "sigla_uf": "PE",
+    "nome_municipio": "ITAMBÉ"
+  },
+  {
+    "ddd": "81",
+    "sigla_uf": "PE",
+    "nome_municipio": "IPOJUCA"
+  },
+  {
+    "ddd": "81",
+    "sigla_uf": "PE",
+    "nome_municipio": "IGARASSU"
+  },
+  {
+    "ddd": "81",
+    "sigla_uf": "PE",
+    "nome_municipio": "GRAVATÁ"
+  },
+  {
+    "ddd": "81",
+    "sigla_uf": "PE",
+    "nome_municipio": "GOIANA"
+  },
+  {
+    "ddd": "81",
+    "sigla_uf": "PE",
+    "nome_municipio": "GLÓRIA DO GOITÁ"
+  },
+  {
+    "ddd": "81",
+    "sigla_uf": "PE",
+    "nome_municipio": "GAMELEIRA"
+  },
+  {
+    "ddd": "81",
+    "sigla_uf": "PE",
+    "nome_municipio": "FREI MIGUELINHO"
+  },
+  {
+    "ddd": "81",
+    "sigla_uf": "PE",
+    "nome_municipio": "FERREIROS"
+  },
+  {
+    "ddd": "81",
+    "sigla_uf": "PE",
+    "nome_municipio": "FERNANDO DE NORONHA"
+  },
+  {
+    "ddd": "81",
+    "sigla_uf": "PE",
+    "nome_municipio": "FEIRA NOVA"
+  },
+  {
+    "ddd": "81",
+    "sigla_uf": "PE",
+    "nome_municipio": "ESCADA"
+  },
+  {
+    "ddd": "81",
+    "sigla_uf": "PE",
+    "nome_municipio": "CUPIRA"
+  },
+  {
+    "ddd": "81",
+    "sigla_uf": "PE",
+    "nome_municipio": "CUMARU"
+  },
+  {
+    "ddd": "81",
+    "sigla_uf": "PE",
+    "nome_municipio": "CORTÊS"
+  },
+  {
+    "ddd": "81",
+    "sigla_uf": "PE",
+    "nome_municipio": "CONDADO"
+  },
+  {
+    "ddd": "81",
+    "sigla_uf": "PE",
+    "nome_municipio": "CHÃ GRANDE"
+  },
+  {
+    "ddd": "81",
+    "sigla_uf": "PE",
+    "nome_municipio": "CHÃ DE ALEGRIA"
+  },
+  {
+    "ddd": "81",
+    "sigla_uf": "PE",
+    "nome_municipio": "CATENDE"
+  },
+  {
+    "ddd": "81",
+    "sigla_uf": "PE",
+    "nome_municipio": "CASINHAS"
+  },
+  {
+    "ddd": "81",
+    "sigla_uf": "PE",
+    "nome_municipio": "CARUARU"
+  },
+  {
+    "ddd": "81",
+    "sigla_uf": "PE",
+    "nome_municipio": "CARPINA"
+  },
+  {
+    "ddd": "81",
+    "sigla_uf": "PE",
+    "nome_municipio": "CAMUTANGA"
+  },
+  {
+    "ddd": "81",
+    "sigla_uf": "PE",
+    "nome_municipio": "CAMOCIM DE SÃO FÉLIX"
+  },
+  {
+    "ddd": "81",
+    "sigla_uf": "PE",
+    "nome_municipio": "CAMARAGIBE"
+  },
+  {
+    "ddd": "81",
+    "sigla_uf": "PE",
+    "nome_municipio": "CACHOEIRINHA"
+  },
+  {
+    "ddd": "81",
+    "sigla_uf": "PE",
+    "nome_municipio": "CABO DE SANTO AGOSTINHO"
+  },
+  {
+    "ddd": "81",
+    "sigla_uf": "PE",
+    "nome_municipio": "BUENOS AIRES"
+  },
+  {
+    "ddd": "81",
+    "sigla_uf": "PE",
+    "nome_municipio": "BREJO DA MADRE DE DEUS"
+  },
+  {
+    "ddd": "81",
+    "sigla_uf": "PE",
+    "nome_municipio": "BONITO"
+  },
+  {
+    "ddd": "81",
+    "sigla_uf": "PE",
+    "nome_municipio": "BOM JARDIM"
+  },
+  {
+    "ddd": "81",
+    "sigla_uf": "PE",
+    "nome_municipio": "BEZERROS"
+  },
+  {
+    "ddd": "81",
+    "sigla_uf": "PE",
+    "nome_municipio": "BELO JARDIM"
+  },
+  {
+    "ddd": "81",
+    "sigla_uf": "PE",
+    "nome_municipio": "BELÉM DE MARIA"
+  },
+  {
+    "ddd": "81",
+    "sigla_uf": "PE",
+    "nome_municipio": "BARREIROS"
+  },
+  {
+    "ddd": "81",
+    "sigla_uf": "PE",
+    "nome_municipio": "BARRA DE GUABIRABA"
+  },
+  {
+    "ddd": "81",
+    "sigla_uf": "PE",
+    "nome_municipio": "ARAÇOIABA"
+  },
+  {
+    "ddd": "81",
+    "sigla_uf": "PE",
+    "nome_municipio": "AMARAJI"
+  },
+  {
+    "ddd": "81",
+    "sigla_uf": "PE",
+    "nome_municipio": "ALTINHO"
+  },
+  {
+    "ddd": "81",
+    "sigla_uf": "PE",
+    "nome_municipio": "ALIANÇA"
+  },
+  {
+    "ddd": "81",
+    "sigla_uf": "PE",
+    "nome_municipio": "ÁGUA PRETA"
+  },
+  {
+    "ddd": "81",
+    "sigla_uf": "PE",
+    "nome_municipio": "AGRESTINA"
+  },
+  {
+    "ddd": "81",
+    "sigla_uf": "PE",
+    "nome_municipio": "ABREU E LIMA"
+  },
+  {
+    "ddd": "91",
+    "sigla_uf": "PA",
+    "nome_municipio": "SANTA ISABEL DO PARÁ"
+  },
+  {
+    "ddd": "91",
+    "sigla_uf": "PA",
+    "nome_municipio": "VISEU"
+  },
+  {
+    "ddd": "91",
+    "sigla_uf": "PA",
+    "nome_municipio": "VIGIA"
+  },
+  {
+    "ddd": "91",
+    "sigla_uf": "PA",
+    "nome_municipio": "ULIANÓPOLIS"
+  },
+  {
+    "ddd": "91",
+    "sigla_uf": "PA",
+    "nome_municipio": "TRACUATEUA"
+  },
+  {
+    "ddd": "91",
+    "sigla_uf": "PA",
+    "nome_municipio": "TOMÉ-AÇU"
+  },
+  {
+    "ddd": "91",
+    "sigla_uf": "PA",
+    "nome_municipio": "TERRA ALTA"
+  },
+  {
+    "ddd": "91",
+    "sigla_uf": "PA",
+    "nome_municipio": "TAILÂNDIA"
+  },
+  {
+    "ddd": "91",
+    "sigla_uf": "PA",
+    "nome_municipio": "SOURE"
+  },
+  {
+    "ddd": "91",
+    "sigla_uf": "PA",
+    "nome_municipio": "SENADOR JOSÉ PORFÍRIO"
+  },
+  {
+    "ddd": "91",
+    "sigla_uf": "PA",
+    "nome_municipio": "SÃO SEBASTIÃO DA BOA VISTA"
+  },
+  {
+    "ddd": "91",
+    "sigla_uf": "PA",
+    "nome_municipio": "SÃO MIGUEL DO GUAMÁ"
+  },
+  {
+    "ddd": "91",
+    "sigla_uf": "PA",
+    "nome_municipio": "SÃO JOÃO DE PIRABAS"
+  },
+  {
+    "ddd": "91",
+    "sigla_uf": "PA",
+    "nome_municipio": "SÃO JOÃO DA PONTA"
+  },
+  {
+    "ddd": "91",
+    "sigla_uf": "PA",
+    "nome_municipio": "SÃO FRANCISCO DO PARÁ"
+  },
+  {
+    "ddd": "91",
+    "sigla_uf": "PA",
+    "nome_municipio": "SÃO DOMINGOS DO CAPIM"
+  },
+  {
+    "ddd": "91",
+    "sigla_uf": "PA",
+    "nome_municipio": "SÃO CAETANO DE ODIVELAS"
+  },
+  {
+    "ddd": "91",
+    "sigla_uf": "PA",
+    "nome_municipio": "SANTO ANTÔNIO DO TAUÁ"
+  },
+  {
+    "ddd": "91",
+    "sigla_uf": "PA",
+    "nome_municipio": "SANTARÉM NOVO"
+  },
+  {
+    "ddd": "91",
+    "sigla_uf": "PA",
+    "nome_municipio": "SANTA MARIA DO PARÁ"
+  },
+  {
+    "ddd": "91",
+    "sigla_uf": "PA",
+    "nome_municipio": "SANTA LUZIA DO PARÁ"
+  },
+  {
+    "ddd": "91",
+    "sigla_uf": "PA",
+    "nome_municipio": "SANTA CRUZ DO ARARI"
+  },
+  {
+    "ddd": "91",
+    "sigla_uf": "PA",
+    "nome_municipio": "SANTA BÁRBARA DO PARÁ"
+  },
+  {
+    "ddd": "91",
+    "sigla_uf": "PA",
+    "nome_municipio": "SALVATERRA"
+  },
+  {
+    "ddd": "91",
+    "sigla_uf": "PA",
+    "nome_municipio": "SALINÓPOLIS"
+  },
+  {
+    "ddd": "91",
+    "sigla_uf": "PA",
+    "nome_municipio": "QUATIPURU"
+  },
+  {
+    "ddd": "91",
+    "sigla_uf": "PA",
+    "nome_municipio": "PRIMAVERA"
+  },
+  {
+    "ddd": "91",
+    "sigla_uf": "PA",
+    "nome_municipio": "PORTEL"
+  },
+  {
+    "ddd": "91",
+    "sigla_uf": "PA",
+    "nome_municipio": "PONTA DE PEDRAS"
+  },
+  {
+    "ddd": "91",
+    "sigla_uf": "PA",
+    "nome_municipio": "PEIXE-BOI"
+  },
+  {
+    "ddd": "91",
+    "sigla_uf": "PA",
+    "nome_municipio": "PARAGOMINAS"
+  },
+  {
+    "ddd": "91",
+    "sigla_uf": "PA",
+    "nome_municipio": "PACAJÁ"
+  },
+  {
+    "ddd": "91",
+    "sigla_uf": "PA",
+    "nome_municipio": "OURÉM"
+  },
+  {
+    "ddd": "91",
+    "sigla_uf": "PA",
+    "nome_municipio": "OEIRAS DO PARÁ"
+  },
+  {
+    "ddd": "91",
+    "sigla_uf": "PA",
+    "nome_municipio": "NOVA TIMBOTEUA"
+  },
+  {
+    "ddd": "91",
+    "sigla_uf": "PA",
+    "nome_municipio": "NOVA ESPERANÇA DO PIRIÁ"
+  },
+  {
+    "ddd": "91",
+    "sigla_uf": "PA",
+    "nome_municipio": "MUANÁ"
+  },
+  {
+    "ddd": "91",
+    "sigla_uf": "PA",
+    "nome_municipio": "MOJU"
+  },
+  {
+    "ddd": "91",
+    "sigla_uf": "PA",
+    "nome_municipio": "MOCAJUBA"
+  },
+  {
+    "ddd": "91",
+    "sigla_uf": "PA",
+    "nome_municipio": "MELGAÇO"
+  },
+  {
+    "ddd": "91",
+    "sigla_uf": "PA",
+    "nome_municipio": "MARITUBA"
+  },
+  {
+    "ddd": "91",
+    "sigla_uf": "PA",
+    "nome_municipio": "MARAPANIM"
+  },
+  {
+    "ddd": "91",
+    "sigla_uf": "PA",
+    "nome_municipio": "MARACANÃ"
+  },
+  {
+    "ddd": "91",
+    "sigla_uf": "PA",
+    "nome_municipio": "MAGALHÃES BARATA"
+  },
+  {
+    "ddd": "91",
+    "sigla_uf": "PA",
+    "nome_municipio": "MÃE DO RIO"
+  },
+  {
+    "ddd": "91",
+    "sigla_uf": "PA",
+    "nome_municipio": "LIMOEIRO DO AJURU"
+  },
+  {
+    "ddd": "91",
+    "sigla_uf": "PA",
+    "nome_municipio": "IRITUIA"
+  },
+  {
+    "ddd": "91",
+    "sigla_uf": "PA",
+    "nome_municipio": "IPIXUNA DO PARÁ"
+  },
+  {
+    "ddd": "91",
+    "sigla_uf": "PA",
+    "nome_municipio": "INHANGAPI"
+  },
+  {
+    "ddd": "91",
+    "sigla_uf": "PA",
+    "nome_municipio": "IGARAPÉ-MIRI"
+  },
+  {
+    "ddd": "91",
+    "sigla_uf": "PA",
+    "nome_municipio": "IGARAPÉ-AÇU"
+  },
+  {
+    "ddd": "91",
+    "sigla_uf": "PA",
+    "nome_municipio": "GURUPÁ"
+  },
+  {
+    "ddd": "91",
+    "sigla_uf": "PA",
+    "nome_municipio": "GARRAFÃO DO NORTE"
+  },
+  {
+    "ddd": "91",
+    "sigla_uf": "PA",
+    "nome_municipio": "CURUÇÁ"
+  },
+  {
+    "ddd": "91",
+    "sigla_uf": "PA",
+    "nome_municipio": "CURRALINHO"
+  },
+  {
+    "ddd": "91",
+    "sigla_uf": "PA",
+    "nome_municipio": "CONCÓRDIA DO PARÁ"
+  },
+  {
+    "ddd": "91",
+    "sigla_uf": "PA",
+    "nome_municipio": "COLARES"
+  },
+  {
+    "ddd": "91",
+    "sigla_uf": "PA",
+    "nome_municipio": "CHAVES"
+  },
+  {
+    "ddd": "91",
+    "sigla_uf": "PA",
+    "nome_municipio": "CASTANHAL"
+  },
+  {
+    "ddd": "91",
+    "sigla_uf": "PA",
+    "nome_municipio": "CAPITÃO POÇO"
+  },
+  {
+    "ddd": "91",
+    "sigla_uf": "PA",
+    "nome_municipio": "CAPANEMA"
+  },
+  {
+    "ddd": "91",
+    "sigla_uf": "PA",
+    "nome_municipio": "CAMETÁ"
+  },
+  {
+    "ddd": "91",
+    "sigla_uf": "PA",
+    "nome_municipio": "CACHOEIRA DO ARARI"
+  },
+  {
+    "ddd": "91",
+    "sigla_uf": "PA",
+    "nome_municipio": "CACHOEIRA DO PIRIÁ"
+  },
+  {
+    "ddd": "91",
+    "sigla_uf": "PA",
+    "nome_municipio": "BUJARU"
+  },
+  {
+    "ddd": "91",
+    "sigla_uf": "PA",
+    "nome_municipio": "BREVES"
+  },
+  {
+    "ddd": "91",
+    "sigla_uf": "PA",
+    "nome_municipio": "BRAGANÇA"
+  },
+  {
+    "ddd": "91",
+    "sigla_uf": "PA",
+    "nome_municipio": "BONITO"
+  },
+  {
+    "ddd": "91",
+    "sigla_uf": "PA",
+    "nome_municipio": "BENEVIDES"
+  },
+  {
+    "ddd": "91",
+    "sigla_uf": "PA",
+    "nome_municipio": "BELÉM"
+  },
+  {
+    "ddd": "91",
+    "sigla_uf": "PA",
+    "nome_municipio": "BARCARENA"
+  },
+  {
+    "ddd": "91",
+    "sigla_uf": "PA",
+    "nome_municipio": "BAIÃO"
+  },
+  {
+    "ddd": "91",
+    "sigla_uf": "PA",
+    "nome_municipio": "BAGRE"
+  },
+  {
+    "ddd": "91",
+    "sigla_uf": "PA",
+    "nome_municipio": "AURORA DO PARÁ"
+  },
+  {
+    "ddd": "91",
+    "sigla_uf": "PA",
+    "nome_municipio": "AUGUSTO CORRÊA"
+  },
+  {
+    "ddd": "91",
+    "sigla_uf": "PA",
+    "nome_municipio": "ANAPU"
+  },
+  {
+    "ddd": "91",
+    "sigla_uf": "PA",
+    "nome_municipio": "ANANINDEUA"
+  },
+  {
+    "ddd": "91",
+    "sigla_uf": "PA",
+    "nome_municipio": "ANAJÁS"
+  },
+  {
+    "ddd": "91",
+    "sigla_uf": "PA",
+    "nome_municipio": "AFUÁ"
+  },
+  {
+    "ddd": "91",
+    "sigla_uf": "PA",
+    "nome_municipio": "ACARÁ"
+  },
+  {
+    "ddd": "91",
+    "sigla_uf": "PA",
+    "nome_municipio": "ABAETETUBA"
+  }
+]
