@@ -1,0 +1,62 @@
+contract_id: "ODCS-BR-RFB-CNPJ-001"
+source_id: "rfb_cnpj_lakehouse"
+version: "1.0.0"
+grain: "One row per establishment / company / partner / domain entry"
+primary_keys:
+  - "cnpj_14"
+canonical_keys:
+  - "cnpj_14"
+  - "cnae_7"
+  - "id_municipio"
+  - "sigla_uf"
+  - "cep_8"
+reference_date_column: "reference_date"
+lgpd_legal_basis: "Art. 7, § 3º e 4º LGPD (Dados Cadastrais Públicos com Preservação Compulsória de Máscara de CPF)"
+min_expected_rows: 5
+max_volume_drop_pct: 1.0
+sentinel_values:
+  - "-1"
+  - "99"
+  - "999"
+  - "SEM INFORMACAO"
+  - "IGNORADO"
+  - "N/A"
+  - "-"
+columns:
+  - name: "cnpj_14"
+    data_type: "string"
+    required: true
+    is_primary_key: true
+    description: "Inscrição canônica no CNPJ com 14 dígitos numéricos zfill"
+  - name: "cnpj_basico"
+    data_type: "string"
+    required: true
+    description: "Raiz do CNPJ com 8 dígitos canônicos da entidade jurídica"
+  - name: "nome_fantasia"
+    data_type: "string"
+    required: false
+    description: "Nome comercial ou de fantasia do estabelecimento"
+  - name: "situacao_cadastral"
+    data_type: "string"
+    required: true
+    description: "Código da situação cadastral do CNPJ (01 Nula, 02 Ativa, 03 Suspensa, 04 Inapta, 08 Baixada)"
+  - name: "cnae_fiscal_principal"
+    data_type: "string"
+    required: true
+    description: "Código da atividade econômica principal (CNAE Subclasse 7D)"
+  - name: "sigla_uf"
+    data_type: "string"
+    required: false
+    description: "Sigla oficial de 2 letras maiúsculas da Unidade Federativa"
+  - name: "cep_8"
+    data_type: "string"
+    required: false
+    description: "Código de Endereçamento Postal com 8 dígitos sem hífen"
+  - name: "reference_date"
+    data_type: "string"
+    required: true
+    description: "Data/Competência de referência da base cadastral da Receita Federal (YYYY-MM-DD)"
+  - name: "extracted_at"
+    data_type: "string"
+    required: true
+    description: "Timestamp ISO-8601 da extração do dado"

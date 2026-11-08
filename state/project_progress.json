@@ -1,7 +1,7 @@
 {
   "schema_version": "1.0.0",
-  "last_updated": "2026-11-07",
-  "project_name": "brazil-data-gateway",
+  "last_updated": "2026-11-08",
+  "project_name": "public-data-gateway",
   "ecosystem": "C.O.R.E. (core, operations, career, studies)",
   "governing_pops": [
     "POP_T_177",
@@ -149,6 +149,18 @@
         "Feature Store consolidada para modelos preditivos de propensão e risco",
         "Extração de insights comerciais e operacionais acoplados aos 10 Produtos Modulares C.O.R.E."
       ]
+    },
+    {
+      "phase_id": "10",
+      "name": "Expansão de Fronteira: Auditoria Conecta GOV.BR & Inclusão de APIs Públicas Globais/Geoespaciais",
+      "status": "PENDING",
+      "completion_date": null,
+      "deliverables": [
+        "Auditoria e varredura do Conecta GOV.BR (https://www.gov.br/conecta/catalogo/) para identificar e homologar APIs governamentais federais adicionais que ficaram fora do catálogo inicial",
+        "Mapeamento e viabilidade de APIs públicas globais e geoespaciais de alto valor analítico: Google Maps API (Geocoding/Places) e alternativas abertas como OpenStreetMap / Nominatim (https://www.openstreetmap.org/) e Mapbox API (https://www.mapbox.com/)",
+        "Bipartição da documentação oficial, dbt e catálogo mestre estruturada em: 1) Catálogo APIs Gov Brasil e 2) Catálogo Outras APIs Públicas & Globais",
+        "Disponibilização de conectores com o mesmo padrão ODCS v3.1, camadas Medallion (Bronze/Silver/Gold) e testes fail-hard com limites de rate limit e FinOps"
+      ]
     }
   ],
   "active_connector_gates": {
@@ -271,6 +283,12 @@
       "phase_id": "04",
       "milestone": "Homologação do Conector rfb_cnpj_lakehouse (10 Tabelas, dbt, Mart B2B & Live Fail-Hard)",
       "summary": "Implementação de ponta a ponta do conector rfb_cnpj_lakehouse iniciando a Wave 2: 10 tabelas (rfb_cnaes, rfb_motivos, rfb_municipios, rfb_naturezas, rfb_paises, rfb_qualificacoes, rfb_empresas, rfb_estabelecimentos, rfb_socios, rfb_simples) materializadas em data/rfb_cnpj_lakehouse/{bronze,silver,gold}/; 14 novos modelos dbt (10 staging, dim_empresa, dim_estabelecimento, dim_socio_qsa, mart_densidade_empresarial_brasil) totalizando 48 modelos e 416 testes dbt 100% aprovados; 481 colunas 100% documentadas no linter; testes reais de 1 linha com fail-hard contra o endpoint oficial de CNPJ e suíte offline com 54 testes pytest 100% verde."
+    },
+    {
+      "date": "2026-11-08",
+      "phase_id": "04",
+      "milestone": "Transição de Identidade: Renomeação para public-data-gateway & Registro da Fase 10 (Conecta GOV.BR & Geo/Maps)",
+      "summary": "Renomeação oficial do repositório e projeto para public-data-gateway, integrando suporte simultâneo aos comandos pdg/bdg e pdg-mcp/bdg-mcp, atualização dos vínculos do ecossistema C.O.R.E. e registro da Fase 10 no plano de implementação contemplando a auditoria do Conecta GOV.BR, viabilidade de APIs geoespaciais (Google Maps, OpenStreetMap, Mapbox) e futura bipartição entre catálogo Gov Brasil e catálogo público global."
     }
   ]
 }

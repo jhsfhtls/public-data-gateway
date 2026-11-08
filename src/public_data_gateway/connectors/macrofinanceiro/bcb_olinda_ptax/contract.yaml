@@ -1,0 +1,66 @@
+contract_id: "ODCS-BR-BCB-OLINDA-PTAX-001"
+source_id: "bcb_olinda_ptax"
+version: "1.0.0"
+grain: "One row per currency per quotation reference date"
+primary_keys:
+  - "simbolo_moeda"
+  - "data_cotacao"
+reference_date_column: "reference_date"
+lgpd_legal_basis: "Art. 7, § 3 (Public Data - LAI Law 12.527/2011 & BACEN Open Data)"
+min_expected_rows: 30
+max_volume_drop_pct: 1.0
+sentinel_values:
+  - "-1"
+  - "99"
+  - "999"
+  - "SEM INFORMACAO"
+  - "IGNORADO"
+  - "N/A"
+  - "-"
+columns:
+  - name: "simbolo_moeda"
+    data_type: "string"
+    required: true
+    is_primary_key: true
+    description: "Símbolo alfabético padrão ISO 4217 da moeda estrangeira cotada (USD, EUR, GBP, JPY, CAD, CHF, AUD)"
+  - name: "data_cotacao"
+    data_type: "string"
+    required: true
+    is_primary_key: true
+    description: "Data oficial do dia útil de apuração da taxa PTAX no padrão ISO-8601 (YYYY-MM-DD)"
+  - name: "data_hora_cotacao"
+    data_type: "string"
+    required: true
+    description: "Timestamp exato com milissegundos da apuração do boletim de câmbio pelo Banco Central"
+  - name: "ano_mes"
+    data_type: "string"
+    required: true
+    description: "Ano e mês de competência da cotação no formato YYYY-MM"
+  - name: "cotacao_compra"
+    data_type: "float"
+    required: true
+    description: "Taxa de câmbio oficial de compra em Reais (BRL) fixada pelo Banco Central"
+  - name: "cotacao_venda"
+    data_type: "float"
+    required: true
+    description: "Taxa de câmbio oficial de venda em Reais (BRL) fixada pelo Banco Central"
+  - name: "paridade_compra"
+    data_type: "float"
+    required: false
+    description: "Paridade de compra da moeda estrangeira em relação ao Dólar dos Estados Unidos (USD)"
+  - name: "paridade_venda"
+    data_type: "float"
+    required: false
+    description: "Paridade de venda da moeda estrangeira em relação ao Dólar dos Estados Unidos (USD)"
+  - name: "tipo_boletim"
+    data_type: "string"
+    required: false
+    description: "Tipo de boletim diário divulgado (Abertura, Intermediário, Fechamento PTAX)"
+  - name: "reference_date"
+    data_type: "string"
+    required: true
+    description: "Data de referência para particionamento e joins temporais (YYYY-MM-DD)"
+  - name: "extracted_at"
+    data_type: "string"
+    required: true
+    description: "Timestamp ISO-8601 da extração dos dados via API Olinda OData v4"

@@ -1,0 +1,20 @@
+version: 2
+
+sources:
+  - name: bcb_sgs
+    description: "Fontes brutas normalizadas das Séries Temporais do Banco Central (SGS) em formato colunar Parquet ZSTD."
+    meta:
+      external_location: "data/bcb_sgs/silver/{name}.parquet"
+    tables:
+      - name: sgs_catalogo
+        description: "Catálogo descritivo e metadados das séries macroeconômicas monitoradas no SGS."
+      - name: sgs_ipca
+        description: "Observações históricas do IPCA mensal e acumulado 12 meses apurado pelo IBGE e catalogado no BACEN."
+      - name: sgs_igpm
+        description: "Observações históricas do IGP-M apurado pelo FGV/IBRE e catalogado no BACEN."
+      - name: sgs_selic
+        description: "Observações históricas da Taxa Selic diária anualizada e Meta COPOM estipulada pelo Banco Central."
+      - name: sgs_cdi
+        description: "Observações históricas da Taxa CDI diária anualizada base 252 apurada pela B3 e catalogada no BACEN."
+      - name: sgs_ibcbr
+        description: "Observações históricas do Índice de Atividade Econômica do Banco Central (IBC-Br dessazonalizado)."

@@ -155,7 +155,7 @@ def test_mcp_dispatcher_and_hitl_guard(tmp_settings: GatewaySettings, tmp_path: 
 
     # 1. initialize
     init_res = dispatcher.handle_request({"id": 1, "method": "initialize", "params": {}})
-    assert init_res["result"]["serverInfo"]["name"] == "brazil-data-gateway-mcp"
+    assert init_res["result"]["serverInfo"]["name"] in ["public-data-gateway-mcp", "brazil-data-gateway-mcp"]
 
     # 2. tools/list
     tools_res = dispatcher.handle_request({"id": 2, "method": "tools/list", "params": {}})

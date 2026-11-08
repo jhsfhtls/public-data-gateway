@@ -1,0 +1,28 @@
+version: 2
+
+sources:
+  - name: rfb_cnpj_lakehouse
+    description: "Fontes brutas normalizadas do Cadastro Nacional da Pessoa Jurídica (CNPJ, QSA, Simples e Tabelas de Domínio da Receita Federal) em Parquet ZSTD."
+    meta:
+      external_location: "data/rfb_cnpj_lakehouse/silver/{name}.parquet"
+    tables:
+      - name: rfb_cnaes
+        description: "Tabela de domínio da Classificação Nacional de Atividades Econômicas (CNAE Subclasses 7D)."
+      - name: rfb_motivos
+        description: "Tabela de domínio de motivos de situação cadastral do CNPJ."
+      - name: rfb_municipios
+        description: "Tabela de correspondência de códigos de municípios da Receita Federal."
+      - name: rfb_naturezas
+        description: "Tabela de domínio de naturezas jurídicas do CONCLA/RFB."
+      - name: rfb_paises
+        description: "Tabela de domínio de países de domicílio e sede."
+      - name: rfb_qualificacoes
+        description: "Tabela de domínio de qualificações de sócios e administradores do QSA."
+      - name: rfb_empresas
+        description: "Cadastro de empresas jurídicas a nível de raiz cadastral (CNPJ Básico 8D, Razão Social, Porte, Capital Social)."
+      - name: rfb_estabelecimentos
+        description: "Cadastro de estabelecimentos matrizes e filiais a nível de CNPJ Completo 14D (CNAE Principal, Endereço, Situação Cadastral)."
+      - name: rfb_socios
+        description: "Quadro de Sócios e Administradores (QSA) com preservação de máscara LGPD e faixa etária."
+      - name: rfb_simples
+        description: "Histórico de enquadramento tributário no regime Simples Nacional e MEI."

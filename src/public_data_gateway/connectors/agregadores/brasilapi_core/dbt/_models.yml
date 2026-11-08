@@ -1,0 +1,197 @@
+version: 2
+
+models:
+  - name: stg_brasilapi_bancos
+    description: "Visão padronizada de instituições financeiras bancárias participantes do Sistema Financeiro Nacional."
+    columns:
+      - name: ispb
+        description: "Identificador do Sistema de Pagamentos Brasileiro (ISPB) com 8 dígitos canônicos."
+        tests:
+          - unique
+          - not_null
+      - name: codigo_compensacao
+        description: "Código COMPE de compensação bancária com 3 dígitos (ex: 001 Banco do Brasil, 237 Bradesco) ou NULL para fintechs sem código direto."
+      - name: nome_reduzido
+        description: "Nome comercial resumido da instituição bancária."
+        tests:
+          - not_null
+      - name: nome_completo
+        description: "Razão social oficial completa da instituição cadastrada no Banco Central."
+        tests:
+          - not_null
+      - name: cidade_sede
+        description: "Município onde se localiza a sede administrativa da instituição financeira."
+      - name: uf_sede
+        description: "Sigla oficial de 2 letras da Unidade Federativa da sede da instituição financeira."
+      - name: reference_date
+        description: "Data/Competência de referência da base cadastral (YYYY-MM-DD)."
+        tests:
+          - not_null
+      - name: extracted_at
+        description: "Timestamp ISO-8601 da extração do registro."
+        tests:
+          - not_null
+
+  - name: stg_brasilapi_pix_participantes
+    description: "Visão padronizada dos participantes homologados no arranjo de pagamentos instantâneos PIX."
+    columns:
+      - name: ispb
+        description: "Código ISPB de 8 dígitos da instituição participante do PIX."
+        tests:
+          - unique
+          - not_null
+      - name: nome
+        description: "Razão social do participante PIX."
+        tests:
+          - not_null
+      - name: nome_reduzido
+        description: "Nome comercial resumido do participante PIX."
+        tests:
+          - not_null
+      - name: modalidade_participacao
+        description: "Modalidade de adesão no arranjo (ex: Provedor de Conta Transacional, Liquidante Especial)."
+        tests:
+          - not_null
+      - name: tipo_participacao
+        description: "Classificação da participação no SPI (Direta ou Indireta)."
+        tests:
+          - not_null
+      - name: inicio_operacao
+        description: "Timestamp ou data de homologação e início das operações no ecossistema PIX."
+      - name: reference_date
+        description: "Data de referência do catálogo de participantes PIX (YYYY-MM-DD)."
+        tests:
+          - not_null
+      - name: extracted_at
+        description: "Timestamp ISO-8601 da extração do registro."
+        tests:
+          - not_null
+
+  - name: stg_brasilapi_corretoras
+    description: "Visão padronizada de corretoras e distribuidoras de valores mobiliários registradas na CVM."
+    columns:
+      - name: cnpj_14
+        description: "Número de inscrição no Cadastro Nacional da Pessoa Jurídica com 14 dígitos canônicos."
+        tests:
+          - not_null
+      - name: codigo_cvm
+        description: "Código de registro cadastral da entidade perante a Comissão de Valores Mobiliários."
+        tests:
+          - unique
+          - not_null
+      - name: nome_social
+        description: "Razão social da instituição perante os órgãos reguladores."
+        tests:
+          - not_null
+      - name: nome_comercial
+        description: "Nome fantasia ou marca comercial operada no mercado financeiro."
+      - name: status
+        description: "Situação cadastral na CVM (ex: EM FUNCIONAMENTO NORMAL, CANCELADA)."
+        tests:
+          - not_null
+      - name: municipio
+        description: "Município do domicílio fiscal da corretora."
+      - name: sigla_uf
+        description: "Sigla de 2 letras da Unidade Federativa da sede fiscal."
+      - name: cep_8
+        description: "Código de endereçamento postal com 8 dígitos zfill."
+      - name: reference_date
+        description: "Data de referência do registro CVM (YYYY-MM-DD)."
+        tests:
+          - not_null
+      - name: extracted_at
+        description: "Timestamp ISO-8601 da extração do dado."
+        tests:
+          - not_null
+
+  - name: stg_brasilapi_feriados
+    description: "Visão padronizada dos feriados nacionais bancários e civis do Brasil."
+    columns:
+      - name: data_feriado
+        description: "Data do feriado no formato YYYY-MM-DD."
+        tests:
+          - unique
+          - not_null
+      - name: nome_feriado
+        description: "Denominação oficial do feriado nacional (ex: Tiradentes, Proclamação da República)."
+        tests:
+          - not_null
+      - name: tipo_feriado
+        description: "Classificação do feriado (nacional, estadual, ponto facultativo)."
+        tests:
+          - not_null
+      - name: dia_semana
+        description: "Dia da semana correspondente por extenso em português (ex: segunda-feira)."
+        tests:
+          - not_null
+      - name: ano
+        description: "Ano do calendário civil correspondente ao feriado."
+        tests:
+          - not_null
+      - name: reference_date
+        description: "Data de referência para alinhamento temporal point-in-time (YYYY-MM-DD)."
+        tests:
+          - not_null
+      - name: extracted_at
+        description: "Timestamp ISO-8601 da captura do dado."
+        tests:
+          - not_null
+
+  - name: stg_brasilapi_ddds
+    description: "Visão padronizada de mapeamento entre prefixos telefônicos DDD, UFs e municípios atendidos."
+    columns:
+      - name: ddd
+        description: "Código de discagem direta à distância de 2 dígitos numéricos (ex: 11, 21, 31)."
+        tests:
+          - not_null
+      - name: sigla_uf
+        description: "Sigla de 2 letras da Unidade Federativa coberta pelo DDD."
+        tests:
+          - not_null
+      - name: nome_municipio
+        description: "Nome do município associado à área de numeração telefônica."
+        tests:
+          - not_null
+      - name: reference_date
+        description: "Data de referência do cadastro telefônico (YYYY-MM-DD)."
+        tests:
+          - not_null
+      - name: extracted_at
+        description: "Timestamp ISO-8601 da captura."
+        tests:
+          - not_null
+
+  - name: stg_brasilapi_ceps
+    description: "Visão padronizada de endereçamento de CEPs com geolocalização e vínculo IBGE."
+    columns:
+      - name: cep_8
+        description: "Código de Endereçamento Postal canônico com 8 dígitos sem pontuação."
+        tests:
+          - unique
+          - not_null
+      - name: sigla_uf
+        description: "Sigla de 2 letras da Unidade Federativa do logradouro."
+        tests:
+          - not_null
+      - name: nome_municipio
+        description: "Nome oficial do município onde se localiza o CEP."
+        tests:
+          - not_null
+      - name: bairro
+        description: "Nome do bairro ou distrito municipal do logradouro."
+      - name: logradouro
+        description: "Nome do logradouro público (rua, avenida, praça, alameda)."
+      - name: id_municipio
+        description: "Código IBGE de 7 dígitos do município resolvido na borda."
+      - name: latitude
+        description: "Coordenada geográfica de latitude decimal WGS84."
+      - name: longitude
+        description: "Coordenada geográfica de longitude decimal WGS84."
+      - name: reference_date
+        description: "Data de referência do cadastro postal (YYYY-MM-DD)."
+        tests:
+          - not_null
+      - name: extracted_at
+        description: "Timestamp ISO-8601 da extração."
+        tests:
+          - not_null

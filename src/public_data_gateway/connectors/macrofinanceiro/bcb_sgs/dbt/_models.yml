@@ -1,0 +1,213 @@
+version: 2
+
+models:
+  - name: stg_bcb_sgs_catalogo
+    description: "Visão padronizada dos metadados e catálogo das séries temporais monitoradas no SGS/BACEN."
+    columns:
+      - name: id_serie
+        description: "Código numérico identificador exclusivo da série no SGS do Banco Central."
+        tests:
+          - not_null
+          - unique
+      - name: nome_serie
+        description: "Nome descritivo oficial da série macroeconômica cadastrada."
+        tests:
+          - not_null
+      - name: periodicidade
+        description: "Periodicidade oficial de apuração da série (ex: MENSAL, DIARIA, REUNIAO_COPOM)."
+        tests:
+          - not_null
+      - name: unidade_medida
+        description: "Unidade de medida oficial da série (ex: % a.m., % a.a., Número Índice)."
+        tests:
+          - not_null
+      - name: orgao_gestor
+        description: "Entidade ou autarquia responsável pela apuração primária ou compilação da série."
+        tests:
+          - not_null
+      - name: categoria
+        description: "Segmentação temática analítica da série (ex: INFLACAO, JUROS, ATIVIDADE_ECONOMICA)."
+        tests:
+          - not_null
+      - name: data_inicio_historico
+        description: "Data da primeira observação registrada no histórico oficial da série temporal."
+        tests:
+          - not_null
+      - name: reference_date
+        description: "Ano/Data de competência do catálogo cadastral (YYYY-MM-DD)."
+        tests:
+          - not_null
+      - name: extracted_at
+        description: "Timestamp ISO-8601 do momento da extração dos metadados."
+        tests:
+          - not_null
+
+  - name: stg_bcb_sgs_ipca
+    description: "Visão padronizada das observações históricas do IPCA (mensal e acumulado 12 meses)."
+    columns:
+      - name: id_serie
+        description: "Código identificador da série de IPCA no SGS (433 para mensal, 13522 para 12 meses)."
+        tests:
+          - not_null
+      - name: data_referencia
+        description: "Data de competência oficial da apuração do IPCA no formato YYYY-MM-DD."
+        tests:
+          - not_null
+      - name: ano_mes
+        description: "Competência mensal da observação do IPCA no formato YYYY-MM."
+        tests:
+          - not_null
+      - name: valor
+        description: "Variação percentual apurada do IPCA para o período de referência."
+        tests:
+          - not_null
+      - name: nome_serie
+        description: "Nome oficial descritivo da série de IPCA."
+      - name: unidade_medida
+        description: "Unidade de mensuração da taxa de inflação (% a.m. ou % a.a.)."
+      - name: periodicidade
+        description: "Periodicidade de apuração do índice pelo IBGE (MENSAL)."
+      - name: reference_date
+        description: "Data de competência para joins temporais point-in-time (YYYY-MM-DD)."
+        tests:
+          - not_null
+      - name: extracted_at
+        description: "Timestamp ISO-8601 de captura do dado no Banco Central."
+        tests:
+          - not_null
+
+  - name: stg_bcb_sgs_igpm
+    description: "Visão padronizada das observações históricas do IGP-M apurado pelo FGV/IBRE."
+    columns:
+      - name: id_serie
+        description: "Código identificador da série de IGP-M no SGS (189)."
+        tests:
+          - not_null
+      - name: data_referencia
+        description: "Data de competência oficial da apuração do IGP-M no formato YYYY-MM-DD."
+        tests:
+          - not_null
+      - name: ano_mes
+        description: "Competência mensal da observação do IGP-M no formato YYYY-MM."
+        tests:
+          - not_null
+      - name: valor
+        description: "Variação percentual apurada do IGP-M para o mês de referência."
+        tests:
+          - not_null
+      - name: nome_serie
+        description: "Nome oficial descritivo da série de IGP-M."
+      - name: unidade_medida
+        description: "Unidade de mensuração da taxa (% a.m.)."
+      - name: periodicidade
+        description: "Periodicidade de apuração do índice pela FGV (MENSAL)."
+      - name: reference_date
+        description: "Data de competência para joins temporais (YYYY-MM-DD)."
+        tests:
+          - not_null
+      - name: extracted_at
+        description: "Timestamp ISO-8601 de captura do dado no Banco Central."
+        tests:
+          - not_null
+
+  - name: stg_bcb_sgs_selic
+    description: "Visão padronizada das observações históricas da Taxa Selic (diária e meta COPOM)."
+    columns:
+      - name: id_serie
+        description: "Código identificador da série Selic no SGS (11 para diária, 432 para meta COPOM)."
+        tests:
+          - not_null
+      - name: data_referencia
+        description: "Data oficial de vigência ou apuração da taxa Selic no formato YYYY-MM-DD."
+        tests:
+          - not_null
+      - name: ano_mes
+        description: "Competência mensal da observação da taxa Selic no formato YYYY-MM."
+        tests:
+          - not_null
+      - name: valor
+        description: "Taxa Selic apurada anualizada ou meta estipulada em percentual ao ano (% a.a.)."
+        tests:
+          - not_null
+      - name: nome_serie
+        description: "Nome oficial descritivo da série da taxa Selic."
+      - name: unidade_medida
+        description: "Unidade de medida da taxa Selic (% a.a.)."
+      - name: periodicidade
+        description: "Periodicidade de apuração ou deliberação da Selic (DIARIA ou REUNIAO_COPOM)."
+      - name: reference_date
+        description: "Data de competência da taxa para cálculo de deflatores e juros (YYYY-MM-DD)."
+        tests:
+          - not_null
+      - name: extracted_at
+        description: "Timestamp ISO-8601 de captura do dado no Banco Central."
+        tests:
+          - not_null
+
+  - name: stg_bcb_sgs_cdi
+    description: "Visão padronizada das observações históricas da Taxa CDI diária anualizada."
+    columns:
+      - name: id_serie
+        description: "Código identificador da série CDI no SGS (12)."
+        tests:
+          - not_null
+      - name: data_referencia
+        description: "Data oficial de apuração da taxa CDI pela B3 no formato YYYY-MM-DD."
+        tests:
+          - not_null
+      - name: ano_mes
+        description: "Competência mensal da observação da taxa CDI no formato YYYY-MM."
+        tests:
+          - not_null
+      - name: valor
+        description: "Taxa CDI diária anualizada base 252 apurada pela B3 (% a.a.)."
+        tests:
+          - not_null
+      - name: nome_serie
+        description: "Nome oficial descritivo da série CDI."
+      - name: unidade_medida
+        description: "Unidade de medida da taxa CDI (% a.a.)."
+      - name: periodicidade
+        description: "Periodicidade de apuração da taxa interbancária (DIARIA)."
+      - name: reference_date
+        description: "Data de competência para joins temporais (YYYY-MM-DD)."
+        tests:
+          - not_null
+      - name: extracted_at
+        description: "Timestamp ISO-8601 de captura do dado no Banco Central."
+        tests:
+          - not_null
+
+  - name: stg_bcb_sgs_ibcbr
+    description: "Visão padronizada das observações históricas do IBC-Br (Índice de Atividade Econômica BACEN)."
+    columns:
+      - name: id_serie
+        description: "Código identificador da série IBC-Br no SGS (24363)."
+        tests:
+          - not_null
+      - name: data_referencia
+        description: "Data de competência oficial do índice IBC-Br no formato YYYY-MM-DD."
+        tests:
+          - not_null
+      - name: ano_mes
+        description: "Competência mensal da observação do IBC-Br no formato YYYY-MM."
+        tests:
+          - not_null
+      - name: valor
+        description: "Número índice dessazonalizado apurado pelo Banco Central para atividade econômica."
+        tests:
+          - not_null
+      - name: nome_serie
+        description: "Nome oficial descritivo da série IBC-Br."
+      - name: unidade_medida
+        description: "Unidade de mensuração do índice de atividade (Número Índice)."
+      - name: periodicidade
+        description: "Periodicidade de apuração da atividade econômica (MENSAL)."
+      - name: reference_date
+        description: "Data de competência para joins temporais com dados de faturamento e emprego (YYYY-MM-DD)."
+        tests:
+          - not_null
+      - name: extracted_at
+        description: "Timestamp ISO-8601 de captura do dado no Banco Central."
+        tests:
+          - not_null
