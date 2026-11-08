@@ -179,6 +179,37 @@ class ComplianceFacade:
         return conn.list_pep(uf=uf, sigla_funcao=sigla_funcao, ativos_only=ativos_only, limit=limit)
 
 
+class JudicialFacade:
+    """Judicial proceedings, procedural metadata and litigation risk interface (CNJ DataJud)."""
+
+    def __init__(self, sdk: "BrazilData") -> None:
+        self._sdk = sdk
+        self._connector: Any = None
+
+    @property
+    def connector(self) -> Any:
+        if self._connector is None:
+            from public_data_gateway.connectors.judicial.cnj_datajud.connector import (
+                CNJDataJudConnector,
+            )
+
+            self._connector = CNJDataJudConnector(settings=self._sdk.settings)
+        return self._connector
+
+    def litigation_risk(self, cnpj_or_cpf: str) -> dict[str, Any]:
+        """Assess corporate or individual litigation risk profile across all courts."""
+        return self.connector.get_litigation_risk(cnpj_or_cpf)
+
+    def search_processos(
+        self,
+        termo: str,
+        tribunal: str | None = None,
+        limit: int = 50,
+    ) -> list[dict[str, Any]]:
+        """Search judicial processes by process number (NUP), party name, or court."""
+        return self.connector.search_processos(termo=termo, tribunal=tribunal, limit=limit)
+
+
 class BrazilData:
     """Unified developer SDK facade for querying, normalizing, and enriching Brazilian public datasets."""
 
@@ -196,6 +227,7 @@ class BrazilData:
         self.geo = GeoFacade(self)
         self.procurement = ProcurementFacade(self)
         self.compliance = ComplianceFacade(self)
+        self.judicial = JudicialFacade(self)
 
     def list_sources(
         self,
@@ -261,6 +293,10 @@ class BrazilData:
     def get_pep_status(self, cpf_or_name: str) -> dict[str, Any]:
         """Check whether a person (CPF or Name) is registered as Politically Exposed Person (PEP)."""
         return self.compliance.pep_status(cpf_or_name)
+
+    def get_litigation_risk(self, cnpj_or_cpf: str) -> dict[str, Any]:
+        """Assess corporate or individual litigation risk profile across all courts (CNJ DataJud)."""
+        return self.judicial.litigation_risk(cnpj_or_cpf)
 
     def resolve_municipality(
         self, code_or_name: str | int, uf: str | None = None

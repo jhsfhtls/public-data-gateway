@@ -235,7 +235,7 @@ sources:
   - P07
   rice_score: 780
   roadmap_wave: 2
-  status: CATALOGED
+  status: HOMOLOGATED
 - source_id: cgu_ceis_cnep
   name: 'CGU: Cadastros de Empresas Inidôneas, Suspensas e Punidas (CEIS/CNEP)'
   agency: Controladoria-Geral da União (CGU)

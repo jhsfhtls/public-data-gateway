@@ -1,0 +1,201 @@
+version: 2
+
+models:
+  - name: stg_cnj_processos
+    description: "Visão staging normalizada dos processos judiciais brasileiros cadastrados no CNJ DataJud."
+    columns:
+      - name: numero_processo
+        description: "Número Único de Processo (NUP) canônico no padrão NNNNNNN-DD.AAAA.J.TR.OOOO."
+        tests:
+          - not_null
+          - unique
+      - name: tribunal_sigla
+        description: "Sigla do tribunal de justiça ou tribunal regional competente (ex: TJSP, TRF1, TRT2, STJ)."
+        tests:
+          - not_null
+      - name: grau_jurisdicao
+        description: "Instância ou grau de jurisdição dos autos (G1 = 1º Grau, G2 = 2º Grau, JE = Juizado Especial, TR = Turma Recursal, SUP = Superior)."
+        tests:
+          - not_null
+      - name: classe_codigo_tpu
+        description: "Código numérico da classe processual unificada pelo CNJ."
+        tests:
+          - not_null
+      - name: classe_nome
+        description: "Denominação da classe processual padronizada pelo CNJ."
+        tests:
+          - not_null
+      - name: data_ajuizamento
+        description: "Data em que a ação judicial foi distribuída e ajuizada perante o órgão jurisdicional."
+        tests:
+          - not_null
+      - name: valor_causa
+        description: "Valor econômico atribuído à causa em Reais (BRL)."
+      - name: orgao_julgador_nome
+        description: "Nome da vara, câmara, turma ou órgão julgador responsável pela condução dos autos."
+        tests:
+          - not_null
+      - name: orgao_julgador_municipio_ibge
+        description: "Código IBGE de 7 dígitos do município sede do órgão julgador."
+      - name: sistema_origem
+        description: "Sistema processual eletrônico de origem dos autos (PJe, eproc, Projudi, SAJ, Themis)."
+        tests:
+          - not_null
+      - name: is_segredo_justica
+        description: "Indicador booleano se os autos tramitam sob segredo de justiça (CPC art. 189)."
+        tests:
+          - not_null
+      - name: situacao_processual
+        description: "Situação da tramitação dos autos (ATIVO_EM_ANDAMENTO, SUSPENSO, BAIXADO_ARQUIVADO)."
+        tests:
+          - not_null
+          - accepted_values:
+              values: ['ATIVO_EM_ANDAMENTO', 'SUSPENSO', 'BAIXADO_ARQUIVADO']
+      - name: polo_ativo_tipo
+        description: "Classificação do polo ativo (FAZENDA_NACIONAL, FAZENDA_ESTADUAL, PESSOA_JURIDICA, PESSOA_FISICA)."
+        tests:
+          - not_null
+      - name: polo_passivo_documento
+        description: "CNPJ de 14 dígitos ou CPF mascarado da parte demandada no polo passivo."
+        tests:
+          - not_null
+      - name: polo_passivo_nome
+        description: "Razão Social ou Nome completo da parte demandada no polo passivo."
+        tests:
+          - not_null
+      - name: extracted_at
+        description: "Timestamp UTC da extração e materialização dos dados."
+        tests:
+          - not_null
+
+  - name: stg_cnj_tribunais
+    description: "Visão staging do catálogo unificado de tribunais do Poder Judiciário Nacional."
+    columns:
+      - name: tribunal_sigla
+        description: "Sigla oficial de identificação do tribunal (ex: TJSP, TRF1, TRT2, STJ, TST)."
+        tests:
+          - not_null
+          - unique
+      - name: tribunal_nome
+        description: "Denominação institucional por extenso do tribunal."
+        tests:
+          - not_null
+      - name: ramo_justica
+        description: "Ramo de atuação da justiça brasileira (ESTADUAL, FEDERAL, TRABALHISTA, ELEITORAL, MILITAR, SUPERIOR)."
+        tests:
+          - not_null
+          - accepted_values:
+              values: ['ESTADUAL', 'FEDERAL', 'TRABALHISTA', 'ELEITORAL', 'MILITAR', 'SUPERIOR']
+      - name: esfera_uf
+        description: "Sigla da Unidade Federativa da sede do tribunal ou jurisdição."
+        tests:
+          - not_null
+      - name: municipio_sede_ibge
+        description: "Código IBGE de 7 dígitos do município da sede administrativa do tribunal."
+        tests:
+          - not_null
+      - name: portal_consulta_url
+        description: "URL do portal público de consulta processual do tribunal."
+        tests:
+          - not_null
+      - name: total_processos_estimados
+        description: "Acervo total estimado de processos em tramitação e arquivados no tribunal."
+        tests:
+          - not_null
+      - name: extracted_at
+        description: "Timestamp UTC da extração e materialização dos dados."
+        tests:
+          - not_null
+
+  - name: stg_cnj_classes_tpu
+    description: "Visão staging da Tabela Processual Unificada (TPU) - Classes Processuais do CNJ."
+    columns:
+      - name: classe_codigo_tpu
+        description: "Código numérico oficial da classe processual padronizada pelo CNJ."
+        tests:
+          - not_null
+          - unique
+      - name: classe_nome
+        description: "Nome por extenso da classe processual unificada."
+        tests:
+          - not_null
+      - name: natureza_processual
+        description: "Natureza do procedimento (CONHECIMENTO, EXECUCAO, CAUTELAR, FALIMENTAR_EMPRESARIAL, RECURSAL)."
+        tests:
+          - not_null
+      - name: ramo_aplicavel
+        description: "Ramo do direito ao qual a classe é predominantemente aplicada (CIVEL, FISCAL, TRABALHISTA, EMPRESARIAL, PUBLICO_CONSTITUCIONAL)."
+        tests:
+          - not_null
+      - name: amparo_resolucao_cnj
+        description: "Normativo regulamentador do Conselho Nacional de Justiça que instituiu a classe."
+        tests:
+          - not_null
+      - name: extracted_at
+        description: "Timestamp UTC da extração e materialização dos dados."
+        tests:
+          - not_null
+
+  - name: stg_cnj_assuntos_tpu
+    description: "Visão staging da Tabela Processual Unificada (TPU) - Assuntos Processuais do CNJ."
+    columns:
+      - name: assunto_codigo_tpu
+        description: "Código numérico oficial do assunto processual padronizado pelo CNJ."
+        tests:
+          - not_null
+          - unique
+      - name: assunto_descricao
+        description: "Descrição detalhada da matéria de direito ou pedido controvertido."
+        tests:
+          - not_null
+      - name: ramo_direito
+        description: "Ramo do direito correspondente ao assunto (DIREITO_TRIBUTARIO, DIREITO_CIVIL, DIREITO_DO_TRABALHO, DIREITO_EMPRESARIAL)."
+        tests:
+          - not_null
+      - name: is_tema_repetitivo
+        description: "Indicador booleano se o assunto está vinculado a tema de repercussão geral ou recurso repetitivo."
+        tests:
+          - not_null
+      - name: score_peso_risco
+        description: "Peso ponderado de risco judicial atribuído ao assunto para cálculo de passivo contingente."
+        tests:
+          - not_null
+      - name: extracted_at
+        description: "Timestamp UTC da extração e materialização dos dados."
+        tests:
+          - not_null
+
+  - name: stg_cnj_movimentos_processuais
+    description: "Visão staging dos andamentos e movimentações processuais unificadas dos autos."
+    columns:
+      - name: id_movimento
+        description: "Identificador hash unívoco do andamento processual."
+        tests:
+          - not_null
+          - unique
+      - name: numero_processo
+        description: "Número Único de Processo (NUP) canônico dos autos vinculados."
+        tests:
+          - not_null
+      - name: data_hora_movimento
+        description: "Data e hora no formato ISO 8601 em que a movimentação foi lançada no processo eletrônico."
+        tests:
+          - not_null
+      - name: movimento_codigo_tpu
+        description: "Código numérico do movimento processual padronizado na TPU pelo CNJ."
+        tests:
+          - not_null
+      - name: movimento_nome
+        description: "Nome oficial do ato processual praticado nos autos."
+        tests:
+          - not_null
+      - name: complemento_movimento
+        description: "Texto complementar especificando o ato praticado ou certidão lançada."
+      - name: is_movimento_conclusivo
+        description: "Indicador booleano se o ato encerra a fase de conhecimento ou resolve o mérito da lide."
+        tests:
+          - not_null
+      - name: extracted_at
+        description: "Timestamp UTC da extração e materialização dos dados."
+        tests:
+          - not_null
