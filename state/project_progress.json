@@ -15,8 +15,8 @@
   "current_macro_phase_id": "05",
   "current_macro_phase": "Fase 05 - Ingestão Wave 3 (Mercado de Capitais & Finanças Públicas: cvm_dfp_itr, mdic_comexstat, cvm_fundos, bcb_ifdata, stn_tesouro, comprasgov_catmat)",
   "overall_status": "ON_TRACK",
-  "active_connector": "mdic_comexstat",
-  "next_connector": "cvm_fundos",
+  "active_connector": "cvm_fundos",
+  "next_connector": "bcb_ifdata",
   "structural_phases": [
     {
       "phase_id": "00",
@@ -162,6 +162,19 @@
         "Ampliação do escopo do gateway para além das APIs governamentais do Brasil: mapeamento sistemático e suporte a outras APIs públicas úteis (ex.: dados climáticos, câmbio internacional, georreferenciamento global), deixando os conectores pré-configurados",
         "Bipartição da documentação oficial, dbt e catálogo mestre estruturada em: 1) Catálogo APIs Gov Brasil e 2) Catálogo Outras APIs Públicas & Globais",
         "Disponibilização de conectores com o mesmo padrão ODCS v3.1, camadas Medallion (Bronze/Silver/Gold) e testes fail-hard com limites de rate limit e FinOps"
+      ]
+    },
+    {
+      "phase_id": "11",
+      "name": "Cloud Lakehouse Mirror: Public Data Warehouse na Nuvem (S3 / Cloudflare R2 + DuckDB / MotherDuck / BigQuery)",
+      "status": "PENDING",
+      "completion_date": null,
+      "deliverables": [
+        "Arquitetura de Lakehouse na Nuvem: Espelhamento contínuo dos datasets Silver e Gold (Parquet ZSTD) para Object Storage global (AWS S3 ou Cloudflare R2 com custo zero de egress)",
+        "Pipeline de Ingestão em Lote e CDC (Change Data Capture): Rotinas agendadas (Cron/Airflow/GitHub Actions) para baixar dumps massivos (ex: 55M CNPJs RFB, CVM DFP/ITR anual) e sincronizar deltas incrementais sem depender de chamadas pontuais às APIs governamentais",
+        "Public Data Warehouse Serverless: Disponibilização de catálogo DuckDB / MotherDuck / BigQuery permitindo consultas analíticas em milissegundos sobre todo o patrimônio de dados públicos do Brasil",
+        "Estratégia FinOps e Resiliência contra Quedas de Portais: Eliminação de latências e instabilidades governamentais (Serpro, CVM, BCB), reduzindo o tempo de consulta de 2-5s para 5-15ms e economizando custos de infraestrutura",
+        "Mapeamento e Auditoria de Freshness SLA por Fonte: Avaliar e cadastrar para cada uma das 49 fontes os metadados de frequência e latência de atualização (update_frequency, freshness_sla_hours e cron_schedule_expression) para orquestrar jobs de ingestão diferenciados (diário para PTAX/Câmbio, mensal para Comex/SGS, trimestral/anual para DFP/CNPJ) na Fase 11"
       ]
     }
   ],
@@ -341,6 +354,12 @@
       "phase_id": "05",
       "milestone": "Homologação do Conector cvm_dfp_itr (5 Tabelas, dbt, Mart de Demonstrações Financeiras & Live Fail-Hard)",
       "summary": "Implementação completa do conector cvm_dfp_itr (Comissão de Valores Mobiliários - Demonstrações Financeiras Padronizadas DFP/ITR de Companhias Abertas, Lei nº 6.385/1976, Lei nº 6.404/1976 e Resoluções CVM nº 80/2022 e 81/2022) iniciando a Wave 3: 5 tabelas (cvm_cia_aberta_cadastral, cvm_dfp_balanco_ativo, cvm_dfp_balanco_passivo, cvm_dfp_dre, cvm_dfp_fluxo_caixa) materializadas em data/cvm_dfp_itr/{bronze,silver,gold}/; 10 novos modelos dbt (5 staging views, dim_companhia_aberta_cvm, fct_balanco_patrimonial_cvm, fct_resultado_exercicio_cvm, fct_demonstracao_contabil_cvm, mart_demonstracoes_financeiras_cvm_brasil) totalizando 125 modelos e 1284 testes dbt 100% aprovados; 1421 colunas 100% documentadas no linter; feature store features_financeiras_cvm_brasil.parquet gerada com indicadores contábeis (liquidez corrente/seca, margens bruta/líquida, ROE, endividamento geral), score de solvência fundamentalista contínuo de 0 a 100 e rating contábil; testes reais de 1 linha com fail-hard contra os portais oficiais da CVM gov.br e 12 testes pytest aprovados; multi-interface completa via SDK (PublicData.finance.cvm_company, financial_ratios, list_cvm_companies), CLI (pdg finance cvm, ratios, list-cvm), REST API (/api/v1/finance/cvm, ratios, cias) e MCP (bdg_get_cvm_company, bdg_get_financial_ratios)."
+    },
+    {
+      "date": "2026-11-08",
+      "phase_id": "05",
+      "milestone": "Homologação do Conector mdic_comexstat (6 Tabelas, dbt, Marts de Balança Comercial & Live Fail-Hard)",
+      "summary": "Implementação completa do conector mdic_comexstat (Ministério do Desenvolvimento, Indústria, Comércio e Serviços - Estatísticas de Comércio Exterior do Brasil, Decreto nº 660/1992 e Portaria SECEX nº 44/2020) consolidando a Wave 3: 6 tabelas (comex_ncm_exportacao, comex_ncm_importacao, comex_municipios_exportacao, comex_municipios_importacao, comex_ncm_tabela, comex_paises) materializadas em data/mdic_comexstat/{bronze,silver,gold}/; 13 novos modelos dbt (6 staging views, dim_ncm, dim_pais_comex, fct_exportacao_mensal, fct_importacao_mensal, fct_comercio_exterior_municipio, mart_balanca_comercial_municipios_brasil, mart_comercio_exterior_ncm_brasil) totalizando 138 modelos e 1391 testes dbt 100% aprovados; 1544 colunas 100% documentadas no linter; feature store features_comercio_exterior_brasil.parquet gerada com corrente de comércio, taxa de cobertura, saldo líquido, ranking exportador municipal e score contínuo de 0 a 100 de competitividade exportadora; testes reais de 1 linha com fail-hard contra os portais oficiais do MDIC Comex Stat e 11 testes pytest aprovados; multi-interface completa via SDK (PublicData.trade.municipality_trade, ncm_trade, trade_balance_profile), CLI (pdg trade municipality, ncm, balance e comex shortcut), REST API (/api/v1/trade/municipality, ncm, balance) e MCP (bdg_get_municipality_trade, bdg_get_ncm_trade_profile)."
     }
   ]
 }

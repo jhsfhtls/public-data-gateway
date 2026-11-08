@@ -430,4 +430,35 @@ def create_app(settings: GatewaySettings | None = None) -> FastAPI:
         conn = CvmDfpItrConnector(settings=app_settings)
         return conn.get_financial_ratios(cnpj_or_codigo)
 
+    # 12. Foreign Trade & Trade Balance (MDIC Comex Stat)
+    @app.get("/api/v1/trade/balance")
+    @app.get("/api/v1/comex/balance")
+    async def get_trade_balance_overview() -> dict[str, Any]:
+        from public_data_gateway.connectors.comercio_exterior.mdic_comexstat.connector import (
+            MDICComexStatConnector,
+        )
+
+        conn = MDICComexStatConnector(settings=app_settings)
+        return conn.get_trade_balance_profile()
+
+    @app.get("/api/v1/trade/municipality/{id_municipio}")
+    @app.get("/api/v1/comex/municipio/{id_municipio}")
+    async def get_municipality_trade(id_municipio: str) -> dict[str, Any]:
+        from public_data_gateway.connectors.comercio_exterior.mdic_comexstat.connector import (
+            MDICComexStatConnector,
+        )
+
+        conn = MDICComexStatConnector(settings=app_settings)
+        return conn.get_municipality_trade(id_municipio)
+
+    @app.get("/api/v1/trade/ncm/{codigo_ncm}")
+    @app.get("/api/v1/comex/ncm/{codigo_ncm}")
+    async def get_ncm_trade(codigo_ncm: str) -> dict[str, Any]:
+        from public_data_gateway.connectors.comercio_exterior.mdic_comexstat.connector import (
+            MDICComexStatConnector,
+        )
+
+        conn = MDICComexStatConnector(settings=app_settings)
+        return conn.get_ncm_trade(codigo_ncm)
+
     return app

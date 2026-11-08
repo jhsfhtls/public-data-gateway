@@ -285,6 +285,28 @@ class MCPDispatcher:
                                     "required": ["cnpj_or_codigo"],
                                 },
                             },
+                            {
+                                "name": "bdg_get_municipality_trade",
+                                "description": "Query foreign trade flow, trade balance, export/import totals, and export competitiveness score for a Brazilian municipality from MDIC Comex Stat (Tier 1).",
+                                "inputSchema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "id_municipio": {"type": "string", "description": "IBGE 7-digit municipality code (e.g. 3548500 for Santos/SP)"},
+                                    },
+                                    "required": ["id_municipio"],
+                                },
+                            },
+                            {
+                                "name": "bdg_get_ncm_trade_profile",
+                                "description": "Query commodity trade statistics, export/import flows, and trade orientation for an 8-digit NCM code from MDIC Comex Stat (Tier 1).",
+                                "inputSchema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "codigo_ncm": {"type": "string", "description": "8-digit NCM commodity code (e.g. 12019000 for Soja)"},
+                                    },
+                                    "required": ["codigo_ncm"],
+                                },
+                            },
                         ]
                     },
                 }
@@ -573,6 +595,36 @@ class MCPDispatcher:
             doc = args.get("cnpj_or_codigo") or args.get("documento") or ""
             res = cvm_conn.get_financial_ratios(doc)
             wrapped = wrap_untrusted_gov_data(res, source_id="cvm_dfp_itr")
+            return {
+                "jsonrpc": "2.0",
+                "id": req_id,
+                "result": {"content": [{"type": "text", "text": wrapped}], "isError": False},
+            }
+
+        if tool_name in {"bdg_get_municipality_trade", "pdg_get_municipality_trade"}:
+            from public_data_gateway.connectors.comercio_exterior.mdic_comexstat.connector import (
+                MDICComexStatConnector,
+            )
+
+            comex_conn = MDICComexStatConnector(settings=self.settings)
+            m_id = str(args.get("id_municipio") or args.get("codigo_municipio") or "").strip()
+            res = comex_conn.get_municipality_trade(m_id)
+            wrapped = wrap_untrusted_gov_data(res, source_id="mdic_comexstat")
+            return {
+                "jsonrpc": "2.0",
+                "id": req_id,
+                "result": {"content": [{"type": "text", "text": wrapped}], "isError": False},
+            }
+
+        if tool_name in {"bdg_get_ncm_trade_profile", "pdg_get_ncm_trade_profile"}:
+            from public_data_gateway.connectors.comercio_exterior.mdic_comexstat.connector import (
+                MDICComexStatConnector,
+            )
+
+            comex_conn = MDICComexStatConnector(settings=self.settings)
+            ncm_code = str(args.get("codigo_ncm") or args.get("ncm_8") or "").strip()
+            res = comex_conn.get_ncm_trade(ncm_code)
+            wrapped = wrap_untrusted_gov_data(res, source_id="mdic_comexstat")
             return {
                 "jsonrpc": "2.0",
                 "id": req_id,

@@ -226,6 +226,28 @@ def build_parser() -> argparse.ArgumentParser:
     rat_p.add_argument("documento", type=str, help="CNPJ or CVM registration code")
     rat_p.add_argument("--json", action="store_true", help="Output in JSON format")
 
+    # Subcommand: trade (MDIC Comex Stat)
+    trade_p = subparsers.add_parser(
+        "trade", help="Query foreign trade statistics and trade balance (MDIC Comex Stat)."
+    )
+    trade_sub = trade_p.add_subparsers(dest="trade_action", required=True)
+
+    t_mun_p = trade_sub.add_parser("municipality", help="Query municipality foreign trade and balance.")
+    t_mun_p.add_argument("id_municipio", type=str, help="IBGE 7-digit municipality code")
+    t_mun_p.add_argument("--json", action="store_true", help="Output in JSON format")
+
+    t_ncm_p = trade_sub.add_parser("ncm", help="Query NCM commodity statistics and trade flow.")
+    t_ncm_p.add_argument("codigo_ncm", type=str, help="8-digit NCM commodity code")
+    t_ncm_p.add_argument("--json", action="store_true", help="Output in JSON format")
+
+    t_bal_p = trade_sub.add_parser("balance", help="View national foreign trade balance overview.")
+    t_bal_p.add_argument("--json", action="store_true", help="Output in JSON format")
+
+    # Direct shortcut: comex
+    comex_p = subparsers.add_parser("comex", help="Query foreign trade statistics by municipality or NCM.")
+    comex_p.add_argument("termo", type=str, help="IBGE 7D municipality code or NCM 8D")
+    comex_p.add_argument("--json", action="store_true", help="Output in JSON format")
+
     return parser
 
 
@@ -701,6 +723,58 @@ def main(argv: Sequence[str] | None = None) -> int:
                     print(f"Found {len(cias)} CVM registered companies:")
                     for c in cias:
                         print(f"  - [{c.get('codigo_cvm')}] {c.get('razao_social')} | {c.get('setor_atividade')} | {c.get('situacao_registro')}")
+                return 0
+
+        elif args.command in {"trade", "comex"}:
+            from public_data_gateway.connectors.comercio_exterior.mdic_comexstat.connector import (
+                MDICComexStatConnector,
+            )
+
+            comex_conn = MDICComexStatConnector(settings=settings)
+
+            if args.command == "comex":
+                query_term = args.termo.strip().replace(".", "")
+                if len(query_term) == 8:
+                    res = comex_conn.get_ncm_trade(query_term)
+                else:
+                    res = comex_conn.get_municipality_trade(query_term)
+                if args.json:
+                    print(json.dumps(res, indent=2, ensure_ascii=False))
+                else:
+                    print(f"Comex Stat Profile for '{args.termo}':")
+                    for k, v in res.items():
+                        print(f"  {k}: {v}")
+                return 0
+
+            trade_action = getattr(args, "trade_action", None)
+            if trade_action == "municipality":
+                res = comex_conn.get_municipality_trade(args.id_municipio)
+                if args.json:
+                    print(json.dumps(res, indent=2, ensure_ascii=False))
+                else:
+                    print(f"Municipality Foreign Trade for '{args.id_municipio}':")
+                    for k, v in res.items():
+                        print(f"  {k}: {v}")
+                return 0
+
+            if trade_action == "ncm":
+                res = comex_conn.get_ncm_trade(args.codigo_ncm)
+                if args.json:
+                    print(json.dumps(res, indent=2, ensure_ascii=False))
+                else:
+                    print(f"NCM Trade Profile for '{args.codigo_ncm}':")
+                    for k, v in res.items():
+                        print(f"  {k}: {v}")
+                return 0
+
+            if trade_action == "balance":
+                res = comex_conn.get_trade_balance_profile()
+                if args.json:
+                    print(json.dumps(res, indent=2, ensure_ascii=False))
+                else:
+                    print("Brazilian Foreign Trade Balance Profile:")
+                    for k, v in res.items():
+                        print(f"  {k}: {v}")
                 return 0
 
     except Exception as exc:

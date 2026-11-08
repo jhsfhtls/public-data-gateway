@@ -18,6 +18,7 @@ model-paths:
   - "../src/public_data_gateway/connectors/judicial/tst_cndt/dbt"
   - "../src/public_data_gateway/connectors/empresarial/suframa_pim_zfm/dbt"
   - "../src/public_data_gateway/connectors/macrofinanceiro/cvm_dfp_itr/dbt"
+  - "../src/public_data_gateway/connectors/comercio_exterior/mdic_comexstat/dbt"
   - "models"
 
 analysis-paths: ["analyses"]

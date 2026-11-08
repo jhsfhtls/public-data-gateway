@@ -404,7 +404,7 @@ sources:
   - P02
   rice_score: 660
   roadmap_wave: 3
-  status: CATALOGED
+  status: HOMOLOGATED
 - source_id: cvm_fundos
   name: 'CVM: Informe Diário de Fundos de Investimento'
   agency: Comissão de Valores Mobiliários (CVM)
