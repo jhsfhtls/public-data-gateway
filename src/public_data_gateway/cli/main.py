@@ -143,6 +143,21 @@ def build_parser() -> argparse.ArgumentParser:
     pep_list_p.add_argument("--limit", type=int, default=10, help="Max rows to return")
     pep_list_p.add_argument("--json", action="store_true", help="Output in JSON format")
 
+    jud_parser = subparsers.add_parser(
+        "judicial", help="Query judicial proceedings and litigation risk profile (CNJ DataJud)."
+    )
+    jud_sub = jud_parser.add_subparsers(dest="jud_action", required=True)
+
+    jud_risk_p = jud_sub.add_parser("risk", help="Assess litigation risk by CNPJ or CPF.")
+    jud_risk_p.add_argument("documento", type=str, help="CNPJ or CPF to evaluate")
+    jud_risk_p.add_argument("--json", action="store_true", help="Output in JSON format")
+
+    jud_search_p = jud_sub.add_parser("search", help="Search processes by NUP, party name, or court.")
+    jud_search_p.add_argument("termo", type=str, help="Process number (NUP), party name or document")
+    jud_search_p.add_argument("--tribunal", type=str, help="Filter by court acronym (e.g. TJSP, TRF1, TRT2)")
+    jud_search_p.add_argument("--limit", type=int, default=10, help="Max rows to return")
+    jud_search_p.add_argument("--json", action="store_true", help="Output in JSON format")
+
     return parser
 
 
@@ -438,6 +453,40 @@ def main(argv: Sequence[str] | None = None) -> int:
                     print(f"PEP Registros ({len(rows)} found):")
                     for r in rows:
                         print(f"  {r['cpf_pep']} | {r['nome_pep']} | {r['sigla_funcao']} ({r['descricao_funcao']}) | {r['nome_orgao']} ({r['sigla_uf_orgao']})")
+                return 0
+
+        if args.command == "judicial":
+            from public_data_gateway.connectors.judicial.cnj_datajud.connector import (
+                CNJDataJudConnector,
+            )
+
+            conn = CNJDataJudConnector(settings=settings)
+            if args.jud_action == "risk":
+                res = conn.get_litigation_risk(args.documento)
+                if args.json:
+                    print(json.dumps(res, indent=2, ensure_ascii=False))
+                else:
+                    print(f"Litigation Risk Profile for '{args.documento}':")
+                    print(f"  Risco Judicial:       {res['categoria_risco_judicial']}")
+                    print(f"  Score Litigiosidade:  {res['score_litigiosidade_juridica']}")
+                    print(f"  Total Processos:      {res['total_processos']} ({res['total_processos_ativos']} ativos)")
+                    print(f"  Execuções Fiscais:    {res['total_execucoes_fiscais']}")
+                    print(f"  Ações Trabalhistas:   {res['total_acoes_trabalhistas']}")
+                    print(f"  Passivo Contingente:  R$ {res['valor_total_causas_contingentes']:,.2f}")
+                return 0
+
+            if args.jud_action == "search":
+                rows = conn.search_processos(
+                    termo=args.termo,
+                    tribunal=args.tribunal,
+                    limit=args.limit,
+                )
+                if args.json:
+                    print(json.dumps(rows, indent=2, ensure_ascii=False))
+                else:
+                    print(f"DataJud Processos ({len(rows)} found):")
+                    for r in rows:
+                        print(f"  {r['numero_processo']} | {r['tribunal_sigla']} ({r['grau_jurisdicao']}) | {r['classe_nome']} | R$ {r.get('valor_causa', 0.0):,.2f} | {r['polo_passivo_nome']}")
                 return 0
 
     except Exception as exc:

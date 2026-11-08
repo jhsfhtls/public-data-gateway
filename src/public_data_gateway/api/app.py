@@ -311,4 +311,27 @@ def create_app(settings: GatewaySettings | None = None) -> FastAPI:
             uf=uf, sigla_funcao=sigla_funcao, ativos_only=ativos_only, limit=limit
         )
 
+    # 8. Judicial & Litigation Risk Routes (CNJ DataJud)
+    @app.get("/api/v1/judicial/risk/{cnpj_or_cpf}")
+    async def get_judicial_risk(cnpj_or_cpf: str) -> dict[str, Any]:
+        from public_data_gateway.connectors.judicial.cnj_datajud.connector import (
+            CNJDataJudConnector,
+        )
+
+        conn = CNJDataJudConnector(settings=app_settings)
+        return conn.get_litigation_risk(cnpj_or_cpf)
+
+    @app.get("/api/v1/judicial/processos")
+    async def search_judicial_processos(
+        termo: str,
+        tribunal: str | None = None,
+        limit: int = 50,
+    ) -> list[dict[str, Any]]:
+        from public_data_gateway.connectors.judicial.cnj_datajud.connector import (
+            CNJDataJudConnector,
+        )
+
+        conn = CNJDataJudConnector(settings=app_settings)
+        return conn.search_processos(termo=termo, tribunal=tribunal, limit=limit)
+
     return app

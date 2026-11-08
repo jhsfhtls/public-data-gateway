@@ -1,0 +1,18 @@
+version: 2
+
+sources:
+  - name: cnj_datajud
+    description: "Bases oficiais da Base Nacional de Dados do Poder Judiciário (DataJud - CNJ) em formato Parquet ZSTD."
+    meta:
+      external_location: "data/cnj_datajud/silver/{name}.parquet"
+    tables:
+      - name: cnj_processos
+        description: "Metadados de processos judiciais em tramitação e arquivados nos 90+ tribunais do Brasil (NUP canônico)."
+      - name: cnj_tribunais
+        description: "Estrutura dos tribunais do Poder Judiciário Nacional (Estadual, Federal, Trabalhista, Eleitoral, Militar, Superiores)."
+      - name: cnj_classes_tpu
+        description: "Tabelas Processuais Unificadas (TPU) do CNJ - Classes Processuais."
+      - name: cnj_assuntos_tpu
+        description: "Tabelas Processuais Unificadas (TPU) do CNJ - Assuntos Processuais e ramos do direito."
+      - name: cnj_movimentos_processuais
+        description: "Andamentos e movimentos processuais unificados dos autos."

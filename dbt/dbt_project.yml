@@ -14,6 +14,7 @@ model-paths:
   - "../src/public_data_gateway/connectors/compras_publicas/pncp_contratacoes/dbt"
   - "../src/public_data_gateway/connectors/compliance/cgu_ceis_cnep/dbt"
   - "../src/public_data_gateway/connectors/compliance/cgu_pep/dbt"
+  - "../src/public_data_gateway/connectors/judicial/cnj_datajud/dbt"
   - "models"
 
 analysis-paths: ["analyses"]

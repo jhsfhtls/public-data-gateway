@@ -1279,6 +1279,185 @@ models:
         tests:
           - not_null
 
+  - name: dim_tribunal_judiciario
+    description: "Dimensão de tribunais do Poder Judiciário Nacional brasileiro com atributos jurisdicionais e volumetria."
+    columns:
+      - name: tribunal_sigla
+        description: "Sigla oficial do tribunal judiciário competente (chave primária natural)."
+        tests:
+          - unique
+          - not_null
+      - name: tribunal_nome
+        description: "Nome institucional por extenso do tribunal."
+        tests:
+          - not_null
+      - name: ramo_justica
+        description: "Ramo de competência judiciária (ESTADUAL, FEDERAL, TRABALHISTA, ELEITORAL, MILITAR, SUPERIOR)."
+        tests:
+          - not_null
+      - name: esfera_uf
+        description: "Unidade Federativa da sede do tribunal."
+        tests:
+          - not_null
+      - name: municipio_sede_ibge
+        description: "Código IBGE de 7 dígitos do município da sede administrativa."
+        tests:
+          - not_null
+      - name: portal_consulta_url
+        description: "Endereço eletrônico oficial para consulta processual."
+        tests:
+          - not_null
+      - name: total_processos_estimados
+        description: "Estimativa consolidada do acervo processual do tribunal."
+        tests:
+          - not_null
+      - name: porte_tribunal
+        description: "Classificação do tribunal por volume de processos (GRANDE_PORTE, MEDIO_PORTE, PEQUENO_PORTE)."
+        tests:
+          - not_null
+      - name: extracted_at
+        description: "Timestamp UTC de extração e materialização dos dados."
+        tests:
+          - not_null
+
+  - name: dim_classe_judicial_tpu
+    description: "Dimensão de classes processuais da Tabela Processual Unificada (TPU) do Conselho Nacional de Justiça."
+    columns:
+      - name: classe_codigo_tpu
+        description: "Código numérico oficial da classe processual padronizada pelo CNJ (chave primária natural)."
+        tests:
+          - unique
+          - not_null
+      - name: classe_nome
+        description: "Denominação da classe processual unificada."
+        tests:
+          - not_null
+      - name: natureza_processual
+        description: "Natureza jurídica do procedimento (CONHECIMENTO, EXECUCAO, CAUTELAR, FALIMENTAR_EMPRESARIAL, RECURSAL)."
+        tests:
+          - not_null
+      - name: ramo_aplicavel
+        description: "Ramo do direito ao qual a classe é aplicada preponderantemente."
+        tests:
+          - not_null
+      - name: amparo_resolucao_cnj
+        description: "Resolução do CNJ que fundamenta e normatiza a classe."
+        tests:
+          - not_null
+      - name: extracted_at
+        description: "Timestamp UTC de extração e materialização dos dados."
+        tests:
+          - not_null
+
+  - name: dim_assunto_judicial_tpu
+    description: "Dimensão de assuntos e matérias de direito da Tabela Processual Unificada (TPU) do CNJ."
+    columns:
+      - name: assunto_codigo_tpu
+        description: "Código numérico oficial do assunto processual padronizado pelo CNJ (chave primária natural)."
+        tests:
+          - unique
+          - not_null
+      - name: assunto_descricao
+        description: "Descrição da matéria de direito ou pedido controvertido."
+        tests:
+          - not_null
+      - name: ramo_direito
+        description: "Ramo do direito correspondente ao assunto controvertido."
+        tests:
+          - not_null
+      - name: is_tema_repetitivo
+        description: "Flag indicando vinculação a tema com repercussão geral ou repetitivo."
+        tests:
+          - not_null
+      - name: score_peso_risco
+        description: "Peso ponderado de risco judicial para passivo contingente."
+        tests:
+          - not_null
+      - name: faixa_risco_assunto
+        description: "Classificação da faixa de risco do assunto (RISCO_CRITICO, RISCO_ALTO, RISCO_MODERADO)."
+        tests:
+          - not_null
+      - name: extracted_at
+        description: "Timestamp UTC de extração e materialização dos dados."
+        tests:
+          - not_null
+
+  - name: fct_processo_judicial
+    description: "Tabela de fatos com histórico, valores e órgãos julgadores dos processos judiciais brasileiros (CNJ DataJud)."
+    columns:
+      - name: numero_processo
+        description: "Número Único de Processo (NUP) canônico (chave primária da fato)."
+        tests:
+          - unique
+          - not_null
+      - name: tribunal_sigla
+        description: "Sigla do tribunal judiciário competente."
+        tests:
+          - not_null
+      - name: grau_jurisdicao
+        description: "Instância ou grau de jurisdição dos autos."
+        tests:
+          - not_null
+      - name: classe_codigo_tpu
+        description: "Código numérico da classe processual TPU."
+        tests:
+          - not_null
+      - name: classe_nome
+        description: "Nome oficial da classe processual."
+        tests:
+          - not_null
+      - name: data_ajuizamento
+        description: "Data em que a ação judicial foi proposta e distribuída."
+        tests:
+          - not_null
+      - name: valor_causa
+        description: "Valor econômico em Reais (BRL) atribuído à causa."
+        tests:
+          - not_null
+      - name: orgao_julgador_nome
+        description: "Nome da vara, turma ou câmara judicial que conduz o processo."
+        tests:
+          - not_null
+      - name: orgao_julgador_municipio_ibge
+        description: "Código IBGE de 7 dígitos do município do órgão julgador."
+      - name: sistema_origem
+        description: "Sistema de processo eletrônico originário (PJe, eproc, Projudi, SAJ)."
+        tests:
+          - not_null
+      - name: is_segredo_justica
+        description: "Flag indicando se o processo tramita sob segredo de justiça."
+        tests:
+          - not_null
+      - name: situacao_processual
+        description: "Situação de tramitação dos autos (ATIVO_EM_ANDAMENTO, SUSPENSO, BAIXADO_ARQUIVADO)."
+        tests:
+          - not_null
+      - name: polo_ativo_tipo
+        description: "Classificação do polo ativo da demanda."
+        tests:
+          - not_null
+      - name: polo_passivo_documento
+        description: "CNPJ de 14 dígitos ou CPF mascarado da parte demandada."
+        tests:
+          - not_null
+      - name: polo_passivo_nome
+        description: "Nome completo ou Razão Social da parte demandada."
+        tests:
+          - not_null
+      - name: categoria_demanda
+        description: "Categorização analítica da demanda (EXECUCAO_FISCAL, ACAO_TRABALHISTA, RECUPERACAO_JUDICIAL, CIVEL_E_OUTROS)."
+        tests:
+          - not_null
+      - name: is_processo_ativo
+        description: "Flag booleana indicando se o processo está em tramitação ativa."
+        tests:
+          - not_null
+      - name: extracted_at
+        description: "Timestamp UTC da extração e carga dos dados."
+        tests:
+          - not_null
+
+
 
 
 

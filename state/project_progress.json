@@ -1,6 +1,6 @@
 {
   "schema_version": "1.0.0",
-  "last_updated": "2026-11-08T06:30:00.000000+00:00",
+  "last_updated": "2026-11-08T06:55:00.000000+00:00",
   "project_name": "public-data-gateway",
   "ecosystem": "C.O.R.E. (core, operations, career, studies)",
   "governing_pops": [
@@ -15,8 +15,8 @@
   "current_macro_phase_id": "04",
   "current_macro_phase": "Fase 04 — Ingestão Wave 2 (B2B, Compras Públicas & Compliance: rfb_cnpj_lakehouse, rfb_simples_mei, pncp_contratacoes, etc.)",
   "overall_status": "ON_TRACK",
-  "active_connector": "cnj_datajud",
-  "next_connector": "tst_cndt",
+  "active_connector": "tst_cndt",
+  "next_connector": "suframa_pim_zfm",
   "structural_phases": [
     {
       "phase_id": "00",
@@ -315,6 +315,12 @@
       "phase_id": "04",
       "milestone": "Homologação do Conector cgu_pep (5 Tabelas, dbt, Mart de Exposição Política & Live Fail-Hard)",
       "summary": "Implementação completa do conector cgu_pep (Resolução COAF nº 40/2021 & Circular BACEN nº 3.978/2020 / PLD/FTP): 5 tabelas (cgu_pep, cgu_pep_orgaos, cgu_pep_funcoes, cgu_pep_historico_carencia, cgu_pep_relacionados) materializadas em data/cgu_pep/{bronze,silver,gold}/; 9 novos modelos dbt (5 staging views, dim_pep, dim_funcao_pep, fct_mandato_pep, mart_pep_distribuicao_brasil) totalizando 85 modelos e 759 testes dbt 100% aprovados; 931 colunas 100% documentadas no linter; feature store features_pep_exposicao_politica_brasil.parquet gerada com score de risco PLD e categorização de quarentena de 5 anos; testes reais de 1 linha com fail-hard contra a API oficial da CGU (/api-de-dados/peps) e 11 testes pytest aprovados; multi-interface completa via SDK (PublicData.compliance.pep_status), CLI (pdg pep status), REST API (/api/v1/pep) e MCP (bdg_get_pep_status)."
+    },
+    {
+      "date": "2026-11-08",
+      "phase_id": "04",
+      "milestone": "Homologação do Conector cnj_datajud (5 Tabelas, dbt, Mart de Litigiosidade & Live Fail-Hard)",
+      "summary": "Implementação completa do conector cnj_datajud (Base Nacional do Poder Judiciário — Resolução CNJ nº 331/2020 & Resolução CNJ nº 46/2007 TPU): 5 tabelas (cnj_processos, cnj_tribunais, cnj_classes_tpu, cnj_assuntos_tpu, cnj_movimentos_processuais) materializadas em data/cnj_datajud/{bronze,silver,gold}/; 10 novos modelos dbt (5 staging views, dim_tribunal_judiciario, dim_classe_judicial_tpu, dim_assunto_judicial_tpu, fct_processo_judicial, mart_litigiosidade_tribunais_brasil) totalizando 95 modelos e 863 testes dbt 100% aprovados; 1028 colunas 100% documentadas no linter; feature store features_litigiosidade_juridica_brasil.parquet gerada com score de litigiosidade e categorização de risco judicial; testes reais de 1 linha com fail-hard contra a API pública e Wiki do CNJ DataJud e 12 testes pytest aprovados; multi-interface completa via SDK (PublicData.judicial.litigation_risk e search_processos), CLI (pdg judicial risk e search), REST API (/api/v1/judicial) e MCP (bdg_get_litigation_risk)."
     }
   ]
 }

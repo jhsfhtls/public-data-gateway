@@ -208,6 +208,17 @@ class MCPDispatcher:
                                     "required": ["termo"],
                                 },
                             },
+                            {
+                                "name": "bdg_get_litigation_risk",
+                                "description": "Assess corporate or individual litigation risk and court proceedings from CNJ DataJud (Tier 1).",
+                                "inputSchema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "documento": {"type": "string", "description": "CNPJ or CPF to evaluate"},
+                                    },
+                                    "required": ["documento"],
+                                },
+                            },
                         ]
                     },
                 }
@@ -391,6 +402,21 @@ class MCPDispatcher:
             termo = args.get("termo") or args.get("cpf_or_name") or ""
             res = conn.get_pep_status(termo)
             wrapped = wrap_untrusted_gov_data(res, source_id="cgu_pep")
+            return {
+                "jsonrpc": "2.0",
+                "id": req_id,
+                "result": {"content": [{"type": "text", "text": wrapped}], "isError": False},
+            }
+
+        if tool_name in {"bdg_get_litigation_risk", "pdg_get_litigation_risk"}:
+            from public_data_gateway.connectors.judicial.cnj_datajud.connector import (
+                CNJDataJudConnector,
+            )
+
+            conn = CNJDataJudConnector(settings=self.settings)
+            doc = args.get("documento") or args.get("cnpj_or_cpf") or ""
+            res = conn.get_litigation_risk(doc)
+            wrapped = wrap_untrusted_gov_data(res, source_id="cnj_datajud")
             return {
                 "jsonrpc": "2.0",
                 "id": req_id,

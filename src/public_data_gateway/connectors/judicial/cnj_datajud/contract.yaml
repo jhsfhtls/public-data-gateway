@@ -1,0 +1,84 @@
+contract_id: "ODCS-BR-CNJ-DATAJUD-001"
+source_id: "cnj_datajud"
+version: "1.0.0"
+grain: "One row per judicial proceeding NUP metadata record across Brazilian courts (DataJud)"
+primary_keys:
+  - "numero_processo"
+canonical_keys:
+  - "numero_processo"
+  - "polo_passivo_documento"
+  - "tribunal_sigla"
+reference_date_column: "data_ajuizamento"
+lgpd_legal_basis: "Resolução CNJ nº 331/2020, Resolução CNJ nº 46/2007 (TPU) e Art. 7º, § 3º e 4º da Lei nº 13.709/2018 (LGPD - Publicidade Processual)"
+min_expected_rows: 5
+max_volume_drop_pct: 1.0
+sentinel_values:
+  - "-1"
+  - "99"
+  - "999"
+  - "SEM INFORMACAO"
+  - "IGNORADO"
+  - "N/A"
+  - "-"
+columns:
+  - name: "numero_processo"
+    data_type: "string"
+    required: true
+    is_primary_key: true
+    description: "Número Único de Processo (NUP) canônico no padrão NNNNNNN-DD.AAAA.J.TR.OOOO"
+  - name: "tribunal_sigla"
+    data_type: "string"
+    required: true
+    description: "Sigla do Tribunal de Justiça ou Tribunal Regional competente (ex.: TJSP, TRF1, TRT2, STJ)"
+  - name: "grau_jurisdicao"
+    data_type: "string"
+    required: true
+    description: "Grau de jurisdição do processo (G1 = 1º Grau, G2 = 2º Grau, JE = Juizado Especial, TR = Turma Recursal, SUP = Superior)"
+  - name: "classe_codigo_tpu"
+    data_type: "int32"
+    required: true
+    description: "Código numérico da classe processual unificada pelo CNJ (ex.: 1116 = Execução Fiscal)"
+  - name: "classe_nome"
+    data_type: "string"
+    required: true
+    description: "Nome oficial da classe processual padronizada pelo CNJ"
+  - name: "data_ajuizamento"
+    data_type: "date"
+    required: true
+    description: "Data em que a ação judicial foi distribuída e ajuizada perante o órgão jurisdicional"
+  - name: "valor_causa"
+    data_type: "float64"
+    required: false
+    description: "Valor econômico atribuído à causa em Reais (BRL)"
+  - name: "orgao_julgador_nome"
+    data_type: "string"
+    required: true
+    description: "Nome da vara, câmara, turma ou órgão julgador responsável pela condução do processo"
+  - name: "orgao_julgador_municipio_ibge"
+    data_type: "string"
+    required: false
+    description: "Código IBGE de 7 dígitos do município sede do órgão julgador"
+  - name: "sistema_origem"
+    data_type: "string"
+    required: true
+    description: "Sistema processual eletrônico de origem dos autos (PJe, eproc, Projudi, SAJ, Themis)"
+  - name: "is_segredo_justica"
+    data_type: "boolean"
+    required: true
+    description: "Indicador booleano se os autos tramitam sob segredo de justiça (CPC art. 189)"
+  - name: "situacao_processual"
+    data_type: "string"
+    required: true
+    description: "Situação da tramitação dos autos (ATIVO_EM_ANDAMENTO, SUSPENSO, BAIXADO_ARQUIVADO)"
+  - name: "polo_ativo_tipo"
+    data_type: "string"
+    required: true
+    description: "Classificação do polo ativo (FAZENDA_NACIONAL, FAZENDA_ESTADUAL, PESSOA_JURIDICA, PESSOA_FISICA)"
+  - name: "polo_passivo_documento"
+    data_type: "string"
+    required: true
+    description: "CNPJ de 14 dígitos ou CPF mascarado da parte demandada no polo passivo"
+  - name: "polo_passivo_nome"
+    data_type: "string"
+    required: true
+    description: "Razão Social ou Nome completo da parte demandada no polo passivo"

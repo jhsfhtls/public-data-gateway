@@ -1,0 +1,57 @@
+version: 2
+
+models:
+  - name: mart_litigiosidade_tribunais_brasil
+    description: "Datamart analítico consolidando o volume de processos, passivo contingente e concentração de demandas por tribunal do Poder Judiciário Nacional."
+    columns:
+      - name: tribunal_sigla
+        description: "Sigla oficial do tribunal judiciário competente."
+        tests:
+          - unique
+          - not_null
+      - name: tribunal_nome
+        description: "Denominação institucional por extenso do tribunal."
+        tests:
+          - not_null
+      - name: ramo_justica
+        description: "Ramo da justiça brasileira (ESTADUAL, FEDERAL, TRABALHISTA, ELEITORAL, MILITAR, SUPERIOR)."
+        tests:
+          - not_null
+      - name: esfera_uf
+        description: "Sigla da UF da sede do tribunal."
+        tests:
+          - not_null
+      - name: porte_tribunal
+        description: "Classificação por volume de acervo processual (GRANDE_PORTE, MEDIO_PORTE, PEQUENO_PORTE)."
+        tests:
+          - not_null
+      - name: total_processos_cadastrados
+        description: "Total de processos judiciais cadastrados na base do tribunal."
+        tests:
+          - not_null
+      - name: total_processos_ativos
+        description: "Quantidade de processos judiciais em tramitação ativa no tribunal."
+        tests:
+          - not_null
+      - name: total_execucoes_fiscais
+        description: "Quantidade de execuções fiscais tributárias propostas perante o tribunal."
+        tests:
+          - not_null
+      - name: total_acoes_trabalhistas
+        description: "Quantidade de ações trabalhistas distribuídas no tribunal."
+        tests:
+          - not_null
+      - name: total_recuperacoes_judiciais
+        description: "Quantidade de processos de recuperação judicial ou falência no tribunal."
+        tests:
+          - not_null
+      - name: valor_total_contingente
+        description: "Soma consolidada do valor econômico contingente das causas em Reais (BRL)."
+        tests:
+          - not_null
+      - name: valor_medio_causa
+        description: "Ticket médio do valor atribuído à causa em Reais (BRL)."
+        tests:
+          - not_null
+      - name: data_ultima_carga
+        description: "Data e hora da carga mais recente de dados processuais do tribunal."
