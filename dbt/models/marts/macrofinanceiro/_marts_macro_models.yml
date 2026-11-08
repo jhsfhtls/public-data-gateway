@@ -87,3 +87,123 @@ models:
         tests:
           - not_null
 
+  - name: mart_demonstracoes_financeiras_cvm_brasil
+    description: "Datamart macrofinanceiro corporativo unificando balanços patrimoniais, DRE, DFC e indicadores fundamentalistas de solvência das companhias abertas da CVM."
+    columns:
+      - name: codigo_cvm
+        description: "Código identificador numérico da companhia perante a CVM."
+        tests:
+          - not_null
+      - name: cnpj_14
+        description: "Cadastro Nacional da Pessoa Jurídica da companhia emissora."
+        tests:
+          - not_null
+      - name: razao_social
+        description: "Razão social oficial arquivada na CVM."
+        tests:
+          - not_null
+      - name: nome_comercial
+        description: "Nome comercial ou de fantasia da companhia."
+      - name: setor_atividade
+        description: "Classificação setorial da companhia perante a CVM."
+        tests:
+          - not_null
+      - name: categoria_registro
+        description: "Categoria de registro da companhia aberta (CATEGORIA_A ou CATEGORIA_B)."
+        tests:
+          - not_null
+      - name: situacao_registro
+        description: "Situação cadastral do registro na CVM."
+        tests:
+          - not_null
+      - name: sigla_uf
+        description: "Sigla da Unidade Federativa da sede social da empresa."
+        tests:
+          - not_null
+      - name: ano_exercicio
+        description: "Ano contábil de exercício da demonstração financeira."
+        tests:
+          - not_null
+      - name: tipo_demonstracao
+        description: "Tipo de consolidação das demonstrações (CONSOLIDADO ou INDIVIDUAL)."
+        tests:
+          - not_null
+      - name: ativo_total
+        description: "Valor monetário do Ativo Total da companhia."
+        tests:
+          - not_null
+      - name: ativo_circulante
+        description: "Ativo Circulante realizável no curto prazo."
+        tests:
+          - not_null
+      - name: caixa_equivalentes
+        description: "Saldo de caixa e equivalentes de caixa de alta liquidez."
+        tests:
+          - not_null
+      - name: estoques
+        description: "Valor contábil de estoques de insumos e produtos acabados."
+        tests:
+          - not_null
+      - name: passivo_circulante
+        description: "Obrigações exigíveis no curto prazo."
+        tests:
+          - not_null
+      - name: passivo_nao_circulante
+        description: "Exigível a longo prazo."
+        tests:
+          - not_null
+      - name: patrimonio_liquido
+        description: "Patrimônio Líquido atribuível aos acionistas da companhia."
+        tests:
+          - not_null
+      - name: receita_liquida_vendas
+        description: "Receita operacional líquida de vendas de bens e serviços."
+        tests:
+          - not_null
+      - name: lucro_bruto
+        description: "Resultado bruto antes das despesas operacionais e administrativas."
+        tests:
+          - not_null
+      - name: ebitda_calculado
+        description: "Lucro antes de juros, impostos, depreciação e amortização (EBITDA)."
+        tests:
+          - not_null
+      - name: lucro_liquido_exercicio
+        description: "Lucro ou prejuízo líquido consolidado do exercício social."
+        tests:
+          - not_null
+      - name: fluxo_caixa_operacional
+        description: "Fluxo de caixa líquido gerado pelas atividades operacionais (FCO)."
+      - name: indice_liquidez_corrente
+        description: "Índice de liquidez corrente (Ativo Circulante / Passivo Circulante)."
+        tests:
+          - not_null
+      - name: indice_liquidez_seca
+        description: "Índice de liquidez seca ((Ativo Circulante - Estoques) / Passivo Circulante)."
+        tests:
+          - not_null
+      - name: margem_bruta_pct
+        description: "Margem bruta percentual (Lucro Bruto / Receita Líquida * 100)."
+        tests:
+          - not_null
+      - name: margem_liquida_pct
+        description: "Margem líquida percentual (Lucro Líquido / Receita Líquida * 100)."
+        tests:
+          - not_null
+      - name: retorno_sobre_patrimonio_roe_pct
+        description: "Retorno sobre o patrimônio líquido ROE percentual (Lucro Líquido / PL * 100)."
+        tests:
+          - not_null
+      - name: indice_endividamento_geral_pct
+        description: "Endividamento geral percentual ((PC + PNC) / Ativo Total * 100)."
+        tests:
+          - not_null
+      - name: classificacao_solvencia
+        description: "Classificação analítica da saúde econômico-financeira (SOLVENTE_GRAU_INVESTIMENTO, ZONA_CINZENTA_MODERADA, ALERTA_INSOLVENCIA)."
+        tests:
+          - not_null
+      - name: mart_timestamp
+        description: "Timestamp ISO de compilação do registro no datamart."
+        tests:
+          - not_null
+

@@ -271,6 +271,40 @@ class CompanyFacade:
         return self._sdk.get_simples_status(cnpj)
 
 
+class FinanceFacade:
+    """Capital markets, standardized financial statements and solvency metrics (CVM DFP/ITR)."""
+
+    def __init__(self, sdk: "BrazilData") -> None:
+        self._sdk = sdk
+        self._cvm_connector: Any = None
+
+    @property
+    def cvm_connector(self) -> Any:
+        if self._cvm_connector is None:
+            from public_data_gateway.connectors.macrofinanceiro.cvm_dfp_itr.connector import (
+                CvmDfpItrConnector,
+            )
+
+            self._cvm_connector = CvmDfpItrConnector(settings=self._sdk.settings)
+        return self._cvm_connector
+
+    def cvm_company(self, cnpj_or_codigo: str) -> dict[str, Any]:
+        """Query CVM company registration and latest financial snapshot by CNPJ or CVM code."""
+        return self.cvm_connector.get_company(cnpj_or_codigo)
+
+    def financial_ratios(self, cnpj_or_codigo: str) -> dict[str, Any]:
+        """Query fundamental financial ratios (liquidez, margens, ROE, endividamento) and solvency score."""
+        return self.cvm_connector.get_financial_ratios(cnpj_or_codigo)
+
+    def list_cvm_companies(
+        self,
+        setor: str | None = None,
+        situacao: str | None = None,
+    ) -> list[dict[str, Any]]:
+        """List publicly traded companies registered with CVM."""
+        return self.cvm_connector.list_companies(setor=setor, situacao=situacao)
+
+
 class BrazilData:
     """Unified developer SDK facade for querying, normalizing, and enriching Brazilian public datasets."""
 
@@ -290,6 +324,7 @@ class BrazilData:
         self.compliance = ComplianceFacade(self)
         self.judicial = JudicialFacade(self)
         self.company = CompanyFacade(self)
+        self.finance = FinanceFacade(self)
 
     def list_sources(
         self,
@@ -375,6 +410,14 @@ class BrazilData:
     def get_tax_incentives(self, cnpj: str) -> dict[str, Any]:
         """Assess corporate fiscal incentive score and industrial capacity profile (PIM/ZFM/ALC)."""
         return self.company.tax_incentives(cnpj)
+
+    def get_cvm_company(self, cnpj_or_codigo: str) -> dict[str, Any]:
+        """Query CVM publicly traded company registration and financial profile."""
+        return self.finance.cvm_company(cnpj_or_codigo)
+
+    def get_financial_ratios(self, cnpj_or_codigo: str) -> dict[str, Any]:
+        """Assess corporate financial health, solvency score, and fundamental ratios from CVM."""
+        return self.finance.financial_ratios(cnpj_or_codigo)
 
     def resolve_municipality(
         self, code_or_name: str | int, uf: str | None = None

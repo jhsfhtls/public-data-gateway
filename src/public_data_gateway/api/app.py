@@ -396,4 +396,38 @@ def create_app(settings: GatewaySettings | None = None) -> FastAPI:
         conn = SuframaPimZfmConnector(settings=app_settings)
         return conn.get_tax_incentives_profile(cnpj)
 
+    # 11. Capital Markets & Financial Statements (CVM DFP / ITR)
+    @app.get("/api/v1/finance/cvm/cias")
+    @app.get("/api/v1/cvm/cias")
+    async def list_cvm_companies(
+        setor: str | None = None,
+        situacao: str | None = None,
+    ) -> list[dict[str, Any]]:
+        from public_data_gateway.connectors.macrofinanceiro.cvm_dfp_itr.connector import (
+            CvmDfpItrConnector,
+        )
+
+        conn = CvmDfpItrConnector(settings=app_settings)
+        return conn.list_companies(setor=setor, situacao=situacao)
+
+    @app.get("/api/v1/finance/cvm/{cnpj_or_codigo}")
+    @app.get("/api/v1/cvm/{cnpj_or_codigo}")
+    async def get_cvm_company_profile(cnpj_or_codigo: str) -> dict[str, Any]:
+        from public_data_gateway.connectors.macrofinanceiro.cvm_dfp_itr.connector import (
+            CvmDfpItrConnector,
+        )
+
+        conn = CvmDfpItrConnector(settings=app_settings)
+        return conn.get_company(cnpj_or_codigo)
+
+    @app.get("/api/v1/finance/ratios/{cnpj_or_codigo}")
+    @app.get("/api/v1/ratios/{cnpj_or_codigo}")
+    async def get_cvm_financial_ratios(cnpj_or_codigo: str) -> dict[str, Any]:
+        from public_data_gateway.connectors.macrofinanceiro.cvm_dfp_itr.connector import (
+            CvmDfpItrConnector,
+        )
+
+        conn = CvmDfpItrConnector(settings=app_settings)
+        return conn.get_financial_ratios(cnpj_or_codigo)
+
     return app

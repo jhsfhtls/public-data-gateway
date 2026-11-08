@@ -1,0 +1,18 @@
+version: 2
+
+sources:
+  - name: cvm_dfp_itr
+    description: "Demonstrações Financeiras Padronizadas (DFP) e Cadastro de Companhias Abertas da CVM em Parquet ZSTD."
+    meta:
+      external_location: "data/cvm_dfp_itr/silver/{name}.parquet"
+    tables:
+      - name: cvm_cia_aberta_cadastral
+        description: "Cadastro oficial de companhias abertas com código CVM, CNPJ, razão social, setor de atividade e situação de registro."
+      - name: cvm_dfp_balanco_ativo
+        description: "Balanço Patrimonial Ativo (BPA) com detalhamento de ativo circulante, imobilizado e ativo total."
+      - name: cvm_dfp_balanco_passivo
+        description: "Balanço Patrimonial Passivo (BPP) com passivo circulante, não circulante e patrimônio líquido."
+      - name: cvm_dfp_dre
+        description: "Demonstração do Resultado do Exercício (DRE) com receita de vendas, custos, EBITDA e lucro líquido."
+      - name: cvm_dfp_fluxo_caixa
+        description: "Demonstração dos Fluxos de Caixa (DFC) com fluxos operacionais, de investimentos e de financiamento."
