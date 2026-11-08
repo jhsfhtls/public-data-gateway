@@ -1867,6 +1867,308 @@ models:
         tests:
           - not_null
 
+  - name: dim_companhia_aberta_cvm
+    description: "Dimensão conformada de companhias abertas com registro oficial perante a CVM."
+    columns:
+      - name: codigo_cvm
+        description: "Código identificador numérico da companhia perante a CVM."
+        tests:
+          - not_null
+          - unique
+      - name: cnpj_14
+        description: "Cadastro Nacional da Pessoa Jurídica da companhia emissora."
+        tests:
+          - not_null
+      - name: cnpj_raiz
+        description: "Raiz do CNPJ da companhia (8 primeiros dígitos)."
+        tests:
+          - not_null
+      - name: razao_social
+        description: "Razão social oficial arquivada na CVM."
+        tests:
+          - not_null
+      - name: nome_comercial
+        description: "Nome comercial ou de fantasia da companhia."
+      - name: setor_atividade
+        description: "Classificação setorial da companhia perante a CVM."
+        tests:
+          - not_null
+      - name: categoria_registro
+        description: "Categoria de registro da companhia aberta (CATEGORIA_A ou CATEGORIA_B)."
+        tests:
+          - not_null
+      - name: situacao_registro
+        description: "Situação cadastral do registro na CVM (ATIVO, CANCELADO, SUSPENSO)."
+        tests:
+          - not_null
+      - name: data_registro_cvm
+        description: "Data em que a companhia obteve seu registro inicial na CVM."
+        tests:
+          - not_null
+      - name: data_constituicao
+        description: "Data de constituição jurídica da companhia."
+      - name: tipo_mercado
+        description: "Segmento de mercado de negociação principal (BOLSA, BALCAO_ORGANIZADO)."
+        tests:
+          - not_null
+      - name: sigla_uf
+        description: "Sigla da Unidade Federativa da sede social da empresa."
+        tests:
+          - not_null
+      - name: id_municipio_ibge
+        description: "Código IBGE de 7 dígitos do município da sede social."
+      - name: is_registro_ativo
+        description: "Flag booleana indicando se a companhia possui registro ativo na CVM."
+        tests:
+          - not_null
+      - name: ingestion_timestamp
+        description: "Timestamp ISO de ingestão do registro no Lakehouse."
+        tests:
+          - not_null
+
+  - name: fct_balanco_patrimonial_cvm
+    description: "Fato consolidada de Balanço Patrimonial Ativo (BPA) e Passivo/PL (BPP) da CVM."
+    columns:
+      - name: id_demonstracao
+        description: "Identificador unívoco do balanço patrimonial por empresa, ano e tipo."
+        tests:
+          - not_null
+          - unique
+      - name: codigo_cvm
+        description: "Código identificador numérico da companhia perante a CVM."
+        tests:
+          - not_null
+      - name: cnpj_14
+        description: "Cadastro Nacional da Pessoa Jurídica da companhia emissora."
+        tests:
+          - not_null
+      - name: ano_exercicio
+        description: "Ano contábil de exercício da demonstração financeira."
+        tests:
+          - not_null
+      - name: data_referencia
+        description: "Data de encerramento do exercício social ou do trimestre."
+        tests:
+          - not_null
+      - name: tipo_demonstracao
+        description: "Tipo de consolidação das demonstrações (CONSOLIDADO ou INDIVIDUAL)."
+        tests:
+          - not_null
+      - name: versao_documento
+        description: "Número da versão do documento contábil arquivado na CVM."
+        tests:
+          - not_null
+      - name: ativo_total
+        description: "Valor monetário do Ativo Total da companhia."
+        tests:
+          - not_null
+      - name: ativo_circulante
+        description: "Ativo Circulante realizável no curto prazo."
+        tests:
+          - not_null
+      - name: caixa_equivalentes
+        description: "Saldo de caixa e equivalentes de caixa de alta liquidez."
+        tests:
+          - not_null
+      - name: aplicacoes_financeiras
+        description: "Aplicações financeiras e títulos negociáveis de curto prazo."
+        tests:
+          - not_null
+      - name: contas_a_receber
+        description: "Valores a receber de clientes e duplicatas a receber."
+        tests:
+          - not_null
+      - name: estoques
+        description: "Valor contábil de estoques de insumos e produtos acabados."
+        tests:
+          - not_null
+      - name: ativo_nao_circulante
+        description: "Ativo Não Circulante realizável a longo prazo."
+        tests:
+          - not_null
+      - name: imobilizado
+        description: "Ativo imobilizado corpóreo de produção e operação."
+        tests:
+          - not_null
+      - name: intangivel
+        description: "Ativo intangível, marcas, patentes e ágio por rentabilidade futura."
+        tests:
+          - not_null
+      - name: passivo_total
+        description: "Valor total do Passivo exigível somado ao Patrimônio Líquido."
+        tests:
+          - not_null
+      - name: passivo_circulante
+        description: "Obrigações exigíveis no curto prazo (até 12 meses)."
+        tests:
+          - not_null
+      - name: fornecedores
+        description: "Obrigações comerciais com fornecedores de mercadorias e serviços."
+        tests:
+          - not_null
+      - name: emprestimos_financiamentos_cp
+        description: "Empréstimos e financiamentos bancários de curto prazo."
+        tests:
+          - not_null
+      - name: passivo_nao_circulante
+        description: "Exigível a longo prazo (superior a 12 meses)."
+        tests:
+          - not_null
+      - name: emprestimos_financiamentos_lp
+        description: "Dívida bancária e debêntures exigíveis a longo prazo."
+        tests:
+          - not_null
+      - name: patrimonio_liquido
+        description: "Patrimônio Líquido atribuível aos acionistas da companhia."
+        tests:
+          - not_null
+      - name: capital_social_integralizado
+        description: "Capital social realizado e subscrito da companhia."
+        tests:
+          - not_null
+      - name: reservas_lucros
+        description: "Reservas de lucros, retenções e lucros/prejuízos acumulados."
+        tests:
+          - not_null
+      - name: ingestion_timestamp
+        description: "Timestamp ISO de ingestão do registro no Lakehouse."
+        tests:
+          - not_null
+
+  - name: fct_resultado_exercicio_cvm
+    description: "Fato de Demonstração do Resultado do Exercício (DRE) da CVM."
+    columns:
+      - name: id_demonstracao
+        description: "Identificador unívoco da DRE por empresa, ano e tipo."
+        tests:
+          - not_null
+          - unique
+      - name: codigo_cvm
+        description: "Código identificador numérico da companhia perante a CVM."
+        tests:
+          - not_null
+      - name: cnpj_14
+        description: "Cadastro Nacional da Pessoa Jurídica da companhia emissora."
+        tests:
+          - not_null
+      - name: ano_exercicio
+        description: "Ano contábil de exercício da demonstração financeira."
+        tests:
+          - not_null
+      - name: data_referencia
+        description: "Data de encerramento do exercício social ou do trimestre."
+        tests:
+          - not_null
+      - name: tipo_demonstracao
+        description: "Tipo de consolidação das demonstrações (CONSOLIDADO ou INDIVIDUAL)."
+        tests:
+          - not_null
+      - name: versao_documento
+        description: "Número da versão do documento contábil arquivado na CVM."
+        tests:
+          - not_null
+      - name: receita_liquida_vendas
+        description: "Receita operacional líquida de vendas de bens e serviços."
+        tests:
+          - not_null
+      - name: custo_bens_servicos_vendidos
+        description: "Custo dos produtos, mercadorias e serviços vendidos (CPV/CMV)."
+        tests:
+          - not_null
+      - name: lucro_bruto
+        description: "Resultado bruto antes das despesas operacionais e administrativas."
+        tests:
+          - not_null
+      - name: despesas_operacionais
+        description: "Despesas operacionais totais de vendas, gerais e administrativas."
+        tests:
+          - not_null
+      - name: despesas_vendas_gerais_adm
+        description: "Despesas comerciais e administrativas da companhia."
+        tests:
+          - not_null
+      - name: ebitda_calculado
+        description: "Lucro antes de juros, impostos, depreciação e amortização (LAJIDA / EBITDA)."
+        tests:
+          - not_null
+      - name: resultado_financeiro_liquido
+        description: "Resultado financeiro líquido de receitas e despesas financeiras."
+        tests:
+          - not_null
+      - name: lucro_prejuizo_antes_tributos
+        description: "Resultado antes da tributação sobre a renda (LAIR)."
+        tests:
+          - not_null
+      - name: imposto_renda_contribuicao_social
+        description: "Provisão para IRPJ e CSLL incidente sobre o resultado."
+        tests:
+          - not_null
+      - name: lucro_liquido_exercicio
+        description: "Lucro ou prejuízo líquido consolidado do exercício social."
+        tests:
+          - not_null
+      - name: is_exercicio_lucrativo
+        description: "Flag booleana indicando se a companhia encerrou o período com lucro líquido positivo."
+        tests:
+          - not_null
+      - name: ingestion_timestamp
+        description: "Timestamp ISO de ingestão do registro no Lakehouse."
+        tests:
+          - not_null
+
+  - name: fct_demonstracao_contabil_cvm
+    description: "Fato de Demonstração dos Fluxos de Caixa (DFC) da CVM."
+    columns:
+      - name: id_demonstracao
+        description: "Identificador unívoco da DFC por empresa, ano e tipo."
+        tests:
+          - not_null
+          - unique
+      - name: codigo_cvm
+        description: "Código identificador numérico da companhia perante a CVM."
+        tests:
+          - not_null
+      - name: cnpj_14
+        description: "Cadastro Nacional da Pessoa Jurídica da companhia emissora."
+        tests:
+          - not_null
+      - name: ano_exercicio
+        description: "Ano contábil de exercício da demonstração financeira."
+        tests:
+          - not_null
+      - name: data_referencia
+        description: "Data de encerramento do exercício social ou do trimestre."
+        tests:
+          - not_null
+      - name: tipo_demonstracao
+        description: "Tipo de consolidação das demonstrações (CONSOLIDADO ou INDIVIDUAL)."
+        tests:
+          - not_null
+      - name: fluxo_caixa_operacional
+        description: "Fluxo de caixa líquido gerado pelas atividades operacionais (FCO)."
+        tests:
+          - not_null
+      - name: fluxo_caixa_investimento
+        description: "Fluxo de caixa líquido consumido ou gerado por atividades de investimento (FCI)."
+        tests:
+          - not_null
+      - name: fluxo_caixa_financiamento
+        description: "Fluxo de caixa líquido das atividades de financiamento e amortização de dívida (FCF)."
+        tests:
+          - not_null
+      - name: variacao_liquida_caixa
+        description: "Aumento ou redução líquida de disponibilidades e equivalentes de caixa no período."
+        tests:
+          - not_null
+      - name: is_fco_positivo
+        description: "Flag booleana indicando se o fluxo de caixa operacional foi superavitário."
+        tests:
+          - not_null
+      - name: ingestion_timestamp
+        description: "Timestamp ISO de ingestão do registro no Lakehouse."
+        tests:
+          - not_null
+
 
 
 

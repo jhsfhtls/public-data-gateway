@@ -263,6 +263,28 @@ class MCPDispatcher:
                                     "required": ["cnpj"],
                                 },
                             },
+                            {
+                                "name": "bdg_get_cvm_company",
+                                "description": "Query official CVM registration, sector, and latest financial snapshot for a publicly traded company (Tier 1).",
+                                "inputSchema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "cnpj_or_codigo": {"type": "string", "description": "CNPJ or CVM registration code (e.g. 009512 for Petrobras)"},
+                                    },
+                                    "required": ["cnpj_or_codigo"],
+                                },
+                            },
+                            {
+                                "name": "bdg_get_financial_ratios",
+                                "description": "Assess fundamental financial health, solvency score (0-100), liquidity, and profit margins from CVM DFP statements (Tier 1).",
+                                "inputSchema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "cnpj_or_codigo": {"type": "string", "description": "CNPJ or CVM registration code"},
+                                    },
+                                    "required": ["cnpj_or_codigo"],
+                                },
+                            },
                         ]
                     },
                 }
@@ -521,6 +543,36 @@ class MCPDispatcher:
             cnpj_val = args.get("cnpj") or args.get("documento") or ""
             res = suf_conn.get_tax_incentives_profile(cnpj_val)
             wrapped = wrap_untrusted_gov_data(res, source_id="suframa_pim_zfm")
+            return {
+                "jsonrpc": "2.0",
+                "id": req_id,
+                "result": {"content": [{"type": "text", "text": wrapped}], "isError": False},
+            }
+
+        if tool_name in {"bdg_get_cvm_company", "pdg_get_cvm_company"}:
+            from public_data_gateway.connectors.macrofinanceiro.cvm_dfp_itr.connector import (
+                CvmDfpItrConnector,
+            )
+
+            cvm_conn = CvmDfpItrConnector(settings=self.settings)
+            doc = args.get("cnpj_or_codigo") or args.get("documento") or ""
+            res = cvm_conn.get_company(doc)
+            wrapped = wrap_untrusted_gov_data(res, source_id="cvm_dfp_itr")
+            return {
+                "jsonrpc": "2.0",
+                "id": req_id,
+                "result": {"content": [{"type": "text", "text": wrapped}], "isError": False},
+            }
+
+        if tool_name in {"bdg_get_financial_ratios", "pdg_get_financial_ratios"}:
+            from public_data_gateway.connectors.macrofinanceiro.cvm_dfp_itr.connector import (
+                CvmDfpItrConnector,
+            )
+
+            cvm_conn = CvmDfpItrConnector(settings=self.settings)
+            doc = args.get("cnpj_or_codigo") or args.get("documento") or ""
+            res = cvm_conn.get_financial_ratios(doc)
+            wrapped = wrap_untrusted_gov_data(res, source_id="cvm_dfp_itr")
             return {
                 "jsonrpc": "2.0",
                 "id": req_id,

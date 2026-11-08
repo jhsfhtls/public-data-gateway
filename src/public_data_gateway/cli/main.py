@@ -198,6 +198,34 @@ def build_parser() -> argparse.ArgumentParser:
     tax_p.add_argument("cnpj", type=str, help="CNPJ to evaluate")
     tax_p.add_argument("--json", action="store_true", help="Output in JSON format")
 
+    # Finance, CVM & Capital Markets
+    fin_p = subparsers.add_parser(
+        "finance", help="Query capital markets, financial statements and solvency metrics (CVM DFP/ITR)."
+    )
+    fin_sub = fin_p.add_subparsers(dest="finance_action")
+
+    f_cvm_p = fin_sub.add_parser("cvm", help="Query CVM publicly traded company registration and financials.")
+    f_cvm_p.add_argument("documento", type=str, help="CNPJ or CVM registration code")
+    f_cvm_p.add_argument("--json", action="store_true", help="Output in JSON format")
+
+    f_rat_p = fin_sub.add_parser("ratios", help="Assess fundamental financial ratios and solvency score.")
+    f_rat_p.add_argument("documento", type=str, help="CNPJ or CVM registration code")
+    f_rat_p.add_argument("--json", action="store_true", help="Output in JSON format")
+
+    f_list_p = fin_sub.add_parser("list-cvm", help="List publicly traded companies registered with CVM.")
+    f_list_p.add_argument("--setor", type=str, default=None, help="Filter by sector of activity")
+    f_list_p.add_argument("--situacao", type=str, default=None, help="Filter by registration status (e.g. ATIVO)")
+    f_list_p.add_argument("--json", action="store_true", help="Output in JSON format")
+
+    # Direct shortcuts
+    cvm_p = subparsers.add_parser("cvm", help="Query CVM publicly traded company registration and financials.")
+    cvm_p.add_argument("documento", type=str, help="CNPJ or CVM registration code")
+    cvm_p.add_argument("--json", action="store_true", help="Output in JSON format")
+
+    rat_p = subparsers.add_parser("ratios", help="Assess fundamental financial ratios and solvency score.")
+    rat_p.add_argument("documento", type=str, help="CNPJ or CVM registration code")
+    rat_p.add_argument("--json", action="store_true", help="Output in JSON format")
+
     return parser
 
 
@@ -624,6 +652,55 @@ def main(argv: Sequence[str] | None = None) -> int:
                     print(f"Found {len(projs)} SUFRAMA CAS industrial projects:")
                     for p in projs:
                         print(f"  - [{p.get('codigo_projeto')}] {p.get('titulo_projeto', p.get('nome_projeto', 'N/A'))} | {p.get('status_projeto')} | Resolução: {p.get('resolucao_aprovacao_cas', 'N/A')}")
+                return 0
+
+        if args.command in {"finance", "cvm", "ratios"}:
+            from public_data_gateway.connectors.macrofinanceiro.cvm_dfp_itr.connector import (
+                CvmDfpItrConnector,
+            )
+            cvm_conn = CvmDfpItrConnector(settings=settings)
+
+            action = getattr(args, "finance_action", None) or args.command
+            if action in {"cvm"}:
+                res = cvm_conn.get_company(args.documento)
+                if args.json:
+                    print(json.dumps(res, indent=2, ensure_ascii=False))
+                else:
+                    print(f"CVM Public Company Profile for '{args.documento}':")
+                    print(f"  Razão Social:        {res.get('razao_social', 'N/A')}")
+                    print(f"  Código CVM:          {res.get('codigo_cvm', 'N/A')}")
+                    print(f"  CNPJ:                {res.get('cnpj_14', 'N/A')}")
+                    print(f"  Setor de Atividade:  {res.get('setor_atividade', 'N/A')}")
+                    print(f"  Situação Registro:   {res.get('situacao_registro', 'N/A')}")
+                    print(f"  Categoria Registro:  {res.get('categoria_registro', 'N/A')}")
+                    print(f"  Segmento Mercado:    {res.get('tipo_mercado', 'N/A')}")
+                return 0
+
+            if action in {"ratios"}:
+                res = cvm_conn.get_financial_ratios(args.documento)
+                if args.json:
+                    print(json.dumps(res, indent=2, ensure_ascii=False))
+                else:
+                    print(f"Financial Ratios & Solvency for '{args.documento}':")
+                    print(f"  Razão Social:       {res.get('razao_social', 'N/A')}")
+                    print(f"  Liquidez Corrente:  {res.get('liquidez_corrente', 0.0)}")
+                    print(f"  Liquidez Seca:      {res.get('liquidez_seca', 0.0)}")
+                    print(f"  Margem Bruta:       {res.get('margem_bruta_pct', 0.0)}%")
+                    print(f"  Margem Líquida:     {res.get('margem_liquida_pct', 0.0)}%")
+                    print(f"  ROE:                {res.get('roe_pct', 0.0)}%")
+                    print(f"  Endividamento Geral:{res.get('endividamento_geral_pct', 0.0)}%")
+                    print(f"  Score Solvência:    {res.get('score_solvencia_fundamentalista', 0.0)}/100.0")
+                    print(f"  Classificação:      {res.get('classificacao_solvencia', 'N/A')}")
+                return 0
+
+            if action in {"list-cvm"}:
+                cias = cvm_conn.list_companies(setor=args.setor, situacao=args.situacao)
+                if args.json:
+                    print(json.dumps(cias, indent=2, ensure_ascii=False))
+                else:
+                    print(f"Found {len(cias)} CVM registered companies:")
+                    for c in cias:
+                        print(f"  - [{c.get('codigo_cvm')}] {c.get('razao_social')} | {c.get('setor_atividade')} | {c.get('situacao_registro')}")
                 return 0
 
     except Exception as exc:

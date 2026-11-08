@@ -12,11 +12,11 @@
     "POP_T_074",
     "POP_T_148"
   ],
-  "current_macro_phase_id": "04",
-  "current_macro_phase": "Fase 04 — Ingestão Wave 2 (B2B, Compras Públicas & Compliance: rfb_cnpj_lakehouse, rfb_simples_mei, pncp_contratacoes, etc.)",
+  "current_macro_phase_id": "05",
+  "current_macro_phase": "Fase 05 - Ingestão Wave 3 (Mercado de Capitais & Finanças Públicas: cvm_dfp_itr, mdic_comexstat, cvm_fundos, bcb_ifdata, stn_tesouro, comprasgov_catmat)",
   "overall_status": "ON_TRACK",
-  "active_connector": "cvm_dfp_itr",
-  "next_connector": "mdic_comexstat",
+  "active_connector": "mdic_comexstat",
+  "next_connector": "cvm_fundos",
   "structural_phases": [
     {
       "phase_id": "00",
@@ -81,8 +81,8 @@
     {
       "phase_id": "04",
       "name": "Ingestão Wave 2 — B2B, Compras Públicas & Compliance",
-      "status": "IN_PROGRESS",
-      "completion_date": null,
+      "status": "COMPLETED",
+      "completion_date": "2026-11-08",
       "deliverables": [
         "Conector rfb_cnpj_lakehouse (55M CNPJs em streaming DuckDB)",
         "Conector rfb_simples_mei (Enquadramento tributário Simples/MEI)",
@@ -96,7 +96,7 @@
     {
       "phase_id": "05",
       "name": "Ingestão Wave 3 — Mercado de Capitais & Finanças Públicas",
-      "status": "PENDING",
+      "status": "IN_PROGRESS",
       "completion_date": null,
       "deliverables": [
         "Conector cvm_dfp_itr (Balanços e DRE de companhias abertas)",
@@ -333,6 +333,14 @@
       "phase_id": "04",
       "milestone": "Homologação do Conector suframa_pim_zfm (5 Tabelas, dbt, Mart de Incentivos Fiscais PIM & Live Fail-Hard)",
       "summary": "Implementação completa do conector suframa_pim_zfm (Superintendência da Zona Franca de Manaus — Cadastro de Empresas Incentivadas do Polo Industrial de Manaus / ZFM e Áreas de Livre Comércio, Decreto-Lei nº 288/1967, Lei nº 8.387/1991, Art. 40 do ADCT, EC 83/2014 e Lei nº 10.996/2004): 5 tabelas (suframa_empresas_cadastradas, suframa_projetos_incentivados, suframa_beneficios_fiscais, suframa_areas_livre_comercio, suframa_subsetores_industriais) materializadas em data/suframa_pim_zfm/{bronze,silver,gold}/; 11 novos modelos dbt (5 staging views, dim_empresa_suframa, dim_area_livre_comercio, dim_subsetor_industrial_pim, fct_projeto_incentivado_suframa, fct_beneficio_fiscal_suframa, mart_incentivos_fiscais_pim_brasil) totalizando 115 modelos e 1098 testes dbt 100% aprovados; 1242 colunas 100% documentadas no linter; feature store features_incentivos_fiscais_zfm_brasil.parquet gerada com score contínuo de 0 a 100 de incentivos fiscais, cumprimento de PPB e classificação de capacidade fabril; testes reais de 1 linha com fail-hard contra os portais oficiais da SUFRAMA gov.br e 12 testes pytest aprovados; multi-interface completa via SDK (PublicData.company.suframa, tax_incentives, list_pim_projects, get_suframa_status, get_tax_incentives), CLI (pdg company suframa, tax-incentives, pim-projects), REST API (/api/v1/company/suframa, tax-incentives, projetos) e MCP (bdg_get_suframa_status, bdg_get_tax_incentives_profile)."
+    }
+  ],
+  "recent_milestones": [
+    {
+      "date": "2026-11-08",
+      "phase_id": "05",
+      "milestone": "Homologação do Conector cvm_dfp_itr (5 Tabelas, dbt, Mart de Demonstrações Financeiras & Live Fail-Hard)",
+      "summary": "Implementação completa do conector cvm_dfp_itr (Comissão de Valores Mobiliários - Demonstrações Financeiras Padronizadas DFP/ITR de Companhias Abertas, Lei nº 6.385/1976, Lei nº 6.404/1976 e Resoluções CVM nº 80/2022 e 81/2022) iniciando a Wave 3: 5 tabelas (cvm_cia_aberta_cadastral, cvm_dfp_balanco_ativo, cvm_dfp_balanco_passivo, cvm_dfp_dre, cvm_dfp_fluxo_caixa) materializadas em data/cvm_dfp_itr/{bronze,silver,gold}/; 10 novos modelos dbt (5 staging views, dim_companhia_aberta_cvm, fct_balanco_patrimonial_cvm, fct_resultado_exercicio_cvm, fct_demonstracao_contabil_cvm, mart_demonstracoes_financeiras_cvm_brasil) totalizando 125 modelos e 1284 testes dbt 100% aprovados; 1421 colunas 100% documentadas no linter; feature store features_financeiras_cvm_brasil.parquet gerada com indicadores contábeis (liquidez corrente/seca, margens bruta/líquida, ROE, endividamento geral), score de solvência fundamentalista contínuo de 0 a 100 e rating contábil; testes reais de 1 linha com fail-hard contra os portais oficiais da CVM gov.br e 12 testes pytest aprovados; multi-interface completa via SDK (PublicData.finance.cvm_company, financial_ratios, list_cvm_companies), CLI (pdg finance cvm, ratios, list-cvm), REST API (/api/v1/finance/cvm, ratios, cias) e MCP (bdg_get_cvm_company, bdg_get_financial_ratios)."
     }
   ]
 }

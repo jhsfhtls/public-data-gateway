@@ -1,0 +1,91 @@
+contract_id: "ODCS-BR-CVM-DFP-ITR-001"
+source_id: "cvm_dfp_itr"
+version: "1.0.0"
+grain: "One row per publicly traded company registered with CVM (Companhia Aberta)"
+primary_keys:
+  - "codigo_cvm"
+canonical_keys:
+  - "cnpj_14"
+  - "codigo_cvm"
+reference_date_column: "data_registro_cvm"
+lgpd_legal_basis: "Lei nº 6.385/1976, Lei nº 6.404/1976, Resolução CVM nº 80/2022 e Art. 7º, § 3º e 4º da Lei nº 13.709/2018 (LGPD - Transparência Pública Mandatória do Mercado de Capitais)"
+min_expected_rows: 5
+max_volume_drop_pct: 1.0
+sentinel_values:
+  - "NA"
+  - "N/A"
+  - "NULL"
+  - "00000000"
+  - "-"
+  - "SEM INFORMACAO"
+columns:
+  - name: "codigo_cvm"
+    data_type: "string"
+    nullable: false
+    description: "Código numérico oficial da companhia aberta registrado junto à CVM."
+    classification: "PUBLIC_REGULATORY"
+  - name: "cnpj_14"
+    data_type: "string"
+    nullable: false
+    description: "Cadastro Nacional da Pessoa Jurídica (CNPJ) com 14 dígitos normalizados."
+    classification: "PUBLIC_IDENTIFIER"
+  - name: "cnpj_raiz"
+    data_type: "string"
+    nullable: false
+    description: "Raiz do CNPJ da companhia (8 primeiros dígitos)."
+    classification: "PUBLIC_IDENTIFIER"
+  - name: "razao_social"
+    data_type: "string"
+    nullable: false
+    description: "Razão social oficial arquivada na CVM."
+    classification: "PUBLIC_LEGAL_NAME"
+  - name: "nome_comercial"
+    data_type: "string"
+    nullable: true
+    description: "Nome de fantasia ou comercial da emissora."
+    classification: "PUBLIC_TRADE_NAME"
+  - name: "setor_atividade"
+    data_type: "string"
+    nullable: false
+    description: "Classificação setorial da companhia perante a CVM (e.g. Petróleo e Gás, Energia Elétrica, Mineração, Bancos, Varejo)."
+    classification: "PUBLIC_METRIC"
+  - name: "categoria_registro"
+    data_type: "string"
+    nullable: false
+    description: "Categoria de registro da companhia aberta (CATEGORIA_A autoriza negociação de ações; CATEGORIA_B autoriza outros valores mobiliários)."
+    classification: "PUBLIC_STATUS"
+  - name: "situacao_registro"
+    data_type: "string"
+    nullable: false
+    description: "Situação cadastral do registro na CVM (ATIVO, CANCELADO, SUSPENSO)."
+    classification: "PUBLIC_STATUS"
+  - name: "data_registro_cvm"
+    data_type: "date"
+    nullable: false
+    description: "Data em que a companhia obteve seu registro inicial na CVM (formato ISO YYYY-MM-DD)."
+    classification: "PUBLIC_METRIC"
+  - name: "data_constituicao"
+    data_type: "date"
+    nullable: true
+    description: "Data de fundação ou constituição societária da empresa."
+    classification: "PUBLIC_METRIC"
+  - name: "tipo_mercado"
+    data_type: "string"
+    nullable: false
+    description: "Segmento de negociação principal dos valores mobiliários (BOLSA, BALCAO_ORGANIZADO, BALCAO_NAO_ORGANIZADO)."
+    classification: "PUBLIC_METRIC"
+  - name: "sigla_uf"
+    data_type: "string"
+    nullable: false
+    description: "Sigla da Unidade Federativa da sede social da companhia."
+    classification: "PUBLIC_GEO"
+  - name: "id_municipio_ibge"
+    data_type: "string"
+    nullable: true
+    description: "Código IBGE de 7 dígitos do município da sede social."
+    classification: "PUBLIC_GEO"
+  - name: "ingestion_timestamp"
+    data_type: "string"
+    nullable: false
+    description: "Timestamp ISO 8601 UTC de ingestão dos dados no repositório."
+    classification: "AUDIT_METADATA"
