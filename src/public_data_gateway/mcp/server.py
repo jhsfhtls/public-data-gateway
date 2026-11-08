@@ -329,6 +329,28 @@ class MCPDispatcher:
                                     },
                                 },
                             },
+                            {
+                                "name": "bdg_get_bank_financial_profile",
+                                "description": "Query financial institution prudential segment (S1-S5), quarterly balance sheet, P&L, and Basiléia ratio from BACEN IF.data (Tier 1).",
+                                "inputSchema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "cnpj": {"type": "string", "description": "Financial institution CNPJ or BACEN code (e.g. 60701190000104 for Itaú)"},
+                                    },
+                                    "required": ["cnpj"],
+                                },
+                            },
+                            {
+                                "name": "bdg_get_banking_ranking",
+                                "description": "Query Brazilian banking ranking by Total Assets, Credit Portfolio, and Basiléia Index with optional segment filter from BACEN IF.data (Tier 1).",
+                                "inputSchema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "segmento": {"type": "string", "description": "Optional prudential segment filter (S1, S2, S3, S4, S5)"},
+                                        "top": {"type": "integer", "description": "Top N institutions to return (default: 10)"},
+                                    },
+                                },
+                            },
                         ]
                     },
                 }
@@ -681,6 +703,58 @@ class MCPDispatcher:
             min_aum = float(args.get("min_aum") or 0.0)
             managers = fund_conn.get_asset_managers(query=q, min_aum=min_aum)
             wrapped = wrap_untrusted_gov_data(managers, source_id="cvm_fundos")
+            return {
+                "jsonrpc": "2.0",
+                "id": req_id,
+                "result": {"content": [{"type": "text", "text": wrapped}], "isError": False},
+            }
+
+        if tool_name in {"bdg_get_bank_financial_profile", "pdg_get_bank_financial_profile"}:
+            from public_data_gateway.connectors.macrofinanceiro.bcb_ifdata.connector import (
+                BcbIfdataConnector,
+            )
+
+            bank_conn = BcbIfdataConnector(settings=self.settings)
+            cnpj = args.get("cnpj", "")
+            bank = bank_conn.get_bank_by_cnpj(cnpj)
+            if not bank:
+                return {
+                    "jsonrpc": "2.0",
+                    "id": req_id,
+                    "result": {
+                        "content": [
+                            {
+                                "type": "text",
+                                "text": f"Financial institution not found for '{cnpj}'",
+                            }
+                        ],
+                        "isError": True,
+                    },
+                }
+            sheet = bank_conn.get_bank_balance_sheet(cnpj)
+            sol = bank_conn.get_bank_solidity(cnpj)
+            payload = {
+                "instituicao": bank,
+                "balanco": sheet,
+                "solidez": sol,
+            }
+            wrapped = wrap_untrusted_gov_data(payload, source_id="bcb_ifdata")
+            return {
+                "jsonrpc": "2.0",
+                "id": req_id,
+                "result": {"content": [{"type": "text", "text": wrapped}], "isError": False},
+            }
+
+        if tool_name in {"bdg_get_banking_ranking", "pdg_get_banking_ranking"}:
+            from public_data_gateway.connectors.macrofinanceiro.bcb_ifdata.connector import (
+                BcbIfdataConnector,
+            )
+
+            bank_conn = BcbIfdataConnector(settings=self.settings)
+            segmento = args.get("segmento")
+            top = int(args.get("top") or 10)
+            ranking = bank_conn.get_banking_ranking(segmento=segmento, top=top)
+            wrapped = wrap_untrusted_gov_data(ranking, source_id="bcb_ifdata")
             return {
                 "jsonrpc": "2.0",
                 "id": req_id,

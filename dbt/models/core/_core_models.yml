@@ -2525,3 +2525,190 @@ models:
         description: "Quantidade total de cotistas do fundo no dia."
         tests:
           - not_null
+
+  - name: dim_instituicao_prudencial_bcb
+    description: "Dimensão cadastral das Instituições Financeiras e Conglomerados Prudenciais registradas no BACEN (IF.data)."
+    columns:
+      - name: cnpj_14_lider
+        description: "CNPJ de 14 dígitos da instituição líder do conglomerado financeiro ou prudencial."
+        tests:
+          - not_null
+      - name: cod_inst
+        description: "Código identificador único BACEN no IF.data."
+        tests:
+          - not_null
+          - unique
+      - name: nome_instituicao
+        description: "Nome oficial ou denominação social da instituição financeira."
+        tests:
+          - not_null
+      - name: data_base
+        description: "Data-base trimestral de referência contábil (formato YYYYMM)."
+        tests:
+          - not_null
+      - name: segmento_prudencial
+        description: "Classificação de segmento prudencial S1 a S5 (Resolução CMN 4.553/2017)."
+        tests:
+          - not_null
+      - name: tipo_instituicao
+        description: "Tipo de consolidação ou natureza regulatória da instituição."
+      - name: tcb
+        description: "Código do Tipo de Consolidação Bancária BACEN."
+      - name: tc
+        description: "Código do Tipo de Controle de Capital."
+      - name: atividade
+        description: "Modalidade preponderante de atividade operacional da instituição."
+      - name: uf_sede
+        description: "Sigla da UF da sede institucional."
+      - name: municipio_sede
+        description: "Município da sede institucional."
+      - name: cod_conglomerado_financeiro
+        description: "Código identificador do conglomerado financeiro se aplicável."
+      - name: cod_conglomerado_prudencial
+        description: "Código identificador do conglomerado prudencial."
+      - name: situacao
+        description: "Situação cadastral da instituição perante o Banco Central."
+
+  - name: fct_balanco_bancario_trimestral
+    description: "Tabela fato consolidada com as contas de Ativo, Passivo e Patrimônio Líquido das Instituições Financeiras (BACEN IF.data)."
+    columns:
+      - name: cnpj_14_lider
+        description: "CNPJ de 14 dígitos da instituição líder."
+        tests:
+          - not_null
+      - name: cod_inst
+        description: "Código identificador único BACEN da instituição."
+        tests:
+          - not_null
+      - name: nome_instituicao
+        description: "Nome oficial da instituição financeira."
+      - name: segmento_prudencial
+        description: "Segmentação prudencial da instituição (S1 a S5)."
+      - name: data_base
+        description: "Data-base trimestral do balanço contábil."
+        tests:
+          - not_null
+      - name: disponibilidades
+        description: "Disponibilidades em caixa e equivalentes bancários (R$)."
+      - name: aplicacoes_interfinanceiras
+        description: "Aplicações em operações compromissadas e liquidez interfinanceira (R$)."
+      - name: titulos_valores_mobiliarios
+        description: "Títulos e Valores Mobiliários (TVM) e derivativos bancários (R$)."
+      - name: carteira_credito_classificada
+        description: "Volume total da carteira de crédito classificada (R$)."
+        tests:
+          - not_null
+      - name: outros_creditos_operacionais
+        description: "Outros créditos e contas a receber operacionais (R$)."
+      - name: ativo_permanente
+        description: "Ativo permanente, imobilizado e intangível bancário (R$)."
+      - name: ativo_total
+        description: "Ativo total consolidado da instituição financeira (R$)."
+        tests:
+          - not_null
+      - name: depositos_vista
+        description: "Depósitos bancários à vista em conta corrente (R$)."
+      - name: depositos_prazo
+        description: "Depósitos a prazo captados via CDB e títulos emitidos (R$)."
+      - name: depositos_poupanca
+        description: "Depósitos captados em caderneta de poupança (R$)."
+      - name: depositos_totais
+        description: "Volume consolidado total de depósitos captados (R$)."
+        tests:
+          - not_null
+      - name: captacoes_mercado_aberto
+        description: "Captações no mercado interfinanceiro e mercado aberto (R$)."
+      - name: patrimonio_liquido
+        description: "Patrimônio líquido contábil consolidado (R$)."
+        tests:
+          - not_null
+      - name: patrimonio_referencia
+        description: "Patrimônio de Referência (PR) regulatório para limites de capital (R$)."
+        tests:
+          - not_null
+      - name: passivo_total_exigivel
+        description: "Passivo total exigível da instituição (R$)."
+
+  - name: fct_resultado_bancario_trimestral
+    description: "Tabela fato consolidando a Demonstração do Resultado do Exercício das Instituições Financeiras (BACEN IF.data)."
+    columns:
+      - name: cnpj_14_lider
+        description: "CNPJ de 14 dígitos da instituição líder."
+        tests:
+          - not_null
+      - name: cod_inst
+        description: "Código identificador único BACEN da instituição."
+        tests:
+          - not_null
+      - name: nome_instituicao
+        description: "Nome oficial da instituição financeira."
+      - name: segmento_prudencial
+        description: "Segmentação prudencial da instituição (S1 a S5)."
+      - name: data_base
+        description: "Data-base trimestral do exercício."
+        tests:
+          - not_null
+      - name: receitas_intermediacao_financeira
+        description: "Receitas de intermediação financeira com operações de crédito e títulos (R$)."
+        tests:
+          - not_null
+      - name: despesas_intermediacao_financeira
+        description: "Despesas com captação e intermediação financeira (R$)."
+        tests:
+          - not_null
+      - name: margem_financeira_bruta
+        description: "Margem financeira bruta (Receitas menos Despesas de Intermediação em R$)."
+        tests:
+          - not_null
+      - name: despesas_provisao_pdd
+        description: "Despesas com provisão para devedores duvidosos e perdas esperadas PDD (R$)."
+        tests:
+          - not_null
+      - name: resultado_operacional
+        description: "Resultado operacional contábil apurado no período (R$)."
+      - name: lucro_liquido_trimestral
+        description: "Lucro líquido consolidado no trimestre (R$)."
+        tests:
+          - not_null
+
+  - name: fct_indicadores_prudenciais_bcb
+    description: "Tabela fato com os Indicadores Prudenciais e Regulatórios calculados pelo BACEN (IF.data)."
+    columns:
+      - name: cnpj_14_lider
+        description: "CNPJ de 14 dígitos da instituição líder."
+        tests:
+          - not_null
+      - name: cod_inst
+        description: "Código identificador único BACEN da instituição."
+        tests:
+          - not_null
+      - name: nome_instituicao
+        description: "Nome oficial da instituição financeira."
+      - name: segmento_prudencial
+        description: "Segmentação prudencial regulatória (S1 a S5)."
+      - name: data_base
+        description: "Data-base trimestral dos indicadores."
+        tests:
+          - not_null
+      - name: indice_basileia_pct
+        description: "Índice de Basiléia percentual apurado (Mínimo regulatório: 10.5%)."
+        tests:
+          - not_null
+      - name: indice_imobilizacao_pct
+        description: "Índice de Imobilização percentual (Teto regulatório: 50.0%)."
+        tests:
+          - not_null
+      - name: razao_alavancagem_pct
+        description: "Razão de alavancagem bancária (Patrimônio Líquido sobre Ativo Total em %)."
+        tests:
+          - not_null
+      - name: roe_bancario_pct
+        description: "Retorno anualizado sobre o patrimônio líquido ROE bancário (%)."
+        tests:
+          - not_null
+      - name: roa_bancario_pct
+        description: "Retorno sobre o ativo total ROA bancário (%)."
+      - name: taxa_inadimplencia_pct
+        description: "Taxa de inadimplência da carteira classificada com atraso superior a 90 dias (%)."
+        tests:
+          - not_null

@@ -1,0 +1,18 @@
+version: 2
+
+sources:
+  - name: bcb_ifdata
+    description: "Fontes de dados normalizados de Instituições Financeiras e Conglomerados Prudenciais (IF.data) do Banco Central do Brasil."
+    meta:
+      external_location: "data/bcb_ifdata/silver/{name}.parquet"
+    tables:
+      - name: bcb_ifdata_cadastro
+        description: "Cadastro de instituições e conglomerados financeiros/prudenciais com segmento S1 a S5."
+      - name: bcb_ifdata_ativo
+        description: "Balanço Patrimonial Ativo detalhado (Crédito, TVM, Disponibilidades, Ativo Total)."
+      - name: bcb_ifdata_passivo
+        description: "Balanço Patrimonial Passivo e PL (Depósitos, Captações, Patrimônio Líquido, PR)."
+      - name: bcb_ifdata_dre
+        description: "Demonstração do Resultado trimestral (Receitas de Intermediação, PDD, Lucro Líquido)."
+      - name: bcb_ifdata_indicadores
+        description: "Indicadores prudenciais apurados (Índice de Basiléia, Imobilização, ROE, Inadimplência)."

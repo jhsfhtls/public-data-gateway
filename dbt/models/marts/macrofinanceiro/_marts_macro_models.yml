@@ -309,3 +309,121 @@ models:
         description: "Posição ordinal no ranking geral de gestoras ordenado por AuM decrescente."
         tests:
           - not_null
+
+  - name: mart_ranking_bancario_brasil
+    description: "Datamart consolidado com o ranking das maiores instituições financeiras do Brasil por Ativo Total, Crédito e Depósitos (BACEN IF.data)."
+    columns:
+      - name: cnpj_14_lider
+        description: "CNPJ de 14 dígitos da instituição líder."
+        tests:
+          - not_null
+      - name: cod_inst
+        description: "Código identificador único BACEN no IF.data."
+        tests:
+          - not_null
+      - name: nome_instituicao
+        description: "Nome oficial ou denominação da instituição financeira."
+        tests:
+          - not_null
+      - name: segmento_prudencial
+        description: "Segmento regulatório prudencial da instituição (S1 a S5)."
+        tests:
+          - not_null
+      - name: data_base
+        description: "Data-base trimestral do ranking (formato YYYYMM)."
+        tests:
+          - not_null
+      - name: ativo_total
+        description: "Ativo total consolidado da instituição apurado em reais (R$)."
+        tests:
+          - not_null
+      - name: carteira_credito_classificada
+        description: "Volume financeiro total da carteira de crédito classificada (R$)."
+        tests:
+          - not_null
+      - name: depositos_totais
+        description: "Volume consolidado total de depósitos captados (R$)."
+        tests:
+          - not_null
+      - name: patrimonio_liquido
+        description: "Patrimônio líquido contábil consolidado apurado (R$)."
+        tests:
+          - not_null
+      - name: lucro_liquido_trimestral
+        description: "Lucro líquido contábil apurado no trimestre (R$)."
+      - name: market_share_ativo_pct
+        description: "Percentual de participação de mercado no ativo total do SFN analisado (%)."
+        tests:
+          - not_null
+      - name: market_share_credito_pct
+        description: "Percentual de participação de mercado na carteira de crédito do SFN analisado (%)."
+        tests:
+          - not_null
+      - name: ranking_ativo_total
+        description: "Posição ordinal no ranking geral de instituições ordenado por ativo total decrescente."
+        tests:
+          - not_null
+
+  - name: mart_saude_prudencial_basileia
+    description: "Datamart de risco e solidez regulatória bancária com enquadramento de Basiléia, imobilização e inadimplência (BACEN IF.data)."
+    columns:
+      - name: cnpj_14_lider
+        description: "CNPJ de 14 dígitos da instituição líder."
+        tests:
+          - not_null
+      - name: cod_inst
+        description: "Código identificador único BACEN da instituição."
+        tests:
+          - not_null
+      - name: nome_instituicao
+        description: "Nome oficial da instituição financeira."
+        tests:
+          - not_null
+      - name: segmento_prudencial
+        description: "Segmentação prudencial da instituição (S1 a S5)."
+        tests:
+          - not_null
+      - name: tipo_instituicao
+        description: "Tipo de consolidação ou natureza regulatória da instituição."
+      - name: atividade
+        description: "Modalidade preponderante de atividade operacional da instituição."
+      - name: uf_sede
+        description: "Sigla da UF da sede institucional."
+      - name: data_base
+        description: "Data-base trimestral de apuração."
+        tests:
+          - not_null
+      - name: indice_basileia_pct
+        description: "Índice de Basiléia percentual apurado (Mínimo regulatório: 10.5%)."
+        tests:
+          - not_null
+      - name: indice_imobilizacao_pct
+        description: "Índice de Imobilização percentual (Teto regulatório: 50.0%)."
+        tests:
+          - not_null
+      - name: razao_alavancagem_pct
+        description: "Razão de alavancagem bancária (Patrimônio Líquido sobre Ativo Total em %)."
+        tests:
+          - not_null
+      - name: roe_bancario_pct
+        description: "Retorno sobre o patrimônio líquido ROE bancário anualizado (%)."
+        tests:
+          - not_null
+      - name: roa_bancario_pct
+        description: "Retorno sobre o ativo total ROA bancário (%)."
+      - name: taxa_inadimplencia_pct
+        description: "Taxa de inadimplência da carteira classificada com atraso superior a 90 dias (%)."
+        tests:
+          - not_null
+      - name: status_enquadramento_basileia
+        description: "Classificação do enquadramento de capital (CAPITALIZACAO_FORTE, CAPITALIZACAO_ADEQUADA, ALERTA_CAPITAL)."
+        tests:
+          - not_null
+      - name: status_enquadramento_imobilizacao
+        description: "Classificação do enquadramento do teto de imobilização (IMOBILIZACAO_CONFORTAVEL, IMOBILIZACAO_LIMITE, DESENQUADRADO)."
+        tests:
+          - not_null
+      - name: perfil_risco_inadimplencia
+        description: "Classificação de risco de crédito da carteira (BAIXO_RISCO_CREDITO, RISCO_MODERADO_CREDITO, ALTO_RISCO_CREDITO)."
+        tests:
+          - not_null

@@ -1,0 +1,192 @@
+version: 2
+
+models:
+  - name: stg_bcb_ifdata_cadastro
+    description: "Visão de staging para o Cadastro de Instituições Financeiras e Conglomerados Prudenciais do BACEN IF.data."
+    columns:
+      - name: cnpj_14_lider
+        description: "CNPJ de 14 dígitos normalizados da instituição líder do conglomerado."
+        tests:
+          - not_null
+      - name: cod_inst
+        description: "Código identificador único BACEN no IF.data."
+        tests:
+          - not_null
+      - name: nome_instituicao
+        description: "Nome oficial ou denominação da instituição financeira."
+        tests:
+          - not_null
+      - name: data_base
+        description: "Data-base trimestral de referência contábil (formato YYYYMM)."
+        tests:
+          - not_null
+      - name: segmento_prudencial
+        description: "Classificação de segmento prudencial S1 a S5 (Resolução CMN 4.553/2017)."
+        tests:
+          - not_null
+      - name: tipo_instituicao
+        description: "Tipo de instituição ou nível de consolidação regulatória."
+      - name: tcb
+        description: "Código do Tipo de Consolidação Bancária segundo BACEN."
+      - name: tc
+        description: "Código do Tipo de Controle de Capital."
+      - name: atividade
+        description: "Segmento operacional preponderante da instituição."
+      - name: uf_sede
+        description: "Sigla da Unidade Federativa da sede institucional."
+      - name: municipio_sede
+        description: "Município da sede institucional."
+      - name: cod_conglomerado_financeiro
+        description: "Código identificador do conglomerado financeiro se aplicável."
+      - name: cod_conglomerado_prudencial
+        description: "Código identificador do conglomerado prudencial."
+      - name: situacao
+        description: "Situação cadastral da instituição perante o Banco Central."
+
+  - name: stg_bcb_ifdata_ativo
+    description: "Visão de staging para as contas do Ativo Patrimonial das Instituições Financeiras (BACEN IF.data)."
+    columns:
+      - name: cnpj_14_lider
+        description: "CNPJ de 14 dígitos da instituição líder."
+        tests:
+          - not_null
+      - name: cod_inst
+        description: "Código identificador único BACEN da instituição."
+        tests:
+          - not_null
+      - name: data_base
+        description: "Data-base trimestral do balanço."
+        tests:
+          - not_null
+      - name: disponibilidades
+        description: "Disponibilidades em caixa e equivalentes bancários em reais (R$)."
+      - name: aplicacoes_interfinanceiras
+        description: "Aplicações em operações compromissadas e interfinanceiras de liquidez (R$)."
+      - name: titulos_valores_mobiliarios
+        description: "Títulos e Valores Mobiliários (TVM) e instrumentos derivativos (R$)."
+      - name: carteira_credito_classificada
+        description: "Volume financeiro total da carteira de crédito classificada (R$)."
+        tests:
+          - not_null
+      - name: outros_creditos_operacionais
+        description: "Outros créditos e contas a receber operacionais do banco (R$)."
+      - name: ativo_permanente
+        description: "Ativo permanente, imobilizado e intangível bancário (R$)."
+      - name: ativo_total
+        description: "Ativo total consolidado da instituição financeira (R$)."
+        tests:
+          - not_null
+
+  - name: stg_bcb_ifdata_passivo
+    description: "Visão de staging para as contas de Passivo e Patrimônio Líquido das Instituições Financeiras (BACEN IF.data)."
+    columns:
+      - name: cnpj_14_lider
+        description: "CNPJ de 14 dígitos da instituição líder."
+        tests:
+          - not_null
+      - name: cod_inst
+        description: "Código identificador único BACEN da instituição."
+        tests:
+          - not_null
+      - name: data_base
+        description: "Data-base trimestral de apuração."
+        tests:
+          - not_null
+      - name: depositos_vista
+        description: "Depósitos bancários à vista em conta corrente (R$)."
+      - name: depositos_prazo
+        description: "Depósitos a prazo captados via CDB, RDB e títulos emitidos (R$)."
+      - name: depositos_poupanca
+        description: "Depósitos de poupança tradicionais captados (R$)."
+      - name: depositos_totais
+        description: "Volume financeiro total consolidado de depósitos captados (R$)."
+        tests:
+          - not_null
+      - name: captacoes_mercado_aberto
+        description: "Captações no mercado interfinanceiro e mercado aberto (R$)."
+      - name: patrimonio_liquido
+        description: "Patrimônio líquido contábil consolidado apurado (R$)."
+        tests:
+          - not_null
+      - name: patrimonio_referencia
+        description: "Patrimônio de Referência (PR) regulatório para apuração de capital (R$)."
+        tests:
+          - not_null
+      - name: passivo_total_exigivel
+        description: "Passivo total exigível da instituição financeira (R$)."
+
+  - name: stg_bcb_ifdata_dre
+    description: "Visão de staging para a Demonstração do Resultado do Exercício das Instituições Financeiras (BACEN IF.data)."
+    columns:
+      - name: cnpj_14_lider
+        description: "CNPJ de 14 dígitos da instituição líder."
+        tests:
+          - not_null
+      - name: cod_inst
+        description: "Código identificador único BACEN da instituição."
+        tests:
+          - not_null
+      - name: data_base
+        description: "Data-base trimestral do exercício."
+        tests:
+          - not_null
+      - name: receitas_intermediacao_financeira
+        description: "Receitas de intermediação financeira com juros e crédito (R$)."
+        tests:
+          - not_null
+      - name: despesas_intermediacao_financeira
+        description: "Despesas de captação e intermediação financeira (R$)."
+        tests:
+          - not_null
+      - name: margem_financeira_bruta
+        description: "Margem financeira bruta (Receitas menos Despesas de Intermediação em R$)."
+        tests:
+          - not_null
+      - name: despesas_provisao_pdd
+        description: "Despesas com provisão para devedores duvidosos e perdas esperadas PDD (R$)."
+        tests:
+          - not_null
+      - name: resultado_operacional
+        description: "Resultado operacional contábil apurado no período (R$)."
+      - name: lucro_liquido_trimestral
+        description: "Lucro líquido do exercício apurado no trimestre (R$)."
+        tests:
+          - not_null
+
+  - name: stg_bcb_ifdata_indicadores
+    description: "Visão de staging para os Indicadores Prudenciais e Regulatórios apurados pelo BACEN (IF.data)."
+    columns:
+      - name: cnpj_14_lider
+        description: "CNPJ de 14 dígitos da instituição líder."
+        tests:
+          - not_null
+      - name: cod_inst
+        description: "Código identificador único BACEN da instituição."
+        tests:
+          - not_null
+      - name: data_base
+        description: "Data-base trimestral dos indicadores."
+        tests:
+          - not_null
+      - name: indice_basileia_pct
+        description: "Índice de Basiléia percentual apurado (Mínimo regulatório: 10.5%)."
+        tests:
+          - not_null
+      - name: indice_imobilizacao_pct
+        description: "Índice de Imobilização percentual (Teto regulatório: 50.0%)."
+        tests:
+          - not_null
+      - name: razao_alavancagem_pct
+        description: "Razão de alavancagem bancária (Patrimônio Líquido sobre Ativo Total em %)."
+        tests:
+          - not_null
+      - name: roe_bancario_pct
+        description: "Retorno sobre o patrimônio líquido contábil ROE bancário anualizado (%)."
+        tests:
+          - not_null
+      - name: roa_bancario_pct
+        description: "Retorno sobre o ativo total ROA bancário (%)."
+      - name: taxa_inadimplencia_pct
+        description: "Taxa de inadimplência da carteira classificada com atraso superior a 90 dias (%)."
+        tests:
+          - not_null

@@ -278,6 +278,34 @@ def build_parser() -> argparse.ArgumentParser:
     cvm_f_p.add_argument("cnpj", type=str, help="Investment fund CNPJ")
     cvm_f_p.add_argument("--json", action="store_true", help="Output in JSON format")
 
+    # Subcommand: banking (BACEN IF.data)
+    bank_p = subparsers.add_parser(
+        "banking", help="Query prudential financial institutions, balances, and solidity scores (BACEN IF.data)."
+    )
+    bank_sub = bank_p.add_subparsers(dest="banking_action", required=True)
+
+    b_prof_p = bank_sub.add_parser("profile", help="Query financial institution registration and segment.")
+    b_prof_p.add_argument("cnpj", type=str, help="Financial institution CNPJ or BACEN code")
+    b_prof_p.add_argument("--json", action="store_true", help="Output in JSON format")
+
+    b_bal_p = bank_sub.add_parser("balance", help="Query quarterly balance sheet, liabilities and P&L.")
+    b_bal_p.add_argument("cnpj", type=str, help="Financial institution CNPJ or BACEN code")
+    b_bal_p.add_argument("--json", action="store_true", help="Output in JSON format")
+
+    b_rank_p = bank_sub.add_parser("ranking", help="Query ranking of financial institutions by Total Assets.")
+    b_rank_p.add_argument("--segmento", type=str, default=None, help="Filter by prudential segment (S1 to S5)")
+    b_rank_p.add_argument("--top", type=int, default=10, help="Number of institutions to display (default: 10)")
+    b_rank_p.add_argument("--json", action="store_true", help="Output in JSON format")
+
+    b_sol_p = bank_sub.add_parser("solidity", help="Query Gold banking solidity score (0-100) and Basiléia ratio.")
+    b_sol_p.add_argument("cnpj", type=str, help="Financial institution CNPJ or BACEN code")
+    b_sol_p.add_argument("--json", action="store_true", help="Output in JSON format")
+
+    # Direct shortcut: ifdata
+    ifdata_p = subparsers.add_parser("ifdata", help="Shortcut to query banking profile, balance, or solidity.")
+    ifdata_p.add_argument("cnpj", type=str, help="Financial institution CNPJ or BACEN code")
+    ifdata_p.add_argument("--json", action="store_true", help="Output in JSON format")
+
     return parser
 
 
@@ -878,6 +906,109 @@ def main(argv: Sequence[str] | None = None) -> int:
                     print(f"  Rentabilidade 30d: {feat.get('rentabilidade_30d_pct')}%")
                     print(f"  Volatilidade:      {feat.get('volatilidade_diaria')}%")
                     print(f"  Captação Liq 30d:  R$ {feat.get('captacao_liquida_30d', 0.0):,.2f}")
+                return 0
+
+        elif args.command in {"banking", "ifdata"}:
+            from public_data_gateway.connectors.macrofinanceiro.bcb_ifdata.connector import (
+                BcbIfdataConnector,
+            )
+
+            bank_conn = BcbIfdataConnector(settings=settings)
+
+            if args.command == "ifdata":
+                res = bank_conn.get_bank_by_cnpj(args.cnpj)
+                if not res:
+                    print(f"Financial institution not found for '{args.cnpj}'", file=sys.stderr)
+                    return 1
+                sol = bank_conn.get_bank_solidity(args.cnpj)
+                if args.json:
+                    output = {"instituicao": res, "solidez": sol}
+                    print(json.dumps(output, indent=2, ensure_ascii=False))
+                else:
+                    uf_str = res.get("uf_sede") or res.get("uf") or "N/A"
+                    mun_str = res.get("municipio_sede") or res.get("municipio") or "N/A"
+                    print(f"BACEN IF.data Institution: {res.get('nome_instituicao')} [{res.get('cnpj_14_lider')}]")
+                    print(f"  Segmento:       {res.get('segmento_prudencial')}")
+                    print(f"  Tipo:           {res.get('tipo_instituicao')}")
+                    print(f"  Localização:    {mun_str}/{uf_str}")
+                    if sol:
+                        bas_pct = sol.get("indice_basileia_pct") or sol.get("indice_basileia") or 0.0
+                        print(f"  Score Solidez:  {sol.get('score_solidez_bancaria')}/100.0")
+                        print(f"  Porte:          {sol.get('classificacao_porte_bancario')}")
+                        print(f"  Ativo Total:    R$ {sol.get('ativo_total', 0.0):,.2f}")
+                        print(f"  Basiléia:       {bas_pct:.1f}%")
+                return 0
+
+            banking_action = getattr(args, "banking_action", None)
+            if banking_action == "profile":
+                res = bank_conn.get_bank_by_cnpj(args.cnpj)
+                if not res:
+                    print(f"Financial institution not found for '{args.cnpj}'", file=sys.stderr)
+                    return 1
+                if args.json:
+                    print(json.dumps(res, indent=2, ensure_ascii=False))
+                else:
+                    print(f"BACEN Prudential Profile: {res.get('nome_instituicao')}")
+                    for k, v in res.items():
+                        print(f"  {k}: {v}")
+                return 0
+
+            if banking_action == "balance":
+                sheet = bank_conn.get_bank_balance_sheet(args.cnpj)
+                if not sheet:
+                    print(f"Balance sheet not found for institution '{args.cnpj}'", file=sys.stderr)
+                    return 1
+                if args.json:
+                    print(json.dumps(sheet, indent=2, ensure_ascii=False))
+                else:
+                    inst = sheet.get("instituicao", {})
+                    atv = sheet.get("ativo", {})
+                    pas = sheet.get("passivo_e_pl", {})
+                    dre = sheet.get("dre", {})
+                    ind = sheet.get("indicadores_prudenciais", {})
+                    print(f"Quarterly Balance Sheet for {inst.get('nome_instituicao')} [{inst.get('cnpj_14_lider')}]:")
+                    print(f"  Ativo Total:                R$ {atv.get('ativo_total', 0.0):,.2f}")
+                    print(f"  Carteira Crédito:           R$ {atv.get('carteira_credito_classificada', 0.0):,.2f}")
+                    print(f"  Títulos e Val. Mobiliários: R$ {atv.get('titulos_valores_mobiliarios', 0.0):,.2f}")
+                    print(f"  Depósitos Totais:           R$ {pas.get('depositos_totais', 0.0):,.2f}")
+                    print(f"  Patrimônio Líquido:         R$ {pas.get('patrimonio_liquido', 0.0):,.2f}")
+                    print(f"  Lucro Líquido Trimestre:    R$ {dre.get('lucro_liquido', 0.0):,.2f}")
+                    print(f"  Índice de Basiléia:         {ind.get('indice_basileia')}%")
+                    print(f"  Inadimplência > 90 dias:    {ind.get('inadimplencia_maior_90d')}%")
+                return 0
+
+            if banking_action == "ranking":
+                ranking = bank_conn.get_banking_ranking(segmento=args.segmento, top=args.top)
+                if args.json:
+                    print(json.dumps(ranking, indent=2, ensure_ascii=False))
+                else:
+                    seg_label = f" [Segmento {args.segmento}]" if args.segmento else ""
+                    print(f"Top {len(ranking)} Brazilian Financial Institutions by Total Assets{seg_label}:")
+                    for idx, b in enumerate(ranking, 1):
+                        bas_v = b.get("indice_basileia_pct") or b.get("indice_basileia") or 0.0
+                        score_v = b.get("score_solidez_bancaria") or 0.0
+                        print(f"  {idx:2d}. {b.get('nome_instituicao'):<30} | {b.get('segmento_prudencial')} | Ativo: R$ {b.get('ativo_total', 0.0):>18,.2f} | Basiléia: {bas_v:>5.1f}% | Score: {score_v:>5.1f}")
+                return 0
+
+            if banking_action == "solidity":
+                sol = bank_conn.get_bank_solidity(args.cnpj)
+                if not sol:
+                    print(f"Solidity profile not found for institution '{args.cnpj}'", file=sys.stderr)
+                    return 1
+                if args.json:
+                    print(json.dumps(sol, indent=2, ensure_ascii=False))
+                else:
+                    bas_v = sol.get("indice_basileia_pct") or sol.get("indice_basileia") or 0.0
+                    imob_v = sol.get("indice_imobilizacao_pct") or sol.get("indice_imobilizacao") or 0.0
+                    roe_v = sol.get("roe_bancario_pct") or sol.get("roe_bancario_anualizado") or 0.0
+                    inad_v = sol.get("taxa_inadimplencia_pct") or sol.get("inadimplencia_maior_90d") or 0.0
+                    print(f"Gold Solidity & Resilience Features for {sol.get('nome_instituicao')} [{sol.get('cnpj_14_lider')}]:")
+                    print(f"  Score Solidez Bancária:    {sol.get('score_solidez_bancaria')}/100.0")
+                    print(f"  Classificação de Porte:    {sol.get('classificacao_porte_bancario')}")
+                    print(f"  Índice de Basiléia:        {bas_v}% (Mínimo CMN: 10.5%)")
+                    print(f"  Índice de Imobilização:    {imob_v}% (Máximo CMN: 50.0%)")
+                    print(f"  ROE Bancário Anualizado:   {roe_v}%")
+                    print(f"  Inadimplência Carteira:    {inad_v}%")
                 return 0
 
     except Exception as exc:
