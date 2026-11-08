@@ -82,7 +82,7 @@ sources:
   - P03
   rice_score: 950
   roadmap_wave: 1
-  status: CATALOGED
+  status: HOMOLOGATED
 - source_id: brasilapi_core
   name: 'BrasilAPI: CEPs, FIPE, Bancos, DDD & CNPJ de Borda'
   agency: Comunidade Open Source BrasilAPI

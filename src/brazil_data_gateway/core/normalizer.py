@@ -148,6 +148,11 @@ class CheckDigitValidator:
 class CanonicalNormalizer:
     """Canonical data normalizer for Brazilian geographic, tax, and economic codes."""
 
+    UF_MAP: dict[str, dict[str, str]] = {
+        code: {"sigla": sigla, "nome": nome, "regiao": regiao}
+        for code, (sigla, nome, regiao) in _UF_PREFIX_MAP.items()
+    }
+
     def __init__(self, settings: GatewaySettings | None = None) -> None:
         self.settings = settings or GatewaySettings()
         self._loaded = False
@@ -201,6 +206,8 @@ class CanonicalNormalizer:
             record = {
                 "id_municipio": id_7,
                 "id_municipio_6": id_6,
+                "nome": nome,
+                "nome_municipio": nome,
                 "nome_municipio_oficial": nome,
                 "sigla_uf": sigla_uf,
                 "id_uf": id_uf or id_7[:2],
@@ -217,6 +224,18 @@ class CanonicalNormalizer:
             self._by_name.setdefault(norm_name, []).append(record)
 
         self._loaded = True
+
+    @property
+    def municipios(self) -> list[dict[str, Any]]:
+        """Return all loaded municipality records."""
+        self._ensure_loaded()
+        return list(self._by_id_7.values())
+
+    def get_municipio(
+        self, code_or_name: str | int | None, uf: str | None = None
+    ) -> dict[str, Any] | None:
+        """Alias for get_municipio_record."""
+        return self.get_municipio_record(code_or_name, uf=uf)
 
     def get_municipio_record(
         self, code_or_name: str | int | None, uf: str | None = None

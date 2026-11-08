@@ -14,10 +14,10 @@ Este artefato constitui a **Fonte Única da Verdade Operacional (SSOT)** do stat
 
 ## 1. Painel de Status Executivo em Tempo Real
 
-- **Macrofase Ativa:** `Fase 02 — Fundação do Catálogo (45+ Fontes), Normalização Canônica & Interfaces Unificadas`
+- **Macrofase Ativa:** `Fase 03 — Ingestão Wave 1 — APIs de Borda & Macroeconomia (Piloto: ibge_localidades Homologado)`
 - **Status Geral de Governança:** `🟢 ON_TRACK`
-- **Conector Ativo em Desenvolvimento:** `Nenhum (Transição de Fase / Fundação Concluída)`
-- **Próximo Conector na Fila de Execução:** `ibge_localidades` (Wave 1 — Prioridade RICE 950)
+- **Conector Ativo em Desenvolvimento:** `ibge_localidades`
+- **Próximo Conector na Fila de Execução:** `bcb_sgs` (Wave 1 — Prioridade RICE 950)
 - **Progresso Estrutural das Macrofases:** **3 de 9 Concluídas (33.3%)**
 - **Universo de Fontes Homologadas no Catálogo:** **49 fontes públicas** nos 13 macrosegmentos
 
@@ -38,7 +38,7 @@ flowchart LR
 | **Fase 00** | **Arquitetura, Governança & Decisões Fundacionais (ADRs)** | 🟢 CONCLUÍDO | `2026-11-07` | • ADR-001: Storage Híbrido Medallion (SQLite WAL + DuckDB Parquet ZSTD)<br/>• ADR-002: Chaves Canônicas STRING, Contratos ODCS v3.1 & Quarentena<br/>• ADR-003: Hardening DevSecOps, Proteção LGPD & Client Path Shield |
 | **Fase 01** | **Estrutura do Repositório Satélite, CI/CD & DevSecOps** | 🟢 CONCLUÍDO | `2026-11-07` | • Repositório satélite brazil-data-gateway inicializado<br/>• Isolamento Python 3.12 (.venv) e dependências pinadas (requirements.txt, requirements-dev.txt)<br/>• Configuração de CI (.github/workflows/ci.yml e pr-lint.yml)<br/>• Templates padronizados de Pull Request (feature, bugfix, docs) |
 | **Fase 02** | **Fundação do Catálogo (45+ Fontes), Normalização Canônica & Interfaces Unificadas** | 🟢 CONCLUÍDO | `2026-11-07` | • Base de referência sanitizada dos 5.571 municípios brasileiros (zero falhas de UF)<br/>• Catálogo formal de 49 fontes governamentais nos 13 macrosegmentos (catalog/sources_registry.yaml)<br/>• Renderizador determinístico do catálogo (scripts/render_catalog.py & CATALOG.md)<br/>• Tracker vivo da jornada de implementação (state/project_progress.json, scripts/render_progress.py & JORNADA_IMPLEMENTACAO.md)<br/>• Validação de integridade (--check) e conformidade ruff 100% verde |
-| **Fase 03** | **Ingestão Wave 1 — APIs de Borda & Macroeconomia** | ⚪ PENDENTE | `—` | • Conector ibge_localidades (5.571 municípios, 27 UFs, 5 regiões)<br/>• Conector brasilapi_core (CEPs, bancos, DDDs, borda síncrona)<br/>• Conector bcb_sgs (Séries macroeconômicas: IPCA, Selic, IGP-M)<br/>• Conector bcb_olinda_ptax (Cotações PTAX diárias OData v4) |
+| **Fase 03** | **Ingestão Wave 1 — APIs de Borda & Macroeconomia** | 🟡 EM ANDAMENTO | `—` | • [HOMOLOGADO] Conector ibge_localidades (5.571 municípios, 27 UFs, 5 regiões, features territoriais ML)<br/>• Conector brasilapi_core (CEPs, bancos, DDDs, borda síncrona)<br/>• Conector bcb_sgs (Séries macroeconômicas: IPCA, Selic, IGP-M)<br/>• Conector bcb_olinda_ptax (Cotações PTAX diárias OData v4) |
 | **Fase 04** | **Ingestão Wave 2 — B2B, Compras Públicas & Compliance** | ⚪ PENDENTE | `—` | • Conector rfb_cnpj_lakehouse (55M CNPJs em streaming DuckDB)<br/>• Conector rfb_simples_mei (Enquadramento tributário Simples/MEI)<br/>• Conector pncp_contratacoes (Licitações Lei 14.133)<br/>• Conector cgu_ceis_cnep & cgu_pep (Sanções e autoridades PEP)<br/>• Conector cnj_datajud (Metadados processuais de 90+ tribunais)<br/>• Conector tst_cndt (Certidões trabalhistas negativas)<br/>• Conector suframa_pim_zfm (Empresas incentivadas Polo Industrial) |
 | **Fase 05** | **Ingestão Wave 3 — Mercado de Capitais & Finanças Públicas** | ⚪ PENDENTE | `—` | • Conector cvm_dfp_itr (Balanços e DRE de companhias abertas)<br/>• Conector cvm_fundos (Informes diários de fundos)<br/>• Conector bcb_ifdata (Balanços de instituições financeiras)<br/>• Conector stn_tesouro_transparente (SADIPEM e dívida pública)<br/>• Conector mdic_comexstat (Balança comercial por NCM e município)<br/>• Conector comprasgov_catmat (Catálogo unificado de compras públicas) |
 | **Fase 06** | **Ingestão Wave 4 — Censo, Trabalho, Logística & Telecom** | ⚪ PENDENTE | `—` | • Conectores ibge_sidra, ibge_pib_municipal, ibge_censo2022, ibge_pnad_continua<br/>• Conectores mte_novo_caged & mte_rais<br/>• Conectores ibge_cnefe, ibge_malhas, anatel_mosaico, antt_malha_transporte |
@@ -106,6 +106,7 @@ O `brazil-data-gateway` atua como barramento alimentador de dados para os **10 P
 | `2026-11-07` | **Fase 00** | **Arquitetura & Governança Fundacional** | Elaboração das ADR-001 (Storage Híbrido Medallion), ADR-002 (Chaves Canônicas e Quarentena) e ADR-003 (DevSecOps e LGPD) fundamentadas nos POP_T_177, POP_T_176, POP_T_175, POP_T_070 e POP_T_074. |
 | `2026-11-07` | **Fase 01** | **Setup do Repositório Satélite & Workflows CI** | Inicialização do repositório satélite brazil-data-gateway com isolamento venv Python 3.12, pyproject.toml, requirements.txt pinados, templates de PR e workflows de CI (pr-lint e ci.yml). |
 | `2026-11-07` | **Fase 02** | **Catálogo Mestre (49 Fontes), Normalização Canônica & Interfaces Unificadas** | Catalogação formal de 49 fontes públicas nos 13 macrosegmentos e Ondas 1..6; sanitização da base de referência dos 5.571 municípios brasileiros; implementação dos motores determinísticos render_catalog.py e render_progress.py com verificação --check. |
+| `2026-11-07` | **Fase 03** | **Homologação do Conector Piloto ibge_localidades (Bronze a Gold)** | Implementação e homologação ponta a ponta do primeiro conector do gateway (ibge_localidades). Normalização dos 5.571 municípios e 27 UFs com validação de dígitos verificadores Mod-11, resolução de novas emancipações (ex: Boa Esperança do Norte 5101837), observabilidade de 5 pilares, feature view ML para ASOF joins e exposição completa em Python SDK (bd.geo), REST API (/api/v1/geo/ibge), CLI (bdg geo/sync) e MCP (bdg_list_ufs, bdg_list_municipalities, bdg_sync_dataset com HITL Tier 3 guard). |
 
 ---
 

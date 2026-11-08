@@ -108,6 +108,16 @@ class ResilientHttpClient:
         self._flight_locks: dict[str, threading.Lock] = {}
         self._master_lock = threading.Lock()
 
+    @property
+    def client(self) -> httpx.Client:
+        """Return active httpx client, re-opening if closed."""
+        if self._client.is_closed:
+            self._client = httpx.Client(
+                timeout=self.timeout,
+                headers={"User-Agent": self.settings.user_agent},
+            )
+        return self._client
+
     def __enter__(self) -> "ResilientHttpClient":
         return self
 
@@ -184,7 +194,7 @@ class ResilientHttpClient:
             for attempt in range(max_retries + 1):
                 self.rate_limiter.acquire(tokens=1.0)
                 try:
-                    resp = self._client.get(url, params=params, headers=headers)
+                    resp = self.client.get(url, params=params, headers=headers)
                     if resp.status_code in _RETRYABLE_STATUS_CODES:
                         last_error = httpx.HTTPStatusError(
                             f"Server returned retryable status {resp.status_code}",

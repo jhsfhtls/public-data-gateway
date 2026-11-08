@@ -36,6 +36,11 @@ def register_connector(source_id: str, connector_cls: type[BaseConnector]) -> No
 
 def get_connector(source_id: str, settings: GatewaySettings | None = None) -> BaseConnector:
     """Instantiate a registered connector by source_id."""
+    if source_id not in _CONNECTOR_REGISTRY:
+        try:
+            import brazil_data_gateway.connectors  # noqa: F401
+        except ImportError:
+            pass
     cls = _CONNECTOR_REGISTRY.get(source_id)
     if cls is None:
         raise KeyError(
@@ -46,4 +51,8 @@ def get_connector(source_id: str, settings: GatewaySettings | None = None) -> Ba
 
 def list_registered_connectors() -> list[str]:
     """Return all currently registered connector identifiers."""
+    try:
+        import brazil_data_gateway.connectors  # noqa: F401
+    except ImportError:
+        pass
     return sorted(list(_CONNECTOR_REGISTRY.keys()))

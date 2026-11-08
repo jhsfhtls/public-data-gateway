@@ -13,6 +13,52 @@ from brazil_data_gateway.core.storage import HybridStorageEngine
 from brazil_data_gateway.enrichment.engine import EnrichmentEngine
 
 
+class GeoFacade:
+    """Geographic & territorial query interface powered by IBGE Localidades."""
+
+    def __init__(self, sdk: "BrazilData") -> None:
+        self._sdk = sdk
+        self._connector: Any = None
+
+    @property
+    def connector(self) -> Any:
+        if self._connector is None:
+            from brazil_data_gateway.connectors.demografico.ibge_localidades import (
+                IBGELocalidadesConnector,
+            )
+
+            self._connector = IBGELocalidadesConnector(
+                settings=self._sdk.settings,
+                storage=self._sdk.storage,
+            )
+        return self._connector
+
+    def municipios(
+        self,
+        uf: str | None = None,
+        regiao: str | None = None,
+        capitais_only: bool = False,
+        limit: int | None = None,
+        offset: int = 0,
+    ) -> list[dict[str, Any]]:
+        """List Brazilian municipalities with optional filters."""
+        return self.connector.list_municipios(
+            uf=uf, regiao=regiao, capitais_only=capitais_only, limit=limit, offset=offset
+        )
+
+    def municipio(self, id_or_name: str | int, uf: str | None = None) -> dict[str, Any] | None:
+        """Get detailed municipality information by 6D/7D IBGE code or name."""
+        return self.connector.get_municipio(str(id_or_name), uf=uf)
+
+    def ufs(self) -> list[dict[str, Any]]:
+        """List all 27 Brazilian Federative Units (UFs) with regions."""
+        return self.connector.list_ufs()
+
+    def sync_localidades(self) -> pa.Table:
+        """Trigger Bronze-to-Gold extraction and materialization pipeline."""
+        return self.connector.extract()
+
+
 class BrazilData:
     """Unified developer SDK facade for querying, normalizing, and enriching Brazilian public datasets."""
 
@@ -27,6 +73,7 @@ class BrazilData:
             storage_engine=self.storage,
             normalizer=self.normalizer,
         )
+        self.geo = GeoFacade(self)
 
     def list_sources(
         self,
