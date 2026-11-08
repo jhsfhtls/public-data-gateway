@@ -1,0 +1,311 @@
+version: 2
+
+models:
+  - name: stg_rfb_cnaes
+    description: "Visão padronizada de atividades econômicas da Classificação Nacional de Atividades Econômicas (CNAE Subclasses)."
+    columns:
+      - name: codigo_cnae
+        description: "Código numérico da CNAE com 7 dígitos (ex: 6422100)."
+        tests:
+          - unique
+          - not_null
+      - name: descricao_cnae
+        description: "Denominação oficial da subclasse de atividade econômica."
+        tests:
+          - not_null
+      - name: reference_date
+        description: "Data/Competência de referência da tabela de domínio (YYYY-MM-DD)."
+        tests:
+          - not_null
+      - name: extracted_at
+        description: "Timestamp ISO-8601 da extração do registro."
+        tests:
+          - not_null
+
+  - name: stg_rfb_motivos
+    description: "Visão padronizada dos motivos cadastrais de alteração ou baixa do CNPJ."
+    columns:
+      - name: codigo_motivo
+        description: "Código numérico do motivo cadastral com 2 dígitos."
+        tests:
+          - unique
+          - not_null
+      - name: descricao_motivo
+        description: "Descrição textual do motivo da situação cadastral."
+        tests:
+          - not_null
+      - name: reference_date
+        description: "Data de referência da tabela de domínio (YYYY-MM-DD)."
+        tests:
+          - not_null
+      - name: extracted_at
+        description: "Timestamp ISO-8601 da extração."
+        tests:
+          - not_null
+
+  - name: stg_rfb_municipios
+    description: "Visão padronizada de municípios segundo codificação cadastral da Receita Federal."
+    columns:
+      - name: codigo_municipio_rf
+        description: "Código do município de 4 dígitos atribuído pela Receita Federal (ex: 7107 para São Paulo)."
+        tests:
+          - unique
+          - not_null
+      - name: nome_municipio
+        description: "Nome oficial do município registrado na Receita Federal."
+        tests:
+          - not_null
+      - name: reference_date
+        description: "Data de referência da tabela cadastral (YYYY-MM-DD)."
+        tests:
+          - not_null
+      - name: extracted_at
+        description: "Timestamp ISO-8601 da extração."
+        tests:
+          - not_null
+
+  - name: stg_rfb_naturezas
+    description: "Visão padronizada de naturezas jurídicas societárias e associativas."
+    columns:
+      - name: codigo_natureza
+        description: "Código numérico de 4 dígitos da natureza jurídica (ex: 2062 para Sociedade Empresária Limitada)."
+        tests:
+          - unique
+          - not_null
+      - name: descricao_natureza
+        description: "Denominação oficial da natureza jurídica segundo o CONCLA."
+        tests:
+          - not_null
+      - name: reference_date
+        description: "Data de referência da tabela de domínio (YYYY-MM-DD)."
+        tests:
+          - not_null
+      - name: extracted_at
+        description: "Timestamp ISO-8601 da extração."
+        tests:
+          - not_null
+
+  - name: stg_rfb_paises
+    description: "Visão padronizada de países de domicílio, sede ou residência fiscal."
+    columns:
+      - name: codigo_pais
+        description: "Código numérico do país atribuído pela Receita Federal (ex: 105 para Brasil)."
+        tests:
+          - unique
+          - not_null
+      - name: nome_pais
+        description: "Nome por extenso do país."
+        tests:
+          - not_null
+      - name: reference_date
+        description: "Data de referência da tabela de domínio (YYYY-MM-DD)."
+        tests:
+          - not_null
+      - name: extracted_at
+        description: "Timestamp ISO-8601 da extração."
+        tests:
+          - not_null
+
+  - name: stg_rfb_qualificacoes
+    description: "Visão padronizada de qualificações de sócios, diretores e administradores perante o QSA."
+    columns:
+      - name: codigo_qualificacao
+        description: "Código numérico de 2 dígitos da qualificação no QSA (ex: 49 para Sócio-Administrador)."
+        tests:
+          - unique
+          - not_null
+      - name: descricao_qualificacao
+        description: "Título ou função exercida pelo membro societário."
+        tests:
+          - not_null
+      - name: reference_date
+        description: "Data de referência da tabela de domínio (YYYY-MM-DD)."
+        tests:
+          - not_null
+      - name: extracted_at
+        description: "Timestamp ISO-8601 da extração."
+        tests:
+          - not_null
+
+  - name: stg_rfb_empresas
+    description: "Visão padronizada de empresas a nível de raiz cadastral (CNPJ Básico 8D)."
+    columns:
+      - name: cnpj_basico
+        description: "Raiz de 8 dígitos numéricos que identifica unicamente a empresa jurídica no Brasil."
+        tests:
+          - unique
+          - not_null
+      - name: razao_social
+        description: "Razão social oficial completa registrada nos órgãos competentes."
+        tests:
+          - not_null
+      - name: natureza_juridica
+        description: "Código de 4 dígitos da natureza jurídica da empresa."
+        tests:
+          - not_null
+      - name: qualificacao_responsavel
+        description: "Código de qualificação da pessoa física responsável pela empresa perante a Receita Federal."
+        tests:
+          - not_null
+      - name: capital_social
+        description: "Valor em Reais (BRL) do capital social subscrito e integralizado da empresa."
+        tests:
+          - not_null
+      - name: porte_empresa
+        description: "Classificação do porte da empresa (01 Microempresa, 03 Empresa de Pequeno Porte, 05 Demais)."
+        tests:
+          - not_null
+      - name: ente_federativo_responsavel
+        description: "Ente federativo responsável no caso de empresas públicas ou sociedades de economia mista."
+      - name: reference_date
+        description: "Competência cadastral de referência (YYYY-MM-DD)."
+        tests:
+          - not_null
+      - name: extracted_at
+        description: "Timestamp ISO-8601 da captura do dado."
+        tests:
+          - not_null
+
+  - name: stg_rfb_estabelecimentos
+    description: "Visão padronizada de estabelecimentos (matrizes e filiais) com CNPJ Completo 14D."
+    columns:
+      - name: cnpj_14
+        description: "Inscrição canônica no CNPJ com 14 dígitos numéricos zfill."
+        tests:
+          - unique
+          - not_null
+      - name: cnpj_basico
+        description: "Raiz de 8 dígitos que vincula o estabelecimento à sua respectiva empresa."
+        tests:
+          - not_null
+      - name: cnpj_ordem
+        description: "Número de ordem do estabelecimento de 4 dígitos (ex: 0001 para matriz, 0002 para primeira filial)."
+        tests:
+          - not_null
+      - name: cnpj_dv
+        description: "Dois dígitos verificadores finais calculados pelo algoritmo Módulo 11 oficial."
+        tests:
+          - not_null
+      - name: identificador_matriz_filial
+        description: "Identificador de tipo de unidade (1 Matriz, 2 Filial)."
+        tests:
+          - not_null
+      - name: nome_fantasia
+        description: "Nome comercial ou título do estabelecimento."
+      - name: situacao_cadastral
+        description: "Código da situação cadastral (01 Nula, 02 Ativa, 03 Suspensa, 04 Inapta, 08 Baixada)."
+        tests:
+          - not_null
+      - name: data_situacao_cadastral
+        description: "Data em que foi homologada a situação cadastral vigente."
+        tests:
+          - not_null
+      - name: motivo_situacao_cadastral
+        description: "Código do motivo da situação cadastral."
+        tests:
+          - not_null
+      - name: data_inicio_atividade
+        description: "Data oficial de início das atividades econômicas do estabelecimento."
+        tests:
+          - not_null
+      - name: cnae_fiscal_principal
+        description: "Código de 7 dígitos da atividade econômica principal (CNAE Subclasse)."
+        tests:
+          - not_null
+      - name: tipo_logradouro
+        description: "Tipo de logradouro do endereço (RUA, AVENIDA, QUADRA, PRAÇA, ALAMEDA)."
+      - name: logradouro
+        description: "Nome do logradouro público do endereço."
+      - name: numero
+        description: "Número do imóvel ou lote (SN se sem número)."
+      - name: complemento
+        description: "Complemento do endereço (sala, andar, bloco, conjunto)."
+      - name: bairro
+        description: "Bairro ou distrito do estabelecimento."
+      - name: cep_8
+        description: "Código de endereçamento postal de 8 dígitos sem separadores."
+      - name: sigla_uf
+        description: "Sigla de 2 letras maiúsculas da Unidade Federativa onde opera o estabelecimento."
+      - name: id_municipio_rf
+        description: "Código de 4 dígitos do município segundo a tabela de municípios da Receita Federal."
+      - name: reference_date
+        description: "Data de competência dos dados cadastrais (YYYY-MM-DD)."
+        tests:
+          - not_null
+      - name: extracted_at
+        description: "Timestamp ISO-8601 da extração do registro."
+        tests:
+          - not_null
+
+  - name: stg_rfb_socios
+    description: "Visão padronizada do Quadro de Sócios e Administradores (QSA) com proteção LGPD."
+    columns:
+      - name: cnpj_basico
+        description: "Raiz do CNPJ da empresa de 8 dígitos vinculada ao sócio."
+        tests:
+          - not_null
+      - name: identificador_socio
+        description: "Identificador de tipo de pessoa do sócio (1 Pessoa Jurídica, 2 Pessoa Física, 3 Estrangeiro)."
+        tests:
+          - not_null
+      - name: nome_socio
+        description: "Nome civil ou razão social do integrante societário."
+        tests:
+          - not_null
+      - name: cpf_cnpj_socio_mascarado
+        description: "Documento de identificação mascarado em estrita conformidade com o Art. 7 § 3/4 da LGPD."
+        tests:
+          - not_null
+      - name: qualificacao_socio
+        description: "Código numérico de 2 dígitos da qualificação societária do integrante."
+        tests:
+          - not_null
+      - name: data_entrada_sociedade
+        description: "Data em que o sócio passou a integrar o quadro societário."
+        tests:
+          - not_null
+      - name: faixa_etaria
+        description: "Faixa etária do sócio (1 até 12 anos, 2 de 13 a 20, 3 de 21 a 30, 4 de 31 a 40, 5 de 41 a 50, 6 de 51 a 60, 7 de 61 a 70, 8 de 71 a 80, 9 mais de 80)."
+        tests:
+          - not_null
+      - name: reference_date
+        description: "Data de referência do quadro societário (YYYY-MM-DD)."
+        tests:
+          - not_null
+      - name: extracted_at
+        description: "Timestamp ISO-8601 da extração."
+        tests:
+          - not_null
+
+  - name: stg_rfb_simples
+    description: "Visão padronizada do histórico de enquadramento nos regimes Simples Nacional e MEI."
+    columns:
+      - name: cnpj_basico
+        description: "Raiz do CNPJ da empresa com 8 dígitos canônicos."
+        tests:
+          - unique
+          - not_null
+      - name: opcao_pelo_simples
+        description: "Indicador de opção pelo Simples Nacional (S Sim, N Não, Outros)."
+        tests:
+          - not_null
+      - name: data_opcao_simples
+        description: "Data em que a empresa ingressou no regime do Simples Nacional."
+      - name: data_exclusao_simples
+        description: "Data em que ocorreu a exclusão do regime tributário do Simples Nacional."
+      - name: opcao_mei
+        description: "Indicador de enquadramento como Microempreendedor Individual - MEI (S Sim, N Não)."
+        tests:
+          - not_null
+      - name: data_opcao_mei
+        description: "Data de enquadramento como Microempreendedor Individual."
+      - name: data_exclusao_mei
+        description: "Data de desenquadramento da sistemática do MEI."
+      - name: reference_date
+        description: "Competência de referência da base tributária (YYYY-MM-DD)."
+        tests:
+          - not_null
+      - name: extracted_at
+        description: "Timestamp ISO-8601 da captura do dado."
+        tests:
+          - not_null

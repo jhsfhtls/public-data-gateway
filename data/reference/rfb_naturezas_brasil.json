@@ -1,0 +1,26 @@
+[
+  {
+    "codigo_natureza": "2038",
+    "descricao_natureza": "Sociedade de Economia Mista"
+  },
+  {
+    "codigo_natureza": "2046",
+    "descricao_natureza": "Sociedade Anônima Aberta"
+  },
+  {
+    "codigo_natureza": "2054",
+    "descricao_natureza": "Sociedade Anônima Fechada"
+  },
+  {
+    "codigo_natureza": "2062",
+    "descricao_natureza": "Sociedade Empresária Limitada"
+  },
+  {
+    "codigo_natureza": "2135",
+    "descricao_natureza": "Empresário (Individual)"
+  },
+  {
+    "codigo_natureza": "2305",
+    "descricao_natureza": "Empresa Individual de Responsabilidade Limitada (EIRELI)"
+  }
+]

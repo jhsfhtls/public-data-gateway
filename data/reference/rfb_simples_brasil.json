@@ -1,0 +1,74 @@
+[
+  {
+    "cnpj_basico": "00000000",
+    "opcao_pelo_simples": "N",
+    "data_opcao_simples": null,
+    "data_exclusao_simples": null,
+    "opcao_mei": "N",
+    "data_opcao_mei": null,
+    "data_exclusao_mei": null
+  },
+  {
+    "cnpj_basico": "33000167",
+    "opcao_pelo_simples": "N",
+    "data_opcao_simples": null,
+    "data_exclusao_simples": null,
+    "opcao_mei": "N",
+    "data_opcao_mei": null,
+    "data_exclusao_mei": null
+  },
+  {
+    "cnpj_basico": "33592510",
+    "opcao_pelo_simples": "N",
+    "data_opcao_simples": null,
+    "data_exclusao_simples": null,
+    "opcao_mei": "N",
+    "data_opcao_mei": null,
+    "data_exclusao_mei": null
+  },
+  {
+    "cnpj_basico": "47960950",
+    "opcao_pelo_simples": "N",
+    "data_opcao_simples": null,
+    "data_exclusao_simples": null,
+    "opcao_mei": "N",
+    "data_opcao_mei": null,
+    "data_exclusao_mei": null
+  },
+  {
+    "cnpj_basico": "12345678",
+    "opcao_pelo_simples": "S",
+    "data_opcao_simples": "2020-03-15",
+    "data_exclusao_simples": null,
+    "opcao_mei": "N",
+    "data_opcao_mei": null,
+    "data_exclusao_mei": null
+  },
+  {
+    "cnpj_basico": "87654321",
+    "opcao_pelo_simples": "S",
+    "data_opcao_simples": "2021-06-01",
+    "data_exclusao_simples": null,
+    "opcao_mei": "S",
+    "data_opcao_mei": "2021-06-01",
+    "data_exclusao_mei": null
+  },
+  {
+    "cnpj_basico": "99887766",
+    "opcao_pelo_simples": "S",
+    "data_opcao_simples": "2015-08-10",
+    "data_exclusao_simples": "2023-01-10",
+    "opcao_mei": "N",
+    "data_opcao_mei": null,
+    "data_exclusao_mei": null
+  },
+  {
+    "cnpj_basico": "11223344",
+    "opcao_pelo_simples": "N",
+    "data_opcao_simples": null,
+    "data_exclusao_simples": null,
+    "opcao_mei": "N",
+    "data_opcao_mei": null,
+    "data_exclusao_mei": null
+  }
+]

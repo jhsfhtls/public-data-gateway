@@ -1,0 +1,74 @@
+[
+  {
+    "cnpj_basico": "00000000",
+    "razao_social": "BANCO DO BRASIL SA",
+    "natureza_juridica": "2038",
+    "qualificacao_responsavel": "16",
+    "capital_social": 90000000000.0,
+    "porte_empresa": "05",
+    "ente_federativo_responsavel": null
+  },
+  {
+    "cnpj_basico": "33000167",
+    "razao_social": "PETROLEO BRASILEIRO S A PETROBRAS",
+    "natureza_juridica": "2038",
+    "qualificacao_responsavel": "16",
+    "capital_social": 205000000000.0,
+    "porte_empresa": "05",
+    "ente_federativo_responsavel": null
+  },
+  {
+    "cnpj_basico": "33592510",
+    "razao_social": "VALE S.A.",
+    "natureza_juridica": "2046",
+    "qualificacao_responsavel": "16",
+    "capital_social": 77000000000.0,
+    "porte_empresa": "05",
+    "ente_federativo_responsavel": null
+  },
+  {
+    "cnpj_basico": "47960950",
+    "razao_social": "MAGAZINE LUIZA S.A.",
+    "natureza_juridica": "2046",
+    "qualificacao_responsavel": "16",
+    "capital_social": 6000000000.0,
+    "porte_empresa": "05",
+    "ente_federativo_responsavel": null
+  },
+  {
+    "cnpj_basico": "12345678",
+    "razao_social": "SILVA E SANTOS TECNOLOGIA E SERVICOS LTDA",
+    "natureza_juridica": "2062",
+    "qualificacao_responsavel": "49",
+    "capital_social": 50000.0,
+    "porte_empresa": "01",
+    "ente_federativo_responsavel": null
+  },
+  {
+    "cnpj_basico": "87654321",
+    "razao_social": "JOAO CARLOS PEREIRA CONSULTORIA INDIVIDUAL",
+    "natureza_juridica": "2135",
+    "qualificacao_responsavel": "65",
+    "capital_social": 10000.0,
+    "porte_empresa": "01",
+    "ente_federativo_responsavel": null
+  },
+  {
+    "cnpj_basico": "99887766",
+    "razao_social": "ALPHA COMERCIO DE ALIMENTOS LTDA",
+    "natureza_juridica": "2062",
+    "qualificacao_responsavel": "49",
+    "capital_social": 250000.0,
+    "porte_empresa": "03",
+    "ente_federativo_responsavel": null
+  },
+  {
+    "cnpj_basico": "11223344",
+    "razao_social": "BETA LOGISTICA E TRANSPORTES SA",
+    "natureza_juridica": "2054",
+    "qualificacao_responsavel": "10",
+    "capital_social": 15000000.0,
+    "porte_empresa": "05",
+    "ente_federativo_responsavel": null
+  }
+]

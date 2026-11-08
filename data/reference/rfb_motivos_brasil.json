@@ -1,0 +1,30 @@
+[
+  {
+    "codigo_motivo": "00",
+    "descricao_motivo": "SEM MOTIVO"
+  },
+  {
+    "codigo_motivo": "01",
+    "descricao_motivo": "EXTINCAO POR ENCERRAMENTO LIQUIDACAO VOLUNTARIA"
+  },
+  {
+    "codigo_motivo": "02",
+    "descricao_motivo": "INCORPORACAO"
+  },
+  {
+    "codigo_motivo": "03",
+    "descricao_motivo": "FUSAO"
+  },
+  {
+    "codigo_motivo": "04",
+    "descricao_motivo": "CISAO TOTAL"
+  },
+  {
+    "codigo_motivo": "63",
+    "descricao_motivo": "OMISSAO DE DECLARACOES"
+  },
+  {
+    "codigo_motivo": "67",
+    "descricao_motivo": "INEXISTENCIA DE FATO"
+  }
+]

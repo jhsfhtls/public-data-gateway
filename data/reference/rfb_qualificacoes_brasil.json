@@ -1,0 +1,26 @@
+[
+  {
+    "codigo_qualificacao": "05",
+    "descricao_qualificacao": "Administrador"
+  },
+  {
+    "codigo_qualificacao": "10",
+    "descricao_qualificacao": "Diretor"
+  },
+  {
+    "codigo_qualificacao": "16",
+    "descricao_qualificacao": "Presidente"
+  },
+  {
+    "codigo_qualificacao": "22",
+    "descricao_qualificacao": "Sócio"
+  },
+  {
+    "codigo_qualificacao": "49",
+    "descricao_qualificacao": "Sócio-Administrador"
+  },
+  {
+    "codigo_qualificacao": "65",
+    "descricao_qualificacao": "Titular Pessoa Física Residente ou Domiciliado no Brasil"
+  }
+]

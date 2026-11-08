@@ -1,0 +1,57 @@
+[
+  {
+    "cnpj_basico": "00000000",
+    "identificador_socio": "2",
+    "nome_socio": "TARCISIO JOSE MASSOTE DE GODOY",
+    "cpf_cnpj_socio_mascarado": "***123456**",
+    "qualificacao_socio": "10",
+    "data_entrada_sociedade": "2021-04-12",
+    "pais": null,
+    "representante_legal": null,
+    "faixa_etaria": "6"
+  },
+  {
+    "cnpj_basico": "33000167",
+    "identificador_socio": "2",
+    "nome_socio": "MAGDA MARIA DE REGINA CHAMBRIARD",
+    "cpf_cnpj_socio_mascarado": "***789012**",
+    "qualificacao_socio": "16",
+    "data_entrada_sociedade": "2024-05-24",
+    "pais": null,
+    "representante_legal": null,
+    "faixa_etaria": "7"
+  },
+  {
+    "cnpj_basico": "12345678",
+    "identificador_socio": "2",
+    "nome_socio": "CARLOS ALBERTO SILVA",
+    "cpf_cnpj_socio_mascarado": "***456789**",
+    "qualificacao_socio": "49",
+    "data_entrada_sociedade": "2020-03-15",
+    "pais": null,
+    "representante_legal": null,
+    "faixa_etaria": "5"
+  },
+  {
+    "cnpj_basico": "12345678",
+    "identificador_socio": "2",
+    "nome_socio": "MARIANA SANTOS",
+    "cpf_cnpj_socio_mascarado": "***987654**",
+    "qualificacao_socio": "22",
+    "data_entrada_sociedade": "2020-03-15",
+    "pais": null,
+    "representante_legal": null,
+    "faixa_etaria": "4"
+  },
+  {
+    "cnpj_basico": "87654321",
+    "identificador_socio": "2",
+    "nome_socio": "JOAO CARLOS PEREIRA",
+    "cpf_cnpj_socio_mascarado": "***321654**",
+    "qualificacao_socio": "65",
+    "data_entrada_sociedade": "2021-06-01",
+    "pais": null,
+    "representante_legal": null,
+    "faixa_etaria": "5"
+  }
+]

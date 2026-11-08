@@ -1,0 +1,59 @@
+version: 2
+
+models:
+  - name: mart_densidade_empresarial_brasil
+    description: "Mart analítico agregando indicadores de densidade empresarial, atividade operacional, enquadramento Simples/MEI e capital social por Unidade Federativa."
+    columns:
+      - name: sigla_uf
+        description: "Sigla de 2 letras maiúsculas da Unidade Federativa (chave primária analítica)."
+        tests:
+          - unique
+          - not_null
+      - name: total_estabelecimentos
+        description: "Contagem total de estabelecimentos comerciais, industriais e de serviços sediados na UF."
+        tests:
+          - not_null
+      - name: total_estabelecimentos_ativos
+        description: "Quantidade de estabelecimentos com situação cadastral estritamente ativa perante o Fisco federal."
+        tests:
+          - not_null
+      - name: total_matrizes
+        description: "Quantidade de sedes / matrizes empresariais estabelecidas na UF."
+        tests:
+          - not_null
+      - name: total_filiais
+        description: "Quantidade de unidades filiais ou operacionais localizadas na UF."
+        tests:
+          - not_null
+      - name: total_empresas_distintas
+        description: "Quantidade de grupos ou pessoas jurídicas distintas (CNPJ básico único) na UF."
+        tests:
+          - not_null
+      - name: total_optantes_simples
+        description: "Quantidade de empresas da UF enquadradas no regime especial do Simples Nacional."
+        tests:
+          - not_null
+      - name: total_enquadrados_mei
+        description: "Quantidade de microempreendedores individuais (MEI) sediados na UF."
+        tests:
+          - not_null
+      - name: capital_social_total_uf
+        description: "Somatório do capital social registrado de todas as empresas da UF em Reais (BRL)."
+        tests:
+          - not_null
+      - name: capital_social_medio_uf
+        description: "Média aritmética do capital social registrado por empresa na UF em Reais (BRL)."
+        tests:
+          - not_null
+      - name: taxa_estabelecimentos_ativos_pct
+        description: "Percentual de estabelecimentos com situação cadastral ativa em relação ao total da UF (0 a 100%)."
+        tests:
+          - not_null
+      - name: taxa_optantes_simples_pct
+        description: "Percentual de estabelecimentos pertencentes a optantes pelo Simples Nacional na UF (0 a 100%)."
+        tests:
+          - not_null
+      - name: data_processamento
+        description: "Data em que o mart analítico foi compilado e materializado (YYYY-MM-DD)."
+        tests:
+          - not_null
