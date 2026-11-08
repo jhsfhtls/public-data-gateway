@@ -965,6 +965,173 @@ models:
         tests:
           - not_null
 
+  - name: dim_tipo_sancao
+    description: "Dimensão normativa padronizada de tipos e espécies de sanções administrativas e anticorrupção no Brasil."
+    columns:
+      - name: id_tipo_sancao
+        description: "Código canônico unívoco do tipo de sanção administrativa."
+        tests:
+          - not_null
+          - unique
+      - name: nome_tipo_sancao
+        description: "Nome descritivo formal do tipo da sanção administrativa."
+        tests:
+          - not_null
+      - name: cadastro_origem
+        description: "Base ou cadastro oficial de proveniência (CEIS, CNEP, CEPIM)."
+        tests:
+          - not_null
+      - name: amparo_legal_padrao
+        description: "Dispositivo normativo e legislação federal que fundamenta a modalidade de sanção."
+        tests:
+          - not_null
+      - name: alcance_sancao
+        description: "Descrição da extensão e eficácia jurídica dos efeitos restritivos da sanção."
+        tests:
+          - not_null
+      - name: nivel_gravidade
+        description: "Classificação categórica da severidade da sanção (GRAVISSIMA, GRAVE, MEDIA)."
+        tests:
+          - not_null
+      - name: ranking_gravidade
+        description: "Classificação ordinal numérica da gravidade da sanção (1 sendo a mais severa)."
+        tests:
+          - not_null
+
+  - name: fct_sancao_administrativa
+    description: "Tabela de fatos unificada de sanções administrativas, penalidades da Lei Anticorrupção e impedimentos de convênios."
+    columns:
+      - name: id_sancao_global
+        description: "Identificador unívoco global composto pelo cadastro de origem e id da sanção."
+        tests:
+          - not_null
+          - unique
+      - name: id_sancao_origem
+        description: "Identificador original do registro no sistema de origem (CGU CEIS, CNEP ou CEPIM)."
+        tests:
+          - not_null
+      - name: cadastro_origem
+        description: "Cadastro de origem do registro sancionatório (CEIS, CNEP ou CEPIM)."
+        tests:
+          - not_null
+      - name: id_tipo_sancao
+        description: "Código do tipo normativo da sanção correlacionado com dim_tipo_sancao."
+        tests:
+          - not_null
+      - name: nivel_gravidade
+        description: "Nível de severidade da penalidade aplicada."
+        tests:
+          - not_null
+      - name: ranking_gravidade
+        description: "Posição no ranking ordinal de severidade da sanção."
+        tests:
+          - not_null
+      - name: tipo_pessoa
+        description: "Tipo de entidade sancionada (PJ = Pessoa Jurídica, PF = Pessoa Física)."
+        tests:
+          - not_null
+      - name: cpf_cnpj_sancionado
+        description: "Inscrição no CPF ou CNPJ da entidade sancionada."
+        tests:
+          - not_null
+      - name: cnpj_basico
+        description: "Primeiros 8 dígitos do CNPJ para relacionamento relacional com dim_empresa."
+      - name: nome_sancionado
+        description: "Razão social ou denominação do sancionado."
+        tests:
+          - not_null
+      - name: tipo_sancao
+        description: "Descrição textual do tipo de sanção aplicada pelo órgão prolator."
+        tests:
+          - not_null
+      - name: data_inicio_sancao
+        description: "Data em que começou a produzir efeitos a penalidade administrativa."
+        tests:
+          - not_null
+      - name: data_fim_sancao
+        description: "Data de término ou expiração dos efeitos restritivos da penalidade."
+      - name: data_publicacao_sancao
+        description: "Data em que o ato punitivo foi divulgado no órgão oficial de imprensa."
+      - name: orgao_sancionador
+        description: "Órgão, entidade ou autoridade pública prolatora da decisão sancionatória."
+        tests:
+          - not_null
+      - name: sigla_uf_orgao
+        description: "Sigla da UF de localização do órgão sancionador."
+      - name: poder_orgao
+        description: "Poder institucional ao qual a autoridade pertence (E, L, J)."
+      - name: esfera_orgao
+        description: "Esfera de governo da autoridade sancionadora (F, E, M)."
+      - name: fundamentacao_legal
+        description: "Fundamentação jurídica e dispositivos normativos embasadores da penalidade."
+      - name: numero_processo
+        description: "Identificação do processo administrativo ou judicial onde tramitou a sanção."
+      - name: valor_multa
+        description: "Valor financeiro pecuniário em Reais (BRL) fixado a título de multa contra a entidade."
+        tests:
+          - not_null
+      - name: is_sancao_ativa
+        description: "Indicador se a penalidade administrativa está atualmente ativa e com restrições vigentes."
+        tests:
+          - not_null
+
+  - name: dim_empresa_sancionada
+    description: "Catálogo dimensional consolidado de entidades e empresas com registros em cadastros de sanções e compliance."
+    columns:
+      - name: cpf_cnpj_sancionado
+        description: "Número de inscrição cadastral (CPF ou CNPJ) da entidade constante nos registros sancionatórios."
+        tests:
+          - not_null
+          - unique
+      - name: cnpj_basico
+        description: "Raiz de 8 dígitos do CNPJ da empresa sancionada (nulo para CPF)."
+      - name: tipo_pessoa
+        description: "Classificação da pessoa sancionada (PJ ou PF)."
+        tests:
+          - not_null
+      - name: nome_sancionado
+        description: "Nome oficial ou razão social da pessoa sancionada."
+        tests:
+          - not_null
+      - name: sigla_uf_referencia
+        description: "UF de referência da sanção aplicada."
+      - name: total_sancoes_historicas
+        description: "Quantidade total de sanções já registradas historicamente contra a entidade."
+        tests:
+          - not_null
+      - name: total_sancoes_ativas
+        description: "Contagem de sanções atualmente vigentes e ativas contra a entidade."
+        tests:
+          - not_null
+      - name: is_inidoneo_ceis_ativo
+        description: "Indicador se a entidade possui sanção de inidoneidade ou suspensão ativa no CEIS."
+        tests:
+          - not_null
+      - name: is_punido_cnep_ativo
+        description: "Indicador se a entidade possui condenação ativa no CNEP sob a Lei Anticorrupção."
+        tests:
+          - not_null
+      - name: is_impedido_cepim_ativo
+        description: "Indicador se a entidade possui impedimento ativo de celebrar convênios no CEPIM."
+        tests:
+          - not_null
+      - name: has_active_sanction
+        description: "Indicador booleano consolidado de existência de qualquer sanção restritiva ativa."
+        tests:
+          - not_null
+      - name: valor_total_multas_anticorrupcao
+        description: "Valor total acumulado de multas da Lei Anticorrupção aplicadas contra a entidade."
+        tests:
+          - not_null
+      - name: score_risco_compliance
+        description: "Pontuação ponderada de risco de integridade e compliance (0 = sem apontamentos, 100 = risco crítico)."
+        tests:
+          - not_null
+      - name: status_compliance
+        description: "Situação cadastral de integridade da entidade (ex: INIDONEO_SANCIONADO, HISTORICO_REGULARIZADO)."
+        tests:
+          - not_null
+
 
 
 

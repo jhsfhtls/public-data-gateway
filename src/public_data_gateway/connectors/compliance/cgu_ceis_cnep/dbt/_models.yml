@@ -1,0 +1,223 @@
+version: 2
+
+models:
+  - name: stg_cgu_ceis
+    description: "Visão de staging das sanções administrativas do Cadastro Nacional de Empresas Inidôneas e Suspensas (CEIS/CGU)."
+    columns:
+      - name: id_sancao
+        description: "Identificador unívoco do registro de sanção cadastrado no sistema CEIS da CGU."
+        tests:
+          - not_null
+          - unique
+      - name: tipo_pessoa
+        description: "Classificação da pessoa sancionada, sendo PJ (Pessoa Jurídica) ou PF (Pessoa Física)."
+        tests:
+          - not_null
+      - name: cpf_cnpj_sancionado
+        description: "Número de inscrição no CPF ou CNPJ da entidade sancionada com ou sem máscara de formatação."
+        tests:
+          - not_null
+      - name: cnpj_basico
+        description: "Primeiros 8 dígitos do CNPJ para vinculação com a base cadastral de empresas (nulo para PF)."
+      - name: nome_sancionado
+        description: "Razão social da empresa ou nome completo da pessoa física sancionada administrativamente."
+        tests:
+          - not_null
+      - name: tipo_sancao
+        description: "Natureza da penalidade aplicada (ex: Declaração de Inidoneidade, Suspensão Temporária, Impedimento de Licitar)."
+        tests:
+          - not_null
+      - name: data_inicio_sancao
+        description: "Data em que tem início a vigência dos efeitos restritivos da sanção administrativa."
+        tests:
+          - not_null
+      - name: data_fim_sancao
+        description: "Data de término ou expiração dos efeitos da sanção administrativa (se aplicável)."
+      - name: data_publicacao_sancao
+        description: "Data de publicação oficial do ato sancionador no Diário Oficial ou órgão de imprensa."
+      - name: orgao_sancionador
+        description: "Nome do órgão, entidade pública ou tribunal responsável pela aplicação da penalidade."
+        tests:
+          - not_null
+      - name: sigla_uf_orgao
+        description: "Sigla da Unidade Federativa de lotação do órgão sancionador."
+      - name: poder_orgao
+        description: "Poder da República ao qual o órgão pertence: E (Executivo), L (Legislativo) ou J (Judiciário)."
+      - name: esfera_orgao
+        description: "Esfera governamental do órgão sancionador: F (Federal), E (Estadual) ou M (Municipal)."
+      - name: fundamentacao_legal
+        description: "Dispositivo normativo e base legal que ampara a aplicação da sanção (Leis 8.666/93, 10.520/02, 14.133/2021)."
+      - name: numero_processo
+        description: "Número de autuação do processo administrativo sancionador ou tomada de contas."
+      - name: is_sancao_ativa
+        description: "Indicador booleano informando se a sanção encontra-se atualmente ativa e com efeitos restritivos vigentes."
+        tests:
+          - not_null
+
+  - name: stg_cgu_cnep
+    description: "Visão de staging das sanções da Lei Anticorrupção (Lei nº 12.846/2013) do Cadastro Nacional de Empresas Punidas (CNEP/CGU)."
+    columns:
+      - name: id_sancao
+        description: "Identificador unívoco da sanção cadastrada no CNEP perante a CGU."
+        tests:
+          - not_null
+          - unique
+      - name: tipo_pessoa
+        description: "Tipo de pessoa sancionada sob a Lei Anticorrupção (predominantemente PJ)."
+        tests:
+          - not_null
+      - name: cpf_cnpj_sancionado
+        description: "Inscrição cadastral no CNPJ da pessoa jurídica punida pela prática de atos lesivos."
+        tests:
+          - not_null
+      - name: cnpj_basico
+        description: "Primeiros 8 dígitos do CNPJ para relacionamento relacional com as tabelas de empresas."
+      - name: nome_sancionado
+        description: "Razão social ou denominação empresarial da pessoa jurídica punida."
+        tests:
+          - not_null
+      - name: tipo_sancao
+        description: "Espécie da penalidade aplicada nos termos da Lei nº 12.846/2013 (ex: Multa pecuniária, Publicação extraordinária da decisão)."
+        tests:
+          - not_null
+      - name: data_inicio_sancao
+        description: "Data em que começou a vigência da punição administrativa por atos lesivos."
+        tests:
+          - not_null
+      - name: data_fim_sancao
+        description: "Data final estipulada para cumprimento da penalidade (se houver termo final delimitado)."
+      - name: data_publicacao_sancao
+        description: "Data de veiculação e publicação do extrato da punição no Diário Oficial."
+      - name: orgao_sancionador
+        description: "Órgão ou ente federativo prolator da condenação no âmbito da Lei Anticorrupção."
+        tests:
+          - not_null
+      - name: sigla_uf_orgao
+        description: "Unidade da federação do órgão julgador da penalidade."
+      - name: fundamentacao_legal
+        description: "Artigos e incisos legais da Lei Anticorrupção (Lei nº 12.846/2013) embasadores da decisão."
+      - name: numero_processo
+        description: "Número do Processo Administrativo de Responsabilização (PAR)."
+      - name: valor_multa
+        description: "Valor pecuniário monetário em Reais (BRL) fixado a título de multa contra a pessoa jurídica punida."
+        tests:
+          - not_null
+      - name: is_sancao_ativa
+        description: "Sinalizador booleano de vigência ou exigibilidade presente da sanção anticorrupção."
+        tests:
+          - not_null
+
+  - name: stg_cgu_cepim
+    description: "Visão de staging de entidades sem fins lucrativos impedidas de celebrar convênios ou parcerias públicas (CEPIM/CGU)."
+    columns:
+      - name: id_impedimento
+        description: "Identificador exclusivo do registro de impedimento cadastrado no CEPIM."
+        tests:
+          - not_null
+          - unique
+      - name: cnpj_entidade
+        description: "Inscrição de CNPJ da entidade privada sem fins lucrativos (OSC/ONG) impedida."
+        tests:
+          - not_null
+      - name: cnpj_basico
+        description: "CNPJ básico (8 dígitos) da entidade sem fins lucrativos."
+      - name: nome_entidade
+        description: "Nome oficial ou razão social da entidade sem fins lucrativos com restrições."
+        tests:
+          - not_null
+      - name: motivo_impedimento
+        description: "Causa jurídica ou fática motivadora da inclusão no cadastro de impedimentos (ex: omissão de prestação de contas)."
+        tests:
+          - not_null
+      - name: orgao_concedente
+        description: "Órgão público repassador de recursos que formalizou o bloqueio ou inadimplência."
+        tests:
+          - not_null
+      - name: numero_convenio
+        description: "Número identificador do instrumento de convênio, termo de fomento ou colaboração que ensejou a restrição."
+      - name: data_referencia
+        description: "Data em que foi formalizado o bloqueio cadastral e impedimento de novos repasses."
+        tests:
+          - not_null
+      - name: is_ativo
+        description: "Indicador se a restrição no CEPIM está atualmente surtindo efeitos e bloqueando transferências."
+        tests:
+          - not_null
+
+  - name: stg_cgu_acordos_leniencia
+    description: "Visão de staging dos acordos de leniência formalizados e monitorados pela CGU e AGU."
+    columns:
+      - name: id_acordo
+        description: "Número unívoco do acordo de leniência pactuado perante a administração federal."
+        tests:
+          - not_null
+          - unique
+      - name: nome_empresa
+        description: "Razão social ou denominação da corporação signatária do acordo de leniência."
+        tests:
+          - not_null
+      - name: cnpj_empresa
+        description: "CNPJ da empresa compromissária celebrante do termo de leniência."
+        tests:
+          - not_null
+      - name: cnpj_basico
+        description: "Raiz do CNPJ com 8 caracteres para cruzamento unificado com o cadastro fiscal."
+      - name: data_inicio_acordo
+        description: "Data solene de assinatura e formalização do pacto de leniência."
+        tests:
+          - not_null
+      - name: data_fim_acordo
+        description: "Data de conclusão estimada ou término do monitoramento do acordo."
+      - name: situacao_acordo
+        description: "Estado atual do acordo de leniência (ex: EM EXECUCAO, CUMPRIDO, RESCINDIDO)."
+        tests:
+          - not_null
+      - name: orgao_responsavel
+        description: "Órgão público condutor e fiscalizador do acordo de leniência."
+        tests:
+          - not_null
+      - name: total_sancoes_reparacoes
+        description: "Total de sanções reparatórias pactuadas no acordo de leniência."
+        tests:
+          - not_null
+      - name: valor_total_reparacao
+        description: "Valor total consolidado pactuado para ressarcimento ao erário e pagamento de penalidades cíveis/administrativas."
+        tests:
+          - not_null
+
+  - name: stg_cgu_orgaos_sancionadores
+    description: "Visão de staging consolidada dos órgãos e entidades da federação aplicadoras de sanções administrativas."
+    columns:
+      - name: codigo_orgao
+        description: "Código cadastral ou sigla atribuída à autoridade sancionadora."
+        tests:
+          - not_null
+          - unique
+      - name: nome_orgao
+        description: "Nome oficial por extenso do tribunal, ministério, secretaria ou ente julgador."
+        tests:
+          - not_null
+      - name: sigla_uf
+        description: "UF de localização e jurisdição territorial do órgão sancionador."
+        tests:
+          - not_null
+      - name: poder
+        description: "Poder institucional ao qual a autoridade pertence (Executivo, Legislativo, Judiciário)."
+        tests:
+          - not_null
+      - name: esfera
+        description: "Esfera de governo de atuação da autoridade (Federal, Estadual, Municipal)."
+        tests:
+          - not_null
+      - name: total_sancoes_ceis
+        description: "Quantidade de sanções no cadastro CEIS aplicadas pelo órgão."
+        tests:
+          - not_null
+      - name: total_sancoes_cnep
+        description: "Quantidade de sanções no cadastro CNEP aplicadas pelo órgão."
+        tests:
+          - not_null
+      - name: total_sancoes_aplicadas
+        description: "Quantidade histórica total consolidada de sanções aplicadas pela autoridade sancionadora."
+        tests:
+          - not_null

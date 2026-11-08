@@ -1,0 +1,66 @@
+version: 2
+
+models:
+  - name: mart_compliance_sancoes_brasil
+    description: "Datamart analítico consolidado de conformidade, sanções administrativas, inidoneidades e penalidades da Lei Anticorrupção no Brasil."
+    columns:
+      - name: sigla_uf_orgao
+        description: "Sigla da Unidade da Federação do órgão ou autoridade sancionadora (ou ND para não determinado)."
+        tests:
+          - not_null
+      - name: esfera_orgao
+        description: "Esfera de governo responsável pela punição (F = Federal, E = Estadual, M = Municipal, ND = Não determinado)."
+        tests:
+          - not_null
+      - name: poder_orgao
+        description: "Poder institucional ao qual a autoridade pertence (E = Executivo, L = Legislativo, J = Judiciário, ND = Não determinado)."
+        tests:
+          - not_null
+      - name: cadastro_origem
+        description: "Cadastro ou base de dados de origem da sanção (CEIS, CNEP ou CEPIM)."
+        tests:
+          - not_null
+      - name: id_tipo_sancao
+        description: "Código do tipo normativo da sanção administrativa."
+        tests:
+          - not_null
+      - name: nivel_gravidade
+        description: "Classificação padronizada de severidade da penalidade (GRAVISSIMA, GRAVE, MEDIA)."
+        tests:
+          - not_null
+      - name: ano_sancao
+        description: "Ano civil de início de vigência da sanção administrativa."
+        tests:
+          - not_null
+      - name: total_sancoes
+        description: "Contagem consolidada de sanções aplicadas para a agregação dimensional."
+        tests:
+          - not_null
+      - name: total_sancoes_ativas
+        description: "Quantidade de sanções vigentes e com efeitos restritivos ativos no momento da apuração."
+        tests:
+          - not_null
+      - name: total_entidades_sancionadas
+        description: "Contagem de pessoas físicas e jurídicas distintas sancionadas."
+        tests:
+          - not_null
+      - name: total_pj_sancionadas
+        description: "Quantidade de empresas e pessoas jurídicas sancionadas."
+        tests:
+          - not_null
+      - name: total_pf_sancionadas
+        description: "Quantidade de pessoas físicas sancionadas."
+        tests:
+          - not_null
+      - name: valor_total_multas_aplicadas
+        description: "Soma monetária acumulada das multas pecuniárias anticorrupção cominadas em Reais (BRL)."
+        tests:
+          - not_null
+      - name: valor_multas_ativas
+        description: "Montante financeiro de multas vinculadas a processos sancionadores atualmente ativos."
+        tests:
+          - not_null
+      - name: valor_medio_multa
+        description: "Valor médio das multas pecuniárias aplicadas no estrato de agregação."
+        tests:
+          - not_null

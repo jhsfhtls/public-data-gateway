@@ -101,6 +101,60 @@ class ProcurementFacade:
         )
 
 
+class ComplianceFacade:
+    """Compliance, administrative sanctions and anti-corruption query interface (CGU CEIS/CNEP/CEPIM)."""
+
+    def __init__(self, sdk: "BrazilData") -> None:
+        self._sdk = sdk
+        self._connector: Any = None
+
+    @property
+    def connector(self) -> Any:
+        if self._connector is None:
+            from public_data_gateway.connectors.compliance.cgu_ceis_cnep.connector import (
+                CGUCEISCNEPConnector,
+            )
+
+            self._connector = CGUCEISCNEPConnector(settings=self._sdk.settings)
+        return self._connector
+
+    def status(self, cnpj_or_cpf: str) -> dict[str, Any]:
+        """Check whether a CNPJ or CPF has active sanctions in CEIS, CNEP, or CEPIM."""
+        return self.connector.get_compliance_status(cnpj_or_cpf)
+
+    def sancoes(
+        self,
+        cadastro: str | None = None,
+        uf: str | None = None,
+        ativas_only: bool = True,
+        limit: int | None = None,
+    ) -> list[dict[str, Any]]:
+        """List administrative sanctions with optional filters."""
+        if cadastro == "ceis":
+            records = self.connector.extract_table("cgu_ceis")
+        elif cadastro == "cnep":
+            records = self.connector.extract_table("cgu_cnep")
+        elif cadastro == "cepim":
+            records = self.connector.extract_table("cgu_cepim")
+        else:
+            records = (
+                self.connector.extract_table("cgu_ceis")
+                + self.connector.extract_table("cgu_cnep")
+                + self.connector.extract_table("cgu_cepim")
+            )
+
+        filtered = []
+        for r in records:
+            if ativas_only and not r.get("is_sancao_ativa", r.get("is_ativo", False)):
+                continue
+            if uf and r.get("sigla_uf_orgao") != uf.upper():
+                continue
+            filtered.append(r)
+            if limit and len(filtered) >= limit:
+                break
+        return filtered
+
+
 class BrazilData:
     """Unified developer SDK facade for querying, normalizing, and enriching Brazilian public datasets."""
 
@@ -117,6 +171,7 @@ class BrazilData:
         )
         self.geo = GeoFacade(self)
         self.procurement = ProcurementFacade(self)
+        self.compliance = ComplianceFacade(self)
 
     def list_sources(
         self,
@@ -174,6 +229,10 @@ class BrazilData:
         return self.procurement.contratos(
             cnpj_orgao=cnpj_orgao, ni_fornecedor=ni_fornecedor, ano=ano, limit=limit
         )
+
+    def get_compliance_status(self, cnpj_or_cpf: str) -> dict[str, Any]:
+        """Check whether a CNPJ or CPF has active administrative sanctions in CEIS, CNEP, or CEPIM."""
+        return self.compliance.status(cnpj_or_cpf)
 
     def resolve_municipality(
         self, code_or_name: str | int, uf: str | None = None

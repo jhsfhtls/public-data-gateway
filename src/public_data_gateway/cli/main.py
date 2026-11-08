@@ -109,6 +109,23 @@ def build_parser() -> argparse.ArgumentParser:
     pncp_ct_p.add_argument("--limit", type=int, default=10, help="Max rows to return")
     pncp_ct_p.add_argument("--json", action="store_true", help="Output in JSON format")
 
+    # Subcommand: compliance
+    comp_parser = subparsers.add_parser(
+        "compliance", help="Query sanctions, ineligibility & anti-corruption compliance (CGU CEIS/CNEP/CEPIM)."
+    )
+    comp_sub = comp_parser.add_subparsers(dest="comp_action", required=True)
+
+    comp_status_p = comp_sub.add_parser("status", help="Check integrity & compliance status for a CNPJ or CPF.")
+    comp_status_p.add_argument("documento", type=str, help="CNPJ (14 digits) or CPF to verify")
+    comp_status_p.add_argument("--json", action="store_true", help="Output in JSON format")
+
+    comp_sanc_p = comp_sub.add_parser("sancoes", help="List administrative sanctions and penalties.")
+    comp_sanc_p.add_argument("--cadastro", choices=["ceis", "cnep", "cepim"], help="Filter by specific registry")
+    comp_sanc_p.add_argument("--uf", type=str, help="Filter by sanctioning authority UF")
+    comp_sanc_p.add_argument("--todas", action="store_true", help="Include historical/expired sanctions (default active only)")
+    comp_sanc_p.add_argument("--limit", type=int, default=10, help="Max rows to return")
+    comp_sanc_p.add_argument("--json", action="store_true", help="Output in JSON format")
+
     return parser
 
 
@@ -316,6 +333,59 @@ def main(argv: Sequence[str] | None = None) -> int:
                             f"  {r['numero_controle_pncp']} | {r['sigla_uf']} | Forn: {r['nome_fornecedor']} ({r['ni_fornecedor']}) | "
                             f"R$ {r['valor_global']:,.2f} | {r['razao_social_orgao']}"
                         )
+                return 0
+
+        if args.command == "compliance":
+            from public_data_gateway.connectors.compliance.cgu_ceis_cnep.connector import (
+                CGUCEISCNEPConnector,
+            )
+
+            conn = CGUCEISCNEPConnector(settings=settings)
+            if args.comp_action == "status":
+                res = conn.get_compliance_status(args.documento)
+                if args.json:
+                    print(json.dumps(res, indent=2, ensure_ascii=False))
+                else:
+                    print(f"Compliance Status for {args.documento}:")
+                    print(f"  Status Idoneidade:    {res['status_idoneidade']}")
+                    print(f"  Sanção Ativa:         {res['has_active_sanction']}")
+                    print(f"  Total Sanções CEIS:   {res['total_sancoes_ceis']} ({res['total_sancoes_ceis_ativas']} ativas)")
+                    print(f"  Total Sanções CNEP:   {res['total_sancoes_cnep']} ({res['total_sancoes_cnep_ativas']} ativas)")
+                    print(f"  Total Multas CNEP:    R$ {res['valor_total_multas_cnep']:,.2f}")
+                return 0
+
+            if args.comp_action == "sancoes":
+                table_map = {
+                    "ceis": ["cgu_ceis"],
+                    "cnep": ["cgu_cnep"],
+                    "cepim": ["cgu_cepim"],
+                }
+                tables_to_query = table_map.get(args.cadastro, ["cgu_ceis", "cgu_cnep"])
+                all_rows = []
+                for t in tables_to_query:
+                    rows = conn.extract_table(t)
+                    for r in rows:
+                        if not args.todas and not r.get("is_sancao_ativa", r.get("is_ativo", False)):
+                            continue
+                        if args.uf and r.get("sigla_uf_orgao") != args.uf.upper():
+                            continue
+                        r["_fonte_tabela"] = t
+                        all_rows.append(r)
+                        if len(all_rows) >= args.limit:
+                            break
+                    if len(all_rows) >= args.limit:
+                        break
+
+                if args.json:
+                    print(json.dumps(all_rows, indent=2, ensure_ascii=False))
+                else:
+                    print(f"CGU Sanções ({len(all_rows)} found):")
+                    for r in all_rows:
+                        doc = r.get("cpf_cnpj_sancionado") or r.get("cnpj_entidade")
+                        nome = r.get("nome_sancionado") or r.get("nome_entidade")
+                        tipo = r.get("tipo_sancao") or r.get("motivo_impedimento")
+                        org = r.get("orgao_sancionador") or r.get("orgao_concedente")
+                        print(f"  [{r['_fonte_tabela']}] {doc} | {nome} | {tipo} | Org: {org}")
                 return 0
 
     except Exception as exc:

@@ -1,0 +1,18 @@
+version: 2
+
+sources:
+  - name: cgu_ceis_cnep
+    description: "Bases oficiais da Controladoria-Geral da União (CGU) com cadastros de sanções administrativas (CEIS, CNEP, CEPIM), acordos de leniência e órgãos sancionadores em Parquet ZSTD."
+    meta:
+      external_location: "data/cgu_ceis_cnep/silver/{name}.parquet"
+    tables:
+      - name: cgu_ceis
+        description: "Cadastro Nacional de Empresas Inidôneas e Suspensas (CEIS) contendo pessoas físicas e jurídicas impedidas de licitar ou contratar com a administração pública."
+      - name: cgu_cnep
+        description: "Cadastro Nacional de Empresas Punidas (CNEP) decorrente da aplicação da Lei Anticorrupção (Lei nº 12.846/2013) com multas pecuniárias e sanções lesivas."
+      - name: cgu_cepim
+        description: "Cadastro de Entidades Privadas Sem Fins Lucrativos Impedidas (CEPIM) com restrições para celebrar parcerias e convênios com a administração pública."
+      - name: cgu_acordos_leniencia
+        description: "Acordos de Leniência celebrados ou em andamento perante a CGU e AGU nos termos da Lei Federal nº 12.846/2013."
+      - name: cgu_orgaos_sancionadores
+        description: "Tabela consolidada de órgãos julgadores e autoridades competentes que aplicaram sanções nos cadastros mantidos pela CGU."
