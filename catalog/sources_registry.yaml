@@ -307,7 +307,7 @@ sources:
   - P02
   rice_score: 720
   roadmap_wave: 2
-  status: CATALOGED
+  status: HOMOLOGATED
 - source_id: tst_cndt
   name: 'TST: Certidão Negativa de Débitos Trabalhistas (CNDT)'
   agency: Tribunal Superior do Trabalho (TST)

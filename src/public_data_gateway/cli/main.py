@@ -83,6 +83,12 @@ def build_parser() -> argparse.ArgumentParser:
     single_muni.add_argument("--uf", type=str, help="Optional UF state code")
     single_muni.add_argument("--json", action="store_true", help="Output in JSON format")
 
+    simples_parser = subparsers.add_parser(
+        "simples", help="Query Simples Nacional and MEI tax status by CNPJ."
+    )
+    simples_parser.add_argument("cnpj", type=str, help="14-digit CNPJ or 8-digit root")
+    simples_parser.add_argument("--json", action="store_true", help="Output in JSON format")
+
     return parser
 
 
@@ -229,6 +235,26 @@ def main(argv: Sequence[str] | None = None) -> int:
                     for k, v in rec.items():
                         print(f"  {k:<25}: {v}")
                 return 0
+
+        if args.command == "simples":
+            from public_data_gateway.connectors.empresarial.rfb_simples_mei import (
+                RFBSimplesMEIConnector,
+            )
+
+            conn = RFBSimplesMEIConnector(settings=settings)
+            res = conn.get_simples_mei_status(args.cnpj)
+            if args.json:
+                print(json.dumps(res, indent=2, ensure_ascii=False))
+            else:
+                print(f"Simples Nacional / MEI Status for CNPJ: {res['cnpj_pesquisado']}")
+                print(f"  CNPJ Básico:       {res['cnpj_basico']}")
+                print(f"  Opção Simples:     {res['opcao_simples']} ({res['status_simples_atual']})")
+                print(f"  Data Opção:        {res['data_opcao_simples'] or '-'}")
+                print(f"  Data Exclusão:     {res['data_exclusao_simples'] or '-'}")
+                print(f"  Enquadrado MEI:    {res['opcao_simei']} ({res['status_simei_atual']})")
+                print(f"  Data Opção MEI:    {res['data_opcao_simei'] or '-'}")
+                print(f"  Data Exclusão MEI: {res['data_exclusao_simei'] or '-'}")
+            return 0
 
     except Exception as exc:
         print(f"Error executing command '{args.command}': {exc}", file=sys.stderr)

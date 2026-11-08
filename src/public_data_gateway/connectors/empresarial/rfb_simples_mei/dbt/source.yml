@@ -1,0 +1,18 @@
+version: 2
+
+sources:
+  - name: rfb_simples_mei
+    description: "Fontes brutas normalizadas da Receita Federal e CGSN sobre Simples Nacional, SIMEI, sublimites estaduais, eventos e tabelas de alíquotas em Parquet ZSTD."
+    meta:
+      external_location: "data/rfb_simples_mei/silver/{name}.parquet"
+    tables:
+      - name: simples_nacional_cadastral
+        description: "Dados cadastrais e histórico de opção e exclusão do Simples Nacional por raiz de CNPJ (8 dígitos)."
+      - name: simei_cadastral
+        description: "Dados cadastrais e histórico de enquadramento e desenquadramento no SIMEI (Microempreendedor Individual)."
+      - name: simples_sublimites_estaduais
+        description: "Tabela oficial de sublimites estaduais de ICMS e ISS (R$ 3.6M ou R$ 4.8M) por Unidade Federativa e ano-calendário."
+      - name: simples_eventos_historico
+        description: "Catálogo de eventos tributários, hipóteses legais de inclusão, exclusão e desenquadramento da LC 123/2006."
+      - name: simples_tabelas_anexos
+        description: "Tabelas de alíquotas nominais, faixas de faturamento e parcelas a deduzir dos Anexos I a V da Lei Complementar nº 123/2006."

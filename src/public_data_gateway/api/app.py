@@ -200,4 +200,13 @@ def create_app(settings: GatewaySettings | None = None) -> FastAPI:
             "layers": ["bronze", "silver", "gold"],
         }
 
+    @app.get("/api/v1/simples/{cnpj}")
+    async def get_simples_status(cnpj: str) -> dict[str, Any]:
+        from public_data_gateway.connectors.empresarial.rfb_simples_mei import (
+            RFBSimplesMEIConnector,
+        )
+
+        conn = RFBSimplesMEIConnector(settings=app_settings)
+        return conn.get_simples_mei_status(cnpj)
+
     return app
