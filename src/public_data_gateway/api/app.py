@@ -570,4 +570,62 @@ def create_app(settings: GatewaySettings | None = None) -> FastAPI:
             )
         return res
 
+    @app.get("/api/v1/treasury/profile/{id_municipio_or_name}")
+    @app.get("/api/v1/sadipem/profile/{id_municipio_or_name}")
+    async def get_treasury_profile(id_municipio_or_name: str) -> dict[str, Any]:
+        from public_data_gateway.connectors.macrofinanceiro.stn_tesouro_transparente.connector import (
+            StnTesouroTransparenteConnector,
+        )
+
+        conn = StnTesouroTransparenteConnector(settings=app_settings)
+        res = conn.get_municipio_fiscal_profile(id_municipio_or_name)
+        if not res:
+            raise HTTPException(
+                status_code=404,
+                detail=f"Fiscal profile not found for '{id_municipio_or_name}'",
+            )
+        return res
+
+    @app.get("/api/v1/treasury/pvl/{id_municipio_or_uf}")
+    @app.get("/api/v1/sadipem/pvl/{id_municipio_or_uf}")
+    async def get_sadipem_pvl(
+        id_municipio_or_uf: str,
+        status: str | None = Query(None, description="Filter by status (e.g. Deferido)"),
+    ) -> list[dict[str, Any]]:
+        from public_data_gateway.connectors.macrofinanceiro.stn_tesouro_transparente.connector import (
+            StnTesouroTransparenteConnector,
+        )
+
+        conn = StnTesouroTransparenteConnector(settings=app_settings)
+        return conn.get_credit_operations_pvl(id_municipio_or_uf, status=status)
+
+    @app.get("/api/v1/treasury/fpm/{id_municipio}")
+    @app.get("/api/v1/sadipem/fpm/{id_municipio}")
+    async def get_fpm_transfers(
+        id_municipio: str,
+        ano: int | None = Query(None, description="Exercise year filter (e.g. 2024)"),
+    ) -> list[dict[str, Any]]:
+        from public_data_gateway.connectors.macrofinanceiro.stn_tesouro_transparente.connector import (
+            StnTesouroTransparenteConnector,
+        )
+
+        conn = StnTesouroTransparenteConnector(settings=app_settings)
+        return conn.get_fpm_transfers(id_municipio, ano=ano)
+
+    @app.get("/api/v1/treasury/capag/{id_municipio}")
+    @app.get("/api/v1/sadipem/capag/{id_municipio}")
+    async def get_capag_rating(id_municipio: str) -> dict[str, Any]:
+        from public_data_gateway.connectors.macrofinanceiro.stn_tesouro_transparente.connector import (
+            StnTesouroTransparenteConnector,
+        )
+
+        conn = StnTesouroTransparenteConnector(settings=app_settings)
+        res = conn.get_capag_rating(id_municipio)
+        if not res:
+            raise HTTPException(
+                status_code=404,
+                detail=f"CAPAG rating not found for '{id_municipio}'",
+            )
+        return res
+
     return app

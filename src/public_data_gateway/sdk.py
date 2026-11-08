@@ -407,6 +407,44 @@ class BankingFacade:
         return self.banking_connector.get_bank_solidity(cnpj)
 
 
+class TreasuryFacade:
+    """Public finances, SADIPEM credit operations, CAPAG rating and FPM transfers (STN Tesouro Transparente)."""
+
+    def __init__(self, sdk: "BrazilData") -> None:
+        self._sdk = sdk
+        self._treasury_connector: Any = None
+
+    @property
+    def treasury_connector(self) -> Any:
+        if self._treasury_connector is None:
+            from public_data_gateway.connectors.macrofinanceiro.stn_tesouro_transparente.connector import (
+                StnTesouroTransparenteConnector,
+            )
+
+            self._treasury_connector = StnTesouroTransparenteConnector(settings=self._sdk.settings)
+        return self._treasury_connector
+
+    def get_municipio_fiscal_profile(self, id_municipio_or_name: str) -> dict[str, Any] | None:
+        """Lookup municipality fiscal health, debt ratio and CAPAG grade."""
+        return self.treasury_connector.get_municipio_fiscal_profile(id_municipio_or_name)
+
+    def get_credit_operations_pvl(
+        self, id_municipio_or_uf: str, status: str | None = None
+    ) -> list[dict[str, Any]]:
+        """Retrieve SADIPEM credit operations for a municipality or UF."""
+        return self.treasury_connector.get_credit_operations_pvl(id_municipio_or_uf, status=status)
+
+    def get_fpm_transfers(
+        self, id_municipio: str, ano: int | None = None
+    ) -> list[dict[str, Any]]:
+        """Retrieve constitutional FPM transfer history for a municipality."""
+        return self.treasury_connector.get_fpm_transfers(id_municipio, ano=ano)
+
+    def get_capag_rating(self, id_municipio: str) -> dict[str, Any] | None:
+        """Retrieve official CAPAG payment capacity rating and indicators for a municipality."""
+        return self.treasury_connector.get_capag_rating(id_municipio)
+
+
 class BrazilData:
     """Unified developer SDK facade for querying, normalizing, and enriching Brazilian public datasets."""
 
@@ -430,6 +468,7 @@ class BrazilData:
         self.trade = TradeFacade(self)
         self.funds = FundsFacade(self)
         self.banking = BankingFacade(self)
+        self.treasury = TreasuryFacade(self)
 
     def list_sources(
         self,
@@ -571,6 +610,26 @@ class BrazilData:
     def get_bank_solidity(self, cnpj: str) -> dict[str, Any] | None:
         """Consultar features Gold e score contínuo de solidez prudencial (0 a 100) de uma instituição bancária (BACEN)."""
         return self.banking.get_bank_solidity(cnpj)
+
+    def get_municipio_fiscal_profile(self, id_municipio_or_name: str) -> dict[str, Any] | None:
+        """Consultar saúde fiscal consolidada, classificação CAPAG e endividamento de um município (STN)."""
+        return self.treasury.get_municipio_fiscal_profile(id_municipio_or_name)
+
+    def get_credit_operations_pvl(
+        self, id_municipio_or_uf: str, status: str | None = None
+    ) -> list[dict[str, Any]]:
+        """Consultar operações de crédito e financiamentos subnacionais no SADIPEM (STN)."""
+        return self.treasury.get_credit_operations_pvl(id_municipio_or_uf, status=status)
+
+    def get_fpm_transfers(
+        self, id_municipio: str, ano: int | None = None
+    ) -> list[dict[str, Any]]:
+        """Consultar histórico de repasses constitucionais do FPM de um município (STN)."""
+        return self.treasury.get_fpm_transfers(id_municipio, ano=ano)
+
+    def get_capag_rating(self, id_municipio: str) -> dict[str, Any] | None:
+        """Consultar nota da Capacidade de Pagamento CAPAG (A, B, C) e indicadores LRF (STN)."""
+        return self.treasury.get_capag_rating(id_municipio)
 
     def resolve_municipality(
         self, code_or_name: str | int, uf: str | None = None

@@ -474,7 +474,7 @@ sources:
   - P05
   rice_score: 630
   roadmap_wave: 3
-  status: CATALOGED
+  status: HOMOLOGATED
 - source_id: comprasgov_catmat
   name: 'Compras.gov.br: Catálogo Unificado de Materiais e Serviços (CATMAT/CATSER)'
   agency: Ministério da Gestão e Inovação em Serviços Públicos (MGI)

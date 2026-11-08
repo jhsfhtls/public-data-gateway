@@ -1,0 +1,30 @@
+version: 2
+
+sources:
+  - name: stn_tesouro_transparente
+    description: "Tabelas Silver da Secretaria do Tesouro Nacional (SADIPEM, FPM, FPE, CAPAG e Dívida Consolidada)"
+    meta:
+      agency: "Secretaria do Tesouro Nacional (STN)"
+      domain: "macrofinanceiro"
+      freshness_sla: "Mensal (720h)"
+    tables:
+      - name: stn_sadipem_pvl
+        description: "Operações de crédito subnacionais e pleitos de verificação de limites (SADIPEM PVL)"
+        meta:
+          external_location: "data/stn_tesouro_transparente/silver/stn_sadipem_pvl.parquet"
+      - name: stn_transferencias_fpm
+        description: "Repasses constitucionais decendiais e mensais do Fundo de Participação dos Municípios (FPM)"
+        meta:
+          external_location: "data/stn_tesouro_transparente/silver/stn_transferencias_fpm.parquet"
+      - name: stn_transferencias_fpe
+        description: "Repasses constitucionais do Fundo de Participação dos Estados (FPE)"
+        meta:
+          external_location: "data/stn_tesouro_transparente/silver/stn_transferencias_fpe.parquet"
+      - name: stn_capag_municipios
+        description: "Avaliação fiscal oficial e Notas CAPAG (A, B, C) de Estados e Municípios"
+        meta:
+          external_location: "data/stn_tesouro_transparente/silver/stn_capag_municipios.parquet"
+      - name: stn_divida_consolidada
+        description: "Balanço de dívida fundada líquida (DCL) e Receita Corrente Líquida (RCL)"
+        meta:
+          external_location: "data/stn_tesouro_transparente/silver/stn_divida_consolidada.parquet"

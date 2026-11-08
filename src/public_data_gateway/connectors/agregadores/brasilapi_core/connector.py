@@ -187,6 +187,8 @@ class BrasilAPICoreConnector(BaseConnector):
         """Load offline reference fixtures from data/reference/."""
         ref_path = self.settings.data_dir / "reference" / f"{name}_brasil.json"
         if not ref_path.exists():
+            ref_path = self.settings.repo_root / "data" / "reference" / f"{name}_brasil.json"
+        if not ref_path.exists():
             ref_path = Path("data/reference") / f"{name}_brasil.json"
 
         if ref_path.exists():
