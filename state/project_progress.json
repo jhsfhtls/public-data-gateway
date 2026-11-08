@@ -12,11 +12,11 @@
     "POP_T_074",
     "POP_T_148"
   ],
-  "current_macro_phase_id": "03-SPIKE",
-  "current_macro_phase": "Fase 03-SPIKE — Golden Spike ibge_localidades (5 Tabelas, dbt, Negócio Territorial & Live Fail-Hard)",
+  "current_macro_phase_id": "03",
+  "current_macro_phase": "Fase 03 — Ingestão Wave 1 (Macroeconomia & Borda: bcb_sgs, bcb_olinda_ptax, brasilapi_core)",
   "overall_status": "ON_TRACK",
-  "active_connector": "ibge_localidades",
-  "next_connector": "bcb_sgs",
+  "active_connector": "bcb_sgs",
+  "next_connector": "bcb_olinda_ptax",
   "structural_phases": [
     {
       "phase_id": "00",
@@ -152,50 +152,50 @@
     }
   ],
   "active_connector_gates": {
-    "target_connector": "ibge_localidades",
+    "target_connector": "bcb_sgs",
     "target_wave": 1,
     "gates": [
       {
         "gate_id": "GATE_01",
         "name": "Contrato Declarativo ODCS v3.1 das N Tabelas da API",
         "status": "COMPLETED",
-        "criteria": "Schema tipado, chaves primárias STRING e regras para municipios, distritos, subdistritos, estados e regioes."
+        "criteria": "Schema tipado, chaves primárias STRING e regras para catalogo, ipca, igpm, selic, cdi e ibcbr."
       },
       {
         "gate_id": "GATE_02",
         "name": "Ingestão Bronze Isolada (Todas as Tabelas) & Cache WAL",
         "status": "COMPLETED",
-        "criteria": "Download resiliente das 5 tabelas em data/ibge_localidades/bronze/ com cache SQLite WAL."
+        "criteria": "Download resiliente das 6 tabelas em data/bcb_sgs/bronze/ com cache SQLite WAL."
       },
       {
         "gate_id": "GATE_03",
         "name": "Sanitização de Sentinelas & Nulls",
         "status": "COMPLETED",
-        "criteria": "Conversão determinística de códigos sentinela em NULLs reais em todas as tabelas."
+        "criteria": "Conversão determinística de códigos sentinela e hífens em NULLs reais em todas as tabelas."
       },
       {
         "gate_id": "GATE_04",
         "name": "Materialização Silver Parquet Isolada (Todas as Tabelas)",
         "status": "COMPLETED",
-        "criteria": "Gravação de municipios.parquet, distritos.parquet, etc., em data/ibge_localidades/silver/ com SHA-256."
+        "criteria": "Gravação de sgs_catalogo.parquet, sgs_ipca.parquet, etc., em data/bcb_sgs/silver/ com SHA-256."
       },
       {
         "gate_id": "GATE_05",
         "name": "Validação dos 5 Pilares & Quarentena",
         "status": "COMPLETED",
-        "criteria": "Aprovação em Freshness, Volume, Schema, Null Ceiling e Lineage; desvio para data/ibge_localidades/quarantine/ se violado."
+        "criteria": "Aprovação em Freshness, Volume, Schema, Null Ceiling e Lineage; desvio para data/bcb_sgs/quarantine/ se violado."
       },
       {
         "gate_id": "GATE_06",
         "name": "Gold Feature View Isolada & ASOF Join ML",
         "status": "COMPLETED",
-        "criteria": "Features analíticas agregadas em data/ibge_localidades/gold/ com suporte comprovado a point-in-time join para modelos preditivos."
+        "criteria": "Features analíticas agregadas em data/bcb_sgs/gold/features_macro_brasil.parquet com cálculo de juros reais e spreads."
       },
       {
         "gate_id": "GATE_07",
         "name": "Integração ao EnrichmentEngine",
         "status": "COMPLETED",
-        "criteria": "Disponibilização para enriquecimento cadastral batch/online respeitando o Client Path Shield (POP_T_154)."
+        "criteria": "Disponibilização para enriquecimento econômico batch/online respeitando o Client Path Shield (POP_T_154)."
       },
       {
         "gate_id": "GATE_08",
@@ -205,21 +205,21 @@
       },
       {
         "gate_id": "GATE_09",
-        "name": "Bateria de Testes Offline com Cidades Diversas",
+        "name": "Bateria de Testes Offline com Períodos Diversos",
         "status": "COMPLETED",
-        "criteria": "Testes unitários offline com fixtures locais cobrindo cidades de todas as 5 macrorregiões nas 5 tabelas."
+        "criteria": "Testes unitários offline com fixtures cobrindo ciclos de crise (2020), inflação alta (2021-2022) e recente (2024-2026)."
       },
       {
         "gate_id": "GATE_10",
         "name": "dbt Staging, source.yml e 100% Colunas Documentadas",
         "status": "COMPLETED",
-        "criteria": "Pasta connectors/.../ibge_localidades/dbt/ com source.yml próprio, 5 modelos staging e _models.yml com 100% de colunas documentadas."
+        "criteria": "Pasta connectors/.../bcb_sgs/dbt/ com source.yml próprio, 6 modelos staging e _models.yml com 100% de colunas documentadas."
       },
       {
         "gate_id": "GATE_11",
         "name": "Teste Real de 1 Linha com API ao Vivo (Fail-Hard)",
         "status": "COMPLETED",
-        "criteria": "Execução obrigatória contra os 5 endpoints oficiais ao vivo limitados a 1 registro; falha de qualquer endpoint reprova o pipeline."
+        "criteria": "Execução obrigatória contra os 7 endpoints oficiais do BACEN SGS ao vivo limitados a 1 registro; falha reprova o pipeline."
       }
     ]
   },
@@ -247,6 +247,12 @@
       "phase_id": "03-SPIKE",
       "milestone": "Homologação do Golden Spike ibge_localidades (5 Tabelas, dbt, Negócio & Live Fail-Hard)",
       "summary": "Execução completa do Golden Spike: 5 tabelas da API do IBGE (5.571 municípios, 10.751 distritos, 646 subdistritos, 27 UFs, 5 regiões) materializadas em data/ibge_localidades/{bronze,silver,gold}/; 9 modelos dbt (5 staging, dim_municipio, dim_distrito, xwalk_ibge_6d_7d, mart_hierarquia_territorial_brasil) com 109 testes 100% aprovados; 108 colunas 100% documentadas no linter; testes reais de 1 linha com fail-hard e suite com 35 testes unitários/integração 100% verde."
+    },
+    {
+      "date": "2026-11-07",
+      "phase_id": "03",
+      "milestone": "Homologação do Conector bcb_sgs (6 Tabelas, dbt, Mart Macroeconômico & Live Fail-Hard)",
+      "summary": "Implementação de ponta a ponta do conector bcb_sgs: 6 tabelas (sgs_catalogo, sgs_ipca, sgs_igpm, sgs_selic, sgs_cdi, sgs_ibcbr) materializadas em data/bcb_sgs/{bronze,silver,gold}/; 9 novos modelos dbt (6 staging, dim_serie_macroeconomica, fct_macro_indicadores_mensal, mart_cenario_macroeconomico_brasil) com 167 testes dbt 100% aprovados; 195 colunas 100% documentadas no linter; testes reais de 1 linha com fail-hard contra os 7 endpoints oficiais do BACEN e suíte offline com 37 testes pytest 100% verde."
     }
   ]
 }

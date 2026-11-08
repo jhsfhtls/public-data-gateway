@@ -132,7 +132,7 @@ sources:
   - P05
   rice_score: 860
   roadmap_wave: 1
-  status: CATALOGED
+  status: HOMOLOGATED
 - source_id: bcb_olinda_ptax
   name: 'Banco Central Olinda: Cotações PTAX Moedas Diárias'
   agency: Banco Central do Brasil (BACEN)
