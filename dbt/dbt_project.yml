@@ -1,15 +1,15 @@
-name: 'brazil_data_gateway'
+name: 'public_data_gateway'
 version: '1.0.0'
 config-version: 2
 
-profile: 'brazil_data_gateway'
+profile: 'public_data_gateway'
 
 model-paths:
-  - "../src/brazil_data_gateway/connectors/demografico/ibge_localidades/dbt"
-  - "../src/brazil_data_gateway/connectors/macrofinanceiro/bcb_sgs/dbt"
-  - "../src/brazil_data_gateway/connectors/macrofinanceiro/bcb_olinda_ptax/dbt"
-  - "../src/brazil_data_gateway/connectors/agregadores/brasilapi_core/dbt"
-  - "../src/brazil_data_gateway/connectors/empresarial/rfb_cnpj_lakehouse/dbt"
+  - "../src/public_data_gateway/connectors/demografico/ibge_localidades/dbt"
+  - "../src/public_data_gateway/connectors/macrofinanceiro/bcb_sgs/dbt"
+  - "../src/public_data_gateway/connectors/macrofinanceiro/bcb_olinda_ptax/dbt"
+  - "../src/public_data_gateway/connectors/agregadores/brasilapi_core/dbt"
+  - "../src/public_data_gateway/connectors/empresarial/rfb_cnpj_lakehouse/dbt"
   - "models"
 
 analysis-paths: ["analyses"]
@@ -24,7 +24,7 @@ clean-targets:
   - "dbt_packages"
 
 models:
-  brazil_data_gateway:
+  public_data_gateway:
     +materialized: view
     core:
       +materialized: table

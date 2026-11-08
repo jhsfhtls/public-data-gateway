@@ -8,7 +8,7 @@
 
 # Catálogo Mestre de Fontes Públicas Governamentais (49 Fontes)
 
-Este catálogo consolida formalmente as **49 bases de dados públicas e APIs governamentais do Brasil** integradas ao `brazil-data-gateway`. As fontes abrangem a totalidade dos **13 macrosegmentos estruturais federativos**, organizadas em **6 Ondas Estratégicas de Implementação** ordenadas por priorização ponderada `RICE` (`POP_B_091`), garantindo integridade cadastral canônica, observabilidade de 5 pilares (`POP_T_074`) e conformidade com a LGPD (`POP_B_051`).
+Este catálogo consolida formalmente as **49 bases de dados públicas e APIs governamentais do Brasil** integradas ao `public-data-gateway`. As fontes abrangem a totalidade dos **13 macrosegmentos estruturais federativos**, organizadas em **6 Ondas Estratégicas de Implementação** ordenadas por priorização ponderada `RICE` (`POP_B_091`), garantindo integridade cadastral canônica, observabilidade de 5 pilares (`POP_T_074`) e conformidade com a LGPD (`POP_B_051`).
 
 ---
 

@@ -1,0 +1,16 @@
+version: 2
+
+sources:
+  - name: bcb_olinda_ptax
+    description: "Fontes brutas normalizadas das Cotações Oficiais PTAX e Boletins Diários do Banco Central (Olinda OData v4) em Parquet ZSTD."
+    meta:
+      external_location: "data/bcb_olinda_ptax/silver/{name}.parquet"
+    tables:
+      - name: ptax_moedas
+        description: "Catálogo oficial das moedas estrangeiras cotadas pelo Banco Central."
+      - name: ptax_cotacao_dolar
+        description: "Histórico diário de fechamento das taxas PTAX de compra e venda do Dólar dos Estados Unidos (USD)."
+      - name: ptax_cotacao_moedas
+        description: "Histórico diário das taxas de compra, venda e paridade de moedas estrangeiras (EUR, GBP, JPY, etc.)."
+      - name: ptax_boletins
+        description: "Registro de boletins de câmbio intradiários emitidos pelo Banco Central (Abertura, Intermediários, Fechamento)."

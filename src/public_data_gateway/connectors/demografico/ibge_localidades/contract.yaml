@@ -1,0 +1,79 @@
+contract_id: "ODCS-BR-IBGE-LOCALIDADES-001"
+source_id: "ibge_localidades"
+version: "1.0.0"
+grain: "One row per Brazilian municipality"
+primary_keys:
+  - "id_municipio"
+reference_date_column: "reference_date"
+lgpd_legal_basis: "Art. 7, § 3 (Public Data - LAI Law 12.527/2011)"
+min_expected_rows: 5570
+max_volume_drop_pct: 1.0
+sentinel_values:
+  - "-1"
+  - "99"
+  - "999"
+  - "SEM INFORMACAO"
+  - "IGNORADO"
+  - "N/A"
+columns:
+  - name: "id_municipio"
+    data_type: "string"
+    required: true
+    is_primary_key: true
+    description: "Código oficial do município IBGE com 7 dígitos (inclui dígito verificador)"
+  - name: "id_municipio_6"
+    data_type: "string"
+    required: true
+    description: "Código legado do município IBGE com 6 dígitos (usado em DataSUS e RAIS)"
+  - name: "nome_municipio"
+    data_type: "string"
+    required: true
+    description: "Nome oficial do município segundo o IBGE"
+  - name: "sigla_uf"
+    data_type: "string"
+    required: true
+    description: "Sigla da Unidade Federativa (2 letras maiúsculas)"
+  - name: "id_uf"
+    data_type: "string"
+    required: true
+    description: "Código numérico da UF no IBGE (2 dígitos)"
+  - name: "nome_uf"
+    data_type: "string"
+    required: true
+    description: "Nome por extenso da Unidade Federativa"
+  - name: "regiao"
+    data_type: "string"
+    required: true
+    description: "Nome da macrorregião geográfica oficial (Norte, Nordeste, Sudeste, Sul, Centro-Oeste)"
+  - name: "sigla_regiao"
+    data_type: "string"
+    required: true
+    description: "Sigla da macrorregião geográfica oficial (N, NE, SE, S, CO)"
+  - name: "mesorregiao"
+    data_type: "string"
+    required: false
+    description: "Mesorregião geográfica do IBGE (nulo para novos municípios como Boa Esperança do Norte)"
+  - name: "microrregiao"
+    data_type: "string"
+    required: false
+    description: "Microrregião geográfica do IBGE (nulo para novos municípios)"
+  - name: "regiao_intermediaria"
+    data_type: "string"
+    required: false
+    description: "Região geográfica intermediária do IBGE"
+  - name: "regiao_imediata"
+    data_type: "string"
+    required: false
+    description: "Região geográfica imediata do IBGE"
+  - name: "is_capital"
+    data_type: "boolean"
+    required: true
+    description: "Flag booleana indicando se o município é a capital do Estado ou do Distrito Federal"
+  - name: "reference_date"
+    data_type: "string"
+    required: true
+    description: "Ano/Competência de referência da malha municipal oficial do IBGE (YYYY-MM-DD)"
+  - name: "extracted_at"
+    data_type: "string"
+    required: true
+    description: "Timestamp ISO-8601 da extração ou snapshot dos dados"

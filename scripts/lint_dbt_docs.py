@@ -27,7 +27,7 @@ def main() -> int:
     undocumented_columns: list[str] = []
 
     for unique_id, node in nodes.items():
-        if not unique_id.startswith("model.brazil_data_gateway."):
+        if not (unique_id.startswith("model.public_data_gateway.") or unique_id.startswith("model.brazil_data_gateway.")):
             continue
 
         model_name = node.get("name")

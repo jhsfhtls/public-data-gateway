@@ -1,0 +1,1 @@
+"""Macrofinanceiro connectors package."""

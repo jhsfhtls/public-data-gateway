@@ -1,0 +1,58 @@
+contract_id: "ODCS-BR-BCB-SGS-001"
+source_id: "bcb_sgs"
+version: "1.0.0"
+grain: "One row per macroeconomic indicator per reference date"
+primary_keys:
+  - "id_serie"
+  - "data_referencia"
+reference_date_column: "reference_date"
+lgpd_legal_basis: "Art. 7, § 3 (Public Data - LAI Law 12.527/2011 & BACEN Open Data)"
+min_expected_rows: 30
+max_volume_drop_pct: 1.0
+sentinel_values:
+  - "-1"
+  - "99"
+  - "999"
+  - "SEM INFORMACAO"
+  - "IGNORADO"
+  - "N/A"
+  - "-"
+columns:
+  - name: "id_serie"
+    data_type: "string"
+    required: true
+    is_primary_key: true
+    description: "Código identificador numérico da série temporal no Sistema Gerenciador de Séries Temporais (SGS) do Banco Central"
+  - name: "data_referencia"
+    data_type: "string"
+    required: true
+    is_primary_key: true
+    description: "Data oficial de referência da observação no padrão ISO-8601 (YYYY-MM-DD)"
+  - name: "ano_mes"
+    data_type: "string"
+    required: true
+    description: "Competência do ano e mês da observação (YYYY-MM)"
+  - name: "valor"
+    data_type: "float"
+    required: true
+    description: "Valor numérico apurado para a série temporal na data de referência (taxa percentual ou número índice)"
+  - name: "nome_serie"
+    data_type: "string"
+    required: false
+    description: "Nome oficial descritivo da série temporal macroeconômica"
+  - name: "unidade_medida"
+    data_type: "string"
+    required: false
+    description: "Unidade de medida (% a.m., % a.a., Número Índice, R$, etc.)"
+  - name: "periodicidade"
+    data_type: "string"
+    required: false
+    description: "Periodicidade da série (MENSAL, DIARIA, ANUAL, REUNIAO_COPOM)"
+  - name: "reference_date"
+    data_type: "string"
+    required: true
+    description: "Data/Competência de referência da observação no padrão YYYY-MM-DD"
+  - name: "extracted_at"
+    data_type: "string"
+    required: true
+    description: "Timestamp ISO-8601 da extração dos dados da API oficial"

@@ -1,14 +1,14 @@
 <div align="center">
-  <h2>Brazil Data Gateway — Plataforma Unificada de Dados Públicos, Analytics/ML & Enriquecimento</h2>
+  <h2>Public Data Gateway — Plataforma Unificada de Dados Públicos, Analytics/ML & Enriquecimento</h2>
   <p><i>Repositório Satélite Oficial do Ecossistema C.O.R.E.</i></p>
   <p><b>Versão:</b> 0.1.0 &nbsp;|&nbsp; <b>Governança:</b> POP_T_176 • POP_T_177 • POP_T_175 • POP_T_070 • POP_T_074</p>
   <hr/>
 </div>
 <br/>
 
-# `brazil-data-gateway`
+# `public-data-gateway`
 
-Barramento modular corporativo que unifica **44+ bases de dados públicas oficiais e APIs governamentais do Brasil** distribuídas nos **13 macrosegmentos federativos**, curadas em arquitetura **Medallion (`Bronze -> Silver -> Gold / ML Feature Views`)** e expostas simultaneamente via **Python SDK**, **FastAPI (`/api/v1`)**, **CLI (`bdg`)** e **Servidor MCP (`bdg-mcp`)** para todo o ecossistema **C.O.R.E.** (`core`, `operations`, `career`, `studies`).
+Barramento modular corporativo que unifica **bases de dados públicas oficiais, APIs governamentais do Brasil e fontes públicas globais** estruturadas nos macrosegmentos estratégicos, curadas em arquitetura **Medallion (`Bronze -> Silver -> Gold / ML Feature Views`)** e expostas simultaneamente via **Python SDK (`PublicData` / `BrazilData`)**, **FastAPI (`/api/v1`)**, **CLI (`pdg` / `bdg`)** e **Servidor MCP (`pdg-mcp` / `bdg-mcp`)** para todo o ecossistema **C.O.R.E.** (`core`, `operations`, `career`, `studies`).
 
 ---
 
@@ -51,16 +51,16 @@ pip install --no-deps -e .
 ## Uso Rápido
 
 ```powershell
-# Consultar status evolutivo e catálogo de fontes
-bdg status
-bdg catalog --wave 1
+# Consultar status evolutivo e catálogo de fontes (suporta pdg ou bdg)
+pdg status
+pdg catalog --wave 1
 
 # Consultar schema semântico ou perfilar um Parquet sem estourar contexto de IA
-bdg schema ibge_localidades
+pdg schema ibge_localidades
 
 # Subir servidor REST OpenAPI 3.1
-uvicorn brazil_data_gateway.api.app:create_app --factory --reload
+uvicorn public_data_gateway.api.app:create_app --factory --reload
 
 # Iniciar servidor MCP stdio para agentes C.O.R.E.
-bdg-mcp
+pdg-mcp
 ```

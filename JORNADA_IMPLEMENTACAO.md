@@ -1,14 +1,14 @@
 <div align="center">
   <h2>Jornada de Implementação — Brazil Data Gateway</h2>
   <p><i>Painel Vivo de Evolução Arquitetural, Ciclo de Vida de Conectores & Habilitação de Produtos C.O.R.E.</i></p>
-  <p><b>Versão:</b> 1.0.0 &nbsp;|&nbsp; <b>Última Atualização:</b> 2026-11-07 &nbsp;|&nbsp; <b>Governança:</b> POP_T_177 • POP_T_176 • POP_T_175 • POP_T_070 • POP_T_074 • POP_T_148</p>
+  <p><b>Versão:</b> 1.0.0 &nbsp;|&nbsp; <b>Última Atualização:</b> 2026-11-08 &nbsp;|&nbsp; <b>Governança:</b> POP_T_177 • POP_T_176 • POP_T_175 • POP_T_070 • POP_T_074 • POP_T_148</p>
   <hr/>
 </div>
 <br/>
 
 # Jornada de Implementação & Painel Vivo de Governança
 
-Este artefato constitui a **Fonte Única da Verdade Operacional (SSOT)** do status de desenvolvimento do `brazil-data-gateway`. Ele rastreia o avanço das macrofases arquiteturais, o ciclo de vida dos 9 Gates de qualidade por conector, o desbloqueio comercial dos 10 Produtos Modulares do ecossistema C.O.R.E. e o **Runbook Anti-Bus-Factor** para continuidade operacional autônoma.
+Este artefato constitui a **Fonte Única da Verdade Operacional (SSOT)** do status de desenvolvimento do `public-data-gateway`. Ele rastreia o avanço das macrofases arquiteturais, o ciclo de vida dos 9 Gates de qualidade por conector, o desbloqueio comercial dos 10 Produtos Modulares do ecossistema C.O.R.E. e o **Runbook Anti-Bus-Factor** para continuidade operacional autônoma.
 
 ---
 
@@ -18,7 +18,7 @@ Este artefato constitui a **Fonte Única da Verdade Operacional (SSOT)** do stat
 - **Status Geral de Governança:** `🟢 ON_TRACK`
 - **Conector Ativo em Desenvolvimento:** `rfb_cnpj_lakehouse`
 - **Próximo Conector na Fila de Execução:** `rfb_simples_mei` (Wave 1 — Prioridade RICE 950)
-- **Progresso Estrutural das Macrofases:** **5 de 11 Concluídas (45.5%)**
+- **Progresso Estrutural das Macrofases:** **5 de 12 Concluídas (41.7%)**
 - **Universo de Fontes Homologadas no Catálogo:** **49 fontes públicas** nos 13 macrosegmentos
 
 ```mermaid
@@ -46,12 +46,13 @@ flowchart LR
 | **Fase 07** | **Ingestão Wave 5 — Saúde, Educação & Setor Notarial** | ⚪ PENDENTE | `—` | • Conectores DataSUS (CNES, SIH, SIM, SINASC, OpenDataSUS) & anvisa_cmed<br/>• Conectores INEP (Censo Escolar, Superior, IDEB, ENEM) & capes_sucupira<br/>• Conectores Notariais (cnj_justica_aberta, onr_registro_imoveis, capitais_iptu_itbi) |
 | **Fase 08** | **Ingestão Wave 6 — Meio Ambiente, Agro & Metaportais** | ⚪ PENDENTE | `—` | • Conectores Ambientais (ana_hidroweb, inpe_terrabrasilis, mapbiomas, sfb_sicar, mapa_zarc)<br/>• Conectores Metaportais (basedosdados_bq, dadosgov_ckan) |
 | **Fase 09** | **Pós-Ingestão Total — Tabelas Gold Analíticas Cross-Domain, Datamarts & Insights** | ⚪ PENDENTE | `—` | • Data Marts analíticos multidisciplinares (B2B x Território x Macro x Compras Públicas)<br/>• Feature Store consolidada para modelos preditivos de propensão e risco<br/>• Extração de insights comerciais e operacionais acoplados aos 10 Produtos Modulares C.O.R.E. |
+| **Fase 10** | **Expansão de Fronteira: Auditoria Conecta GOV.BR & Inclusão de APIs Públicas Globais/Geoespaciais** | ⚪ PENDENTE | `—` | • Auditoria e varredura do Conecta GOV.BR (https://www.gov.br/conecta/catalogo/) para identificar e homologar APIs governamentais federais adicionais que ficaram fora do catálogo inicial<br/>• Mapeamento e viabilidade de APIs públicas globais e geoespaciais de alto valor analítico: Google Maps API (Geocoding/Places) e alternativas abertas como OpenStreetMap / Nominatim (https://www.openstreetmap.org/) e Mapbox API (https://www.mapbox.com/)<br/>• Bipartição da documentação oficial, dbt e catálogo mestre estruturada em: 1) Catálogo APIs Gov Brasil e 2) Catálogo Outras APIs Públicas & Globais<br/>• Disponibilização de conectores com o mesmo padrão ODCS v3.1, camadas Medallion (Bronze/Silver/Gold) e testes fail-hard com limites de rate limit e FinOps |
 
 ---
 
 ## 3. Checklist dos 9 Gates de Qualidade do Conector Ativo
 
-Todo conector integrado ao `brazil-data-gateway` deve percorrer rigorosamente os **9 Gates de Qualidade** antes de ser promovido a `HOMOLOGATED`. O alvo atual do ciclo de vida é o conector `rfb_cnpj_lakehouse` (Wave 2):
+Todo conector integrado ao `public-data-gateway` deve percorrer rigorosamente os **9 Gates de Qualidade** antes de ser promovido a `HOMOLOGATED`. O alvo atual do ciclo de vida é o conector `rfb_cnpj_lakehouse` (Wave 2):
 
 | Gate | Nome do Gate de Homologação | Critério Operacional de Aceite (`POP_T_070` / `POP_T_074` / `POP_T_177`) | Status |
 | :---: | :--- | :--- | :---: |
@@ -86,7 +87,7 @@ Estatísticas dinâmicas cruzadas diretamente com o catálogo mestre `catalog/so
 
 ## 5. Matriz de Habilitação dos 10 Produtos Modulares C.O.R.E.
 
-O `brazil-data-gateway` atua como barramento alimentador de dados para os **10 Produtos Modulares** do ecossistema corporativo (definidos em `biz-feasibility-evaluator` e no Catálogo de Ofertas GTM):
+O `public-data-gateway` atua como barramento alimentador de dados para os **10 Produtos Modulares** do ecossistema corporativo (definidos em `biz-feasibility-evaluator` e no Catálogo de Ofertas GTM):
 
 | Produto | Nome Comercial do Módulo | Status de Prontidão no Gateway | Fontes Mapeadas que Viabilizam o Módulo |
 | :---: | :--- | :--- | :--- |
@@ -115,6 +116,7 @@ O `brazil-data-gateway` atua como barramento alimentador de dados para os **10 P
 | `2026-11-07` | **Fase 03** | **Homologação do Conector bcb_olinda_ptax (4 Tabelas, dbt, Mart de Volatilidade Cambial & Live Fail-Hard)** | Implementação de ponta a ponta do conector bcb_olinda_ptax: 4 tabelas (ptax_moedas, ptax_cotacao_dolar, ptax_cotacao_moedas, ptax_boletins) materializadas em data/bcb_olinda_ptax/{bronze,silver,gold}/; 7 novos modelos dbt (4 staging, dim_moeda, fct_cambio_ptax_diario, mart_cambio_volatilidade_brasil) com 220 testes dbt 100% aprovados; 260 colunas 100% documentadas no linter; testes reais de 1 linha com fail-hard contra os endpoints oficiais Olinda PTAX e suíte offline com 42 testes pytest 100% verde. |
 | `2026-11-07` | **Fase 03** | **Homologação do Conector brasilapi_core & Conclusão da Wave 1 (6 Tabelas, dbt, Mart Bancário & Live Fail-Hard)** | Implementação de ponta a ponta do conector brasilapi_core concluindo com sucesso 100% da Wave 1: 6 tabelas (brasilapi_bancos, brasilapi_pix_participantes, brasilapi_corretoras, brasilapi_feriados, brasilapi_ddds, brasilapi_ceps) materializadas em data/brasilapi_core/{bronze,silver,gold}/; 9 novos modelos dbt (6 staging, dim_instituicao_financeira, dim_calendario_nacional, mart_infraestrutura_bancaria_brasil) totalizando 34 modelos e 288 testes dbt 100% aprovados; 337 colunas 100% documentadas no linter; testes reais de 1 linha com fail-hard contra os 6 endpoints da BrasilAPI e suíte offline com 47 testes pytest 100% verde. |
 | `2026-11-08` | **Fase 04** | **Homologação do Conector rfb_cnpj_lakehouse (10 Tabelas, dbt, Mart B2B & Live Fail-Hard)** | Implementação de ponta a ponta do conector rfb_cnpj_lakehouse iniciando a Wave 2: 10 tabelas (rfb_cnaes, rfb_motivos, rfb_municipios, rfb_naturezas, rfb_paises, rfb_qualificacoes, rfb_empresas, rfb_estabelecimentos, rfb_socios, rfb_simples) materializadas em data/rfb_cnpj_lakehouse/{bronze,silver,gold}/; 14 novos modelos dbt (10 staging, dim_empresa, dim_estabelecimento, dim_socio_qsa, mart_densidade_empresarial_brasil) totalizando 48 modelos e 416 testes dbt 100% aprovados; 481 colunas 100% documentadas no linter; testes reais de 1 linha com fail-hard contra o endpoint oficial de CNPJ e suíte offline com 54 testes pytest 100% verde. |
+| `2026-11-08` | **Fase 04** | **Transição de Identidade: Renomeação para public-data-gateway & Registro da Fase 10 (Conecta GOV.BR & Geo/Maps)** | Renomeação oficial do repositório e projeto para public-data-gateway, integrando suporte simultâneo aos comandos pdg/bdg e pdg-mcp/bdg-mcp, atualização dos vínculos do ecossistema C.O.R.E. e registro da Fase 10 no plano de implementação contemplando a auditoria do Conecta GOV.BR, viabilidade de APIs geoespaciais (Google Maps, OpenStreetMap, Mapbox) e futura bipartição entre catálogo Gov Brasil e catálogo público global. |
 
 ---
 
@@ -126,7 +128,7 @@ Este runbook documenta os procedimentos padronizados para garantir que **qualque
 
 ```powershell
 # 1. Clonar repositório e navegar para a raiz
-cd c:\Users\jhose\GitOps\brazil-data-gateway
+cd c:\Users\jhose\GitOps\public-data-gateway
 
 # 2. Criar e ativar o ambiente virtual isolado (.venv)
 py -3.12 -m venv .venv

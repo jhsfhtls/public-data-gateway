@@ -3,9 +3,9 @@ requires = ["setuptools>=68.0"]
 build-backend = "setuptools.build_meta"
 
 [project]
-name = "brazil-data-gateway"
+name = "public-data-gateway"
 version = "0.1.0"
-description = "Unified Medallion platform, enrichment engine, and MCP/REST/SDK gateway for official Brazilian public data sources (C.O.R.E. Ecosystem)."
+description = "Unified Medallion platform, enrichment engine, and MCP/REST/SDK gateway for official public data sources (C.O.R.E. Ecosystem)."
 readme = "README.md"
 requires-python = ">=3.12"
 license = { file = "LICENSE" }
@@ -21,8 +21,10 @@ dependencies = [
 ]
 
 [project.scripts]
-bdg = "brazil_data_gateway.cli.main:main"
-bdg-mcp = "brazil_data_gateway.mcp.server:main"
+pdg = "public_data_gateway.cli.main:main"
+pdg-mcp = "public_data_gateway.mcp.server:main"
+bdg = "public_data_gateway.cli.main:main"
+bdg-mcp = "public_data_gateway.mcp.server:main"
 
 [tool.setuptools]
 package-dir = { "" = "src" }
