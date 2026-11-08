@@ -170,6 +170,34 @@ def build_parser() -> argparse.ArgumentParser:
     jud_deb_p.add_argument("termo", type=str, help="Document, court, or NUP")
     jud_deb_p.add_argument("--json", action="store_true", help="Output in JSON format")
 
+    # Company, Tax Regimes & Fiscal Incentives
+    comp_p = subparsers.add_parser(
+        "company", help="Query corporate registries, tax regimes and fiscal incentives (SUFRAMA/RFB)."
+    )
+    comp_sub = comp_p.add_subparsers(dest="company_action")
+
+    c_suf_p = comp_sub.add_parser("suframa", help="Query SUFRAMA registration and incentive status.")
+    c_suf_p.add_argument("documento", type=str, help="CNPJ or 9-digit SUFRAMA inscription number")
+    c_suf_p.add_argument("--json", action="store_true", help="Output in JSON format")
+
+    c_tax_p = comp_sub.add_parser("tax-incentives", help="Assess corporate fiscal incentives (PIM/ZFM/ALC).")
+    c_tax_p.add_argument("cnpj", type=str, help="CNPJ to evaluate")
+    c_tax_p.add_argument("--json", action="store_true", help="Output in JSON format")
+
+    c_proj_p = comp_sub.add_parser("pim-projects", help="List industrial projects submitted to SUFRAMA CAS.")
+    c_proj_p.add_argument("--cnpj", type=str, default=None, help="Filter by CNPJ or inscription")
+    c_proj_p.add_argument("--status", type=str, default=None, help="Filter by project status (e.g. EM_OPERACAO)")
+    c_proj_p.add_argument("--json", action="store_true", help="Output in JSON format")
+
+    # Direct shortcuts
+    suf_p = subparsers.add_parser("suframa", help="Query SUFRAMA registration and incentive status.")
+    suf_p.add_argument("documento", type=str, help="CNPJ or 9-digit SUFRAMA inscription number")
+    suf_p.add_argument("--json", action="store_true", help="Output in JSON format")
+
+    tax_p = subparsers.add_parser("tax-incentives", help="Assess corporate fiscal incentives (PIM/ZFM/ALC).")
+    tax_p.add_argument("cnpj", type=str, help="CNPJ to evaluate")
+    tax_p.add_argument("--json", action="store_true", help="Output in JSON format")
+
     return parser
 
 
@@ -550,6 +578,52 @@ def main(argv: Sequence[str] | None = None) -> int:
                     print(f"Found {len(rows)} BNDT debtor entries matching '{args.termo}':")
                     for r in rows:
                         print(f"  - [{r.get('tribunal_origem')}] NUP: {r.get('numero_processo_nup')} | R$ {r.get('valor_debito', 0.0):,.2f} | {r.get('situacao_exigibilidade')}")
+                return 0
+
+        if args.command in {"company", "suframa", "tax-incentives"}:
+            from public_data_gateway.connectors.empresarial.suframa_pim_zfm.connector import (
+                SuframaPimZfmConnector,
+            )
+            suf_conn = SuframaPimZfmConnector(settings=settings)
+
+            action = getattr(args, "company_action", None) or args.command
+            if action in {"suframa"}:
+                res = suf_conn.get_suframa_status(args.documento)
+                if args.json:
+                    print(json.dumps(res, indent=2, ensure_ascii=False))
+                else:
+                    print(f"SUFRAMA Registration Status for '{args.documento}':")
+                    print(f"  Razão Social:        {res.get('razao_social', 'N/A')}")
+                    print(f"  CNPJ:                {res.get('cnpj', 'N/A')}")
+                    print(f"  Inscrição SUFRAMA:   {res.get('numero_inscricao_suframa', 'N/A')}")
+                    print(f"  Situação Cadastral:  {res.get('situacao_cadastral', 'N/A')}")
+                    print(f"  Incentivo Aprovado:  {res.get('tem_incentivo_fiscal_aprovado', False)}")
+                    print(f"  Área de Atuação:     {res.get('tipo_area_incentivada', 'N/A')}")
+                    print(f"  Projetos Industriais:{res.get('qtd_projetos_industriais', 0)}")
+                return 0
+
+            if action in {"tax-incentives"}:
+                res = suf_conn.get_tax_incentives_profile(args.cnpj)
+                if args.json:
+                    print(json.dumps(res, indent=2, ensure_ascii=False))
+                else:
+                    print(f"Corporate Fiscal Incentive Profile for '{args.cnpj}':")
+                    print(f"  Razão Social:       {res.get('razao_social', 'N/A')}")
+                    print(f"  Score Incentivo:    {res.get('tax_incentive_score', 0.0)}/100.0")
+                    print(f"  Classificação:      {res.get('tax_incentive_class', 'N/A')}")
+                    print(f"  Cumpre PPB:         {res.get('cumpre_processo_produtivo_basico', False)}")
+                    print(f"  Capacidade Fabril:  {res.get('capacidade_fabril_estimada', 'N/A')}")
+                    print(f"  Benefícios Fiscais: {', '.join(res.get('beneficios_habilitados', [])) or 'Nenhum'}")
+                return 0
+
+            if action in {"pim-projects"}:
+                projs = suf_conn.list_projetos(cnpj_or_inscricao=args.cnpj, status=args.status)
+                if args.json:
+                    print(json.dumps(projs, indent=2, ensure_ascii=False))
+                else:
+                    print(f"Found {len(projs)} SUFRAMA CAS industrial projects:")
+                    for p in projs:
+                        print(f"  - [{p.get('codigo_projeto')}] {p.get('titulo_projeto', p.get('nome_projeto', 'N/A'))} | {p.get('status_projeto')} | Resolução: {p.get('resolucao_aprovacao_cas', 'N/A')}")
                 return 0
 
     except Exception as exc:

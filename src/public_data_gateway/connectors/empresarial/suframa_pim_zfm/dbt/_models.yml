@@ -1,0 +1,211 @@
+version: 2
+
+models:
+  - name: stg_suframa_empresas
+    description: "Visão de staging para as empresas cadastradas junto à SUFRAMA com direito a fruição de incentivos fiscais."
+    columns:
+      - name: numero_inscricao_suframa
+        description: "Número único de Inscrição SUFRAMA da empresa."
+        tests:
+          - not_null
+          - unique
+      - name: cnpj_14
+        description: "CNPJ de 14 dígitos do estabelecimento."
+        tests:
+          - not_null
+      - name: cnpj_raiz
+        description: "Radical de 8 dígitos do CNPJ para consolidação matriz/filiais."
+        tests:
+          - not_null
+      - name: razao_social
+        description: "Razão social da empresa cadastrada."
+        tests:
+          - not_null
+      - name: nome_fantasia
+        description: "Nome de fantasia comercial da empresa."
+      - name: situacao_cadastral
+        description: "Situação cadastral perante a autarquia (ATIVA, CANCELADA, BLOQUEADA, SUSPENSA)."
+        tests:
+          - not_null
+          - accepted_values:
+              values: ['ATIVA', 'CANCELADA', 'BLOQUEADA', 'SUSPENSA']
+      - name: data_inscricao
+        description: "Data em que a inscrição na SUFRAMA foi deferida."
+        tests:
+          - not_null
+      - name: data_validade_cadastro
+        description: "Data de vencimento da regularidade do cadastro SUFRAMA."
+        tests:
+          - not_null
+      - name: tipo_estabelecimento
+        description: "Classificação da unidade: MATRIZ ou FILIAL."
+        tests:
+          - not_null
+          - accepted_values:
+              values: ['MATRIZ', 'FILIAL']
+      - name: tipo_area_incentivada
+        description: "Enquadramento territorial fiscal (ZONA_FRANCA_MANAUS, AMAZONIA_OCIDENTAL, AREA_LIVRE_COMERCIO)."
+        tests:
+          - not_null
+      - name: codigo_area_suframa
+        description: "Código da área de abrangência de incentivo (ZFM, ALC_TABATINGA, etc.)."
+        tests:
+          - not_null
+      - name: id_municipio_ibge
+        description: "Código IBGE de 7 dígitos do município da planta."
+        tests:
+          - not_null
+      - name: sigla_uf
+        description: "Sigla da Unidade Federativa da planta incentivada."
+        tests:
+          - not_null
+      - name: subsetor_industrial
+        description: "Subsetor fabril predominante da empresa cadastrada."
+        tests:
+          - not_null
+      - name: ingestion_timestamp
+        description: "Carimbo de data/hora da ingestão no repositório."
+        tests:
+          - not_null
+
+  - name: stg_suframa_projetos
+    description: "Visão de staging para os projetos industriais e agropecuários aprovados pelo Conselho de Administração da SUFRAMA (CAS)."
+    columns:
+      - name: codigo_projeto
+        description: "Código identificador do projeto industrial perante a SUFRAMA."
+        tests:
+          - not_null
+          - unique
+      - name: numero_resolucao_cas
+        description: "Número oficial da Resolução do Conselho de Administração da SUFRAMA que aprovou o projeto."
+        tests:
+          - not_null
+      - name: numero_inscricao_suframa
+        description: "Número da inscrição SUFRAMA da empresa titular do projeto."
+        tests:
+          - not_null
+      - name: cnpj_14
+        description: "CNPJ de 14 dígitos da empresa titular."
+        tests:
+          - not_null
+      - name: titulo_projeto
+        description: "Título descritivo da linha de produção ou expansão fabril aprovada."
+        tests:
+          - not_null
+      - name: subsetor_industrial
+        description: "Subsetor do Polo Industrial de Manaus ao qual o projeto pertence."
+        tests:
+          - not_null
+      - name: status_projeto
+        description: "Situação operacional do projeto aprovado (EM_OPERACAO, EM_IMPLANTACAO, CANCELADO)."
+        tests:
+          - not_null
+          - accepted_values:
+              values: ['EM_OPERACAO', 'EM_IMPLANTACAO', 'CANCELADO']
+      - name: data_aprovacao_cas
+        description: "Data em que a Resolução do CAS foi publicada."
+        tests:
+          - not_null
+      - name: faturamento_anual_estimado
+        description: "Estimativa anual de faturamento incentivado do projeto em Reais (BRL)."
+        tests:
+          - not_null
+      - name: empregos_diretos_estimados
+        description: "Estimativa de empregos diretos gerados pela planta fabril."
+        tests:
+          - not_null
+      - name: cumpre_ppb
+        description: "Indicador de cumprimento do Processo Produtivo Básico (PPB) conforme Lei nº 8.387/1991."
+        tests:
+          - not_null
+      - name: ingestion_timestamp
+        description: "Carimbo de data/hora da ingestão do registro."
+        tests:
+          - not_null
+
+  - name: stg_suframa_beneficios
+    description: "Visão de staging para o catálogo legal de benefícios fiscais e incentivos concedidos pela SUFRAMA."
+    columns:
+      - name: codigo_beneficio
+        description: "Código do benefício fiscal."
+        tests:
+          - not_null
+          - unique
+      - name: tipo_tributo
+        description: "Tributo desonerado ou incentivado (IPI, II, PIS_COFINS, ICMS, II_IPI)."
+        tests:
+          - not_null
+      - name: descricao_beneficio
+        description: "Descrição detalhada do incentivo tributário."
+        tests:
+          - not_null
+      - name: base_legal
+        description: "Dispositivo normativo de concessão legal (Decreto-Lei, Lei Ordinária, Lei Estadual)."
+        tests:
+          - not_null
+      - name: tipo_incentivo
+        description: "Mecanismo tributário: ISENCAO, REDUCAO_ALIQUOTA, ALIQUOTA_ZERO, CREDITO_PRESUMIDO."
+        tests:
+          - not_null
+      - name: vigencia_limite
+        description: "Data limite constitucional de fruição do incentivo (prorrogada até 2073 pela EC 83/2014)."
+        tests:
+          - not_null
+      - name: exige_ppb
+        description: "Flag indicando se o benefício exige cumprimento de Processo Produtivo Básico."
+        tests:
+          - not_null
+
+  - name: stg_suframa_areas
+    description: "Visão de staging para o catálogo territorial das Áreas de Livre Comércio e Polo Industrial de Manaus."
+    columns:
+      - name: codigo_area_suframa
+        description: "Identificador unificado da área de incentivo regional."
+        tests:
+          - not_null
+          - unique
+      - name: nome_area
+        description: "Nome por extenso da Área de Livre Comércio ou ZFM."
+        tests:
+          - not_null
+      - name: tipo_area
+        description: "Classificação territorial: ZONA_FRANCA_MANAUS ou AREA_LIVRE_COMERCIO."
+        tests:
+          - not_null
+      - name: id_municipio_ibge
+        description: "Código IBGE de 7 dígitos do município polo."
+        tests:
+          - not_null
+      - name: nome_municipio
+        description: "Nome do município sede da área de incentivo."
+        tests:
+          - not_null
+      - name: sigla_uf
+        description: "Sigla da Unidade Federativa da área."
+        tests:
+          - not_null
+      - name: base_legal
+        description: "Lei federal instituidora da área de incentivo."
+        tests:
+          - not_null
+
+  - name: stg_suframa_subsetores
+    description: "Visão de staging para os subsetores fabris e econômicos atuantes no âmbito da SUFRAMA."
+    columns:
+      - name: subsetor_industrial
+        description: "Código mnemônico do subsetor fabril."
+        tests:
+          - not_null
+          - unique
+      - name: nome_subsetor
+        description: "Descrição por extenso do polo setorial."
+        tests:
+          - not_null
+      - name: is_industrial
+        description: "Flag indicando se o polo envolve atividade manufatureira e fabril."
+        tests:
+          - not_null
+      - name: relevancia_pim
+        description: "Nível de relevância e representatividade econômica no faturamento global do PIM."
+        tests:
+          - not_null

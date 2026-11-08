@@ -356,7 +356,7 @@ sources:
   - P09
   rice_score: 610
   roadmap_wave: 2
-  status: CATALOGED
+  status: HOMOLOGATED
 - source_id: cvm_dfp_itr
   name: 'CVM: Demonstrações Financeiras Padronizadas (DFP / ITR)'
   agency: Comissão de Valores Mobiliários (CVM)

@@ -1,6 +1,6 @@
 {
   "schema_version": "1.0.0",
-  "last_updated": "2026-11-08T06:55:00.000000+00:00",
+  "last_updated": "2026-11-08",
   "project_name": "public-data-gateway",
   "ecosystem": "C.O.R.E. (core, operations, career, studies)",
   "governing_pops": [
@@ -15,8 +15,8 @@
   "current_macro_phase_id": "04",
   "current_macro_phase": "Fase 04 — Ingestão Wave 2 (B2B, Compras Públicas & Compliance: rfb_cnpj_lakehouse, rfb_simples_mei, pncp_contratacoes, etc.)",
   "overall_status": "ON_TRACK",
-  "active_connector": "suframa_pim_zfm",
-  "next_connector": "cvm_cia_aberta",
+  "active_connector": "cvm_dfp_itr",
+  "next_connector": "mdic_comexstat",
   "structural_phases": [
     {
       "phase_id": "00",
@@ -166,74 +166,74 @@
     }
   ],
   "active_connector_gates": {
-    "target_connector": "rfb_simples_mei",
-    "target_wave": 2,
+    "target_connector": "cvm_dfp_itr",
+    "target_wave": 3,
     "gates": [
       {
         "gate_id": "GATE_01",
         "name": "Contrato Declarativo ODCS v3.1 das N Tabelas da API",
-        "status": "COMPLETED",
-        "criteria": "Schema tipado, chaves primárias STRING e regras semânticas para simples_nacional_cadastral, simei_cadastral, simples_sublimites_estaduais, simples_eventos_historico e simples_tabelas_anexos."
+        "status": "PLANNED",
+        "criteria": "Schema tipado, chaves primarias STRING e regras semanticas para demonstracoes financeiras CVM (BPA, BPP, DRE, DFC, DMPL, DVA)."
       },
       {
         "gate_id": "GATE_02",
-        "name": "Ingestão Bronze Isolada (Todas as Tabelas) & Cache WAL",
-        "status": "COMPLETED",
-        "criteria": "Download resiliente das 5 tabelas em data/rfb_simples_mei/bronze/ com cache SQLite WAL."
+        "name": "Ingestao Bronze Isolada (Todas as Tabelas) & Cache WAL",
+        "status": "PLANNED",
+        "criteria": "Download resiliente das tabelas em data/cvm_dfp_itr/bronze/ com cache SQLite WAL."
       },
       {
         "gate_id": "GATE_03",
-        "name": "Sanitização de Sentinelas & Nulls",
-        "status": "COMPLETED",
-        "criteria": "Conversão determinística de códigos sentinela, zeros e hífens em NULLs reais em todas as tabelas."
+        "name": "Sanitizacao de Sentinelas & Nulls",
+        "status": "PLANNED",
+        "criteria": "Conversao deterministica de codigos sentinela e zeros em NULLs reais."
       },
       {
         "gate_id": "GATE_04",
-        "name": "Materialização Silver Parquet Isolada (Todas as Tabelas)",
-        "status": "COMPLETED",
-        "criteria": "Gravação de simples_nacional_cadastral.parquet, simei_cadastral.parquet, etc., em data/rfb_simples_mei/silver/ com SHA-256."
+        "name": "Materializacao Silver Parquet Isolada (Todas as Tabelas)",
+        "status": "PLANNED",
+        "criteria": "Gravacao de demonstracoes financeiras padronizadas em data/cvm_dfp_itr/silver/ com SHA-256."
       },
       {
         "gate_id": "GATE_05",
-        "name": "Validação dos 5 Pilares & Quarentena",
-        "status": "COMPLETED",
-        "criteria": "Aprovação em Freshness, Volume, Schema, Null Ceiling e Lineage; desvio para data/rfb_simples_mei/quarantine/ se violado."
+        "name": "Validacao dos 5 Pilares & Quarentena",
+        "status": "PLANNED",
+        "criteria": "Aprovacao em Freshness, Volume, Schema, Null Ceiling e Lineage; desvio para data/cvm_dfp_itr/quarantine/ se violado."
       },
       {
         "gate_id": "GATE_06",
         "name": "Gold Feature View Isolada & ASOF Join ML",
-        "status": "COMPLETED",
-        "criteria": "Features analíticas tributárias em data/rfb_simples_mei/gold/features_tributarias_simples.parquet com propensão, tempo de permanência e risco de desenquadramento."
+        "status": "PLANNED",
+        "criteria": "Features fundamentalistas e solvenica em data/cvm_dfp_itr/gold/features_financeiras_cvm.parquet."
       },
       {
         "gate_id": "GATE_07",
-        "name": "Integração ao EnrichmentEngine",
-        "status": "COMPLETED",
-        "criteria": "Disponibilização para enriquecimento tributário e cadastral batch/online respeitando o Client Path Shield (POP_T_154)."
+        "name": "Integracao ao EnrichmentEngine",
+        "status": "PLANNED",
+        "criteria": "Disponibilizacao para enriquecimento financeiro e balancos respeitando o Client Path Shield (POP_T_154)."
       },
       {
         "gate_id": "GATE_08",
-        "name": "Exposição Multi-Interface",
-        "status": "COMPLETED",
-        "criteria": "Exposição síncrona/analítica simultânea via Python SDK (PublicData / BrazilData), REST (/api/v1/simples), CLI (pdg simples) e Servidor MCP."
+        "name": "Exposicao Multi-Interface",
+        "status": "PLANNED",
+        "criteria": "Exposicao simultanea via SDK (PublicData / BrazilData), REST (/api/v1/cvm), CLI (pdg cvm) e Servidor MCP."
       },
       {
         "gate_id": "GATE_09",
-        "name": "Bateria de Testes Offline com Períodos Diversos",
-        "status": "COMPLETED",
-        "criteria": "Testes unitários offline com fixtures cobrindo optantes, MEI ativo, desenquadramentos, eventos e sublimites estaduais."
+        "name": "Bateria de Testes Offline com Periodos Diversos",
+        "status": "PLANNED",
+        "criteria": "Testes unitarios offline com fixtures cobrindo companhias abertas e balancos."
       },
       {
         "gate_id": "GATE_10",
         "name": "dbt Staging, source.yml e 100% Colunas Documentadas",
-        "status": "COMPLETED",
-        "criteria": "Pasta connectors/.../rfb_simples_mei/dbt/ com source.yml próprio, 5 modelos staging, dim_simples_nacional, dim_simei, dim_sublimites_icms, mart_regimes_tributarios_brasil e 100% colunas documentadas."
+        "status": "PLANNED",
+        "criteria": "Modelos dbt com source.yml proprio, staging, dims, fcts, marts e 100% de colunas documentadas."
       },
       {
         "gate_id": "GATE_11",
         "name": "Teste Real de 1 Linha com API ao Vivo (Fail-Hard)",
-        "status": "COMPLETED",
-        "criteria": "Execução obrigatória contra endpoint ao vivo de consulta de situação Simples/MEI limitado a 1 registro; falha reprova o pipeline."
+        "status": "PLANNED",
+        "criteria": "Execucao obrigatoria contra endpoint ao vivo de dados abertos da CVM limitado a 1 registro; falha reprova o pipeline."
       }
     ]
   },
@@ -327,6 +327,12 @@
       "phase_id": "04",
       "milestone": "Homologação do Conector tst_cndt (4 Tabelas, dbt, Mart de Compliance Trabalhista & Live Fail-Hard)",
       "summary": "Implementação completa do conector tst_cndt (Certidão Negativa de Débitos Trabalhistas & Banco Nacional de Devedores Trabalhistas - Lei nº 12.440/2011, Res. TST nº 1.470/2011 e CLT): 4 tabelas (tst_cndt_certidoes, tst_cndt_debitos_bndt, tst_cndt_tribunais_regionais, tst_cndt_status_dominio) materializadas em data/tst_cndt/{bronze,silver,gold}/; 9 novos modelos dbt (4 staging views, dim_tribunal_regional_trabalho, dim_status_cndt, fct_certidao_trabalhista, fct_debito_trabalhista_bndt, mart_compliance_trabalhista_brasil) totalizando 104 modelos e 968 testes dbt 100% aprovados; 1122 colunas 100% documentadas no linter; feature store features_compliance_trabalhista_brasil.parquet gerada com score contínuo de 0 a 100 de risco de passivo trabalhista; testes reais de 1 linha com fail-hard contra o portal oficial do TST CNDT e 10 testes pytest aprovados; multi-interface completa via SDK (PublicData.judicial.cndt, labor_risk, get_cndt, get_labor_risk), CLI (pdg judicial cndt, labor-risk, debitos), REST API (/api/v1/judicial/cndt, labor-risk, debitos) e MCP (bdg_get_cndt_certificate, bdg_get_labor_risk)."
+    },
+    {
+      "date": "2026-11-08",
+      "phase_id": "04",
+      "milestone": "Homologação do Conector suframa_pim_zfm (5 Tabelas, dbt, Mart de Incentivos Fiscais PIM & Live Fail-Hard)",
+      "summary": "Implementação completa do conector suframa_pim_zfm (Superintendência da Zona Franca de Manaus — Cadastro de Empresas Incentivadas do Polo Industrial de Manaus / ZFM e Áreas de Livre Comércio, Decreto-Lei nº 288/1967, Lei nº 8.387/1991, Art. 40 do ADCT, EC 83/2014 e Lei nº 10.996/2004): 5 tabelas (suframa_empresas_cadastradas, suframa_projetos_incentivados, suframa_beneficios_fiscais, suframa_areas_livre_comercio, suframa_subsetores_industriais) materializadas em data/suframa_pim_zfm/{bronze,silver,gold}/; 11 novos modelos dbt (5 staging views, dim_empresa_suframa, dim_area_livre_comercio, dim_subsetor_industrial_pim, fct_projeto_incentivado_suframa, fct_beneficio_fiscal_suframa, mart_incentivos_fiscais_pim_brasil) totalizando 115 modelos e 1098 testes dbt 100% aprovados; 1242 colunas 100% documentadas no linter; feature store features_incentivos_fiscais_zfm_brasil.parquet gerada com score contínuo de 0 a 100 de incentivos fiscais, cumprimento de PPB e classificação de capacidade fabril; testes reais de 1 linha com fail-hard contra os portais oficiais da SUFRAMA gov.br e 12 testes pytest aprovados; multi-interface completa via SDK (PublicData.company.suframa, tax_incentives, list_pim_projects, get_suframa_status, get_tax_incentives), CLI (pdg company suframa, tax-incentives, pim-projects), REST API (/api/v1/company/suframa, tax-incentives, projetos) e MCP (bdg_get_suframa_status, bdg_get_tax_incentives_profile)."
     }
   ]
 }
