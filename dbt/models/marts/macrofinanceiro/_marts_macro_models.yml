@@ -43,3 +43,47 @@ models:
         description: "Enquadramento da inflação acumulada de 12 meses frente às metas e bandas de tolerância do CMN."
         tests:
           - not_null
+
+  - name: mart_cambio_volatilidade_brasil
+    description: "Datamart analítico de volatilidade cambial e retornos diários das taxas PTAX oficiais do Banco Central."
+    columns:
+      - name: data_cotacao
+        description: "Data oficial do dia útil da cotação no formato YYYY-MM-DD."
+        tests:
+          - unique
+          - not_null
+      - name: data_referencia
+        description: "Data em formato DATE para indexação e joins com séries de faturamento e balança comercial."
+        tests:
+          - not_null
+      - name: ano_mes
+        description: "Mês de competência das cotações no formato YYYY-MM."
+        tests:
+          - not_null
+      - name: dolar_compra
+        description: "Taxa de câmbio oficial de compra do Dólar americano (BRL)."
+        tests:
+          - not_null
+      - name: dolar_venda
+        description: "Taxa de câmbio oficial de venda do Dólar americano (BRL)."
+        tests:
+          - not_null
+      - name: dolar_spread
+        description: "Diferença entre a taxa de venda e compra do Dólar (spread bancário oficial)."
+        tests:
+          - not_null
+      - name: euro_venda
+        description: "Taxa de câmbio oficial de venda do Euro (BRL)."
+      - name: variacao_dolar_dia_pct
+        description: "Variação percentual diária da taxa de venda do Dólar americano frente ao dia útil anterior."
+      - name: variacao_euro_dia_pct
+        description: "Variação percentual diária da taxa de venda do Euro frente ao dia útil anterior."
+      - name: media_movel_dolar_21d
+        description: "Média móvel aritmética de 21 dias úteis da taxa de venda do Dólar (aproximadamente 1 mês útil de mercado)."
+      - name: volatilidade_dolar_30d
+        description: "Desvio padrão amostral móvel de 30 dias úteis da cotação do Dólar (medida de volatilidade cambial realizada)."
+      - name: regime_estresse_cambial
+        description: "Classificação analítica do estresse cambial diário (ALTO_ESTRESSE, VOLATILIDADE_MODERADA, ESTABILIDADE)."
+        tests:
+          - not_null
+

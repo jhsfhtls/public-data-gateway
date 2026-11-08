@@ -1,0 +1,42 @@
+[
+  {
+    "paridadeCompra": 1.1167,
+    "paridadeVenda": 1.1169,
+    "cotacaoCompra": 6.1465,
+    "cotacaoVenda": 6.1483,
+    "dataHoraCotacao": "2026-11-06 10:02:16.317608",
+    "tipoBoletim": "Abertura"
+  },
+  {
+    "paridadeCompra": 1.1145,
+    "paridadeVenda": 1.1146,
+    "cotacaoCompra": 6.1491,
+    "cotacaoVenda": 6.1504,
+    "dataHoraCotacao": "2026-11-06 11:09:10.31413",
+    "tipoBoletim": "Intermedi\u00e1rio"
+  },
+  {
+    "paridadeCompra": 1.1149,
+    "paridadeVenda": 1.115,
+    "cotacaoCompra": 6.1188,
+    "cotacaoVenda": 6.12,
+    "dataHoraCotacao": "2026-11-06 12:06:10.503399",
+    "tipoBoletim": "Intermedi\u00e1rio"
+  },
+  {
+    "paridadeCompra": 1.1144,
+    "paridadeVenda": 1.1146,
+    "cotacaoCompra": 6.1214,
+    "cotacaoVenda": 6.1232,
+    "dataHoraCotacao": "2026-11-06 13:06:13.89165",
+    "tipoBoletim": "Intermedi\u00e1rio"
+  },
+  {
+    "paridadeCompra": 1.1144,
+    "paridadeVenda": 1.1146,
+    "cotacaoCompra": 6.13,
+    "cotacaoVenda": 6.1317,
+    "dataHoraCotacao": "2026-11-06 13:06:13.966362",
+    "tipoBoletim": "Fechamento PTAX"
+  }
+]

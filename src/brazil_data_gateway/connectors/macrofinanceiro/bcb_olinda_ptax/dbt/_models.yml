@@ -1,0 +1,157 @@
+version: 2
+
+models:
+  - name: stg_bcb_ptax_moedas
+    description: "Visão padronizada da lista de moedas estrangeiras oficiais cotadas pelo Banco Central no PTAX."
+    columns:
+      - name: simbolo_moeda
+        description: "Código alfabético de 3 letras da moeda no padrão internacional ISO 4217."
+        tests:
+          - unique
+          - not_null
+      - name: nome_moeda
+        description: "Nome oficial formatado da moeda estrangeira em português."
+        tests:
+          - not_null
+      - name: tipo_moeda
+        description: "Classificação do tipo de moeda no sistema PTAX (Tipo A ou Tipo B)."
+        tests:
+          - not_null
+      - name: reference_date
+        description: "Data/Competência de referência do catálogo cadastral (YYYY-MM-DD)."
+        tests:
+          - not_null
+      - name: extracted_at
+        description: "Timestamp ISO-8601 da extração dos dados."
+        tests:
+          - not_null
+
+  - name: stg_bcb_ptax_dolar
+    description: "Visão padronizada das cotações diárias de fechamento do Dólar dos Estados Unidos (USD/BRL)."
+    columns:
+      - name: simbolo_moeda
+        description: "Símbolo identificador da moeda cotada (USD)."
+        tests:
+          - not_null
+      - name: data_cotacao
+        description: "Data do dia útil da cotação oficial no formato YYYY-MM-DD."
+        tests:
+          - not_null
+      - name: data_hora_cotacao
+        description: "Timestamp exato da apuração da taxa PTAX pelo Banco Central."
+        tests:
+          - not_null
+      - name: ano_mes
+        description: "Ano e mês de competência da cotação cambial (YYYY-MM)."
+        tests:
+          - not_null
+      - name: cotacao_compra
+        description: "Taxa de câmbio oficial de compra do Dólar em Reais (BRL)."
+        tests:
+          - not_null
+      - name: cotacao_venda
+        description: "Taxa de câmbio oficial de venda do Dólar em Reais (BRL)."
+        tests:
+          - not_null
+      - name: paridade_compra
+        description: "Paridade de compra da moeda em relação ao Dólar americano (1.0 para USD)."
+      - name: paridade_venda
+        description: "Paridade de venda da moeda em relação ao Dólar americano (1.0 para USD)."
+      - name: tipo_boletim
+        description: "Classificação do boletim cambial (Fechamento PTAX)."
+        tests:
+          - not_null
+      - name: reference_date
+        description: "Data de referência para joins temporais point-in-time (YYYY-MM-DD)."
+        tests:
+          - not_null
+      - name: extracted_at
+        description: "Timestamp ISO-8601 da captura do dado no Banco Central."
+        tests:
+          - not_null
+
+  - name: stg_bcb_ptax_moedas_cotacoes
+    description: "Visão padronizada das cotações diárias de moedas estrangeiras (EUR, GBP, JPY, etc.)."
+    columns:
+      - name: simbolo_moeda
+        description: "Símbolo ISO 4217 da moeda estrangeira cotada (EUR, GBP, JPY, CAD, CHF, AUD)."
+        tests:
+          - not_null
+      - name: data_cotacao
+        description: "Data oficial do dia útil de apuração da cotação no formato YYYY-MM-DD."
+        tests:
+          - not_null
+      - name: data_hora_cotacao
+        description: "Timestamp da publicação da taxa de câmbio pelo Banco Central."
+        tests:
+          - not_null
+      - name: ano_mes
+        description: "Competência mensal da cotação no formato YYYY-MM."
+        tests:
+          - not_null
+      - name: cotacao_compra
+        description: "Taxa de câmbio de compra da moeda estrangeira em Reais (BRL)."
+        tests:
+          - not_null
+      - name: cotacao_venda
+        description: "Taxa de câmbio de venda da moeda estrangeira em Reais (BRL)."
+        tests:
+          - not_null
+      - name: paridade_compra
+        description: "Paridade oficial de compra da moeda estrangeira em relação ao USD."
+      - name: paridade_venda
+        description: "Paridade oficial de venda da moeda estrangeira em relação ao USD."
+      - name: tipo_boletim
+        description: "Tipo de boletim diário (Abertura, Intermediário, Fechamento)."
+      - name: reference_date
+        description: "Data de competência para joins temporais (YYYY-MM-DD)."
+        tests:
+          - not_null
+      - name: extracted_at
+        description: "Timestamp ISO-8601 da extração dos dados."
+        tests:
+          - not_null
+
+  - name: stg_bcb_ptax_boletins
+    description: "Visão padronizada dos boletins de câmbio intradiários emitidos pelo Banco Central."
+    columns:
+      - name: simbolo_moeda
+        description: "Símbolo ISO 4217 da moeda objeto do boletim de câmbio."
+        tests:
+          - not_null
+      - name: data_cotacao
+        description: "Data do dia útil do boletim no formato YYYY-MM-DD."
+        tests:
+          - not_null
+      - name: data_hora_cotacao
+        description: "Timestamp exato com milissegundos da emissão do boletim."
+        tests:
+          - not_null
+      - name: ano_mes
+        description: "Mês de competência do boletim no formato YYYY-MM."
+        tests:
+          - not_null
+      - name: cotacao_compra
+        description: "Taxa de câmbio de compra apurada no boletim em Reais (BRL)."
+        tests:
+          - not_null
+      - name: cotacao_venda
+        description: "Taxa de câmbio de venda apurada no boletim em Reais (BRL)."
+        tests:
+          - not_null
+      - name: paridade_compra
+        description: "Paridade de compra apurada na janela do boletim."
+      - name: paridade_venda
+        description: "Paridade de venda apurada na janela do boletim."
+      - name: tipo_boletim
+        description: "Identificação da janela do boletim (Abertura, Intermediário 1/2/3, Fechamento PTAX)."
+        tests:
+          - not_null
+      - name: reference_date
+        description: "Data de competência temporal (YYYY-MM-DD)."
+        tests:
+          - not_null
+      - name: extracted_at
+        description: "Timestamp ISO-8601 da extração."
+        tests:
+          - not_null

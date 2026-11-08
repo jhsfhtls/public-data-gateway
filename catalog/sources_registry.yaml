@@ -154,7 +154,7 @@ sources:
   - P05
   rice_score: 820
   roadmap_wave: 1
-  status: CATALOGED
+  status: HOMOLOGATED
 - source_id: rfb_cnpj_lakehouse
   name: 'Receita Federal: Cadastro Nacional da Pessoa Jurídica (CNPJ & QSA)'
   agency: Receita Federal do Brasil
