@@ -373,3 +373,67 @@ def test_live_ibge_connectivity(connector: IBGELocalidadesConnector) -> None:
     """Live smoke test verifying actual HTTP connectivity to servicodados.ibge.gov.br."""
     connected = connector.test_connection()
     assert connected is True, "Must successfully connect to official IBGE API in live mode"
+
+
+# ---------------------------------------------------------------------------
+# Test Case 10: Full Multi-Table Extraction to Isolated Directories
+# ---------------------------------------------------------------------------
+def test_extract_all_5_tables_isolated_directories(connector: IBGELocalidadesConnector, temp_settings: GatewaySettings) -> None:
+    """Verify all 5 IBGE tables are extracted, normalized, and saved to data/ibge_localidades/{bronze, silver, gold}/."""
+    tables = connector.extract_all()
+    assert len(tables) == 5
+    assert "municipios" in tables
+    assert "distritos" in tables
+    assert "subdistritos" in tables
+    assert "estados" in tables
+    assert "regioes" in tables
+
+    source_dir = temp_settings.data_dir / "ibge_localidades"
+    assert (source_dir / "bronze" / "raw_municipios.json").is_file()
+    assert (source_dir / "bronze" / "raw_distritos.json").is_file()
+    assert (source_dir / "bronze" / "raw_subdistritos.json").is_file()
+    assert (source_dir / "bronze" / "raw_estados.json").is_file()
+    assert (source_dir / "bronze" / "raw_regioes.json").is_file()
+
+    assert (source_dir / "silver" / "municipios.parquet").is_file()
+    assert (source_dir / "silver" / "distritos.parquet").is_file()
+    assert (source_dir / "silver" / "subdistritos.parquet").is_file()
+    assert (source_dir / "silver" / "estados.parquet").is_file()
+    assert (source_dir / "silver" / "regioes.parquet").is_file()
+
+    assert (source_dir / "gold" / "features_municipio_ml.parquet").is_file()
+
+
+# ---------------------------------------------------------------------------
+# Test Case 11: Distritos, Subdistritos, Estados, and Regioes Queries
+# ---------------------------------------------------------------------------
+def test_multitable_query_methods(connector: IBGELocalidadesConnector) -> None:
+    """Verify querying methods across distritos, subdistritos, estados, and regiões."""
+    connector.extract_all()
+
+    # Query distritos for Manaus (1302603)
+    distritos_manaus = connector.list_distritos(id_municipio="1302603")
+    assert len(distritos_manaus) >= 1
+    assert any(d["nome_distrito"] == "Manaus" for d in distritos_manaus)
+
+    # Query distritos for São Paulo (3550308)
+    distritos_sp = connector.list_distritos(id_municipio="3550308")
+    assert len(distritos_sp) >= 1
+
+    # Query subdistritos for Alegrete (4300406)
+    subdistritos_alegrete = connector.list_subdistritos(id_municipio="4300406")
+    assert len(subdistritos_alegrete) >= 1
+    assert any(s["nome_subdistrito"] == "Zona Central" for s in subdistritos_alegrete)
+
+    # Query all 27 UFs
+    ufs = connector.list_ufs()
+    assert len(ufs) == 27
+    uf_siglas = {u["sigla_uf"] for u in ufs}
+    assert {"AM", "MG", "RS", "MT", "PE", "DF"}.issubset(uf_siglas)
+
+    # Query 5 macro-regions
+    regioes = connector.list_regioes()
+    assert len(regioes) == 5
+    reg_siglas = {r["sigla_regiao"] for r in regioes}
+    assert reg_siglas == {"N", "NE", "SE", "S", "CO"}
+

@@ -36,6 +36,11 @@ def build_parser() -> argparse.ArgumentParser:
     schema_parser = subparsers.add_parser("schema", help="View ODCS schema contract for a source.")
     schema_parser.add_argument("source_id", type=str, help="Source identifier")
 
+    # Subcommand: dict
+    dict_parser = subparsers.add_parser("dict", help="View dbt-standard data dictionary and metadata for a source.")
+    dict_parser.add_argument("source_id", type=str, help="Source identifier")
+    dict_parser.add_argument("--json", action="store_true", help="Output in JSON format")
+
     # Subcommand: profile
     prof_parser = subparsers.add_parser("profile", help="Generate profile metrics for a Parquet dataset.")
     prof_parser.add_argument("parquet_path", type=Path, help="Path to the Parquet file")
@@ -129,6 +134,19 @@ def main(argv: Sequence[str] | None = None) -> int:
             for col in contract.columns:
                 req = "mandatory" if col.required else "optional"
                 print(f"  - {col.name:<25} {col.data_type:<10} ({req})")
+            return 0
+
+        if args.command == "dict":
+            import yaml
+
+            dbt_dict = catalog.get_dictionary(args.source_id)
+            if not dbt_dict:
+                print(f"Data dictionary not found for source: '{args.source_id}'", file=sys.stderr)
+                return 1
+            if args.json:
+                print(json.dumps(dbt_dict, indent=2, ensure_ascii=False))
+            else:
+                print(yaml.dump(dbt_dict, sort_keys=False, allow_unicode=True))
             return 0
 
         if args.command == "profile":

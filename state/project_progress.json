@@ -12,8 +12,8 @@
     "POP_T_074",
     "POP_T_148"
   ],
-  "current_macro_phase_id": "03",
-  "current_macro_phase": "Fase 03 — Ingestão Wave 1 — APIs de Borda & Macroeconomia (Piloto: ibge_localidades Homologado)",
+  "current_macro_phase_id": "03-SPIKE",
+  "current_macro_phase": "Fase 03-SPIKE — Golden Spike ibge_localidades (5 Tabelas, dbt, Negócio Territorial & Live Fail-Hard)",
   "overall_status": "ON_TRACK",
   "active_connector": "ibge_localidades",
   "next_connector": "bcb_sgs",
@@ -43,7 +43,7 @@
     },
     {
       "phase_id": "02",
-      "name": "Fundação do Catálogo (45+ Fontes), Normalização Canônica & Interfaces Unificadas",
+      "name": "Fundação do Catálogo (49 Fontes), Normalização Canônica & Interfaces Unificadas",
       "status": "COMPLETED",
       "completion_date": "2026-11-07",
       "deliverables": [
@@ -55,15 +55,27 @@
       ]
     },
     {
+      "phase_id": "03-SPIKE",
+      "name": "Golden Spike: Piloto ibge_localidades com Todas as Tabelas & Camada de Negócio Territorial",
+      "status": "COMPLETED",
+      "completion_date": "2026-11-07",
+      "deliverables": [
+        "Ingestão e normalização das 5 tabelas da API (municipios, distritos, subdistritos, estados, regioes)",
+        "Estrutura física isolada data/ibge_localidades/{bronze,silver,gold,quarantine}/",
+        "Encapsulamento dbt no conector (source.yml + 5 staging models + _models.yml com 100% colunas documentadas)",
+        "Camada de negócio territorial (dim_municipio SCD2, dim_distrito, crosswalk 6D/7D, mart_hierarquia_territorial)",
+        "Bateria de testes ao vivo de 1 linha com fail-hard e suite offline com cidades diversas"
+      ]
+    },
+    {
       "phase_id": "03",
       "name": "Ingestão Wave 1 — APIs de Borda & Macroeconomia",
-      "status": "IN_PROGRESS",
+      "status": "PENDING",
       "completion_date": null,
       "deliverables": [
-        "[HOMOLOGADO] Conector ibge_localidades (5.571 municípios, 27 UFs, 5 regiões, features territoriais ML)",
-        "Conector brasilapi_core (CEPs, bancos, DDDs, borda síncrona)",
         "Conector bcb_sgs (Séries macroeconômicas: IPCA, Selic, IGP-M)",
-        "Conector bcb_olinda_ptax (Cotações PTAX diárias OData v4)"
+        "Conector bcb_olinda_ptax (Cotações PTAX diárias OData v4)",
+        "Conector brasilapi_core (CEPs, bancos, DDDs, borda síncrona)"
       ]
     },
     {
@@ -126,6 +138,17 @@
         "Conectores Ambientais (ana_hidroweb, inpe_terrabrasilis, mapbiomas, sfb_sicar, mapa_zarc)",
         "Conectores Metaportais (basedosdados_bq, dadosgov_ckan)"
       ]
+    },
+    {
+      "phase_id": "09",
+      "name": "Pós-Ingestão Total — Tabelas Gold Analíticas Cross-Domain, Datamarts & Insights",
+      "status": "PENDING",
+      "completion_date": null,
+      "deliverables": [
+        "Data Marts analíticos multidisciplinares (B2B x Território x Macro x Compras Públicas)",
+        "Feature Store consolidada para modelos preditivos de propensão e risco",
+        "Extração de insights comerciais e operacionais acoplados aos 10 Produtos Modulares C.O.R.E."
+      ]
     }
   ],
   "active_connector_gates": {
@@ -134,39 +157,39 @@
     "gates": [
       {
         "gate_id": "GATE_01",
-        "name": "Contrato Declarativo ODCS v3.1",
+        "name": "Contrato Declarativo ODCS v3.1 das N Tabelas da API",
         "status": "COMPLETED",
-        "criteria": "Schema tipado, chaves primárias STRING, regras de qualidade e limites de volume declarados em contract.yaml."
+        "criteria": "Schema tipado, chaves primárias STRING e regras para municipios, distritos, subdistritos, estados e regioes."
       },
       {
         "gate_id": "GATE_02",
-        "name": "Ingestão Bronze & Cache WAL",
+        "name": "Ingestão Bronze Isolada (Todas as Tabelas) & Cache WAL",
         "status": "COMPLETED",
-        "criteria": "Download resiliente com circuit breaker, backoff exponencial e cache SQLite WAL com suporte a Stale-While-Error."
+        "criteria": "Download resiliente das 5 tabelas em data/ibge_localidades/bronze/ com cache SQLite WAL."
       },
       {
         "gate_id": "GATE_03",
         "name": "Sanitização de Sentinelas & Nulls",
         "status": "COMPLETED",
-        "criteria": "Conversão determinística de códigos sentinela (99, 999, -1, 'SEM INFORMACAO') em NULLs reais."
+        "criteria": "Conversão determinística de códigos sentinela em NULLs reais em todas as tabelas."
       },
       {
         "gate_id": "GATE_04",
-        "name": "Materialização Silver Parquet & Manifesto",
+        "name": "Materialização Silver Parquet Isolada (Todas as Tabelas)",
         "status": "COMPLETED",
-        "criteria": "Gravação colunar Parquet ZSTD via atomic swap (.tmp.parquet -> rename) com selagem criptográfica SHA-256."
+        "criteria": "Gravação de municipios.parquet, distritos.parquet, etc., em data/ibge_localidades/silver/ com SHA-256."
       },
       {
         "gate_id": "GATE_05",
-        "name": "Validação dos 5 Pilares de Observabilidade",
+        "name": "Validação dos 5 Pilares & Quarentena",
         "status": "COMPLETED",
-        "criteria": "Aprovação em Freshness, Volume, Schema, Null Ceiling e Lineage; desvio automático para data/quarantine/ se violado."
+        "criteria": "Aprovação em Freshness, Volume, Schema, Null Ceiling e Lineage; desvio para data/ibge_localidades/quarantine/ se violado."
       },
       {
         "gate_id": "GATE_06",
-        "name": "Gold Feature View & ASOF Join ML",
+        "name": "Gold Feature View Isolada & ASOF Join ML",
         "status": "COMPLETED",
-        "criteria": "Features analíticas agregadas com suporte a point-in-time join evitando data leakage para modelos preditivos."
+        "criteria": "Features analíticas agregadas em data/ibge_localidades/gold/ com suporte comprovado a point-in-time join para modelos preditivos."
       },
       {
         "gate_id": "GATE_07",
@@ -182,9 +205,21 @@
       },
       {
         "gate_id": "GATE_09",
-        "name": "Bateria de Testes Offline & Documentação",
+        "name": "Bateria de Testes Offline com Cidades Diversas",
         "status": "COMPLETED",
-        "criteria": "Testes unitários offline com fixtures locais, documentação no CATALOG.md e passagem limpa nos linters."
+        "criteria": "Testes unitários offline com fixtures locais cobrindo cidades de todas as 5 macrorregiões nas 5 tabelas."
+      },
+      {
+        "gate_id": "GATE_10",
+        "name": "dbt Staging, source.yml e 100% Colunas Documentadas",
+        "status": "COMPLETED",
+        "criteria": "Pasta connectors/.../ibge_localidades/dbt/ com source.yml próprio, 5 modelos staging e _models.yml com 100% de colunas documentadas."
+      },
+      {
+        "gate_id": "GATE_11",
+        "name": "Teste Real de 1 Linha com API ao Vivo (Fail-Hard)",
+        "status": "COMPLETED",
+        "criteria": "Execução obrigatória contra os 5 endpoints oficiais ao vivo limitados a 1 registro; falha de qualquer endpoint reprova o pipeline."
       }
     ]
   },
@@ -209,9 +244,9 @@
     },
     {
       "date": "2026-11-07",
-      "phase_id": "03",
-      "milestone": "Homologação do Conector Piloto ibge_localidades (Bronze a Gold)",
-      "summary": "Implementação e homologação ponta a ponta do primeiro conector do gateway (ibge_localidades). Normalização dos 5.571 municípios e 27 UFs com validação de dígitos verificadores Mod-11, resolução de novas emancipações (ex: Boa Esperança do Norte 5101837), observabilidade de 5 pilares, feature view ML para ASOF joins e exposição completa em Python SDK (bd.geo), REST API (/api/v1/geo/ibge), CLI (bdg geo/sync) e MCP (bdg_list_ufs, bdg_list_municipalities, bdg_sync_dataset com HITL Tier 3 guard)."
+      "phase_id": "03-SPIKE",
+      "milestone": "Homologação do Golden Spike ibge_localidades (5 Tabelas, dbt, Negócio & Live Fail-Hard)",
+      "summary": "Execução completa do Golden Spike: 5 tabelas da API do IBGE (5.571 municípios, 10.751 distritos, 646 subdistritos, 27 UFs, 5 regiões) materializadas em data/ibge_localidades/{bronze,silver,gold}/; 9 modelos dbt (5 staging, dim_municipio, dim_distrito, xwalk_ibge_6d_7d, mart_hierarquia_territorial_brasil) com 109 testes 100% aprovados; 108 colunas 100% documentadas no linter; testes reais de 1 linha com fail-hard e suite com 35 testes unitários/integração 100% verde."
     }
   ]
 }

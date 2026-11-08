@@ -1,0 +1,7 @@
+brazil_data_gateway:
+  target: dev
+  outputs:
+    dev:
+      type: duckdb
+      path: "{{ env_var('BDG_DUCKDB_PATH', 'data/brasil.duckdb') }}"
+      threads: 4

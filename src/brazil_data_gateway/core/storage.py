@@ -1,6 +1,7 @@
 """Hybrid Medallion Lakehouse & SQLite Caching Engine (POP_T_070, POP_T_074, POP_T_128)."""
 
 import hashlib
+import logging
 import os
 import re
 import sqlite3
@@ -17,6 +18,8 @@ import pyarrow.parquet as pq
 from brazil_data_gateway.core.config import GatewaySettings
 from brazil_data_gateway.core.contracts import evaluate_five_pillars
 from brazil_data_gateway.core.models import DataContract, ObservabilityReport, SnapshotManifest
+
+logger = logging.getLogger(__name__)
 
 _BANNED_SQL_PATTERN = re.compile(
     r"\b(DROP|DELETE|TRUNCATE|ALTER|UPDATE|INSERT|CREATE)\b",
@@ -140,15 +143,26 @@ class HybridStorageEngine:
         table: pa.Table,
         source_id: str,
         layer: Literal["bronze", "silver", "gold", "quarantine"],
+        table_name: str | None = None,
         contract: DataContract | None = None,
+        use_source_subfolder: bool | None = None,
     ) -> tuple[Path, SnapshotManifest, ObservabilityReport | None]:
         """Atomically write a Medallion table. Automatically routes failed Silver writes to Quarantine."""
         with self._lock:
             report: ObservabilityReport | None = None
+            tbl_identifier = table_name or source_id
+
+            # If use_source_subfolder is explicitly provided, respect it; otherwise use subfolder only when table_name is set
+            isolated = use_source_subfolder if use_source_subfolder is not None else (table_name is not None)
+
+            if isolated:
+                target_dir = self.settings.get_source_layer_dir(source_id, layer)
+            else:
+                target_dir = self.settings.get_layer_dir(layer)
 
             # 5-Pillar evaluation for Silver layer
             if layer == "silver" and contract is not None:
-                silver_target = self.settings.silver_dir / f"{source_id}.parquet"
+                silver_target = target_dir / f"{tbl_identifier}.parquet"
                 prev_rows: int | None = None
                 if silver_target.is_file():
                     try:
@@ -163,20 +177,25 @@ class HybridStorageEngine:
                 if not report.passed:
                     # Route to quarantine WITHOUT touching healthy silver
                     ts = datetime.now(UTC).strftime("%Y%m%d_%H%M%S")
-                    q_path = self.settings.quarantine_dir / f"{source_id}_{ts}.parquet"
-                    tmp_q_path = self.settings.quarantine_dir / f"{source_id}_{ts}.tmp.parquet"
+                    if isolated:
+                        q_dir = self.settings.get_source_layer_dir(source_id, "quarantine")
+                    else:
+                        q_dir = self.settings.quarantine_dir
+
+                    q_path = q_dir / f"{tbl_identifier}_{ts}.parquet"
+                    tmp_q_path = q_dir / f"{tbl_identifier}_{ts}.tmp.parquet"
 
                     pq.write_table(table, tmp_q_path, compression="ZSTD")
                     os.replace(tmp_q_path, q_path)
 
                     sha = self._compute_file_sha256(q_path)
                     manifest = SnapshotManifest(
-                        source_id=source_id,
+                        source_id=f"{source_id}.{table_name}" if table_name else source_id,
                         layer="quarantine",
                         row_count=table.num_rows,
                         sha256=sha,
                     )
-                    manifest_path = self.settings.quarantine_dir / f"{source_id}_{ts}.manifest.json"
+                    manifest_path = q_dir / f"{tbl_identifier}_{ts}.manifest.json"
                     with open(manifest_path, "w", encoding="utf-8") as f:
                         f.write(manifest.model_dump_json(indent=2))
 
@@ -184,33 +203,59 @@ class HybridStorageEngine:
                     return q_path, manifest, report
 
             # Standard atomic write to destination layer
-            target_dir = self.settings.get_layer_dir(layer)
-            target_file = target_dir / f"{source_id}.parquet"
-            tmp_file = target_dir / f"{source_id}.tmp.parquet"
+            target_file = target_dir / f"{tbl_identifier}.parquet"
+            tmp_file = target_dir / f"{tbl_identifier}.tmp.parquet"
 
             pq.write_table(table, tmp_file, compression="ZSTD")
             os.replace(tmp_file, target_file)
 
             sha = self._compute_file_sha256(target_file)
             manifest = SnapshotManifest(
-                source_id=source_id,
+                source_id=f"{source_id}.{table_name}" if table_name else source_id,
                 layer=layer,
                 row_count=table.num_rows,
                 sha256=sha,
             )
-            manifest_path = target_dir / f"{source_id}.manifest.json"
+            manifest_path = target_dir / f"{tbl_identifier}.manifest.json"
             with open(manifest_path, "w", encoding="utf-8") as f:
                 f.write(manifest.model_dump_json(indent=2))
 
+            # Maintain backward compatibility alias in flat layer when writing primary table
+            import shutil
+            if isolated and (not table_name or table_name == "municipios"):
+                legacy_dir = self.settings.get_layer_dir(layer)
+                legacy_file = legacy_dir / f"{source_id}.parquet"
+                try:
+                    shutil.copy2(target_file, legacy_file)
+                except Exception as exc:
+                    logger.debug("Failed copying legacy flat table alias: %s", exc)
+
             return target_file, manifest, report
 
-    def read_table(self, source_id: str, layer: str = "silver") -> pa.Table:
+    def read_table(
+        self,
+        source_id: str,
+        layer: str = "silver",
+        table_name: str | None = None,
+    ) -> pa.Table:
         """Read a table from a specific medallion layer."""
+        tbl_identifier = table_name or source_id
+        # Check source-first path first
+        source_target = (
+            self.settings.data_dir / source_id / layer / f"{tbl_identifier}.parquet"
+        )
+        if source_target.is_file():
+            return pq.read_table(source_target)
+
+        # Fallback to legacy flat layout
         target_dir = self.settings.get_layer_dir(layer)
-        target_file = target_dir / f"{source_id}.parquet"
+        target_file = target_dir / f"{tbl_identifier}.parquet"
+        if not target_file.is_file():
+            target_file = target_dir / f"{source_id}.parquet"
+
         if not target_file.is_file():
             raise FileNotFoundError(
-                f"Medallion table '{source_id}' not found in layer '{layer}' at {target_file}"
+                f"Medallion table '{tbl_identifier}' not found in layer '{layer}' (checked {source_target} and {target_file})"
             )
         return pq.read_table(target_file)
 

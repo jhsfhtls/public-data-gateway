@@ -1,0 +1,79 @@
+version: 2
+
+models:
+  - name: mart_hierarquia_territorial_brasil
+    description: "Data Mart analítico consolidando a hierarquia territorial completa do Brasil com contagens e métricas agregadas intra-domínio."
+    columns:
+      - name: id_municipio
+        description: "Código oficial do município IBGE com 7 dígitos (chave primária natural do mart)."
+        tests:
+          - unique
+          - not_null
+      - name: id_municipio_6
+        description: "Código legado do município com 6 dígitos para integração multissetorial."
+        tests:
+          - not_null
+      - name: nome_municipio
+        description: "Nome oficial do município registrado no IBGE."
+        tests:
+          - not_null
+      - name: sigla_uf
+        description: "Sigla de 2 letras maiúsculas da Unidade Federativa."
+        tests:
+          - not_null
+      - name: id_uf
+        description: "Código numérico da UF com 2 dígitos."
+        tests:
+          - not_null
+      - name: nome_uf
+        description: "Nome por extenso da Unidade Federativa."
+        tests:
+          - not_null
+      - name: regiao
+        description: "Nome oficial da macrorregião geográfica brasileira."
+        tests:
+          - not_null
+      - name: sigla_regiao
+        description: "Sigla da macrorregião geográfica (N, NE, SE, S, CO)."
+        tests:
+          - not_null
+      - name: mesorregiao
+        description: "Nome da mesorregião geográfica do IBGE."
+      - name: microrregiao
+        description: "Nome da microrregião geográfica do IBGE."
+      - name: regiao_intermediaria
+        description: "Nome da região geográfica intermediária segundo taxonomia do IBGE."
+      - name: regiao_imediata
+        description: "Nome da região geográfica imediata segundo taxonomia do IBGE."
+      - name: is_capital
+        description: "Flag booleana indicando se o município é a capital estadual ou federal."
+        tests:
+          - not_null
+      - name: is_amazonia_legal
+        description: "Flag booleana indicando se o município integra a área delimitada da Amazônia Legal."
+        tests:
+          - not_null
+      - name: qtd_distritos_no_municipio
+        description: "Quantidade total de distritos municipais subordinados ao município."
+        tests:
+          - not_null
+      - name: qtd_subdistritos_no_municipio
+        description: "Quantidade total de subdistritos municipais subordinados ao município."
+        tests:
+          - not_null
+      - name: qtd_municipios_na_uf
+        description: "Total de municípios existentes dentro da mesma Unidade Federativa."
+        tests:
+          - not_null
+      - name: qtd_municipios_na_regiao
+        description: "Total de municípios existentes dentro da mesma macrorregião geográfica."
+        tests:
+          - not_null
+      - name: reference_date
+        description: "Data de corte e competência territorial oficial no formato YYYY-MM-DD."
+        tests:
+          - not_null
+      - name: extracted_at
+        description: "Timestamp ISO-8601 da extração dos dados originais."
+        tests:
+          - not_null

@@ -56,6 +56,20 @@ class GatewaySettings:
     def catalog_path(self) -> Path:
         return self.repo_root / "catalog" / "sources_registry.yaml"
 
+    def get_source_dir(self, source_id: str) -> Path:
+        """Resolve isolated root folder for a specific data source (e.g. data/ibge_localidades/)."""
+        return self.data_dir / source_id
+
+    def get_source_layer_dir(self, source_id: str, layer: str) -> Path:
+        """Resolve isolated medallion layer folder for a specific data source."""
+        normalized = layer.lower().strip()
+        valid_layers = {"bronze", "silver", "gold", "quarantine"}
+        if normalized not in valid_layers:
+            raise ValueError(f"Unknown medallion layer: {layer}. Must be one of {sorted(valid_layers)}")
+        p = self.data_dir / source_id / normalized
+        p.mkdir(parents=True, exist_ok=True)
+        return p
+
     def get_layer_dir(self, layer: str) -> Path:
         """Resolve directory path for a specific medallion layer."""
         normalized = layer.lower().strip()

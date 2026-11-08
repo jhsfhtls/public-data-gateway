@@ -1,0 +1,18 @@
+version: 2
+
+sources:
+  - name: ibge_localidades
+    description: "Fontes brutas normalizadas da Malha Territorial do IBGE em formato colunar Parquet ZSTD."
+    meta:
+      external_location: "data/ibge_localidades/silver/{name}.parquet"
+    tables:
+      - name: municipios
+        description: "Tabela oficial dos 5.571 municípios brasileiros com códigos de 7 e 6 dígitos."
+      - name: distritos
+        description: "Tabela oficial de todos os distritos municipais do Brasil (código de 9 dígitos)."
+      - name: subdistritos
+        description: "Tabela oficial dos subdistritos municipais do Brasil (código de 11 dígitos)."
+      - name: estados
+        description: "Tabela oficial das 27 Unidades Federativas do Brasil."
+      - name: regioes
+        description: "Tabela oficial das 5 macrorregiões geográficas do Brasil."

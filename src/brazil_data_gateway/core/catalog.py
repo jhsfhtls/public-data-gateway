@@ -1,6 +1,7 @@
 """Catalog registry loader and query interface for official Brazilian data sources."""
 
 from pathlib import Path
+from typing import Any
 
 import yaml
 
@@ -72,3 +73,29 @@ class CatalogRegistry:
         # Sort: roadmap_wave ascending, rice_score descending
         filtered.sort(key=lambda s: (s.roadmap_wave, -s.rice_score))
         return filtered
+
+    def get_dictionary(self, source_id: str) -> dict[str, Any] | None:
+        """Retrieve the dbt-standard data dictionary for a source."""
+        candidates = [
+            self.settings.repo_root / "catalog" / "dictionaries" / f"{source_id}.dbt.yml",
+            self.settings.repo_root / "catalog" / "dictionaries" / f"{source_id}.yml",
+        ]
+        connectors_dir = self.settings.repo_root / "src" / "brazil_data_gateway" / "connectors"
+        if connectors_dir.is_dir():
+            for p in connectors_dir.rglob("_models.yml"):
+                if p.parent.parent.name == source_id:
+                    candidates.insert(0, p)
+            for p in connectors_dir.rglob("schema.yml"):
+                if p.parent.name == source_id:
+                    candidates.insert(0, p)
+
+        for path in candidates:
+            if path.is_file():
+                try:
+                    with open(path, encoding="utf-8") as f:
+                        data = yaml.safe_load(f)
+                    if data:
+                        return data
+                except Exception:
+                    continue
+        return None
