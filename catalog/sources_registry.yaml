@@ -520,7 +520,7 @@ sources:
   - P02
   rice_score: 590
   roadmap_wave: 4
-  status: CATALOGED
+  status: HOMOLOGATED
 - source_id: ibge_pib_municipal
   name: 'IBGE: Produto Interno Bruto dos Municípios'
   agency: Instituto Brasileiro de Geografia e Estatística (IBGE)

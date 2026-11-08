@@ -1,0 +1,18 @@
+version: 2
+
+sources:
+  - name: ibge_sidra_silver
+    description: "Tabelas normalizadas da camada Silver de estatísticas socioeconômicas, demográficas e monetárias do IBGE SIDRA."
+    meta:
+      external_location: "data/ibge_sidra/silver/{name}.parquet"
+    tables:
+      - name: sidra_pib_municipal
+        description: "Contas Regionais do Brasil: Produto Interno Bruto a preços correntes e valor adicionado por setor dos municípios."
+      - name: sidra_populacao_censo
+        description: "Censo Demográfico e Estimativas Oficiais: População residente e densidade demográfica dos municípios."
+      - name: sidra_agropecuaria_pam
+        description: "Produção Agrícola Municipal (PAM): Quantidade produzida, valor da produção e culturas agrícolas."
+      - name: sidra_ipca_mensal
+        description: "Índice Nacional de Preços ao Consumidor Amplo (IPCA): Variação mensal, acumulada no ano e em 12 meses."
+      - name: sidra_gini_rendimento_uf
+        description: "Pesquisa Nacional por Amostra de Domicílios Contínua (PNADC): Índice de Gini e rendimento médio domiciliar por UF."

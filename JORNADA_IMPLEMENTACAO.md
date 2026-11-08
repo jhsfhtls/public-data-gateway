@@ -1,7 +1,7 @@
 <div align="center">
   <h2>Jornada de Implementação — Brazil Data Gateway</h2>
   <p><i>Painel Vivo de Evolução Arquitetural, Ciclo de Vida de Conectores & Habilitação de Produtos C.O.R.E.</i></p>
-  <p><b>Versão:</b> 1.0.0 &nbsp;|&nbsp; <b>Última Atualização:</b> 2026-11-08T10:55:00.000000+00:00 &nbsp;|&nbsp; <b>Governança:</b> POP_T_177 • POP_T_176 • POP_T_175 • POP_T_070 • POP_T_074 • POP_T_148</p>
+  <p><b>Versão:</b> 1.0.0 &nbsp;|&nbsp; <b>Última Atualização:</b> 2026-11-08T11:16:57.924695+00:00 &nbsp;|&nbsp; <b>Governança:</b> POP_T_177 • POP_T_176 • POP_T_175 • POP_T_070 • POP_T_074 • POP_T_148</p>
   <hr/>
 </div>
 <br/>
@@ -14,11 +14,11 @@ Este artefato constitui a **Fonte Única da Verdade Operacional (SSOT)** do stat
 
 ## 1. Painel de Status Executivo em Tempo Real
 
-- **Macrofase Ativa:** `Fase 05 - Ingestão Wave 3 Concluída (Mercado de Capitais & Finanças Públicas: cvm_dfp_itr, mdic_comexstat, cvm_fundos, bcb_ifdata, stn_tesouro, comprasgov_catmat) -> Avançando para Wave 4`
+- **Macrofase Ativa:** `Fase 06 - Ingestão Wave 4 em Andamento (Censo, Trabalho, Logística & Telecom: ibge_sidra homologado)`
 - **Status Geral de Governança:** `🟢 ON_TRACK`
-- **Conector Ativo em Desenvolvimento:** `ibge_sidra`
-- **Próximo Conector na Fila de Execução:** `inep_censo_escolar` (Wave 1 — Prioridade RICE 950)
-- **Progresso Estrutural das Macrofases:** **6 de 13 Concluídas (46.2%)**
+- **Conector Ativo em Desenvolvimento:** `ibge_censo2022`
+- **Próximo Conector na Fila de Execução:** `mte_novo_caged` (Wave 1 — Prioridade RICE 950)
+- **Progresso Estrutural das Macrofases:** **7 de 13 Concluídas (53.8%)**
 - **Universo de Fontes Homologadas no Catálogo:** **49 fontes públicas** nos 13 macrosegmentos
 
 ```mermaid
@@ -41,8 +41,8 @@ flowchart LR
 | **Fase 03-SPIKE** | **Golden Spike: Piloto ibge_localidades com Todas as Tabelas & Camada de Negócio Territorial** | 🟢 CONCLUÍDO | `2026-11-07` | • Ingestão e normalização das 5 tabelas da API (municipios, distritos, subdistritos, estados, regioes)<br/>• Estrutura física isolada data/ibge_localidades/{bronze,silver,gold,quarantine}/<br/>• Encapsulamento dbt no conector (source.yml + 5 staging models + _models.yml com 100% colunas documentadas)<br/>• Camada de negócio territorial (dim_municipio SCD2, dim_distrito, crosswalk 6D/7D, mart_hierarquia_territorial)<br/>• Bateria de testes ao vivo de 1 linha com fail-hard e suite offline com cidades diversas |
 | **Fase 03** | **Ingestão Wave 1 — APIs de Borda & Macroeconomia** | 🟢 CONCLUÍDO | `2026-11-07` | • Conector bcb_sgs (Séries macroeconômicas: IPCA, Selic, IGP-M)<br/>• Conector bcb_olinda_ptax (Cotações PTAX diárias OData v4)<br/>• Conector brasilapi_core (CEPs, bancos, DDDs, borda síncrona) |
 | **Fase 04** | **Ingestão Wave 2 — B2B, Compras Públicas & Compliance** | 🟢 CONCLUÍDO | `2026-11-08` | • Conector rfb_cnpj_lakehouse (55M CNPJs em streaming DuckDB)<br/>• Conector rfb_simples_mei (Enquadramento tributário Simples/MEI)<br/>• Conector pncp_contratacoes (Licitações Lei 14.133)<br/>• Conector cgu_ceis_cnep & cgu_pep (Sanções e autoridades PEP)<br/>• Conector cnj_datajud (Metadados processuais de 90+ tribunais)<br/>• Conector tst_cndt (Certidões trabalhistas negativas)<br/>• Conector suframa_pim_zfm (Empresas incentivadas Polo Industrial) |
-| **Fase 05** | **Ingestão Wave 3 — Mercado de Capitais & Finanças Públicas** | 🟡 EM ANDAMENTO | `—` | • Conector cvm_dfp_itr (Balanços e DRE de companhias abertas)<br/>• Conector cvm_fundos (Informes diários de fundos)<br/>• Conector bcb_ifdata (Balanços de instituições financeiras)<br/>• Conector stn_tesouro_transparente (SADIPEM e dívida pública)<br/>• Conector mdic_comexstat (Balança comercial por NCM e município)<br/>• Conector comprasgov_catmat (Catálogo unificado de compras públicas) |
-| **Fase 06** | **Ingestão Wave 4 — Censo, Trabalho, Logística & Telecom** | ⚪ PENDENTE | `—` | • Conectores ibge_sidra, ibge_pib_municipal, ibge_censo2022, ibge_pnad_continua<br/>• Conectores mte_novo_caged & mte_rais<br/>• Conectores ibge_cnefe, ibge_malhas, anatel_mosaico, antt_malha_transporte |
+| **Fase 05** | **Ingestão Wave 3 — Mercado de Capitais & Finanças Públicas** | 🟢 CONCLUÍDO | `2026-11-08` | • Conector cvm_dfp_itr (Balanços e DRE de companhias abertas)<br/>• Conector cvm_fundos (Informes diários de fundos)<br/>• Conector bcb_ifdata (Balanços de instituições financeiras)<br/>• Conector stn_tesouro_transparente (SADIPEM e dívida pública)<br/>• Conector mdic_comexstat (Balança comercial por NCM e município)<br/>• Conector comprasgov_catmat (Catálogo unificado de compras públicas) |
+| **Fase 06** | **Ingestão Wave 4 — Censo, Trabalho, Logística & Telecom** | 🟡 EM ANDAMENTO | `—` | • Conector ibge_sidra (PIB municipal, Censo demográfico, PAM, IPCA e Gini) - CONCLUÍDO<br/>• Conectores ibge_censo2022 & ibge_pnad_continua<br/>• Conectores mte_novo_caged & mte_rais<br/>• Conectores ibge_cnefe, ibge_malhas, anatel_mosaico, antt_malha_transporte |
 | **Fase 07** | **Ingestão Wave 5 — Saúde, Educação & Setor Notarial** | ⚪ PENDENTE | `—` | • Conectores DataSUS (CNES, SIH, SIM, SINASC, OpenDataSUS) & anvisa_cmed<br/>• Conectores INEP (Censo Escolar, Superior, IDEB, ENEM) & capes_sucupira<br/>• Conectores Notariais (cnj_justica_aberta, onr_registro_imoveis, capitais_iptu_itbi) |
 | **Fase 08** | **Ingestão Wave 6 — Meio Ambiente, Agro & Metaportais** | ⚪ PENDENTE | `—` | • Conectores Ambientais (ana_hidroweb, inpe_terrabrasilis, mapbiomas, sfb_sicar, mapa_zarc)<br/>• Conectores Metaportais (basedosdados_bq, dadosgov_ckan) |
 | **Fase 09** | **Pós-Ingestão Total — Tabelas Gold Analíticas Cross-Domain, Datamarts & Insights** | ⚪ PENDENTE | `—` | • Data Marts analíticos multidisciplinares (B2B x Território x Macro x Compras Públicas)<br/>• Feature Store consolidada para modelos preditivos de propensão e risco<br/>• Extração de insights comerciais e operacionais acoplados aos 10 Produtos Modulares C.O.R.E.<br/>• Bateria de Regressão Live Global com Rotação Sistemática de IDs: Re-execução obrigatória de testes reais ao vivo contra todos os órgãos públicos, alternando e rotacionando os IDs de consulta (novos CNPJs, novos municípios IBGE, novas moedas, séries BACEN e novos contratos PNCP) para validar a resiliência contínua contra drift em produção sem overfitting a registros pontuais |

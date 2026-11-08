@@ -707,4 +707,67 @@ def create_app(settings: GatewaySettings | None = None) -> FastAPI:
                 return [bench]
         return results
 
+    # --- IBGE SIDRA Socioeconomic Endpoints ---
+
+    @app.get("/api/v1/socioeconomic/municipality/{id_municipio}/gdp")
+    async def get_municipality_gdp(id_municipio: str) -> dict[str, Any]:
+        from public_data_gateway.connectors.demografico.ibge_sidra.connector import (
+            IBGESidraConnector,
+        )
+
+        conn = IBGESidraConnector(settings=app_settings)
+        res = conn.get_municipality_gdp(id_municipio)
+        if not res:
+            raise HTTPException(status_code=404, detail=f"GDP data not found for municipality '{id_municipio}'")
+        return res
+
+    @app.get("/api/v1/socioeconomic/municipality/{id_municipio}/profile")
+    @app.get("/api/v1/sidra/{id_municipio}")
+    async def get_municipality_socioeconomic_profile(id_municipio: str) -> dict[str, Any]:
+        from public_data_gateway.connectors.demografico.ibge_sidra.connector import (
+            IBGESidraConnector,
+        )
+
+        conn = IBGESidraConnector(settings=app_settings)
+        res = conn.get_municipality_socioeconomic_profile(id_municipio)
+        if not res:
+            raise HTTPException(
+                status_code=404, detail=f"Socioeconomic profile not found for municipality '{id_municipio}'"
+            )
+        return res
+
+    @app.get("/api/v1/socioeconomic/ipca")
+    async def get_ipca_series(
+        limit: int = Query(12, ge=1, le=120, description="Max months to return"),
+    ) -> list[dict[str, Any]]:
+        from public_data_gateway.connectors.demografico.ibge_sidra.connector import (
+            IBGESidraConnector,
+        )
+
+        conn = IBGESidraConnector(settings=app_settings)
+        return conn.get_ipca_history(limit=limit)
+
+    @app.get("/api/v1/socioeconomic/gini/{sigla_uf}")
+    async def get_gini_state(sigla_uf: str) -> dict[str, Any]:
+        from public_data_gateway.connectors.demografico.ibge_sidra.connector import (
+            IBGESidraConnector,
+        )
+
+        conn = IBGESidraConnector(settings=app_settings)
+        res = conn.get_gini_uf(sigla_uf)
+        if not res:
+            raise HTTPException(status_code=404, detail=f"Gini data not found for UF '{sigla_uf}'")
+        return res
+
+    @app.get("/api/v1/socioeconomic/ranking")
+    async def get_gdp_ranking(
+        limit: int = Query(10, ge=1, le=50, description="Top N municipalities by GDP"),
+    ) -> list[dict[str, Any]]:
+        from public_data_gateway.connectors.demografico.ibge_sidra.connector import (
+            IBGESidraConnector,
+        )
+
+        conn = IBGESidraConnector(settings=app_settings)
+        return conn.list_top_municipalities_by_gdp(limit=limit)
+
     return app
