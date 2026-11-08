@@ -6,5 +6,8 @@ from public_data_gateway.connectors.empresarial.rfb_cnpj_lakehouse.connector imp
 from public_data_gateway.connectors.empresarial.rfb_simples_mei.connector import (
     RFBSimplesMEIConnector,
 )
+from public_data_gateway.connectors.empresarial.suframa_pim_zfm.connector import (
+    SuframaPimZfmConnector,
+)
 
-__all__ = ["RFBCNPJLakehouseConnector", "RFBSimplesMEIConnector"]
+__all__ = ["RFBCNPJLakehouseConnector", "RFBSimplesMEIConnector", "SuframaPimZfmConnector"]

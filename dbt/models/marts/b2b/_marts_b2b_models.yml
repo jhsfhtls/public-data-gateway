@@ -107,3 +107,106 @@ models:
         tests:
           - not_null
 
+  - name: mart_incentivos_fiscais_pim_brasil
+    description: "Mart analítico integrando empresas, projetos do CAS, benefícios tributários e capacidade fabril do Polo Industrial de Manaus e ALCs."
+    columns:
+      - name: cnpj_14
+        description: "CNPJ de 14 dígitos da empresa incentivada."
+        tests:
+          - not_null
+      - name: numero_inscricao_suframa
+        description: "Número oficial de Inscrição SUFRAMA da empresa."
+        tests:
+          - not_null
+      - name: razao_social
+        description: "Razão social cadastrada perante a SUFRAMA."
+        tests:
+          - not_null
+      - name: nome_fantasia
+        description: "Nome comercial ou de fantasia da planta."
+      - name: situacao_cadastral
+        description: "Situação cadastral na SUFRAMA (ATIVA, CANCELADA, BLOQUEADA, SUSPENSA)."
+        tests:
+          - not_null
+      - name: is_cadastro_regular_vigente
+        description: "Indicador de cadastro ativo e dentro do prazo de validade."
+        tests:
+          - not_null
+      - name: tipo_area_incentivada
+        description: "Enquadramento fiscal (ZONA_FRANCA_MANAUS, AMAZONIA_OCIDENTAL, AREA_LIVRE_COMERCIO)."
+        tests:
+          - not_null
+      - name: codigo_area_suframa
+        description: "Código da área incentivada (ZFM, ALC_TABATINGA, etc.)."
+        tests:
+          - not_null
+      - name: id_municipio_ibge
+        description: "Código IBGE do município da planta fabril."
+        tests:
+          - not_null
+      - name: sigla_uf
+        description: "Sigla da UF da planta produtiva."
+        tests:
+          - not_null
+      - name: subsetor_industrial
+        description: "Subsetor industrial classificado pela SUFRAMA."
+        tests:
+          - not_null
+      - name: nome_subsetor
+        description: "Descrição por extenso do polo de produção."
+        tests:
+          - not_null
+      - name: relevancia_pim
+        description: "Relevância econômica do polo no Polo Industrial de Manaus."
+        tests:
+          - not_null
+      - name: total_projetos_cas
+        description: "Quantidade de projetos industriais aprovados pelo CAS."
+        tests:
+          - not_null
+      - name: total_projetos_em_operacao
+        description: "Quantidade de projetos com linhas fabris ativas em operação."
+        tests:
+          - not_null
+      - name: faturamento_anual_incentivado
+        description: "Faturamento anual total aprovado e incentivado em Reais (BRL)."
+        tests:
+          - not_null
+      - name: total_empregos_diretos_gerados
+        description: "Quantidade de postos de trabalho diretos gerados."
+        tests:
+          - not_null
+      - name: cumpre_processo_produtivo_basico
+        description: "Indicador de cumprimento das etapas fabris de PPB."
+        tests:
+          - not_null
+      - name: has_isencao_ipi
+        description: "Indicador de fruição de isenção de IPI."
+        tests:
+          - not_null
+      - name: has_reducao_ii
+        description: "Indicador de redução tarifária de até 88% no Imposto de Importação."
+        tests:
+          - not_null
+      - name: has_credito_presumido_icms
+        description: "Indicador de fruição de crédito estímulo estadual de ICMS."
+        tests:
+          - not_null
+      - name: has_desoneracao_pis_cofins
+        description: "Indicador de alíquota zero de PIS/COFINS em insumos."
+        tests:
+          - not_null
+      - name: capacidade_fabril_estimada
+        description: "Porte da capacidade produtiva (GRANDE_PORTE, MEDIO_PORTE, PEQUENO_PORTE, INEXISTENTE)."
+        tests:
+          - not_null
+      - name: tax_incentive_score
+        description: "Pontuação de 0 a 100 de densidade de incentivos fiscais da empresa."
+        tests:
+          - not_null
+      - name: mart_generated_at
+        description: "Timestamp de compilação do mart analítico."
+        tests:
+          - not_null
+
+

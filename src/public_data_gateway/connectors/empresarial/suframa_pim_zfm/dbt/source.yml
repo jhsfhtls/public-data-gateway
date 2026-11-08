@@ -1,0 +1,18 @@
+version: 2
+
+sources:
+  - name: suframa_pim_zfm
+    description: "Bases oficiais da Superintendência da Zona Franca de Manaus (SUFRAMA) em formato Parquet ZSTD."
+    meta:
+      external_location: "data/suframa_pim_zfm/silver/{name}.parquet"
+    tables:
+      - name: suframa_empresas_cadastradas
+        description: "Empresas com inscrição cadastral perante a SUFRAMA para fruição de incentivos fiscais."
+      - name: suframa_projetos_incentivados
+        description: "Projetos industriais, agropecuários e de serviços aprovados pelo Conselho de Administração da Suframa (CAS)."
+      - name: suframa_beneficios_fiscais
+        description: "Catálogo legislativo de benefícios fiscais (IPI, II, PIS/COFINS e ICMS) aplicáveis na ZFM e ALCs."
+      - name: suframa_areas_livre_comercio
+        description: "Mapeamento territorial das Áreas de Livre Comércio (ALCs) e Zona Franca de Manaus."
+      - name: suframa_subsetores_industriais
+        description: "Catálogo dos subsetores industriais do Polo Industrial de Manaus (PIM)."

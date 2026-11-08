@@ -241,6 +241,28 @@ class MCPDispatcher:
                                     "required": ["documento"],
                                 },
                             },
+                            {
+                                "name": "bdg_get_suframa_status",
+                                "description": "Query official SUFRAMA registration, incentive approval, and operational status in Polo Industrial de Manaus and ALCs (Tier 1).",
+                                "inputSchema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "cnpj_or_inscricao": {"type": "string", "description": "CNPJ or 9-digit SUFRAMA inscription number to query"},
+                                    },
+                                    "required": ["cnpj_or_inscricao"],
+                                },
+                            },
+                            {
+                                "name": "bdg_get_tax_incentives_profile",
+                                "description": "Assess corporate fiscal incentive score and industrial capacity profile in PIM, ZFM, and Western Amazon (Tier 1).",
+                                "inputSchema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "cnpj": {"type": "string", "description": "CNPJ to evaluate"},
+                                    },
+                                    "required": ["cnpj"],
+                                },
+                            },
                         ]
                     },
                 }
@@ -469,6 +491,36 @@ class MCPDispatcher:
             doc = args.get("documento") or args.get("cnpj_or_cpf") or ""
             res = tst_conn.get_labor_risk(doc)
             wrapped = wrap_untrusted_gov_data(res, source_id="tst_cndt")
+            return {
+                "jsonrpc": "2.0",
+                "id": req_id,
+                "result": {"content": [{"type": "text", "text": wrapped}], "isError": False},
+            }
+
+        if tool_name in {"bdg_get_suframa_status", "pdg_get_suframa_status"}:
+            from public_data_gateway.connectors.empresarial.suframa_pim_zfm.connector import (
+                SuframaPimZfmConnector,
+            )
+
+            suf_conn = SuframaPimZfmConnector(settings=self.settings)
+            query = args.get("cnpj_or_inscricao") or args.get("documento") or args.get("cnpj") or ""
+            res = suf_conn.get_suframa_status(query)
+            wrapped = wrap_untrusted_gov_data(res, source_id="suframa_pim_zfm")
+            return {
+                "jsonrpc": "2.0",
+                "id": req_id,
+                "result": {"content": [{"type": "text", "text": wrapped}], "isError": False},
+            }
+
+        if tool_name in {"bdg_get_tax_incentives_profile", "pdg_get_tax_incentives_profile"}:
+            from public_data_gateway.connectors.empresarial.suframa_pim_zfm.connector import (
+                SuframaPimZfmConnector,
+            )
+
+            suf_conn = SuframaPimZfmConnector(settings=self.settings)
+            cnpj_val = args.get("cnpj") or args.get("documento") or ""
+            res = suf_conn.get_tax_incentives_profile(cnpj_val)
+            wrapped = wrap_untrusted_gov_data(res, source_id="suframa_pim_zfm")
             return {
                 "jsonrpc": "2.0",
                 "id": req_id,

@@ -1,7 +1,7 @@
 <div align="center">
   <h2>Jornada de Implementação — Brazil Data Gateway</h2>
   <p><i>Painel Vivo de Evolução Arquitetural, Ciclo de Vida de Conectores & Habilitação de Produtos C.O.R.E.</i></p>
-  <p><b>Versão:</b> 1.0.0 &nbsp;|&nbsp; <b>Última Atualização:</b> 2026-11-08T06:55:00.000000+00:00 &nbsp;|&nbsp; <b>Governança:</b> POP_T_177 • POP_T_176 • POP_T_175 • POP_T_070 • POP_T_074 • POP_T_148</p>
+  <p><b>Versão:</b> 1.0.0 &nbsp;|&nbsp; <b>Última Atualização:</b> 2026-11-08 &nbsp;|&nbsp; <b>Governança:</b> POP_T_177 • POP_T_176 • POP_T_175 • POP_T_070 • POP_T_074 • POP_T_148</p>
   <hr/>
 </div>
 <br/>
@@ -16,8 +16,8 @@ Este artefato constitui a **Fonte Única da Verdade Operacional (SSOT)** do stat
 
 - **Macrofase Ativa:** `Fase 04 — Ingestão Wave 2 (B2B, Compras Públicas & Compliance: rfb_cnpj_lakehouse, rfb_simples_mei, pncp_contratacoes, etc.)`
 - **Status Geral de Governança:** `🟢 ON_TRACK`
-- **Conector Ativo em Desenvolvimento:** `suframa_pim_zfm`
-- **Próximo Conector na Fila de Execução:** `cvm_cia_aberta` (Wave 1 — Prioridade RICE 950)
+- **Conector Ativo em Desenvolvimento:** `cvm_dfp_itr`
+- **Próximo Conector na Fila de Execução:** `mdic_comexstat` (Wave 1 — Prioridade RICE 950)
 - **Progresso Estrutural das Macrofases:** **5 de 12 Concluídas (41.7%)**
 - **Universo de Fontes Homologadas no Catálogo:** **49 fontes públicas** nos 13 macrosegmentos
 
@@ -52,21 +52,21 @@ flowchart LR
 
 ## 3. Checklist dos 9 Gates de Qualidade do Conector Ativo
 
-Todo conector integrado ao `public-data-gateway` deve percorrer rigorosamente os **9 Gates de Qualidade** antes de ser promovido a `HOMOLOGATED`. O alvo atual do ciclo de vida é o conector `rfb_simples_mei` (Wave 2):
+Todo conector integrado ao `public-data-gateway` deve percorrer rigorosamente os **9 Gates de Qualidade** antes de ser promovido a `HOMOLOGATED`. O alvo atual do ciclo de vida é o conector `cvm_dfp_itr` (Wave 3):
 
 | Gate | Nome do Gate de Homologação | Critério Operacional de Aceite (`POP_T_070` / `POP_T_074` / `POP_T_177`) | Status |
 | :---: | :--- | :--- | :---: |
-| **GATE_01** | **Contrato Declarativo ODCS v3.1 das N Tabelas da API** | Schema tipado, chaves primárias STRING e regras semânticas para simples_nacional_cadastral, simei_cadastral, simples_sublimites_estaduais, simples_eventos_historico e simples_tabelas_anexos. | ⚪ NÃO INICIADO |
-| **GATE_02** | **Ingestão Bronze Isolada (Todas as Tabelas) & Cache WAL** | Download resiliente das 5 tabelas em data/rfb_simples_mei/bronze/ com cache SQLite WAL. | ⚪ NÃO INICIADO |
-| **GATE_03** | **Sanitização de Sentinelas & Nulls** | Conversão determinística de códigos sentinela, zeros e hífens em NULLs reais em todas as tabelas. | ⚪ NÃO INICIADO |
-| **GATE_04** | **Materialização Silver Parquet Isolada (Todas as Tabelas)** | Gravação de simples_nacional_cadastral.parquet, simei_cadastral.parquet, etc., em data/rfb_simples_mei/silver/ com SHA-256. | ⚪ NÃO INICIADO |
-| **GATE_05** | **Validação dos 5 Pilares & Quarentena** | Aprovação em Freshness, Volume, Schema, Null Ceiling e Lineage; desvio para data/rfb_simples_mei/quarantine/ se violado. | ⚪ NÃO INICIADO |
-| **GATE_06** | **Gold Feature View Isolada & ASOF Join ML** | Features analíticas tributárias em data/rfb_simples_mei/gold/features_tributarias_simples.parquet com propensão, tempo de permanência e risco de desenquadramento. | ⚪ NÃO INICIADO |
-| **GATE_07** | **Integração ao EnrichmentEngine** | Disponibilização para enriquecimento tributário e cadastral batch/online respeitando o Client Path Shield (POP_T_154). | ⚪ NÃO INICIADO |
-| **GATE_08** | **Exposição Multi-Interface** | Exposição síncrona/analítica simultânea via Python SDK (PublicData / BrazilData), REST (/api/v1/simples), CLI (pdg simples) e Servidor MCP. | ⚪ NÃO INICIADO |
-| **GATE_09** | **Bateria de Testes Offline com Períodos Diversos** | Testes unitários offline com fixtures cobrindo optantes, MEI ativo, desenquadramentos, eventos e sublimites estaduais. | ⚪ NÃO INICIADO |
-| **GATE_10** | **dbt Staging, source.yml e 100% Colunas Documentadas** | Pasta connectors/.../rfb_simples_mei/dbt/ com source.yml próprio, 5 modelos staging, dim_simples_nacional, dim_simei, dim_sublimites_icms, mart_regimes_tributarios_brasil e 100% colunas documentadas. | ⚪ NÃO INICIADO |
-| **GATE_11** | **Teste Real de 1 Linha com API ao Vivo (Fail-Hard)** | Execução obrigatória contra endpoint ao vivo de consulta de situação Simples/MEI limitado a 1 registro; falha reprova o pipeline. | ⚪ NÃO INICIADO |
+| **GATE_01** | **Contrato Declarativo ODCS v3.1 das N Tabelas da API** | Schema tipado, chaves primarias STRING e regras semanticas para demonstracoes financeiras CVM (BPA, BPP, DRE, DFC, DMPL, DVA). | ⚪ NÃO INICIADO |
+| **GATE_02** | **Ingestao Bronze Isolada (Todas as Tabelas) & Cache WAL** | Download resiliente das tabelas em data/cvm_dfp_itr/bronze/ com cache SQLite WAL. | ⚪ NÃO INICIADO |
+| **GATE_03** | **Sanitizacao de Sentinelas & Nulls** | Conversao deterministica de codigos sentinela e zeros em NULLs reais. | ⚪ NÃO INICIADO |
+| **GATE_04** | **Materializacao Silver Parquet Isolada (Todas as Tabelas)** | Gravacao de demonstracoes financeiras padronizadas em data/cvm_dfp_itr/silver/ com SHA-256. | ⚪ NÃO INICIADO |
+| **GATE_05** | **Validacao dos 5 Pilares & Quarentena** | Aprovacao em Freshness, Volume, Schema, Null Ceiling e Lineage; desvio para data/cvm_dfp_itr/quarantine/ se violado. | ⚪ NÃO INICIADO |
+| **GATE_06** | **Gold Feature View Isolada & ASOF Join ML** | Features fundamentalistas e solvenica em data/cvm_dfp_itr/gold/features_financeiras_cvm.parquet. | ⚪ NÃO INICIADO |
+| **GATE_07** | **Integracao ao EnrichmentEngine** | Disponibilizacao para enriquecimento financeiro e balancos respeitando o Client Path Shield (POP_T_154). | ⚪ NÃO INICIADO |
+| **GATE_08** | **Exposicao Multi-Interface** | Exposicao simultanea via SDK (PublicData / BrazilData), REST (/api/v1/cvm), CLI (pdg cvm) e Servidor MCP. | ⚪ NÃO INICIADO |
+| **GATE_09** | **Bateria de Testes Offline com Periodos Diversos** | Testes unitarios offline com fixtures cobrindo companhias abertas e balancos. | ⚪ NÃO INICIADO |
+| **GATE_10** | **dbt Staging, source.yml e 100% Colunas Documentadas** | Modelos dbt com source.yml proprio, staging, dims, fcts, marts e 100% de colunas documentadas. | ⚪ NÃO INICIADO |
+| **GATE_11** | **Teste Real de 1 Linha com API ao Vivo (Fail-Hard)** | Execucao obrigatoria contra endpoint ao vivo de dados abertos da CVM limitado a 1 registro; falha reprova o pipeline. | ⚪ NÃO INICIADO |
 
 ---
 
@@ -123,6 +123,7 @@ O `public-data-gateway` atua como barramento alimentador de dados para os **10 P
 | `2026-11-08` | **Fase 04** | **Homologação do Conector cgu_pep (5 Tabelas, dbt, Mart de Exposição Política & Live Fail-Hard)** | Implementação completa do conector cgu_pep (Resolução COAF nº 40/2021 & Circular BACEN nº 3.978/2020 / PLD/FTP): 5 tabelas (cgu_pep, cgu_pep_orgaos, cgu_pep_funcoes, cgu_pep_historico_carencia, cgu_pep_relacionados) materializadas em data/cgu_pep/{bronze,silver,gold}/; 9 novos modelos dbt (5 staging views, dim_pep, dim_funcao_pep, fct_mandato_pep, mart_pep_distribuicao_brasil) totalizando 85 modelos e 759 testes dbt 100% aprovados; 931 colunas 100% documentadas no linter; feature store features_pep_exposicao_politica_brasil.parquet gerada com score de risco PLD e categorização de quarentena de 5 anos; testes reais de 1 linha com fail-hard contra a API oficial da CGU (/api-de-dados/peps) e 11 testes pytest aprovados; multi-interface completa via SDK (PublicData.compliance.pep_status), CLI (pdg pep status), REST API (/api/v1/pep) e MCP (bdg_get_pep_status). |
 | `2026-11-08` | **Fase 04** | **Homologação do Conector cnj_datajud (5 Tabelas, dbt, Mart de Litigiosidade & Live Fail-Hard)** | Implementação completa do conector cnj_datajud (Base Nacional do Poder Judiciário — Resolução CNJ nº 331/2020 & Resolução CNJ nº 46/2007 TPU): 5 tabelas (cnj_processos, cnj_tribunais, cnj_classes_tpu, cnj_assuntos_tpu, cnj_movimentos_processuais) materializadas em data/cnj_datajud/{bronze,silver,gold}/; 10 novos modelos dbt (5 staging views, dim_tribunal_judiciario, dim_classe_judicial_tpu, dim_assunto_judicial_tpu, fct_processo_judicial, mart_litigiosidade_tribunais_brasil) totalizando 95 modelos e 863 testes dbt 100% aprovados; 1028 colunas 100% documentadas no linter; feature store features_litigiosidade_juridica_brasil.parquet gerada com score de litigiosidade e categorização de risco judicial; testes reais de 1 linha com fail-hard contra a API pública e Wiki do CNJ DataJud e 12 testes pytest aprovados; multi-interface completa via SDK (PublicData.judicial.litigation_risk e search_processos), CLI (pdg judicial risk e search), REST API (/api/v1/judicial) e MCP (bdg_get_litigation_risk). |
 | `2026-11-08` | **Fase 04** | **Homologação do Conector tst_cndt (4 Tabelas, dbt, Mart de Compliance Trabalhista & Live Fail-Hard)** | Implementação completa do conector tst_cndt (Certidão Negativa de Débitos Trabalhistas & Banco Nacional de Devedores Trabalhistas - Lei nº 12.440/2011, Res. TST nº 1.470/2011 e CLT): 4 tabelas (tst_cndt_certidoes, tst_cndt_debitos_bndt, tst_cndt_tribunais_regionais, tst_cndt_status_dominio) materializadas em data/tst_cndt/{bronze,silver,gold}/; 9 novos modelos dbt (4 staging views, dim_tribunal_regional_trabalho, dim_status_cndt, fct_certidao_trabalhista, fct_debito_trabalhista_bndt, mart_compliance_trabalhista_brasil) totalizando 104 modelos e 968 testes dbt 100% aprovados; 1122 colunas 100% documentadas no linter; feature store features_compliance_trabalhista_brasil.parquet gerada com score contínuo de 0 a 100 de risco de passivo trabalhista; testes reais de 1 linha com fail-hard contra o portal oficial do TST CNDT e 10 testes pytest aprovados; multi-interface completa via SDK (PublicData.judicial.cndt, labor_risk, get_cndt, get_labor_risk), CLI (pdg judicial cndt, labor-risk, debitos), REST API (/api/v1/judicial/cndt, labor-risk, debitos) e MCP (bdg_get_cndt_certificate, bdg_get_labor_risk). |
+| `2026-11-08` | **Fase 04** | **Homologação do Conector suframa_pim_zfm (5 Tabelas, dbt, Mart de Incentivos Fiscais PIM & Live Fail-Hard)** | Implementação completa do conector suframa_pim_zfm (Superintendência da Zona Franca de Manaus — Cadastro de Empresas Incentivadas do Polo Industrial de Manaus / ZFM e Áreas de Livre Comércio, Decreto-Lei nº 288/1967, Lei nº 8.387/1991, Art. 40 do ADCT, EC 83/2014 e Lei nº 10.996/2004): 5 tabelas (suframa_empresas_cadastradas, suframa_projetos_incentivados, suframa_beneficios_fiscais, suframa_areas_livre_comercio, suframa_subsetores_industriais) materializadas em data/suframa_pim_zfm/{bronze,silver,gold}/; 11 novos modelos dbt (5 staging views, dim_empresa_suframa, dim_area_livre_comercio, dim_subsetor_industrial_pim, fct_projeto_incentivado_suframa, fct_beneficio_fiscal_suframa, mart_incentivos_fiscais_pim_brasil) totalizando 115 modelos e 1098 testes dbt 100% aprovados; 1242 colunas 100% documentadas no linter; feature store features_incentivos_fiscais_zfm_brasil.parquet gerada com score contínuo de 0 a 100 de incentivos fiscais, cumprimento de PPB e classificação de capacidade fabril; testes reais de 1 linha com fail-hard contra os portais oficiais da SUFRAMA gov.br e 12 testes pytest aprovados; multi-interface completa via SDK (PublicData.company.suframa, tax_incentives, list_pim_projects, get_suframa_status, get_tax_incentives), CLI (pdg company suframa, tax-incentives, pim-projects), REST API (/api/v1/company/suframa, tax-incentives, projetos) e MCP (bdg_get_suframa_status, bdg_get_tax_incentives_profile). |
 
 ---
 

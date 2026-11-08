@@ -231,6 +231,46 @@ class JudicialFacade:
         return self.tst_connector.search_debitos(termo)
 
 
+class CompanyFacade:
+    """Corporate registries, tax regimes, and regional fiscal incentives (RFB & SUFRAMA)."""
+
+    def __init__(self, sdk: "BrazilData") -> None:
+        self._sdk = sdk
+        self._suframa_connector: Any = None
+
+    @property
+    def suframa_connector(self) -> Any:
+        if self._suframa_connector is None:
+            from public_data_gateway.connectors.empresarial.suframa_pim_zfm.connector import (
+                SuframaPimZfmConnector,
+            )
+
+            self._suframa_connector = SuframaPimZfmConnector(settings=self._sdk.settings)
+        return self._suframa_connector
+
+    def suframa(self, cnpj_or_inscricao: str) -> dict[str, Any]:
+        """Query SUFRAMA registration, incentive approval, and operational status."""
+        return self.suframa_connector.get_suframa_status(cnpj_or_inscricao)
+
+    def tax_incentives(self, cnpj: str) -> dict[str, Any]:
+        """Assess corporate fiscal incentive score and industrial capacity profile (PIM/ZFM/ALC)."""
+        return self.suframa_connector.get_tax_incentives_profile(cnpj)
+
+    def list_pim_projects(
+        self,
+        cnpj_or_inscricao: str | None = None,
+        status: str | None = None,
+    ) -> list[dict[str, Any]]:
+        """List industrial investment projects submitted to SUFRAMA CAS."""
+        return self.suframa_connector.list_projetos(
+            cnpj_or_inscricao=cnpj_or_inscricao, status=status
+        )
+
+    def simples_status(self, cnpj: str) -> dict[str, Any]:
+        """Resolve Simples Nacional and MEI tax regime for a given CNPJ."""
+        return self._sdk.get_simples_status(cnpj)
+
+
 class BrazilData:
     """Unified developer SDK facade for querying, normalizing, and enriching Brazilian public datasets."""
 
@@ -249,6 +289,7 @@ class BrazilData:
         self.procurement = ProcurementFacade(self)
         self.compliance = ComplianceFacade(self)
         self.judicial = JudicialFacade(self)
+        self.company = CompanyFacade(self)
 
     def list_sources(
         self,
@@ -326,6 +367,14 @@ class BrazilData:
     def get_labor_risk(self, cnpj_or_cpf: str) -> dict[str, Any]:
         """Assess labor compliance and BNDT risk profile (TST)."""
         return self.judicial.labor_risk(cnpj_or_cpf)
+
+    def get_suframa_status(self, cnpj_or_inscricao: str) -> dict[str, Any]:
+        """Query official SUFRAMA registration and incentive status (PIM / ZFM / ALC)."""
+        return self.company.suframa(cnpj_or_inscricao)
+
+    def get_tax_incentives(self, cnpj: str) -> dict[str, Any]:
+        """Assess corporate fiscal incentive score and industrial capacity profile (PIM/ZFM/ALC)."""
+        return self.company.tax_incentives(cnpj)
 
     def resolve_municipality(
         self, code_or_name: str | int, uf: str | None = None

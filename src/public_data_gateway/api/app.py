@@ -362,4 +362,38 @@ def create_app(settings: GatewaySettings | None = None) -> FastAPI:
         conn = TstCndtConnector(settings=app_settings)
         return conn.search_debitos(termo)
 
+    # 10. Corporate Fiscal Incentives & SUFRAMA Routes (PIM / ZFM / ALC)
+    @app.get("/api/v1/company/suframa/projetos")
+    @app.get("/api/v1/suframa/projetos")
+    async def list_suframa_projects(
+        cnpj_or_inscricao: str | None = None,
+        status: str | None = None,
+    ) -> list[dict[str, Any]]:
+        from public_data_gateway.connectors.empresarial.suframa_pim_zfm.connector import (
+            SuframaPimZfmConnector,
+        )
+
+        conn = SuframaPimZfmConnector(settings=app_settings)
+        return conn.list_projetos(cnpj_or_inscricao=cnpj_or_inscricao, status=status)
+
+    @app.get("/api/v1/company/suframa/{cnpj_or_inscricao}")
+    @app.get("/api/v1/suframa/{cnpj_or_inscricao}")
+    async def get_suframa_registration_status(cnpj_or_inscricao: str) -> dict[str, Any]:
+        from public_data_gateway.connectors.empresarial.suframa_pim_zfm.connector import (
+            SuframaPimZfmConnector,
+        )
+
+        conn = SuframaPimZfmConnector(settings=app_settings)
+        return conn.get_suframa_status(cnpj_or_inscricao)
+
+    @app.get("/api/v1/company/tax-incentives/{cnpj}")
+    @app.get("/api/v1/tax-incentives/{cnpj}")
+    async def get_tax_incentives_profile(cnpj: str) -> dict[str, Any]:
+        from public_data_gateway.connectors.empresarial.suframa_pim_zfm.connector import (
+            SuframaPimZfmConnector,
+        )
+
+        conn = SuframaPimZfmConnector(settings=app_settings)
+        return conn.get_tax_incentives_profile(cnpj)
+
     return app
