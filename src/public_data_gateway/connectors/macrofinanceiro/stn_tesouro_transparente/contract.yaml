@@ -1,0 +1,206 @@
+contract_id: ODCS-BR-STN-TESOURO-001
+source_id: stn_tesouro_transparente
+name: Secretaria do Tesouro Nacional - SADIPEM, Dívida Pública e Transferências Constitucionais
+agency: Secretaria do Tesouro Nacional (STN / Ministério da Fazenda)
+official_url: https://www.tesourotransparente.gov.br/
+segment_id: 02_economico_macrofinanceiro
+access_mode: FEDERATED_API
+protocol: REST_JSON
+auth_type: NONE
+update_frequency: Mensal
+freshness_sla_hours: 720
+cron_schedule_expression: "0 4 5 * *"
+primary_keys:
+  - id_municipio_ibge_7d
+  - sigla_uf
+canonical_keys:
+  - id_municipio_ibge_7d
+  - sigla_uf
+governing_laws:
+  - Lei Complementar nº 101/2000 (Lei de Responsabilidade Fiscal - LRF)
+  - Resolução do Senado Federal nº 40/2001 e nº 43/2001 (Limites Globais de Endividamento)
+  - Portaria MF nº 501/2017 e Portaria STN nº 1.589/2021 (Metodologia CAPAG)
+tables:
+  - name: stn_sadipem_pvl
+    description: Pedidos de Verificação de Limites e Condições para operações de crédito de Estados e Municípios (SADIPEM)
+    layer: silver
+    schema:
+      - name: id_pleito
+        type: INT64
+        description: Identificador único sequencial do pleito no SADIPEM
+      - name: tipo_interessado
+        type: STRING
+        description: Categoria do ente requerente (Município ou Estado)
+      - name: interessado
+        type: STRING
+        description: Nome do ente público solicitante da operação de crédito
+      - name: id_municipio_ibge_7d
+        type: STRING
+        description: Código IBGE canônico de 7 dígitos do município
+      - name: sigla_uf
+        type: STRING
+        description: Sigla da Unidade da Federação do ente
+      - name: num_pvl
+        type: STRING
+        description: Número de registro oficial do PVL perante a STN
+      - name: status_pleito
+        type: STRING
+        description: Parecer conclusivo da STN (Deferido, Regular, Em análise, Indeferido)
+      - name: tipo_operacao
+        type: STRING
+        description: Modalidade de crédito (Operação contratual interna ou externa)
+      - name: finalidade
+        type: STRING
+        description: Destinação dos recursos (Infraestrutura, Saneamento, Iluminação, Mobilidade)
+      - name: tipo_credor
+        type: STRING
+        description: Categoria da entidade financiadora (Nacional ou Internacional)
+      - name: credor
+        type: STRING
+        description: Razão social da instituição financeira ou organismo multilateral concedente
+      - name: moeda
+        type: STRING
+        description: Moeda contratual pactuada (Real, Dólar, Euro)
+      - name: valor_operacao
+        type: FLOAT64
+        description: Montante financeiro autorizado da operação de crédito em BRL
+      - name: data_status
+        type: STRING
+        description: Data de homologação ou última tramitação do pleito (YYYY-MM-DD)
+
+  - name: stn_transferencias_fpm
+    description: Repasses constitucionais do Fundo de Participação dos Municípios (FPM)
+    layer: silver
+    schema:
+      - name: id_municipio_ibge_7d
+        type: STRING
+        description: Código IBGE canônico de 7 dígitos do município beneficiário
+      - name: sigla_uf
+        type: STRING
+        description: Sigla da Unidade da Federação do município
+      - name: nome_municipio
+        type: STRING
+        description: Nome oficial do município beneficiário do repasse
+      - name: ano_exercicio
+        type: INT64
+        description: Ano civil de exercício orçamentário do repasse
+      - name: mes_competencia
+        type: INT64
+        description: Mês civil de competência financeira do repasse (1 a 12)
+      - name: decendio
+        type: INT64
+        description: Decêndio do repasse (1º, 2º ou 3º decêndio)
+      - name: valor_bruto_fpm
+        type: FLOAT64
+        description: Montante bruto apurado do repasse constitucional em BRL
+      - name: deducao_fundeb
+        type: FLOAT64
+        description: Retenção legal obrigatória de 20% destinada ao FUNDEB em BRL
+      - name: deducao_saude
+        type: FLOAT64
+        description: Retenção legal obrigatória de 15% destinada à Saúde em BRL
+      - name: valor_liquido_fpm
+        type: FLOAT64
+        description: Montante líquido efetivamente creditado na conta do município em BRL
+
+  - name: stn_transferencias_fpe
+    description: Repasses constitucionais do Fundo de Participação dos Estados (FPE)
+    layer: silver
+    schema:
+      - name: sigla_uf
+        type: STRING
+        description: Sigla de 2 letras da Unidade da Federação beneficiária
+      - name: nome_uf
+        type: STRING
+        description: Nome oficial do Estado beneficiário do repasse
+      - name: ano_exercicio
+        type: INT64
+        description: Ano civil de exercício orçamentário
+      - name: mes_competencia
+        type: INT64
+        description: Mês civil de competência financeira
+      - name: decendio
+        type: INT64
+        description: Decêndio do repasse estadual (1 a 3)
+      - name: valor_bruto_fpe
+        type: FLOAT64
+        description: Montante bruto do FPE apurado em BRL
+      - name: deducao_fundeb
+        type: FLOAT64
+        description: Retenção legal destinada ao FUNDEB em BRL
+      - name: valor_liquido_fpe
+        type: FLOAT64
+        description: Montante líquido creditado ao Estado em BRL
+
+  - name: stn_capag_municipios
+    description: Avaliação da Capacidade de Pagamento (CAPAG) de Estados e Municípios
+    layer: silver
+    schema:
+      - name: id_municipio_ibge_7d
+        type: STRING
+        description: Código IBGE canônico de 7 dígitos do ente avaliado
+      - name: sigla_uf
+        type: STRING
+        description: Sigla da Unidade da Federação
+      - name: nome_ente
+        type: STRING
+        description: Nome oficial do Estado ou Município avaliado
+      - name: ano_exercicio
+        type: INT64
+        description: Ano de exercício base da avaliação fiscal
+      - name: indicador_1_endividamento_pct
+        type: FLOAT64
+        description: Indicador 1 - Relação Dívida Consolidada Líquida sobre Receita Corrente Líquida (DCL/RCL %)
+      - name: indicador_2_poupanca_corrente_pct
+        type: FLOAT64
+        description: Indicador 2 - Relação Despesa Corrente sobre Receita Corrente Ajustada (DC/RC %)
+      - name: indicador_3_liquidez_relativa_pct
+        type: FLOAT64
+        description: Indicador 3 - Relação Obrigações Financeiras sobre Disponibilidade de Caixa (OF/DC %)
+      - name: nota_indicador_1
+        type: STRING
+        description: Conceito apurado no Indicador 1 de Endividamento (A, B ou C)
+      - name: nota_indicador_2
+        type: STRING
+        description: Conceito apurado no Indicador 2 de Poupança Corrente (A, B ou C)
+      - name: nota_indicador_3
+        type: STRING
+        description: Conceito apurado no Indicador 3 de Liquidez Relativa (A, B ou C)
+      - name: nota_capag_final
+        type: STRING
+        description: Classificação final da Capacidade de Pagamento (A, B ou C)
+
+  - name: stn_divida_consolidada
+    description: Balanço fiscal de Dívida Consolidada Líquida (DCL) e Receita Corrente Líquida (RCL)
+    layer: silver
+    schema:
+      - name: id_municipio_ibge_7d
+        type: STRING
+        description: Código IBGE canônico do ente federativo
+      - name: sigla_uf
+        type: STRING
+        description: Sigla da Unidade da Federação
+      - name: nome_ente
+        type: STRING
+        description: Nome do ente municipal ou estadual
+      - name: ano_exercicio
+        type: INT64
+        description: Ano do exercício fiscal de encerramento
+      - name: receita_corrente_liquida_rcl
+        type: FLOAT64
+        description: Montante da Receita Corrente Líquida (RCL) dos últimos 12 meses em BRL
+      - name: divida_consolidada_bruta
+        type: FLOAT64
+        description: Estoque total da dívida fundada e contratual bruta em BRL
+      - name: disponibilidade_caixa_bruta
+        type: FLOAT64
+        description: Saldo de disponibilidades de caixa e haveres financeiros em BRL
+      - name: divida_consolidada_liquida_dcl
+        type: FLOAT64
+        description: Saldo líquido apurado da dívida (DCB menos Disponibilidades) em BRL
+      - name: razao_dcl_rcl_pct
+        type: FLOAT64
+        description: Percentual de comprometimento da RCL pela dívida consolidada líquida
+      - name: limite_senado_rcl_pct
+        type: FLOAT64
+        description: Limite prudencial fixado pelo Senado Federal (120% municípios, 200% estados)

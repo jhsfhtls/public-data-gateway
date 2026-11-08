@@ -427,3 +427,138 @@ models:
         description: "Classificação de risco de crédito da carteira (BAIXO_RISCO_CREDITO, RISCO_MODERADO_CREDITO, ALTO_RISCO_CREDITO)."
         tests:
           - not_null
+
+  - name: mart_saude_fiscal_municipios_brasil
+    description: "Datamart consolidado de saúde fiscal, endividamento LRF, classificação CAPAG e repasses FPM municipais"
+    columns:
+      - name: id_municipio_ibge_7d
+        description: "Código IBGE canônico de 7 dígitos do município"
+        tests:
+          - not_null
+          - unique
+      - name: sigla_uf
+        description: "Sigla de 2 caracteres da Unidade Federativa"
+        tests:
+          - not_null
+      - name: nome_municipio
+        description: "Nome oficial do município"
+        tests:
+          - not_null
+      - name: ano_exercicio
+        description: "Ano do exercício fiscal de encerramento"
+        tests:
+          - not_null
+      - name: nota_capag_final
+        description: "Classificação oficial final da Capacidade de Pagamento (A, B ou C)"
+        tests:
+          - not_null
+      - name: receita_corrente_liquida_rcl
+        description: "Receita Corrente Líquida apurada dos últimos 12 meses em BRL"
+      - name: divida_consolidada_liquida_dcl
+        description: "Estoque da Dívida Consolidada Líquida em BRL"
+      - name: razao_dcl_rcl_pct
+        description: "Relação percentual da DCL sobre a RCL (Indicador 1 CAPAG / LRF)"
+        tests:
+          - not_null
+      - name: indicador_2_poupanca_corrente_pct
+        description: "Relação Despesa Corrente sobre Receita Corrente (Indicador 2 CAPAG)"
+        tests:
+          - not_null
+      - name: indicador_3_liquidez_relativa_pct
+        description: "Relação Obrigações Financeiras sobre Disponibilidade de Caixa (Indicador 3 CAPAG)"
+        tests:
+          - not_null
+      - name: total_fpm_bruto_anual
+        description: "Montante bruto anual de repasses do FPM transferidos em BRL"
+        tests:
+          - not_null
+      - name: total_fpm_liquido_anual
+        description: "Montante líquido anual de repasses do FPM creditados em BRL"
+        tests:
+          - not_null
+      - name: total_pleitos_pvl
+        description: "Quantidade total de operações de crédito submetidas ao SADIPEM"
+        tests:
+          - not_null
+      - name: volume_credito_solicitado_pvl
+        description: "Volume financeiro total de crédito pleiteado no SADIPEM em BRL"
+        tests:
+          - not_null
+      - name: volume_credito_deferido_pvl
+        description: "Volume financeiro de crédito com parecer deferido pela STN em BRL"
+        tests:
+          - not_null
+      - name: classificacao_saude_fiscal
+        description: "Classificação categórica de saúde fiscal (EXCELENTE_CAPAG_A, REGULAR_CAPAG_B, CRITICO_CAPAG_C)"
+        tests:
+          - not_null
+
+  - name: mart_operacoes_credito_sadipem
+    description: "Datamart de operações de crédito e financiamentos subnacionais avaliados pelo Tesouro Nacional (SADIPEM PVL)"
+    columns:
+      - name: id_pleito
+        description: "Identificador sequencial único do pleito no SADIPEM"
+        tests:
+          - not_null
+          - unique
+      - name: tipo_interessado
+        description: "Tipo de ente federativo proponente"
+        tests:
+          - not_null
+      - name: interessado
+        description: "Razão social ou nome oficial do ente proponente"
+        tests:
+          - not_null
+      - name: id_municipio_ibge_7d
+        description: "Código IBGE de 7 dígitos do município"
+        tests:
+          - not_null
+      - name: sigla_uf
+        description: "Sigla da Unidade Federativa"
+        tests:
+          - not_null
+      - name: num_pvl
+        description: "Número do processo de Verificação de Limites e Condições (PVL)"
+        tests:
+          - not_null
+      - name: status_pleito
+        description: "Status de deferimento ou análise conclusiva da STN"
+        tests:
+          - not_null
+      - name: tipo_operacao
+        description: "Classificação da operação contratual de crédito"
+        tests:
+          - not_null
+      - name: finalidade
+        description: "Destinação socioeconômica dos recursos"
+        tests:
+          - not_null
+      - name: tipo_credor
+        description: "Classificação institucional do credor financeiro"
+        tests:
+          - not_null
+      - name: credor
+        description: "Nome da instituição credora"
+        tests:
+          - not_null
+      - name: moeda
+        description: "Moeda padrão do contrato"
+        tests:
+          - not_null
+      - name: valor_operacao
+        description: "Valor contratual autorizado da operação em BRL"
+        tests:
+          - not_null
+      - name: data_status
+        description: "Data da homologação do pleito"
+        tests:
+          - not_null
+      - name: nota_capag_proponente
+        description: "Nota CAPAG do proponente da operação (A, B, C ou N/A)"
+        tests:
+          - not_null
+      - name: faixa_valor_credito
+        description: "Faixa de porte do valor de crédito (GRANDE_PORTE, MEDIO_PORTE, PEQUENO_PORTE)"
+        tests:
+          - not_null
+

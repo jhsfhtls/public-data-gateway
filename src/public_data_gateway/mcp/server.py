@@ -351,6 +351,29 @@ class MCPDispatcher:
                                     },
                                 },
                             },
+                            {
+                                "name": "bdg_get_municipality_fiscal_health",
+                                "description": "Query municipality fiscal health, CAPAG grade (A, B, C), debt ratio DCL/RCL, and continuous fiscal score from STN Tesouro Transparente (Tier 1).",
+                                "inputSchema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "id_municipio_or_name": {"type": "string", "description": "IBGE 7-digit code or municipality name (e.g. 3550308 or São Paulo)"},
+                                    },
+                                    "required": ["id_municipio_or_name"],
+                                },
+                            },
+                            {
+                                "name": "bdg_get_sadipem_credit_operations",
+                                "description": "Query SADIPEM subnational credit operations, financing limits, lenders and loan purposes from STN (Tier 1).",
+                                "inputSchema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "termo": {"type": "string", "description": "IBGE 7-digit code, UF acronym (e.g. SP) or entity name"},
+                                        "status": {"type": "string", "description": "Optional filter by pleito status (e.g. Deferido)"},
+                                    },
+                                    "required": ["termo"],
+                                },
+                            },
                         ]
                     },
                 }
@@ -755,6 +778,51 @@ class MCPDispatcher:
             top = int(args.get("top") or 10)
             ranking = bank_conn.get_banking_ranking(segmento=segmento, top=top)
             wrapped = wrap_untrusted_gov_data(ranking, source_id="bcb_ifdata")
+            return {
+                "jsonrpc": "2.0",
+                "id": req_id,
+                "result": {"content": [{"type": "text", "text": wrapped}], "isError": False},
+            }
+
+        if tool_name in {"bdg_get_municipality_fiscal_health", "pdg_get_municipality_fiscal_health"}:
+            from public_data_gateway.connectors.macrofinanceiro.stn_tesouro_transparente.connector import (
+                StnTesouroTransparenteConnector,
+            )
+
+            treas_conn = StnTesouroTransparenteConnector(settings=self.settings)
+            termo = args.get("id_municipio_or_name", "")
+            prof = treas_conn.get_municipio_fiscal_profile(termo)
+            if not prof:
+                return {
+                    "jsonrpc": "2.0",
+                    "id": req_id,
+                    "result": {
+                        "content": [
+                            {
+                                "type": "text",
+                                "text": f"Fiscal health profile not found for '{termo}'",
+                            }
+                        ],
+                        "isError": True,
+                    },
+                }
+            wrapped = wrap_untrusted_gov_data(prof, source_id="stn_tesouro_transparente")
+            return {
+                "jsonrpc": "2.0",
+                "id": req_id,
+                "result": {"content": [{"type": "text", "text": wrapped}], "isError": False},
+            }
+
+        if tool_name in {"bdg_get_sadipem_credit_operations", "pdg_get_sadipem_credit_operations"}:
+            from public_data_gateway.connectors.macrofinanceiro.stn_tesouro_transparente.connector import (
+                StnTesouroTransparenteConnector,
+            )
+
+            treas_conn = StnTesouroTransparenteConnector(settings=self.settings)
+            termo = args.get("termo", "")
+            st = args.get("status")
+            pvls = treas_conn.get_credit_operations_pvl(termo, status=st)
+            wrapped = wrap_untrusted_gov_data(pvls, source_id="stn_tesouro_transparente")
             return {
                 "jsonrpc": "2.0",
                 "id": req_id,

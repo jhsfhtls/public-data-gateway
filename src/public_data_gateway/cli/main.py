@@ -306,6 +306,35 @@ def build_parser() -> argparse.ArgumentParser:
     ifdata_p.add_argument("cnpj", type=str, help="Financial institution CNPJ or BACEN code")
     ifdata_p.add_argument("--json", action="store_true", help="Output in JSON format")
 
+    # Subcommand: treasury (STN Tesouro Transparente)
+    treas_p = subparsers.add_parser(
+        "treasury", help="Query municipal/state fiscal health, SADIPEM credit operations and FPM transfers (STN)."
+    )
+    treas_sub = treas_p.add_subparsers(dest="treasury_action", required=True)
+
+    t_prof_p = treas_sub.add_parser("profile", help="Query municipality fiscal health profile, CAPAG and debt.")
+    t_prof_p.add_argument("termo", type=str, help="IBGE 7-digit code or municipality name")
+    t_prof_p.add_argument("--json", action="store_true", help="Output in JSON format")
+
+    t_pvl_p = treas_sub.add_parser("pvl", help="Query SADIPEM credit operations by municipality or UF.")
+    t_pvl_p.add_argument("termo", type=str, help="IBGE 7-digit code, UF acronym (e.g. SP) or entity name")
+    t_pvl_p.add_argument("--status", type=str, default=None, help="Filter by pleito status (e.g. Deferido)")
+    t_pvl_p.add_argument("--json", action="store_true", help="Output in JSON format")
+
+    t_fpm_p = treas_sub.add_parser("fpm", help="Query constitutional FPM transfers for a municipality.")
+    t_fpm_p.add_argument("id_municipio", type=str, help="IBGE 7-digit municipality code")
+    t_fpm_p.add_argument("--ano", type=int, default=None, help="Exercise year (e.g. 2024)")
+    t_fpm_p.add_argument("--json", action="store_true", help="Output in JSON format")
+
+    t_cap_p = treas_sub.add_parser("capag", help="Query official CAPAG payment capacity grade and LRF ratios.")
+    t_cap_p.add_argument("termo", type=str, help="IBGE 7-digit code or entity name")
+    t_cap_p.add_argument("--json", action="store_true", help="Output in JSON format")
+
+    # Direct shortcut: sadipem
+    sadipem_p = subparsers.add_parser("sadipem", help="Shortcut to query SADIPEM credit operations or fiscal health.")
+    sadipem_p.add_argument("termo", type=str, help="IBGE 7-digit code, UF acronym or municipality name")
+    sadipem_p.add_argument("--json", action="store_true", help="Output in JSON format")
+
     return parser
 
 
@@ -1009,6 +1038,87 @@ def main(argv: Sequence[str] | None = None) -> int:
                     print(f"  Índice de Imobilização:    {imob_v}% (Máximo CMN: 50.0%)")
                     print(f"  ROE Bancário Anualizado:   {roe_v}%")
                     print(f"  Inadimplência Carteira:    {inad_v}%")
+                return 0
+
+        elif args.command in {"treasury", "sadipem"}:
+            from public_data_gateway.connectors.macrofinanceiro.stn_tesouro_transparente.connector import (
+                StnTesouroTransparenteConnector,
+            )
+
+            treas_conn = StnTesouroTransparenteConnector(settings=settings)
+
+            if args.command == "sadipem":
+                pvls = treas_conn.get_credit_operations_pvl(args.termo)
+                prof = treas_conn.get_municipio_fiscal_profile(args.termo)
+                if args.json:
+                    out = {"perfil_fiscal": prof, "operacoes_credito": pvls}
+                    print(json.dumps(out, indent=2, ensure_ascii=False))
+                else:
+                    if prof:
+                        print(f"STN Fiscal Health Profile: {prof.get('nome_municipio')} [{prof.get('sigla_uf')} - {prof.get('id_municipio_ibge_7d')}]:")
+                        print(f"  Classificação CAPAG:     Nota {prof.get('nota_capag_final')}")
+                        print(f"  Score Saúde Fiscal:      {prof.get('score_saude_fiscal')}/100.0 ({prof.get('classificacao_saude_fiscal')})")
+                        print(f"  Receita Corrente (RCL):  R$ {prof.get('receita_corrente_liquida_rcl', 0.0):,.2f}")
+                        print(f"  Dívida Líquida (DCL):    R$ {prof.get('divida_consolidada_liquida_dcl', 0.0):,.2f} ({prof.get('razao_dcl_rcl_pct')}%)")
+                        print(f"  FPM Anual Recebido:      R$ {prof.get('total_fpm_anual', 0.0):,.2f}")
+                    if pvls:
+                        print(f"\nSADIPEM Credit Operations for '{args.termo}' ({len(pvls)} pleitos):")
+                        for idx, p in enumerate(pvls, 1):
+                            print(f"  {idx}. {p.get('num_pvl')} | R$ {p.get('valor_operacao', 0.0):,.2f} | {p.get('status_pleito')} | Credor: {p.get('credor')} | Finalidade: {p.get('finalidade')}")
+                    elif not prof:
+                        print(f"No records found in STN SADIPEM for '{args.termo}'", file=sys.stderr)
+                        return 1
+                return 0
+
+            treasury_action = getattr(args, "treasury_action", None)
+            if treasury_action == "profile":
+                prof = treas_conn.get_municipio_fiscal_profile(args.termo)
+                if not prof:
+                    print(f"Fiscal profile not found for '{args.termo}'", file=sys.stderr)
+                    return 1
+                if args.json:
+                    print(json.dumps(prof, indent=2, ensure_ascii=False))
+                else:
+                    print(f"STN Fiscal Health Profile for {prof.get('nome_municipio')} [{prof.get('sigla_uf')}]:")
+                    for k, v in prof.items():
+                        print(f"  {k}: {v}")
+                return 0
+
+            if treasury_action == "pvl":
+                pvls = treas_conn.get_credit_operations_pvl(args.termo, status=args.status)
+                if args.json:
+                    print(json.dumps(pvls, indent=2, ensure_ascii=False))
+                else:
+                    print(f"SADIPEM Credit Operations for '{args.termo}' ({len(pvls)} records):")
+                    for idx, p in enumerate(pvls, 1):
+                        print(f"  {idx}. {p.get('num_pvl')} | R$ {p.get('valor_operacao', 0.0):,.2f} | {p.get('status_pleito')} | Credor: {p.get('credor')}")
+                return 0
+
+            if treasury_action == "fpm":
+                fpms = treas_conn.get_fpm_transfers(args.id_municipio, ano=args.ano)
+                if args.json:
+                    print(json.dumps(fpms, indent=2, ensure_ascii=False))
+                else:
+                    print(f"FPM Constitutional Transfers for '{args.id_municipio}' ({len(fpms)} records):")
+                    for f in fpms[:6]:
+                        print(f"  {f.get('ano_exercicio')}-{f.get('mes_competencia'):02d} D{f.get('decendio')}: Bruto=R$ {f.get('valor_bruto_fpm', 0.0):,.2f} | FUNDEB=-R$ {f.get('deducao_fundeb', 0.0):,.2f} | Liq=R$ {f.get('valor_liquido_fpm', 0.0):,.2f}")
+                    if len(fpms) > 6:
+                        print(f"  ... and {len(fpms) - 6} more decêndios")
+                return 0
+
+            if treasury_action == "capag":
+                cap = treas_conn.get_capag_rating(args.termo)
+                if not cap:
+                    print(f"CAPAG rating not found for '{args.termo}'", file=sys.stderr)
+                    return 1
+                if args.json:
+                    print(json.dumps(cap, indent=2, ensure_ascii=False))
+                else:
+                    print(f"STN CAPAG Payment Capacity: {cap.get('nome_ente')} [{cap.get('sigla_uf')}]:")
+                    print(f"  Nota Final CAPAG:        {cap.get('nota_capag_final')}")
+                    print(f"  Ind 1 (Endividamento):   {cap.get('indicador_1_endividamento_pct')}% (Nota {cap.get('nota_indicador_1')})")
+                    print(f"  Ind 2 (Poupança Corr):   {cap.get('indicador_2_poupanca_corrente_pct')}% (Nota {cap.get('nota_indicador_2')})")
+                    print(f"  Ind 3 (Liquidez Rel):    {cap.get('indicador_3_liquidez_relativa_pct')}% (Nota {cap.get('nota_indicador_3')})")
                 return 0
 
     except Exception as exc:

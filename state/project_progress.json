@@ -1,6 +1,6 @@
 {
   "schema_version": "1.0.0",
-  "last_updated": "2026-11-08T10:05:00.000000+00:00",
+  "last_updated": "2026-11-08T10:25:00.000000+00:00",
   "project_name": "public-data-gateway",
   "ecosystem": "C.O.R.E. (core, operations, career, studies)",
   "governing_pops": [
@@ -15,8 +15,8 @@
   "current_macro_phase_id": "05",
   "current_macro_phase": "Fase 05 - Ingestão Wave 3 (Mercado de Capitais & Finanças Públicas: cvm_dfp_itr, mdic_comexstat, cvm_fundos, bcb_ifdata, stn_tesouro, comprasgov_catmat)",
   "overall_status": "ON_TRACK",
-  "active_connector": "stn_tesouro_transparente",
-  "next_connector": "comprasgov_catmat",
+  "active_connector": "comprasgov_catmat",
+  "next_connector": "ibge_sidra",
   "structural_phases": [
     {
       "phase_id": "00",
@@ -372,6 +372,12 @@
       "phase_id": "05",
       "milestone": "Homologação do Conector bcb_ifdata (5 Tabelas, dbt, Marts de Ranking Bancário e Basiléia & Live Fail-Hard)",
       "summary": "Implementação completa do conector bcb_ifdata (Banco Central do Brasil — Informações Financeiras e Balanços de Instituições Financeiras e Conglomerados Prudenciais S1 a S5, Lei nº 4.595/1964, Resoluções CMN nº 4.966/2021 e nº 4.553/2017) consolidando o quarto conector da Wave 3: 5 tabelas (bcb_ifdata_cadastro, bcb_ifdata_ativo, bcb_ifdata_passivo, bcb_ifdata_dre, bcb_ifdata_indicadores) materializadas em data/bcb_ifdata/{bronze,silver,gold}/; 11 novos modelos dbt (5 staging views, dim_instituicao_prudencial_bcb, fct_balanco_bancario_trimestral, fct_resultado_bancario_trimestral, fct_indicadores_prudenciais_bcb, mart_ranking_bancario_brasil, mart_saude_prudencial_basileia) totalizando 159 modelos e 1530 testes dbt 100% aprovados; 1810 colunas 100% documentadas no linter (100% coverage); feature store features_sistema_financeiro_brasil.parquet gerada com indicadores prudenciais (Índice de Basiléia, Índice de Imobilização, ROE Bancário, Inadimplência > 90d, classificação de porte CONGLOMERADO_S1, BANCO_MEDIO_S2_S3, INSTITUICAO_REGIONAL_S4_S5) e score contínuo de 0 a 100 de solidez bancária; testes reais com fail-hard estrito contra a API Olinda OData e portal do BACEN e 11 testes pytest aprovados (142 testes totais no repositório); multi-interface completa via SDK (PublicData.banking.* e aliases), CLI (pdg banking e ifdata), REST API (/api/v1/banking/*) e MCP (bdg_get_bank_financial_profile, bdg_get_banking_ranking) com proteção contra prompt injection."
+    },
+    {
+      "date": "2026-11-08",
+      "phase_id": "05",
+      "milestone": "Homologação do Conector stn_tesouro_transparente (5 Tabelas, dbt, Marts de Saúde Fiscal e Crédito SADIPEM & Live Fail-Hard)",
+      "summary": "Implementação completa do conector stn_tesouro_transparente (Secretaria do Tesouro Nacional / Ministério da Fazenda — SADIPEM PVL, Capacidade de Pagamento CAPAG, Dívida Consolidada Líquida e Transferências Constitucionais FPM/FPE, Lei Complementar nº 101/2000 - LRF, Portaria STN nº 447/2018 e Art. 159 da CF/88) consolidando o quinto conector da Wave 3: 5 tabelas (stn_sadipem_pvl, stn_transferencias_fpm, stn_transferencias_fpe, stn_capag_municipios, stn_divida_consolidada) materializadas em data/stn_tesouro_transparente/{bronze,silver,gold}/; 11 novos modelos dbt (5 staging views, dim_ente_federativo_stn, fct_operacao_credito_pvl, fct_transferencia_constitucional_fpm, fct_capacidade_pagamento_capag, mart_saude_fiscal_municipios_brasil, mart_operacoes_credito_sadipem) totalizando 170 modelos e 1658 testes dbt 100% aprovados; 1943 colunas 100% documentadas no linter (100% coverage); feature store features_fiscal_municipios_brasil.parquet gerada com indicadores fiscais LRF (Dívida Consolidada / RCL, Despesa de Pessoal / RCL, Poupança Corrente, Rating CAPAG A/B/C/D) e score contínuo de 0 a 100 de saúde fiscal municipal; testes reais com fail-hard contra a API SADIPEM do Tesouro Nacional e CKAN do Tesouro Transparente com 11 testes pytest aprovados (150 testes offline totais no repositório); multi-interface completa via SDK (PublicData.treasury.* e aliases), CLI (pdg treasury e sadipem), REST API (/api/v1/treasury/* e /api/v1/sadipem/*) e MCP (bdg_get_municipality_fiscal_health, bdg_get_sadipem_credit_operations) com contenção de prompt injection."
     }
   ]
 }

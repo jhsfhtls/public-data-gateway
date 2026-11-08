@@ -2712,3 +2712,198 @@ models:
         description: "Taxa de inadimplência da carteira classificada com atraso superior a 90 dias (%)."
         tests:
           - not_null
+
+  - name: dim_ente_federativo_stn
+    description: "Dimensão analítica consolidada de entes subnacionais (Municípios e Estados) com notas fiscais vigentes da STN"
+    columns:
+      - name: id_municipio_ibge_7d
+        description: "Código IBGE canônico de 7 dígitos do ente municipal"
+        tests:
+          - not_null
+          - unique
+      - name: sigla_uf
+        description: "Sigla de 2 letras da Unidade Federativa"
+        tests:
+          - not_null
+      - name: nome_ente
+        description: "Nome oficial do município ou ente federativo"
+        tests:
+          - not_null
+      - name: ano_referencia_fiscal
+        description: "Ano do exercício fiscal de referência"
+        tests:
+          - not_null
+      - name: nota_capag_vigente
+        description: "Nota oficial vigente da Capacidade de Pagamento (A, B ou C)"
+        tests:
+          - not_null
+      - name: receita_corrente_liquida_rcl
+        description: "Receita Corrente Líquida anual em BRL"
+      - name: divida_consolidada_liquida_dcl
+        description: "Dívida Consolidada Líquida apurada em BRL"
+      - name: razao_dcl_rcl_pct
+        description: "Percentual apurado da relação DCL/RCL (%)"
+
+  - name: fct_operacao_credito_pvl
+    description: "Fato de pedidos de verificação de limites e operações de crédito de entes subnacionais (SADIPEM PVL)"
+    columns:
+      - name: id_pleito
+        description: "Identificador sequencial único do pleito no SADIPEM"
+        tests:
+          - not_null
+          - unique
+      - name: tipo_interessado
+        description: "Categoria do ente público requerente"
+        tests:
+          - not_null
+      - name: interessado
+        description: "Nome do ente solicitante da operação de crédito"
+        tests:
+          - not_null
+      - name: id_municipio_ibge_7d
+        description: "Código IBGE de 7 dígitos do município"
+        tests:
+          - not_null
+      - name: sigla_uf
+        description: "Sigla da Unidade Federativa"
+        tests:
+          - not_null
+      - name: num_pvl
+        description: "Número do processo PVL na STN"
+        tests:
+          - not_null
+      - name: status_pleito
+        description: "Parecer ou status de tramitação do pleito"
+        tests:
+          - not_null
+      - name: tipo_operacao
+        description: "Modalidade da operação de crédito"
+        tests:
+          - not_null
+      - name: finalidade
+        description: "Finalidade dos recursos captados"
+        tests:
+          - not_null
+      - name: tipo_credor
+        description: "Classificação institucional do credor"
+        tests:
+          - not_null
+      - name: credor
+        description: "Razão social da instituição financeira financiadora"
+        tests:
+          - not_null
+      - name: moeda
+        description: "Moeda contratual pactuada"
+        tests:
+          - not_null
+      - name: valor_operacao
+        description: "Montante autorizado da operação de crédito em BRL"
+        tests:
+          - not_null
+      - name: data_status
+        description: "Data do parecer ou despacho do pleito"
+        tests:
+          - not_null
+
+  - name: fct_transferencia_constitucional_fpm
+    description: "Fato agregada mensal de repasses constitucionais do Fundo de Participação dos Municípios (FPM)"
+    columns:
+      - name: id_municipio_ibge_7d
+        description: "Código IBGE canônico de 7 dígitos do município"
+        tests:
+          - not_null
+      - name: sigla_uf
+        description: "Sigla da Unidade Federativa"
+        tests:
+          - not_null
+      - name: nome_municipio
+        description: "Nome oficial do município beneficiário"
+        tests:
+          - not_null
+      - name: ano_exercicio
+        description: "Ano do exercício orçamentário"
+        tests:
+          - not_null
+      - name: mes_competencia
+        description: "Mês civil de apuração das transferências (1 a 12)"
+        tests:
+          - not_null
+      - name: valor_bruto_fpm_mes
+        description: "Total bruto repassado do FPM no mês em BRL"
+        tests:
+          - not_null
+      - name: deducao_fundeb_mes
+        description: "Total de retenção obrigatória do FUNDEB no mês em BRL"
+        tests:
+          - not_null
+      - name: deducao_saude_mes
+        description: "Total de retenção para a Saúde no mês em BRL"
+        tests:
+          - not_null
+      - name: valor_liquido_fpm_mes
+        description: "Total líquido creditado ao município no mês em BRL"
+        tests:
+          - not_null
+      - name: total_decendios_creditados
+        description: "Quantidade de decêndios com repasse efetivado no mês"
+        tests:
+          - not_null
+
+  - name: fct_capacidade_pagamento_capag
+    description: "Fato de classificação de Capacidade de Pagamento (CAPAG) e endividamento LRF"
+    columns:
+      - name: id_municipio_ibge_7d
+        description: "Código IBGE de 7 dígitos do ente federativo"
+        tests:
+          - not_null
+      - name: sigla_uf
+        description: "Sigla da Unidade Federativa"
+        tests:
+          - not_null
+      - name: nome_ente
+        description: "Nome oficial do ente avaliado"
+        tests:
+          - not_null
+      - name: ano_exercicio
+        description: "Ano civil de exercício fiscal"
+        tests:
+          - not_null
+      - name: indicador_1_endividamento_pct
+        description: "Indicador 1 de Endividamento DCL/RCL (%)"
+        tests:
+          - not_null
+      - name: indicador_2_poupanca_corrente_pct
+        description: "Indicador 2 de Poupança Corrente Despesa/Receita (%)"
+        tests:
+          - not_null
+      - name: indicador_3_liquidez_relativa_pct
+        description: "Indicador 3 de Liquidez Relativa Obrigações/Caixa (%)"
+        tests:
+          - not_null
+      - name: nota_indicador_1
+        description: "Conceito apurado no Indicador 1 (A, B ou C)"
+        tests:
+          - not_null
+      - name: nota_indicador_2
+        description: "Conceito apurado no Indicador 2 (A, B ou C)"
+        tests:
+          - not_null
+      - name: nota_indicador_3
+        description: "Conceito apurado no Indicador 3 (A, B ou C)"
+        tests:
+          - not_null
+      - name: nota_capag_final
+        description: "Nota global final da Capacidade de Pagamento CAPAG"
+        tests:
+          - not_null
+      - name: receita_corrente_liquida_rcl
+        description: "Receita Corrente Líquida do ente em BRL"
+      - name: divida_consolidada_bruta
+        description: "Estoque da Dívida Consolidada Bruta em BRL"
+      - name: disponibilidade_caixa_bruta
+        description: "Saldo de disponibilidades de caixa em BRL"
+      - name: divida_consolidada_liquida_dcl
+        description: "Dívida Consolidada Líquida em BRL"
+      - name: limite_senado_rcl_pct
+        description: "Limite máximo prudencial fixado pelo Senado Federal (%)"
+

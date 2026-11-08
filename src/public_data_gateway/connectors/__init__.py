@@ -21,3 +21,4 @@ import public_data_gateway.connectors.macrofinanceiro.bcb_olinda_ptax  # noqa: F
 import public_data_gateway.connectors.macrofinanceiro.bcb_sgs  # noqa: F401
 import public_data_gateway.connectors.macrofinanceiro.cvm_dfp_itr  # noqa: F401
 import public_data_gateway.connectors.macrofinanceiro.cvm_fundos  # noqa: F401
+import public_data_gateway.connectors.macrofinanceiro.stn_tesouro_transparente  # noqa: F401

@@ -1,0 +1,235 @@
+version: 2
+
+models:
+  - name: stg_stn_sadipem_pvl
+    description: "Staging view para pleitos de verificação de limites de operações de crédito subnacionais (SADIPEM PVL)"
+    columns:
+      - name: id_pleito
+        description: "Identificador sequencial único do pleito no SADIPEM"
+        tests:
+          - not_null
+          - unique
+      - name: tipo_interessado
+        description: "Categoria do ente interessado (Município ou Estado)"
+        tests:
+          - not_null
+      - name: interessado
+        description: "Nome oficial do ente público proponente da operação"
+        tests:
+          - not_null
+      - name: id_municipio_ibge_7d
+        description: "Código IBGE de 7 dígitos do município proponente"
+        tests:
+          - not_null
+      - name: sigla_uf
+        description: "Sigla de 2 letras da Unidade Federativa"
+        tests:
+          - not_null
+      - name: num_pvl
+        description: "Número do processo PVL perante o Tesouro Nacional"
+        tests:
+          - not_null
+      - name: status_pleito
+        description: "Status de tramitação ou parecer conclusivo da STN"
+        tests:
+          - not_null
+      - name: tipo_operacao
+        description: "Classificação da operação (contratual interna ou externa)"
+        tests:
+          - not_null
+      - name: finalidade
+        description: "Destinação socioeconômica dos recursos captados"
+        tests:
+          - not_null
+      - name: tipo_credor
+        description: "Tipo de entidade credora (Nacional ou Organismo Multilateral)"
+        tests:
+          - not_null
+      - name: credor
+        description: "Nome do banco ou agência credora concedente do crédito"
+        tests:
+          - not_null
+      - name: moeda
+        description: "Moeda padrão pactuada no contrato de crédito"
+        tests:
+          - not_null
+      - name: valor_operacao
+        description: "Valor total autorizado da operação de crédito em BRL"
+        tests:
+          - not_null
+      - name: data_status
+        description: "Data da última atualização ou deferimento do pleito"
+        tests:
+          - not_null
+
+  - name: stg_stn_transferencias_fpm
+    description: "Staging view de repasses constitucionais do Fundo de Participação dos Municípios (FPM)"
+    columns:
+      - name: id_municipio_ibge_7d
+        description: "Código IBGE canônico de 7 dígitos do município"
+        tests:
+          - not_null
+      - name: sigla_uf
+        description: "Sigla da Unidade Federativa do município"
+        tests:
+          - not_null
+      - name: nome_municipio
+        description: "Nome oficial do município beneficiário"
+        tests:
+          - not_null
+      - name: ano_exercicio
+        description: "Ano do exercício financeiro do repasse"
+        tests:
+          - not_null
+      - name: mes_competencia
+        description: "Mês de competência orçamentária do repasse (1 a 12)"
+        tests:
+          - not_null
+      - name: decendio
+        description: "Número do decêndio de transferência bancária (1, 2 ou 3)"
+        tests:
+          - not_null
+      - name: valor_bruto_fpm
+        description: "Valor bruto apurado da cota-parte do FPM em BRL"
+        tests:
+          - not_null
+      - name: deducao_fundeb
+        description: "Retenção legal obrigatória de 20% para o FUNDEB em BRL"
+        tests:
+          - not_null
+      - name: deducao_saude
+        description: "Retenção legal obrigatória de 15% para a Saúde em BRL"
+        tests:
+          - not_null
+      - name: valor_liquido_fpm
+        description: "Montante líquido creditado na conta do ente municipal em BRL"
+        tests:
+          - not_null
+
+  - name: stg_stn_transferencias_fpe
+    description: "Staging view de repasses constitucionais do Fundo de Participação dos Estados (FPE)"
+    columns:
+      - name: sigla_uf
+        description: "Sigla de 2 caracteres da Unidade Federativa estadual"
+        tests:
+          - not_null
+      - name: nome_uf
+        description: "Nome por extenso do Estado beneficiário do FPE"
+        tests:
+          - not_null
+      - name: ano_exercicio
+        description: "Ano de competência orçamentária do repasse"
+        tests:
+          - not_null
+      - name: mes_competencia
+        description: "Mês de competência financeira do repasse"
+        tests:
+          - not_null
+      - name: decendio
+        description: "Decêndio de crédito bancário do repasse (1 a 3)"
+        tests:
+          - not_null
+      - name: valor_bruto_fpe
+        description: "Valor bruto apurado da cota-parte estadual do FPE em BRL"
+        tests:
+          - not_null
+      - name: deducao_fundeb
+        description: "Dedução legal obrigatória de 20% para o FUNDEB em BRL"
+        tests:
+          - not_null
+      - name: valor_liquido_fpe
+        description: "Valor líquido transferido ao tesouro estadual em BRL"
+        tests:
+          - not_null
+
+  - name: stg_stn_capag_municipios
+    description: "Staging view da classificação da Capacidade de Pagamento (CAPAG) de Estados e Municípios"
+    columns:
+      - name: id_municipio_ibge_7d
+        description: "Código IBGE de 7 dígitos do ente público avaliado"
+        tests:
+          - not_null
+      - name: sigla_uf
+        description: "Sigla da Unidade Federativa correspondente"
+        tests:
+          - not_null
+      - name: nome_ente
+        description: "Nome oficial do ente federativo subnacional"
+        tests:
+          - not_null
+      - name: ano_exercicio
+        description: "Ano base de análise das contas públicas e balancetes"
+        tests:
+          - not_null
+      - name: indicador_1_endividamento_pct
+        description: "Indicador 1 - Relação DCL/RCL em percentual"
+        tests:
+          - not_null
+      - name: indicador_2_poupanca_corrente_pct
+        description: "Indicador 2 - Relação Despesa Corrente/Receita Corrente em percentual"
+        tests:
+          - not_null
+      - name: indicador_3_liquidez_relativa_pct
+        description: "Indicador 3 - Relação Obrigações Financeiras/Disponibilidade em percentual"
+        tests:
+          - not_null
+      - name: nota_indicador_1
+        description: "Conceito obtido no Indicador 1 (A, B ou C)"
+        tests:
+          - not_null
+      - name: nota_indicador_2
+        description: "Conceito obtido no Indicador 2 (A, B ou C)"
+        tests:
+          - not_null
+      - name: nota_indicador_3
+        description: "Conceito obtido no Indicador 3 (A, B ou C)"
+        tests:
+          - not_null
+      - name: nota_capag_final
+        description: "Conceito global final da CAPAG (A, B ou C)"
+        tests:
+          - not_null
+
+  - name: stg_stn_divida_consolidada
+    description: "Staging view de balanço de Dívida Consolidada Líquida e Receita Corrente Líquida"
+    columns:
+      - name: id_municipio_ibge_7d
+        description: "Código IBGE canônico de 7 dígitos do município ou ente"
+        tests:
+          - not_null
+      - name: sigla_uf
+        description: "Sigla da Unidade Federativa"
+        tests:
+          - not_null
+      - name: nome_ente
+        description: "Nome oficial do ente público"
+        tests:
+          - not_null
+      - name: ano_exercicio
+        description: "Ano civil de apuração das variáveis fiscais"
+        tests:
+          - not_null
+      - name: receita_corrente_liquida_rcl
+        description: "Receita Corrente Líquida (RCL) acumulada em 12 meses em BRL"
+        tests:
+          - not_null
+      - name: divida_consolidada_bruta
+        description: "Estoque da Dívida Consolidada Bruta (DCB) em BRL"
+        tests:
+          - not_null
+      - name: disponibilidade_caixa_bruta
+        description: "Disponibilidades totais de caixa e ativos financeiros em BRL"
+        tests:
+          - not_null
+      - name: divida_consolidada_liquida_dcl
+        description: "Dívida Consolidada Líquida (DCB deduzidas Disponibilidades) em BRL"
+        tests:
+          - not_null
+      - name: razao_dcl_rcl_pct
+        description: "Percentual apurado da relação DCL sobre RCL (%)"
+        tests:
+          - not_null
+      - name: limite_senado_rcl_pct
+        description: "Teto prudencial fixado pelo Senado Federal para o ente (%)"
+        tests:
+          - not_null
