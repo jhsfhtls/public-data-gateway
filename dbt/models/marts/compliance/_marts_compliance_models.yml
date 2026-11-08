@@ -64,3 +64,47 @@ models:
         description: "Valor médio das multas pecuniárias aplicadas no estrato de agregação."
         tests:
           - not_null
+
+  - name: mart_pep_distribuicao_brasil
+    description: "Datamart analítico de distribuição e exposição política de Pessoas Expostas Politicamente (PEP) no Brasil."
+    columns:
+      - name: sigla_uf_orgao
+        description: "Unidade da Federação de lotação do órgão público da autoridade PEP."
+        tests:
+          - not_null
+      - name: nome_orgao
+        description: "Órgão, ministério, tribunal ou entidade pública de exercício da função."
+        tests:
+          - not_null
+      - name: sigla_funcao
+        description: "Sigla cadastral do cargo ou mandato público exercido."
+        tests:
+          - not_null
+      - name: descricao_funcao
+        description: "Denominação oficial por extenso da função pública."
+        tests:
+          - not_null
+      - name: categoria_exposicao
+        description: "Classificação institucional da exposição política do cargo perante o COAF."
+        tests:
+          - not_null
+      - name: grau_risco_pld
+        description: "Grau de risco regulatório para fins de Prevenção à Lavagem de Dinheiro (CRITICO, ALTO, MODERADO)."
+        tests:
+          - not_null
+      - name: is_pep_ativo
+        description: "Indicador se as autoridades no estrato estão ativas ou sob carência regulatória."
+        tests:
+          - not_null
+      - name: total_mandatos_registrados
+        description: "Contagem total de registros de mandatos e tenures no estrato de agregação."
+        tests:
+          - not_null
+      - name: total_titulares_pep
+        description: "Quantidade distinta de titulares individuais de cargos PEP."
+        tests:
+          - not_null
+      - name: total_titulares_pep_ativos
+        description: "Quantidade distinta de titulares com mandato ou carência regulatória ativa."
+        tests:
+          - not_null

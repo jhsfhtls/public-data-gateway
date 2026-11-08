@@ -1,0 +1,18 @@
+version: 2
+
+sources:
+  - name: cgu_pep
+    description: "Bases oficiais do Cadastro de Pessoas Expostas Politicamente (PEP) da Controladoria-Geral da União (CGU) em formato Parquet ZSTD."
+    meta:
+      external_location: "data/cgu_pep/silver/{name}.parquet"
+    tables:
+      - name: cgu_pep
+        description: "Cadastro consolidado de autoridades públicas em exercício e ex-ocupantes de cargos públicos com carência ativa (Resolução COAF nº 40/2021)."
+      - name: cgu_pep_orgaos
+        description: "Tabela de órgãos públicos, ministérios, tribunais e entidades com postos de liderança e representação PEP."
+      - name: cgu_pep_funcoes
+        description: "Catálogo normativo de funções, cargos públicos e níveis hierárquicos enquadrados como PEP pelo COAF."
+      - name: cgu_pep_historico_carencia
+        description: "Histórico de mandatos encerrados e acompanhamento da carência regulatória de 5 anos para fins de PLD/FTP."
+      - name: cgu_pep_relacionados
+        description: "Cadastro de pessoas estreitamente relacionadas a PEP (familiares de 1º grau, cônjuges e vínculos societários)."

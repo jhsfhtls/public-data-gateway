@@ -285,4 +285,30 @@ def create_app(settings: GatewaySettings | None = None) -> FastAPI:
                 break
         return results
 
+    # 7. Politically Exposed Persons (PEP) Routes
+    @app.get("/api/v1/pep/status/{cpf_or_name}")
+    async def get_pep_status(cpf_or_name: str) -> dict[str, Any]:
+        from public_data_gateway.connectors.compliance.cgu_pep.connector import (
+            CGUPEPConnector,
+        )
+
+        conn = CGUPEPConnector(settings=app_settings)
+        return conn.get_pep_status(cpf_or_name)
+
+    @app.get("/api/v1/pep")
+    async def list_pep(
+        uf: str | None = None,
+        sigla_funcao: str | None = None,
+        ativos_only: bool = True,
+        limit: int = 50,
+    ) -> list[dict[str, Any]]:
+        from public_data_gateway.connectors.compliance.cgu_pep.connector import (
+            CGUPEPConnector,
+        )
+
+        conn = CGUPEPConnector(settings=app_settings)
+        return conn.list_pep(
+            uf=uf, sigla_funcao=sigla_funcao, ativos_only=ativos_only, limit=limit
+        )
+
     return app
