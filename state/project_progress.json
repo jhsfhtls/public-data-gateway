@@ -1,0 +1,211 @@
+{
+  "schema_version": "1.0.0",
+  "last_updated": "2026-11-07",
+  "project_name": "brazil-data-gateway",
+  "ecosystem": "C.O.R.E. (core, operations, career, studies)",
+  "governing_pops": [
+    "POP_T_177",
+    "POP_T_176",
+    "POP_T_175",
+    "POP_T_174",
+    "POP_T_070",
+    "POP_T_074",
+    "POP_T_148"
+  ],
+  "current_macro_phase_id": "02",
+  "current_macro_phase": "Fase 02 — Fundação do Catálogo (45+ Fontes), Normalização Canônica & Interfaces Unificadas",
+  "overall_status": "ON_TRACK",
+  "active_connector": null,
+  "next_connector": "ibge_localidades",
+  "structural_phases": [
+    {
+      "phase_id": "00",
+      "name": "Arquitetura, Governança & Decisões Fundacionais (ADRs)",
+      "status": "COMPLETED",
+      "completion_date": "2026-11-07",
+      "deliverables": [
+        "ADR-001: Storage Híbrido Medallion (SQLite WAL + DuckDB Parquet ZSTD)",
+        "ADR-002: Chaves Canônicas STRING, Contratos ODCS v3.1 & Quarentena",
+        "ADR-003: Hardening DevSecOps, Proteção LGPD & Client Path Shield"
+      ]
+    },
+    {
+      "phase_id": "01",
+      "name": "Estrutura do Repositório Satélite, CI/CD & DevSecOps",
+      "status": "COMPLETED",
+      "completion_date": "2026-11-07",
+      "deliverables": [
+        "Repositório satélite brazil-data-gateway inicializado",
+        "Isolamento Python 3.12 (.venv) e dependências pinadas (requirements.txt, requirements-dev.txt)",
+        "Configuração de CI (.github/workflows/ci.yml e pr-lint.yml)",
+        "Templates padronizados de Pull Request (feature, bugfix, docs)"
+      ]
+    },
+    {
+      "phase_id": "02",
+      "name": "Fundação do Catálogo (45+ Fontes), Normalização Canônica & Interfaces Unificadas",
+      "status": "COMPLETED",
+      "completion_date": "2026-11-07",
+      "deliverables": [
+        "Base de referência sanitizada dos 5.571 municípios brasileiros (zero falhas de UF)",
+        "Catálogo formal de 49 fontes governamentais nos 13 macrosegmentos (catalog/sources_registry.yaml)",
+        "Renderizador determinístico do catálogo (scripts/render_catalog.py & CATALOG.md)",
+        "Tracker vivo da jornada de implementação (state/project_progress.json, scripts/render_progress.py & JORNADA_IMPLEMENTACAO.md)",
+        "Validação de integridade (--check) e conformidade ruff 100% verde"
+      ]
+    },
+    {
+      "phase_id": "03",
+      "name": "Ingestão Wave 1 — APIs de Borda & Macroeconomia",
+      "status": "PENDING",
+      "completion_date": null,
+      "deliverables": [
+        "Conector ibge_localidades (5.571 municípios, 27 UFs, 5 regiões)",
+        "Conector brasilapi_core (CEPs, bancos, DDDs, borda síncrona)",
+        "Conector bcb_sgs (Séries macroeconômicas: IPCA, Selic, IGP-M)",
+        "Conector bcb_olinda_ptax (Cotações PTAX diárias OData v4)"
+      ]
+    },
+    {
+      "phase_id": "04",
+      "name": "Ingestão Wave 2 — B2B, Compras Públicas & Compliance",
+      "status": "PENDING",
+      "completion_date": null,
+      "deliverables": [
+        "Conector rfb_cnpj_lakehouse (55M CNPJs em streaming DuckDB)",
+        "Conector rfb_simples_mei (Enquadramento tributário Simples/MEI)",
+        "Conector pncp_contratacoes (Licitações Lei 14.133)",
+        "Conector cgu_ceis_cnep & cgu_pep (Sanções e autoridades PEP)",
+        "Conector cnj_datajud (Metadados processuais de 90+ tribunais)",
+        "Conector tst_cndt (Certidões trabalhistas negativas)",
+        "Conector suframa_pim_zfm (Empresas incentivadas Polo Industrial)"
+      ]
+    },
+    {
+      "phase_id": "05",
+      "name": "Ingestão Wave 3 — Mercado de Capitais & Finanças Públicas",
+      "status": "PENDING",
+      "completion_date": null,
+      "deliverables": [
+        "Conector cvm_dfp_itr (Balanços e DRE de companhias abertas)",
+        "Conector cvm_fundos (Informes diários de fundos)",
+        "Conector bcb_ifdata (Balanços de instituições financeiras)",
+        "Conector stn_tesouro_transparente (SADIPEM e dívida pública)",
+        "Conector mdic_comexstat (Balança comercial por NCM e município)",
+        "Conector comprasgov_catmat (Catálogo unificado de compras públicas)"
+      ]
+    },
+    {
+      "phase_id": "06",
+      "name": "Ingestão Wave 4 — Censo, Trabalho, Logística & Telecom",
+      "status": "PENDING",
+      "completion_date": null,
+      "deliverables": [
+        "Conectores ibge_sidra, ibge_pib_municipal, ibge_censo2022, ibge_pnad_continua",
+        "Conectores mte_novo_caged & mte_rais",
+        "Conectores ibge_cnefe, ibge_malhas, anatel_mosaico, antt_malha_transporte"
+      ]
+    },
+    {
+      "phase_id": "07",
+      "name": "Ingestão Wave 5 — Saúde, Educação & Setor Notarial",
+      "status": "PENDING",
+      "completion_date": null,
+      "deliverables": [
+        "Conectores DataSUS (CNES, SIH, SIM, SINASC, OpenDataSUS) & anvisa_cmed",
+        "Conectores INEP (Censo Escolar, Superior, IDEB, ENEM) & capes_sucupira",
+        "Conectores Notariais (cnj_justica_aberta, onr_registro_imoveis, capitais_iptu_itbi)"
+      ]
+    },
+    {
+      "phase_id": "08",
+      "name": "Ingestão Wave 6 — Meio Ambiente, Agro & Metaportais",
+      "status": "PENDING",
+      "completion_date": null,
+      "deliverables": [
+        "Conectores Ambientais (ana_hidroweb, inpe_terrabrasilis, mapbiomas, sfb_sicar, mapa_zarc)",
+        "Conectores Metaportais (basedosdados_bq, dadosgov_ckan)"
+      ]
+    }
+  ],
+  "active_connector_gates": {
+    "target_connector": "ibge_localidades",
+    "target_wave": 1,
+    "gates": [
+      {
+        "gate_id": "GATE_01",
+        "name": "Contrato Declarativo ODCS v3.1",
+        "status": "NOT_STARTED",
+        "criteria": "Schema tipado, chaves primárias STRING, regras de qualidade e limites de volume declarados em contract.yaml."
+      },
+      {
+        "gate_id": "GATE_02",
+        "name": "Ingestão Bronze & Cache WAL",
+        "status": "NOT_STARTED",
+        "criteria": "Download resiliente com circuit breaker, backoff exponencial e cache SQLite WAL com suporte a Stale-While-Error."
+      },
+      {
+        "gate_id": "GATE_03",
+        "name": "Sanitização de Sentinelas & Nulls",
+        "status": "NOT_STARTED",
+        "criteria": "Conversão determinística de códigos sentinela (99, 999, -1, 'SEM INFORMACAO') em NULLs reais."
+      },
+      {
+        "gate_id": "GATE_04",
+        "name": "Materialização Silver Parquet & Manifesto",
+        "status": "NOT_STARTED",
+        "criteria": "Gravação colunar Parquet ZSTD via atomic swap (.tmp.parquet -> rename) com selagem criptográfica SHA-256."
+      },
+      {
+        "gate_id": "GATE_05",
+        "name": "Validação dos 5 Pilares de Observabilidade",
+        "status": "NOT_STARTED",
+        "criteria": "Aprovação em Freshness, Volume, Schema, Null Ceiling e Lineage; desvio automático para data/quarantine/ se violado."
+      },
+      {
+        "gate_id": "GATE_06",
+        "name": "Gold Feature View & ASOF Join ML",
+        "status": "NOT_STARTED",
+        "criteria": "Features analíticas agregadas com suporte a point-in-time join evitando data leakage para modelos preditivos."
+      },
+      {
+        "gate_id": "GATE_07",
+        "name": "Integração ao EnrichmentEngine",
+        "status": "NOT_STARTED",
+        "criteria": "Disponibilização para enriquecimento cadastral batch/online respeitando o Client Path Shield (POP_T_154)."
+      },
+      {
+        "gate_id": "GATE_08",
+        "name": "Exposição Multi-Interface",
+        "status": "NOT_STARTED",
+        "criteria": "Exposição síncrona/analítica simultânea via Python SDK (BrazilData), REST (/api/v1), CLI (bdg) e Servidor MCP (bdg-mcp)."
+      },
+      {
+        "gate_id": "GATE_09",
+        "name": "Bateria de Testes Offline & Documentação",
+        "status": "NOT_STARTED",
+        "criteria": "Testes unitários offline com fixtures locais, documentação no CATALOG.md e passagem limpa nos linters."
+      }
+    ]
+  },
+  "history": [
+    {
+      "date": "2026-11-07",
+      "phase_id": "00",
+      "milestone": "Arquitetura & Governança Fundacional",
+      "summary": "Elaboração das ADR-001 (Storage Híbrido Medallion), ADR-002 (Chaves Canônicas e Quarentena) e ADR-003 (DevSecOps e LGPD) fundamentadas nos POP_T_177, POP_T_176, POP_T_175, POP_T_070 e POP_T_074."
+    },
+    {
+      "date": "2026-11-07",
+      "phase_id": "01",
+      "milestone": "Setup do Repositório Satélite & Workflows CI",
+      "summary": "Inicialização do repositório satélite brazil-data-gateway com isolamento venv Python 3.12, pyproject.toml, requirements.txt pinados, templates de PR e workflows de CI (pr-lint e ci.yml)."
+    },
+    {
+      "date": "2026-11-07",
+      "phase_id": "02",
+      "milestone": "Catálogo Mestre (49 Fontes), Normalização Canônica & Interfaces Unificadas",
+      "summary": "Catalogação formal de 49 fontes públicas nos 13 macrosegmentos e Ondas 1..6; sanitização da base de referência dos 5.571 municípios brasileiros; implementação dos motores determinísticos render_catalog.py e render_progress.py com verificação --check."
+    }
+  ]
+}

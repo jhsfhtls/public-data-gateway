@@ -1,0 +1,1261 @@
+schema_version: 1.0.0
+updated_at: '2026-11-07'
+segments:
+- segment_id: 01_b2b_empresarial
+  name: Empresarial, Cadastral & Societário B2B
+  description: Dados de mais de 55 milhões de CNPJs (matrizes, filiais, sócios QSA,
+    capital social, CNAEs, situação cadastral, optantes pelo Simples Nacional e MEI).
+- segment_id: 02_economico_macrofinanceiro
+  name: Econômico, Monetário & Macrofinanceiro
+  description: Séries macroeconômicas oficiais (IPCA, Selic, IGP-M), balanços contábeis
+    trimestrais de instituições financeiras (IFData), cotações diárias de moedas (PTAX)
+    e dados contábeis da CVM.
+- segment_id: 03_demografico_censitario
+  name: Demográfico, Censitário & Domiciliar
+  description: Censo Demográfico 2022 em nível de 450.000 setores censitários, características
+    de domicílios, PNAD Contínua (renda e trabalho) e PIB municipal do IBGE.
+- segment_id: 04_trabalho_renda
+  name: Trabalho, Emprego & Renda
+  description: Fluxos mensais de contratações e demissões do Novo CAGED (salários
+    de admissão por CBO e setor) e estoque de empregos da RAIS.
+- segment_id: 05_geografico_logistica
+  name: Geográfico, Logístico & Endereçamento
+  description: 111+ milhões de coordenadas pontuais do CNEFE/IBGE, limites territoriais
+    vetoriais, base de logradouros/CEPs e antenas de telecomunicação da Anatel.
+- segment_id: 06_saude_publica
+  name: Saúde Pública & Epidemiologia
+  description: Registros de óbitos (SIM), nascimentos (SINASC), internações hospitalares
+    (SIH/SUS), estabelecimentos de saúde (CNES) e preços regulados de medicamentos
+    (CMED/ANVISA).
+- segment_id: 07_educacao_capital_humano
+  name: Educação & Capital Humano
+  description: Infraestrutura de escolas e matrículas (Censo Escolar), universidades
+    e cursos (Censo Superior), notas por escola (IDEB) e microdados do ENEM.
+- segment_id: 08_judicial_compliance
+  name: Judicial, Integridade & Compliance
+  description: Metadados de processos de todos os 90+ tribunais do Brasil (CNJ DataJud),
+    cadastros de inidôneos e punidos (CEIS/CNEP/CEPIM), autoridades (PEP) e certidões
+    negativas (CNDT).
+- segment_id: 09_comercio_exterior
+  name: Comércio Exterior & Balança Comercial
+  description: Exportações e importações detalhadas por NCM, valor FOB, peso líquido,
+    modal de transporte e município do exportador (Comex Stat).
+- segment_id: 10_compras_publicas
+  name: Compras Públicas, Licitações & Contratos
+  description: Repositório unificado da Lei nº 14.133/2021 (PNCP) com editais, atas
+    e contratos de todos os entes federados e catálogo unificado CATMAT/CATSER.
+- segment_id: 11_agronegocio_meio_ambiente
+  name: Agronegócio, Terra & Meio Ambiente
+  description: 7+ milhões de imóveis rurais com polígonos de reserva legal e APP (SICAR/CAR),
+    desmatamento e alertas por satélite (INPE DETER/PRODES), uso da terra (MapBiomas)
+    e zoneamento climático (ZARC).
+- segment_id: 12_imobiliario_cartorial
+  name: Imobiliário, Notarial & Cartorial
+  description: Cadastro nacional de cartórios e produtividade (CNJ Justiça Aberta),
+    transações registradas (ONR) e cadastros imobiliários municipais (IPTU/ITBI).
+- segment_id: 13_metaportais_agregadores
+  name: Metaportais & Hubs Agregadores
+  description: Plataformas de facilitação técnica que unificam e padronizam centenas
+    de fontes em protocolos únicos (Base dos Dados, BrasilAPI, Dados.gov.br).
+sources:
+- source_id: ibge_localidades
+  name: IBGE Localidades & Malha Territorial
+  agency: Instituto Brasileiro de Geografia e Estatística (IBGE)
+  official_url: https://servicodados.ibge.gov.br/api/docs/localidades
+  segment_id: 05_geografico_logistica
+  segment_name: Geográfico, Logístico & Endereçamento
+  access_mode: FEDERATED_API
+  protocol: REST_JSON
+  auth_type: NONE
+  canonical_keys:
+  - id_municipio
+  - sigla_uf
+  update_frequency: Eventual (Criação de novos municípios)
+  estimated_volume: 5.571 municípios, 27 UFs, 5 regiões (~2 MB)
+  lgpd_tier: PUBLIC_NON_PERSONAL
+  ml_feature_domains:
+  - territorial_hierarchy
+  - geo_resolution
+  core_products_enabled:
+  - P01
+  - P02
+  - P03
+  rice_score: 950
+  roadmap_wave: 1
+  status: CATALOGED
+- source_id: brasilapi_core
+  name: 'BrasilAPI: CEPs, FIPE, Bancos, DDD & CNPJ de Borda'
+  agency: Comunidade Open Source BrasilAPI
+  official_url: https://brasilapi.com.br/docs
+  segment_id: 13_metaportais_agregadores
+  segment_name: Metaportais & Hubs Agregadores
+  access_mode: FEDERATED_API
+  protocol: REST_JSON
+  auth_type: NONE
+  canonical_keys:
+  - cep_8
+  - cnpj_14
+  - sigla_uf
+  update_frequency: Tempo Real (< 150 ms)
+  estimated_volume: Sob demanda (milissegundos)
+  lgpd_tier: PUBLIC_NON_PERSONAL
+  ml_feature_domains:
+  - geo_resolution
+  - entity_resolution
+  core_products_enabled:
+  - P01
+  - P02
+  - P03
+  - P04
+  rice_score: 880
+  roadmap_wave: 1
+  status: CATALOGED
+- source_id: bcb_sgs
+  name: 'Banco Central: Sistema Gerenciador de Séries Temporais (SGS)'
+  agency: Banco Central do Brasil (BACEN)
+  official_url: https://dadosabertos.bcb.gov.br/dataset/series-temporais
+  segment_id: 02_economico_macrofinanceiro
+  segment_name: Econômico, Monetário & Macrofinanceiro
+  access_mode: FEDERATED_API
+  protocol: REST_JSON
+  auth_type: NONE
+  canonical_keys: []
+  update_frequency: Diária / Mensal
+  estimated_volume: ~40 MB (Milhares de séries históricas)
+  lgpd_tier: PUBLIC_NON_PERSONAL
+  ml_feature_domains:
+  - macro_deflators
+  - monetary_indicators
+  core_products_enabled:
+  - P01
+  - P02
+  - P05
+  rice_score: 860
+  roadmap_wave: 1
+  status: CATALOGED
+- source_id: bcb_olinda_ptax
+  name: 'Banco Central Olinda: Cotações PTAX Moedas Diárias'
+  agency: Banco Central do Brasil (BACEN)
+  official_url: https://olinda.bcb.gov.br/olinda/servico/PTAX/versao/v1/swagger-ui3
+  segment_id: 02_economico_macrofinanceiro
+  segment_name: Econômico, Monetário & Macrofinanceiro
+  access_mode: FEDERATED_API
+  protocol: ODATA_V4
+  auth_type: NONE
+  canonical_keys: []
+  update_frequency: Diária (Tempo Real)
+  estimated_volume: ~10 KB/dia
+  lgpd_tier: PUBLIC_NON_PERSONAL
+  ml_feature_domains:
+  - fx_rates
+  - macro_deflators
+  core_products_enabled:
+  - P01
+  - P05
+  rice_score: 820
+  roadmap_wave: 1
+  status: CATALOGED
+- source_id: rfb_cnpj_lakehouse
+  name: 'Receita Federal: Cadastro Nacional da Pessoa Jurídica (CNPJ & QSA)'
+  agency: Receita Federal do Brasil
+  official_url: https://dados.gov.br/dados/conjuntos-dados/cadastro-nacional-da-pessoa-juridica---cnpj
+  segment_id: 01_b2b_empresarial
+  segment_name: Empresarial, Cadastral & Societário B2B
+  access_mode: LAKEHOUSE_BATCH
+  protocol: HTTP_BULK_ZIP
+  auth_type: NONE
+  canonical_keys:
+  - cnpj_14
+  - cnae_7
+  - id_municipio
+  - sigla_uf
+  - cep_8
+  update_frequency: Mensal
+  estimated_volume: ~80 GB descompactado (~55M CNPJs)
+  lgpd_tier: PUBLIC_CORPORATE_QSA
+  ml_feature_domains:
+  - firmographics
+  - corporate_hierarchy
+  - qsa_network
+  core_products_enabled:
+  - P01
+  - P02
+  - P04
+  - P06
+  rice_score: 840
+  roadmap_wave: 2
+  status: CATALOGED
+- source_id: pncp_contratacoes
+  name: 'PNCP: Portal Nacional de Contratações Públicas (Lei 14.133)'
+  agency: Governo Federal / PNCP
+  official_url: https://pncp.gov.br/api/consulta/swagger-ui/index.html
+  segment_id: 10_compras_publicas
+  segment_name: Compras Públicas, Licitações & Contratos
+  access_mode: FEDERATED_API
+  protocol: REST_JSON
+  auth_type: NONE
+  canonical_keys:
+  - cnpj_14
+  - id_municipio
+  - sigla_uf
+  update_frequency: Tempo Real Contínuo
+  estimated_volume: ~50k contratações/mês
+  lgpd_tier: PUBLIC_CORPORATE_QSA
+  ml_feature_domains:
+  - public_procurement
+  - vendor_risk
+  core_products_enabled:
+  - P01
+  - P02
+  - P04
+  rice_score: 790
+  roadmap_wave: 2
+  status: CATALOGED
+- source_id: cnj_datajud
+  name: 'CNJ: Base Nacional do Poder Judiciário (DataJud)'
+  agency: Conselho Nacional de Justiça (CNJ)
+  official_url: https://datajud-wiki.cnj.jus.br/
+  segment_id: 08_judicial_compliance
+  segment_name: Judicial, Integridade & Compliance
+  access_mode: FEDERATED_API
+  protocol: REST_JSON
+  auth_type: PUBLIC_KEY
+  canonical_keys:
+  - cnpj_14
+  - cpf_masked
+  update_frequency: Diária em tempo real
+  estimated_volume: Milhões de metadados processuais (90+ tribunais)
+  lgpd_tier: PUBLIC_CORPORATE_QSA
+  ml_feature_domains:
+  - legal_exposure
+  - court_litigation
+  core_products_enabled:
+  - P01
+  - P02
+  - P07
+  rice_score: 780
+  roadmap_wave: 2
+  status: CATALOGED
+- source_id: cgu_ceis_cnep
+  name: 'CGU: Cadastros de Empresas Inidôneas, Suspensas e Punidas (CEIS/CNEP)'
+  agency: Controladoria-Geral da União (CGU)
+  official_url: https://portaldatransparencia.gov.br/swagger-ui.html
+  segment_id: 08_judicial_compliance
+  segment_name: Judicial, Integridade & Compliance
+  access_mode: FEDERATED_API
+  protocol: REST_JSON
+  auth_type: ENV_TOKEN
+  canonical_keys:
+  - cnpj_14
+  - cpf_masked
+  update_frequency: Diária
+  estimated_volume: ~50k sanções ativas
+  lgpd_tier: PUBLIC_CORPORATE_QSA
+  ml_feature_domains:
+  - compliance_risk
+  - sanction_lists
+  core_products_enabled:
+  - P01
+  - P06
+  - P07
+  rice_score: 760
+  roadmap_wave: 2
+  status: CATALOGED
+- source_id: cgu_pep
+  name: 'CGU: Cadastro de Pessoas Expostas Politicamente (PEP)'
+  agency: Controladoria-Geral da União (CGU)
+  official_url: https://portaldatransparencia.gov.br/swagger-ui.html
+  segment_id: 08_judicial_compliance
+  segment_name: Judicial, Integridade & Compliance
+  access_mode: FEDERATED_API
+  protocol: REST_JSON
+  auth_type: ENV_TOKEN
+  canonical_keys:
+  - cpf_masked
+  update_frequency: Diária
+  estimated_volume: ~100k registros PEP
+  lgpd_tier: PUBLIC_AGENT_PEP
+  ml_feature_domains:
+  - compliance_risk
+  - pep_screening
+  core_products_enabled:
+  - P01
+  - P06
+  - P07
+  rice_score: 750
+  roadmap_wave: 2
+  status: CATALOGED
+- source_id: rfb_simples_mei
+  name: 'Receita Federal: Opção pelo Simples Nacional & MEI'
+  agency: Receita Federal do Brasil
+  official_url: https://dados.gov.br/dados/conjuntos-dados/simples-nacional
+  segment_id: 01_b2b_empresarial
+  segment_name: Empresarial, Cadastral & Societário B2B
+  access_mode: LAKEHOUSE_BATCH
+  protocol: HTTP_BULK_ZIP
+  auth_type: NONE
+  canonical_keys:
+  - cnpj_14
+  update_frequency: Mensal
+  estimated_volume: ~5 GB descompactado
+  lgpd_tier: PUBLIC_CORPORATE_QSA
+  ml_feature_domains:
+  - tax_regime
+  - sme_status
+  core_products_enabled:
+  - P01
+  - P02
+  rice_score: 720
+  roadmap_wave: 2
+  status: CATALOGED
+- source_id: tst_cndt
+  name: 'TST: Certidão Negativa de Débitos Trabalhistas (CNDT)'
+  agency: Tribunal Superior do Trabalho (TST)
+  official_url: https://cndt-certidao.tst.jus.br/
+  segment_id: 08_judicial_compliance
+  segment_name: Judicial, Integridade & Compliance
+  access_mode: FEDERATED_API
+  protocol: REST_JSON
+  auth_type: NONE
+  canonical_keys:
+  - cnpj_14
+  - cpf_masked
+  update_frequency: Sob demanda / Diária
+  estimated_volume: ~1 MB/dia
+  lgpd_tier: PUBLIC_CORPORATE_QSA
+  ml_feature_domains:
+  - labor_compliance
+  - labor_liabilities
+  core_products_enabled:
+  - P01
+  - P07
+  rice_score: 700
+  roadmap_wave: 2
+  status: CATALOGED
+- source_id: suframa_pim_zfm
+  name: 'SUFRAMA: Cadastro de Empresas Incentivadas do PIM / ZFM'
+  agency: Superintendência da Zona Franca de Manaus (SUFRAMA)
+  official_url: https://www.gov.br/suframa/pt-br
+  segment_id: 01_b2b_empresarial
+  segment_name: Empresarial, Cadastral & Societário B2B
+  access_mode: LAKEHOUSE_BATCH
+  protocol: HTTP_BULK_ZIP
+  auth_type: NONE
+  canonical_keys:
+  - cnpj_14
+  - id_municipio
+  - sigla_uf
+  update_frequency: Mensal
+  estimated_volume: ~200 MB
+  lgpd_tier: PUBLIC_NON_PERSONAL
+  ml_feature_domains:
+  - tax_incentives
+  - industrial_zfm
+  core_products_enabled:
+  - P01
+  - P09
+  rice_score: 610
+  roadmap_wave: 2
+  status: CATALOGED
+- source_id: cvm_dfp_itr
+  name: 'CVM: Demonstrações Financeiras Padronizadas (DFP / ITR)'
+  agency: Comissão de Valores Mobiliários (CVM)
+  official_url: https://dados.cvm.gov.br/dados/CIA_ABERTA/DOC/DFP/
+  segment_id: 02_economico_macrofinanceiro
+  segment_name: Econômico, Monetário & Macrofinanceiro
+  access_mode: LAKEHOUSE_BATCH
+  protocol: HTTP_BULK_ZIP
+  auth_type: NONE
+  canonical_keys:
+  - cnpj_14
+  update_frequency: Trimestral / Anual
+  estimated_volume: ~2 GB/ano
+  lgpd_tier: PUBLIC_CORPORATE_QSA
+  ml_feature_domains:
+  - corporate_financials
+  - dre_balance_sheet
+  core_products_enabled:
+  - P01
+  - P05
+  rice_score: 680
+  roadmap_wave: 3
+  status: CATALOGED
+- source_id: mdic_comexstat
+  name: 'MDIC: Comex Stat Exportações e Importações Detalhadas'
+  agency: Ministério do Desenvolvimento, Indústria e Comércio Exterior (MDIC)
+  official_url: https://www.gov.br/produtividade-e-comercio-exterior/pt-br/assuntos/comercio-exterior/estatisticas
+  segment_id: 09_comercio_exterior
+  segment_name: Comércio Exterior & Balança Comercial
+  access_mode: LAKEHOUSE_BATCH
+  protocol: HTTP_BULK_ZIP
+  auth_type: NONE
+  canonical_keys:
+  - ncm_8
+  - id_municipio
+  - sigla_uf
+  update_frequency: Mensal
+  estimated_volume: ~500 MB/ano
+  lgpd_tier: PUBLIC_NON_PERSONAL
+  ml_feature_domains:
+  - trade_fob_flows
+  - export_import_metrics
+  core_products_enabled:
+  - P01
+  - P02
+  rice_score: 660
+  roadmap_wave: 3
+  status: CATALOGED
+- source_id: cvm_fundos
+  name: 'CVM: Informe Diário de Fundos de Investimento'
+  agency: Comissão de Valores Mobiliários (CVM)
+  official_url: https://dados.cvm.gov.br/dados/FI/DOC/INF_DIARIO/
+  segment_id: 02_economico_macrofinanceiro
+  segment_name: Econômico, Monetário & Macrofinanceiro
+  access_mode: LAKEHOUSE_BATCH
+  protocol: HTTP_BULK_ZIP
+  auth_type: NONE
+  canonical_keys:
+  - cnpj_14
+  update_frequency: Diária
+  estimated_volume: ~500 MB/mês
+  lgpd_tier: PUBLIC_NON_PERSONAL
+  ml_feature_domains:
+  - investment_funds
+  - nav_liquidity
+  core_products_enabled:
+  - P01
+  - P05
+  rice_score: 650
+  roadmap_wave: 3
+  status: CATALOGED
+- source_id: bcb_ifdata
+  name: 'Banco Central: Informações Financeiras das IFs (IF.data)'
+  agency: Banco Central do Brasil (BACEN)
+  official_url: https://www3.bcb.gov.br/ifdata/
+  segment_id: 02_economico_macrofinanceiro
+  segment_name: Econômico, Monetário & Macrofinanceiro
+  access_mode: FEDERATED_API
+  protocol: ODATA_V4
+  auth_type: NONE
+  canonical_keys:
+  - cnpj_14
+  update_frequency: Trimestral
+  estimated_volume: ~100 MB/trimestre
+  lgpd_tier: PUBLIC_NON_PERSONAL
+  ml_feature_domains:
+  - banking_prudential
+  - credit_portfolio
+  core_products_enabled:
+  - P01
+  - P05
+  rice_score: 640
+  roadmap_wave: 3
+  status: CATALOGED
+- source_id: stn_tesouro_transparente
+  name: 'Secretaria do Tesouro Nacional: SADIPEM & Dívida Pública'
+  agency: Secretaria do Tesouro Nacional (STN)
+  official_url: https://www.tesourotransparente.gov.br/
+  segment_id: 02_economico_macrofinanceiro
+  segment_name: Econômico, Monetário & Macrofinanceiro
+  access_mode: FEDERATED_API
+  protocol: REST_JSON
+  auth_type: NONE
+  canonical_keys:
+  - id_municipio
+  - sigla_uf
+  update_frequency: Mensal
+  estimated_volume: ~1 GB
+  lgpd_tier: PUBLIC_NON_PERSONAL
+  ml_feature_domains:
+  - public_debt
+  - fiscal_transfers_fpm
+  core_products_enabled:
+  - P01
+  - P05
+  rice_score: 630
+  roadmap_wave: 3
+  status: CATALOGED
+- source_id: comprasgov_catmat
+  name: 'Compras.gov.br: Catálogo Unificado de Materiais e Serviços (CATMAT/CATSER)'
+  agency: Ministério da Gestão e Inovação em Serviços Públicos (MGI)
+  official_url: https://dados.gov.br/dados/conjuntos-dados/catalogo-de-materiais-e-servicos---catmat-catser
+  segment_id: 10_compras_publicas
+  segment_name: Compras Públicas, Licitações & Contratos
+  access_mode: FEDERATED_API
+  protocol: REST_JSON
+  auth_type: NONE
+  canonical_keys: []
+  update_frequency: Semanal
+  estimated_volume: ~50 MB
+  lgpd_tier: PUBLIC_NON_PERSONAL
+  ml_feature_domains:
+  - item_catalog
+  - procurement_pricing
+  core_products_enabled:
+  - P01
+  - P04
+  rice_score: 610
+  roadmap_wave: 3
+  status: CATALOGED
+- source_id: ibge_sidra
+  name: 'IBGE: Sistema IBGE de Recuperação Automática (SIDRA)'
+  agency: Instituto Brasileiro de Geografia e Estatística (IBGE)
+  official_url: https://apisidra.ibge.gov.br/
+  segment_id: 03_demografico_censitario
+  segment_name: Demográfico, Censitário & Domiciliar
+  access_mode: FEDERATED_API
+  protocol: REST_JSON
+  auth_type: NONE
+  canonical_keys:
+  - id_municipio
+  - sigla_uf
+  update_frequency: Mensal / Variável
+  estimated_volume: Centenas de tabelas agregadas sob demanda
+  lgpd_tier: PUBLIC_NON_PERSONAL
+  ml_feature_domains:
+  - aggregate_indicators
+  - demographic_series
+  core_products_enabled:
+  - P01
+  - P02
+  rice_score: 590
+  roadmap_wave: 4
+  status: CATALOGED
+- source_id: ibge_pib_municipal
+  name: 'IBGE: Produto Interno Bruto dos Municípios'
+  agency: Instituto Brasileiro de Geografia e Estatística (IBGE)
+  official_url: https://www.ibge.gov.br/estatisticas/economicas/contas-nacionais/9088-produto-interno-bruto-dos-municipios.html
+  segment_id: 03_demografico_censitario
+  segment_name: Demográfico, Censitário & Domiciliar
+  access_mode: LAKEHOUSE_BATCH
+  protocol: HTTP_BULK_ZIP
+  auth_type: NONE
+  canonical_keys:
+  - id_municipio
+  - sigla_uf
+  update_frequency: Anual (defasagem 2 anos)
+  estimated_volume: ~15 MB/ano
+  lgpd_tier: PUBLIC_NON_PERSONAL
+  ml_feature_domains:
+  - municipal_pib
+  - vab_sectors
+  core_products_enabled:
+  - P01
+  - P02
+  rice_score: 580
+  roadmap_wave: 4
+  status: CATALOGED
+- source_id: ibge_censo2022
+  name: 'IBGE: Microdados do Censo Demográfico 2022'
+  agency: Instituto Brasileiro de Geografia e Estatística (IBGE)
+  official_url: https://censo2022.ibge.gov.br/
+  segment_id: 03_demografico_censitario
+  segment_name: Demográfico, Censitário & Domiciliar
+  access_mode: LAKEHOUSE_BATCH
+  protocol: HTTP_BULK_ZIP
+  auth_type: NONE
+  canonical_keys:
+  - id_municipio
+  - sigla_uf
+  update_frequency: Decenal
+  estimated_volume: ~25 GB (450k setores censitários)
+  lgpd_tier: ANONYMIZED_MICRODATA
+  ml_feature_domains:
+  - census_tracts
+  - socioeconomic_profile
+  core_products_enabled:
+  - P01
+  - P02
+  - P03
+  rice_score: 570
+  roadmap_wave: 4
+  status: CATALOGED
+- source_id: mte_novo_caged
+  name: 'MTE: Microdados do Novo CAGED'
+  agency: Ministério do Trabalho e Emprego (MTE)
+  official_url: http://pdet.mte.gov.br/novo-caged
+  segment_id: 04_trabalho_renda
+  segment_name: Trabalho, Emprego & Renda
+  access_mode: LAKEHOUSE_BATCH
+  protocol: HTTP_BULK_ZIP
+  auth_type: NONE
+  canonical_keys:
+  - cbo_6
+  - cnae_7
+  - id_municipio
+  - sigla_uf
+  update_frequency: Mensal
+  estimated_volume: ~2 GB/mês
+  lgpd_tier: ANONYMIZED_MICRODATA
+  ml_feature_domains:
+  - labor_flow
+  - admissions_layoffs
+  - salary_benchmarks
+  core_products_enabled:
+  - P01
+  - P02
+  rice_score: 570
+  roadmap_wave: 4
+  status: CATALOGED
+- source_id: ibge_pnad_continua
+  name: 'IBGE: Pesquisa Nacional por Amostra de Domicílios Contínua (PNAD Contínua)'
+  agency: Instituto Brasileiro de Geografia e Estatística (IBGE)
+  official_url: https://www.ibge.gov.br/estatisticas/sociais/trabalho/9171-pesquisa-nacional-por-amostra-de-domicilios-continua-mensal.html
+  segment_id: 04_trabalho_renda
+  segment_name: Trabalho, Emprego & Renda
+  access_mode: LAKEHOUSE_BATCH
+  protocol: HTTP_BULK_ZIP
+  auth_type: NONE
+  canonical_keys:
+  - sigla_uf
+  update_frequency: Trimestral
+  estimated_volume: ~4 GB/ano
+  lgpd_tier: ANONYMIZED_MICRODATA
+  ml_feature_domains:
+  - household_income
+  - unemployment_rate
+  core_products_enabled:
+  - P01
+  - P02
+  rice_score: 560
+  roadmap_wave: 4
+  status: CATALOGED
+- source_id: ibge_cnefe
+  name: 'IBGE: Cadastro Nacional de Endereços para Fins Estatísticos (CNEFE)'
+  agency: Instituto Brasileiro de Geografia e Estatística (IBGE)
+  official_url: https://www.ibge.gov.br/estatisticas/sociais/populacao/38734-cadastro-nacional-de-enderecos-para-fins-estatisticos.html
+  segment_id: 05_geografico_logistica
+  segment_name: Geográfico, Logístico & Endereçamento
+  access_mode: LAKEHOUSE_BATCH
+  protocol: HTTP_BULK_ZIP
+  auth_type: NONE
+  canonical_keys:
+  - cep_8
+  - id_municipio
+  - sigla_uf
+  update_frequency: Decenal
+  estimated_volume: ~30 GB (111M coordenadas pontuais)
+  lgpd_tier: PUBLIC_NON_PERSONAL
+  ml_feature_domains:
+  - geo_coordinates
+  - address_standardization
+  core_products_enabled:
+  - P01
+  - P03
+  rice_score: 560
+  roadmap_wave: 4
+  status: CATALOGED
+- source_id: mte_rais
+  name: 'MTE: Relação Anual de Informações Sociais (RAIS)'
+  agency: Ministério do Trabalho e Emprego (MTE)
+  official_url: http://pdet.mte.gov.br/rais
+  segment_id: 04_trabalho_renda
+  segment_name: Trabalho, Emprego & Renda
+  access_mode: LAKEHOUSE_BATCH
+  protocol: FTP_DBC
+  auth_type: NONE
+  canonical_keys:
+  - cbo_6
+  - cnae_7
+  - id_municipio
+  - sigla_uf
+  update_frequency: Anual
+  estimated_volume: ~15 GB/ano
+  lgpd_tier: ANONYMIZED_MICRODATA
+  ml_feature_domains:
+  - formal_employment_stock
+  - wage_distribution
+  core_products_enabled:
+  - P01
+  - P02
+  rice_score: 550
+  roadmap_wave: 4
+  status: CATALOGED
+- source_id: ibge_malhas
+  name: 'IBGE: Malhas Territoriais Vetoriais (Municípios e UFs)'
+  agency: Instituto Brasileiro de Geografia e Estatística (IBGE)
+  official_url: https://www.ibge.gov.br/geociencias/organizacao-do-territorio/malhas-territoriais.html
+  segment_id: 05_geografico_logistica
+  segment_name: Geográfico, Logístico & Endereçamento
+  access_mode: LAKEHOUSE_BATCH
+  protocol: OGC_WFS_SHP
+  auth_type: NONE
+  canonical_keys:
+  - id_municipio
+  - sigla_uf
+  update_frequency: Anual
+  estimated_volume: ~500 MB (Shapefiles/GeoJSON)
+  lgpd_tier: PUBLIC_NON_PERSONAL
+  ml_feature_domains:
+  - boundary_polygons
+  - spatial_geometries
+  core_products_enabled:
+  - P01
+  - P03
+  rice_score: 540
+  roadmap_wave: 4
+  status: CATALOGED
+- source_id: anatel_mosaico
+  name: 'ANATEL: Sistema Mosaico de Estações e Cobertura de Telecomunicações'
+  agency: Agência Nacional de Telecomunicações (ANATEL)
+  official_url: https://sistemas.anatel.gov.br/mosaico/
+  segment_id: 05_geografico_logistica
+  segment_name: Geográfico, Logístico & Endereçamento
+  access_mode: FEDERATED_API
+  protocol: REST_JSON
+  auth_type: NONE
+  canonical_keys:
+  - id_municipio
+  - sigla_uf
+  update_frequency: Mensal
+  estimated_volume: ~200 MB
+  lgpd_tier: PUBLIC_NON_PERSONAL
+  ml_feature_domains:
+  - telecom_towers
+  - broadband_coverage
+  core_products_enabled:
+  - P01
+  - P09
+  rice_score: 510
+  roadmap_wave: 4
+  status: CATALOGED
+- source_id: antt_malha_transporte
+  name: 'ANTT: Malha de Transporte Rodoviário e Ferroviário de Cargas'
+  agency: Agência Nacional de Transportes Terrestres (ANTT)
+  official_url: https://dados.antt.gov.br/
+  segment_id: 05_geografico_logistica
+  segment_name: Geográfico, Logístico & Endereçamento
+  access_mode: FEDERATED_API
+  protocol: REST_JSON
+  auth_type: NONE
+  canonical_keys:
+  - id_municipio
+  - sigla_uf
+  update_frequency: Trimestral
+  estimated_volume: ~50 MB
+  lgpd_tier: PUBLIC_NON_PERSONAL
+  ml_feature_domains:
+  - freight_corridors
+  - transport_nodes
+  core_products_enabled:
+  - P01
+  - P03
+  - P09
+  rice_score: 500
+  roadmap_wave: 4
+  status: CATALOGED
+- source_id: datasus_cnes
+  name: 'DataSUS: Cadastro Nacional de Estabelecimentos de Saúde (CNES)'
+  agency: Ministério da Saúde / DataSUS
+  official_url: https://cnes.datasus.gov.br/
+  segment_id: 06_saude_publica
+  segment_name: Saúde Pública & Epidemiologia
+  access_mode: LAKEHOUSE_BATCH
+  protocol: FTP_DBC
+  auth_type: NONE
+  canonical_keys:
+  - cnpj_14
+  - id_municipio
+  - sigla_uf
+  - cep_8
+  update_frequency: Mensal
+  estimated_volume: ~1 GB/mês
+  lgpd_tier: PUBLIC_NON_PERSONAL
+  ml_feature_domains:
+  - health_facilities
+  - icu_beds_capacity
+  core_products_enabled:
+  - P01
+  - P02
+  rice_score: 480
+  roadmap_wave: 5
+  status: CATALOGED
+- source_id: datasus_sih
+  name: 'DataSUS: Sistema de Informações Hospitalares (SIH/SUS)'
+  agency: Ministério da Saúde / DataSUS
+  official_url: https://datasus.saude.gov.br/transferencia-de-arquivos/
+  segment_id: 06_saude_publica
+  segment_name: Saúde Pública & Epidemiologia
+  access_mode: LAKEHOUSE_BATCH
+  protocol: FTP_DBC
+  auth_type: NONE
+  canonical_keys:
+  - id_municipio
+  - sigla_uf
+  update_frequency: Mensal
+  estimated_volume: ~3 GB/ano
+  lgpd_tier: ANONYMIZED_MICRODATA
+  ml_feature_domains:
+  - hospital_admissions
+  - hospital_costs_cid10
+  core_products_enabled:
+  - P01
+  - P02
+  rice_score: 470
+  roadmap_wave: 5
+  status: CATALOGED
+- source_id: inep_censo_escolar
+  name: 'INEP: Microdados do Censo Escolar da Educação Básica'
+  agency: Instituto Nacional de Estudos e Pesquisas Educacionais Anísio Teixeira (INEP)
+  official_url: https://www.gov.br/inep/pt-br/acesso-a-informacao/dados-abertos/microdados/censo-escolar
+  segment_id: 07_educacao_capital_humano
+  segment_name: Educação & Capital Humano
+  access_mode: LAKEHOUSE_BATCH
+  protocol: HTTP_BULK_ZIP
+  auth_type: NONE
+  canonical_keys:
+  - id_municipio
+  - sigla_uf
+  - cep_8
+  update_frequency: Anual
+  estimated_volume: ~4 GB/ano
+  lgpd_tier: ANONYMIZED_MICRODATA
+  ml_feature_domains:
+  - school_infrastructure
+  - basic_ed_enrollments
+  core_products_enabled:
+  - P01
+  - P02
+  rice_score: 470
+  roadmap_wave: 5
+  status: CATALOGED
+- source_id: datasus_sim
+  name: 'DataSUS: Sistema de Informações sobre Mortalidade (SIM)'
+  agency: Ministério da Saúde / DataSUS
+  official_url: https://datasus.saude.gov.br/transferencia-de-arquivos/
+  segment_id: 06_saude_publica
+  segment_name: Saúde Pública & Epidemiologia
+  access_mode: LAKEHOUSE_BATCH
+  protocol: FTP_DBC
+  auth_type: NONE
+  canonical_keys:
+  - id_municipio
+  - sigla_uf
+  update_frequency: Anual
+  estimated_volume: ~500 MB/ano
+  lgpd_tier: ANONYMIZED_MICRODATA
+  ml_feature_domains:
+  - mortality_causes
+  - cid10_trends
+  core_products_enabled:
+  - P01
+  - P02
+  rice_score: 460
+  roadmap_wave: 5
+  status: CATALOGED
+- source_id: inep_censo_superior
+  name: 'INEP: Microdados do Censo da Educação Superior'
+  agency: Instituto Nacional de Estudos e Pesquisas Educacionais Anísio Teixeira (INEP)
+  official_url: https://www.gov.br/inep/pt-br/acesso-a-informacao/dados-abertos/microdados/censo-da-educacao-superior
+  segment_id: 07_educacao_capital_humano
+  segment_name: Educação & Capital Humano
+  access_mode: LAKEHOUSE_BATCH
+  protocol: HTTP_BULK_ZIP
+  auth_type: NONE
+  canonical_keys:
+  - cnpj_14
+  - id_municipio
+  - sigla_uf
+  update_frequency: Anual
+  estimated_volume: ~2 GB/ano
+  lgpd_tier: ANONYMIZED_MICRODATA
+  ml_feature_domains:
+  - higher_ed_institutions
+  - degree_courses
+  core_products_enabled:
+  - P01
+  - P02
+  rice_score: 460
+  roadmap_wave: 5
+  status: CATALOGED
+- source_id: cnj_justica_aberta
+  name: 'CNJ: Justiça Aberta (Cadastro e Produtividade de Cartórios)'
+  agency: Conselho Nacional de Justiça (CNJ)
+  official_url: https://www.cnj.jus.br/corregedoria/justica_aberta/
+  segment_id: 12_imobiliario_cartorial
+  segment_name: Imobiliário, Notarial & Cartorial
+  access_mode: FEDERATED_API
+  protocol: REST_JSON
+  auth_type: NONE
+  canonical_keys:
+  - id_municipio
+  - sigla_uf
+  update_frequency: Semestral
+  estimated_volume: ~15k serventias cartorárias
+  lgpd_tier: PUBLIC_CORPORATE_QSA
+  ml_feature_domains:
+  - notary_offices
+  - cartorial_productivity
+  core_products_enabled:
+  - P01
+  - P04
+  rice_score: 460
+  roadmap_wave: 5
+  status: CATALOGED
+- source_id: datasus_sinasc
+  name: 'DataSUS: Sistema de Informações sobre Nascidos Vivos (SINASC)'
+  agency: Ministério da Saúde / DataSUS
+  official_url: https://datasus.saude.gov.br/transferencia-de-arquivos/
+  segment_id: 06_saude_publica
+  segment_name: Saúde Pública & Epidemiologia
+  access_mode: LAKEHOUSE_BATCH
+  protocol: FTP_DBC
+  auth_type: NONE
+  canonical_keys:
+  - id_municipio
+  - sigla_uf
+  update_frequency: Anual
+  estimated_volume: ~300 MB/ano
+  lgpd_tier: ANONYMIZED_MICRODATA
+  ml_feature_domains:
+  - live_births
+  - maternal_indicators
+  core_products_enabled:
+  - P01
+  - P02
+  rice_score: 450
+  roadmap_wave: 5
+  status: CATALOGED
+- source_id: anvisa_cmed
+  name: 'ANVISA: Câmara de Regulação do Mercado de Medicamentos (CMED)'
+  agency: Agência Nacional de Vigilância Sanitária (ANVISA)
+  official_url: https://www.gov.br/anvisa/pt-br/assuntos/medicamentos/cmed/precos
+  segment_id: 06_saude_publica
+  segment_name: Saúde Pública & Epidemiologia
+  access_mode: FEDERATED_API
+  protocol: REST_JSON
+  auth_type: NONE
+  canonical_keys:
+  - cnpj_14
+  update_frequency: Mensal
+  estimated_volume: ~30 MB
+  lgpd_tier: PUBLIC_NON_PERSONAL
+  ml_feature_domains:
+  - regulated_drug_prices
+  - maximum_consumer_price
+  core_products_enabled:
+  - P01
+  - P04
+  rice_score: 450
+  roadmap_wave: 5
+  status: CATALOGED
+- source_id: inep_ideb
+  name: 'INEP: Índice de Desenvolvimento da Educação Básica (IDEB)'
+  agency: Instituto Nacional de Estudos e Pesquisas Educacionais Anísio Teixeira (INEP)
+  official_url: https://www.gov.br/inep/pt-br/areas-de-atuacao/pesquisas-estatisticas-e-indicadores/ideb
+  segment_id: 07_educacao_capital_humano
+  segment_name: Educação & Capital Humano
+  access_mode: FEDERATED_API
+  protocol: REST_JSON
+  auth_type: NONE
+  canonical_keys:
+  - id_municipio
+  - sigla_uf
+  update_frequency: Bienal
+  estimated_volume: ~50 MB
+  lgpd_tier: PUBLIC_NON_PERSONAL
+  ml_feature_domains:
+  - education_quality_index
+  - learning_metrics
+  core_products_enabled:
+  - P01
+  - P02
+  rice_score: 450
+  roadmap_wave: 5
+  status: CATALOGED
+- source_id: onr_registro_imoveis
+  name: 'ONR: Sistema de Registro Eletrônico de Imóveis (SREI)'
+  agency: Operador Nacional do Registro de Imóveis Eletrônico (ONR)
+  official_url: https://onr.org.br/
+  segment_id: 12_imobiliario_cartorial
+  segment_name: Imobiliário, Notarial & Cartorial
+  access_mode: FEDERATED_API
+  protocol: REST_JSON
+  auth_type: NONE
+  canonical_keys:
+  - id_municipio
+  - sigla_uf
+  update_frequency: Mensal
+  estimated_volume: Metadados de transações imobiliárias
+  lgpd_tier: PUBLIC_NON_PERSONAL
+  ml_feature_domains:
+  - real_estate_transactions
+  - property_registries
+  core_products_enabled:
+  - P01
+  - P03
+  rice_score: 450
+  roadmap_wave: 5
+  status: CATALOGED
+- source_id: opendatasus_vigilancia
+  name: 'OpenDataSUS: Notificações de Síndromes e Vigilância Epidemiológica'
+  agency: Ministério da Saúde
+  official_url: https://opendatasus.saude.gov.br/
+  segment_id: 06_saude_publica
+  segment_name: Saúde Pública & Epidemiologia
+  access_mode: FEDERATED_API
+  protocol: REST_JSON
+  auth_type: NONE
+  canonical_keys:
+  - id_municipio
+  - sigla_uf
+  update_frequency: Semanal
+  estimated_volume: ~500 MB
+  lgpd_tier: ANONYMIZED_MICRODATA
+  ml_feature_domains:
+  - epidemiological_surveillance
+  - vaccination_coverage
+  core_products_enabled:
+  - P01
+  - P02
+  rice_score: 440
+  roadmap_wave: 5
+  status: CATALOGED
+- source_id: inep_enem
+  name: 'INEP: Microdados do Exame Nacional do Ensino Médio (ENEM)'
+  agency: Instituto Nacional de Estudos e Pesquisas Educacionais Anísio Teixeira (INEP)
+  official_url: https://www.gov.br/inep/pt-br/acesso-a-informacao/dados-abertos/microdados/enem
+  segment_id: 07_educacao_capital_humano
+  segment_name: Educação & Capital Humano
+  access_mode: LAKEHOUSE_BATCH
+  protocol: HTTP_BULK_ZIP
+  auth_type: NONE
+  canonical_keys:
+  - id_municipio
+  - sigla_uf
+  update_frequency: Anual
+  estimated_volume: ~3 GB/ano
+  lgpd_tier: ANONYMIZED_MICRODATA
+  ml_feature_domains:
+  - exam_performance
+  - socioeconomic_test_scores
+  core_products_enabled:
+  - P01
+  - P02
+  rice_score: 440
+  roadmap_wave: 5
+  status: CATALOGED
+- source_id: capitais_iptu_itbi
+  name: 'Capitais: Cadastros Imobiliários Municipais (IPTU / ITBI)'
+  agency: Prefeituras Municipais das Capitais
+  official_url: https://dados.gov.br/
+  segment_id: 12_imobiliario_cartorial
+  segment_name: Imobiliário, Notarial & Cartorial
+  access_mode: FEDERATED_API
+  protocol: REST_JSON
+  auth_type: NONE
+  canonical_keys:
+  - cep_8
+  - id_municipio
+  - sigla_uf
+  update_frequency: Anual / Mensal
+  estimated_volume: ~500 MB (Cadastros das capitais)
+  lgpd_tier: PUBLIC_NON_PERSONAL
+  ml_feature_domains:
+  - property_valuation
+  - municipal_cadastre
+  core_products_enabled:
+  - P01
+  - P03
+  rice_score: 430
+  roadmap_wave: 5
+  status: CATALOGED
+- source_id: capes_sucupira
+  name: 'CAPES: Plataforma Sucupira (Pós-Graduação Stricto Sensu)'
+  agency: Coordenação de Aperfeiçoamento de Pessoal de Nível Superior (CAPES)
+  official_url: https://dadosabertos.capes.gov.br/
+  segment_id: 07_educacao_capital_humano
+  segment_name: Educação & Capital Humano
+  access_mode: FEDERATED_API
+  protocol: REST_JSON
+  auth_type: NONE
+  canonical_keys:
+  - id_municipio
+  - sigla_uf
+  update_frequency: Anual
+  estimated_volume: ~100 MB
+  lgpd_tier: PUBLIC_NON_PERSONAL
+  ml_feature_domains:
+  - postgrad_programs
+  - academic_production
+  core_products_enabled:
+  - P01
+  - P02
+  rice_score: 410
+  roadmap_wave: 5
+  status: CATALOGED
+- source_id: inpe_terrabrasilis
+  name: 'INPE: Plataforma TerraBrasilis (DETER & PRODES)'
+  agency: Instituto Nacional de Pesquisas Espaciais (INPE)
+  official_url: http://terrabrasilis.dpi.inpe.br/
+  segment_id: 11_agronegocio_meio_ambiente
+  segment_name: Agronegócio, Terra & Meio Ambiente
+  access_mode: FEDERATED_API
+  protocol: REST_JSON
+  auth_type: NONE
+  canonical_keys:
+  - id_municipio
+  - sigla_uf
+  update_frequency: Diária (DETER) / Anual (PRODES)
+  estimated_volume: Polígonos geoespaciais de alertas de supressão
+  lgpd_tier: PUBLIC_NON_PERSONAL
+  ml_feature_domains:
+  - deforestation_alerts
+  - environmental_compliance
+  core_products_enabled:
+  - P01
+  - P06
+  - P09
+  rice_score: 390
+  roadmap_wave: 6
+  status: CATALOGED
+- source_id: basedosdados_bq
+  name: 'Base dos Dados: Datalake Público Federado (BigQuery)'
+  agency: Base dos Dados
+  official_url: https://basedosdados.org/
+  segment_id: 13_metaportais_agregadores
+  segment_name: Metaportais & Hubs Agregadores
+  access_mode: BIGQUERY_FEDERATED
+  protocol: BIGQUERY_SQL
+  auth_type: GCP_ADC
+  canonical_keys:
+  - id_municipio
+  - sigla_uf
+  - cnpj_14
+  - cep_8
+  update_frequency: Contínua
+  estimated_volume: Centenas de tabelas tratadas em BigQuery
+  lgpd_tier: PUBLIC_NON_PERSONAL
+  ml_feature_domains:
+  - federated_catalog
+  - cross_domain_warehouse
+  core_products_enabled:
+  - P01
+  - P02
+  - P03
+  - P04
+  - P05
+  - P06
+  rice_score: 390
+  roadmap_wave: 6
+  status: CATALOGED
+- source_id: ana_hidroweb_telemetria
+  name: 'ANA: Rede Hidrometeorológica Nacional (HidroWeb)'
+  agency: Agência Nacional de Águas e Saneamento Básico (ANA)
+  official_url: https://www.snirh.gov.br/hidroweb/
+  segment_id: 11_agronegocio_meio_ambiente
+  segment_name: Agronegócio, Terra & Meio Ambiente
+  access_mode: FEDERATED_API
+  protocol: REST_JSON
+  auth_type: NONE
+  canonical_keys:
+  - id_municipio
+  - sigla_uf
+  update_frequency: Diária (Telemetria horária)
+  estimated_volume: Milhões de leituras de telemetria fluvial
+  lgpd_tier: PUBLIC_NON_PERSONAL
+  ml_feature_domains:
+  - river_levels
+  - hydro_telemetry
+  core_products_enabled:
+  - P01
+  - P09
+  rice_score: 380
+  roadmap_wave: 6
+  status: CATALOGED
+- source_id: mapbiomas_cobertura
+  name: 'MapBiomas: Cobertura e Uso da Terra no Brasil (1985-2024)'
+  agency: Projeto MapBiomas
+  official_url: https://mapbiomas.org/
+  segment_id: 11_agronegocio_meio_ambiente
+  segment_name: Agronegócio, Terra & Meio Ambiente
+  access_mode: BIGQUERY_FEDERATED
+  protocol: BIGQUERY_SQL
+  auth_type: GCP_ADC
+  canonical_keys:
+  - id_municipio
+  - sigla_uf
+  update_frequency: Anual
+  estimated_volume: Matriz raster 30m / tabelas agregadas municipais
+  lgpd_tier: PUBLIC_NON_PERSONAL
+  ml_feature_domains:
+  - land_use
+  - land_cover_transition
+  core_products_enabled:
+  - P01
+  - P06
+  - P09
+  rice_score: 370
+  roadmap_wave: 6
+  status: CATALOGED
+- source_id: sfb_sicar
+  name: 'SFB: Sistema Nacional de Cadastro Ambiental Rural (SICAR)'
+  agency: Serviço Florestal Brasileiro (SFB) / MMA
+  official_url: https://www.car.gov.br/
+  segment_id: 11_agronegocio_meio_ambiente
+  segment_name: Agronegócio, Terra & Meio Ambiente
+  access_mode: LAKEHOUSE_BATCH
+  protocol: OGC_WFS_SHP
+  auth_type: NONE
+  canonical_keys:
+  - id_municipio
+  - sigla_uf
+  update_frequency: Semestral
+  estimated_volume: ~10 GB (7M imóveis rurais com polígonos)
+  lgpd_tier: PUBLIC_NON_PERSONAL
+  ml_feature_domains:
+  - rural_properties
+  - legal_reserve_polygons
+  core_products_enabled:
+  - P01
+  - P06
+  - P09
+  rice_score: 360
+  roadmap_wave: 6
+  status: CATALOGED
+- source_id: mapa_zarc
+  name: 'MAPA: Zoneamento Agrícola de Risco Climático (ZARC)'
+  agency: Ministério da Agricultura e Pecuária (MAPA) / Embrapa
+  official_url: https://www.gov.br/agricultura/pt-br/assuntos/riscos-seguro/programas-de-gestao-de-risco/zoneamento-agricola-de-risco-climatico
+  segment_id: 11_agronegocio_meio_ambiente
+  segment_name: Agronegócio, Terra & Meio Ambiente
+  access_mode: FEDERATED_API
+  protocol: REST_JSON
+  auth_type: NONE
+  canonical_keys:
+  - id_municipio
+  - sigla_uf
+  update_frequency: Safra / Anual
+  estimated_volume: ~50 MB
+  lgpd_tier: PUBLIC_NON_PERSONAL
+  ml_feature_domains:
+  - agro_climatic_risk
+  - planting_calendar
+  core_products_enabled:
+  - P01
+  - P09
+  rice_score: 350
+  roadmap_wave: 6
+  status: CATALOGED
+- source_id: dadosgov_ckan
+  name: 'Dados.gov.br: Portal Brasileiro de Dados Abertos (Catálogo CKAN)'
+  agency: Governo Federal (Dados.gov.br)
+  official_url: https://dados.gov.br/dados/conjuntos-dados
+  segment_id: 13_metaportais_agregadores
+  segment_name: Metaportais & Hubs Agregadores
+  access_mode: FEDERATED_API
+  protocol: REST_JSON
+  auth_type: NONE
+  canonical_keys: []
+  update_frequency: Contínua
+  estimated_volume: Metadados de milhares de conjuntos de dados
+  lgpd_tier: PUBLIC_NON_PERSONAL
+  ml_feature_domains:
+  - gov_catalog_metadata
+  - ckan_api_directory
+  core_products_enabled:
+  - P01
+  - P02
+  rice_score: 340
+  roadmap_wave: 6
+  status: CATALOGED

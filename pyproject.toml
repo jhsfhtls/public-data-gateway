@@ -1,0 +1,47 @@
+[build-system]
+requires = ["setuptools>=68.0"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "brazil-data-gateway"
+version = "0.1.0"
+description = "Unified Medallion platform, enrichment engine, and MCP/REST/SDK gateway for official Brazilian public data sources (C.O.R.E. Ecosystem)."
+readme = "README.md"
+requires-python = ">=3.12"
+license = { file = "LICENSE" }
+dependencies = [
+    "duckdb==2.0.0",
+    "fastapi==0.162.2",
+    "httpx==0.28.1",
+    "pyarrow==26.0.1",
+    "pydantic==2.14.3",
+    "python-dotenv==1.2.4",
+    "PyYAML==6.0.3",
+    "uvicorn==0.54.0",
+]
+
+[project.scripts]
+bdg = "brazil_data_gateway.cli.main:main"
+bdg-mcp = "brazil_data_gateway.mcp.server:main"
+
+[tool.setuptools]
+package-dir = { "" = "src" }
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+addopts = "-q --strict-markers"
+markers = [
+    "live: executes live smoke requests against official government endpoints",
+]
+
+[tool.ruff]
+target-version = "py312"
+line-length = 100
+src = ["src", "tests", "scripts"]
+
+[tool.ruff.lint]
+select = ["E", "F", "I", "B", "UP"]
+ignore = ["E501"]

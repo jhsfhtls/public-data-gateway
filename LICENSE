@@ -1,0 +1,11 @@
+Copyright (c) 2026 C.O.R.E. Ecosystem (jhsfhtls). All Rights Reserved.
+
+BACKGROUND INTELLECTUAL PROPERTY NOTICE (POP_B_049):
+This software, architecture, data contracts, normalization pipelines, and MCP
+integration components constitute proprietary Background Intellectual Property
+of the C.O.R.E. consulting ecosystem. Unauthorized reproduction, redistribution,
+or sublicensing outside authorized client engagements is strictly prohibited.
+
+All third-party runtime dependencies are governed by permissive open-source
+licenses (MIT, BSD-3-Clause, Apache-2.0) verified free of copyleft contamination
+per POP_B_123 and POP_T_151.

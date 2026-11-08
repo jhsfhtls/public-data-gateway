@@ -1,0 +1,48 @@
+# Security & Environment Secrets
+.env
+.env.*
+!.env.example
+
+# Python Virtual Environment & Packaging
+.venv/
+__pycache__/
+*.py[cod]
+*$py.class
+*.egg-info/
+dist/
+build/
+.pytest_cache/
+.ruff_cache/
+.mypy_cache/
+.coverage
+htmlcov/
+
+# Medallion Lakehouse, Quarantine & Local Cache (Keep only data/reference/ versioned)
+data/bronze/
+data/silver/
+data/gold/
+data/quarantine/
+data/cache/
+*.parquet
+*.duckdb
+*.duckdb.wal
+*.sqlite
+*.sqlite-wal
+*.sqlite-shm
+*.dbc
+
+# Runtime Telemetry & Locks
+.logs/
+.state/
+*.lock
+
+# --- AI SATELLITE SHIELD (DO NOT REMOVE) ---
+CLAUDE.md
+AGENTS.md
+GEMINI.md
+.windsurfrules
+.cursor/
+.github/copilot-instructions.md
+.agents/cache/
+.agents/memory/
+# --------------------------------------------
