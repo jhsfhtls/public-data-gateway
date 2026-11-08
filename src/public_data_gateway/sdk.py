@@ -100,6 +100,36 @@ class ProcurementFacade:
             cnpj_orgao=cnpj_orgao, ni_fornecedor=ni_fornecedor, ano=ano, limit=limit
         )
 
+    @property
+    def catmat_connector(self) -> Any:
+        if not hasattr(self, "_catmat_conn") or self._catmat_conn is None:
+            from public_data_gateway.connectors.compras_publicas.comprasgov_catmat import (
+                ComprasGovCatmatConnector,
+            )
+
+            self._catmat_conn = ComprasGovCatmatConnector(settings=self._sdk.settings)
+        return self._catmat_conn
+
+    def search_materials(self, query: str, limit: int = 20) -> list[dict[str, Any]]:
+        """Search CATMAT materials by description or PDM name."""
+        return self.catmat_connector.search_materials(query=query, limit=limit)
+
+    def search_services(self, query: str, limit: int = 20) -> list[dict[str, Any]]:
+        """Search CATSER services by description or service name."""
+        return self.catmat_connector.search_services(query=query, limit=limit)
+
+    def get_material(self, codigo_item: str) -> dict[str, Any] | None:
+        """Lookup CATMAT material details by its unique item code."""
+        return self.catmat_connector.get_item_detail(codigo_item)
+
+    def get_price_benchmark(self, codigo_pdm_or_item: str) -> dict[str, Any] | None:
+        """Get official price benchmark, dispersion, and overpricing risk rating."""
+        return self.catmat_connector.get_price_benchmark(codigo_pdm_or_item)
+
+    def get_supplier_history(self, cnpj: str) -> dict[str, Any] | None:
+        """Lookup government procurement history by supplier CNPJ."""
+        return self.catmat_connector.get_supplier_procurement_history(cnpj)
+
 
 class ComplianceFacade:
     """Compliance, administrative sanctions and anti-corruption query interface (CGU CEIS/CNEP/CEPIM)."""
@@ -630,6 +660,22 @@ class BrazilData:
     def get_capag_rating(self, id_municipio: str) -> dict[str, Any] | None:
         """Consultar nota da Capacidade de Pagamento CAPAG (A, B, C) e indicadores LRF (STN)."""
         return self.treasury.get_capag_rating(id_municipio)
+
+    def search_catmat(self, query: str, limit: int = 20) -> list[dict[str, Any]]:
+        """Pesquisar materiais no catálogo unificado de compras públicas CATMAT."""
+        return self.procurement.search_materials(query=query, limit=limit)
+
+    def search_catser(self, query: str, limit: int = 20) -> list[dict[str, Any]]:
+        """Pesquisar serviços no catálogo unificado de compras públicas CATSER."""
+        return self.procurement.search_services(query=query, limit=limit)
+
+    def get_procurement_benchmark(self, codigo_pdm_or_item: str) -> dict[str, Any] | None:
+        """Consultar benchmark oficial de preços praticados e risco de sobrepreço (Compras.gov.br)."""
+        return self.procurement.get_price_benchmark(codigo_pdm_or_item)
+
+    def get_procurement_supplier(self, cnpj: str) -> dict[str, Any] | None:
+        """Consultar histórico e volume de fornecimento de uma empresa ao poder público."""
+        return self.procurement.get_supplier_history(cnpj)
 
     def resolve_municipality(
         self, code_or_name: str | int, uf: str | None = None

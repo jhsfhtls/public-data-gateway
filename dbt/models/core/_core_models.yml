@@ -2907,3 +2907,258 @@ models:
       - name: limite_senado_rcl_pct
         description: "Limite máximo prudencial fixado pelo Senado Federal (%)"
 
+  - name: dim_item_material_catmat
+    description: "Dimensão conformada de itens de materiais cadastrados no catálogo oficial de compras públicas CATMAT/SIASG."
+    columns:
+      - name: codigo_item
+        description: "Código unificado identificador do material no padrão CATMAT."
+        tests:
+          - not_null
+          - unique
+      - name: codigo_pdm
+        description: "Código numérico do Padrão Descritivo de Material (PDM)."
+        tests:
+          - not_null
+      - name: nome_pdm
+        description: "Nome descritivo padronizado do PDM."
+        tests:
+          - not_null
+      - name: codigo_classe
+        description: "Código da classe de fornecimento do material."
+        tests:
+          - not_null
+      - name: nome_classe
+        description: "Nome da classe de fornecimento do material."
+        tests:
+          - not_null
+      - name: codigo_grupo
+        description: "Código do grupo superior de materiais."
+        tests:
+          - not_null
+      - name: nome_grupo
+        description: "Nome do grupo de material."
+        tests:
+          - not_null
+      - name: descricao_item
+        description: "Descrição técnica completa do item de material."
+        tests:
+          - not_null
+      - name: status_item
+        description: "Indicador booleano se o item de material está ativo no catálogo."
+        tests:
+          - not_null
+      - name: item_sustentavel
+        description: "Flag de atendimento a critérios socioambientais de sustentabilidade."
+        tests:
+          - not_null
+      - name: codigo_ncm
+        description: "Código da Nomenclatura Comum do Mercosul."
+      - name: descricao_ncm
+        description: "Descrição oficial da NCM vinculada."
+      - name: data_hora_atualizacao
+        description: "Timestamp ISO da última modificação cadastral."
+      - name: reference_date
+        description: "Competência temporal de referência da extração."
+        tests:
+          - not_null
+      - name: extracted_at
+        description: "Timestamp ISO-8601 da extração pela plataforma."
+        tests:
+          - not_null
+
+  - name: dim_item_servico_catser
+    description: "Dimensão conformada de serviços catalogados no padrão descritivo oficial CATSER/SIASG."
+    columns:
+      - name: codigo_servico
+        description: "Código unificado identificador do serviço no CATSER."
+        tests:
+          - not_null
+          - unique
+      - name: nome_servico
+        description: "Denominação e escopo do serviço padronizado."
+        tests:
+          - not_null
+      - name: codigo_classe
+        description: "Código numérico da classe de serviço."
+        tests:
+          - not_null
+      - name: nome_classe
+        description: "Nome da classe de serviço."
+        tests:
+          - not_null
+      - name: codigo_grupo
+        description: "Código do grupo de serviço."
+        tests:
+          - not_null
+      - name: nome_grupo
+        description: "Nome do grupo de serviço."
+        tests:
+          - not_null
+      - name: codigo_divisao
+        description: "Código da divisão econômica do serviço."
+        tests:
+          - not_null
+      - name: nome_divisao
+        description: "Nome da divisão econômica do serviço."
+        tests:
+          - not_null
+      - name: codigo_secao
+        description: "Código da seção econômica superior do serviço."
+        tests:
+          - not_null
+      - name: nome_secao
+        description: "Nome da seção do serviço."
+        tests:
+          - not_null
+      - name: codigo_cpc
+        description: "Código da Classificação Central de Produtos (CPC/ONU)."
+        tests:
+          - not_null
+      - name: status_servico
+        description: "Flag booleana indicando se o serviço está ativo no catálogo."
+        tests:
+          - not_null
+      - name: exclusivo_central_compras
+        description: "Indicador se a contratação é de uso exclusivo da Central de Compras."
+        tests:
+          - not_null
+      - name: data_hora_atualizacao
+        description: "Timestamp ISO da última atualização cadastral do serviço."
+      - name: reference_date
+        description: "Data de referência da extração dos serviços."
+        tests:
+          - not_null
+      - name: extracted_at
+        description: "Timestamp ISO UTC da ingestão da tabela."
+        tests:
+          - not_null
+
+  - name: fct_preco_praticado_comprasgov
+    description: "Fato de preços unitários e contratações reais praticadas na Administração Pública Federal e Municipal."
+    columns:
+      - name: id_compra_item
+        description: "Identificador único do item contratado no certame."
+        tests:
+          - not_null
+          - unique
+      - name: id_compra
+        description: "Identificador da compra ou licitação pública de origem."
+        tests:
+          - not_null
+      - name: data_compra
+        description: "Data de homologação ou adjudicação da compra pública."
+        tests:
+          - not_null
+      - name: codigo_item_catalogo
+        description: "Código do item de material no padrão CATMAT contratado."
+        tests:
+          - not_null
+      - name: codigo_pdm
+        description: "Código do Padrão Descritivo de Material (PDM)."
+        tests:
+          - not_null
+      - name: nome_pdm
+        description: "Nome do Padrão Descritivo de Material contratado."
+        tests:
+          - not_null
+      - name: descricao_item
+        description: "Descrição detalhada do item fornecido no certame."
+        tests:
+          - not_null
+      - name: quantidade
+        description: "Quantidade física adjudicada e fornecida."
+        tests:
+          - not_null
+      - name: preco_unitario
+        description: "Preço unitário homologado em Reais (R$)."
+        tests:
+          - not_null
+      - name: valor_total
+        description: "Valor financeiro total do item adjudicado em Reais (R$)."
+        tests:
+          - not_null
+      - name: sigla_unidade_fornecimento
+        description: "Sigla da unidade física de fornecimento."
+        tests:
+          - not_null
+      - name: cnpj_fornecedor
+        description: "CNPJ de 14 dígitos do fornecedor vencedor da licitação."
+        tests:
+          - not_null
+      - name: nome_fornecedor
+        description: "Razão social da empresa fornecedora contratada."
+        tests:
+          - not_null
+      - name: marca
+        description: "Marca comercial do produto cotado e aceito."
+      - name: codigo_uasg
+        description: "Código da Unidade Administrativa de Serviços Gerais (UASG) compradora."
+        tests:
+          - not_null
+      - name: nome_uasg
+        description: "Nome da unidade compradora ou órgão público adquirente."
+        tests:
+          - not_null
+      - name: codigo_municipio_ibge
+        description: "Código IBGE de 7 dígitos do município da unidade compradora."
+        tests:
+          - not_null
+      - name: municipio
+        description: "Nome do município onde a compra foi homologada."
+        tests:
+          - not_null
+      - name: sigla_uf
+        description: "Sigla de 2 letras da Unidade Federativa da compra."
+        tests:
+          - not_null
+      - name: reference_date
+        description: "Data de referência da extração dos preços praticados."
+        tests:
+          - not_null
+      - name: extracted_at
+        description: "Timestamp ISO UTC do processamento da tabela de preços."
+        tests:
+          - not_null
+
+  - name: fct_fornecedor_compras_catalogo
+    description: "Fato consolidado de indicadores operacionais e histórico de vendas de fornecedores para a Administração Pública."
+    columns:
+      - name: cnpj_fornecedor
+        description: "CNPJ de 14 dígitos do fornecedor participante de compras públicas."
+        tests:
+          - not_null
+          - unique
+      - name: nome_fornecedor
+        description: "Razão social da empresa fornecedora."
+        tests:
+          - not_null
+      - name: total_itens_fornecidos
+        description: "Quantidade total de itens adjudicados pelo fornecedor."
+        tests:
+          - not_null
+      - name: valor_total_fornecido
+        description: "Valor financeiro total adjudicado em Reais (R$)."
+        tests:
+          - not_null
+      - name: ticket_medio_unitario
+        description: "Ticket médio financeiro por unidade de item fornecida em R$."
+        tests:
+          - not_null
+      - name: total_uasgs_atendidas
+        description: "Contagem de unidades compradoras (UASGs) distintas atendidas."
+        tests:
+          - not_null
+      - name: sigla_uf_principal
+        description: "Sigla da principal UF de entrega e contratação."
+        tests:
+          - not_null
+      - name: reference_date
+        description: "Data de referência da consolidação."
+        tests:
+          - not_null
+      - name: extracted_at
+        description: "Timestamp ISO-8601 da extração."
+        tests:
+          - not_null
+
+

@@ -52,3 +52,94 @@ models:
         description: "Contagem de órgãos e entidades compradoras distintas com certames no grupo."
         tests:
           - not_null
+
+  - name: mart_benchmark_precos_catmat
+    description: "Datamart analítico de benchmark de preços públicos praticados por Padrão Descritivo de Material (PDM), calculando preço médio, amplitude e volume."
+    columns:
+      - name: codigo_pdm
+        description: "Código do Padrão Descritivo de Material (PDM)."
+        tests:
+          - not_null
+          - unique
+      - name: nome_pdm
+        description: "Nome do Padrão Descritivo de Material (PDM)."
+        tests:
+          - not_null
+      - name: total_itens_comprados
+        description: "Quantidade total de itens adjudicados no catálogo."
+        tests:
+          - not_null
+      - name: quantidade_total
+        description: "Volume físico total adquirido pelos órgãos públicos."
+        tests:
+          - not_null
+      - name: valor_total_homologado
+        description: "Montante financeiro total gasto nas aquisições em R$."
+        tests:
+          - not_null
+      - name: preco_medio_praticado
+        description: "Preço unitário médio homologado nas licitações em R$."
+        tests:
+          - not_null
+      - name: preco_minimo
+        description: "Menor preço unitário homologado no período em R$."
+        tests:
+          - not_null
+      - name: preco_maximo
+        description: "Maior preço unitário homologado no período em R$."
+        tests:
+          - not_null
+      - name: amplitude_preco
+        description: "Diferença entre o preço máximo e o preço mínimo em R$."
+        tests:
+          - not_null
+      - name: total_fornecedores
+        description: "Número total de fornecedores distintos contratados."
+        tests:
+          - not_null
+      - name: total_uasgs_compradoras
+        description: "Número total de unidades compradoras (UASGs) adquirentes."
+        tests:
+          - not_null
+      - name: total_ufs_atendidas
+        description: "Total de Unidades Federativas com aquisições do material."
+        tests:
+          - not_null
+
+  - name: mart_fornecedores_destaque_comprasgov
+    description: "Datamart de inteligência de fornecedores de compras públicas, segmentando atuação por porte governamental e ticket médio."
+    columns:
+      - name: cnpj_fornecedor
+        description: "CNPJ de 14 dígitos do fornecedor de compras públicas."
+        tests:
+          - not_null
+          - unique
+      - name: nome_fornecedor
+        description: "Razão social da empresa fornecedora."
+        tests:
+          - not_null
+      - name: total_itens_fornecidos
+        description: "Quantidade total de itens fornecidos."
+        tests:
+          - not_null
+      - name: valor_total_fornecido
+        description: "Valor total fornecido para o setor público em R$."
+        tests:
+          - not_null
+      - name: ticket_medio_unitario
+        description: "Ticket médio financeiro por unidade de item em R$."
+        tests:
+          - not_null
+      - name: total_uasgs_atendidas
+        description: "Total de órgãos compradores (UASGs) atendidos."
+        tests:
+          - not_null
+      - name: sigla_uf_principal
+        description: "UF prioritária de entrega e execução contratual."
+        tests:
+          - not_null
+      - name: perfil_porte_governamental
+        description: "Classificação do porte do fornecedor perante o Estado (ESTRATEGICO, MEDIO ou REGIONAL)."
+        tests:
+          - not_null
+

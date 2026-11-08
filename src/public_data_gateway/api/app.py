@@ -628,4 +628,83 @@ def create_app(settings: GatewaySettings | None = None) -> FastAPI:
             )
         return res
 
+    # 16. Public Procurement Catalog & Pricing (Compras.gov.br CATMAT/CATSER)
+    @app.get("/api/v1/procurement/materials/search")
+    async def search_materials(
+        q: str = Query(..., description="Search term for materials (e.g. CADEIRA, NOTEBOOK)"),
+        limit: int = Query(20, ge=1, le=100, description="Max items to return"),
+    ) -> list[dict[str, Any]]:
+        from public_data_gateway.connectors.compras_publicas.comprasgov_catmat.connector import (
+            ComprasGovCatmatConnector,
+        )
+
+        conn = ComprasGovCatmatConnector(settings=app_settings)
+        return conn.search_materials(query=q, limit=limit)
+
+    @app.get("/api/v1/procurement/services/search")
+    async def search_services(
+        q: str = Query(..., description="Search term for services (e.g. SOFTWARE, LIMPEZA)"),
+        limit: int = Query(20, ge=1, le=100, description="Max items to return"),
+    ) -> list[dict[str, Any]]:
+        from public_data_gateway.connectors.compras_publicas.comprasgov_catmat.connector import (
+            ComprasGovCatmatConnector,
+        )
+
+        conn = ComprasGovCatmatConnector(settings=app_settings)
+        return conn.search_services(query=q, limit=limit)
+
+    @app.get("/api/v1/procurement/materials/{codigo_item}")
+    async def get_material_detail(codigo_item: str) -> dict[str, Any]:
+        from public_data_gateway.connectors.compras_publicas.comprasgov_catmat.connector import (
+            ComprasGovCatmatConnector,
+        )
+
+        conn = ComprasGovCatmatConnector(settings=app_settings)
+        res = conn.get_item_detail(codigo_item)
+        if not res:
+            raise HTTPException(status_code=404, detail=f"Material not found for code '{codigo_item}'")
+        return res
+
+    @app.get("/api/v1/procurement/benchmark/{pdm_or_item}")
+    @app.get("/api/v1/catmat/benchmark/{pdm_or_item}")
+    async def get_procurement_benchmark(pdm_or_item: str) -> dict[str, Any]:
+        from public_data_gateway.connectors.compras_publicas.comprasgov_catmat.connector import (
+            ComprasGovCatmatConnector,
+        )
+
+        conn = ComprasGovCatmatConnector(settings=app_settings)
+        res = conn.get_price_benchmark(pdm_or_item)
+        if not res:
+            raise HTTPException(status_code=404, detail=f"Price benchmark not found for '{pdm_or_item}'")
+        return res
+
+    @app.get("/api/v1/procurement/supplier/{cnpj}")
+    async def get_supplier_procurement(cnpj: str) -> dict[str, Any]:
+        from public_data_gateway.connectors.compras_publicas.comprasgov_catmat.connector import (
+            ComprasGovCatmatConnector,
+        )
+
+        conn = ComprasGovCatmatConnector(settings=app_settings)
+        res = conn.get_supplier_procurement_history(cnpj)
+        if not res:
+            raise HTTPException(status_code=404, detail=f"Supplier not found for CNPJ '{cnpj}'")
+        return res
+
+    @app.get("/api/v1/catmat/{termo}")
+    async def get_catmat_quick(
+        termo: str,
+        limit: int = Query(10, ge=1, le=50, description="Max items"),
+    ) -> list[dict[str, Any]]:
+        from public_data_gateway.connectors.compras_publicas.comprasgov_catmat.connector import (
+            ComprasGovCatmatConnector,
+        )
+
+        conn = ComprasGovCatmatConnector(settings=app_settings)
+        results = conn.search_materials(query=termo, limit=limit)
+        if not results:
+            bench = conn.get_price_benchmark(termo)
+            if bench:
+                return [bench]
+        return results
+
     return app

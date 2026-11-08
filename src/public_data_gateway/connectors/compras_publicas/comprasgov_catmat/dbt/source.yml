@@ -1,0 +1,18 @@
+version: 2
+
+sources:
+  - name: comprasgov_catmat_silver
+    description: "Tabelas normalizadas da camada Silver do catálogo de compras públicas (CATMAT/CATSER e Preços Praticados)."
+    meta:
+      external_location: "data/comprasgov_catmat/silver/{name}.parquet"
+    tables:
+      - name: catmat_itens_material
+        description: "Itens de material catalogados no padrão descritivo CATMAT/SIASG."
+      - name: catser_itens_servico
+        description: "Itens de serviços catalogados no padrão CATSER/SIASG."
+      - name: catmat_grupos_classes
+        description: "Grupos e classes da estrutura hierárquica de materiais e serviços."
+      - name: catmat_precos_praticados
+        description: "Preços unitários e valores totais homologados em compras públicas."
+      - name: catmat_fornecedores_compras
+        description: "Agregação cadastral e operacional de fornecedores participantes."

@@ -496,7 +496,7 @@ sources:
   - P04
   rice_score: 610
   roadmap_wave: 3
-  status: CATALOGED
+  status: HOMOLOGATED
 - source_id: ibge_sidra
   name: 'IBGE: Sistema IBGE de Recuperação Automática (SIDRA)'
   agency: Instituto Brasileiro de Geografia e Estatística (IBGE)
