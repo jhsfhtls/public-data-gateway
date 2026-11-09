@@ -3502,3 +3502,123 @@ models:
         description: "Timestamp ISO-8601 UTC da ingestão dos dados."
         tests:
           - not_null
+
+  - name: fct_caged_movimentacao_mensal
+    description: "Tabela fato agregada de movimentação mensal de empregos formais (admissões, desligamentos, saldo e salários) do Novo CAGED."
+    columns:
+      - name: id_municipio
+        description: "Código IBGE de 7 dígitos do município."
+        tests:
+          - not_null
+      - name: nome_municipio
+        description: "Nome oficial do município."
+        tests:
+          - not_null
+      - name: sigla_uf
+        description: "Sigla de 2 letras da Unidade Federativa."
+        tests:
+          - not_null
+      - name: regiao
+        description: "Grande região geográfica do Brasil."
+      - name: is_capital
+        description: "Flag indicando se o município é capital."
+        tests:
+          - not_null
+      - name: competencia_movimentacao
+        description: "Competência da movimentação trabalhista no formato AAAA-MM."
+        tests:
+          - not_null
+      - name: total_admissoes
+        description: "Total de contratações formais no mês."
+        tests:
+          - not_null
+      - name: total_desligamentos
+        description: "Total de demissões ou desligamentos formais no mês."
+        tests:
+          - not_null
+      - name: saldo_movimentacao
+        description: "Saldo líquido de postos de trabalho gerados."
+        tests:
+          - not_null
+      - name: estoque_declarado_aproximado
+        description: "Estoque estimado de empregos formais ativos."
+      - name: taxa_rotatividade_turnover_pct
+        description: "Taxa percentual de turnover de pessoal apurada."
+      - name: salario_medio_admissao_reais
+        description: "Remuneração média contratual de admissão em Reais."
+        tests:
+          - not_null
+      - name: salario_medio_desligamento_reais
+        description: "Remuneração média de desligamento em Reais."
+        tests:
+          - not_null
+      - name: taxa_crescimento_emprego_pct
+        description: "Taxa percentual de crescimento líquido da base de empregados formais."
+        tests:
+          - not_null
+      - name: regime_movimentacao
+        description: "Classificação da dinâmica mensal (GERACAO_LIQUIDA, FECHAMENTO_POSTOS, ESTABILIDADE)."
+        tests:
+          - not_null
+      - name: reference_date
+        description: "Data de referência da consolidação."
+        tests:
+          - not_null
+      - name: extracted_at
+        description: "Timestamp ISO-8601 UTC de extração dos dados."
+        tests:
+          - not_null
+
+  - name: fct_caged_setores_cnae
+    description: "Tabela fato da distribuição de contratações e saldos formais por grande grupamento CNAE segundo o Novo CAGED."
+    columns:
+      - name: id_municipio
+        description: "Código IBGE de 7 dígitos do município."
+        tests:
+          - not_null
+      - name: nome_municipio
+        description: "Nome oficial do município."
+        tests:
+          - not_null
+      - name: sigla_uf
+        description: "Sigla de 2 letras da Unidade Federativa."
+        tests:
+          - not_null
+      - name: regiao
+        description: "Grande região geográfica do Brasil."
+      - name: is_capital
+        description: "Flag booleana indicando se é capital estadual ou federal."
+        tests:
+          - not_null
+      - name: competencia_movimentacao
+        description: "Competência no formato AAAA-MM."
+        tests:
+          - not_null
+      - name: grande_setor_cnae
+        description: "Grupamento econômico (AGROPECUARIA, INDUSTRIA, CONSTRUCAO, COMERCIO, SERVICOS)."
+        tests:
+          - not_null
+      - name: total_admissoes
+        description: "Total de contratações formais no setor."
+        tests:
+          - not_null
+      - name: total_desligamentos
+        description: "Total de demissões registradas no setor."
+        tests:
+          - not_null
+      - name: saldo_setorial
+        description: "Saldo líquido de vagas no setor."
+        tests:
+          - not_null
+      - name: salario_medio_admissao_reais
+        description: "Salário médio admissional do setor."
+        tests:
+          - not_null
+      - name: reference_date
+        description: "Data de referência da apuração."
+        tests:
+          - not_null
+      - name: extracted_at
+        description: "Timestamp ISO-8601 UTC da carga."
+        tests:
+          - not_null

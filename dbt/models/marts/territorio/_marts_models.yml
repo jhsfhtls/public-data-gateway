@@ -310,3 +310,91 @@ models:
         description: "Timestamp ISO-8601 UTC da extração dos dados."
         tests:
           - not_null
+
+  - name: mart_dinamica_emprego_formal_brasil
+    description: "Data Mart analítico de dinâmica do emprego formal, rotatividade, salários e aquecimento do mercado de trabalho segundo o Novo CAGED."
+    columns:
+      - name: id_municipio
+        description: "Código IBGE de 7 dígitos do município."
+        tests:
+          - not_null
+      - name: nome_municipio
+        description: "Nome oficial do município."
+        tests:
+          - not_null
+      - name: sigla_uf
+        description: "Sigla de 2 letras da Unidade Federativa."
+        tests:
+          - not_null
+      - name: regiao
+        description: "Grande região geográfica do Brasil."
+      - name: is_capital
+        description: "Flag booleana indicando se o município é capital."
+        tests:
+          - not_null
+      - name: competencia_movimentacao
+        description: "Mês e ano da competência da movimentação no formato AAAA-MM."
+        tests:
+          - not_null
+      - name: total_admissoes
+        description: "Total de contratações formais no período."
+        tests:
+          - not_null
+      - name: total_desligamentos
+        description: "Total de demissões ou desligamentos no período."
+        tests:
+          - not_null
+      - name: saldo_movimentacao
+        description: "Saldo líquido de empregos gerados."
+        tests:
+          - not_null
+      - name: estoque_declarado_aproximado
+        description: "Estoque estimado de postos de trabalho formais ativos."
+      - name: taxa_rotatividade_turnover_pct
+        description: "Taxa percentual de turnover de pessoal apurada."
+      - name: salario_medio_admissao_reais
+        description: "Remuneração média contratual de admissão em Reais."
+        tests:
+          - not_null
+      - name: salario_medio_desligamento_reais
+        description: "Remuneração média de desligamento em Reais."
+        tests:
+          - not_null
+      - name: razao_salarial_admissao_desligamento
+        description: "Razão entre salário médio de admissão e de desligamento."
+        tests:
+          - not_null
+      - name: taxa_crescimento_emprego_pct
+        description: "Taxa percentual de crescimento líquido da base de empregados formais."
+        tests:
+          - not_null
+      - name: regime_movimentacao
+        description: "Classificação da dinâmica de movimentação (GERACAO_LIQUIDA, FECHAMENTO_POSTOS, ESTABILIDADE)."
+        tests:
+          - not_null
+      - name: populacao_residente
+        description: "População residente apurada no Censo Demográfico."
+      - name: pib_per_capita_reais
+        description: "PIB per capita do município em Reais."
+      - name: perfil_economico_dominante
+        description: "Perfil produtivo dominante segundo valor adicionado bruto (SERVICOS, INDUSTRIA, AGROPECUARIA, ADMINISTRACAO_PUBLICA)."
+      - name: score_aquecimento_mercado_trabalho
+        description: "Score contínuo sintético (0 a 100) medindo aquecimento do mercado de trabalho e geração de postos."
+        tests:
+          - not_null
+      - name: score_vulnerabilidade_emprego
+        description: "Score contínuo sintético (0 a 100) de vulnerabilidade ocupacional e rotatividade de mão de obra."
+        tests:
+          - not_null
+      - name: classificacao_dinamica_emprego
+        description: "Enquadramento da dinâmica do mercado de trabalho (EXPANSAO_ACELERADA, CRESCIMENTO_MODERADO, ESTABILIDADE, CONTRACAO)."
+        tests:
+          - not_null
+      - name: reference_date
+        description: "Data de referência da consolidação analítica."
+        tests:
+          - not_null
+      - name: extracted_at
+        description: "Timestamp ISO-8601 UTC de extração dos dados."
+        tests:
+          - not_null

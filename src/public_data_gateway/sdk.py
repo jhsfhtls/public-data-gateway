@@ -539,6 +539,42 @@ class SocioeconomicFacade:
         return self.censo_connector.list_highest_aging_municipalities(limit=limit)
 
 
+class LaborFacade:
+    """Unified developer facade for employment, labor market dynamics, and wages (MTE Novo CAGED)."""
+
+    def __init__(self, sdk: "BrazilData") -> None:
+        self._sdk = sdk
+        self._connector: Any = None
+
+    @property
+    def connector(self) -> Any:
+        if self._connector is None:
+            from public_data_gateway.connectors.trabalho.mte_novo_caged.connector import (
+                MTENovoCagedConnector,
+            )
+
+            self._connector = MTENovoCagedConnector(settings=self._sdk.settings)
+        return self._connector
+
+    def employment_summary(
+        self, id_municipio: str, competencia: str | None = None
+    ) -> dict[str, Any] | None:
+        """Get official Novo CAGED employment movements and balance for a municipality."""
+        return self.connector.get_employment_summary(id_municipio, competencia=competencia)
+
+    def market_profile(self, id_municipio: str) -> dict[str, Any] | None:
+        """Get comprehensive Gold labor market profile (salaries, turnover, heating score) for a municipality."""
+        return self.connector.get_labor_market_profile(id_municipio)
+
+    def sectoral(self, id_municipio: str) -> list[dict[str, Any]]:
+        """Get employment movements broken down by major CNAE sector for a municipality."""
+        return self.connector.get_sectoral_employment(id_municipio)
+
+    def top_job_creators(self, limit: int = 10) -> list[dict[str, Any]]:
+        """List municipalities with highest net job creation balance from Novo CAGED."""
+        return self.connector.list_top_job_creating_municipalities(limit=limit)
+
+
 class BrazilData:
     """Unified developer SDK facade for querying, normalizing, and enriching Brazilian public datasets."""
 
@@ -564,6 +600,7 @@ class BrazilData:
         self.banking = BankingFacade(self)
         self.treasury = TreasuryFacade(self)
         self.socioeconomic = SocioeconomicFacade(self)
+        self.labor = LaborFacade(self)
 
     def list_sources(
         self,
@@ -773,6 +810,20 @@ class BrazilData:
     def get_highest_aging_municipalities(self, limit: int = 10) -> list[dict[str, Any]]:
         """Consultar ranking de municípios com maior índice de envelhecimento (Censo 2022)."""
         return self.socioeconomic.highest_aging_municipalities(limit=limit)
+
+    def get_employment_summary(
+        self, id_municipio: str, competencia: str | None = None
+    ) -> dict[str, Any] | None:
+        """Consultar movimentações de admissões, desligamentos e saldo formal (Novo CAGED)."""
+        return self.labor.employment_summary(id_municipio, competencia=competencia)
+
+    def get_labor_market_profile(self, id_municipio: str) -> dict[str, Any] | None:
+        """Consultar perfil Gold do mercado de trabalho e score de aquecimento (Novo CAGED)."""
+        return self.labor.market_profile(id_municipio)
+
+    def get_top_job_creators(self, limit: int = 10) -> list[dict[str, Any]]:
+        """Consultar ranking de municípios com maior saldo líquido de empregos gerados (Novo CAGED)."""
+        return self.labor.top_job_creators(limit=limit)
 
     def resolve_municipality(
         self, code_or_name: str | int, uf: str | None = None

@@ -1,0 +1,231 @@
+version: "3.1.0"
+contract_id: "ODCS-BR-MTE-NOVOCAGED-001"
+source_id: "mte_novo_caged"
+name: "MTE: Microdados do Novo CAGED"
+agency: "Ministério do Trabalho e Emprego (MTE)"
+domain: "trabalho_renda"
+legislation:
+  - "Lei nº 4.923/1965 (Institui o Cadastro Geral de Empregados e Desempregados)"
+  - "Portaria SEPRT nº 1.127/2019 (Regulamenta as obrigações do CAGED e eSocial)"
+  - "Lei nº 13.467/2017 (Modernização das relações de trabalho e modalidades contratuais)"
+  - "Portaria MTE nº 671/2021 (Disposições relativas à legislação trabalhista e inspeção do trabalho)"
+
+sla:
+  freshness_hours: 720
+  update_frequency: "Mensal"
+  availability_target_pct: 99.5
+
+primary_keys:
+  - id_municipio
+  - competencia_movimentacao
+
+schema:
+  tables:
+    caged_movimentacao_mensal:
+      description: "Agregado municipal de admissões, desligamentos, saldo líquido formal e taxa de rotatividade (turnover) do Novo CAGED."
+      min_expected_rows: 5
+      columns:
+        - name: id_municipio
+          type: string
+          nullable: false
+          description: "Código IBGE de 7 dígitos identificador do município."
+        - name: nome_municipio
+          type: string
+          nullable: false
+          description: "Nome oficial do município brasileiro."
+        - name: sigla_uf
+          type: string
+          nullable: false
+          description: "Sigla da Unidade Federativa correspondente."
+        - name: competencia_movimentacao
+          type: string
+          nullable: false
+          description: "Mês e ano da competência da movimentação no formato AAAA-MM."
+        - name: total_admissoes
+          type: integer
+          nullable: false
+          description: "Quantidade total de trabalhadores formais admitidos no período."
+        - name: total_desligamentos
+          type: integer
+          nullable: false
+          description: "Quantidade total de trabalhadores formais desligados no período."
+        - name: saldo_movimentacao
+          type: integer
+          nullable: false
+          description: "Saldo líquido de empregos formais gerados (admissões menos desligamentos)."
+        - name: estoque_declarado_aproximado
+          type: integer
+          nullable: true
+          description: "Estoque estimado de postos de trabalho formais ativos no município."
+        - name: taxa_rotatividade_turnover_pct
+          type: float
+          nullable: true
+          description: "Taxa de rotatividade de mão de obra calculada em percentual."
+        - name: salario_medio_admissao_reais
+          type: float
+          nullable: false
+          description: "Remuneração média contratual dos admitidos em Reais (BRL)."
+        - name: salario_medio_desligamento_reais
+          type: float
+          nullable: false
+          description: "Remuneração média contratual dos desligados em Reais (BRL)."
+        - name: reference_date
+          type: string
+          nullable: false
+          description: "Data de referência da consolidação estatística no formato AAAA-MM-DD."
+        - name: extracted_at
+          type: string
+          nullable: false
+          description: "Timestamp ISO-8601 UTC de ingestão do registro."
+
+    caged_perfil_setorial_cnae:
+      description: "Distribuição das contratações formais por grande grupamento e divisão setorial CNAE 2.3."
+      min_expected_rows: 5
+      columns:
+        - name: id_municipio
+          type: string
+          nullable: false
+          description: "Código IBGE de 7 dígitos do município."
+        - name: nome_municipio
+          type: string
+          nullable: false
+          description: "Nome oficial do município."
+        - name: sigla_uf
+          type: string
+          nullable: false
+          description: "Sigla da Unidade Federativa."
+        - name: competencia_movimentacao
+          type: string
+          nullable: false
+          description: "Competência de apuração no formato AAAA-MM."
+        - name: grande_setor_cnae
+          type: string
+          nullable: false
+          description: "Grupamento econômico (AGROPECUARIA, INDUSTRIA, CONSTRUCAO, COMERCIO, SERVICOS)."
+        - name: total_admissoes
+          type: integer
+          nullable: false
+          description: "Total de admissões registradas no grande setor."
+        - name: total_desligamentos
+          type: integer
+          nullable: false
+          description: "Total de desligamentos registrados no grande setor."
+        - name: saldo_setorial
+          type: integer
+          nullable: false
+          description: "Saldo líquido de vagas no setor (admissões menos desligamentos)."
+        - name: salario_medio_admissao_reais
+          type: float
+          nullable: false
+          description: "Salário médio admissional do setor em Reais (BRL)."
+
+    caged_ocupacao_cbo:
+      description: "Movimentações de contratações formais por ocupação segundo o CBO-2002."
+      min_expected_rows: 5
+      columns:
+        - name: id_municipio
+          type: string
+          nullable: false
+          description: "Código IBGE de 7 dígitos do município."
+        - name: competencia_movimentacao
+          type: string
+          nullable: false
+          description: "Competência de apuração no formato AAAA-MM."
+        - name: codigo_cbo_6
+          type: string
+          nullable: false
+          description: "Código de 6 dígitos da ocupação na Classificação Brasileira de Ocupações."
+        - name: titulo_ocupacao_cbo
+          type: string
+          nullable: false
+          description: "Título oficial da ocupação segundo o CBO-2002."
+        - name: total_admissoes
+          type: integer
+          nullable: false
+          description: "Admissões na ocupação."
+        - name: total_desligamentos
+          type: integer
+          nullable: false
+          description: "Desligamentos na ocupação."
+        - name: saldo_ocupacao
+          type: integer
+          nullable: false
+          description: "Saldo líquido de vagas geradas na ocupação."
+        - name: salario_medio_admissao_reais
+          type: float
+          nullable: false
+          description: "Remuneração média de admissão praticada para a ocupação."
+
+    caged_demografia_trabalhador:
+      description: "Perfil sociodemográfico das admissões e desligamentos formais (faixa etária, escolaridade, sexo e raça)."
+      min_expected_rows: 5
+      columns:
+        - name: id_municipio
+          type: string
+          nullable: false
+          description: "Código IBGE de 7 dígitos do município."
+        - name: competencia_movimentacao
+          type: string
+          nullable: false
+          description: "Competência de apuração no formato AAAA-MM."
+        - name: faixa_etaria
+          type: string
+          nullable: false
+          description: "Faixa etária do trabalhador (ex: JOVEM_ATE_24_ANOS, ADULTO_25_A_49, 50_ANOS_OU_MAIS)."
+        - name: nivel_escolaridade
+          type: string
+          nullable: false
+          description: "Grau de instrução formal (ex: FUNDAMENTAL, MEDIO_COMPLETO, SUPERIOR_COMPLETO)."
+        - name: sexo_trabalhador
+          type: string
+          nullable: false
+          description: "Sexo do trabalhador (MASCULINO ou FEMININO)."
+        - name: total_admissoes
+          type: integer
+          nullable: false
+          description: "Total de trabalhadores admitidos com o perfil demográfico."
+        - name: total_desligamentos
+          type: integer
+          nullable: false
+          description: "Total de trabalhadores desligados com o perfil demográfico."
+        - name: saldo_demografico
+          type: integer
+          nullable: false
+          description: "Saldo líquido de empregos para o perfil."
+
+    caged_salarios_remuneracao:
+      description: "Estatísticas agregadas de remuneração salarial, piso praticado e massa de rendimentos contratada."
+      min_expected_rows: 5
+      columns:
+        - name: id_municipio
+          type: string
+          nullable: false
+          description: "Código IBGE de 7 dígitos do município."
+        - name: sigla_uf
+          type: string
+          nullable: false
+          description: "Sigla da Unidade Federativa."
+        - name: competencia_movimentacao
+          type: string
+          nullable: false
+          description: "Competência de referência no formato AAAA-MM."
+        - name: salario_medio_admissao_reais
+          type: float
+          nullable: false
+          description: "Salário médio contratual de admissão em Reais."
+        - name: salario_medio_desligamento_reais
+          type: float
+          nullable: false
+          description: "Salário médio contratual de desligamento em Reais."
+        - name: piso_salarial_admissao_reais
+          type: float
+          nullable: false
+          description: "Menor salário de admissão apurado no município no período."
+        - name: massa_salarial_admissoes_mil_reais
+          type: float
+          nullable: false
+          description: "Massa salarial total contratada nas admissões em milhares de Reais."
+        - name: razao_salario_admissao_desligamento
+          type: float
+          nullable: false
+          description: "Razão entre o salário médio de admissão e o salário médio de desligamento."

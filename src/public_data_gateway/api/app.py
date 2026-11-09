@@ -818,4 +818,59 @@ def create_app(settings: GatewaySettings | None = None) -> FastAPI:
         conn = IBGECenso2022Connector(settings=app_settings)
         return conn.list_highest_aging_municipalities(limit=limit)
 
+    # 18. Formal Labor Market & Employment Routes (MTE Novo CAGED)
+    @app.get("/api/v1/labor/municipality/{id_municipio}/summary")
+    async def get_labor_employment_summary(
+        id_municipio: str,
+        competencia: str | None = Query(None, description="Optional competence period in YYYY-MM format"),
+    ) -> dict[str, Any]:
+        from public_data_gateway.connectors.trabalho.mte_novo_caged.connector import (
+            MTENovoCagedConnector,
+        )
+
+        conn = MTENovoCagedConnector(settings=app_settings)
+        res = conn.get_employment_summary(id_municipio, competencia=competencia)
+        if not res:
+            raise HTTPException(
+                status_code=404,
+                detail=f"Labor employment summary not found for municipality '{id_municipio}'",
+            )
+        return res
+
+    @app.get("/api/v1/labor/municipality/{id_municipio}/profile")
+    @app.get("/api/v1/caged/{id_municipio}")
+    async def get_labor_market_profile(id_municipio: str) -> dict[str, Any]:
+        from public_data_gateway.connectors.trabalho.mte_novo_caged.connector import (
+            MTENovoCagedConnector,
+        )
+
+        conn = MTENovoCagedConnector(settings=app_settings)
+        res = conn.get_labor_market_profile(id_municipio)
+        if not res:
+            raise HTTPException(
+                status_code=404,
+                detail=f"Labor market profile not found for municipality '{id_municipio}'",
+            )
+        return res
+
+    @app.get("/api/v1/labor/municipality/{id_municipio}/sectors")
+    async def get_labor_sectoral_employment(id_municipio: str) -> list[dict[str, Any]]:
+        from public_data_gateway.connectors.trabalho.mte_novo_caged.connector import (
+            MTENovoCagedConnector,
+        )
+
+        conn = MTENovoCagedConnector(settings=app_settings)
+        return conn.get_sectoral_employment(id_municipio)
+
+    @app.get("/api/v1/labor/ranking")
+    async def get_labor_top_job_creating_municipalities(
+        limit: int = Query(10, ge=1, le=50, description="Top N municipalities by net job creation balance"),
+    ) -> list[dict[str, Any]]:
+        from public_data_gateway.connectors.trabalho.mte_novo_caged.connector import (
+            MTENovoCagedConnector,
+        )
+
+        conn = MTENovoCagedConnector(settings=app_settings)
+        return conn.list_top_job_creating_municipalities(limit=limit)
+
     return app

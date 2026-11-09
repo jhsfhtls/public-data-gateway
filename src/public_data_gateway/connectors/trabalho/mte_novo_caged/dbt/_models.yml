@@ -1,0 +1,214 @@
+version: 2
+
+models:
+  - name: stg_caged_movimentacao_mensal
+    description: "Visão de staging das movimentações mensais de admissões, desligamentos e saldo de empregos formais do Novo CAGED."
+    columns:
+      - name: id_municipio
+        description: "Código IBGE de 7 dígitos do município."
+        tests:
+          - not_null
+      - name: nome_municipio
+        description: "Nome oficial do município."
+        tests:
+          - not_null
+      - name: sigla_uf
+        description: "Sigla da Unidade Federativa correspondente."
+        tests:
+          - not_null
+      - name: competencia_movimentacao
+        description: "Mês e ano da competência da movimentação no formato AAAA-MM."
+        tests:
+          - not_null
+      - name: total_admissoes
+        description: "Quantidade total de trabalhadores formais admitidos no período."
+        tests:
+          - not_null
+      - name: total_desligamentos
+        description: "Quantidade total de trabalhadores formais desligados no período."
+        tests:
+          - not_null
+      - name: saldo_movimentacao
+        description: "Saldo líquido de empregos formais gerados (admissões menos desligamentos)."
+        tests:
+          - not_null
+      - name: estoque_declarado_aproximado
+        description: "Estoque estimado de postos de trabalho formais ativos no município."
+      - name: taxa_rotatividade_turnover_pct
+        description: "Taxa de rotatividade de mão de obra calculada em percentual."
+      - name: salario_medio_admissao_reais
+        description: "Remuneração média contratual dos admitidos em Reais (BRL)."
+        tests:
+          - not_null
+      - name: salario_medio_desligamento_reais
+        description: "Remuneração média contratual dos desligados em Reais (BRL)."
+        tests:
+          - not_null
+      - name: reference_date
+        description: "Data de referência da consolidação estatística."
+      - name: extracted_at
+        description: "Timestamp ISO-8601 UTC de ingestão do registro."
+
+  - name: stg_caged_perfil_setorial_cnae
+    description: "Visão de staging da movimentação de emprego formal por grande grupamento econômico da CNAE."
+    columns:
+      - name: id_municipio
+        description: "Código IBGE de 7 dígitos do município."
+        tests:
+          - not_null
+      - name: nome_municipio
+        description: "Nome oficial do município."
+        tests:
+          - not_null
+      - name: sigla_uf
+        description: "Sigla da Unidade Federativa."
+        tests:
+          - not_null
+      - name: competencia_movimentacao
+        description: "Competência de apuração no formato AAAA-MM."
+        tests:
+          - not_null
+      - name: grande_setor_cnae
+        description: "Grupamento econômico (AGROPECUARIA, INDUSTRIA, CONSTRUCAO, COMERCIO, SERVICOS)."
+        tests:
+          - not_null
+      - name: total_admissoes
+        description: "Total de admissões registradas no grande setor."
+        tests:
+          - not_null
+      - name: total_desligamentos
+        description: "Total de desligamentos registrados no grande setor."
+        tests:
+          - not_null
+      - name: saldo_setorial
+        description: "Saldo líquido de vagas no setor (admissões menos desligamentos)."
+        tests:
+          - not_null
+      - name: salario_medio_admissao_reais
+        description: "Salário médio admissional do setor em Reais (BRL)."
+        tests:
+          - not_null
+      - name: reference_date
+        description: "Data de referência da apuração."
+      - name: extracted_at
+        description: "Timestamp ISO-8601 UTC da extração."
+
+  - name: stg_caged_ocupacao_cbo
+    description: "Visão de staging das contratações e desligamentos formais por ocupação CBO-2002."
+    columns:
+      - name: id_municipio
+        description: "Código IBGE de 7 dígitos do município."
+        tests:
+          - not_null
+      - name: competencia_movimentacao
+        description: "Competência de apuração no formato AAAA-MM."
+        tests:
+          - not_null
+      - name: codigo_cbo_6
+        description: "Código de 6 dígitos da ocupação na CBO."
+        tests:
+          - not_null
+      - name: titulo_ocupacao_cbo
+        description: "Título oficial da ocupação segundo a CBO-2002."
+        tests:
+          - not_null
+      - name: total_admissoes
+        description: "Admissões registradas na ocupação."
+        tests:
+          - not_null
+      - name: total_desligamentos
+        description: "Desligamentos registrados na ocupação."
+        tests:
+          - not_null
+      - name: saldo_ocupacao
+        description: "Saldo líquido de vagas geradas na ocupação."
+        tests:
+          - not_null
+      - name: salario_medio_admissao_reais
+        description: "Remuneração média de admissão praticada para a ocupação."
+        tests:
+          - not_null
+      - name: reference_date
+        description: "Data de referência da consolidação."
+      - name: extracted_at
+        description: "Timestamp ISO-8601 UTC da carga."
+
+  - name: stg_caged_demografia_trabalhador
+    description: "Visão de staging do perfil sociodemográfico (idade, escolaridade, sexo) das movimentações do Novo CAGED."
+    columns:
+      - name: id_municipio
+        description: "Código IBGE de 7 dígitos do município."
+        tests:
+          - not_null
+      - name: competencia_movimentacao
+        description: "Competência de apuração no formato AAAA-MM."
+        tests:
+          - not_null
+      - name: faixa_etaria
+        description: "Faixa etária do trabalhador (ex: JOVEM_ATE_24_ANOS, ADULTO_25_A_49, 50_ANOS_OU_MAIS)."
+        tests:
+          - not_null
+      - name: nivel_escolaridade
+        description: "Grau de instrução formal do trabalhador."
+        tests:
+          - not_null
+      - name: sexo_trabalhador
+        description: "Sexo do trabalhador (MASCULINO ou FEMININO)."
+        tests:
+          - not_null
+      - name: total_admissoes
+        description: "Total de trabalhadores admitidos com o perfil demográfico."
+        tests:
+          - not_null
+      - name: total_desligamentos
+        description: "Total de trabalhadores desligados com o perfil demográfico."
+        tests:
+          - not_null
+      - name: saldo_demografico
+        description: "Saldo líquido de empregos para o perfil."
+        tests:
+          - not_null
+      - name: reference_date
+        description: "Data de referência estatística."
+      - name: extracted_at
+        description: "Timestamp ISO-8601 UTC de ingestão."
+
+  - name: stg_caged_salarios_remuneracao
+    description: "Visão de staging de estatísticas salariais, piso de admissão e massa salarial contratada."
+    columns:
+      - name: id_municipio
+        description: "Código IBGE de 7 dígitos do município."
+        tests:
+          - not_null
+      - name: sigla_uf
+        description: "Sigla da Unidade Federativa."
+        tests:
+          - not_null
+      - name: competencia_movimentacao
+        description: "Competência de referência no formato AAAA-MM."
+        tests:
+          - not_null
+      - name: salario_medio_admissao_reais
+        description: "Salário médio contratual de admissão em Reais."
+        tests:
+          - not_null
+      - name: salario_medio_desligamento_reais
+        description: "Salário médio contratual de desligamento em Reais."
+        tests:
+          - not_null
+      - name: piso_salarial_admissao_reais
+        description: "Menor salário de admissão apurado no município no período."
+        tests:
+          - not_null
+      - name: massa_salarial_admissoes_mil_reais
+        description: "Massa salarial total contratada nas admissões em milhares de Reais."
+        tests:
+          - not_null
+      - name: razao_salario_admissao_desligamento
+        description: "Razão entre o salário médio de admissão e o salário médio de desligamento."
+        tests:
+          - not_null
+      - name: reference_date
+        description: "Data de referência da consolidação."
+      - name: extracted_at
+        description: "Timestamp ISO-8601 UTC da extração."
