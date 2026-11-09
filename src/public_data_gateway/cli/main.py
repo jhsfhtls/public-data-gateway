@@ -480,6 +480,29 @@ def build_parser() -> argparse.ArgumentParser:
     pnad_rank_p.add_argument("--limit", type=int, default=10, help="Max UFs to list")
     pnad_rank_p.add_argument("--json", action="store_true", help="Output in JSON format")
 
+    # CNEFE (IBGE Cadastro Nacional de Endereços para Fins Estatísticos)
+    cnefe_p = subparsers.add_parser(
+        "cnefe",
+        help="Query IBGE CNEFE address database, geocoding and building species (Censo 2022).",
+    )
+    cnefe_sub = cnefe_p.add_subparsers(dest="cnefe_action", required=True)
+
+    cnefe_sum_p = cnefe_sub.add_parser("summary", help="Query address totals, density and classification by municipality.")
+    cnefe_sum_p.add_argument("municipio", type=str, help="IBGE 7-digit code or municipality name")
+    cnefe_sum_p.add_argument("--json", action="store_true", help="Output in JSON format")
+
+    cnefe_cep_p = cnefe_sub.add_parser("cep", help="Query address counts and centroid for an 8-digit CEP.")
+    cnefe_cep_p.add_argument("cep", type=str, help="8-digit Brazilian postal code (CEP)")
+    cnefe_cep_p.add_argument("--json", action="store_true", help="Output in JSON format")
+
+    cnefe_bld_p = cnefe_sub.add_parser("building-types", help="List building species breakdown for a municipality.")
+    cnefe_bld_p.add_argument("municipio", type=str, help="IBGE 7-digit code or municipality name")
+    cnefe_bld_p.add_argument("--json", action="store_true", help="Output in JSON format")
+
+    cnefe_rank_p = cnefe_sub.add_parser("ranking", help="List top municipalities ranked by address density per km2.")
+    cnefe_rank_p.add_argument("--limit", type=int, default=10, help="Max municipalities to list")
+    cnefe_rank_p.add_argument("--json", action="store_true", help="Output in JSON format")
+
     # Direct shortcut: pnad-uf
     pnad_s_p = subparsers.add_parser("pnad-uf", help="Shortcut to query PNAD Contínua labor market profile.")
     pnad_s_p.add_argument("uf", type=str, help="IBGE 2-digit UF code or 2-letter state abbreviation (e.g. SP, 35)")
@@ -1712,6 +1735,73 @@ def main(argv: Sequence[str] | None = None) -> int:
                         print(f"Top {len(ranks)} States by Lowest Unemployment Rate (PNAD Contínua):")
                         for idx, r in enumerate(ranks, 1):
                             print(f"  {idx}. {r.get('nome_uf')} ({r.get('sigla_uf')}): {r.get('taxa_desocupacao_pct')}% desocupação | Nível Ocupação: {r.get('taxa_nivel_ocupacao_pct')}%")
+                return 0
+
+        elif args.command in ("cnefe",):
+            from public_data_gateway.connectors.geografico.ibge_cnefe.connector import (
+                IBGECnefeConnector,
+            )
+
+            cnefe_conn = IBGECnefeConnector(settings=settings)
+            cnefe_action = getattr(args, "cnefe_action", None)
+
+            if cnefe_action == "summary":
+                summ = cnefe_conn.get_municipality_summary(args.municipio)
+                if not summ:
+                    print(f"No CNEFE data found for municipality '{args.municipio}'.", file=sys.stderr)
+                    return 1
+                if args.json:
+                    print(json.dumps(summ, indent=2, ensure_ascii=False))
+                else:
+                    print(f"IBGE CNEFE Address Profile: {summ.get('nome_municipio')} ({summ.get('sigla_uf')} - {summ.get('id_municipio')}):")
+                    print(f"  Total de Endereços:       {summ.get('total_enderecos'):,}")
+                    print(f"  Domicílios Particulares:  {summ.get('total_domicilios_particulares'):,}")
+                    print(f"  Comércio e Serviços:      {summ.get('total_estabelecimentos_comerciais_servicos'):,}")
+                    print(f"  Estabelecimentos Saúde:   {summ.get('total_estabelecimentos_saude'):,}")
+                    print(f"  Estabelecimentos Ensino:  {summ.get('total_estabelecimentos_ensino'):,}")
+                    print(f"  Densidade de Endereços:   {summ.get('densidade_enderecos_km2'):,.2f} end/km²")
+                    print(f"  Score Densidade Com.:     {summ.get('score_densidade_comercial')}/100.0")
+                    print(f"  Score Infra Social:       {summ.get('score_infraestrutura_social')}/100.0")
+                    print(f"  Taxa Georreferenciamento: {summ.get('taxa_cobertura_georreferenciada_pct')}%")
+                return 0
+
+            if cnefe_action == "cep":
+                profile = cnefe_conn.get_cep_profile(args.cep)
+                if not profile:
+                    print(f"No CNEFE data found for CEP '{args.cep}'.", file=sys.stderr)
+                    return 1
+                if args.json:
+                    print(json.dumps(profile, indent=2, ensure_ascii=False))
+                else:
+                    print(f"IBGE CNEFE CEP Profile: {profile.get('cep_8')} - {profile.get('nome_municipio')} ({profile.get('sigla_uf')}):")
+                    print(f"  Total de Endereços:      {profile.get('total_enderecos'):,}")
+                    print(f"  Total de Domicílios:     {profile.get('total_domicilios'):,}")
+                    print(f"  Estabelecimentos:        {profile.get('total_estabelecimentos'):,}")
+                    print(f"  Centroide (Lat, Lon):    {profile.get('latitude_centroide')}, {profile.get('longitude_centroide')}")
+                    print(f"  Índice Uso Misto:        {profile.get('indice_misto_residencial_comercial')}")
+                return 0
+
+            if cnefe_action == "building-types":
+                types_list = cnefe_conn.list_building_types(args.municipio)
+                if not types_list:
+                    print(f"No building species found for municipality '{args.municipio}'.", file=sys.stderr)
+                    return 1
+                if args.json:
+                    print(json.dumps(types_list, indent=2, ensure_ascii=False))
+                else:
+                    print(f"IBGE CNEFE Building Species Breakdown: {types_list[0].get('nome_municipio')} ({types_list[0].get('sigla_uf')}):")
+                    for b in types_list:
+                        print(f"  - {b.get('tipo_edificacao')}: {b.get('total_edificacoes'):,} ({b.get('participacao_pct')}%) | {b.get('densidade_edificacoes_km2'):,.2f} /km²")
+                return 0
+
+            if cnefe_action == "ranking":
+                ranks = cnefe_conn.list_top_address_density(limit=args.limit)
+                if args.json:
+                    print(json.dumps(ranks, indent=2, ensure_ascii=False))
+                else:
+                    print(f"Top {len(ranks)} Municipalities by Address Density (CNEFE Censo 2022):")
+                    for idx, r in enumerate(ranks, 1):
+                        print(f"  {idx}. {r.get('nome_municipio')} ({r.get('sigla_uf')}): {r.get('densidade_enderecos_km2'):,.2f} end/km² | Total: {r.get('total_enderecos'):,}")
                 return 0
 
     except Exception as exc:

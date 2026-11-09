@@ -1,6 +1,6 @@
 {
   "schema_version": "1.0.0",
-  "last_updated": "2026-11-08T11:45:00.000000+00:00",
+  "last_updated": "2026-11-09T17:25:43.699851",
   "project_name": "public-data-gateway",
   "ecosystem": "C.O.R.E. (core, operations, career, studies)",
   "governing_pops": [
@@ -15,8 +15,8 @@
   "current_macro_phase_id": "06",
   "current_macro_phase": "Fase 06 - Ingestão Wave 4 em Andamento (Censo, Trabalho, Logística & Telecom: ibge_sidra, ibge_censo2022, mte_novo_caged e ibge_pnad_continua homologados)",
   "overall_status": "ON_TRACK",
-  "active_connector": "ibge_cnefe",
-  "next_connector": "mte_rais",
+  "active_connector": "mte_rais",
+  "next_connector": "ibge_pib_municipal",
   "structural_phases": [
     {
       "phase_id": "00",
@@ -348,39 +348,15 @@
       "phase_id": "04",
       "milestone": "Homologação do Conector suframa_pim_zfm (5 Tabelas, dbt, Mart de Incentivos Fiscais PIM & Live Fail-Hard)",
       "summary": "Implementação completa do conector suframa_pim_zfm (Superintendência da Zona Franca de Manaus — Cadastro de Empresas Incentivadas do Polo Industrial de Manaus / ZFM e Áreas de Livre Comércio, Decreto-Lei nº 288/1967, Lei nº 8.387/1991, Art. 40 do ADCT, EC 83/2014 e Lei nº 10.996/2004): 5 tabelas (suframa_empresas_cadastradas, suframa_projetos_incentivados, suframa_beneficios_fiscais, suframa_areas_livre_comercio, suframa_subsetores_industriais) materializadas em data/suframa_pim_zfm/{bronze,silver,gold}/; 11 novos modelos dbt (5 staging views, dim_empresa_suframa, dim_area_livre_comercio, dim_subsetor_industrial_pim, fct_projeto_incentivado_suframa, fct_beneficio_fiscal_suframa, mart_incentivos_fiscais_pim_brasil) totalizando 115 modelos e 1098 testes dbt 100% aprovados; 1242 colunas 100% documentadas no linter; feature store features_incentivos_fiscais_zfm_brasil.parquet gerada com score contínuo de 0 a 100 de incentivos fiscais, cumprimento de PPB e classificação de capacidade fabril; testes reais de 1 linha com fail-hard contra os portais oficiais da SUFRAMA gov.br e 12 testes pytest aprovados; multi-interface completa via SDK (PublicData.company.suframa, tax_incentives, list_pim_projects, get_suframa_status, get_tax_incentives), CLI (pdg company suframa, tax-incentives, pim-projects), REST API (/api/v1/company/suframa, tax-incentives, projetos) e MCP (bdg_get_suframa_status, bdg_get_tax_incentives_profile)."
+    },
+    {
+      "date": "2026-11-09",
+      "phase_id": "04",
+      "milestone": "Homologação do Conector ibge_cnefe (5 Tabelas, dbt, Mart de Geografia e Endereçamento & Live Fail-Hard)",
+      "summary": "Implementação completa do conector ibge_cnefe (Cadastro Nacional de Endereços para Fins Estatísticos - IBGE Censo Demográfico 2022, Lei nº 5.534/1968, Lei nº 5.878/1973 e Portaria IBGE nº 123/2021): 5 tabelas (cnefe_enderecos_padrao, cnefe_coordenadas_geograficas, cnefe_tipos_edificacao, cnefe_agregados_cep, cnefe_densidade_enderecamento) materializadas em data/ibge_cnefe/{silver,gold}/; 8 novos modelos dbt (5 staging views, fct_cnefe_perfil_edificacoes_municipio, fct_cnefe_malha_logradouros_cep, mart_geografia_enderecamento_edificacoes_brasil) totalizando 225 modelos e 2.229 testes dbt 100% aprovados; 2.718 colunas 100% documentadas no linter; feature store features_cnefe_enderecamento_municipios_brasil.parquet gerada com scores de densidade comercial, infraestrutura social e tipologia urbana; testes reais com fail-hard contra FTP oficial do IBGE e Servicodados, 8 testes pytest aprovados (196 offline tests sem falhas); multi-interface completa via SDK (BrazilData.geo.cnefe_*, get_cnefe_*), CLI (bdg cnefe summary/cep/building-types/ranking), REST API (/api/v1/geo/cnefe/*, /api/v1/cnefe/*) e MCP (bdg_get_cnefe_municipality_summary, bdg_get_cnefe_cep_profile, bdg_list_cnefe_building_types, bdg_list_cnefe_top_address_density)."
     }
   ],
   "recent_milestones": [
-    {
-      "date": "2026-11-08",
-      "phase_id": "05",
-      "milestone": "Homologação do Conector cvm_dfp_itr (5 Tabelas, dbt, Mart de Demonstrações Financeiras & Live Fail-Hard)",
-      "summary": "Implementação completa do conector cvm_dfp_itr (Comissão de Valores Mobiliários - Demonstrações Financeiras Padronizadas DFP/ITR de Companhias Abertas, Lei nº 6.385/1976, Lei nº 6.404/1976 e Resoluções CVM nº 80/2022 e 81/2022) iniciando a Wave 3: 5 tabelas (cvm_cia_aberta_cadastral, cvm_dfp_balanco_ativo, cvm_dfp_balanco_passivo, cvm_dfp_dre, cvm_dfp_fluxo_caixa) materializadas em data/cvm_dfp_itr/{bronze,silver,gold}/; 10 novos modelos dbt (5 staging views, dim_companhia_aberta_cvm, fct_balanco_patrimonial_cvm, fct_resultado_exercicio_cvm, fct_demonstracao_contabil_cvm, mart_demonstracoes_financeiras_cvm_brasil) totalizando 125 modelos e 1284 testes dbt 100% aprovados; 1421 colunas 100% documentadas no linter; feature store features_financeiras_cvm_brasil.parquet gerada com indicadores contábeis (liquidez corrente/seca, margens bruta/líquida, ROE, endividamento geral), score de solvência fundamentalista contínuo de 0 a 100 e rating contábil; testes reais de 1 linha com fail-hard contra os portais oficiais da CVM gov.br e 12 testes pytest aprovados; multi-interface completa via SDK (PublicData.finance.cvm_company, financial_ratios, list_cvm_companies), CLI (pdg finance cvm, ratios, list-cvm), REST API (/api/v1/finance/cvm, ratios, cias) e MCP (bdg_get_cvm_company, bdg_get_financial_ratios)."
-    },
-    {
-      "date": "2026-11-08",
-      "phase_id": "05",
-      "milestone": "Homologação do Conector mdic_comexstat (6 Tabelas, dbt, Marts de Balança Comercial & Live Fail-Hard)",
-      "summary": "Implementação completa do conector mdic_comexstat (Ministério do Desenvolvimento, Indústria, Comércio e Serviços - Estatísticas de Comércio Exterior do Brasil, Decreto nº 660/1992 e Portaria SECEX nº 44/2020) consolidando a Wave 3: 6 tabelas (comex_ncm_exportacao, comex_ncm_importacao, comex_municipios_exportacao, comex_municipios_importacao, comex_ncm_tabela, comex_paises) materializadas em data/mdic_comexstat/{bronze,silver,gold}/; 13 novos modelos dbt (6 staging views, dim_ncm, dim_pais_comex, fct_exportacao_mensal, fct_importacao_mensal, fct_comercio_exterior_municipio, mart_balanca_comercial_municipios_brasil, mart_comercio_exterior_ncm_brasil) totalizando 138 modelos e 1391 testes dbt 100% aprovados; 1544 colunas 100% documentadas no linter; feature store features_comercio_exterior_brasil.parquet gerada com corrente de comércio, taxa de cobertura, saldo líquido, ranking exportador municipal e score contínuo de 0 a 100 de competitividade exportadora; testes reais de 1 linha com fail-hard contra os portais oficiais do MDIC Comex Stat e 11 testes pytest aprovados; multi-interface completa via SDK (PublicData.trade.municipality_trade, ncm_trade, trade_balance_profile), CLI (pdg trade municipality, ncm, balance e comex shortcut), REST API (/api/v1/trade/municipality, ncm, balance) e MCP (bdg_get_municipality_trade, bdg_get_ncm_trade_profile)."
-    },
-    {
-      "date": "2026-11-08",
-      "phase_id": "05",
-      "milestone": "Homologação do Conector cvm_fundos (4 Tabelas, dbt, Marts de Performance e Gestoras & Live Fail-Hard)",
-      "summary": "Implementação completa do conector cvm_fundos (Comissão de Valores Mobiliários - Cadastro Geral e Informes Diários de Fundos de Investimento ICVM 555 / Resolução CVM 175) consolidando o terceiro conector da Wave 3: 4 tabelas (cvm_cadastro_fundos, cvm_informe_diario, cvm_gestores_fundos, cvm_administradores_fundos) materializadas em data/cvm_fundos/{bronze,silver,gold}/; 10 novos modelos dbt (4 staging views, dim_fundo_investimento, dim_gestor_fundo, dim_administrador_fundo, fct_informe_diario_fundos, mart_performance_liquidez_fundos, mart_ranking_gestoras_assets) totalizando 148 modelos e 1443 testes dbt 100% aprovados; 1671 colunas 100% documentadas no linter; feature store features_fundos_investimento_brasil.parquet gerada com métricas de PL, cotistas, captação líquida 30d, volatilidade diária, classificação de liquidez e score contínuo de 0 a 100 de resiliência do fundo; testes reais com fail-hard contra os portais da CVM e 11 testes pytest aprovados; multi-interface completa via SDK (PublicData.funds.* e aliases), CLI (pdg funds e cvm-fundos), REST API (/api/v1/funds/*) e MCP (bdg_get_fund_profile, bdg_get_asset_manager_funds)."
-    },
-    {
-      "date": "2026-11-08",
-      "phase_id": "05",
-      "milestone": "Homologação do Conector bcb_ifdata (5 Tabelas, dbt, Marts de Ranking Bancário e Basiléia & Live Fail-Hard)",
-      "summary": "Implementação completa do conector bcb_ifdata (Banco Central do Brasil — Informações Financeiras e Balanços de Instituições Financeiras e Conglomerados Prudenciais S1 a S5, Lei nº 4.595/1964, Resoluções CMN nº 4.966/2021 e nº 4.553/2017) consolidando o quarto conector da Wave 3: 5 tabelas (bcb_ifdata_cadastro, bcb_ifdata_ativo, bcb_ifdata_passivo, bcb_ifdata_dre, bcb_ifdata_indicadores) materializadas em data/bcb_ifdata/{bronze,silver,gold}/; 11 novos modelos dbt (5 staging views, dim_instituicao_prudencial_bcb, fct_balanco_bancario_trimestral, fct_resultado_bancario_trimestral, fct_indicadores_prudenciais_bcb, mart_ranking_bancario_brasil, mart_saude_prudencial_basileia) totalizando 159 modelos e 1530 testes dbt 100% aprovados; 1810 colunas 100% documentadas no linter (100% coverage); feature store features_sistema_financeiro_brasil.parquet gerada com indicadores prudenciais (Índice de Basiléia, Índice de Imobilização, ROE Bancário, Inadimplência > 90d, classificação de porte CONGLOMERADO_S1, BANCO_MEDIO_S2_S3, INSTITUICAO_REGIONAL_S4_S5) e score contínuo de 0 a 100 de solidez bancária; testes reais com fail-hard estrito contra a API Olinda OData e portal do BACEN e 11 testes pytest aprovados (142 testes totais no repositório); multi-interface completa via SDK (PublicData.banking.* e aliases), CLI (pdg banking e ifdata), REST API (/api/v1/banking/*) e MCP (bdg_get_bank_financial_profile, bdg_get_banking_ranking) com proteção contra prompt injection."
-    },
-    {
-      "date": "2026-11-08",
-      "phase_id": "05",
-      "milestone": "Homologação do Conector stn_tesouro_transparente (5 Tabelas, dbt, Marts de Saúde Fiscal e Crédito SADIPEM & Live Fail-Hard)",
-      "summary": "Implementação completa do conector stn_tesouro_transparente (Secretaria do Tesouro Nacional / Ministério da Fazenda — SADIPEM PVL, Capacidade de Pagamento CAPAG, Dívida Consolidada Líquida e Transferências Constitucionais FPM/FPE, Lei Complementar nº 101/2000 - LRF, Portaria STN nº 447/2018 e Art. 159 da CF/88) consolidando o quinto conector da Wave 3: 5 tabelas (stn_sadipem_pvl, stn_transferencias_fpm, stn_transferencias_fpe, stn_capag_municipios, stn_divida_consolidada) materializadas em data/stn_tesouro_transparente/{bronze,silver,gold}/; 11 novos modelos dbt (5 staging views, dim_ente_federativo_stn, fct_operacao_credito_pvl, fct_transferencia_constitucional_fpm, fct_capacidade_pagamento_capag, mart_saude_fiscal_municipios_brasil, mart_operacoes_credito_sadipem) totalizando 170 modelos e 1658 testes dbt 100% aprovados; 1943 colunas 100% documentadas no linter (100% coverage); feature store features_fiscal_municipios_brasil.parquet gerada com indicadores fiscais LRF (Dívida Consolidada / RCL, Despesa de Pessoal / RCL, Poupança Corrente, Rating CAPAG A/B/C/D) e score contínuo de 0 a 100 de saúde fiscal municipal; testes reais com fail-hard contra a API SADIPEM do Tesouro Nacional e CKAN do Tesouro Transparente com 11 testes pytest aprovados (150 testes offline totais no repositório); multi-interface completa via SDK (PublicData.treasury.* e aliases), CLI (pdg treasury e sadipem), REST API (/api/v1/treasury/* e /api/v1/sadipem/*) e MCP (bdg_get_municipality_fiscal_health, bdg_get_sadipem_credit_operations) com contenção de prompt injection."
-    },
     {
       "date": "2026-11-08",
       "phase_id": "05",
@@ -404,6 +380,7 @@
       "phase_id": "06",
       "milestone": "Homologação do Conector ibge_pnad_continua (5 Tabelas, dbt, Mart de Panorama do Trabalho e Renda & Live Fail-Hard)",
       "summary": "Implementação e homologação completa do conector ibge_pnad_continua (IBGE Pesquisa Nacional por Amostra de Domicílios Contínua — Taxa de Desocupação, Rendimento Médio Real Habitual e Efetivo, Subutilização da Força de Trabalho, Informalidade e Paridade Salarial por UF, Leis nº 5.534/1968, 5.878/1973 e Resolução CD/IBGE nº 1/2012) consolidando o quarto conector da Wave 4 e 22º conector total da plataforma: 5 tabelas (pnad_mercado_trabalho_trimestral, pnad_rendimento_trabalho, pnad_subutilizacao_forca, pnad_posicao_ocupacao, pnad_demografia_educacao_trabalho) materializadas em data/ibge_pnad_continua/{silver,gold}/ cobrindo todas as 27 UFs do Brasil; 8 novos modelos dbt (5 staging views, fct_pnad_mercado_trabalho_uf, fct_pnad_posicao_informalidade_uf, mart_panorama_trabalho_renda_estados_brasil) totalizando 217 modelos dbt (102 tabelas, 115 views) e 2.178 testes dbt 100% aprovados com 0 erros; 2.608 colunas 100% documentadas no linter (100% coverage); feature store features_pnad_trabalho_renda_estados_brasil.parquet gerada com indicadores de desocupação, renda média real, massa salarial, informalidade, subutilização e desalento, score de resiliência do mercado de trabalho estadual (0 a 100) e score de vulnerabilidade trabalho/renda; testes reais com fail-hard estrito contra as APIs oficiais do IBGE SIDRA PNAD Contínua (Tabelas 4099 e 6388 v5934) com 9 testes pytest aprovados (191 testes offline totais no repositório); multi-interface completa via SDK (BrazilData.labor.*, get_state_labor_profile, get_labor_force_indicators, get_lowest_unemployment_states), CLI (bdg pnad indicators/profile/earnings/ranking e atalho direto bdg pnad-uf), REST API (/api/v1/labor/state/* e atalho /api/v1/pnad/*) e MCP (bdg_get_labor_force_indicators, bdg_get_state_labor_profile, bdg_list_lowest_unemployment_states, bdg_list_highest_earnings_states) com contenção de prompt injection."
-    }
+    },
+    "Homologação do Conector ibge_cnefe (5 Tabelas, dbt, Mart de Geografia e Endereçamento & Live Fail-Hard)"
   ]
 }

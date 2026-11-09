@@ -1,0 +1,18 @@
+version: 2
+
+sources:
+  - name: ibge_cnefe_silver
+    description: "Tabelas normalizadas da camada Silver do Cadastro Nacional de Endereços para Fins Estatísticos (CNEFE Censo 2022) do IBGE."
+    meta:
+      external_location: "data/ibge_cnefe/silver/{name}.parquet"
+    tables:
+      - name: cnefe_enderecos_padrao
+        description: "Logradouros, números prediais, complementos e espécies de edificações padronizadas no Censo 2022."
+      - name: cnefe_coordenadas_geograficas
+        description: "Coordenadas georreferenciadas pontuais (latitude, longitude WGS84 e altitude) dos endereços."
+      - name: cnefe_tipos_edificacao
+        description: "Distribuição e volumetria das espécies de edificações (domicílios, comércios, saúde, ensino) por município."
+      - name: cnefe_agregados_cep
+        description: "Métricas agregadas, centroides geográficos e densidade de domicílios e estabelecimentos por CEP de 8 dígitos."
+      - name: cnefe_densidade_enderecamento
+        description: "Indicadores municipais consolidados de densidade territorial, cobertura georreferenciada e perfil de ocupação do solo."

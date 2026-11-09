@@ -58,6 +58,32 @@ class GeoFacade:
         """Trigger Bronze-to-Gold extraction and materialization pipeline."""
         return self.connector.extract()
 
+    @property
+    def cnefe_connector(self) -> Any:
+        if not hasattr(self, "_cnefe_conn") or self._cnefe_conn is None:
+            from public_data_gateway.connectors.geografico.ibge_cnefe import (
+                IBGECnefeConnector,
+            )
+
+            self._cnefe_conn = IBGECnefeConnector(settings=self._sdk.settings)
+        return self._cnefe_conn
+
+    def cnefe_municipality_summary(self, id_municipio: str) -> dict[str, Any] | None:
+        """Get CNEFE address and building density summary for a municipality."""
+        return self.cnefe_connector.get_municipality_summary(id_municipio)
+
+    def cnefe_cep_profile(self, cep: str) -> dict[str, Any] | None:
+        """Get CNEFE address, centroid and building count by 8-digit CEP."""
+        return self.cnefe_connector.get_cep_profile(cep)
+
+    def cnefe_building_types(self, id_municipio: str) -> list[dict[str, Any]]:
+        """List building species distribution in a municipality."""
+        return self.cnefe_connector.list_building_types(id_municipio)
+
+    def cnefe_top_address_density(self, limit: int = 10) -> list[dict[str, Any]]:
+        """List municipalities ranked by address density per km2."""
+        return self.cnefe_connector.list_top_address_density(limit=limit)
+
 
 class ProcurementFacade:
     """Public procurement query interface powered by PNCP (Lei nº 14.133/2021)."""
@@ -871,6 +897,22 @@ class BrazilData:
     def get_lowest_unemployment_states(self, limit: int = 10) -> list[dict[str, Any]]:
         """Consultar ranking de estados com menor taxa de desocupação (PNAD Contínua)."""
         return self.labor.lowest_unemployment_states(limit=limit)
+
+    def get_cnefe_municipality_summary(self, id_municipio: str) -> dict[str, Any] | None:
+        """Consultar sumário de endereços e edificações do município (IBGE CNEFE Censo 2022)."""
+        return self.geo.cnefe_municipality_summary(id_municipio)
+
+    def get_cnefe_cep_profile(self, cep: str) -> dict[str, Any] | None:
+        """Consultar perfil de endereços, centroide e contagem predial por CEP (IBGE CNEFE)."""
+        return self.geo.cnefe_cep_profile(cep)
+
+    def get_cnefe_building_types(self, id_municipio: str) -> list[dict[str, Any]]:
+        """Listar espécies de edificações e finalidades de uso no município (IBGE CNEFE)."""
+        return self.geo.cnefe_building_types(id_municipio)
+
+    def get_cnefe_top_address_density(self, limit: int = 10) -> list[dict[str, Any]]:
+        """Listar municípios com maior densidade de endereços por km² (IBGE CNEFE)."""
+        return self.geo.cnefe_top_address_density(limit=limit)
 
     def resolve_municipality(
         self, code_or_name: str | int, uf: str | None = None

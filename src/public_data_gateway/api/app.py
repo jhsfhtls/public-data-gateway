@@ -945,4 +945,55 @@ def create_app(settings: GatewaySettings | None = None) -> FastAPI:
         conn = IBGEPnadContinuaConnector(settings=app_settings)
         return conn.list_highest_earnings_states(limit=limit)
 
+    @app.get("/api/v1/geo/cnefe/municipality/{id_municipio}/summary")
+    @app.get("/api/v1/cnefe/{id_municipio}")
+    async def get_cnefe_municipality_summary(id_municipio: str) -> dict[str, Any]:
+        from public_data_gateway.connectors.geografico.ibge_cnefe.connector import (
+            IBGECnefeConnector,
+        )
+
+        conn = IBGECnefeConnector(settings=app_settings)
+        res = conn.get_municipality_summary(id_municipio)
+        if not res:
+            raise HTTPException(
+                status_code=404,
+                detail=f"CNEFE summary not found for municipality '{id_municipio}'",
+            )
+        return res
+
+    @app.get("/api/v1/geo/cnefe/cep/{cep}")
+    async def get_cnefe_cep_profile(cep: str) -> dict[str, Any]:
+        from public_data_gateway.connectors.geografico.ibge_cnefe.connector import (
+            IBGECnefeConnector,
+        )
+
+        conn = IBGECnefeConnector(settings=app_settings)
+        res = conn.get_cep_profile(cep)
+        if not res:
+            raise HTTPException(
+                status_code=404,
+                detail=f"CNEFE profile not found for CEP '{cep}'",
+            )
+        return res
+
+    @app.get("/api/v1/geo/cnefe/municipality/{id_municipio}/building-types")
+    async def get_cnefe_building_types(id_municipio: str) -> list[dict[str, Any]]:
+        from public_data_gateway.connectors.geografico.ibge_cnefe.connector import (
+            IBGECnefeConnector,
+        )
+
+        conn = IBGECnefeConnector(settings=app_settings)
+        return conn.list_building_types(id_municipio)
+
+    @app.get("/api/v1/geo/cnefe/ranking/density")
+    async def get_cnefe_highest_density_ranking(
+        limit: int = Query(10, ge=1, le=100, description="Top N municipalities by address density"),
+    ) -> list[dict[str, Any]]:
+        from public_data_gateway.connectors.geografico.ibge_cnefe.connector import (
+            IBGECnefeConnector,
+        )
+
+        conn = IBGECnefeConnector(settings=app_settings)
+        return conn.list_top_address_density(limit=limit)
+
     return app

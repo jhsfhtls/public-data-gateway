@@ -514,3 +514,95 @@ models:
         description: "Timestamp ISO-8601 UTC de extração dos dados."
         tests:
           - not_null
+
+  - name: mart_geografia_enderecamento_edificacoes_brasil
+    description: "Mart analítico territorial consolidando densidade de endereços, espécies de edificações, índice de georreferenciamento e perfil de uso do solo municipal do CNEFE Censo 2022."
+    columns:
+      - name: id_municipio
+        description: "Código IBGE de 7 dígitos do município."
+        tests:
+          - not_null
+      - name: sigla_uf
+        description: "Sigla da Unidade Federativa."
+        tests:
+          - not_null
+      - name: nome_municipio
+        description: "Nome oficial do município."
+        tests:
+          - not_null
+      - name: total_enderecos_municipio
+        description: "Volume total de endereços cadastrados no CNEFE."
+        tests:
+          - not_null
+      - name: total_logradouros_distintos
+        description: "Total de logradouros distintos catalogados no município."
+        tests:
+          - not_null
+      - name: total_ceps_distintos
+        description: "Total de CEPs ativos catalogados no município."
+        tests:
+          - not_null
+      - name: taxa_cobertura_georreferenciada_pct
+        description: "Percentual de endereços com coordenadas geográficas precisas validadas."
+        tests:
+          - not_null
+      - name: densidade_total_enderecos_km2
+        description: "Densidade de endereços por km² de área municipal."
+        tests:
+          - not_null
+      - name: proporcao_enderecos_comerciais_pct
+        description: "Percentual de endereços com atividade comercial ou de serviços."
+        tests:
+          - not_null
+      - name: total_domicilios_particulares
+        description: "Total de domicílios particulares recenseados."
+        tests:
+          - not_null
+      - name: total_domicilios_coletivos
+        description: "Total de domicílios coletivos (hotéis, asilos, pensões)."
+        tests:
+          - not_null
+      - name: total_estabelecimentos_comerciais
+        description: "Total de estabelecimentos comerciais e serviços."
+        tests:
+          - not_null
+      - name: total_estabelecimentos_saude
+        description: "Total de estabelecimentos de saúde (hospitais, UBSs, clínicas)."
+        tests:
+          - not_null
+      - name: total_estabelecimentos_ensino
+        description: "Total de estabelecimentos de ensino (escolas, faculdades)."
+        tests:
+          - not_null
+      - name: total_estabelecimentos_agropecuarios
+        description: "Total de estabelecimentos agropecuários cadastrados."
+        tests:
+          - not_null
+      - name: total_estabelecimentos_religiosos
+        description: "Total de templos e estabelecimentos religiosos."
+        tests:
+          - not_null
+      - name: total_edificacoes_construcao
+        description: "Total de edificações em construção ou reforma."
+        tests:
+          - not_null
+      - name: score_densidade_comercial
+        description: "Score contínuo (0 a 100) da intensidade e concentração comercial municipal."
+        tests:
+          - not_null
+      - name: score_infraestrutura_social
+        description: "Score contínuo (0 a 100) da oferta de infraestrutura de saúde e ensino."
+        tests:
+          - not_null
+      - name: classificacao_dinamica_territorial
+        description: "Tipologia territorial do município baseada em densidade e uso do solo (METROPOLE_ALTA_DENSIDADE_MISTA, POLO_URBANO_CONSOLIDADO, AGROPOVOAMENTO_EXPANSAO, MUNICIPIO_RESIDENCIAL_EQUILIBRADO)."
+        tests:
+          - not_null
+      - name: reference_date
+        description: "Data de referência da consolidação estatística."
+        tests:
+          - not_null
+      - name: extracted_at
+        description: "Timestamp ISO-8601 UTC da extração dos dados."
+        tests:
+          - not_null
