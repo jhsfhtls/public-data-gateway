@@ -1,0 +1,283 @@
+version: "3.1.0"
+contract_id: "ODCS-BR-IBGE-PNADCONT-001"
+source_id: "ibge_pnad_continua"
+name: "IBGE: Pesquisa Nacional por Amostra de Domicílios Contínua (PNAD Contínua)"
+agency: "Instituto Brasileiro de Geografia e Estatística (IBGE)"
+domain: "trabalho_renda"
+legislation:
+  - "Lei nº 5.534/1968 (Dispõe sobre a obrigatoriedade de prestação de informações estatísticas ao IBGE)"
+  - "Lei nº 5.878/1973 (Cria a Fundação Instituto Brasileiro de Geografia e Estatística - IBGE)"
+  - "Resolução CD/IBGE nº 1/2012 (Aprova a implantação da Pesquisa Nacional por Amostra de Domicílios Contínua - PNAD Contínua)"
+  - "Portaria IBGE nº 123/2021 (Normas de governança de microdados e dados agregados oficiais)"
+
+sla:
+  freshness_hours: 2160
+  update_frequency: "Trimestral"
+  availability_target_pct: 99.5
+
+primary_keys:
+  - id_uf
+  - ano_trimestre
+
+schema:
+  tables:
+    pnad_mercado_trabalho_trimestral:
+      description: "Indicadores oficiais trimestrais da força de trabalho, taxa de desocupação e nível de ocupação por UF do IBGE."
+      min_expected_rows: 5
+      columns:
+        - name: id_uf
+          type: string
+          nullable: false
+          description: "Código IBGE de 2 dígitos identificador da Unidade Federativa."
+        - name: sigla_uf
+          type: string
+          nullable: false
+          description: "Sigla de 2 letras da Unidade Federativa correspondente."
+        - name: nome_uf
+          type: string
+          nullable: false
+          description: "Nome oficial da Unidade Federativa."
+        - name: ano_trimestre
+          type: string
+          nullable: false
+          description: "Ano e trimestre de referência no formato AAAA-TT (ex: 2026-T2 ou 202602)."
+        - name: populacao_idade_trabalhar_mil
+          type: integer
+          nullable: false
+          description: "População em idade de trabalhar (14 anos ou mais de idade) expressa em milhares de pessoas."
+        - name: forca_trabalho_total_mil
+          type: integer
+          nullable: false
+          description: "População na força de trabalho (ocupados mais desocupados) em milhares de pessoas."
+        - name: populacao_ocupada_mil
+          type: integer
+          nullable: false
+          description: "População ocupada na semana de referência em milhares de pessoas."
+        - name: populacao_desocupada_mil
+          type: integer
+          nullable: false
+          description: "População desocupada que buscou trabalho na semana de referência em milhares de pessoas."
+        - name: populacao_fora_forca_mil
+          type: integer
+          nullable: false
+          description: "Pessoas fora da força de trabalho em milhares de pessoas."
+        - name: taxa_desocupacao_pct
+          type: float
+          nullable: false
+          description: "Taxa oficial de desocupação da força de trabalho calculada em percentual (%)."
+        - name: taxa_participacao_forca_pct
+          type: float
+          nullable: false
+          description: "Taxa de participação na força de trabalho em percentual (%)."
+        - name: taxa_nivel_ocupacao_pct
+          type: float
+          nullable: false
+          description: "Nível de ocupação das pessoas em idade de trabalhar em percentual (%)."
+        - name: reference_date
+          type: string
+          nullable: false
+          description: "Data de referência do indicador no formato AAAA-MM-DD."
+        - name: extracted_at
+          type: string
+          nullable: false
+          description: "Timestamp ISO-8601 UTC do momento da ingestão."
+
+    pnad_rendimento_trabalho:
+      description: "Rendimento médio real habitual e efetivo e massa salarial por UF do IBGE PNAD Contínua."
+      min_expected_rows: 5
+      columns:
+        - name: id_uf
+          type: string
+          nullable: false
+          description: "Código IBGE de 2 dígitos identificador da Unidade Federativa."
+        - name: sigla_uf
+          type: string
+          nullable: false
+          description: "Sigla de 2 letras da Unidade Federativa correspondente."
+        - name: nome_uf
+          type: string
+          nullable: false
+          description: "Nome oficial da Unidade Federativa."
+        - name: ano_trimestre
+          type: string
+          nullable: false
+          description: "Ano e trimestre de referência no formato AAAA-TT."
+        - name: rendimento_medio_real_habitual_reais
+          type: float
+          nullable: false
+          description: "Rendimento médio mensal real habitualmente recebido no trabalho principal em Reais (BRL)."
+        - name: rendimento_medio_real_efetivo_reais
+          type: float
+          nullable: false
+          description: "Rendimento médio mensal real efetivamente recebido no trabalho principal em Reais (BRL)."
+        - name: massa_rendimento_real_habitual_milhoes_reais
+          type: float
+          nullable: false
+          description: "Massa salarial real habitual recebida pelos ocupados expressa em milhões de Reais."
+        - name: variacao_rendimento_ano_anterior_pct
+          type: float
+          nullable: true
+          description: "Variação percentual real do rendimento em relação ao mesmo trimestre do ano anterior."
+        - name: reference_date
+          type: string
+          nullable: false
+          description: "Data de referência do indicador no formato AAAA-MM-DD."
+        - name: extracted_at
+          type: string
+          nullable: false
+          description: "Timestamp ISO-8601 UTC do momento da ingestão."
+
+    pnad_subutilizacao_forca:
+      description: "Medidas ampliadas de subutilização da força de trabalho, desalento e subocupação por insuficiência de horas."
+      min_expected_rows: 5
+      columns:
+        - name: id_uf
+          type: string
+          nullable: false
+          description: "Código IBGE de 2 dígitos identificador da Unidade Federativa."
+        - name: sigla_uf
+          type: string
+          nullable: false
+          description: "Sigla de 2 letras da Unidade Federativa correspondente."
+        - name: nome_uf
+          type: string
+          nullable: false
+          description: "Nome oficial da Unidade Federativa."
+        - name: ano_trimestre
+          type: string
+          nullable: false
+          description: "Ano e trimestre de referência no formato AAAA-TT."
+        - name: taxa_composta_subutilizacao_pct
+          type: float
+          nullable: false
+          description: "Taxa composta de subutilização da força de trabalho expressa em percentual (%)."
+        - name: subocupados_por_insuficiencia_horas_mil
+          type: integer
+          nullable: false
+          description: "Pessoas subocupadas por insuficiência de horas trabalhadas em milhares de pessoas."
+        - name: forca_trabalho_potencial_mil
+          type: integer
+          nullable: false
+          description: "Força de trabalho potencial (desalentados e disponíveis não ocupados) em milhares."
+        - name: populacao_desalentada_mil
+          type: integer
+          nullable: false
+          description: "População em desalento (desistiu de buscar trabalho por falta de perspectiva) em milhares."
+        - name: taxa_desalento_pct
+          type: float
+          nullable: false
+          description: "Percentual de pessoas desalentadas em relação à força de trabalho ampliada (%)."
+        - name: reference_date
+          type: string
+          nullable: false
+          description: "Data de referência do indicador no formato AAAA-MM-DD."
+        - name: extracted_at
+          type: string
+          nullable: false
+          description: "Timestamp ISO-8601 UTC do momento da ingestão."
+
+    pnad_posicao_ocupacao:
+      description: "Distribuição da população ocupada por categoria do emprego, carteira assinada, setor público e informalidade."
+      min_expected_rows: 5
+      columns:
+        - name: id_uf
+          type: string
+          nullable: false
+          description: "Código IBGE de 2 dígitos identificador da Unidade Federativa."
+        - name: sigla_uf
+          type: string
+          nullable: false
+          description: "Sigla de 2 letras da Unidade Federativa correspondente."
+        - name: nome_uf
+          type: string
+          nullable: false
+          description: "Nome oficial da Unidade Federativa."
+        - name: ano_trimestre
+          type: string
+          nullable: false
+          description: "Ano e trimestre de referência no formato AAAA-TT."
+        - name: empregado_com_carteira_clt_mil
+          type: integer
+          nullable: false
+          description: "Empregados no setor privado com carteira de trabalho assinada (CLT) em milhares."
+        - name: empregado_sem_carteira_mil
+          type: integer
+          nullable: false
+          description: "Empregados no setor privado sem carteira de trabalho assinada em milhares."
+        - name: trabalhador_domestico_mil
+          type: integer
+          nullable: false
+          description: "Trabalhadores domésticos em milhares de pessoas."
+        - name: empregado_setor_publico_mil
+          type: integer
+          nullable: false
+          description: "Empregados no setor público (estatutários, militares e celetistas) em milhares."
+        - name: empregador_mil
+          type: integer
+          nullable: false
+          description: "Empregadores formais e informais em milhares de pessoas."
+        - name: conta_propria_mil
+          type: integer
+          nullable: false
+          description: "Trabalhadores por conta própria (autônomos) em milhares de pessoas."
+        - name: taxa_informalidade_pct
+          type: float
+          nullable: false
+          description: "Taxa oficial de informalidade da população ocupada expressa em percentual (%)."
+        - name: reference_date
+          type: string
+          nullable: false
+          description: "Data de referência do indicador no formato AAAA-MM-DD."
+        - name: extracted_at
+          type: string
+          nullable: false
+          description: "Timestamp ISO-8601 UTC do momento da ingestão."
+
+    pnad_demografia_educacao_trabalho:
+      description: "Recortes socioeconômicos do mercado de trabalho por gênero, faixa etária e nível de instrução."
+      min_expected_rows: 5
+      columns:
+        - name: id_uf
+          type: string
+          nullable: false
+          description: "Código IBGE de 2 dígitos identificador da Unidade Federativa."
+        - name: sigla_uf
+          type: string
+          nullable: false
+          description: "Sigla de 2 letras da Unidade Federativa correspondente."
+        - name: nome_uf
+          type: string
+          nullable: false
+          description: "Nome oficial da Unidade Federativa."
+        - name: ano_trimestre
+          type: string
+          nullable: false
+          description: "Ano e trimestre de referência no formato AAAA-TT."
+        - name: taxa_desocupacao_homens_pct
+          type: float
+          nullable: false
+          description: "Taxa de desocupação para o segmento masculino expressa em percentual (%)."
+        - name: taxa_desocupacao_mulheres_pct
+          type: float
+          nullable: false
+          description: "Taxa de desocupação para o segmento feminino expressa em percentual (%)."
+        - name: taxa_desocupacao_jovens_18_24_pct
+          type: float
+          nullable: false
+          description: "Taxa de desocupação entre jovens de 18 a 24 anos expressa em percentual (%)."
+        - name: taxa_desocupacao_ensino_superior_pct
+          type: float
+          nullable: false
+          description: "Taxa de desocupação entre pessoas com nível superior completo em percentual (%)."
+        - name: razao_rendimento_mulher_homem
+          type: float
+          nullable: false
+          description: "Razão entre o rendimento médio das mulheres e o dos homens (paridade salarial de gênero)."
+        - name: reference_date
+          type: string
+          nullable: false
+          description: "Data de referência do indicador no formato AAAA-MM-DD."
+        - name: extracted_at
+          type: string
+          nullable: false
+          description: "Timestamp ISO-8601 UTC do momento da ingestão."

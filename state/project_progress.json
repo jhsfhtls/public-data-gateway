@@ -13,10 +13,10 @@
     "POP_T_148"
   ],
   "current_macro_phase_id": "06",
-  "current_macro_phase": "Fase 06 - Ingestão Wave 4 em Andamento (Censo, Trabalho, Logística & Telecom: ibge_sidra, ibge_censo2022 e mte_novo_caged homologados)",
+  "current_macro_phase": "Fase 06 - Ingestão Wave 4 em Andamento (Censo, Trabalho, Logística & Telecom: ibge_sidra, ibge_censo2022, mte_novo_caged e ibge_pnad_continua homologados)",
   "overall_status": "ON_TRACK",
-  "active_connector": "ibge_pnad_continua",
-  "next_connector": "ibge_cnefe",
+  "active_connector": "ibge_cnefe",
+  "next_connector": "mte_rais",
   "structural_phases": [
     {
       "phase_id": "00",
@@ -116,8 +116,8 @@
         "Conector ibge_sidra (PIB municipal, Censo demográfico, PAM, IPCA e Gini) - CONCLUÍDO",
         "Conector ibge_censo2022 (Microdados, Domicílios, Estrutura Etária, Alfabetização, Diversidade) - CONCLUÍDO",
         "Conector mte_novo_caged (Microdados do Novo CAGED, Movimentação Mensal, Perfil Setorial, Salários) - CONCLUÍDO",
-        "Conectores ibge_pnad_continua & mte_rais",
-        "Conectores ibge_cnefe, ibge_malhas, anatel_mosaico, antt_malha_transporte"
+        "Conector ibge_pnad_continua (Taxa de Desocupação, Rendimento Médio Real, Subutilização, Informalidade) - CONCLUÍDO",
+        "Conectores mte_rais, ibge_cnefe, ibge_malhas, anatel_mosaico, antt_malha_transporte"
       ]
     },
     {
@@ -398,6 +398,12 @@
       "phase_id": "06",
       "milestone": "Homologação do Conector mte_novo_caged (5 Tabelas, dbt, Mart de Dinâmica do Emprego Formal & Live Fail-Hard)",
       "summary": "Implementação e homologação completa do conector mte_novo_caged (Ministério do Trabalho e Emprego: Microdados do Novo CAGED, Lei nº 4.923/1965 e Portaria SEPRT nº 1.127/2019) consolidando o terceiro conector da Wave 4: 5 tabelas (caged_movimentacao_mensal, caged_perfil_setorial_cnae, caged_ocupacao_cbo, caged_demografia_trabalhador, caged_salarios_remuneracao) materializadas em data/mte_novo_caged/{bronze,silver,gold}/; 8 novos modelos dbt (5 staging views, fct_caged_movimentacao_mensal, fct_caged_setores_cnae, mart_dinamica_emprego_formal_brasil) totalizando 209 modelos dbt (99 tabelas, 110 views) e 2.053 testes dbt 100% aprovados com 0 erros; 2.482 colunas 100% documentadas no linter (100% coverage); feature store features_mercado_trabalho_municipios_brasil.parquet gerada com indicadores de rotatividade (turnover), razão salarial admissão/desligamento, saldo anualizado, score de aquecimento do mercado de trabalho (0 a 100) e score de vulnerabilidade do emprego; testes reais com fail-hard estrito contra o servidor FTP oficial do MTE (ftp.mtps.gov.br) com 9 testes pytest aprovados (183 testes offline totais no repositório); multi-interface completa via SDK (BrazilData.labor.*, get_employment_summary, get_labor_market_profile, get_top_job_creators), CLI (bdg caged summary/profile/sectors/ranking e atalho direto bdg novo-caged), REST API (/api/v1/labor/* e atalho /api/v1/caged/*) e MCP (bdg_get_employment_summary, bdg_get_labor_market_profile, bdg_list_top_job_creating_municipalities) com contenção de prompt injection."
+    },
+    {
+      "date": "2026-11-09",
+      "phase_id": "06",
+      "milestone": "Homologação do Conector ibge_pnad_continua (5 Tabelas, dbt, Mart de Panorama do Trabalho e Renda & Live Fail-Hard)",
+      "summary": "Implementação e homologação completa do conector ibge_pnad_continua (IBGE Pesquisa Nacional por Amostra de Domicílios Contínua — Taxa de Desocupação, Rendimento Médio Real Habitual e Efetivo, Subutilização da Força de Trabalho, Informalidade e Paridade Salarial por UF, Leis nº 5.534/1968, 5.878/1973 e Resolução CD/IBGE nº 1/2012) consolidando o quarto conector da Wave 4 e 22º conector total da plataforma: 5 tabelas (pnad_mercado_trabalho_trimestral, pnad_rendimento_trabalho, pnad_subutilizacao_forca, pnad_posicao_ocupacao, pnad_demografia_educacao_trabalho) materializadas em data/ibge_pnad_continua/{silver,gold}/ cobrindo todas as 27 UFs do Brasil; 8 novos modelos dbt (5 staging views, fct_pnad_mercado_trabalho_uf, fct_pnad_posicao_informalidade_uf, mart_panorama_trabalho_renda_estados_brasil) totalizando 217 modelos dbt (102 tabelas, 115 views) e 2.178 testes dbt 100% aprovados com 0 erros; 2.608 colunas 100% documentadas no linter (100% coverage); feature store features_pnad_trabalho_renda_estados_brasil.parquet gerada com indicadores de desocupação, renda média real, massa salarial, informalidade, subutilização e desalento, score de resiliência do mercado de trabalho estadual (0 a 100) e score de vulnerabilidade trabalho/renda; testes reais com fail-hard estrito contra as APIs oficiais do IBGE SIDRA PNAD Contínua (Tabelas 4099 e 6388 v5934) com 9 testes pytest aprovados (191 testes offline totais no repositório); multi-interface completa via SDK (BrazilData.labor.*, get_state_labor_profile, get_labor_force_indicators, get_lowest_unemployment_states), CLI (bdg pnad indicators/profile/earnings/ranking e atalho direto bdg pnad-uf), REST API (/api/v1/labor/state/* e atalho /api/v1/pnad/*) e MCP (bdg_get_labor_force_indicators, bdg_get_state_labor_profile, bdg_list_lowest_unemployment_states, bdg_list_highest_earnings_states) com contenção de prompt injection."
     }
   ]
 }

@@ -619,7 +619,7 @@ sources:
   - P02
   rice_score: 560
   roadmap_wave: 4
-  status: CATALOGED
+  status: HOMOLOGATED
 - source_id: ibge_cnefe
   name: 'IBGE: Cadastro Nacional de Endereços para Fins Estatísticos (CNEFE)'
   agency: Instituto Brasileiro de Geografia e Estatística (IBGE)
