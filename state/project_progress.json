@@ -13,10 +13,10 @@
     "POP_T_148"
   ],
   "current_macro_phase_id": "06",
-  "current_macro_phase": "Fase 06 - Ingestão Wave 4 em Andamento (Censo, Trabalho, Logística & Telecom: ibge_sidra e ibge_censo2022 homologados)",
+  "current_macro_phase": "Fase 06 - Ingestão Wave 4 em Andamento (Censo, Trabalho, Logística & Telecom: ibge_sidra, ibge_censo2022 e mte_novo_caged homologados)",
   "overall_status": "ON_TRACK",
-  "active_connector": "mte_novo_caged",
-  "next_connector": "ibge_pnad_continua",
+  "active_connector": "ibge_pnad_continua",
+  "next_connector": "ibge_cnefe",
   "structural_phases": [
     {
       "phase_id": "00",
@@ -115,7 +115,8 @@
       "deliverables": [
         "Conector ibge_sidra (PIB municipal, Censo demográfico, PAM, IPCA e Gini) - CONCLUÍDO",
         "Conector ibge_censo2022 (Microdados, Domicílios, Estrutura Etária, Alfabetização, Diversidade) - CONCLUÍDO",
-        "Conectores ibge_pnad_continua, mte_novo_caged & mte_rais",
+        "Conector mte_novo_caged (Microdados do Novo CAGED, Movimentação Mensal, Perfil Setorial, Salários) - CONCLUÍDO",
+        "Conectores ibge_pnad_continua & mte_rais",
         "Conectores ibge_cnefe, ibge_malhas, anatel_mosaico, antt_malha_transporte"
       ]
     },
@@ -391,6 +392,12 @@
       "phase_id": "06",
       "milestone": "Homologação do Conector ibge_censo2022 (5 Tabelas, dbt, Mart de Transição Demográfica & Live Fail-Hard)",
       "summary": "Implementação e homologação completa do conector ibge_censo2022 (IBGE Censo Demográfico 2022 — Microdados, Domicílios Ocupados, Estrutura Etária, Alfabetização e Diversidade Étnico-Racial, Leis nº 5.534/1968, 5.878/1973 e Portaria IBGE nº 123/2021) consolidando o segundo conector da Wave 4: 5 tabelas (censo_populacao_domicilios, censo_estrutura_etaria, censo_educacao_alfabetizacao, censo_urbanizacao_situacao, censo_diversidade_quilombola_indigena) materializadas em data/ibge_censo2022/{bronze,silver,gold}/; 8 novos modelos dbt (5 staging views, fct_censo_demografico_municipios, fct_censo_diversidade_etnico_racial, mart_censo_transicao_demografica_brasil) totalizando 201 modelos dbt (96 tabelas, 105 views) e 1967 testes dbt 100% aprovados com 0 erros; 2374 colunas 100% documentadas no linter (100% coverage); feature store features_censo2022_municipios_brasil.parquet gerada com indicadores demográficos (idade mediana, índice de envelhecimento, razão de sexo, taxa de alfabetização/analfabetismo, urbanização, população indígena/quilombola), score de maturidade social (0 a 100) e score de vulnerabilidade demográfica; testes reais com fail-hard estrito contra as APIs oficiais do IBGE SIDRA Censo 2022 (Tabelas 4712, 9515 e 9543) com 9 testes pytest aprovados (175 testes offline totais no repositório); multi-interface completa via SDK (PublicData.socioeconomic.*, census_summary, demographic_profile, literacy_indicators, highest_aging_municipalities), CLI (pdg censo summary/profile/literacy/aging e atalho direto pdg censo2022), REST API (/api/v1/census/* e atalho /api/v1/censo/*) e MCP (bdg_get_census_summary, bdg_get_demographic_profile, bdg_list_highest_aging_municipalities) com contenção de prompt injection."
+    },
+    {
+      "date": "2026-11-09",
+      "phase_id": "06",
+      "milestone": "Homologação do Conector mte_novo_caged (5 Tabelas, dbt, Mart de Dinâmica do Emprego Formal & Live Fail-Hard)",
+      "summary": "Implementação e homologação completa do conector mte_novo_caged (Ministério do Trabalho e Emprego: Microdados do Novo CAGED, Lei nº 4.923/1965 e Portaria SEPRT nº 1.127/2019) consolidando o terceiro conector da Wave 4: 5 tabelas (caged_movimentacao_mensal, caged_perfil_setorial_cnae, caged_ocupacao_cbo, caged_demografia_trabalhador, caged_salarios_remuneracao) materializadas em data/mte_novo_caged/{bronze,silver,gold}/; 8 novos modelos dbt (5 staging views, fct_caged_movimentacao_mensal, fct_caged_setores_cnae, mart_dinamica_emprego_formal_brasil) totalizando 209 modelos dbt (99 tabelas, 110 views) e 2.053 testes dbt 100% aprovados com 0 erros; 2.482 colunas 100% documentadas no linter (100% coverage); feature store features_mercado_trabalho_municipios_brasil.parquet gerada com indicadores de rotatividade (turnover), razão salarial admissão/desligamento, saldo anualizado, score de aquecimento do mercado de trabalho (0 a 100) e score de vulnerabilidade do emprego; testes reais com fail-hard estrito contra o servidor FTP oficial do MTE (ftp.mtps.gov.br) com 9 testes pytest aprovados (183 testes offline totais no repositório); multi-interface completa via SDK (BrazilData.labor.*, get_employment_summary, get_labor_market_profile, get_top_job_creators), CLI (bdg caged summary/profile/sectors/ranking e atalho direto bdg novo-caged), REST API (/api/v1/labor/* e atalho /api/v1/caged/*) e MCP (bdg_get_employment_summary, bdg_get_labor_market_profile, bdg_list_top_job_creating_municipalities) com contenção de prompt injection."
     }
   ]
 }

@@ -596,7 +596,7 @@ sources:
   - P02
   rice_score: 570
   roadmap_wave: 4
-  status: CATALOGED
+  status: HOMOLOGATED
 - source_id: ibge_pnad_continua
   name: 'IBGE: Pesquisa Nacional por Amostra de Domicílios Contínua (PNAD Contínua)'
   agency: Instituto Brasileiro de Geografia e Estatística (IBGE)

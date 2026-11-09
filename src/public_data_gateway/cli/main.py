@@ -423,6 +423,34 @@ def build_parser() -> argparse.ArgumentParser:
     censo_s_p.add_argument("id_municipio", type=str, help="IBGE 7-digit municipality code")
     censo_s_p.add_argument("--json", action="store_true", help="Output in JSON format")
 
+    # Subcommand: caged (MTE Novo CAGED)
+    caged_p = subparsers.add_parser(
+        "caged", help="Query official MTE Novo CAGED formal employment, admissions, separations, and wages."
+    )
+    caged_sub = caged_p.add_subparsers(dest="caged_action", required=True)
+
+    cg_sum_p = caged_sub.add_parser("summary", help="Query monthly employment admissions, separations, and net balance.")
+    cg_sum_p.add_argument("id_municipio", type=str, help="IBGE 7-digit municipality code")
+    cg_sum_p.add_argument("--competencia", type=str, default=None, help="Optional competence YYYY-MM")
+    cg_sum_p.add_argument("--json", action="store_true", help="Output in JSON format")
+
+    cg_prof_p = caged_sub.add_parser("profile", help="Query Gold labor market profile, turnover, and heating score.")
+    cg_prof_p.add_argument("id_municipio", type=str, help="IBGE 7-digit municipality code")
+    cg_prof_p.add_argument("--json", action="store_true", help="Output in JSON format")
+
+    cg_sec_p = caged_sub.add_parser("sectors", help="Query employment movements by major CNAE sector.")
+    cg_sec_p.add_argument("id_municipio", type=str, help="IBGE 7-digit municipality code")
+    cg_sec_p.add_argument("--json", action="store_true", help="Output in JSON format")
+
+    cg_rank_p = caged_sub.add_parser("ranking", help="List top municipalities by net job creation balance.")
+    cg_rank_p.add_argument("--limit", type=int, default=10, help="Max municipalities to list")
+    cg_rank_p.add_argument("--json", action="store_true", help="Output in JSON format")
+
+    # Direct shortcut: novo-caged
+    caged_s_p = subparsers.add_parser("novo-caged", help="Shortcut to query Novo CAGED labor market profile.")
+    caged_s_p.add_argument("id_municipio", type=str, help="IBGE 7-digit municipality code")
+    caged_s_p.add_argument("--json", action="store_true", help="Output in JSON format")
+
     return parser
 
 
@@ -1470,6 +1498,87 @@ def main(argv: Sequence[str] | None = None) -> int:
                     print(f"Top {len(ranks)} Municipalities by Aging Index (Censo 2022):")
                     for idx, r in enumerate(ranks, 1):
                         print(f"  {idx}. {r.get('nome_municipio')} ({r.get('sigla_uf')}): Índice {r.get('indice_envelhecimento_razao')} | Idade Mediana: {r.get('idade_mediana_anos')} anos | {r.get('classificacao_etaria')}")
+                return 0
+
+        elif args.command in ("caged", "novo-caged"):
+            from public_data_gateway.connectors.trabalho.mte_novo_caged.connector import (
+                MTENovoCagedConnector,
+            )
+
+            caged_conn = MTENovoCagedConnector(settings=settings)
+
+            if args.command == "novo-caged":
+                prof = caged_conn.get_labor_market_profile(args.id_municipio)
+                if not prof:
+                    print(f"No labor market profile found for municipality {args.id_municipio}.", file=sys.stderr)
+                    return 1
+                if args.json:
+                    print(json.dumps(prof, indent=2, ensure_ascii=False))
+                else:
+                    print(f"Novo CAGED Labor Market Profile: {prof.get('nome_municipio')} ({prof.get('sigla_uf')} - {prof.get('id_municipio')}):")
+                    print(f"  Competência Recente:     {prof.get('competencia_recente')}")
+                    print(f"  Saldo Líquido Ano:       {prof.get('saldo_liquido_emprego_ano'):,} postos")
+                    print(f"  Score Aquecimento:       {prof.get('score_aquecimento_mercado_trabalho')}/100 ({prof.get('classificacao_dinamica_emprego')})")
+                    print(f"  Score Vulnerabilidade:   {prof.get('score_vulnerabilidade_emprego')}/100")
+                    print(f"  Salário Médio Admissão:  R$ {prof.get('salario_medio_admissao_reais'):,.2f}")
+                    print(f"  Taxa de Rotatividade:    {prof.get('taxa_rotatividade_turnover_pct')}%")
+                    print(f"  Setor Líder:             {prof.get('setor_lider_geracao_emprego')}")
+                return 0
+
+            caged_action = getattr(args, "caged_action", None)
+
+            if caged_action == "summary":
+                data = caged_conn.get_employment_summary(args.id_municipio, competencia=args.competencia)
+                if not data:
+                    print(f"No CAGED employment movements found for municipality {args.id_municipio}.", file=sys.stderr)
+                    return 1
+                if args.json:
+                    print(json.dumps(data, indent=2, ensure_ascii=False))
+                else:
+                    print(f"Novo CAGED Summary: {data.get('nome_municipio')} ({data.get('sigla_uf')} - {data.get('id_municipio')} - {data.get('competencia_movimentacao')}):")
+                    print(f"  Total Admissões:         {data.get('total_admissoes'):,}")
+                    print(f"  Total Desligamentos:     {data.get('total_desligamentos'):,}")
+                    print(f"  Saldo Movimentação:      {data.get('saldo_movimentacao'):,} postos")
+                    print(f"  Variação Relativa:       {data.get('variacao_relativa_pct')}%")
+                    print(f"  Salário Médio Admissão:  R$ {data.get('salario_medio_admissao_reais'):,.2f}")
+                return 0
+
+            if caged_action == "profile":
+                prof = caged_conn.get_labor_market_profile(args.id_municipio)
+                if not prof:
+                    print(f"No labor market profile found for municipality {args.id_municipio}.", file=sys.stderr)
+                    return 1
+                if args.json:
+                    print(json.dumps(prof, indent=2, ensure_ascii=False))
+                else:
+                    print(f"Novo CAGED Labor Market Profile: {prof.get('nome_municipio')} ({prof.get('sigla_uf')} - {prof.get('id_municipio')}):")
+                    print(f"  Competência Recente:     {prof.get('competencia_recente')}")
+                    print(f"  Saldo Líquido Ano:       {prof.get('saldo_liquido_emprego_ano'):,} postos")
+                    print(f"  Score Aquecimento:       {prof.get('score_aquecimento_mercado_trabalho')}/100 ({prof.get('classificacao_dinamica_emprego')})")
+                    print(f"  Score Vulnerabilidade:   {prof.get('score_vulnerabilidade_emprego')}/100")
+                    print(f"  Salário Médio Admissão:  R$ {prof.get('salario_medio_admissao_reais'):,.2f}")
+                    print(f"  Taxa de Rotatividade:    {prof.get('taxa_rotatividade_turnover_pct')}%")
+                    print(f"  Setor Líder:             {prof.get('setor_lider_geracao_emprego')}")
+                return 0
+
+            if caged_action == "sectors":
+                sectors = caged_conn.get_sectoral_employment(args.id_municipio)
+                if args.json:
+                    print(json.dumps(sectors, indent=2, ensure_ascii=False))
+                else:
+                    print(f"Novo CAGED Sectoral Dynamics ({args.id_municipio}):")
+                    for s in sectors:
+                        print(f"  - {s.get('grande_setor_cnae')}: Saldo {s.get('saldo_setorial'):,} | Admissões: {s.get('total_admissoes'):,} | Desligamentos: {s.get('total_desligamentos'):,} | Salário Médio: R$ {s.get('salario_medio_admissao_reais'):,.2f}")
+                return 0
+
+            if caged_action == "ranking":
+                ranks = caged_conn.list_top_job_creating_municipalities(limit=args.limit)
+                if args.json:
+                    print(json.dumps(ranks, indent=2, ensure_ascii=False))
+                else:
+                    print(f"Top {len(ranks)} Municipalities by Net Job Creation (Novo CAGED):")
+                    for idx, r in enumerate(ranks, 1):
+                        print(f"  {idx}. {r.get('nome_municipio')} ({r.get('sigla_uf')}): Saldo {r.get('saldo_movimentacao'):,} | Admissões: {r.get('total_admissoes'):,} | Salário Médio: R$ {r.get('salario_medio_admissao_reais'):,.2f}")
                 return 0
 
     except Exception as exc:

@@ -1,0 +1,18 @@
+version: 2
+
+sources:
+  - name: mte_novo_caged_silver
+    description: "Tabelas normalizadas da camada Silver dos microdados e agregados do Novo CAGED (MTE)."
+    meta:
+      external_location: "data/mte_novo_caged/silver/{name}.parquet"
+    tables:
+      - name: caged_movimentacao_mensal
+        description: "Admissões, desligamentos, saldo líquido formal e taxa de rotatividade por município e competência."
+      - name: caged_perfil_setorial_cnae
+        description: "Movimentação de emprego formal desagregada por grandes grupamentos econômicos da CNAE."
+      - name: caged_ocupacao_cbo
+        description: "Admissões, desligamentos e remuneração média de admissão por ocupação (CBO-2002)."
+      - name: caged_demografia_trabalhador
+        description: "Perfil sociodemográfico das admissões formais por sexo, faixa etária e escolaridade."
+      - name: caged_salarios_remuneracao
+        description: "Estatísticas de remuneração média, piso praticado e massa de rendimentos contratada."

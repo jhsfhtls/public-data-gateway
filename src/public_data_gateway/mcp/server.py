@@ -461,6 +461,39 @@ class MCPDispatcher:
                                     },
                                 },
                             },
+                            {
+                                "name": "bdg_get_employment_summary",
+                                "description": "Query official Novo CAGED monthly employment admissions, separations, and net balance by municipality (Tier 1).",
+                                "inputSchema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "id_municipio": {"type": "string", "description": "IBGE 7-digit municipality code (e.g. 3550308)"},
+                                        "competencia": {"type": "string", "description": "Optional competence in YYYY-MM format"},
+                                    },
+                                    "required": ["id_municipio"],
+                                },
+                            },
+                            {
+                                "name": "bdg_get_labor_market_profile",
+                                "description": "Query Gold labor market profile: turnover, salary dynamics, heating score, and employment vulnerability from Novo CAGED (Tier 1).",
+                                "inputSchema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "id_municipio": {"type": "string", "description": "IBGE 7-digit municipality code (e.g. 3550308)"},
+                                    },
+                                    "required": ["id_municipio"],
+                                },
+                            },
+                            {
+                                "name": "bdg_list_top_job_creating_municipalities",
+                                "description": "List municipalities with highest net formal job creation balance from MTE Novo CAGED (Tier 1).",
+                                "inputSchema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "limit": {"type": "integer", "description": "Max municipalities to retrieve (default: 10)"},
+                                    },
+                                },
+                            },
                         ]
                     },
                 }
@@ -1094,6 +1127,80 @@ class MCPDispatcher:
             lim = int(args.get("limit", 10))
             aging_res = censo_conn.list_highest_aging_municipalities(limit=lim)
             wrapped = wrap_untrusted_gov_data(aging_res, source_id="ibge_censo2022")
+            return {
+                "jsonrpc": "2.0",
+                "id": req_id,
+                "result": {"content": [{"type": "text", "text": wrapped}], "isError": False},
+            }
+
+        if tool_name in {"bdg_get_employment_summary", "pdg_get_employment_summary"}:
+            from public_data_gateway.connectors.trabalho.mte_novo_caged.connector import (
+                MTENovoCagedConnector,
+            )
+
+            caged_conn = MTENovoCagedConnector(settings=self.settings)
+            id_mun = str(args.get("id_municipio", "")).strip()
+            comp = args.get("competencia")
+            summary_res = caged_conn.get_employment_summary(id_mun, competencia=comp)
+            if not summary_res:
+                return {
+                    "jsonrpc": "2.0",
+                    "id": req_id,
+                    "result": {
+                        "content": [
+                            {
+                                "type": "text",
+                                "text": f"Error: No Novo CAGED summary found for municipality '{id_mun}'.",
+                            }
+                        ],
+                        "isError": True,
+                    },
+                }
+            wrapped = wrap_untrusted_gov_data(summary_res, source_id="mte_novo_caged")
+            return {
+                "jsonrpc": "2.0",
+                "id": req_id,
+                "result": {"content": [{"type": "text", "text": wrapped}], "isError": False},
+            }
+
+        if tool_name in {"bdg_get_labor_market_profile", "pdg_get_labor_market_profile"}:
+            from public_data_gateway.connectors.trabalho.mte_novo_caged.connector import (
+                MTENovoCagedConnector,
+            )
+
+            caged_conn = MTENovoCagedConnector(settings=self.settings)
+            id_mun = str(args.get("id_municipio", "")).strip()
+            profile_res = caged_conn.get_labor_market_profile(id_mun)
+            if not profile_res:
+                return {
+                    "jsonrpc": "2.0",
+                    "id": req_id,
+                    "result": {
+                        "content": [
+                            {
+                                "type": "text",
+                                "text": f"Error: No Novo CAGED labor market profile found for municipality '{id_mun}'.",
+                            }
+                        ],
+                        "isError": True,
+                    },
+                }
+            wrapped = wrap_untrusted_gov_data(profile_res, source_id="mte_novo_caged")
+            return {
+                "jsonrpc": "2.0",
+                "id": req_id,
+                "result": {"content": [{"type": "text", "text": wrapped}], "isError": False},
+            }
+
+        if tool_name in {"bdg_list_top_job_creating_municipalities", "pdg_list_top_job_creating_municipalities"}:
+            from public_data_gateway.connectors.trabalho.mte_novo_caged.connector import (
+                MTENovoCagedConnector,
+            )
+
+            caged_conn = MTENovoCagedConnector(settings=self.settings)
+            lim = int(args.get("limit", 10))
+            ranking_res = caged_conn.list_top_job_creating_municipalities(limit=lim)
+            wrapped = wrap_untrusted_gov_data(ranking_res, source_id="mte_novo_caged")
             return {
                 "jsonrpc": "2.0",
                 "id": req_id,
