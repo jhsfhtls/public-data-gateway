@@ -1,0 +1,140 @@
+version: 2
+
+models:
+  - name: stg_cnefe_enderecos_padrao
+    description: "Visão staging de endereços prediais padronizados com logradouro, número, complemento e espécie do IBGE CNEFE Censo 2022."
+    columns:
+      - name: id_municipio
+        description: "Código IBGE de 7 dígitos identificador único do município."
+      - name: sigla_uf
+        description: "Sigla de 2 letras da Unidade Federativa."
+      - name: nome_municipio
+        description: "Nome oficial do município brasileiro."
+      - name: codigo_distrito
+        description: "Código identificador do distrito municipal do IBGE."
+      - name: codigo_subdistrito
+        description: "Código do subdistrito municipal censitário."
+      - name: codigo_setor_censitario
+        description: "Código identificador do setor censitário de 15 dígitos."
+      - name: seq_endereco
+        description: "Número sequencial identificador do endereço no setor."
+      - name: cep_8
+        description: "Código de Endereçamento Postal de 8 dígitos numéricos."
+      - name: tipo_logradouro
+        description: "Tipo de logradouro oficial padronizado (Rua, Avenida, etc.)."
+      - name: titulo_patente
+        description: "Título ou patente honorífica do logradouro."
+      - name: nome_logradouro
+        description: "Nome oficial do logradouro cadastrado."
+      - name: numero_predial
+        description: "Número do imóvel predial ou 'S/N'."
+      - name: complemento
+        description: "Complemento do endereço (apartamento, bloco, lote, sala)."
+      - name: bairro
+        description: "Nome do bairro ou localidade."
+      - name: especie_edificacao
+        description: "Espécie de edificação ou finalidade de uso do imóvel segundo IBGE."
+      - name: reference_date
+        description: "Data de referência censitária (AAAA-MM-DD)."
+      - name: extracted_at
+        description: "Timestamp ISO-8601 UTC de extração e ingestão."
+
+  - name: stg_cnefe_coordenadas_geograficas
+    description: "Visão staging das coordenadas geográficas pontuais precisas em WGS84 dos endereços cadastrados no CNEFE."
+    columns:
+      - name: id_municipio
+        description: "Código IBGE de 7 dígitos do município."
+      - name: seq_endereco
+        description: "Número sequencial do endereço no setor censitário."
+      - name: cep_8
+        description: "Código de Endereçamento Postal de 8 dígitos."
+      - name: latitude
+        description: "Latitude geográfica do ponto em graus decimais (WGS84)."
+      - name: longitude
+        description: "Longitude geográfica do ponto em graus decimais (WGS84)."
+      - name: precisao_geocodificacao
+        description: "Nível de precisão da geocodificação do ponto (Edificação ou Face de Quadra)."
+      - name: altitude_aproximada_m
+        description: "Altitude aproximada do ponto em metros acima do nível do mar."
+      - name: especie_edificacao
+        description: "Espécie de edificação associada ao ponto de coordenadas."
+      - name: reference_date
+        description: "Data de referência da consolidação estatística."
+      - name: extracted_at
+        description: "Timestamp ISO-8601 UTC de ingestão."
+
+  - name: stg_cnefe_tipos_edificacao
+    description: "Visão staging da contagem e distribuição das espécies de edificações e estabelecimentos por município."
+    columns:
+      - name: id_municipio
+        description: "Código IBGE de 7 dígitos do município."
+      - name: sigla_uf
+        description: "Sigla de 2 letras da Unidade Federativa."
+      - name: nome_municipio
+        description: "Nome oficial do município."
+      - name: tipo_edificacao
+        description: "Espécie ou categoria de finalidade da edificação."
+      - name: total_edificacoes
+        description: "Contagem total de endereços cadastrados nessa espécie no município."
+      - name: participacao_pct
+        description: "Percentual de representatividade em relação ao total do município."
+      - name: densidade_edificacoes_km2
+        description: "Densidade de edificações por km² de área municipal."
+      - name: reference_date
+        description: "Data de referência do censo (AAAA-MM-DD)."
+      - name: extracted_at
+        description: "Timestamp ISO-8601 UTC de extração."
+
+  - name: stg_cnefe_agregados_cep
+    description: "Visão staging das métricas agregadas por CEP de 8 dígitos com contagem de domicílios, estabelecimentos e centroides."
+    columns:
+      - name: cep_8
+        description: "Código de Endereçamento Postal oficial de 8 dígitos."
+      - name: id_municipio
+        description: "Código IBGE de 7 dígitos do município correspondente."
+      - name: sigla_uf
+        description: "Sigla da Unidade Federativa."
+      - name: nome_municipio
+        description: "Nome oficial do município."
+      - name: total_enderecos
+        description: "Quantidade total de endereços e unidades associadas ao CEP."
+      - name: total_domicilios
+        description: "Total de domicílios residenciais situados no CEP."
+      - name: total_estabelecimentos
+        description: "Total de estabelecimentos comerciais, de serviços e indústrias no CEP."
+      - name: latitude_centroide
+        description: "Latitude geográfica média do centroide ponderado do CEP."
+      - name: longitude_centroide
+        description: "Longitude geográfica média do centroide ponderado do CEP."
+      - name: indice_misto_residencial_comercial
+        description: "Índice de uso misto residencial vs comercial do CEP."
+      - name: reference_date
+        description: "Data de referência da consolidação censitária."
+      - name: extracted_at
+        description: "Timestamp ISO-8601 UTC de ingestão."
+
+  - name: stg_cnefe_densidade_enderecamento
+    description: "Visão staging dos indicadores municipais de cobertura georreferenciada, densidade de endereços e diversidade urbana."
+    columns:
+      - name: id_municipio
+        description: "Código IBGE de 7 dígitos identificador do município."
+      - name: sigla_uf
+        description: "Sigla da Unidade Federativa."
+      - name: nome_municipio
+        description: "Nome oficial do município."
+      - name: total_enderecos_municipio
+        description: "Volume total de endereços cadastrados no município."
+      - name: total_logradouros_distintos
+        description: "Quantidade de logradouros distintos catalogados no município."
+      - name: total_ceps_distintos
+        description: "Quantidade de CEPs ativos catalogados no município."
+      - name: taxa_cobertura_georreferenciada_pct
+        description: "Percentual de endereços do município com coordenadas georreferenciadas."
+      - name: densidade_enderecos_km2
+        description: "Média de endereços por quilômetro quadrado de área municipal."
+      - name: proporcao_enderecos_comerciais_pct
+        description: "Percentual de endereços dedicados a atividades econômicas e comerciais."
+      - name: reference_date
+        description: "Data de referência censitária oficial."
+      - name: extracted_at
+        description: "Timestamp ISO-8601 UTC de ingestão."

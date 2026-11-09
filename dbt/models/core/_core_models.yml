@@ -3786,3 +3786,127 @@ models:
         description: "Timestamp ISO-8601 UTC da carga."
         tests:
           - not_null
+
+  - name: fct_cnefe_perfil_edificacoes_municipio
+    description: "Fato analítico da distribuição de espécies de edificações, densidade territorial e cobertura georreferenciada por município do CNEFE Censo 2022."
+    columns:
+      - name: id_municipio
+        description: "Código IBGE de 7 dígitos do município."
+        tests:
+          - not_null
+      - name: sigla_uf
+        description: "Sigla da Unidade Federativa."
+        tests:
+          - not_null
+      - name: nome_municipio
+        description: "Nome oficial do município."
+        tests:
+          - not_null
+      - name: tipo_edificacao
+        description: "Espécie de edificação (domicílio particular, coletivo, comércio, saúde, ensino, etc.)."
+        tests:
+          - not_null
+      - name: total_edificacoes
+        description: "Contagem de edificações dessa espécie no município."
+        tests:
+          - not_null
+      - name: participacao_pct
+        description: "Percentual em relação ao total de endereços do município."
+        tests:
+          - not_null
+      - name: densidade_edificacoes_km2
+        description: "Densidade de edificações por km² de área municipal."
+        tests:
+          - not_null
+      - name: total_enderecos_municipio
+        description: "Total geral de endereços do município."
+        tests:
+          - not_null
+      - name: total_logradouros_distintos
+        description: "Total de logradouros distintos catalogados no município."
+        tests:
+          - not_null
+      - name: total_ceps_distintos
+        description: "Total de CEPs ativos catalogados no município."
+        tests:
+          - not_null
+      - name: taxa_cobertura_georreferenciada_pct
+        description: "Percentual de cobertura de endereços georreferenciados no município."
+        tests:
+          - not_null
+      - name: densidade_total_enderecos_km2
+        description: "Densidade média total de endereços por km²."
+        tests:
+          - not_null
+      - name: proporcao_enderecos_comerciais_pct
+        description: "Percentual de endereços destinados a comércio e serviços."
+        tests:
+          - not_null
+      - name: reference_date
+        description: "Data de referência censitária (AAAA-MM-DD)."
+        tests:
+          - not_null
+      - name: extracted_at
+        description: "Timestamp ISO-8601 UTC de ingestão."
+        tests:
+          - not_null
+
+  - name: fct_cnefe_malha_logradouros_cep
+    description: "Fato analítico da malha de endereços e centroides por CEP com contagem de domicílios e estabelecimentos do CNEFE Censo 2022."
+    columns:
+      - name: cep_8
+        description: "Código de Endereçamento Postal de 8 dígitos."
+        tests:
+          - not_null
+      - name: id_municipio
+        description: "Código IBGE de 7 dígitos do município."
+        tests:
+          - not_null
+      - name: sigla_uf
+        description: "Sigla da Unidade Federativa."
+        tests:
+          - not_null
+      - name: nome_municipio
+        description: "Nome oficial do município."
+        tests:
+          - not_null
+      - name: total_enderecos
+        description: "Volume de endereços cadastrados no CEP."
+        tests:
+          - not_null
+      - name: total_domicilios
+        description: "Total de domicílios residenciais no CEP."
+        tests:
+          - not_null
+      - name: total_estabelecimentos
+        description: "Total de estabelecimentos comerciais, serviços e indústrias no CEP."
+        tests:
+          - not_null
+      - name: latitude_centroide
+        description: "Latitude geográfica do centroide ponderado do CEP."
+        tests:
+          - not_null
+      - name: longitude_centroide
+        description: "Longitude geográfica do centroide ponderado do CEP."
+        tests:
+          - not_null
+      - name: indice_misto_residencial_comercial
+        description: "Índice de uso misto do solo no CEP (0 a 1)."
+        tests:
+          - not_null
+      - name: taxa_cobertura_georreferenciada_pct
+        description: "Taxa municipal de cobertura georreferenciada."
+        tests:
+          - not_null
+      - name: densidade_enderecos_municipio_km2
+        description: "Densidade de endereços por km² no município."
+        tests:
+          - not_null
+      - name: reference_date
+        description: "Data de referência da consolidação."
+        tests:
+          - not_null
+      - name: extracted_at
+        description: "Timestamp ISO-8601 UTC de carga."
+        tests:
+          - not_null

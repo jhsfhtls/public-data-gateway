@@ -537,6 +537,49 @@ class MCPDispatcher:
                                     },
                                 },
                             },
+                            {
+                                "name": "bdg_get_cnefe_municipality_summary",
+                                "description": "Query IBGE CNEFE address totals, building species and density by municipality from Censo Demográfico 2022 (Tier 1).",
+                                "inputSchema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "municipio": {"type": "string", "description": "IBGE 7-digit municipality code or name"},
+                                    },
+                                    "required": ["municipio"],
+                                },
+                            },
+                            {
+                                "name": "bdg_get_cnefe_cep_profile",
+                                "description": "Query IBGE CNEFE address counts, centroid coordinates and mixed-use index for an 8-digit CEP (Tier 1).",
+                                "inputSchema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "cep": {"type": "string", "description": "8-digit Brazilian postal code (CEP)"},
+                                    },
+                                    "required": ["cep"],
+                                },
+                            },
+                            {
+                                "name": "bdg_list_cnefe_building_types",
+                                "description": "List IBGE CNEFE building species and municipal purpose breakdown (Tier 1).",
+                                "inputSchema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "municipio": {"type": "string", "description": "IBGE 7-digit municipality code or name"},
+                                    },
+                                    "required": ["municipio"],
+                                },
+                            },
+                            {
+                                "name": "bdg_list_cnefe_top_address_density",
+                                "description": "List Brazilian municipalities ranked by address density per km2 from IBGE CNEFE (Tier 1).",
+                                "inputSchema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "limit": {"type": "integer", "description": "Max municipalities to retrieve (default: 10)"},
+                                    },
+                                },
+                            },
                         ]
                     },
                 }
@@ -1333,6 +1376,66 @@ class MCPDispatcher:
             lim = int(args.get("limit", 10))
             ranking_res = pnad_conn.list_highest_earnings_states(limit=lim)
             wrapped = wrap_untrusted_gov_data(ranking_res, source_id="ibge_pnad_continua")
+            return {
+                "jsonrpc": "2.0",
+                "id": req_id,
+                "result": {"content": [{"type": "text", "text": wrapped}], "isError": False},
+            }
+
+        if tool_name in {"bdg_get_cnefe_municipality_summary", "pdg_get_cnefe_municipality_summary"}:
+            from public_data_gateway.connectors.geografico.ibge_cnefe.connector import (
+                IBGECnefeConnector,
+            )
+
+            cnefe_conn = IBGECnefeConnector(settings=self.settings)
+            muni = str(args.get("municipio", "")).strip()
+            res = cnefe_conn.get_municipality_summary(muni)
+            wrapped = wrap_untrusted_gov_data(res, source_id="ibge_cnefe")
+            return {
+                "jsonrpc": "2.0",
+                "id": req_id,
+                "result": {"content": [{"type": "text", "text": wrapped}], "isError": False},
+            }
+
+        if tool_name in {"bdg_get_cnefe_cep_profile", "pdg_get_cnefe_cep_profile"}:
+            from public_data_gateway.connectors.geografico.ibge_cnefe.connector import (
+                IBGECnefeConnector,
+            )
+
+            cnefe_conn = IBGECnefeConnector(settings=self.settings)
+            cep = str(args.get("cep", "")).strip()
+            res = cnefe_conn.get_cep_profile(cep)
+            wrapped = wrap_untrusted_gov_data(res, source_id="ibge_cnefe")
+            return {
+                "jsonrpc": "2.0",
+                "id": req_id,
+                "result": {"content": [{"type": "text", "text": wrapped}], "isError": False},
+            }
+
+        if tool_name in {"bdg_list_cnefe_building_types", "pdg_list_cnefe_building_types"}:
+            from public_data_gateway.connectors.geografico.ibge_cnefe.connector import (
+                IBGECnefeConnector,
+            )
+
+            cnefe_conn = IBGECnefeConnector(settings=self.settings)
+            muni = str(args.get("municipio", "")).strip()
+            res = cnefe_conn.list_building_types(muni)
+            wrapped = wrap_untrusted_gov_data(res, source_id="ibge_cnefe")
+            return {
+                "jsonrpc": "2.0",
+                "id": req_id,
+                "result": {"content": [{"type": "text", "text": wrapped}], "isError": False},
+            }
+
+        if tool_name in {"bdg_list_cnefe_top_address_density", "pdg_list_cnefe_top_address_density"}:
+            from public_data_gateway.connectors.geografico.ibge_cnefe.connector import (
+                IBGECnefeConnector,
+            )
+
+            cnefe_conn = IBGECnefeConnector(settings=self.settings)
+            lim = int(args.get("limit", 10))
+            ranking_res = cnefe_conn.list_top_address_density(limit=lim)
+            wrapped = wrap_untrusted_gov_data(ranking_res, source_id="ibge_cnefe")
             return {
                 "jsonrpc": "2.0",
                 "id": req_id,
