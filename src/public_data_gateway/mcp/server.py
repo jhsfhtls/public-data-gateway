@@ -494,6 +494,49 @@ class MCPDispatcher:
                                     },
                                 },
                             },
+                            {
+                                "name": "bdg_get_labor_force_indicators",
+                                "description": "Query official quarterly labor force, population, and unemployment rate by Brazilian UF from IBGE PNAD Contínua (Tier 1).",
+                                "inputSchema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "uf": {"type": "string", "description": "IBGE 2-digit UF code or 2-letter state abbreviation (e.g. SP, 35)"},
+                                        "trimestre": {"type": "string", "description": "Optional quarter in AAAA-TT format (e.g. 2026-T2)"},
+                                    },
+                                    "required": ["uf"],
+                                },
+                            },
+                            {
+                                "name": "bdg_get_state_labor_profile",
+                                "description": "Query Gold labor resilience profile, informality rate, and real habitual earnings by Brazilian UF from IBGE PNAD Contínua (Tier 1).",
+                                "inputSchema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "uf": {"type": "string", "description": "IBGE 2-digit UF code or 2-letter state abbreviation (e.g. SP, 35)"},
+                                    },
+                                    "required": ["uf"],
+                                },
+                            },
+                            {
+                                "name": "bdg_list_lowest_unemployment_states",
+                                "description": "List Brazilian UFs with lowest unemployment rate from IBGE PNAD Contínua (Tier 1).",
+                                "inputSchema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "limit": {"type": "integer", "description": "Max states to retrieve (default: 10)"},
+                                    },
+                                },
+                            },
+                            {
+                                "name": "bdg_list_highest_earnings_states",
+                                "description": "List Brazilian UFs with highest average real monthly earnings from IBGE PNAD Contínua (Tier 1).",
+                                "inputSchema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "limit": {"type": "integer", "description": "Max states to retrieve (default: 10)"},
+                                    },
+                                },
+                            },
                         ]
                     },
                 }
@@ -1201,6 +1244,95 @@ class MCPDispatcher:
             lim = int(args.get("limit", 10))
             ranking_res = caged_conn.list_top_job_creating_municipalities(limit=lim)
             wrapped = wrap_untrusted_gov_data(ranking_res, source_id="mte_novo_caged")
+            return {
+                "jsonrpc": "2.0",
+                "id": req_id,
+                "result": {"content": [{"type": "text", "text": wrapped}], "isError": False},
+            }
+
+        if tool_name in {"bdg_get_labor_force_indicators", "pdg_get_labor_force_indicators"}:
+            from public_data_gateway.connectors.trabalho.ibge_pnad_continua.connector import (
+                IBGEPnadContinuaConnector,
+            )
+
+            pnad_conn = IBGEPnadContinuaConnector(settings=self.settings)
+            uf = str(args.get("uf", "")).strip()
+            trimestre = args.get("trimestre")
+            res = pnad_conn.get_labor_force_indicators(uf, ano_trimestre=trimestre)
+            if not res:
+                return {
+                    "jsonrpc": "2.0",
+                    "id": req_id,
+                    "result": {
+                        "content": [
+                            {
+                                "type": "text",
+                                "text": f"Error: No PNAD labor force indicators found for state '{uf}'.",
+                            }
+                        ],
+                        "isError": True,
+                    },
+                }
+            wrapped = wrap_untrusted_gov_data(res, source_id="ibge_pnad_continua")
+            return {
+                "jsonrpc": "2.0",
+                "id": req_id,
+                "result": {"content": [{"type": "text", "text": wrapped}], "isError": False},
+            }
+
+        if tool_name in {"bdg_get_state_labor_profile", "pdg_get_state_labor_profile"}:
+            from public_data_gateway.connectors.trabalho.ibge_pnad_continua.connector import (
+                IBGEPnadContinuaConnector,
+            )
+
+            pnad_conn = IBGEPnadContinuaConnector(settings=self.settings)
+            uf = str(args.get("uf", "")).strip()
+            res = pnad_conn.get_state_labor_profile(uf)
+            if not res:
+                return {
+                    "jsonrpc": "2.0",
+                    "id": req_id,
+                    "result": {
+                        "content": [
+                            {
+                                "type": "text",
+                                "text": f"Error: No PNAD state labor profile found for state '{uf}'.",
+                            }
+                        ],
+                        "isError": True,
+                    },
+                }
+            wrapped = wrap_untrusted_gov_data(res, source_id="ibge_pnad_continua")
+            return {
+                "jsonrpc": "2.0",
+                "id": req_id,
+                "result": {"content": [{"type": "text", "text": wrapped}], "isError": False},
+            }
+
+        if tool_name in {"bdg_list_lowest_unemployment_states", "pdg_list_lowest_unemployment_states"}:
+            from public_data_gateway.connectors.trabalho.ibge_pnad_continua.connector import (
+                IBGEPnadContinuaConnector,
+            )
+
+            pnad_conn = IBGEPnadContinuaConnector(settings=self.settings)
+            lim = int(args.get("limit", 10))
+            ranking_res = pnad_conn.list_lowest_unemployment_states(limit=lim)
+            wrapped = wrap_untrusted_gov_data(ranking_res, source_id="ibge_pnad_continua")
+            return {
+                "jsonrpc": "2.0",
+                "id": req_id,
+                "result": {"content": [{"type": "text", "text": wrapped}], "isError": False},
+            }
+
+        if tool_name in {"bdg_list_highest_earnings_states", "pdg_list_highest_earnings_states"}:
+            from public_data_gateway.connectors.trabalho.ibge_pnad_continua.connector import (
+                IBGEPnadContinuaConnector,
+            )
+
+            pnad_conn = IBGEPnadContinuaConnector(settings=self.settings)
+            lim = int(args.get("limit", 10))
+            ranking_res = pnad_conn.list_highest_earnings_states(limit=lim)
+            wrapped = wrap_untrusted_gov_data(ranking_res, source_id="ibge_pnad_continua")
             return {
                 "jsonrpc": "2.0",
                 "id": req_id,

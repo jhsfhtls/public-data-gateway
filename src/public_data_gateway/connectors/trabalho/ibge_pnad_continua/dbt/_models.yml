@@ -1,0 +1,256 @@
+version: 2
+
+models:
+  - name: stg_pnad_mercado_trabalho_trimestral
+    description: "Visão staging dos indicadores trimestrais de força de trabalho, desocupação e nível de ocupação por UF do IBGE PNAD Contínua."
+    columns:
+      - name: id_uf
+        description: "Código IBGE de 2 dígitos identificador da Unidade Federativa."
+        tests:
+          - not_null
+      - name: sigla_uf
+        description: "Sigla de 2 letras da Unidade Federativa correspondente."
+        tests:
+          - not_null
+      - name: nome_uf
+        description: "Nome oficial da Unidade Federativa."
+        tests:
+          - not_null
+      - name: ano_trimestre
+        description: "Ano e trimestre de referência no formato AAAA-TT."
+        tests:
+          - not_null
+      - name: populacao_idade_trabalhar_mil
+        description: "População em idade de trabalhar (14 anos ou mais de idade) expressa em milhares de pessoas."
+        tests:
+          - not_null
+      - name: forca_trabalho_total_mil
+        description: "População na força de trabalho (ocupados mais desocupados) em milhares de pessoas."
+        tests:
+          - not_null
+      - name: populacao_ocupada_mil
+        description: "População ocupada na semana de referência em milhares de pessoas."
+        tests:
+          - not_null
+      - name: populacao_desocupada_mil
+        description: "População desocupada que buscou trabalho na semana de referência em milhares de pessoas."
+        tests:
+          - not_null
+      - name: populacao_fora_forca_mil
+        description: "Pessoas fora da força de trabalho em milhares de pessoas."
+        tests:
+          - not_null
+      - name: taxa_desocupacao_pct
+        description: "Taxa oficial de desocupação da força de trabalho calculada em percentual (%)."
+        tests:
+          - not_null
+      - name: taxa_participacao_forca_pct
+        description: "Taxa de participação na força de trabalho em percentual (%)."
+        tests:
+          - not_null
+      - name: taxa_nivel_ocupacao_pct
+        description: "Nível de ocupação das pessoas em idade de trabalhar em percentual (%)."
+        tests:
+          - not_null
+      - name: reference_date
+        description: "Data de referência do indicador no formato AAAA-MM-DD."
+        tests:
+          - not_null
+      - name: extracted_at
+        description: "Timestamp ISO-8601 UTC do momento da ingestão."
+        tests:
+          - not_null
+
+  - name: stg_pnad_rendimento_trabalho
+    description: "Visão staging de rendimento médio real habitual e efetivo e massa salarial por UF do IBGE PNAD Contínua."
+    columns:
+      - name: id_uf
+        description: "Código IBGE de 2 dígitos identificador da Unidade Federativa."
+        tests:
+          - not_null
+      - name: sigla_uf
+        description: "Sigla de 2 letras da Unidade Federativa correspondente."
+        tests:
+          - not_null
+      - name: nome_uf
+        description: "Nome oficial da Unidade Federativa."
+        tests:
+          - not_null
+      - name: ano_trimestre
+        description: "Ano e trimestre de referência no formato AAAA-TT."
+        tests:
+          - not_null
+      - name: rendimento_medio_real_habitual_reais
+        description: "Rendimento médio mensal real habitualmente recebido no trabalho principal em Reais (BRL)."
+        tests:
+          - not_null
+      - name: rendimento_medio_real_efetivo_reais
+        description: "Rendimento médio mensal real efetivamente recebido no trabalho principal em Reais (BRL)."
+        tests:
+          - not_null
+      - name: massa_rendimento_real_habitual_milhoes_reais
+        description: "Massa salarial real habitual recebida pelos ocupados expressa em milhões de Reais."
+        tests:
+          - not_null
+      - name: variacao_rendimento_ano_anterior_pct
+        description: "Variação percentual real do rendimento em relação ao mesmo trimestre do ano anterior."
+      - name: reference_date
+        description: "Data de referência do indicador no formato AAAA-MM-DD."
+        tests:
+          - not_null
+      - name: extracted_at
+        description: "Timestamp ISO-8601 UTC do momento da ingestão."
+        tests:
+          - not_null
+
+  - name: stg_pnad_subutilizacao_forca
+    description: "Visão staging de medidas ampliadas de subutilização da força de trabalho, desalento e subocupação por insuficiência de horas."
+    columns:
+      - name: id_uf
+        description: "Código IBGE de 2 dígitos identificador da Unidade Federativa."
+        tests:
+          - not_null
+      - name: sigla_uf
+        description: "Sigla de 2 letras da Unidade Federativa correspondente."
+        tests:
+          - not_null
+      - name: nome_uf
+        description: "Nome oficial da Unidade Federativa."
+        tests:
+          - not_null
+      - name: ano_trimestre
+        description: "Ano e trimestre de referência no formato AAAA-TT."
+        tests:
+          - not_null
+      - name: taxa_composta_subutilizacao_pct
+        description: "Taxa composta de subutilização da força de trabalho expressa em percentual (%)."
+        tests:
+          - not_null
+      - name: subocupados_por_insuficiencia_horas_mil
+        description: "Pessoas subocupadas por insuficiência de horas trabalhadas em milhares de pessoas."
+        tests:
+          - not_null
+      - name: forca_trabalho_potencial_mil
+        description: "Força de trabalho potencial (desalentados e disponíveis não ocupados) em milhares."
+        tests:
+          - not_null
+      - name: populacao_desalentada_mil
+        description: "População em desalento (desistiu de buscar trabalho por falta de perspectiva) em milhares."
+        tests:
+          - not_null
+      - name: taxa_desalento_pct
+        description: "Percentual de pessoas desalentadas em relação à força de trabalho ampliada (%)."
+        tests:
+          - not_null
+      - name: reference_date
+        description: "Data de referência do indicador no formato AAAA-MM-DD."
+        tests:
+          - not_null
+      - name: extracted_at
+        description: "Timestamp ISO-8601 UTC do momento da ingestão."
+        tests:
+          - not_null
+
+  - name: stg_pnad_posicao_ocupacao
+    description: "Visão staging da distribuição da população ocupada por categoria do emprego, carteira assinada, setor público e informalidade."
+    columns:
+      - name: id_uf
+        description: "Código IBGE de 2 dígitos identificador da Unidade Federativa."
+        tests:
+          - not_null
+      - name: sigla_uf
+        description: "Sigla de 2 letras da Unidade Federativa correspondente."
+        tests:
+          - not_null
+      - name: nome_uf
+        description: "Nome oficial da Unidade Federativa."
+        tests:
+          - not_null
+      - name: ano_trimestre
+        description: "Ano e trimestre de referência no formato AAAA-TT."
+        tests:
+          - not_null
+      - name: empregado_com_carteira_clt_mil
+        description: "Empregados no setor privado com carteira de trabalho assinada (CLT) em milhares."
+        tests:
+          - not_null
+      - name: empregado_sem_carteira_mil
+        description: "Empregados no setor privado sem carteira de trabalho assinada em milhares."
+        tests:
+          - not_null
+      - name: trabalhador_domestico_mil
+        description: "Trabalhadores domésticos em milhares de pessoas."
+        tests:
+          - not_null
+      - name: empregado_setor_publico_mil
+        description: "Empregados no setor público (estatutários, militares e celetistas) em milhares."
+        tests:
+          - not_null
+      - name: empregador_mil
+        description: "Empregadores formais e informais em milhares de pessoas."
+        tests:
+          - not_null
+      - name: conta_propria_mil
+        description: "Trabalhadores por conta própria (autônomos) em milhares de pessoas."
+        tests:
+          - not_null
+      - name: taxa_informalidade_pct
+        description: "Taxa oficial de informalidade da população ocupada expressa em percentual (%)."
+        tests:
+          - not_null
+      - name: reference_date
+        description: "Data de referência do indicador no formato AAAA-MM-DD."
+        tests:
+          - not_null
+      - name: extracted_at
+        description: "Timestamp ISO-8601 UTC do momento da ingestão."
+        tests:
+          - not_null
+
+  - name: stg_pnad_demografia_educacao_trabalho
+    description: "Visão staging de recortes socioeconômicos do mercado de trabalho por gênero, faixa etária e nível de instrução."
+    columns:
+      - name: id_uf
+        description: "Código IBGE de 2 dígitos identificador da Unidade Federativa."
+        tests:
+          - not_null
+      - name: sigla_uf
+        description: "Sigla de 2 letras da Unidade Federativa correspondente."
+        tests:
+          - not_null
+      - name: nome_uf
+        description: "Nome oficial da Unidade Federativa."
+        tests:
+          - not_null
+      - name: ano_trimestre
+        description: "Ano e trimestre de referência no formato AAAA-TT."
+        tests:
+          - not_null
+      - name: taxa_desocupacao_homens_pct
+        description: "Taxa de desocupação para o segmento masculino expressa em percentual (%)."
+        tests:
+          - not_null
+      - name: taxa_desocupacao_mulheres_pct
+        description: "Taxa de desocupação para o segmento feminino expressa em percentual (%)."
+        tests:
+          - not_null
+      - name: taxa_desocupacao_jovens_18_24_pct
+        description: "Taxa de desocupação entre jovens de 18 a 24 anos expressa em percentual (%)."
+        tests:
+          - not_null
+      - name: taxa_desocupacao_ensino_superior_pct
+        description: "Taxa de desocupação entre pessoas com nível superior completo em percentual (%)."
+        tests:
+          - not_null
+      - name: razao_rendimento_mulher_homem
+        description: "Razão entre o rendimento médio das mulheres e o dos homens (paridade salarial de gênero)."
+        tests:
+          - not_null
+      - name: reference_date
+        description: "Data de referência do indicador no formato AAAA-MM-DD."
+        tests:
+          - not_null
+      - name: extracted_at
+        description: "Timestamp ISO-8601 UTC do momento da ingestão."
+        tests:
+          - not_null

@@ -540,11 +540,12 @@ class SocioeconomicFacade:
 
 
 class LaborFacade:
-    """Unified developer facade for employment, labor market dynamics, and wages (MTE Novo CAGED)."""
+    """Unified developer facade for employment, labor market dynamics, and wages (MTE Novo CAGED & IBGE PNAD Contínua)."""
 
     def __init__(self, sdk: "BrazilData") -> None:
         self._sdk = sdk
         self._connector: Any = None
+        self._pnad_connector: Any = None
 
     @property
     def connector(self) -> Any:
@@ -555,6 +556,16 @@ class LaborFacade:
 
             self._connector = MTENovoCagedConnector(settings=self._sdk.settings)
         return self._connector
+
+    @property
+    def pnad_connector(self) -> Any:
+        if self._pnad_connector is None:
+            from public_data_gateway.connectors.trabalho.ibge_pnad_continua.connector import (
+                IBGEPnadContinuaConnector,
+            )
+
+            self._pnad_connector = IBGEPnadContinuaConnector(settings=self._sdk.settings)
+        return self._pnad_connector
 
     def employment_summary(
         self, id_municipio: str, competencia: str | None = None
@@ -573,6 +584,28 @@ class LaborFacade:
     def top_job_creators(self, limit: int = 10) -> list[dict[str, Any]]:
         """List municipalities with highest net job creation balance from Novo CAGED."""
         return self.connector.list_top_job_creating_municipalities(limit=limit)
+
+    def force_indicators(
+        self, id_or_sigla_uf: str, ano_trimestre: str | None = None
+    ) -> dict[str, Any] | None:
+        """Get official quarterly labor force and unemployment indicators for a Brazilian UF (PNAD Contínua)."""
+        return self.pnad_connector.get_labor_force_indicators(id_or_sigla_uf, ano_trimestre=ano_trimestre)
+
+    def state_profile(self, id_or_sigla_uf: str) -> dict[str, Any] | None:
+        """Get comprehensive Gold labor market resilience and earnings profile for a Brazilian UF (PNAD Contínua)."""
+        return self.pnad_connector.get_state_labor_profile(id_or_sigla_uf)
+
+    def earnings(self, id_or_sigla_uf: str) -> dict[str, Any] | None:
+        """Get real habitual and effective monthly earnings for a Brazilian UF (PNAD Contínua)."""
+        return self.pnad_connector.get_earnings_summary(id_or_sigla_uf)
+
+    def lowest_unemployment_states(self, limit: int = 10) -> list[dict[str, Any]]:
+        """List Brazilian UFs with lowest unemployment rate from PNAD Contínua."""
+        return self.pnad_connector.list_lowest_unemployment_states(limit=limit)
+
+    def highest_earnings_states(self, limit: int = 10) -> list[dict[str, Any]]:
+        """List Brazilian UFs with highest average real monthly earnings from PNAD Contínua."""
+        return self.pnad_connector.list_highest_earnings_states(limit=limit)
 
 
 class BrazilData:
@@ -824,6 +857,20 @@ class BrazilData:
     def get_top_job_creators(self, limit: int = 10) -> list[dict[str, Any]]:
         """Consultar ranking de municípios com maior saldo líquido de empregos gerados (Novo CAGED)."""
         return self.labor.top_job_creators(limit=limit)
+
+    def get_state_labor_profile(self, id_or_sigla_uf: str) -> dict[str, Any] | None:
+        """Consultar perfil estadual do mercado de trabalho, taxa de desocupação e renda (PNAD Contínua)."""
+        return self.labor.state_profile(id_or_sigla_uf)
+
+    def get_labor_force_indicators(
+        self, id_or_sigla_uf: str, ano_trimestre: str | None = None
+    ) -> dict[str, Any] | None:
+        """Consultar indicadores trimestrais de força de trabalho e desocupação da UF (PNAD Contínua)."""
+        return self.labor.force_indicators(id_or_sigla_uf, ano_trimestre=ano_trimestre)
+
+    def get_lowest_unemployment_states(self, limit: int = 10) -> list[dict[str, Any]]:
+        """Consultar ranking de estados com menor taxa de desocupação (PNAD Contínua)."""
+        return self.labor.lowest_unemployment_states(limit=limit)
 
     def resolve_municipality(
         self, code_or_name: str | int, uf: str | None = None

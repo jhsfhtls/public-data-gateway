@@ -1,0 +1,18 @@
+version: 2
+
+sources:
+  - name: ibge_pnad_continua_silver
+    description: "Tabelas normalizadas da camada Silver dos agregados estaduais da PNAD Contínua (IBGE)."
+    meta:
+      external_location: "data/ibge_pnad_continua/silver/{name}.parquet"
+    tables:
+      - name: pnad_mercado_trabalho_trimestral
+        description: "Indicadores trimestrais da força de trabalho, desocupação e nível de ocupação por UF do IBGE."
+      - name: pnad_rendimento_trabalho
+        description: "Rendimento médio real habitual e efetivo e massa salarial por UF do IBGE PNAD Contínua."
+      - name: pnad_subutilizacao_forca
+        description: "Medidas ampliadas de subutilização da força de trabalho, desalento e subocupação por insuficiência de horas."
+      - name: pnad_posicao_ocupacao
+        description: "Distribuição da população ocupada por categoria do emprego, carteira assinada, setor público e informalidade."
+      - name: pnad_demografia_educacao_trabalho
+        description: "Recortes socioeconômicos do mercado de trabalho por gênero, faixa etária e nível de instrução."

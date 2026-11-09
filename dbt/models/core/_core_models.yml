@@ -3622,3 +3622,167 @@ models:
         description: "Timestamp ISO-8601 UTC da carga."
         tests:
           - not_null
+
+  - name: fct_pnad_mercado_trabalho_uf
+    description: "Tabela de fatos consolidada trimestral de força de trabalho, desocupação, rendimentos e subutilização por UF do IBGE PNAD Contínua."
+    columns:
+      - name: id_uf
+        description: "Código IBGE de 2 dígitos identificador da Unidade Federativa."
+        tests:
+          - not_null
+      - name: sigla_uf
+        description: "Sigla de 2 letras da Unidade Federativa correspondente."
+        tests:
+          - not_null
+      - name: nome_uf
+        description: "Nome oficial da Unidade Federativa."
+        tests:
+          - not_null
+      - name: ano_trimestre
+        description: "Ano e trimestre de apuração no formato AAAA-TT."
+        tests:
+          - not_null
+      - name: populacao_idade_trabalhar_mil
+        description: "População em idade de trabalhar (14 anos ou mais) em milhares."
+        tests:
+          - not_null
+      - name: forca_trabalho_total_mil
+        description: "População total na força de trabalho em milhares."
+        tests:
+          - not_null
+      - name: populacao_ocupada_mil
+        description: "População ocupada em milhares."
+        tests:
+          - not_null
+      - name: populacao_desocupada_mil
+        description: "População desocupada em milhares."
+        tests:
+          - not_null
+      - name: populacao_fora_forca_mil
+        description: "População fora da força de trabalho em milhares."
+        tests:
+          - not_null
+      - name: taxa_desocupacao_pct
+        description: "Taxa oficial de desocupação (%)."
+        tests:
+          - not_null
+      - name: taxa_participacao_forca_pct
+        description: "Taxa de participação na força de trabalho (%)."
+        tests:
+          - not_null
+      - name: taxa_nivel_ocupacao_pct
+        description: "Nível de ocupação (%)."
+        tests:
+          - not_null
+      - name: rendimento_medio_real_habitual_reais
+        description: "Rendimento médio mensal real habitualmente recebido no trabalho principal em Reais (BRL)."
+        tests:
+          - not_null
+      - name: rendimento_medio_real_efetivo_reais
+        description: "Rendimento médio mensal real efetivamente recebido no trabalho principal em Reais (BRL)."
+        tests:
+          - not_null
+      - name: massa_rendimento_real_habitual_milhoes_reais
+        description: "Massa salarial real habitual recebida pelos ocupados em milhões de Reais."
+        tests:
+          - not_null
+      - name: taxa_composta_subutilizacao_pct
+        description: "Taxa composta de subutilização da força de trabalho (%)."
+        tests:
+          - not_null
+      - name: subocupados_por_insuficiencia_horas_mil
+        description: "Subocupados por insuficiência de horas em milhares."
+        tests:
+          - not_null
+      - name: populacao_desalentada_mil
+        description: "População desalentada em milhares."
+        tests:
+          - not_null
+      - name: taxa_desalento_pct
+        description: "Taxa de desalento em relação à força ampliada (%)."
+        tests:
+          - not_null
+      - name: reference_date
+        description: "Data de referência da apuração."
+        tests:
+          - not_null
+      - name: extracted_at
+        description: "Timestamp ISO-8601 UTC da carga."
+        tests:
+          - not_null
+
+  - name: fct_pnad_posicao_informalidade_uf
+    description: "Tabela de fatos de categorias de ocupação, informalidade e recortes demográficos do trabalho por UF."
+    columns:
+      - name: id_uf
+        description: "Código IBGE de 2 dígitos identificador da Unidade Federativa."
+        tests:
+          - not_null
+      - name: sigla_uf
+        description: "Sigla de 2 letras da Unidade Federativa correspondente."
+        tests:
+          - not_null
+      - name: nome_uf
+        description: "Nome oficial da Unidade Federativa."
+        tests:
+          - not_null
+      - name: ano_trimestre
+        description: "Ano e trimestre de apuração no formato AAAA-TT."
+        tests:
+          - not_null
+      - name: empregado_com_carteira_clt_mil
+        description: "Empregados no setor privado com carteira assinada em milhares."
+        tests:
+          - not_null
+      - name: empregado_sem_carteira_mil
+        description: "Empregados sem carteira assinada em milhares."
+        tests:
+          - not_null
+      - name: trabalhador_domestico_mil
+        description: "Trabalhadores domésticos em milhares."
+        tests:
+          - not_null
+      - name: empregado_setor_publico_mil
+        description: "Empregados no setor público em milhares."
+        tests:
+          - not_null
+      - name: empregador_mil
+        description: "Empregadores formais e informais em milhares."
+        tests:
+          - not_null
+      - name: conta_propria_mil
+        description: "Trabalhadores por conta própria em milhares."
+        tests:
+          - not_null
+      - name: taxa_informalidade_pct
+        description: "Taxa de informalidade da população ocupada (%)."
+        tests:
+          - not_null
+      - name: taxa_desocupacao_homens_pct
+        description: "Taxa de desocupação masculina (%)."
+        tests:
+          - not_null
+      - name: taxa_desocupacao_mulheres_pct
+        description: "Taxa de desocupação feminina (%)."
+        tests:
+          - not_null
+      - name: taxa_desocupacao_jovens_18_24_pct
+        description: "Taxa de desocupação de jovens entre 18 e 24 anos (%)."
+        tests:
+          - not_null
+      - name: taxa_desocupacao_ensino_superior_pct
+        description: "Taxa de desocupação com ensino superior completo (%)."
+        tests:
+          - not_null
+      - name: razao_rendimento_mulher_homem
+        description: "Razão de rendimento entre mulheres e homens."
+        tests:
+          - not_null
+      - name: reference_date
+        description: "Data de referência da apuração."
+        tests:
+          - not_null
+      - name: extracted_at
+        description: "Timestamp ISO-8601 UTC da carga."
+        tests:
+          - not_null

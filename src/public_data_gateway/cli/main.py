@@ -451,6 +451,40 @@ def build_parser() -> argparse.ArgumentParser:
     caged_s_p.add_argument("id_municipio", type=str, help="IBGE 7-digit municipality code")
     caged_s_p.add_argument("--json", action="store_true", help="Output in JSON format")
 
+    # Subcommand: pnad (IBGE PNAD Contínua)
+    pnad_p = subparsers.add_parser(
+        "pnad", help="Query official IBGE PNAD Contínua labor force, unemployment, earnings, and informality."
+    )
+    pnad_sub = pnad_p.add_subparsers(dest="pnad_action", required=True)
+
+    pnad_ind_p = pnad_sub.add_parser("indicators", help="Query quarterly labor force and unemployment indicators.")
+    pnad_ind_p.add_argument("uf", type=str, help="IBGE 2-digit UF code or 2-letter state abbreviation (e.g. SP, 35)")
+    pnad_ind_p.add_argument("--trimestre", type=str, default=None, help="Optional quarter AAAA-TT (e.g. 2026-T2)")
+    pnad_ind_p.add_argument("--json", action="store_true", help="Output in JSON format")
+
+    pnad_prof_p = pnad_sub.add_parser("profile", help="Query Gold labor resilience profile, earnings, and informality.")
+    pnad_prof_p.add_argument("uf", type=str, help="IBGE 2-digit UF code or 2-letter state abbreviation (e.g. SP, 35)")
+    pnad_prof_p.add_argument("--json", action="store_true", help="Output in JSON format")
+
+    pnad_earn_p = pnad_sub.add_parser("earnings", help="Query real habitual and effective monthly earnings by UF.")
+    pnad_earn_p.add_argument("uf", type=str, help="IBGE 2-digit UF code or 2-letter state abbreviation (e.g. SP, 35)")
+    pnad_earn_p.add_argument("--json", action="store_true", help="Output in JSON format")
+
+    pnad_rank_p = pnad_sub.add_parser("ranking", help="List state ranking by unemployment or average earnings.")
+    pnad_rank_p.add_argument(
+        "--criterio",
+        choices=["desocupacao", "renda"],
+        default="desocupacao",
+        help="Ranking criteria: desocupacao (lowest) or renda (highest)",
+    )
+    pnad_rank_p.add_argument("--limit", type=int, default=10, help="Max UFs to list")
+    pnad_rank_p.add_argument("--json", action="store_true", help="Output in JSON format")
+
+    # Direct shortcut: pnad-uf
+    pnad_s_p = subparsers.add_parser("pnad-uf", help="Shortcut to query PNAD Contínua labor market profile.")
+    pnad_s_p.add_argument("uf", type=str, help="IBGE 2-digit UF code or 2-letter state abbreviation (e.g. SP, 35)")
+    pnad_s_p.add_argument("--json", action="store_true", help="Output in JSON format")
+
     return parser
 
 
@@ -1579,6 +1613,105 @@ def main(argv: Sequence[str] | None = None) -> int:
                     print(f"Top {len(ranks)} Municipalities by Net Job Creation (Novo CAGED):")
                     for idx, r in enumerate(ranks, 1):
                         print(f"  {idx}. {r.get('nome_municipio')} ({r.get('sigla_uf')}): Saldo {r.get('saldo_movimentacao'):,} | Admissões: {r.get('total_admissoes'):,} | Salário Médio: R$ {r.get('salario_medio_admissao_reais'):,.2f}")
+                return 0
+
+        elif args.command in ("pnad", "pnad-uf"):
+            from public_data_gateway.connectors.trabalho.ibge_pnad_continua.connector import (
+                IBGEPnadContinuaConnector,
+            )
+
+            pnad_conn = IBGEPnadContinuaConnector(settings=settings)
+
+            if args.command == "pnad-uf":
+                prof = pnad_conn.get_state_labor_profile(args.uf)
+                if not prof:
+                    print(f"No PNAD labor profile found for state '{args.uf}'.", file=sys.stderr)
+                    return 1
+                if args.json:
+                    print(json.dumps(prof, indent=2, ensure_ascii=False))
+                else:
+                    print(f"IBGE PNAD Contínua State Profile: {prof.get('nome_uf')} ({prof.get('sigla_uf')} - {prof.get('ano_trimestre_recente')}):")
+                    print(f"  Taxa de Desocupação:     {prof.get('taxa_desocupacao_pct')}%")
+                    print(f"  Rendimento Médio Real:   R$ {prof.get('rendimento_medio_real_habitual_reais'):,.2f}")
+                    print(f"  Massa Salarial Habitual: R$ {prof.get('massa_rendimento_real_habitual_milhoes_reais'):,.2f} milhões")
+                    print(f"  Taxa de Informalidade:   {prof.get('taxa_informalidade_pct')}%")
+                    print(f"  Taxa de Subutilização:   {prof.get('taxa_composta_subutilizacao_pct')}%")
+                    print(f"  Taxa de Desalento:       {prof.get('taxa_desalento_pct')}%")
+                    print(f"  Razão Renda Mulher/Homem:{prof.get('razao_rendimento_mulher_homem')}")
+                    print(f"  Score Resiliência:       {prof.get('score_resiliencia_mercado_trabalho')}/100 ({prof.get('classificacao_mercado_trabalho_uf')})")
+                return 0
+
+            pnad_action = getattr(args, "pnad_action", None)
+
+            if pnad_action == "indicators":
+                data = pnad_conn.get_labor_force_indicators(args.uf, ano_trimestre=args.trimestre)
+                if not data:
+                    print(f"No labor force indicators found for state '{args.uf}'.", file=sys.stderr)
+                    return 1
+                if args.json:
+                    print(json.dumps(data, indent=2, ensure_ascii=False))
+                else:
+                    print(f"IBGE PNAD Labor Force: {data.get('nome_uf')} ({data.get('sigla_uf')} - {data.get('ano_trimestre')}):")
+                    print(f"  População Idade Trabalhar:{data.get('populacao_idade_trabalhar_mil'):,} mil pessoas")
+                    print(f"  Força de Trabalho Total:  {data.get('forca_trabalho_total_mil'):,} mil pessoas")
+                    print(f"  População Ocupada:        {data.get('populacao_ocupada_mil'):,} mil pessoas")
+                    print(f"  População Desocupada:     {data.get('populacao_desocupada_mil'):,} mil pessoas")
+                    print(f"  Taxa de Desocupação:      {data.get('taxa_desocupacao_pct')}%")
+                    print(f"  Taxa de Participação:     {data.get('taxa_participacao_forca_pct')}%")
+                    print(f"  Taxa de Nível Ocupação:   {data.get('taxa_nivel_ocupacao_pct')}%")
+                return 0
+
+            if pnad_action == "profile":
+                prof = pnad_conn.get_state_labor_profile(args.uf)
+                if not prof:
+                    print(f"No PNAD labor profile found for state '{args.uf}'.", file=sys.stderr)
+                    return 1
+                if args.json:
+                    print(json.dumps(prof, indent=2, ensure_ascii=False))
+                else:
+                    print(f"IBGE PNAD Contínua State Profile: {prof.get('nome_uf')} ({prof.get('sigla_uf')} - {prof.get('ano_trimestre_recente')}):")
+                    print(f"  Taxa de Desocupação:     {prof.get('taxa_desocupacao_pct')}%")
+                    print(f"  Rendimento Médio Real:   R$ {prof.get('rendimento_medio_real_habitual_reais'):,.2f}")
+                    print(f"  Massa Salarial Habitual: R$ {prof.get('massa_rendimento_real_habitual_milhoes_reais'):,.2f} milhões")
+                    print(f"  Taxa de Informalidade:   {prof.get('taxa_informalidade_pct')}%")
+                    print(f"  Taxa de Subutilização:   {prof.get('taxa_composta_subutilizacao_pct')}%")
+                    print(f"  Taxa de Desalento:       {prof.get('taxa_desalento_pct')}%")
+                    print(f"  Razão Renda Mulher/Homem:{prof.get('razao_rendimento_mulher_homem')}")
+                    print(f"  Score Resiliência:       {prof.get('score_resiliencia_mercado_trabalho')}/100 ({prof.get('classificacao_mercado_trabalho_uf')})")
+                return 0
+
+            if pnad_action == "earnings":
+                earn = pnad_conn.get_earnings_summary(args.uf)
+                if not earn:
+                    print(f"No earnings data found for state '{args.uf}'.", file=sys.stderr)
+                    return 1
+                if args.json:
+                    print(json.dumps(earn, indent=2, ensure_ascii=False))
+                else:
+                    print(f"IBGE PNAD Real Earnings: {earn.get('nome_uf')} ({earn.get('sigla_uf')} - {earn.get('ano_trimestre')}):")
+                    print(f"  Rendimento Médio Habitual: R$ {earn.get('rendimento_medio_real_habitual_reais'):,.2f}")
+                    print(f"  Rendimento Médio Efetivo:  R$ {earn.get('rendimento_medio_real_efetivo_reais'):,.2f}")
+                    print(f"  Massa de Rendimento:       R$ {earn.get('massa_rendimento_real_habitual_milhoes_reais'):,.2f} milhões")
+                    print(f"  Variação Ano Anterior:     {earn.get('variacao_rendimento_ano_anterior_pct')}%")
+                return 0
+
+            if pnad_action == "ranking":
+                if args.criterio == "renda":
+                    ranks = pnad_conn.list_highest_earnings_states(limit=args.limit)
+                    if args.json:
+                        print(json.dumps(ranks, indent=2, ensure_ascii=False))
+                    else:
+                        print(f"Top {len(ranks)} States by Real Monthly Earnings (PNAD Contínua):")
+                        for idx, r in enumerate(ranks, 1):
+                            print(f"  {idx}. {r.get('nome_uf')} ({r.get('sigla_uf')}): R$ {r.get('rendimento_medio_real_habitual_reais'):,.2f} | Massa: R$ {r.get('massa_rendimento_real_habitual_milhoes_reais'):,.2f}M")
+                else:
+                    ranks = pnad_conn.list_lowest_unemployment_states(limit=args.limit)
+                    if args.json:
+                        print(json.dumps(ranks, indent=2, ensure_ascii=False))
+                    else:
+                        print(f"Top {len(ranks)} States by Lowest Unemployment Rate (PNAD Contínua):")
+                        for idx, r in enumerate(ranks, 1):
+                            print(f"  {idx}. {r.get('nome_uf')} ({r.get('sigla_uf')}): {r.get('taxa_desocupacao_pct')}% desocupação | Nível Ocupação: {r.get('taxa_nivel_ocupacao_pct')}%")
                 return 0
 
     except Exception as exc:

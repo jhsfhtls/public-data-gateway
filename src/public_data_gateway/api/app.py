@@ -873,4 +873,76 @@ def create_app(settings: GatewaySettings | None = None) -> FastAPI:
         conn = MTENovoCagedConnector(settings=app_settings)
         return conn.list_top_job_creating_municipalities(limit=limit)
 
+    # 19. State Labor Market & Household Survey Routes (IBGE PNAD Contínua)
+    @app.get("/api/v1/labor/state/{uf}/indicators")
+    async def get_pnad_labor_force_indicators(
+        uf: str,
+        trimestre: str | None = Query(None, description="Optional quarter in AAAA-TT format"),
+    ) -> dict[str, Any]:
+        from public_data_gateway.connectors.trabalho.ibge_pnad_continua.connector import (
+            IBGEPnadContinuaConnector,
+        )
+
+        conn = IBGEPnadContinuaConnector(settings=app_settings)
+        res = conn.get_labor_force_indicators(uf, ano_trimestre=trimestre)
+        if not res:
+            raise HTTPException(
+                status_code=404,
+                detail=f"Labor force indicators not found for state '{uf}'",
+            )
+        return res
+
+    @app.get("/api/v1/labor/state/{uf}/profile")
+    @app.get("/api/v1/pnad/{uf}")
+    async def get_pnad_state_labor_profile(uf: str) -> dict[str, Any]:
+        from public_data_gateway.connectors.trabalho.ibge_pnad_continua.connector import (
+            IBGEPnadContinuaConnector,
+        )
+
+        conn = IBGEPnadContinuaConnector(settings=app_settings)
+        res = conn.get_state_labor_profile(uf)
+        if not res:
+            raise HTTPException(
+                status_code=404,
+                detail=f"State labor profile not found for state '{uf}'",
+            )
+        return res
+
+    @app.get("/api/v1/labor/state/{uf}/earnings")
+    async def get_pnad_state_earnings(uf: str) -> dict[str, Any]:
+        from public_data_gateway.connectors.trabalho.ibge_pnad_continua.connector import (
+            IBGEPnadContinuaConnector,
+        )
+
+        conn = IBGEPnadContinuaConnector(settings=app_settings)
+        res = conn.get_earnings_summary(uf)
+        if not res:
+            raise HTTPException(
+                status_code=404,
+                detail=f"State earnings summary not found for state '{uf}'",
+            )
+        return res
+
+    @app.get("/api/v1/labor/ranking/unemployment")
+    async def get_pnad_lowest_unemployment_ranking(
+        limit: int = Query(10, ge=1, le=27, description="Top N states with lowest unemployment rate"),
+    ) -> list[dict[str, Any]]:
+        from public_data_gateway.connectors.trabalho.ibge_pnad_continua.connector import (
+            IBGEPnadContinuaConnector,
+        )
+
+        conn = IBGEPnadContinuaConnector(settings=app_settings)
+        return conn.list_lowest_unemployment_states(limit=limit)
+
+    @app.get("/api/v1/labor/ranking/earnings")
+    async def get_pnad_highest_earnings_ranking(
+        limit: int = Query(10, ge=1, le=27, description="Top N states with highest average real earnings"),
+    ) -> list[dict[str, Any]]:
+        from public_data_gateway.connectors.trabalho.ibge_pnad_continua.connector import (
+            IBGEPnadContinuaConnector,
+        )
+
+        conn = IBGEPnadContinuaConnector(settings=app_settings)
+        return conn.list_highest_earnings_states(limit=limit)
+
     return app
