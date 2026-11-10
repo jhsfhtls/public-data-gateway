@@ -1,0 +1,18 @@
+version: 2
+
+sources:
+  - name: mte_rais_silver
+    description: "Agregados anuais municipais da RAIS, publicados pelo Ministério do Trabalho e Emprego e normalizados na camada Silver."
+    meta:
+      external_location: "data/mte_rais/silver/{name}.parquet"
+    tables:
+      - name: rais_vinculos_ativos
+        description: "Estoque anual de vínculos formais ativos por município e setor CNAE."
+      - name: rais_remuneracao_media
+        description: "Remuneração média anual em reais e salários mínimos por escolaridade e gênero."
+      - name: rais_estabelecimentos_porte
+        description: "Estabelecimentos por faixa de quantidade de empregados."
+      - name: rais_massa_salarial_municipio
+        description: "Massa salarial anual agregada por município."
+      - name: rais_rotatividade_demografia
+        description: "Perfil etário, escolaridade e tempo de emprego dos vínculos formais."

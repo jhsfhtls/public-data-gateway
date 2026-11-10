@@ -382,6 +382,58 @@ models:
         tests:
           - not_null
 
+  - name: mart_panorama_emprego_estrutural_rais_brasil
+    description: "Panorama anual do emprego formal RAIS por município com setor dominante, geografia, remuneração e score Gold."
+    columns:
+      - name: ano
+        description: "Ano civil de referência da RAIS."
+        tests:
+          - not_null
+      - name: id_municipio
+        description: "Código IBGE de sete dígitos do município."
+        tests:
+          - not_null
+      - name: nome_municipio
+        description: "Nome oficial do município."
+      - name: sigla_uf
+        description: "Sigla da Unidade Federativa."
+      - name: regiao
+        description: "Grande região brasileira da dimensão geográfica."
+      - name: is_capital
+        description: "Indica município capital na dimensão geográfica."
+      - name: total_vinculos_ativos
+        description: "Estoque de vínculos formais ativos no município."
+        tests:
+          - not_null
+      - name: total_estabelecimentos
+        description: "Quantidade total de estabelecimentos nas faixas de porte."
+      - name: remuneracao_media_reais
+        description: "Remuneração média mensal ponderada em reais."
+      - name: remuneracao_media_sm
+        description: "Remuneração média mensal ponderada em salários mínimos."
+      - name: massa_salarial_anual_reais
+        description: "Soma anual das remunerações mensais nominais declaradas, em reais."
+      - name: setor_dominante_cnae
+        description: "Grande setor com maior número de vínculos, desempate por nome."
+      - name: participacao_setor_dominante_pct
+        description: "Participação percentual do maior setor no estoque municipal."
+      - name: tempo_medio_emprego_meses
+        description: "Média de tempo do vínculo, ponderada pelo estoque em cada grupo."
+      - name: taxa_vinculos_ate_12_meses_pct
+        description: "Parcela ponderada de vínculos de até doze meses; proxy de permanência curta."
+      - name: score_formalizacao_trabalho_municipio
+        description: "Índice estrutural relativo Gold de zero a cem para comparação analítica; não representa taxa de formalização."
+      - name: classificacao_formalizacao_trabalho_municipio
+        description: "Classe analítica derivada do score Gold."
+      - name: source_url
+        description: "Endereço oficial do arquivo RAIS utilizado."
+        tests:
+          - not_null
+      - name: reference_date
+        description: "Data de referência da fonte."
+      - name: extracted_at
+        description: "Timestamp UTC da extração."
+
   - name: mart_dinamica_emprego_formal_brasil
     description: "Data Mart analítico de dinâmica do emprego formal, rotatividade, salários e aquecimento do mercado de trabalho segundo o Novo CAGED."
     columns:

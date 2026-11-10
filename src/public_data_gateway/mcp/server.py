@@ -495,6 +495,51 @@ class MCPDispatcher:
                                 },
                             },
                             {
+                                "name": "bdg_get_rais_employment_summary",
+                                "description": "Query MTE RAIS annual formal employment stock by municipality (Tier 1).",
+                                "inputSchema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "id_municipio": {
+                                            "type": "string",
+                                            "description": "IBGE 7-digit municipality code",
+                                        },
+                                        "ano": {
+                                            "type": "integer",
+                                            "description": "Optional RAIS reference year",
+                                        },
+                                    },
+                                    "required": ["id_municipio"],
+                                },
+                            },
+                            {
+                                "name": "bdg_get_rais_market_profile",
+                                "description": "Query RAIS Gold municipal formalization score and structural labor features (Tier 1).",
+                                "inputSchema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "id_municipio": {
+                                            "type": "string",
+                                            "description": "IBGE 7-digit municipality code",
+                                        }
+                                    },
+                                    "required": ["id_municipio"],
+                                },
+                            },
+                            {
+                                "name": "bdg_list_top_formalized_municipalities",
+                                "description": "Rank municipalities by RAIS formalization score (Tier 1).",
+                                "inputSchema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "limit": {
+                                            "type": "integer",
+                                            "description": "Maximum rows (default: 10)",
+                                        }
+                                    },
+                                },
+                            },
+                            {
                                 "name": "bdg_get_labor_force_indicators",
                                 "description": "Query official quarterly labor force, population, and unemployment rate by Brazilian UF from IBGE PNAD Contínua (Tier 1).",
                                 "inputSchema": {
@@ -1320,6 +1365,46 @@ class MCPDispatcher:
             lim = int(args.get("limit", 10))
             ranking_res = caged_conn.list_top_job_creating_municipalities(limit=lim)
             wrapped = wrap_untrusted_gov_data(ranking_res, source_id="mte_novo_caged")
+            return {
+                "jsonrpc": "2.0",
+                "id": req_id,
+                "result": {"content": [{"type": "text", "text": wrapped}], "isError": False},
+            }
+
+        if tool_name in {
+            "bdg_get_rais_employment_summary",
+            "bdg_get_rais_market_profile",
+            "bdg_list_top_formalized_municipalities",
+        }:
+            from public_data_gateway.connectors.trabalho.mte_rais.connector import MTERaisConnector
+
+            connector = MTERaisConnector(settings=self.settings)
+            if tool_name == "bdg_get_rais_employment_summary":
+                raw_year = args.get("ano")
+                result = connector.get_formal_employment_summary(
+                    str(args.get("id_municipio", "")).strip(),
+                    ano=int(raw_year) if raw_year is not None else None,
+                )
+            elif tool_name == "bdg_get_rais_market_profile":
+                result = connector.get_rais_market_profile(
+                    str(args.get("id_municipio", "")).strip()
+                )
+            else:
+                result = connector.list_top_formalized_municipalities(
+                    limit=int(args.get("limit", 10))
+                )
+            if not result:
+                return {
+                    "jsonrpc": "2.0",
+                    "id": req_id,
+                    "result": {
+                        "content": [
+                            {"type": "text", "text": "No RAIS data found for the requested query."}
+                        ],
+                        "isError": True,
+                    },
+                }
+            wrapped = wrap_untrusted_gov_data(result, source_id="mte_rais")
             return {
                 "jsonrpc": "2.0",
                 "id": req_id,

@@ -1,0 +1,103 @@
+schema_version: "3.1.0"
+contract_id: "ODCS-BR-MTE-RAIS-001"
+source_id: "mte_rais"
+name: "MTE: Relação Anual de Informações Sociais (RAIS)"
+agency: "Ministério do Trabalho e Emprego (MTE)"
+official_url: "ftp://ftp.mtps.gov.br/pdet/microdados/RAIS/"
+legal_framework:
+  - "Lei nº 5.534/1968: prestação de informações estatísticas"
+  - "Lei nº 5.878/1973: sistema estatístico nacional"
+  - "Decreto nº 76.900/1975: instituição da RAIS"
+  - "Portaria MTE nº 671/2021: regulamentação trabalhista"
+data_governance:
+  lgpd_tier: "ANONYMIZED_MICRODATA"
+  freshness_sla_hours: 17520
+  update_frequency: "Anual"
+  source_grain: "Um vínculo ou estabelecimento declarado no arquivo público de microdados RAIS"
+  output_grain: "Município, ano e dimensões analíticas especificadas por tabela"
+  personal_data_policy: "Apenas agregados municipais são publicados; microdados de linha não são copiados para Silver ou Gold."
+  coverage_policy: "Gold Brasil exige todos os sete arquivos regionais de vínculos e o arquivo de estabelecimentos do mesmo ano."
+  score_methodology: "Índice relativo 0 a 100: 100 * log(1 + estoque municipal) / log(1 + maior estoque municipal do lote); não representa taxa de formalização."
+  annual_payroll_methodology: "Soma das remunerações nominais informadas de janeiro a novembro e dezembro para vínculos ativos em 31/12; sem inferência de pagamentos ausentes."
+  wage_average_methodology: "Médias em R$ e SM usam apenas vínculos com valor informado e não negativo no respectivo campo; vínculo sem valor continua na contagem de estoque. Média 0 indica ausência de valores válidos no grupo."
+  establishments_methodology: "Contagem de todos os estabelecimentos declarados no arquivo público, inclusive faixa de zero vínculos ativos; não é contagem de empresas únicas por CNPJ."
+  municipality_methodology: "Usa Município Trab - Código quando válido; como 999999 é frequente na RAIS, usa Município - Código (município do estabelecimento) como fallback, registrando descartes quando ambos são inválidos."
+  turnover_caveat: "Proporção de vínculos ativos com até 12 meses de emprego é proxy de renovação do estoque; não é taxa de desligamento."
+schema:
+  tables:
+    rais_vinculos_ativos:
+      description: "Estoque de vínculos ativos em 31/12 por município e divisão CNAE 2.0 (dois dígitos)."
+      grain: "ano, id_municipio, grande_setor_cnae"
+      primary_keys: [ano, id_municipio, grande_setor_cnae]
+      columns:
+        - {name: ano, type: integer, nullable: false, description: "Ano da declaração RAIS."}
+        - {name: id_municipio, type: string, nullable: false, description: "Código IBGE de sete dígitos do município do trabalho, ou do estabelecimento quando o primeiro não é informado."}
+        - {name: nome_municipio, type: string, nullable: false, description: "Nome do município no cadastro territorial de referência."}
+        - {name: sigla_uf, type: string, nullable: false, description: "Sigla da UF do município."}
+        - {name: grande_setor_cnae, type: string, nullable: false, description: "Divisão CNAE 2.0 de dois dígitos, ou 00 quando não informada."}
+        - {name: total_vinculos_ativos, type: integer, nullable: false, description: "Contagem dos vínculos declarados ativos em 31/12."}
+        - {name: source_url, type: string, nullable: false, description: "Diretório FTP dos arquivos anuais da RAIS."}
+        - {name: reference_date, type: string, nullable: false, description: "Data de referência, 31 de dezembro do ano."}
+        - {name: extracted_at, type: string, nullable: false, description: "Timestamp UTC da transformação."}
+    rais_remuneracao_media:
+      description: "Remuneração média nominal de vínculos ativos por escolaridade e sexo declarado."
+      grain: "ano, id_municipio, nivel_escolaridade, sexo_trabalhador"
+      primary_keys: [ano, id_municipio, nivel_escolaridade, sexo_trabalhador]
+      columns:
+        - {name: ano, type: integer, nullable: false, description: "Ano da declaração RAIS."}
+        - {name: id_municipio, type: string, nullable: false, description: "Código IBGE de sete dígitos."}
+        - {name: nome_municipio, type: string, nullable: false, description: "Nome do município."}
+        - {name: sigla_uf, type: string, nullable: false, description: "Sigla da UF."}
+        - {name: nivel_escolaridade, type: string, nullable: false, description: "Código RAIS de escolaridade após 2005."}
+        - {name: sexo_trabalhador, type: string, nullable: false, description: "Código RAIS de sexo declarado."}
+        - {name: total_vinculos, type: integer, nullable: false, description: "Contagem de vínculos ativos no grupo."}
+        - {name: remuneracao_media_reais, type: float, nullable: false, description: "Média do campo Vl Rem Média Nom, em reais nominais."}
+        - {name: remuneracao_media_sm, type: float, nullable: false, description: "Média do campo Vl Rem Média (SM), em salários mínimos."}
+        - {name: source_url, type: string, nullable: false, description: "Diretório FTP dos arquivos anuais da RAIS."}
+        - {name: reference_date, type: string, nullable: false, description: "Data de referência anual."}
+        - {name: extracted_at, type: string, nullable: false, description: "Timestamp UTC da transformação."}
+    rais_estabelecimentos_porte:
+      description: "Estabelecimentos declarados por município e faixa de tamanho RAIS, inclusive zero vínculos ativos."
+      grain: "ano, id_municipio, faixa_porte"
+      primary_keys: [ano, id_municipio, faixa_porte]
+      columns:
+        - {name: ano, type: integer, nullable: false, description: "Ano da declaração RAIS."}
+        - {name: id_municipio, type: string, nullable: false, description: "Código IBGE de sete dígitos."}
+        - {name: nome_municipio, type: string, nullable: false, description: "Nome do município."}
+        - {name: sigla_uf, type: string, nullable: false, description: "Sigla da UF."}
+        - {name: faixa_porte, type: string, nullable: false, description: "Código RAIS de tamanho do estabelecimento."}
+        - {name: total_estabelecimentos, type: integer, nullable: false, description: "Contagem de registros de estabelecimento no grupo."}
+        - {name: source_url, type: string, nullable: false, description: "Diretório FTP dos arquivos anuais da RAIS."}
+        - {name: reference_date, type: string, nullable: false, description: "Data de referência anual."}
+        - {name: extracted_at, type: string, nullable: false, description: "Timestamp UTC da transformação."}
+    rais_massa_salarial_municipio:
+      description: "Soma anual das remunerações mensais informadas para vínculos ativos em 31/12."
+      grain: "ano, id_municipio"
+      primary_keys: [ano, id_municipio]
+      columns:
+        - {name: ano, type: integer, nullable: false, description: "Ano da declaração RAIS."}
+        - {name: id_municipio, type: string, nullable: false, description: "Código IBGE de sete dígitos."}
+        - {name: nome_municipio, type: string, nullable: false, description: "Nome do município."}
+        - {name: sigla_uf, type: string, nullable: false, description: "Sigla da UF."}
+        - {name: total_vinculos_ativos, type: integer, nullable: false, description: "Vínculos ativos incluídos na agregação."}
+        - {name: massa_salarial_anual_reais, type: float, nullable: false, description: "Soma nominal das doze remunerações mensais informadas, em reais."}
+        - {name: source_url, type: string, nullable: false, description: "Diretório FTP dos arquivos anuais da RAIS."}
+        - {name: reference_date, type: string, nullable: false, description: "Data de referência anual."}
+        - {name: extracted_at, type: string, nullable: false, description: "Timestamp UTC da transformação."}
+    rais_rotatividade_demografia:
+      description: "Idade, escolaridade e tempo de emprego dos vínculos ativos; proporção recente é proxy de renovação."
+      grain: "ano, id_municipio, faixa_etaria, nivel_escolaridade"
+      primary_keys: [ano, id_municipio, faixa_etaria, nivel_escolaridade]
+      columns:
+        - {name: ano, type: integer, nullable: false, description: "Ano da declaração RAIS."}
+        - {name: id_municipio, type: string, nullable: false, description: "Código IBGE de sete dígitos."}
+        - {name: nome_municipio, type: string, nullable: false, description: "Nome do município."}
+        - {name: sigla_uf, type: string, nullable: false, description: "Sigla da UF."}
+        - {name: faixa_etaria, type: string, nullable: false, description: "Faixa etária derivada do campo Idade."}
+        - {name: nivel_escolaridade, type: string, nullable: false, description: "Código RAIS de escolaridade após 2005."}
+        - {name: total_vinculos_ativos, type: integer, nullable: false, description: "Vínculos ativos do grupo."}
+        - {name: tempo_medio_emprego_meses, type: float, nullable: false, description: "Média do campo Tempo Emprego em meses."}
+        - {name: taxa_vinculos_ate_12_meses_pct, type: float, nullable: false, description: "Percentual com até doze meses de tempo de emprego; não mede desligamentos."}
+        - {name: source_url, type: string, nullable: false, description: "Diretório FTP dos arquivos anuais da RAIS."}
+        - {name: reference_date, type: string, nullable: false, description: "Data de referência anual."}
+        - {name: extracted_at, type: string, nullable: false, description: "Timestamp UTC da transformação."}

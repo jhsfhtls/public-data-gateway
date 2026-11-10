@@ -1,0 +1,154 @@
+version: 2
+
+models:
+  - name: stg_rais_vinculos_ativos
+    description: "Estoque anual de vínculos formais ativos por município e grande setor CNAE."
+    columns:
+      - name: ano
+        description: "Ano civil de referência da RAIS."
+        tests:
+          - not_null
+      - name: id_municipio
+        description: "Código IBGE de sete dígitos do município."
+        tests:
+          - not_null
+      - name: nome_municipio
+        description: "Nome oficial do município."
+      - name: sigla_uf
+        description: "Sigla da Unidade Federativa."
+      - name: grande_setor_cnae
+        description: "Grande setor econômico conforme classificação CNAE."
+      - name: total_vinculos_ativos
+        description: "Número de vínculos formais ativos no ano e setor."
+      - name: source_url
+        description: "Endereço oficial do arquivo público utilizado na extração."
+        tests:
+          - not_null
+      - name: reference_date
+        description: "Data de referência do conjunto publicado."
+      - name: extracted_at
+        description: "Timestamp UTC da extração."
+
+  - name: stg_rais_remuneracao_media
+    description: "Remuneração média dos vínculos por município, escolaridade e sexo."
+    columns:
+      - name: ano
+        description: "Ano civil de referência da RAIS."
+        tests:
+          - not_null
+      - name: id_municipio
+        description: "Código IBGE de sete dígitos do município."
+        tests:
+          - not_null
+      - name: nome_municipio
+        description: "Nome oficial do município."
+      - name: sigla_uf
+        description: "Sigla da Unidade Federativa."
+      - name: nivel_escolaridade
+        description: "Nível de escolaridade do trabalhador."
+      - name: sexo_trabalhador
+        description: "Sexo informado no registro laboral."
+      - name: total_vinculos
+        description: "Vínculos usados no cálculo da remuneração média."
+      - name: remuneracao_media_reais
+        description: "Remuneração média nominal mensal em reais."
+      - name: remuneracao_media_sm
+        description: "Remuneração média mensal em salários mínimos."
+      - name: source_url
+        description: "Endereço oficial do arquivo público utilizado na extração."
+        tests:
+          - not_null
+      - name: reference_date
+        description: "Data de referência do conjunto publicado."
+      - name: extracted_at
+        description: "Timestamp UTC da extração."
+
+  - name: stg_rais_estabelecimentos_porte
+    description: "Quantidade de estabelecimentos por município e faixa de porte."
+    columns:
+      - name: ano
+        description: "Ano civil de referência da RAIS."
+        tests:
+          - not_null
+      - name: id_municipio
+        description: "Código IBGE de sete dígitos do município."
+        tests:
+          - not_null
+      - name: nome_municipio
+        description: "Nome oficial do município."
+      - name: sigla_uf
+        description: "Sigla da Unidade Federativa."
+      - name: faixa_porte
+        description: "Faixa do número de trabalhadores do estabelecimento."
+      - name: total_estabelecimentos
+        description: "Número de estabelecimentos na faixa."
+      - name: source_url
+        description: "Endereço oficial do arquivo público utilizado na extração."
+        tests:
+          - not_null
+      - name: reference_date
+        description: "Data de referência do conjunto publicado."
+      - name: extracted_at
+        description: "Timestamp UTC da extração."
+
+  - name: stg_rais_massa_salarial_municipio
+    description: "Vínculos e massa salarial anual apurada a partir das remunerações mensais declaradas."
+    columns:
+      - name: ano
+        description: "Ano civil de referência da RAIS."
+        tests:
+          - not_null
+      - name: id_municipio
+        description: "Código IBGE de sete dígitos do município."
+        tests:
+          - not_null
+      - name: nome_municipio
+        description: "Nome oficial do município."
+      - name: sigla_uf
+        description: "Sigla da Unidade Federativa."
+      - name: total_vinculos_ativos
+        description: "Total de vínculos formais ativos no município."
+      - name: massa_salarial_anual_reais
+        description: "Soma anual das remunerações mensais nominais declaradas, em reais."
+      - name: source_url
+        description: "Endereço oficial do arquivo público utilizado na extração."
+        tests:
+          - not_null
+      - name: reference_date
+        description: "Data de referência do conjunto publicado."
+      - name: extracted_at
+        description: "Timestamp UTC da extração."
+
+  - name: stg_rais_rotatividade_demografia
+    description: "Distribuição demográfica e indicadores de tempo de vínculo."
+    columns:
+      - name: ano
+        description: "Ano civil de referência da RAIS."
+        tests:
+          - not_null
+      - name: id_municipio
+        description: "Código IBGE de sete dígitos do município."
+        tests:
+          - not_null
+      - name: nome_municipio
+        description: "Nome oficial do município."
+      - name: sigla_uf
+        description: "Sigla da Unidade Federativa."
+      - name: faixa_etaria
+        description: "Faixa de idade do trabalhador."
+      - name: nivel_escolaridade
+        description: "Nível de escolaridade do trabalhador."
+      - name: total_vinculos_ativos
+        description: "Total de vínculos ativos na faixa etária e escolaridade."
+      - name: tempo_medio_emprego_meses
+        description: "Tempo médio no vínculo em meses."
+      - name: taxa_vinculos_ate_12_meses_pct
+        description: "Percentual de vínculos com até 12 meses; proxy de curta permanência, não taxa direta de rotatividade."
+      - name: source_url
+        description: "Endereço oficial do arquivo público utilizado na extração."
+        tests:
+          - not_null
+      - name: reference_date
+        description: "Data de referência do conjunto publicado."
+      - name: extracted_at
+        description: "Timestamp UTC da extração."

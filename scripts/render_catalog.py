@@ -25,6 +25,7 @@ VALID_PROTOCOLS = {
     "GRAPHQL",
     "HTTP_BULK_ZIP",
     "FTP_DBC",
+    "FTP_7Z_CSV",
     "OGC_WFS_SHP",
     "BIGQUERY_SQL",
 }

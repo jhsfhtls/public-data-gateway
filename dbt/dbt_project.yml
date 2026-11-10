@@ -28,6 +28,7 @@ model-paths:
   - "../src/public_data_gateway/connectors/demografico/ibge_pib_municipal/dbt"
   - "../src/public_data_gateway/connectors/trabalho/ibge_pnad_continua/dbt"
   - "../src/public_data_gateway/connectors/trabalho/mte_novo_caged/dbt"
+  - "../src/public_data_gateway/connectors/trabalho/mte_rais/dbt"
   - "../src/public_data_gateway/connectors/geografico/ibge_cnefe/dbt"
   - "models"
 

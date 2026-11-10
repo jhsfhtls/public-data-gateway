@@ -588,12 +588,13 @@ class SocioeconomicFacade:
 
 
 class LaborFacade:
-    """Unified developer facade for employment, labor market dynamics, and wages (MTE Novo CAGED & IBGE PNAD Contínua)."""
+    """Unified developer facade for formal employment, labor, and wages."""
 
     def __init__(self, sdk: "BrazilData") -> None:
         self._sdk = sdk
         self._connector: Any = None
         self._pnad_connector: Any = None
+        self._rais_connector: Any = None
 
     @property
     def connector(self) -> Any:
@@ -614,6 +615,32 @@ class LaborFacade:
 
             self._pnad_connector = IBGEPnadContinuaConnector(settings=self._sdk.settings)
         return self._pnad_connector
+
+    @property
+    def rais_connector(self) -> Any:
+        if self._rais_connector is None:
+            from public_data_gateway.connectors.trabalho.mte_rais.connector import (
+                MTERaisConnector,
+            )
+
+            self._rais_connector = MTERaisConnector(settings=self._sdk.settings)
+        return self._rais_connector
+
+    def rais_summary(self, id_municipio: str, ano: int | None = None) -> dict[str, Any] | None:
+        """Return annual RAIS formal employment stock for a municipality."""
+        return self.rais_connector.get_formal_employment_summary(id_municipio, ano=ano)
+
+    def rais_profile(self, id_municipio: str) -> dict[str, Any] | None:
+        """Return municipal RAIS Gold formalization features."""
+        return self.rais_connector.get_rais_market_profile(id_municipio)
+
+    def rais_sectors(self, id_municipio: str, ano: int | None = None) -> list[dict[str, Any]]:
+        """Return RAIS employment stock broken down by CNAE sector."""
+        return self.rais_connector.get_sectoral_employment(id_municipio, ano=ano)
+
+    def rais_top_formalized(self, limit: int = 10) -> list[dict[str, Any]]:
+        """Rank municipalities by RAIS formalization score."""
+        return self.rais_connector.list_top_formalized_municipalities(limit=limit)
 
     def employment_summary(
         self, id_municipio: str, competencia: str | None = None
@@ -905,6 +932,26 @@ class BrazilData:
     def get_top_job_creators(self, limit: int = 10) -> list[dict[str, Any]]:
         """Consultar ranking de municípios com maior saldo líquido de empregos gerados (Novo CAGED)."""
         return self.labor.top_job_creators(limit=limit)
+
+    def get_rais_employment_summary(
+        self, id_municipio: str, ano: int | None = None
+    ) -> dict[str, Any] | None:
+        """Consultar estoque anual de vínculos formais RAIS no município."""
+        return self.labor.rais_summary(id_municipio, ano=ano)
+
+    def get_rais_market_profile(self, id_municipio: str) -> dict[str, Any] | None:
+        """Consultar perfil Gold e score municipal de formalização RAIS."""
+        return self.labor.rais_profile(id_municipio)
+
+    def get_rais_sectoral_employment(
+        self, id_municipio: str, ano: int | None = None
+    ) -> list[dict[str, Any]]:
+        """Consultar vínculos RAIS por setor CNAE."""
+        return self.labor.rais_sectors(id_municipio, ano=ano)
+
+    def get_top_formalized_municipalities(self, limit: int = 10) -> list[dict[str, Any]]:
+        """Consultar ranking de formalização municipal RAIS."""
+        return self.labor.rais_top_formalized(limit=limit)
 
     def get_state_labor_profile(self, id_or_sigla_uf: str) -> dict[str, Any] | None:
         """Consultar perfil estadual do mercado de trabalho, taxa de desocupação e renda (PNAD Contínua)."""

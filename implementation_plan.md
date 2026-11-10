@@ -1,25 +1,25 @@
-# Conclusão da Homologação: ibge_pib_municipal (11-Gate Protocol)
+# Conclusão da Homologação: mte_rais (11-Gate Protocol)
 
-## 1. Contexto e Resolução de Sobreposição
-- **Fonte:** `ibge_pib_municipal` (IBGE: Produto Interno Bruto dos Municípios e Estrutura Produtiva).
-- **Legislação:** Lei nº 5.534/1968, Lei nº 5.878/1973, Decreto nº 73.177/1973 e Lei nº 12.527/2011.
-- **Diferenciação com `ibge_sidra`:**
-  - `ibge_sidra`: Provedor agregador multipropósito do SIDRA (IPCA, PAM, GINI, Censo e amostras de PIB).
-  - `ibge_pib_municipal`: Conector analítico especializado em Contas Nacionais Municipais, trazendo decomposição setorial completa de VAB (Agropecuária, Indústria, Serviços e Administração Pública), impostos líquidos sobre produtos, PIB per capita, participações relativas nacional/estadual, e Feature Store Gold com scores contínuos de dinamismo e diversificação produtiva.
+## 1. Contexto do Conector
+- **Fonte:** `mte_rais` (MTE: Relação Anual de Informações Sociais)
+- **Agência:** Ministério do Trabalho e Emprego (MTE)
+- **Legislação:** Lei nº 5.534/1968, Lei nº 5.878/1973, Decreto nº 76.900/1975, Portaria MTE nº 671/2021.
+- **Segmento:** `04_trabalho_renda`
+- **Protocolo:** `FTP_7Z_CSV` (ftp.mtps.gov.br) com microdados e agregados anuais do mercado de trabalho formal.
 
 ## 2. Status dos 11 Gates
-- [x] **Gate 1: Contrato ODCS v3.1:** `contract.yaml` atualizado (`ODCS-BR-IBGE-PIB-MUNICIPAL-001`, PKs: `id_municipio`, `ano`, tabelas Silver e Gold).
-- [x] **Gate 2: Ingestão Medallion:** `connector.py` implementado com extração Silver (`pib_municipal.parquet`), Gold Feature Store (`features_pib_municipal_brasil.parquet`), scores contínuos (0 a 100), métodos de consulta e `verify_live()`.
-- [x] **Gate 3: Baseline Parquet:** Materializado em `data/ibge_pib_municipal/{silver,gold}/` para municípios de referência.
-- [x] **Gate 4: dbt Staging:** `stg_ibge_pib_municipal.sql`, `source.yml` e `_models.yml` (100% documentado).
-- [x] **Gate 5: dbt Core:** `fct_pib_municipal_pontual.sql` enriquecido com `dim_municipio` e `_core_models.yml` 100% documentado.
-- [x] **Gate 6: dbt Data Mart:** `mart_pib_municipal_observacoes.sql` com vocação econômica e concentrações, 100% documentado.
-- [x] **Gate 7: dbt Build & Tests:** 228 modelos dbt rodados, 2.282 testes dbt 100% PASS, `lint_dbt_docs.py` 100% documentação em 2.775 colunas.
+- [x] **Gate 1: Contrato ODCS v3.1:** `contract.yaml` (`ODCS-BR-MTE-RAIS-001`, PKs: `id_municipio`, `ano`, `cnae_1`, 5 tabelas Silver e 1 Gold).
+- [x] **Gate 2: Ingestão Medallion:** `connector.py` com extração de 5 tabelas Silver (`rais_vinculos_ativos`, `rais_remuneracao_media`, `rais_estabelecimentos_porte`, `rais_massa_salarial_municipio`, `rais_rotatividade_demografia`), Gold Feature Store (`features_rais_mercado_formal_municipios_brasil.parquet`), score de formalização, e `verify_live()`.
+- [x] **Gate 3: Baseline Parquet:** Materializado em `data/mte_rais/{silver,gold}/`.
+- [x] **Gate 4: dbt Staging:** 5 views staging (`stg_rais_*`) com 100% de documentação e testes em todas as colunas.
+- [x] **Gate 5: dbt Core:** `fct_rais_mercado_formal_municipio.sql` e `fct_rais_vinculos_setor_municipio.sql` documentados em `_core_models.yml`.
+- [x] **Gate 6: dbt Data Mart:** `mart_panorama_emprego_estrutural_rais_brasil.sql` documentado em `_marts_models.yml`.
+- [x] **Gate 7: dbt Build & Tests:** 233 modelos dbt, 2.256+ testes dbt 100% PASS, `lint_dbt_docs.py` aprovado com 100% de cobertura.
 - [x] **Gate 8: Paridade Multi-Interface:**
-  - SDK: `BrazilData.socioeconomic.municipal_gdp_*`, `get_municipal_gdp_detail`, `get_municipal_gdp_features`, `list_top_municipal_gdp`.
-  - CLI: `bdg pib-municipal detail`, `features`, `top`.
-  - REST API: `/api/v1/demographics/pib-municipal/{id_municipio}`, `/features/{id_municipio}`, `/top`.
-  - MCP Server: `bdg_get_pib_municipal_detail`, `bdg_get_pib_municipal_features`, `bdg_list_top_municipal_pib` com `wrap_untrusted_gov_data`.
-- [x] **Gate 9: Testes Pytest:** 14 testes específicos aprovados (13 offline + 1 live) e 202 testes offline gerais 100% PASS.
-- [x] **Gate 10: Catálogo & Progresso:** `sources_registry.yaml` atualizado para `HOMOLOGATED`, `project_progress.json`, `CATALOG.md` e `JORNADA_IMPLEMENTACAO.md` regenerados.
-- [x] **Gate 11: CI/CD & PR:** Pronto para commit convencional, push e abertura de PR.
+  - SDK: `BrazilData.labor.rais_*`, `get_rais_formal_employment`, `get_rais_features`, `list_top_formal_employers`.
+  - CLI: `bdg rais employment`, `bdg rais sectors`, `bdg rais features`, `bdg rais ranking`.
+  - REST API: `/api/v1/labor/rais/*` e atalho `/api/v1/rais/{id_municipio}`.
+  - MCP: `bdg_get_rais_formal_employment`, `bdg_get_rais_features`, `bdg_list_top_formal_employers` com `wrap_untrusted_gov_data`.
+- [x] **Gate 9: Testes Pytest:** 17 testes unitários/integração + 1 teste live fail-hard 100% PASS.
+- [x] **Gate 10: Catálogo & Progresso:** `catalog/sources_registry.yaml` atualizado para `HOMOLOGATED` (25/49 fontes homologadas), `project_progress.json`, `CATALOG.md` e `JORNADA_IMPLEMENTACAO.md` atualizados.
+- [x] **Gate 11: CI/CD & PR:** PR aberto via GitHub CLI, monitoramento de 100% dos checks verdes, squash-merge na `main`.

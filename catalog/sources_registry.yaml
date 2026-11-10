@@ -652,7 +652,7 @@ sources:
   segment_id: 04_trabalho_renda
   segment_name: Trabalho, Emprego & Renda
   access_mode: LAKEHOUSE_BATCH
-  protocol: FTP_DBC
+  protocol: FTP_7Z_CSV
   auth_type: NONE
   canonical_keys:
   - cbo_6
@@ -670,7 +670,7 @@ sources:
   - P02
   rice_score: 550
   roadmap_wave: 4
-  status: CATALOGED
+  status: HOMOLOGATED
 - source_id: ibge_malhas
   name: 'IBGE: Malhas Territoriais Vetoriais (Municípios e UFs)'
   agency: Instituto Brasileiro de Geografia e Estatística (IBGE)
