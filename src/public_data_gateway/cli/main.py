@@ -451,6 +451,27 @@ def build_parser() -> argparse.ArgumentParser:
     caged_s_p.add_argument("id_municipio", type=str, help="IBGE 7-digit municipality code")
     caged_s_p.add_argument("--json", action="store_true", help="Output in JSON format")
 
+    # Subcommand: rais (MTE annual formal employment)
+    rais_p = subparsers.add_parser(
+        "rais", help="Query annual MTE RAIS formal employment and wages."
+    )
+    rais_sub = rais_p.add_subparsers(dest="rais_action", required=True)
+    for action, help_text in (
+        ("summary", "Municipal annual formal employment stock."),
+        ("profile", "Municipal RAIS Gold formalization profile."),
+        ("sectors", "Formal employment by CNAE sector."),
+    ):
+        action_p = rais_sub.add_parser(action, help=help_text)
+        action_p.add_argument("id_municipio", type=str, help="IBGE 7-digit municipality code")
+        if action in {"summary", "sectors"}:
+            action_p.add_argument(
+                "--ano", type=int, default=None, help="Optional RAIS reference year"
+            )
+        action_p.add_argument("--json", action="store_true", help="Output in JSON format")
+    rais_rank_p = rais_sub.add_parser("ranking", help="Rank municipalities by formalization score.")
+    rais_rank_p.add_argument("--limit", type=int, default=10, help="Max municipalities to list")
+    rais_rank_p.add_argument("--json", action="store_true", help="Output in JSON format")
+
     # Subcommand: pnad (IBGE PNAD Contínua)
     pnad_p = subparsers.add_parser(
         "pnad", help="Query official IBGE PNAD Contínua labor force, unemployment, earnings, and informality."
@@ -1637,6 +1658,34 @@ def main(argv: Sequence[str] | None = None) -> int:
                     for idx, r in enumerate(ranks, 1):
                         print(f"  {idx}. {r.get('nome_municipio')} ({r.get('sigla_uf')}): Saldo {r.get('saldo_movimentacao'):,} | Admissões: {r.get('total_admissoes'):,} | Salário Médio: R$ {r.get('salario_medio_admissao_reais'):,.2f}")
                 return 0
+
+        elif args.command == "rais":
+            from public_data_gateway.connectors.trabalho.mte_rais.connector import MTERaisConnector
+
+            conn = MTERaisConnector(settings=settings)
+            action = args.rais_action
+            if action == "summary":
+                result = conn.get_formal_employment_summary(args.id_municipio, ano=args.ano)
+            elif action == "profile":
+                result = conn.get_rais_market_profile(args.id_municipio)
+            elif action == "sectors":
+                result = conn.get_sectoral_employment(args.id_municipio, ano=args.ano)
+            else:
+                result = conn.list_top_formalized_municipalities(limit=args.limit)
+            if not result:
+                print("No RAIS data found for the requested query.", file=sys.stderr)
+                return 1
+            if args.json:
+                print(json.dumps(result, indent=2, ensure_ascii=False))
+            elif isinstance(result, list):
+                print(f"RAIS {action.title()}: {len(result)} municipalities/records")
+                for row in result:
+                    print(f"  {row.get('nome_municipio', row.get('id_municipio'))}: {row}")
+            else:
+                print(f"RAIS {action.title()}: {result.get('nome_municipio', args.id_municipio)}")
+                for key, value in result.items():
+                    print(f"  {key}: {value}")
+            return 0
 
         elif args.command in ("pnad", "pnad-uf"):
             from public_data_gateway.connectors.trabalho.ibge_pnad_continua.connector import (

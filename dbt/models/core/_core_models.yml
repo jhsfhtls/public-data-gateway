@@ -3910,3 +3910,71 @@ models:
         description: "Timestamp ISO-8601 UTC de carga."
         tests:
           - not_null
+
+  - name: fct_rais_mercado_formal_municipio
+    description: "Fato anual municipal de estoque formal, remuneração e massa salarial anual apurada da RAIS."
+    columns:
+      - name: ano
+        description: "Ano civil de referência."
+        tests:
+          - not_null
+      - name: id_municipio
+        description: "Código IBGE de sete dígitos."
+        tests:
+          - not_null
+      - name: nome_municipio
+        description: "Nome oficial do município."
+      - name: sigla_uf
+        description: "Sigla da Unidade Federativa."
+      - name: total_vinculos_ativos
+        description: "Estoque de vínculos formais ativos."
+        tests:
+          - not_null
+      - name: vinculos_com_remuneracao
+        description: "Número de vínculos que compõem a média salarial."
+      - name: remuneracao_media_reais
+        description: "Média mensal de remuneração em reais, ponderada pelo número de vínculos."
+      - name: remuneracao_media_sm
+        description: "Média mensal de remuneração em salários mínimos, ponderada pelo número de vínculos."
+      - name: massa_salarial_anual_reais
+        description: "Soma anual das remunerações mensais nominais declaradas, em reais."
+      - name: source_url
+        description: "Endereço oficial do arquivo usado."
+        tests:
+          - not_null
+      - name: reference_date
+        description: "Data de referência da fonte."
+      - name: extracted_at
+        description: "Timestamp UTC da extração."
+
+  - name: fct_rais_vinculos_setor_municipio
+    description: "Fato anual do estoque de vínculos e participação econômica por setor CNAE e município."
+    columns:
+      - name: ano
+        description: "Ano civil de referência."
+        tests:
+          - not_null
+      - name: id_municipio
+        description: "Código IBGE de sete dígitos."
+        tests:
+          - not_null
+      - name: nome_municipio
+        description: "Nome oficial do município."
+      - name: sigla_uf
+        description: "Sigla da Unidade Federativa."
+      - name: grande_setor_cnae
+        description: "Grande setor CNAE."
+      - name: total_vinculos_ativos
+        description: "Estoque de vínculos ativos no setor."
+        tests:
+          - not_null
+      - name: participacao_vinculos_municipio_pct
+        description: "Participação percentual do setor no estoque municipal observado."
+      - name: source_url
+        description: "Endereço oficial do arquivo usado."
+        tests:
+          - not_null
+      - name: reference_date
+        description: "Data de referência da fonte."
+      - name: extracted_at
+        description: "Timestamp UTC da extração."

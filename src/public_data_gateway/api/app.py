@@ -873,6 +873,58 @@ def create_app(settings: GatewaySettings | None = None) -> FastAPI:
         conn = MTENovoCagedConnector(settings=app_settings)
         return conn.list_top_job_creating_municipalities(limit=limit)
 
+    # RAIS annual structural employment and formalization
+    @app.get("/api/v1/labor/rais/municipality/{id_municipio}/summary")
+    async def get_rais_employment_summary(
+        id_municipio: str,
+        ano: int | None = Query(None, ge=1976, le=2100, description="Optional RAIS reference year"),
+    ) -> dict[str, Any]:
+        from public_data_gateway.connectors.trabalho.mte_rais.connector import MTERaisConnector
+
+        result = MTERaisConnector(settings=app_settings).get_formal_employment_summary(
+            id_municipio, ano=ano
+        )
+        if result is None:
+            raise HTTPException(
+                status_code=404, detail=f"RAIS summary not found for municipality '{id_municipio}'"
+            )
+        return result
+
+    @app.get("/api/v1/labor/rais/municipality/{id_municipio}/profile")
+    @app.get("/api/v1/rais/{id_municipio}")
+    async def get_rais_market_profile(id_municipio: str) -> dict[str, Any]:
+        from public_data_gateway.connectors.trabalho.mte_rais.connector import MTERaisConnector
+
+        result = MTERaisConnector(settings=app_settings).get_rais_market_profile(id_municipio)
+        if result is None:
+            raise HTTPException(
+                status_code=404, detail=f"RAIS profile not found for municipality '{id_municipio}'"
+            )
+        return result
+
+    @app.get("/api/v1/labor/rais/municipality/{id_municipio}/sectors")
+    async def get_rais_sectoral_employment(
+        id_municipio: str,
+        ano: int | None = Query(None, ge=1976, le=2100, description="Optional RAIS reference year"),
+    ) -> list[dict[str, Any]]:
+        from public_data_gateway.connectors.trabalho.mte_rais.connector import MTERaisConnector
+
+        return MTERaisConnector(settings=app_settings).get_sectoral_employment(
+            id_municipio, ano=ano
+        )
+
+    @app.get("/api/v1/labor/rais/ranking")
+    async def get_rais_top_formalized(
+        limit: int = Query(
+            10, ge=1, le=50, description="Top municipalities by RAIS formalization score"
+        ),
+    ) -> list[dict[str, Any]]:
+        from public_data_gateway.connectors.trabalho.mte_rais.connector import MTERaisConnector
+
+        return MTERaisConnector(settings=app_settings).list_top_formalized_municipalities(
+            limit=limit
+        )
+
     # 19. State Labor Market & Household Survey Routes (IBGE PNAD Contínua)
     @app.get("/api/v1/labor/state/{uf}/indicators")
     async def get_pnad_labor_force_indicators(
