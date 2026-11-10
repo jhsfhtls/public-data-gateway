@@ -1,0 +1,16 @@
+version: 2
+
+sources:
+  - name: ibge_malhas_silver
+    description: "Malhas territoriais vetoriais oficiais do IBGE para municípios, UFs, macrorregiões e Brasil, normalizadas na camada Silver."
+    meta:
+      external_location: "data/ibge_malhas/silver/{name}.parquet"
+    tables:
+      - name: malhas_municipios
+        description: "Limites territoriais municipais oficiais com geometrias GeoJSON, centroides geodésicos e bounding boxes."
+      - name: malhas_ufs
+        description: "Limites territoriais oficiais das 27 Unidades da Federação em formato vetorial GeoJSON."
+      - name: malhas_regioes
+        description: "Limites territoriais das 5 macrorregiões brasileiras."
+      - name: malhas_brasil
+        description: "Contorno territorial e marítimo oficial da República Federativa do Brasil."

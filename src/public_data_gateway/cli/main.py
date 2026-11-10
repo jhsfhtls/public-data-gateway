@@ -543,6 +543,32 @@ def build_parser() -> argparse.ArgumentParser:
     cnefe_rank_p.add_argument("--limit", type=int, default=10, help="Max municipalities to list")
     cnefe_rank_p.add_argument("--json", action="store_true", help="Output in JSON format")
 
+    # Malhas Territoriais (IBGE Malhas Vetoriais)
+    malhas_p = subparsers.add_parser(
+        "malhas",
+        help="Query official IBGE territorial boundary polygons, centroids and spatial features.",
+    )
+    malhas_sub = malhas_p.add_subparsers(dest="malhas_action", required=True)
+
+    malhas_mun_p = malhas_sub.add_parser("municipio", help="Query official boundary GeoJSON and metrics for a municipality.")
+    malhas_mun_p.add_argument("id_municipio", type=str, help="IBGE 7-digit municipality code")
+    malhas_mun_p.add_argument("--qualidade", type=str, default="minima", choices=["minima", "intermediaria", "maxima"], help="Mesh resolution quality")
+    malhas_mun_p.add_argument("--json", action="store_true", help="Output in JSON format")
+
+    malhas_uf_p = malhas_sub.add_parser("uf", help="Query official boundary GeoJSON and metrics for a Federative Unit.")
+    malhas_uf_p.add_argument("sigla_uf", type=str, help="2-letter state abbreviation (e.g. SP, RJ)")
+    malhas_uf_p.add_argument("--qualidade", type=str, default="minima", choices=["minima", "intermediaria", "maxima"], help="Mesh resolution quality")
+    malhas_uf_p.add_argument("--json", action="store_true", help="Output in JSON format")
+
+    malhas_feat_p = malhas_sub.add_parser("features", help="Query spatial morphology features and compactness score.")
+    malhas_feat_p.add_argument("id_municipio", type=str, help="IBGE 7-digit municipality code")
+    malhas_feat_p.add_argument("--json", action="store_true", help="Output in JSON format")
+
+    malhas_rank_p = malhas_sub.add_parser("ranking", help="List top municipalities ranked by territorial compactness.")
+    malhas_rank_p.add_argument("--limit", type=int, default=10, help="Max municipalities to list")
+    malhas_rank_p.add_argument("--uf", type=str, help="Optional 2-letter state filter")
+    malhas_rank_p.add_argument("--json", action="store_true", help="Output in JSON format")
+
     # Direct shortcut: pnad-uf
     pnad_s_p = subparsers.add_parser("pnad-uf", help="Shortcut to query PNAD Contínua labor market profile.")
     pnad_s_p.add_argument("uf", type=str, help="IBGE 2-digit UF code or 2-letter state abbreviation (e.g. SP, 35)")
@@ -1870,6 +1896,68 @@ def main(argv: Sequence[str] | None = None) -> int:
                     print(f"Top {len(ranks)} Municipalities by Address Density (CNEFE Censo 2022):")
                     for idx, r in enumerate(ranks, 1):
                         print(f"  {idx}. {r.get('nome_municipio')} ({r.get('sigla_uf')}): {r.get('densidade_enderecos_km2'):,.2f} end/km² | Total: {r.get('total_enderecos'):,}")
+                return 0
+
+        elif args.command == "malhas":
+            from public_data_gateway.connectors.geografico.ibge_malhas.connector import (
+                IBGEMalhasConnector,
+            )
+
+            malhas_conn = IBGEMalhasConnector(settings=settings)
+            malhas_action = getattr(args, "malhas_action", None)
+
+            if malhas_action == "municipio":
+                res = malhas_conn.get_municipio_boundary(
+                    args.id_municipio, qualidade=getattr(args, "qualidade", "minima")
+                )
+                if getattr(args, "json", False):
+                    print(json.dumps(res, indent=2, ensure_ascii=False, default=str))
+                else:
+                    print(f"IBGE Malha Territorial Municipal ({args.id_municipio}):")
+                    print(f"  Tipo Geometria:      {res.get('tipo_geometria')}")
+                    print(f"  Centroide (Lon, Lat): {res.get('centroide_lon')}, {res.get('centroide_lat')}")
+                    print(f"  Bounding Box:        {res.get('bbox')}")
+                    print(f"  Área Aprox. km²:     {res.get('area_aproximada_km2')}")
+                    print(f"  Compacidade:         {res.get('score_compacidade')}/100.0")
+                return 0
+
+            if malhas_action == "uf":
+                res = malhas_conn.get_uf_boundary(
+                    args.sigla_uf, qualidade=getattr(args, "qualidade", "minima")
+                )
+                if getattr(args, "json", False):
+                    print(json.dumps(res, indent=2, ensure_ascii=False, default=str))
+                else:
+                    print(f"IBGE Malha Territorial Estadual ({args.sigla_uf}):")
+                    print(f"  Tipo Geometria:      {res.get('tipo_geometria')}")
+                    print(f"  Centroide (Lon, Lat): {res.get('centroide_lon')}, {res.get('centroide_lat')}")
+                    print(f"  Bounding Box:        {res.get('bbox')}")
+                    print(f"  Área Aprox. km²:     {res.get('area_aproximada_km2')}")
+                return 0
+
+            if malhas_action == "features":
+                feat = malhas_conn.get_territorial_features(args.id_municipio)
+                if getattr(args, "json", False):
+                    print(json.dumps(feat, indent=2, ensure_ascii=False, default=str))
+                else:
+                    print(f"IBGE Features Territoriais: {feat.get('nome_municipio', '')} ({feat.get('sigla_uf', '')} - {feat.get('id_municipio')}):")
+                    print(f"  Centroide:           ({feat.get('centroide_longitude')}, {feat.get('centroide_latitude')})")
+                    print(f"  Extensão Lon / Lat:  {feat.get('extensao_longitudinal_graus')}° / {feat.get('extensao_latitudinal_graus')}°")
+                    print(f"  Área Estimada:       {feat.get('area_aproximada_km2'):,.2f} km²")
+                    print(f"  Compacidade Polsby:  {feat.get('score_compacidade_territorial')}/100.0")
+                    print(f"  Isolamento Capital:  {feat.get('score_isolamento_geografico')}/100.0")
+                return 0
+
+            if malhas_action == "ranking":
+                ranks = malhas_conn.list_top_compact_municipalities(
+                    limit=getattr(args, "limit", 10), sigla_uf=getattr(args, "uf", None)
+                )
+                if getattr(args, "json", False):
+                    print(json.dumps(ranks, indent=2, ensure_ascii=False, default=str))
+                else:
+                    print(f"Top {len(ranks)} Municípios por Compacidade Territorial (IBGE Malhas):")
+                    for idx, r in enumerate(ranks, 1):
+                        print(f"  {idx}. {r.get('nome_municipio')} ({r.get('sigla_uf')}): Score {r.get('score_compacidade_territorial')} | {r.get('area_aproximada_km2'):,.2f} km²")
                 return 0
 
         elif args.command == "pib-municipal":

@@ -540,6 +540,75 @@ class MCPDispatcher:
                                 },
                             },
                             {
+                                "name": "bdg_get_municipio_boundary",
+                                "description": "Query IBGE official boundary polygon GeoJSON, centroid and bounding box for a municipality (Tier 1).",
+                                "inputSchema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "id_municipio": {
+                                            "type": "string",
+                                            "description": "IBGE 7-digit municipality code (e.g. 3550308 for São Paulo)",
+                                        },
+                                        "qualidade": {
+                                            "type": "string",
+                                            "enum": ["minima", "intermediaria", "maxima"],
+                                            "description": "Mesh resolution quality (default: minima)",
+                                        },
+                                    },
+                                    "required": ["id_municipio"],
+                                },
+                            },
+                            {
+                                "name": "bdg_get_uf_boundary",
+                                "description": "Query IBGE official boundary polygon GeoJSON and centroid for a Federative Unit (Tier 1).",
+                                "inputSchema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "sigla_uf": {
+                                            "type": "string",
+                                            "description": "2-letter state abbreviation (e.g. SP, RJ)",
+                                        },
+                                        "qualidade": {
+                                            "type": "string",
+                                            "enum": ["minima", "intermediaria", "maxima"],
+                                            "description": "Mesh resolution quality (default: minima)",
+                                        },
+                                    },
+                                    "required": ["sigla_uf"],
+                                },
+                            },
+                            {
+                                "name": "bdg_get_territorial_features",
+                                "description": "Query IBGE Gold Feature Store spatial morphology features and compactness score for a municipality (Tier 1).",
+                                "inputSchema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "id_municipio": {
+                                            "type": "string",
+                                            "description": "IBGE 7-digit municipality code",
+                                        },
+                                    },
+                                    "required": ["id_municipio"],
+                                },
+                            },
+                            {
+                                "name": "bdg_list_top_compact_municipalities",
+                                "description": "List top municipalities ranked by Polsby-Popper territorial compactness score (Tier 1).",
+                                "inputSchema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "limit": {
+                                            "type": "integer",
+                                            "description": "Maximum rows (default: 10)",
+                                        },
+                                        "sigla_uf": {
+                                            "type": "string",
+                                            "description": "Optional 2-letter state filter (e.g. SP)",
+                                        },
+                                    },
+                                },
+                            },
+                            {
                                 "name": "bdg_get_labor_force_indicators",
                                 "description": "Query official quarterly labor force, population, and unemployment rate by Brazilian UF from IBGE PNAD Contínua (Tier 1).",
                                 "inputSchema": {
@@ -1405,6 +1474,55 @@ class MCPDispatcher:
                     },
                 }
             wrapped = wrap_untrusted_gov_data(result, source_id="mte_rais")
+            return {
+                "jsonrpc": "2.0",
+                "id": req_id,
+                "result": {"content": [{"type": "text", "text": wrapped}], "isError": False},
+            }
+
+        if tool_name in {
+            "bdg_get_municipio_boundary",
+            "bdg_get_uf_boundary",
+            "bdg_get_territorial_features",
+            "bdg_list_top_compact_municipalities",
+        }:
+            from public_data_gateway.connectors.geografico.ibge_malhas.connector import (
+                IBGEMalhasConnector,
+            )
+
+            connector = IBGEMalhasConnector(settings=self.settings)
+            if tool_name == "bdg_get_municipio_boundary":
+                result = connector.get_municipio_boundary(
+                    str(args.get("id_municipio", "")).strip(),
+                    qualidade=str(args.get("qualidade", "minima")),
+                )
+            elif tool_name == "bdg_get_uf_boundary":
+                result = connector.get_uf_boundary(
+                    str(args.get("sigla_uf", "")).strip(),
+                    qualidade=str(args.get("qualidade", "minima")),
+                )
+            elif tool_name == "bdg_get_territorial_features":
+                result = connector.get_territorial_features(
+                    str(args.get("id_municipio", "")).strip()
+                )
+            else:
+                raw_uf = args.get("sigla_uf")
+                result = connector.list_top_compact_municipalities(
+                    limit=int(args.get("limit", 10)),
+                    sigla_uf=str(raw_uf).strip() if raw_uf else None,
+                )
+            if not result:
+                return {
+                    "jsonrpc": "2.0",
+                    "id": req_id,
+                    "result": {
+                        "content": [
+                            {"type": "text", "text": "No territorial mesh data found for the query."}
+                        ],
+                        "isError": True,
+                    },
+                }
+            wrapped = wrap_untrusted_gov_data(result, source_id="ibge_malhas")
             return {
                 "jsonrpc": "2.0",
                 "id": req_id,

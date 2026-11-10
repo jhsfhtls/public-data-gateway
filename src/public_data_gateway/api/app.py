@@ -1092,4 +1092,50 @@ def create_app(settings: GatewaySettings | None = None) -> FastAPI:
         conn = IBGECnefeConnector(settings=app_settings)
         return conn.list_top_address_density(limit=limit)
 
+    @app.get("/api/v1/geo/malhas/top-compact")
+    async def get_top_compact_municipalities(
+        limit: int = Query(10, ge=1, le=50, description="Max municipalities to list"),
+        uf: str | None = Query(None, description="Filter by 2-letter state abbreviation"),
+    ) -> list[dict[str, Any]]:
+        from public_data_gateway.connectors.geografico.ibge_malhas.connector import (
+            IBGEMalhasConnector,
+        )
+
+        conn = IBGEMalhasConnector(settings=app_settings)
+        return conn.list_top_compact_municipalities(limit=limit, sigla_uf=uf)
+
+    @app.get("/api/v1/geo/malhas/features/{id_municipio}")
+    async def get_malhas_territorial_features(id_municipio: str) -> dict[str, Any]:
+        from public_data_gateway.connectors.geografico.ibge_malhas.connector import (
+            IBGEMalhasConnector,
+        )
+
+        conn = IBGEMalhasConnector(settings=app_settings)
+        return conn.get_territorial_features(id_municipio)
+
+    @app.get("/api/v1/geo/malhas/uf/{sigla_uf}")
+    async def get_uf_malha_boundary(
+        sigla_uf: str,
+        qualidade: str = Query("minima", description="Mesh quality (minima, intermediaria, maxima)"),
+    ) -> dict[str, Any]:
+        from public_data_gateway.connectors.geografico.ibge_malhas.connector import (
+            IBGEMalhasConnector,
+        )
+
+        conn = IBGEMalhasConnector(settings=app_settings)
+        return conn.get_uf_boundary(sigla_uf, qualidade=qualidade)
+
+    @app.get("/api/v1/geo/malhas/municipio/{id_municipio}")
+    @app.get("/api/v1/malhas/{id_municipio}")
+    async def get_municipio_malha_boundary(
+        id_municipio: str,
+        qualidade: str = Query("minima", description="Mesh quality (minima, intermediaria, maxima)"),
+    ) -> dict[str, Any]:
+        from public_data_gateway.connectors.geografico.ibge_malhas.connector import (
+            IBGEMalhasConnector,
+        )
+
+        conn = IBGEMalhasConnector(settings=app_settings)
+        return conn.get_municipio_boundary(id_municipio, qualidade=qualidade)
+
     return app

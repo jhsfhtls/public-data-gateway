@@ -1,0 +1,533 @@
+schema_version: "3.1.0"
+contract_id: "ODCS-BR-IBGE-MALHAS-001"
+source_id: "ibge_malhas"
+version: "1.0.0"
+name: "IBGE Malhas Territoriais Vetoriais - Limites Municipais, Estaduais e Nacionais"
+agency: "Instituto Brasileiro de Geografia e Estatística (IBGE)"
+official_url: "https://www.ibge.gov.br/geociencias/organizacao-do-territorio/malhas-territoriais.html"
+
+legal_framework:
+  statutes:
+    - name: "Lei nº 5.534/1968"
+      description: "Dispõe sobre a obrigatoriedade da prestação de informações estatísticas ao IBGE e assegura o sigilo censitário"
+    - name: "Lei nº 5.878/1973"
+      description: "Define os objetivos e competências da Fundação Instituto Brasileiro de Geografia e Estatística (IBGE)"
+    - name: "Decreto nº 73.177/1973"
+      description: "Aprova o regulamento geral do IBGE e fixa suas atribuições no Sistema Estatístico e Cartográfico Nacional"
+    - name: "Portaria IBGE nº 123/2021"
+      description: "Institui a Política de Dados Abertos e Governança Cartográfica do IBGE"
+
+data_governance:
+  grain: "limite_territorial_geometria"
+  primary_keys:
+    - "id_municipio"
+    - "sigla_uf"
+  reference_date_column: "ano_versao"
+  min_expected_rows: 5
+  max_volume_drop_pct: 10.0
+  freshness_sla_hours: 87600
+  lgpd_tier: "PUBLIC_NON_PERSONAL"
+  ml_feature_domains:
+    - "boundary_polygons"
+    - "spatial_geometries"
+    - "geographic_isolation"
+    - "territorial_compactness"
+
+schema:
+  tables:
+    malhas_municipios:
+      description: "Limites territoriais vetoriais oficiais dos municípios brasileiros em formato GeoJSON"
+      grain: "municipio_ano"
+      primary_keys: ["id_municipio", "ano_versao"]
+      min_expected_rows: 5
+      columns:
+        - name: "id_municipio"
+          data_type: "string"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Código IBGE de 7 dígitos identificador único do município"
+        - name: "nome_municipio"
+          data_type: "string"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Nome oficial do município"
+        - name: "sigla_uf"
+          data_type: "string"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Sigla da Unidade Federativa com 2 caracteres"
+        - name: "id_uf"
+          data_type: "string"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Código IBGE de 2 dígitos da UF"
+        - name: "ano_versao"
+          data_type: "integer"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Ano da malha territorial divulgada pelo IBGE"
+        - name: "tipo_geometria"
+          data_type: "string"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Tipo de geometria vetorial (Polygon ou MultiPolygon)"
+        - name: "geojson_geometry"
+          data_type: "string"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Representação GeoJSON da geometria do polígono municipal"
+        - name: "bbox_min_lon"
+          data_type: "double"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Longitude mínima da caixa delimitadora (bounding box)"
+        - name: "bbox_min_lat"
+          data_type: "double"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Latitude mínima da caixa delimitadora (bounding box)"
+        - name: "bbox_max_lon"
+          data_type: "double"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Longitude máxima da caixa delimitadora (bounding box)"
+        - name: "bbox_max_lat"
+          data_type: "double"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Latitude máxima da caixa delimitadora (bounding box)"
+        - name: "centroide_lon"
+          data_type: "double"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Longitude do centroide geométrico calculado do município"
+        - name: "centroide_lat"
+          data_type: "double"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Latitude do centroide geométrico calculado do município"
+        - name: "qtd_vertices"
+          data_type: "integer"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Contagem total de vértices que compõem os anéis da geometria"
+        - name: "qtd_poligonos"
+          data_type: "integer"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Quantidade de polígonos ou ilhas componentes da malha"
+        - name: "area_aproximada_km2"
+          data_type: "double"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Área territorial aproximada calculada em quilômetros quadrados"
+
+    malhas_ufs:
+      description: "Limites territoriais vetoriais oficiais das Unidades da Federação em formato GeoJSON"
+      grain: "uf_ano"
+      primary_keys: ["sigla_uf", "ano_versao"]
+      min_expected_rows: 5
+      columns:
+        - name: "id_uf"
+          data_type: "string"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Código IBGE de 2 dígitos da UF"
+        - name: "sigla_uf"
+          data_type: "string"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Sigla de 2 caracteres da Unidade Federativa"
+        - name: "nome_uf"
+          data_type: "string"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Nome oficial da Unidade Federativa"
+        - name: "regiao"
+          data_type: "string"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Macrorregião geográfica da UF"
+        - name: "ano_versao"
+          data_type: "integer"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Ano da malha territorial divulgada pelo IBGE"
+        - name: "tipo_geometria"
+          data_type: "string"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Tipo de geometria vetorial (Polygon ou MultiPolygon)"
+        - name: "geojson_geometry"
+          data_type: "string"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Representação GeoJSON da geometria do polígono estadual"
+        - name: "bbox_min_lon"
+          data_type: "double"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Longitude mínima da caixa delimitadora do estado"
+        - name: "bbox_min_lat"
+          data_type: "double"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Latitude mínima da caixa delimitadora do estado"
+        - name: "bbox_max_lon"
+          data_type: "double"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Longitude máxima da caixa delimitadora do estado"
+        - name: "bbox_max_lat"
+          data_type: "double"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Latitude máxima da caixa delimitadora do estado"
+        - name: "centroide_lon"
+          data_type: "double"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Longitude do centroide geométrico da UF"
+        - name: "centroide_lat"
+          data_type: "double"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Latitude do centroide geométrico da UF"
+        - name: "qtd_vertices"
+          data_type: "integer"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Contagem total de vértices dos limites estaduais"
+        - name: "qtd_poligonos"
+          data_type: "integer"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Quantidade de polígonos ou ilhas territoriais do estado"
+        - name: "area_aproximada_km2"
+          data_type: "double"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Área territorial aproximada do estado em quilômetros quadrados"
+
+    malhas_regioes:
+      description: "Limites territoriais vetoriais oficiais das Macrorregiões do Brasil"
+      grain: "regiao_ano"
+      primary_keys: ["id_regiao", "ano_versao"]
+      min_expected_rows: 5
+      columns:
+        - name: "id_regiao"
+          data_type: "string"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Código identificador numérico da macrorregião (1 a 5)"
+        - name: "nome_regiao"
+          data_type: "string"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Nome oficial da macrorregião (Norte, Nordeste, Sudeste, Sul, Centro-Oeste)"
+        - name: "ano_versao"
+          data_type: "integer"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Ano da malha territorial"
+        - name: "tipo_geometria"
+          data_type: "string"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Tipo de geometria vetorial"
+        - name: "geojson_geometry"
+          data_type: "string"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Representação GeoJSON da macrorregião"
+        - name: "bbox_min_lon"
+          data_type: "double"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Longitude mínima do bounding box da região"
+        - name: "bbox_min_lat"
+          data_type: "double"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Latitude mínima do bounding box da região"
+        - name: "bbox_max_lon"
+          data_type: "double"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Longitude máxima do bounding box da região"
+        - name: "bbox_max_lat"
+          data_type: "double"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Latitude máxima do bounding box da região"
+        - name: "centroide_lon"
+          data_type: "double"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Longitude do centroide da região"
+        - name: "centroide_lat"
+          data_type: "double"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Latitude do centroide da região"
+        - name: "qtd_vertices"
+          data_type: "integer"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Contagem de vértices dos limites regionais"
+        - name: "qtd_poligonos"
+          data_type: "integer"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Contagem de polígonos componentes"
+        - name: "area_aproximada_km2"
+          data_type: "double"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Área aproximada em quilômetros quadrados"
+
+    malhas_brasil:
+      description: "Contorno territorial oficial da República Federativa do Brasil"
+      grain: "pais_ano"
+      primary_keys: ["codigo_pais", "ano_versao"]
+      min_expected_rows: 1
+      columns:
+        - name: "codigo_pais"
+          data_type: "string"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Código ISO de 2 letras do país (BR)"
+        - name: "nome_pais"
+          data_type: "string"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Nome oficial do país (Brasil)"
+        - name: "ano_versao"
+          data_type: "integer"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Ano da malha territorial oficial"
+        - name: "tipo_geometria"
+          data_type: "string"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Tipo de geometria vetorial"
+        - name: "geojson_geometry"
+          data_type: "string"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Representação GeoJSON da fronteira nacional brasileira"
+        - name: "bbox_min_lon"
+          data_type: "double"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Longitude mínima do Brasil"
+        - name: "bbox_min_lat"
+          data_type: "double"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Latitude mínima do Brasil"
+        - name: "bbox_max_lon"
+          data_type: "double"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Longitude máxima do Brasil"
+        - name: "bbox_max_lat"
+          data_type: "double"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Latitude máxima do Brasil"
+        - name: "centroide_lon"
+          data_type: "double"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Longitude do centroide do território brasileiro"
+        - name: "centroide_lat"
+          data_type: "double"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Latitude do centroide do território brasileiro"
+        - name: "qtd_vertices"
+          data_type: "integer"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Quantidade total de vértices da fronteira nacional"
+        - name: "qtd_poligonos"
+          data_type: "integer"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Quantidade de polígonos ou ilhas oceânicas"
+        - name: "area_aproximada_km2"
+          data_type: "double"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Área territorial aproximada do Brasil em km²"
+
+    features_malhas_territoriais_municipios_brasil:
+      description: "Gold Feature Store de inteligência territorial e morfologia espacial dos municípios brasileiros"
+      grain: "municipio"
+      primary_keys: ["id_municipio"]
+      min_expected_rows: 5
+      columns:
+        - name: "id_municipio"
+          data_type: "string"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Código IBGE de 7 dígitos do município"
+        - name: "sigla_uf"
+          data_type: "string"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Sigla de 2 letras da Unidade Federativa"
+        - name: "nome_municipio"
+          data_type: "string"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Nome oficial do município"
+        - name: "centroide_latitude"
+          data_type: "double"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Latitude calculada do centroide geodésico"
+        - name: "centroide_longitude"
+          data_type: "double"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Longitude calculada do centroide geodésico"
+        - name: "bbox_min_longitude"
+          data_type: "double"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Longitude mínima do bounding box"
+        - name: "bbox_min_latitude"
+          data_type: "double"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Latitude mínima do bounding box"
+        - name: "bbox_max_longitude"
+          data_type: "double"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Longitude máxima do bounding box"
+        - name: "bbox_max_latitude"
+          data_type: "double"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Latitude máxima do bounding box"
+        - name: "extensao_longitudinal_graus"
+          data_type: "double"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Amplitude este-oeste em graus decimais (bbox_max_lon - bbox_min_lon)"
+        - name: "extensao_latitudinal_graus"
+          data_type: "double"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Amplitude norte-sul em graus decimais (bbox_max_lat - bbox_min_lat)"
+        - name: "area_aproximada_km2"
+          data_type: "double"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Área superficial calculada em quilômetros quadrados"
+        - name: "score_compacidade_territorial"
+          data_type: "double"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Score de compacidade territorial normalizado de 0 a 100 baseado no quociente isoperimétrico de Polsby-Popper"
+        - name: "score_isolamento_geografico"
+          data_type: "double"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Score de isolamento geográfico municipal de 0 a 100 baseado na distância geodésica até a capital do estado"
+        - name: "tipo_geometria"
+          data_type: "string"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Tipo de geometria do município (Polygon ou MultiPolygon)"
+        - name: "qtd_poligonos_ilhas"
+          data_type: "integer"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Quantidade de polígonos ou ilhas que constituem o território municipal"
+        - name: "ano_malha"
+          data_type: "integer"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Ano de referência cartográfica da malha"

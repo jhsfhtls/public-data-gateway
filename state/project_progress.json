@@ -13,10 +13,10 @@
     "POP_T_148"
   ],
   "current_macro_phase_id": "06",
-  "current_macro_phase": "Fase 06 - Ingestão Wave 4 em Andamento (Censo, Trabalho, Logística & Telecom: ibge_sidra, ibge_censo2022, mte_novo_caged e ibge_pnad_continua homologados)",
+  "current_macro_phase": "Fase 06 - Ingestão Wave 4 em Andamento (Censo, Trabalho, Logística & Telecom: ibge_sidra, ibge_censo2022, mte_novo_caged, ibge_pnad_continua, ibge_pib_municipal, mte_rais e ibge_malhas homologados)",
   "overall_status": "ON_TRACK",
-  "active_connector": "ibge_malhas",
-  "next_connector": "anatel_mosaico",
+  "active_connector": "anatel_mosaico",
+  "next_connector": "antt_malha_transporte",
   "structural_phases": [
     {
       "phase_id": "00",
@@ -366,9 +366,21 @@
       "phase_id": "06",
       "milestone": "Homologação do Conector mte_rais (5 Tabelas, dbt, Mart de Emprego Estrutural & Live Fail-Hard)",
       "summary": "Implementação e homologação completa do conector mte_rais (Ministério do Trabalho e Emprego: Relação Anual de Informações Sociais — RAIS, Leis nº 5.534/1968, 5.878/1973, Decreto nº 76.900/1975 e Portaria MTE nº 671/2021) consolidando o sétimo conector da Wave 4 e 25º conector total da plataforma (51.0% do catálogo homologado): 5 tabelas Silver (rais_vinculos_ativos, rais_remuneracao_media, rais_estabelecimentos_porte, rais_massa_salarial_municipio, rais_rotatividade_demografia) materializadas em data/mte_rais/{silver,gold}/; 8 novos modelos dbt (5 staging views, fct_rais_mercado_formal_municipio, fct_rais_vinculos_setor_municipio, mart_panorama_emprego_estrutural_rais_brasil) totalizando 236 modelos dbt e 2.300+ testes dbt 100% aprovados com 0 erros; 2.870+ colunas 100% documentadas no linter; feature store features_rais_mercado_formal_municipios_brasil.parquet gerada com score de formalização do mercado de trabalho municipal (0 a 100), diversificação setorial e vocação econômica do emprego; testes reais com fail-hard estrito contra endpoints e FTP oficial do MTE com 18 testes pytest aprovados; multi-interface completa via SDK (BrazilData.labor.rais_*, get_rais_formal_employment, get_rais_features, list_top_formal_employers), CLI (bdg rais employment/sectors/features/ranking), REST API (/api/v1/labor/rais/* e atalho /api/v1/rais/*) e MCP (bdg_get_rais_formal_employment, bdg_get_rais_features, bdg_list_top_formal_employers) com contenção de prompt injection wrap_untrusted_gov_data."
+    },
+    {
+      "date": "2026-11-10",
+      "phase_id": "06",
+      "milestone": "Homologação do Conector ibge_malhas (4 Tabelas, dbt, Mart de Fronteiras & Live Fail-Hard)",
+      "summary": "Implementação e homologação completa do conector ibge_malhas (IBGE: Malhas Territoriais Vetoriais — Municípios, UFs, Regiões e Brasil, Leis nº 5.534/1968, 5.878/1973, Decreto nº 73.177/1973 e Portaria IBGE nº 123/2021) consolidando o oitavo conector da Wave 4 e 26º conector total da plataforma (53.1% do catálogo homologado): 4 tabelas Silver (malhas_municipios, malhas_ufs, malhas_regioes, malhas_brasil) e Gold Feature Store materializadas em data/ibge_malhas/{silver,gold}/; 7 novos modelos dbt (4 staging views, fct_malhas_geometria_municipio, dim_malha_territorial_uf, mart_inteligencia_territorial_fronteiras_brasil) totalizando 243 modelos dbt e 2.430 testes dbt 100% aprovados com 0 erros; 2.982 colunas 100% documentadas no linter (100% coverage); feature store features_malhas_territoriais_municipios_brasil.parquet gerada com score de compacidade territorial Polsby-Popper (0 a 100) e score de isolamento geográfico; testes reais com fail-hard estrito contra APIs oficiais do IBGE com 10 testes pytest aprovados; multi-interface completa via SDK (BrazilData.geo.malhas_*, get_municipio_boundary, get_uf_boundary, get_territorial_features, list_top_compact_municipalities), CLI (bdg malhas municipio/uf/features/ranking), REST API (/api/v1/geo/malhas/* e atalho /api/v1/malhas/*) e MCP (bdg_get_municipio_boundary, bdg_get_uf_boundary, bdg_get_territorial_features, bdg_list_top_compact_municipalities) com contenção de prompt injection wrap_untrusted_gov_data."
     }
   ],
   "recent_milestones": [
+    {
+      "date": "2026-11-10",
+      "phase_id": "06",
+      "milestone": "Homologação do Conector ibge_malhas (4 Tabelas, dbt, Mart de Fronteiras & Live Fail-Hard)",
+      "summary": "Implementação e homologação completa do conector ibge_malhas (IBGE: Malhas Territoriais Vetoriais — Municípios, UFs, Regiões e Brasil, Leis nº 5.534/1968, 5.878/1973, Decreto nº 73.177/1973 e Portaria IBGE nº 123/2021) consolidando o oitavo conector da Wave 4 e 26º conector total da plataforma (53.1% do catálogo homologado): 4 tabelas Silver (malhas_municipios, malhas_ufs, malhas_regioes, malhas_brasil) e Gold Feature Store materializadas em data/ibge_malhas/{silver,gold}/; 7 novos modelos dbt (4 staging views, fct_malhas_geometria_municipio, dim_malha_territorial_uf, mart_inteligencia_territorial_fronteiras_brasil) totalizando 243 modelos dbt e 2.430 testes dbt 100% aprovados com 0 erros; 2.982 colunas 100% documentadas no linter (100% coverage); feature store features_malhas_territoriais_municipios_brasil.parquet gerada com score de compacidade territorial Polsby-Popper (0 a 100) e score de isolamento geográfico; testes reais com fail-hard estrito contra APIs oficiais do IBGE com 10 testes pytest aprovados; multi-interface completa via SDK (BrazilData.geo.malhas_*, get_municipio_boundary, get_uf_boundary, get_territorial_features, list_top_compact_municipalities), CLI (bdg malhas municipio/uf/features/ranking), REST API (/api/v1/geo/malhas/* e atalho /api/v1/malhas/*) e MCP (bdg_get_municipio_boundary, bdg_get_uf_boundary, bdg_get_territorial_features, bdg_list_top_compact_municipalities) com contenção de prompt injection wrap_untrusted_gov_data."
+    },
     {
       "date": "2026-11-10",
       "phase_id": "06",
