@@ -1,0 +1,27 @@
+version: 2
+
+models:
+  - name: stg_ibge_pib_municipal
+    description: "Staging tipado da observação PIB municipal proveniente da tabela SIDRA 5938."
+    columns:
+      - name: id_municipio
+        description: "Código IBGE do município, preservado como texto."
+        tests: [not_null]
+      - name: ano
+        description: "Ano civil de referência da observação."
+        tests: [not_null]
+      - name: indicador_id
+        description: "Código SIDRA da variável econômica."
+        tests: [not_null]
+      - name: indicador
+        description: "Rótulo oficial do indicador SIDRA."
+        tests: [not_null]
+      - name: valor_mil_reais
+        description: "PIB municipal corrente em mil reais."
+        tests: [not_null]
+      - name: fonte
+        description: "Tabela oficial de origem da observação."
+        tests: [not_null]
+      - name: extracted_at
+        description: "Instante UTC em que a observação foi consultada."
+        tests: [not_null]

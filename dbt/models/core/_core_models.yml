@@ -1,6 +1,30 @@
 version: 2
 
 models:
+  - name: fct_pib_municipal_pontual
+    description: "Fato do PIB municipal para as observações selecionadas explicitamente pelo consumidor."
+    columns:
+      - name: id_municipio
+        description: "Código IBGE de sete dígitos do município."
+        tests: [not_null]
+      - name: ano
+        description: "Ano da observação do PIB municipal."
+        tests: [not_null]
+      - name: indicador_id
+        description: "Código SIDRA do indicador."
+        tests: [not_null]
+      - name: indicador
+        description: "Nome oficial do indicador."
+        tests: [not_null]
+      - name: valor_mil_reais
+        description: "PIB municipal a preços correntes em mil reais."
+        tests: [not_null]
+      - name: fonte
+        description: "Identificação da tabela SIDRA de origem."
+        tests: [not_null]
+      - name: extracted_at
+        description: "Instante UTC de consulta ao dado oficial."
+        tests: [not_null]
   - name: dim_municipio
     description: "Dimensão conformatória de municípios brasileiros com suporte a SCD2 e atributos para análise regional."
     columns:

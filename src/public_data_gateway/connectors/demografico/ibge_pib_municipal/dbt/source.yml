@@ -1,0 +1,10 @@
+version: 2
+
+sources:
+  - name: ibge_pib_municipal_silver
+    description: "Observação municipal pontual da tabela 5938 do SIDRA, sem ingestão em lote."
+    meta:
+      external_location: "data/ibge_pib_municipal/silver/{name}.parquet"
+    tables:
+      - name: pib_municipal
+        description: "PIB municipal a preços correntes por município e ano, em mil reais."

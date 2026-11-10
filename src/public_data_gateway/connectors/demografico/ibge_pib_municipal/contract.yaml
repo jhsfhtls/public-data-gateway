@@ -1,0 +1,36 @@
+schema_version: "3.1.0"
+contract_id: "ODCS-BR-IBGE-PIB-MUNICIPAL-001"
+source_id: "ibge_pib_municipal"
+version: "1.0.0"
+name: "IBGE Produto Interno Bruto dos Municípios"
+agency: "Instituto Brasileiro de Geografia e Estatística (IBGE)"
+official_url: "https://apisidra.ibge.gov.br"
+
+legal_framework:
+  statutes:
+    - name: "Lei nº 5.878/1973"
+      description: "Define os objetivos e competências da Fundação Instituto Brasileiro de Geografia e Estatística."
+    - name: "Lei nº 12.527/2011"
+      description: "Regula o acesso público a informações produzidas ou custodiadas pelo poder público."
+
+data_governance:
+  grain: "municipio_ano_indicador"
+  primary_keys: ["id_municipio", "ano", "indicador_id"]
+  reference_date_column: "ano"
+  freshness_sla_hours: 17520
+  lgpd_tier: "PUBLIC_NON_PERSONAL"
+  extraction_safety: "A consulta online exige município e ano específicos; não baixa arquivos em lote."
+
+schema:
+  tables:
+    - name: "pib_municipal"
+      description: "PIB municipal a preços correntes da tabela 5938 do SIDRA, em uma linha por município, ano e indicador."
+      primary_key: ["id_municipio", "ano", "indicador_id"]
+      columns:
+        - {name: "id_municipio", data_type: "string", nullable: false, description: "Código IBGE municipal de sete dígitos."}
+        - {name: "ano", data_type: "int16", nullable: false, description: "Ano de referência da observação."}
+        - {name: "indicador_id", data_type: "string", nullable: false, description: "Código SIDRA do indicador consultado."}
+        - {name: "indicador", data_type: "string", nullable: false, description: "Rótulo do indicador publicado pelo SIDRA."}
+        - {name: "valor_mil_reais", data_type: "float64", nullable: false, description: "Valor divulgado pelo SIDRA em mil reais correntes."}
+        - {name: "fonte", data_type: "string", nullable: false, description: "Identificação da tabela e API oficiais."}
+        - {name: "extracted_at", data_type: "timestamp[UTC]", nullable: false, description: "Instante UTC da consulta."}

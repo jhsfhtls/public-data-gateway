@@ -1,6 +1,36 @@
 version: 2
 
 models:
+  - name: mart_pib_municipal_observacoes
+    description: "Mart municipal enriquecido com a dimensão territorial para observações PIB explicitamente consultadas."
+    columns:
+      - name: id_municipio
+        description: "Código IBGE do município."
+        tests: [not_null]
+      - name: nome_municipio
+        description: "Nome municipal conforme dimensão territorial, ou indicação de ausência no cadastro."
+        tests: [not_null]
+      - name: sigla_uf
+        description: "UF do município, ou NA quando não consta na dimensão."
+        tests: [not_null]
+      - name: ano
+        description: "Ano de referência da estatística."
+        tests: [not_null]
+      - name: indicador_id
+        description: "Código do indicador na tabela SIDRA."
+        tests: [not_null]
+      - name: indicador
+        description: "Rótulo oficial do indicador."
+        tests: [not_null]
+      - name: valor_mil_reais
+        description: "Valor do PIB municipal corrente em mil reais."
+        tests: [not_null]
+      - name: fonte
+        description: "Tabela oficial utilizada."
+        tests: [not_null]
+      - name: extracted_at
+        description: "Timestamp UTC da consulta."
+        tests: [not_null]
   - name: mart_hierarquia_territorial_brasil
     description: "Data Mart analítico consolidando a hierarquia territorial completa do Brasil com contagens e métricas agregadas intra-domínio."
     columns:
