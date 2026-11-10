@@ -1,0 +1,70 @@
+schema_version: "3.1.0"
+contract_id: "ODCS-BR-IBGE-PIB-MUNICIPAL-001"
+source_id: "ibge_pib_municipal"
+version: "1.1.0"
+name: "IBGE Produto Interno Bruto dos Municípios - Contas Nacionais & Estrutura Econômica"
+agency: "Instituto Brasileiro de Geografia e Estatística (IBGE)"
+official_url: "https://apisidra.ibge.gov.br"
+
+legal_framework:
+  statutes:
+    - name: "Lei nº 5.534/1968"
+      description: "Dispõe sobre a obrigatoriedade da prestação de informações estatísticas ao IBGE e assegura o sigilo estatístico."
+    - name: "Lei nº 5.878/1973"
+      description: "Define os objetivos e competências da Fundação Instituto Brasileiro de Geografia e Estatística (IBGE)."
+    - name: "Decreto nº 73.177/1973"
+      description: "Aprova o regulamento geral do IBGE e fixa suas atribuições no Sistema Estatístico Nacional."
+    - name: "Lei nº 12.527/2011"
+      description: "Regula o acesso público a informações produzidas ou custodiadas pelo poder público."
+
+data_governance:
+  grain: "municipio_ano"
+  primary_keys: ["id_municipio", "ano"]
+  reference_date_column: "ano"
+  freshness_sla_hours: 17520
+  lgpd_tier: "PUBLIC_NON_PERSONAL"
+  ml_feature_domains:
+    - "municipal_pib"
+    - "vab_sectors"
+    - "economic_structure"
+    - "productivity_dynamism"
+
+schema:
+  tables:
+    - name: "pib_municipal"
+      description: "Contas econômicas municipais da Tabela 5938 do SIDRA com PIB a preços correntes, impostos, VAB setorial e participações relativas."
+      primary_key: ["id_municipio", "ano"]
+      columns:
+        - {name: "id_municipio", data_type: "string", nullable: false, description: "Código IBGE municipal de sete dígitos."}
+        - {name: "nome_municipio", data_type: "string", nullable: false, description: "Nome oficial do município."}
+        - {name: "sigla_uf", data_type: "string", nullable: false, description: "Sigla da Unidade Federativa."}
+        - {name: "ano", data_type: "int32", nullable: false, description: "Ano de referência da observação econômica."}
+        - {name: "valor_pib_mil_reais", data_type: "float64", nullable: false, description: "Produto Interno Bruto a preços correntes em mil reais."}
+        - {name: "valor_impostos_liquidos_mil_reais", data_type: "float64", nullable: false, description: "Impostos líquidos de subsídios sobre produtos em mil reais."}
+        - {name: "vab_total_mil_reais", data_type: "float64", nullable: false, description: "Valor Adicionado Bruto total a preços correntes em mil reais."}
+        - {name: "vab_agropecuaria_mil_reais", data_type: "float64", nullable: false, description: "Valor Adicionado Bruto da agropecuária em mil reais."}
+        - {name: "vab_industria_mil_reais", data_type: "float64", nullable: false, description: "Valor Adicionado Bruto da indústria em mil reais."}
+        - {name: "vab_servicos_mil_reais", data_type: "float64", nullable: false, description: "Valor Adicionado Bruto dos serviços exclusive administração pública em mil reais."}
+        - {name: "vab_administracao_publica_mil_reais", data_type: "float64", nullable: false, description: "Valor Adicionado Bruto de administração, defesa, educação e saúde públicas em mil reais."}
+        - {name: "participacao_pib_brasil_pct", data_type: "float64", nullable: false, description: "Participação percentual do município no PIB total do Brasil."}
+        - {name: "participacao_pib_uf_pct", data_type: "float64", nullable: false, description: "Participação percentual do município no PIB da sua Unidade Federativa."}
+        - {name: "fonte", data_type: "string", nullable: false, description: "Identificação da tabela e API oficiais do IBGE."}
+        - {name: "extracted_at", data_type: "timestamp[UTC]", nullable: false, description: "Instante UTC da extração dos dados."}
+
+    - name: "features_pib_municipal_brasil"
+      description: "Gold Feature Store contendo scores analíticos contínuos (0 a 100), shares setoriais e vocação econômica predominante do município."
+      primary_key: ["id_municipio", "ano"]
+      columns:
+        - {name: "id_municipio", data_type: "string", nullable: false, description: "Código IBGE municipal de sete dígitos."}
+        - {name: "nome_municipio", data_type: "string", nullable: false, description: "Nome oficial do município."}
+        - {name: "sigla_uf", data_type: "string", nullable: false, description: "Sigla da Unidade Federativa."}
+        - {name: "ano", data_type: "int32", nullable: false, description: "Ano civil de referência das contas municipais."}
+        - {name: "valor_pib_mil_reais", data_type: "float64", nullable: false, description: "Produto Interno Bruto municipal corrente em mil reais."}
+        - {name: "share_vab_agropecuaria_pct", data_type: "float64", nullable: false, description: "Participação percentual da agropecuária no VAB total municipal."}
+        - {name: "share_vab_industria_pct", data_type: "float64", nullable: false, description: "Participação percentual da indústria no VAB total municipal."}
+        - {name: "share_vab_servicos_pct", data_type: "float64", nullable: false, description: "Participação percentual dos serviços no VAB total municipal."}
+        - {name: "share_vab_administracao_publica_pct", data_type: "float64", nullable: false, description: "Participação percentual da administração pública no VAB total municipal."}
+        - {name: "score_peso_economico_nacional", data_type: "float64", nullable: false, description: "Score contínuo de 0 a 100 indicando a relevância do PIB municipal no contexto nacional."}
+        - {name: "score_diversificacao_produtiva", data_type: "float64", nullable: false, description: "Score contínuo de 0 a 100 medindo o equilíbrio entre os setores produtivos (anti-monocultura/anti-monopolio setorial)."}
+        - {name: "vocacao_economica", data_type: "string", nullable: false, description: "Setor produtivo com maior share de valor adicionado: AGROPECUARIA, INDUSTRIAL, SERVICOS ou ADMINISTRACAO_PUBLICA."}
+        - {name: "calculated_at", data_type: "timestamp[UTC]", nullable: false, description: "Instante UTC do cálculo dos scores analíticos."}

@@ -625,6 +625,39 @@ class MCPDispatcher:
                                     },
                                 },
                             },
+                            {
+                                "name": "bdg_get_pib_municipal_detail",
+                                "description": "Query official IBGE municipal GDP accounts, sectoral VAB, taxes, and relative shares (Tier 1).",
+                                "inputSchema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "id_municipio": {"type": "string", "description": "IBGE 7-digit municipality code (e.g. 3550308)"},
+                                        "year": {"type": "integer", "description": "Reference year (default: 2023)"},
+                                    },
+                                    "required": ["id_municipio"],
+                                },
+                            },
+                            {
+                                "name": "bdg_get_pib_municipal_features",
+                                "description": "Query Gold economic features, diversification score, and economic vocation from IBGE municipal accounts (Tier 1).",
+                                "inputSchema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "id_municipio": {"type": "string", "description": "IBGE 7-digit municipality code (e.g. 3550308)"},
+                                    },
+                                    "required": ["id_municipio"],
+                                },
+                            },
+                            {
+                                "name": "bdg_list_top_municipal_pib",
+                                "description": "List top Brazilian municipalities ranked by total municipal GDP from IBGE (Tier 1).",
+                                "inputSchema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "limit": {"type": "integer", "description": "Max municipalities to retrieve (default: 10)"},
+                                    },
+                                },
+                            },
                         ]
                     },
                 }
@@ -1521,6 +1554,52 @@ class MCPDispatcher:
             lim = int(args.get("limit", 10))
             ranking_res = cnefe_conn.list_top_address_density(limit=lim)
             wrapped = wrap_untrusted_gov_data(ranking_res, source_id="ibge_cnefe")
+            return {
+                "jsonrpc": "2.0",
+                "id": req_id,
+                "result": {"content": [{"type": "text", "text": wrapped}], "isError": False},
+            }
+
+        if tool_name in {"bdg_get_pib_municipal_detail", "pdg_get_pib_municipal_detail"}:
+            id_mun = str(args.get("id_municipio", "")).strip()
+            year = int(args.get("year", 2023))
+            from public_data_gateway.connectors.demografico.ibge_pib_municipal.connector import (
+                IBGEPibMunicipalConnector,
+            )
+
+            pib_conn = IBGEPibMunicipalConnector(settings=self.settings)
+            res = pib_conn.get_municipal_gdp_detail(id_mun, year=year)
+            wrapped = wrap_untrusted_gov_data(res, source_id="ibge_pib_municipal")
+            return {
+                "jsonrpc": "2.0",
+                "id": req_id,
+                "result": {"content": [{"type": "text", "text": wrapped}], "isError": False},
+            }
+
+        if tool_name in {"bdg_get_pib_municipal_features", "pdg_get_pib_municipal_features"}:
+            id_mun = str(args.get("id_municipio", "")).strip()
+            from public_data_gateway.connectors.demografico.ibge_pib_municipal.connector import (
+                IBGEPibMunicipalConnector,
+            )
+
+            pib_conn = IBGEPibMunicipalConnector(settings=self.settings)
+            res = pib_conn.get_municipal_gdp_features(id_mun)
+            wrapped = wrap_untrusted_gov_data(res, source_id="ibge_pib_municipal")
+            return {
+                "jsonrpc": "2.0",
+                "id": req_id,
+                "result": {"content": [{"type": "text", "text": wrapped}], "isError": False},
+            }
+
+        if tool_name in {"bdg_list_top_municipal_pib", "pdg_list_top_municipal_pib"}:
+            limit = int(args.get("limit", 10))
+            from public_data_gateway.connectors.demografico.ibge_pib_municipal.connector import (
+                IBGEPibMunicipalConnector,
+            )
+
+            pib_conn = IBGEPibMunicipalConnector(settings=self.settings)
+            res = pib_conn.list_top_municipalities(limit=limit)
+            wrapped = wrap_untrusted_gov_data(res, source_id="ibge_pib_municipal")
             return {
                 "jsonrpc": "2.0",
                 "id": req_id,

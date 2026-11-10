@@ -1,0 +1,10 @@
+version: 2
+
+sources:
+  - name: ibge_pib_municipal_silver
+    description: "Tabelas Silver do IBGE Produto Interno Bruto dos Municípios e Contas Nacionais."
+    meta:
+      external_location: "data/ibge_pib_municipal/silver/{name}.parquet"
+    tables:
+      - name: pib_municipal
+        description: "Contas econômicas municipais consolidadas com PIB a preços correntes, impostos e VAB setorial."

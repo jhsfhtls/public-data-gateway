@@ -770,6 +770,50 @@ def create_app(settings: GatewaySettings | None = None) -> FastAPI:
         conn = IBGESidraConnector(settings=app_settings)
         return conn.list_top_municipalities_by_gdp(limit=limit)
 
+    # --- IBGE PIB Municipal (Contas Nacionais & VAB Setorial) ---
+    @app.get("/api/v1/demographics/pib-municipal/top")
+    async def get_top_pib_municipal(
+        limit: int = Query(10, ge=1, le=50, description="Max municipalities to list"),
+    ) -> list[dict[str, Any]]:
+        from public_data_gateway.connectors.demografico.ibge_pib_municipal.connector import (
+            IBGEPibMunicipalConnector,
+        )
+
+        conn = IBGEPibMunicipalConnector(settings=app_settings)
+        return conn.list_top_municipalities(limit=limit)
+
+    @app.get("/api/v1/demographics/pib-municipal/features/{id_municipio}")
+    async def get_municipal_gdp_features(id_municipio: str) -> dict[str, Any]:
+        from public_data_gateway.connectors.demografico.ibge_pib_municipal.connector import (
+            IBGEPibMunicipalConnector,
+        )
+
+        conn = IBGEPibMunicipalConnector(settings=app_settings)
+        res = conn.get_municipal_gdp_features(id_municipio)
+        if not res:
+            raise HTTPException(
+                status_code=404, detail=f"PIB municipal features not found for municipality '{id_municipio}'"
+            )
+        return res
+
+    @app.get("/api/v1/demographics/pib-municipal/{id_municipio}")
+    @app.get("/api/v1/pib-municipal/{id_municipio}")
+    async def get_municipal_gdp_detail(
+        id_municipio: str,
+        year: int = Query(2023, description="Reference year of the accounts"),
+    ) -> dict[str, Any]:
+        from public_data_gateway.connectors.demografico.ibge_pib_municipal.connector import (
+            IBGEPibMunicipalConnector,
+        )
+
+        conn = IBGEPibMunicipalConnector(settings=app_settings)
+        res = conn.get_municipal_gdp_detail(id_municipio, year=year)
+        if not res:
+            raise HTTPException(
+                status_code=404, detail=f"PIB municipal detail not found for municipality '{id_municipio}'"
+            )
+        return res
+
     @app.get("/api/v1/census/municipality/{id_municipio}/summary")
     async def get_census_summary(id_municipio: str) -> dict[str, Any]:
         from public_data_gateway.connectors.demografico.ibge_censo2022.connector import (

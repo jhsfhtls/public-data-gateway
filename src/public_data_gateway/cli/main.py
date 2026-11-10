@@ -396,6 +396,25 @@ def build_parser() -> argparse.ArgumentParser:
     pib_p.add_argument("id_municipio", type=str, help="IBGE 7-digit municipality code")
     pib_p.add_argument("--json", action="store_true", help="Output in JSON format")
 
+    # Subcommand: pib-municipal (IBGE Produto Interno Bruto dos Municípios)
+    pib_mun_p = subparsers.add_parser(
+        "pib-municipal", help="Query official IBGE municipal GDP accounts, sectoral VAB and economic structure."
+    )
+    pib_mun_sub = pib_mun_p.add_subparsers(dest="pib_mun_action", required=True)
+
+    pm_det_p = pib_mun_sub.add_parser("detail", help="Query municipal macro accounts and sectoral VAB.")
+    pm_det_p.add_argument("id_municipio", type=str, help="IBGE 7-digit municipality code")
+    pm_det_p.add_argument("--year", type=int, default=2023, help="Reference year (default: 2023)")
+    pm_det_p.add_argument("--json", action="store_true", help="Output in JSON format")
+
+    pm_feat_p = pib_mun_sub.add_parser("features", help="Query Gold features, economic weight and diversification score.")
+    pm_feat_p.add_argument("id_municipio", type=str, help="IBGE 7-digit municipality code")
+    pm_feat_p.add_argument("--json", action="store_true", help="Output in JSON format")
+
+    pm_top_p = pib_mun_sub.add_parser("top", help="List top Brazilian municipalities ranked by GDP.")
+    pm_top_p.add_argument("--limit", type=int, default=10, help="Max municipalities to list")
+    pm_top_p.add_argument("--json", action="store_true", help="Output in JSON format")
+
     # Subcommand: censo (IBGE Censo Demográfico 2022)
     censo_p = subparsers.add_parser(
         "censo", help="Query official IBGE Censo Demográfico 2022 population, households, aging, and literacy."
@@ -1851,6 +1870,62 @@ def main(argv: Sequence[str] | None = None) -> int:
                     print(f"Top {len(ranks)} Municipalities by Address Density (CNEFE Censo 2022):")
                     for idx, r in enumerate(ranks, 1):
                         print(f"  {idx}. {r.get('nome_municipio')} ({r.get('sigla_uf')}): {r.get('densidade_enderecos_km2'):,.2f} end/km² | Total: {r.get('total_enderecos'):,}")
+                return 0
+
+        elif args.command == "pib-municipal":
+            from public_data_gateway.connectors.demografico.ibge_pib_municipal.connector import (
+                IBGEPibMunicipalConnector,
+            )
+
+            pib_conn = IBGEPibMunicipalConnector()
+            if args.pib_mun_action == "detail":
+                res = pib_conn.get_municipal_gdp_detail(args.id_municipio, year=getattr(args, "year", 2023))
+                if getattr(args, "json", False):
+                    print(json.dumps(res, indent=2, ensure_ascii=False, default=str))
+                else:
+                    if not res:
+                        print(f"No PIB municipal data found for '{args.id_municipio}'.", file=sys.stderr)
+                        return 1
+                    print(f"IBGE PIB Municipal Detail: {res.get('nome_municipio', '')} ({res.get('sigla_uf', '')} - {res.get('id_municipio')}):")
+                    print(f"  Ano:                     {res.get('ano')}")
+                    print(f"  PIB Total:               R$ {res.get('valor_pib_mil_reais', 0.0):,.2f} mil")
+                    print(f"  Impostos Líquidos:       R$ {res.get('valor_impostos_liquidos_mil_reais', 0.0):,.2f} mil")
+                    print(f"  VAB Total:               R$ {res.get('vab_total_mil_reais', 0.0):,.2f} mil")
+                    print(f"  VAB Agropecuária:        R$ {res.get('vab_agropecuaria_mil_reais', 0.0):,.2f} mil")
+                    print(f"  VAB Indústria:           R$ {res.get('vab_industria_mil_reais', 0.0):,.2f} mil")
+                    print(f"  VAB Serviços:            R$ {res.get('vab_servicos_mil_reais', 0.0):,.2f} mil")
+                    print(f"  VAB Adm Pública:         R$ {res.get('vab_administracao_publica_mil_reais', 0.0):,.2f} mil")
+                    print(f"  Participação Brasil:     {res.get('participacao_pib_brasil_pct')}%")
+                    print(f"  Participação UF:         {res.get('participacao_pib_uf_pct')}%")
+                return 0
+
+            if args.pib_mun_action == "features":
+                feat = pib_conn.get_municipal_gdp_features(args.id_municipio)
+                if getattr(args, "json", False):
+                    print(json.dumps(feat, indent=2, ensure_ascii=False, default=str))
+                else:
+                    if not feat:
+                        print(f"No Gold PIB features found for '{args.id_municipio}'.", file=sys.stderr)
+                        return 1
+                    print(f"IBGE Municipal Economic Features: {feat.get('nome_municipio', '')} ({feat.get('sigla_uf', '')} - {feat.get('id_municipio')}):")
+                    print(f"  PIB Total:               R$ {feat.get('valor_pib_mil_reais', 0.0):,.2f} mil")
+                    print(f"  Vocação Econômica:       {feat.get('vocacao_economica')}")
+                    print(f"  Score Peso Econômico:    {feat.get('score_peso_economico_nacional')} / 100")
+                    print(f"  Score Diversificação:    {feat.get('score_diversificacao_produtiva')} / 100")
+                    print(f"  Share Agropecuária:      {feat.get('share_vab_agropecuaria_pct')}%")
+                    print(f"  Share Indústria:         {feat.get('share_vab_industria_pct')}%")
+                    print(f"  Share Serviços:          {feat.get('share_vab_servicos_pct')}%")
+                    print(f"  Share Adm Pública:       {feat.get('share_vab_administracao_publica_pct')}%")
+                return 0
+
+            if args.pib_mun_action == "top":
+                top = pib_conn.list_top_municipalities(limit=args.limit)
+                if getattr(args, "json", False):
+                    print(json.dumps(top, indent=2, ensure_ascii=False, default=str))
+                else:
+                    print(f"Top {len(top)} Brazilian Municipalities by GDP (IBGE Contas Regionais):")
+                    for idx, r in enumerate(top, 1):
+                        print(f"  {idx}. {r.get('nome_municipio')} ({r.get('sigla_uf')}): R$ {r.get('valor_pib_mil_reais', 0.0):,.2f} mil | Part. Brasil: {r.get('participacao_pib_brasil_pct')}%")
                 return 0
 
     except Exception as exc:

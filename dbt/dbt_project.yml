@@ -25,6 +25,7 @@ model-paths:
   - "../src/public_data_gateway/connectors/compras_publicas/comprasgov_catmat/dbt"
   - "../src/public_data_gateway/connectors/demografico/ibge_censo2022/dbt"
   - "../src/public_data_gateway/connectors/demografico/ibge_sidra/dbt"
+  - "../src/public_data_gateway/connectors/demografico/ibge_pib_municipal/dbt"
   - "../src/public_data_gateway/connectors/trabalho/ibge_pnad_continua/dbt"
   - "../src/public_data_gateway/connectors/trabalho/mte_novo_caged/dbt"
   - "../src/public_data_gateway/connectors/trabalho/mte_rais/dbt"
