@@ -1,0 +1,263 @@
+version: 2
+
+models:
+  - name: stg_ibge_malhas_municipios
+    description: "Visão padronizada dos limites territoriais vetoriais dos municípios brasileiros com centroides e bounding box."
+    columns:
+      - name: id_municipio
+        description: "Código IBGE de 7 dígitos do município."
+        tests:
+          - not_null
+      - name: nome_municipio
+        description: "Nome oficial do município."
+        tests:
+          - not_null
+      - name: sigla_uf
+        description: "Sigla de 2 letras da Unidade Federativa."
+        tests:
+          - not_null
+      - name: id_uf
+        description: "Código IBGE de 2 dígitos da UF."
+        tests:
+          - not_null
+      - name: ano_versao
+        description: "Ano da malha cartográfica oficial."
+        tests:
+          - not_null
+      - name: tipo_geometria
+        description: "Tipo da geometria vetorial (Polygon ou MultiPolygon)."
+        tests:
+          - not_null
+      - name: geojson_geometry
+        description: "String JSON contendo a geometria GeoJSON completa do polígono."
+        tests:
+          - not_null
+      - name: bbox_min_lon
+        description: "Longitude mínima do bounding box municipal."
+        tests:
+          - not_null
+      - name: bbox_min_lat
+        description: "Latitude mínima do bounding box municipal."
+        tests:
+          - not_null
+      - name: bbox_max_lon
+        description: "Longitude máxima do bounding box municipal."
+        tests:
+          - not_null
+      - name: bbox_max_lat
+        description: "Latitude máxima do bounding box municipal."
+        tests:
+          - not_null
+      - name: centroide_lon
+        description: "Longitude do centroide geométrico do município."
+        tests:
+          - not_null
+      - name: centroide_lat
+        description: "Latitude do centroide geométrico do município."
+        tests:
+          - not_null
+      - name: qtd_vertices
+        description: "Contagem de vértices componentes dos anéis da malha."
+        tests:
+          - not_null
+      - name: qtd_poligonos
+        description: "Contagem de polígonos ou ilhas que constituem o território municipal."
+        tests:
+          - not_null
+      - name: area_aproximada_km2
+        description: "Área aproximada calculada em quilômetros quadrados."
+        tests:
+          - not_null
+
+  - name: stg_ibge_malhas_ufs
+    description: "Visão padronizada dos contornos cartográficos vetoriais das 27 Unidades da Federação."
+    columns:
+      - name: id_uf
+        description: "Código IBGE de 2 dígitos da UF."
+        tests:
+          - not_null
+          - unique
+      - name: sigla_uf
+        description: "Sigla de 2 letras da UF."
+        tests:
+          - not_null
+          - unique
+      - name: nome_uf
+        description: "Nome oficial da Unidade Federativa."
+        tests:
+          - not_null
+      - name: regiao
+        description: "Nome da macrorregião geográfica da UF."
+        tests:
+          - not_null
+      - name: ano_versao
+        description: "Ano de divulgação da malha estatística e territorial."
+        tests:
+          - not_null
+      - name: tipo_geometria
+        description: "Tipo da geometria vetorial estadual."
+        tests:
+          - not_null
+      - name: geojson_geometry
+        description: "Representação GeoJSON da geometria do estado."
+        tests:
+          - not_null
+      - name: bbox_min_lon
+        description: "Longitude mínima do bounding box da UF."
+        tests:
+          - not_null
+      - name: bbox_min_lat
+        description: "Latitude mínima do bounding box da UF."
+        tests:
+          - not_null
+      - name: bbox_max_lon
+        description: "Longitude máxima do bounding box da UF."
+        tests:
+          - not_null
+      - name: bbox_max_lat
+        description: "Latitude máxima do bounding box da UF."
+        tests:
+          - not_null
+      - name: centroide_lon
+        description: "Longitude do centroide geodésico da UF."
+        tests:
+          - not_null
+      - name: centroide_lat
+        description: "Latitude do centroide geodésico da UF."
+        tests:
+          - not_null
+      - name: qtd_vertices
+        description: "Contagem total de vértices dos contornos da UF."
+        tests:
+          - not_null
+      - name: qtd_poligonos
+        description: "Quantidade de polígonos componentes da UF."
+        tests:
+          - not_null
+      - name: area_aproximada_km2
+        description: "Área territorial aproximada da UF em km²."
+        tests:
+          - not_null
+
+  - name: stg_ibge_malhas_regioes
+    description: "Visão padronizada dos limites cartográficos das 5 macrorregiões brasileiras."
+    columns:
+      - name: id_regiao
+        description: "Identificador numérico da macrorregião (1 a 5)."
+        tests:
+          - not_null
+          - unique
+      - name: nome_regiao
+        description: "Nome da macrorregião (Norte, Nordeste, Sudeste, Sul, Centro-Oeste)."
+        tests:
+          - not_null
+          - unique
+      - name: ano_versao
+        description: "Ano da malha cartográfica regional."
+        tests:
+          - not_null
+      - name: tipo_geometria
+        description: "Tipo da geometria vetorial regional."
+        tests:
+          - not_null
+      - name: geojson_geometry
+        description: "Geometria GeoJSON da macrorregião."
+        tests:
+          - not_null
+      - name: bbox_min_lon
+        description: "Longitude mínima do bounding box regional."
+        tests:
+          - not_null
+      - name: bbox_min_lat
+        description: "Latitude mínima do bounding box regional."
+        tests:
+          - not_null
+      - name: bbox_max_lon
+        description: "Longitude máxima do bounding box regional."
+        tests:
+          - not_null
+      - name: bbox_max_lat
+        description: "Latitude máxima do bounding box regional."
+        tests:
+          - not_null
+      - name: centroide_lon
+        description: "Longitude do centroide regional."
+        tests:
+          - not_null
+      - name: centroide_lat
+        description: "Latitude do centroide regional."
+        tests:
+          - not_null
+      - name: qtd_vertices
+        description: "Contagem de vértices da malha regional."
+        tests:
+          - not_null
+      - name: qtd_poligonos
+        description: "Contagem de partes da região."
+        tests:
+          - not_null
+      - name: area_aproximada_km2
+        description: "Área territorial aproximada da macrorregião em km²."
+        tests:
+          - not_null
+
+  - name: stg_ibge_malhas_brasil
+    description: "Visão padronizada do contorno territorial nacional brasileiro."
+    columns:
+      - name: codigo_pais
+        description: "Código ISO de 2 letras do Brasil (BR)."
+        tests:
+          - not_null
+          - unique
+      - name: nome_pais
+        description: "Nome do país (Brasil)."
+        tests:
+          - not_null
+      - name: ano_versao
+        description: "Ano da malha cartográfica nacional."
+        tests:
+          - not_null
+      - name: tipo_geometria
+        description: "Tipo da geometria vetorial do Brasil."
+        tests:
+          - not_null
+      - name: geojson_geometry
+        description: "Geometria GeoJSON dos limites territoriais do Brasil."
+        tests:
+          - not_null
+      - name: bbox_min_lon
+        description: "Longitude mínima da extensão nacional."
+        tests:
+          - not_null
+      - name: bbox_min_lat
+        description: "Latitude mínima da extensão nacional."
+        tests:
+          - not_null
+      - name: bbox_max_lon
+        description: "Longitude máxima da extensão nacional."
+        tests:
+          - not_null
+      - name: bbox_max_lat
+        description: "Latitude máxima da extensão nacional."
+        tests:
+          - not_null
+      - name: centroide_lon
+        description: "Longitude do centroide territorial brasileiro."
+        tests:
+          - not_null
+      - name: centroide_lat
+        description: "Latitude do centroide territorial brasileiro."
+        tests:
+          - not_null
+      - name: qtd_vertices
+        description: "Contagem total de vértices da fronteira nacional."
+        tests:
+          - not_null
+      - name: qtd_poligonos
+        description: "Contagem de polígonos ou ilhas oceânicas do Brasil."
+        tests:
+          - not_null
+      - name: area_aproximada_km2
+        description: "Área territorial aproximada do Brasil em km²."
+        tests:
+          - not_null

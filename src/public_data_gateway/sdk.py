@@ -84,6 +84,38 @@ class GeoFacade:
         """List municipalities ranked by address density per km2."""
         return self.cnefe_connector.list_top_address_density(limit=limit)
 
+    @property
+    def malhas_connector(self) -> Any:
+        if not hasattr(self, "_malhas_conn") or self._malhas_conn is None:
+            from public_data_gateway.connectors.geografico.ibge_malhas import (
+                IBGEMalhasConnector,
+            )
+
+            self._malhas_conn = IBGEMalhasConnector(settings=self._sdk.settings)
+        return self._malhas_conn
+
+    def get_municipio_boundary(
+        self, id_municipio: str, qualidade: str = "minima"
+    ) -> dict[str, Any]:
+        """Get official vector territorial boundary GeoJSON and metrics for a municipality."""
+        return self.malhas_connector.get_municipio_boundary(id_municipio, qualidade=qualidade)
+
+    def get_uf_boundary(
+        self, sigla_uf: str, qualidade: str = "minima"
+    ) -> dict[str, Any]:
+        """Get official vector territorial boundary GeoJSON and metrics for a Federative Unit."""
+        return self.malhas_connector.get_uf_boundary(sigla_uf, qualidade=qualidade)
+
+    def get_territorial_features(self, id_municipio: str) -> dict[str, Any]:
+        """Get spatial morphology features and compactness scores from the Gold Feature Store."""
+        return self.malhas_connector.get_territorial_features(id_municipio)
+
+    def list_top_compact_municipalities(
+        self, limit: int = 10, sigla_uf: str | None = None
+    ) -> list[dict[str, Any]]:
+        """List top municipalities ranked by territorial compactness score."""
+        return self.malhas_connector.list_top_compact_municipalities(limit=limit, sigla_uf=sigla_uf)
+
 
 class ProcurementFacade:
     """Public procurement query interface powered by PNCP (Lei nº 14.133/2021)."""
@@ -982,6 +1014,28 @@ class BrazilData:
     def get_cnefe_top_address_density(self, limit: int = 10) -> list[dict[str, Any]]:
         """Listar municípios com maior densidade de endereços por km² (IBGE CNEFE)."""
         return self.geo.cnefe_top_address_density(limit=limit)
+
+    def get_municipio_boundary(
+        self, id_municipio: str, qualidade: str = "minima"
+    ) -> dict[str, Any]:
+        """Obter malha vetorial GeoJSON oficial e métricas espaciais do município (IBGE Malhas)."""
+        return self.geo.get_municipio_boundary(id_municipio, qualidade=qualidade)
+
+    def get_uf_boundary(
+        self, sigla_uf: str, qualidade: str = "minima"
+    ) -> dict[str, Any]:
+        """Obter malha vetorial GeoJSON oficial e métricas espaciais da UF (IBGE Malhas)."""
+        return self.geo.get_uf_boundary(sigla_uf, qualidade=qualidade)
+
+    def get_territorial_features(self, id_municipio: str) -> dict[str, Any]:
+        """Obter features espaciais e score de compacidade do Feature Store Gold (IBGE Malhas)."""
+        return self.geo.get_territorial_features(id_municipio)
+
+    def list_top_compact_municipalities(
+        self, limit: int = 10, sigla_uf: str | None = None
+    ) -> list[dict[str, Any]]:
+        """Listar municípios com maior compacidade territorial (Polsby-Popper score) no Brasil (IBGE Malhas)."""
+        return self.geo.list_top_compact_municipalities(limit=limit, sigla_uf=sigla_uf)
 
     def get_municipal_gdp_detail(self, id_municipio: str, year: int = 2023) -> dict[str, Any] | None:
         """Consultar contas econômicas municipais detalhadas (PIB, VAB setorial, impostos e participações) do IBGE."""

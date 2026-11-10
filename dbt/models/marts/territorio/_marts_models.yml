@@ -729,3 +729,83 @@ models:
         description: "Timestamp ISO-8601 UTC da extração dos dados."
         tests:
           - not_null
+
+  - name: mart_inteligencia_territorial_fronteiras_brasil
+    description: "Mart analítico de inteligência territorial, morfologia espacial e relação centroide-fronteira dos municípios e estados brasileiros."
+    columns:
+      - name: id_municipio
+        description: "Código IBGE de 7 dígitos do município."
+        tests:
+          - not_null
+      - name: nome_municipio
+        description: "Nome oficial do município."
+        tests:
+          - not_null
+      - name: sigla_uf
+        description: "Sigla de 2 letras da Unidade Federativa."
+        tests:
+          - not_null
+      - name: nome_uf
+        description: "Nome oficial da Unidade Federativa."
+        tests:
+          - not_null
+      - name: regiao
+        description: "Macrorregião geográfica da UF e município."
+        tests:
+          - not_null
+      - name: ano_versao
+        description: "Ano da malha cartográfica oficial."
+        tests:
+          - not_null
+      - name: tipo_geometria_municipio
+        description: "Tipo de geometria vetorial municipal."
+        tests:
+          - not_null
+      - name: centroide_lon_municipio
+        description: "Longitude do centroide geodésico municipal."
+        tests:
+          - not_null
+      - name: centroide_lat_municipio
+        description: "Latitude do centroide geodésico municipal."
+        tests:
+          - not_null
+      - name: centroide_lon_uf
+        description: "Longitude do centroide geodésico da respectiva UF."
+        tests:
+          - not_null
+      - name: centroide_lat_uf
+        description: "Latitude do centroide geodésico da respectiva UF."
+        tests:
+          - not_null
+      - name: distancia_centroide_uf_graus
+        description: "Distância euclidiana em graus decimais entre o centroide municipal e o centroide da UF."
+        tests:
+          - not_null
+      - name: area_municipio_km2
+        description: "Área territorial calculada do município em quilômetros quadrados."
+        tests:
+          - not_null
+      - name: area_uf_km2
+        description: "Área territorial aproximada do estado em quilômetros quadrados."
+        tests:
+          - not_null
+      - name: proporcao_area_estado_pct
+        description: "Percentual que a área do município representa na área total do estado correspondente."
+        tests:
+          - not_null
+      - name: qtd_vertices_municipio
+        description: "Contagem de vértices dos limites municipais."
+        tests:
+          - not_null
+      - name: qtd_poligonos_municipio
+        description: "Quantidade de polígonos ou ilhas componentes do território municipal."
+        tests:
+          - not_null
+      - name: amplitude_longitudinal_graus
+        description: "Extensão longitudinal municipal em graus decimais."
+        tests:
+          - not_null
+      - name: amplitude_latitudinal_graus
+        description: "Extensão latitudinal municipal em graus decimais."
+        tests:
+          - not_null

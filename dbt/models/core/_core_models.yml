@@ -4035,3 +4035,153 @@ models:
         description: "Data de referência da fonte."
       - name: extracted_at
         description: "Timestamp UTC da extração."
+
+  - name: fct_malhas_geometria_municipio
+    description: "Tabela de fatos com métricas espaciais, centroides geodésicos e bounding boxes dos municípios brasileiros."
+    columns:
+      - name: id_municipio
+        description: "Código IBGE de 7 dígitos do município."
+        tests:
+          - not_null
+      - name: nome_municipio
+        description: "Nome oficial do município."
+        tests:
+          - not_null
+      - name: sigla_uf
+        description: "Sigla de 2 letras da Unidade Federativa."
+        tests:
+          - not_null
+      - name: id_uf
+        description: "Código IBGE de 2 dígitos da UF."
+        tests:
+          - not_null
+      - name: regiao
+        description: "Macrorregião geográfica do município."
+        tests:
+          - not_null
+      - name: ano_versao
+        description: "Ano da malha cartográfica oficial."
+        tests:
+          - not_null
+      - name: tipo_geometria
+        description: "Tipo da geometria vetorial (Polygon ou MultiPolygon)."
+        tests:
+          - not_null
+      - name: centroide_lon
+        description: "Longitude do centroide geométrico do município."
+        tests:
+          - not_null
+      - name: centroide_lat
+        description: "Latitude do centroide geométrico do município."
+        tests:
+          - not_null
+      - name: bbox_min_lon
+        description: "Longitude mínima do bounding box municipal."
+        tests:
+          - not_null
+      - name: bbox_min_lat
+        description: "Latitude mínima do bounding box municipal."
+        tests:
+          - not_null
+      - name: bbox_max_lon
+        description: "Longitude máxima do bounding box municipal."
+        tests:
+          - not_null
+      - name: bbox_max_lat
+        description: "Latitude máxima do bounding box municipal."
+        tests:
+          - not_null
+      - name: amplitude_longitudinal_graus
+        description: "Extensão longitudinal do município em graus decimais."
+        tests:
+          - not_null
+      - name: amplitude_latitudinal_graus
+        description: "Extensão latitudinal do município em graus decimais."
+        tests:
+          - not_null
+      - name: qtd_vertices
+        description: "Contagem de vértices dos contornos municipais."
+        tests:
+          - not_null
+      - name: qtd_poligonos
+        description: "Quantidade de polígonos ou ilhas componentes."
+        tests:
+          - not_null
+      - name: area_aproximada_km2
+        description: "Área territorial calculada em km²."
+        tests:
+          - not_null
+
+  - name: dim_malha_territorial_uf
+    description: "Dimensão analítica dos limites e métricas cartográficas das 27 Unidades da Federação."
+    columns:
+      - name: id_uf
+        description: "Código IBGE de 2 dígitos da Unidade Federativa."
+        tests:
+          - not_null
+          - unique
+      - name: sigla_uf
+        description: "Sigla de 2 letras da Unidade Federativa."
+        tests:
+          - not_null
+          - unique
+      - name: nome_uf
+        description: "Nome oficial da Unidade Federativa."
+        tests:
+          - not_null
+      - name: regiao
+        description: "Macrorregião geográfica da UF."
+        tests:
+          - not_null
+      - name: ano_versao
+        description: "Ano de divulgação da malha estatística e territorial."
+        tests:
+          - not_null
+      - name: tipo_geometria
+        description: "Tipo da geometria vetorial estadual."
+        tests:
+          - not_null
+      - name: centroide_lon
+        description: "Longitude do centroide geodésico da UF."
+        tests:
+          - not_null
+      - name: centroide_lat
+        description: "Latitude do centroide geodésico da UF."
+        tests:
+          - not_null
+      - name: bbox_min_lon
+        description: "Longitude mínima do bounding box da UF."
+        tests:
+          - not_null
+      - name: bbox_min_lat
+        description: "Latitude mínima do bounding box da UF."
+        tests:
+          - not_null
+      - name: bbox_max_lon
+        description: "Longitude máxima do bounding box da UF."
+        tests:
+          - not_null
+      - name: bbox_max_lat
+        description: "Latitude máxima do bounding box da UF."
+        tests:
+          - not_null
+      - name: amplitude_longitudinal_graus
+        description: "Extensão longitudinal da UF em graus decimais."
+        tests:
+          - not_null
+      - name: amplitude_latitudinal_graus
+        description: "Extensão latitudinal da UF em graus decimais."
+        tests:
+          - not_null
+      - name: qtd_vertices
+        description: "Contagem total de vértices dos limites estaduais."
+        tests:
+          - not_null
+      - name: qtd_poligonos
+        description: "Quantidade de polígonos componentes da UF."
+        tests:
+          - not_null
+      - name: area_aproximada_km2
+        description: "Área territorial aproximada da UF em km²."
+        tests:
+          - not_null

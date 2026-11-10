@@ -694,7 +694,7 @@ sources:
   - P03
   rice_score: 540
   roadmap_wave: 4
-  status: CATALOGED
+  status: HOMOLOGATED
 - source_id: anatel_mosaico
   name: 'ANATEL: Sistema Mosaico de Estações e Cobertura de Telecomunicações'
   agency: Agência Nacional de Telecomunicações (ANATEL)
