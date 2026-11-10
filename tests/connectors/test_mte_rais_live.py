@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import pytest
+
 from public_data_gateway.connectors.trabalho.mte_rais.connector import MTERaisConnector
 
 
