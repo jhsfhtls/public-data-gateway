@@ -564,6 +564,28 @@ class SocioeconomicFacade:
         """List municipalities with highest aging index ratio from Censo 2022."""
         return self.censo_connector.list_highest_aging_municipalities(limit=limit)
 
+    @property
+    def pib_municipal_connector(self) -> Any:
+        if not hasattr(self, "_pib_conn") or self._pib_conn is None:
+            from public_data_gateway.connectors.demografico.ibge_pib_municipal.connector import (
+                IBGEPibMunicipalConnector,
+            )
+
+            self._pib_conn = IBGEPibMunicipalConnector(settings=self._sdk.settings)
+        return self._pib_conn
+
+    def municipal_gdp_detail(self, id_municipio: str, year: int = 2023) -> dict[str, Any] | None:
+        """Get comprehensive municipal macro accounts (PIB, sectoral VAB, taxes, shares) from IBGE."""
+        return self.pib_municipal_connector.get_municipal_gdp_detail(id_municipio, year)
+
+    def municipal_gdp_features(self, id_municipio: str) -> dict[str, Any] | None:
+        """Get Gold features and productive diversification scores from IBGE municipal GDP."""
+        return self.pib_municipal_connector.get_municipal_gdp_features(id_municipio)
+
+    def top_municipalities_pib(self, limit: int = 10) -> list[dict[str, Any]]:
+        """List top Brazilian municipalities ranked by total municipal GDP."""
+        return self.pib_municipal_connector.list_top_municipalities(limit=limit)
+
 
 class LaborFacade:
     """Unified developer facade for employment, labor market dynamics, and wages (MTE Novo CAGED & IBGE PNAD Contínua)."""
@@ -913,6 +935,18 @@ class BrazilData:
     def get_cnefe_top_address_density(self, limit: int = 10) -> list[dict[str, Any]]:
         """Listar municípios com maior densidade de endereços por km² (IBGE CNEFE)."""
         return self.geo.cnefe_top_address_density(limit=limit)
+
+    def get_municipal_gdp_detail(self, id_municipio: str, year: int = 2023) -> dict[str, Any] | None:
+        """Consultar contas econômicas municipais detalhadas (PIB, VAB setorial, impostos e participações) do IBGE."""
+        return self.socioeconomic.municipal_gdp_detail(id_municipio, year)
+
+    def get_municipal_gdp_features(self, id_municipio: str) -> dict[str, Any] | None:
+        """Consultar features Gold e scores de dinamismo e diversificação produtiva do município (IBGE)."""
+        return self.socioeconomic.municipal_gdp_features(id_municipio)
+
+    def list_top_municipal_gdp(self, limit: int = 10) -> list[dict[str, Any]]:
+        """Listar municípios líderes em PIB municipal no Brasil (IBGE Contas Regionais)."""
+        return self.socioeconomic.top_municipalities_pib(limit=limit)
 
     def resolve_municipality(
         self, code_or_name: str | int, uf: str | None = None

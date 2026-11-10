@@ -2,34 +2,75 @@ version: 2
 
 models:
   - name: mart_pib_municipal_observacoes
-    description: "Mart municipal enriquecido com a dimensão territorial para observações PIB explicitamente consultadas."
+    description: "Data Mart analítico de contas econômicas municipais com abertura setorial VAB, participações e vocação econômica predominante."
     columns:
       - name: id_municipio
-        description: "Código IBGE do município."
+        description: "Código IBGE de sete dígitos do município."
         tests: [not_null]
       - name: nome_municipio
-        description: "Nome municipal conforme dimensão territorial, ou indicação de ausência no cadastro."
+        description: "Nome oficial do município."
         tests: [not_null]
       - name: sigla_uf
-        description: "UF do município, ou NA quando não consta na dimensão."
+        description: "Sigla da Unidade Federativa."
+        tests: [not_null]
+      - name: regiao
+        description: "Grande região geográfica do município."
+        tests: [not_null]
+      - name: is_capital
+        description: "Flag booleano indicando se o município é capital."
+        tests: [not_null]
+      - name: is_amazonia_legal
+        description: "Flag booleano indicando se o município integra a Amazônia Legal."
         tests: [not_null]
       - name: ano
-        description: "Ano de referência da estatística."
+        description: "Ano civil de referência da publicação do PIB municipal."
         tests: [not_null]
-      - name: indicador_id
-        description: "Código do indicador na tabela SIDRA."
+      - name: valor_pib_mil_reais
+        description: "Produto Interno Bruto a preços correntes em mil reais."
         tests: [not_null]
-      - name: indicador
-        description: "Rótulo oficial do indicador."
+      - name: valor_impostos_liquidos_mil_reais
+        description: "Impostos líquidos de subsídios sobre produtos em mil reais."
         tests: [not_null]
-      - name: valor_mil_reais
-        description: "Valor do PIB municipal corrente em mil reais."
+      - name: vab_total_mil_reais
+        description: "Valor Adicionado Bruto total a preços correntes em mil reais."
+        tests: [not_null]
+      - name: vab_agropecuaria_mil_reais
+        description: "Valor Adicionado Bruto da agropecuária em mil reais."
+        tests: [not_null]
+      - name: vab_industria_mil_reais
+        description: "Valor Adicionado Bruto da indústria em mil reais."
+        tests: [not_null]
+      - name: vab_servicos_mil_reais
+        description: "Valor Adicionado Bruto dos serviços exclusive administração pública em mil reais."
+        tests: [not_null]
+      - name: vab_administracao_publica_mil_reais
+        description: "Valor Adicionado Bruto da administração pública em mil reais."
+        tests: [not_null]
+      - name: participacao_pib_brasil_pct
+        description: "Participação percentual do município no PIB do Brasil."
+        tests: [not_null]
+      - name: participacao_pib_uf_pct
+        description: "Participação percentual do município no PIB da sua UF."
+        tests: [not_null]
+      - name: share_vab_agropecuaria_pct
+        description: "Participação percentual do VAB agropecuário no VAB total municipal."
+      - name: share_vab_industria_pct
+        description: "Participação percentual do VAB industrial no VAB total municipal."
+      - name: share_vab_servicos_pct
+        description: "Participação percentual do VAB de serviços no VAB total municipal."
+      - name: share_vab_administracao_publica_pct
+        description: "Participação percentual da administração pública no VAB total municipal."
+      - name: vocacao_economica_predominante
+        description: "Setor produtivo líder em geração de valor adicionado no município."
+        tests: [not_null]
+      - name: grau_concentracao_nacional
+        description: "Classificação analítica do grau de concentração do PIB no total nacional."
         tests: [not_null]
       - name: fonte
-        description: "Tabela oficial utilizada."
+        description: "Tabela oficial SIDRA de origem dos dados."
         tests: [not_null]
       - name: extracted_at
-        description: "Timestamp UTC da consulta."
+        description: "Timestamp UTC da extração dos dados."
         tests: [not_null]
   - name: mart_hierarquia_territorial_brasil
     description: "Data Mart analítico consolidando a hierarquia territorial completa do Brasil com contagens e métricas agregadas intra-domínio."

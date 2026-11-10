@@ -1,6 +1,6 @@
 {
   "schema_version": "1.0.0",
-  "last_updated": "2026-11-09T17:25:43.699851",
+  "last_updated": "2026-11-09T22:15:00.000000",
   "project_name": "public-data-gateway",
   "ecosystem": "C.O.R.E. (core, operations, career, studies)",
   "governing_pops": [
@@ -16,7 +16,7 @@
   "current_macro_phase": "Fase 06 - Ingestão Wave 4 em Andamento (Censo, Trabalho, Logística & Telecom: ibge_sidra, ibge_censo2022, mte_novo_caged e ibge_pnad_continua homologados)",
   "overall_status": "ON_TRACK",
   "active_connector": "mte_rais",
-  "next_connector": "ibge_pib_municipal",
+  "next_connector": "ibge_malhas",
   "structural_phases": [
     {
       "phase_id": "00",
@@ -354,9 +354,21 @@
       "phase_id": "04",
       "milestone": "Homologação do Conector ibge_cnefe (5 Tabelas, dbt, Mart de Geografia e Endereçamento & Live Fail-Hard)",
       "summary": "Implementação completa do conector ibge_cnefe (Cadastro Nacional de Endereços para Fins Estatísticos - IBGE Censo Demográfico 2022, Lei nº 5.534/1968, Lei nº 5.878/1973 e Portaria IBGE nº 123/2021): 5 tabelas (cnefe_enderecos_padrao, cnefe_coordenadas_geograficas, cnefe_tipos_edificacao, cnefe_agregados_cep, cnefe_densidade_enderecamento) materializadas em data/ibge_cnefe/{silver,gold}/; 8 novos modelos dbt (5 staging views, fct_cnefe_perfil_edificacoes_municipio, fct_cnefe_malha_logradouros_cep, mart_geografia_enderecamento_edificacoes_brasil) totalizando 225 modelos e 2.229 testes dbt 100% aprovados; 2.718 colunas 100% documentadas no linter; feature store features_cnefe_enderecamento_municipios_brasil.parquet gerada com scores de densidade comercial, infraestrutura social e tipologia urbana; testes reais com fail-hard contra FTP oficial do IBGE e Servicodados, 8 testes pytest aprovados (196 offline tests sem falhas); multi-interface completa via SDK (BrazilData.geo.cnefe_*, get_cnefe_*), CLI (bdg cnefe summary/cep/building-types/ranking), REST API (/api/v1/geo/cnefe/*, /api/v1/cnefe/*) e MCP (bdg_get_cnefe_municipality_summary, bdg_get_cnefe_cep_profile, bdg_list_cnefe_building_types, bdg_list_cnefe_top_address_density)."
+    },
+    {
+      "date": "2026-11-09",
+      "phase_id": "06",
+      "milestone": "Homologação do Conector ibge_pib_municipal (Contas Nacionais, VAB Setorial, Mart de Contas Econômicas & Live Fail-Hard)",
+      "summary": "Implementação e homologação completa do conector ibge_pib_municipal (IBGE Produto Interno Bruto dos Municípios e Estrutura Produtiva, Leis nº 5.534/1968, 5.878/1973 e Lei nº 12.527/2011) consolidando o sexto conector da Wave 4 e 24º conector total da plataforma: 2 tabelas (pib_municipal e features_pib_municipal_brasil) materializadas em data/ibge_pib_municipal/{silver,gold}/; 3 novos modelos dbt (stg_ibge_pib_municipal, fct_pib_municipal_pontual, mart_pib_municipal_observacoes) totalizando 228 modelos dbt e 2.282 testes dbt 100% aprovados com 0 erros; 2.775 colunas 100% documentadas no linter (100% documentation coverage); feature store features_pib_municipal_brasil.parquet gerada com decomposição VAB setorial, score de peso econômico nacional (0 a 100), score de diversificação produtiva (0 a 100) e vocação econômica predominante; testes reais com fail-hard estrito contra as APIs oficiais do IBGE SIDRA (Tabela 5938) com 14 testes pytest aprovados (202 testes offline totais no repositório); multi-interface completa via SDK (BrazilData.socioeconomic.municipal_gdp_*, get_municipal_gdp_detail, get_municipal_gdp_features, list_top_municipal_gdp), CLI (bdg pib-municipal detail/features/top), REST API (/api/v1/demographics/pib-municipal/* e atalho /api/v1/pib-municipal/*) e MCP (bdg_get_pib_municipal_detail, bdg_get_pib_municipal_features, bdg_list_top_municipal_pib) com contenção de prompt injection wrap_untrusted_gov_data."
     }
   ],
   "recent_milestones": [
+    {
+      "date": "2026-11-09",
+      "phase_id": "06",
+      "milestone": "Homologação do Conector ibge_pib_municipal (Contas Nacionais, VAB Setorial, Mart de Contas Econômicas & Live Fail-Hard)",
+      "summary": "Implementação e homologação completa do conector ibge_pib_municipal (IBGE Produto Interno Bruto dos Municípios e Estrutura Produtiva, Leis nº 5.534/1968, 5.878/1973 e Lei nº 12.527/2011) consolidando o sexto conector da Wave 4 e 24º conector total da plataforma: 2 tabelas (pib_municipal e features_pib_municipal_brasil) materializadas em data/ibge_pib_municipal/{silver,gold}/; 3 novos modelos dbt (stg_ibge_pib_municipal, fct_pib_municipal_pontual, mart_pib_municipal_observacoes) totalizando 228 modelos dbt e 2.282 testes dbt 100% aprovados com 0 erros; 2.775 colunas 100% documentadas no linter (100% documentation coverage); feature store features_pib_municipal_brasil.parquet gerada com decomposição VAB setorial, score de peso econômico nacional (0 a 100), score de diversificação produtiva (0 a 100) e vocação econômica predominante; testes reais com fail-hard estrito contra as APIs oficiais do IBGE SIDRA (Tabela 5938) com 14 testes pytest aprovados (202 testes offline totais no repositório); multi-interface completa via SDK (BrazilData.socioeconomic.municipal_gdp_*, get_municipal_gdp_detail, get_municipal_gdp_features, list_top_municipal_gdp), CLI (bdg pib-municipal detail/features/top), REST API (/api/v1/demographics/pib-municipal/* e atalho /api/v1/pib-municipal/*) e MCP (bdg_get_pib_municipal_detail, bdg_get_pib_municipal_features, bdg_list_top_municipal_pib) com contenção de prompt injection wrap_untrusted_gov_data."
+    },
     {
       "date": "2026-11-08",
       "phase_id": "05",
@@ -374,13 +386,6 @@
       "phase_id": "06",
       "milestone": "Homologação do Conector mte_novo_caged (5 Tabelas, dbt, Mart de Dinâmica do Emprego Formal & Live Fail-Hard)",
       "summary": "Implementação e homologação completa do conector mte_novo_caged (Ministério do Trabalho e Emprego: Microdados do Novo CAGED, Lei nº 4.923/1965 e Portaria SEPRT nº 1.127/2019) consolidando o terceiro conector da Wave 4: 5 tabelas (caged_movimentacao_mensal, caged_perfil_setorial_cnae, caged_ocupacao_cbo, caged_demografia_trabalhador, caged_salarios_remuneracao) materializadas em data/mte_novo_caged/{bronze,silver,gold}/; 8 novos modelos dbt (5 staging views, fct_caged_movimentacao_mensal, fct_caged_setores_cnae, mart_dinamica_emprego_formal_brasil) totalizando 209 modelos dbt (99 tabelas, 110 views) e 2.053 testes dbt 100% aprovados com 0 erros; 2.482 colunas 100% documentadas no linter (100% coverage); feature store features_mercado_trabalho_municipios_brasil.parquet gerada com indicadores de rotatividade (turnover), razão salarial admissão/desligamento, saldo anualizado, score de aquecimento do mercado de trabalho (0 a 100) e score de vulnerabilidade do emprego; testes reais com fail-hard estrito contra o servidor FTP oficial do MTE (ftp.mtps.gov.br) com 9 testes pytest aprovados (183 testes offline totais no repositório); multi-interface completa via SDK (BrazilData.labor.*, get_employment_summary, get_labor_market_profile, get_top_job_creators), CLI (bdg caged summary/profile/sectors/ranking e atalho direto bdg novo-caged), REST API (/api/v1/labor/* e atalho /api/v1/caged/*) e MCP (bdg_get_employment_summary, bdg_get_labor_market_profile, bdg_list_top_job_creating_municipalities) com contenção de prompt injection."
-    },
-    {
-      "date": "2026-11-09",
-      "phase_id": "06",
-      "milestone": "Homologação do Conector ibge_pnad_continua (5 Tabelas, dbt, Mart de Panorama do Trabalho e Renda & Live Fail-Hard)",
-      "summary": "Implementação e homologação completa do conector ibge_pnad_continua (IBGE Pesquisa Nacional por Amostra de Domicílios Contínua — Taxa de Desocupação, Rendimento Médio Real Habitual e Efetivo, Subutilização da Força de Trabalho, Informalidade e Paridade Salarial por UF, Leis nº 5.534/1968, 5.878/1973 e Resolução CD/IBGE nº 1/2012) consolidando o quarto conector da Wave 4 e 22º conector total da plataforma: 5 tabelas (pnad_mercado_trabalho_trimestral, pnad_rendimento_trabalho, pnad_subutilizacao_forca, pnad_posicao_ocupacao, pnad_demografia_educacao_trabalho) materializadas em data/ibge_pnad_continua/{silver,gold}/ cobrindo todas as 27 UFs do Brasil; 8 novos modelos dbt (5 staging views, fct_pnad_mercado_trabalho_uf, fct_pnad_posicao_informalidade_uf, mart_panorama_trabalho_renda_estados_brasil) totalizando 217 modelos dbt (102 tabelas, 115 views) e 2.178 testes dbt 100% aprovados com 0 erros; 2.608 colunas 100% documentadas no linter (100% coverage); feature store features_pnad_trabalho_renda_estados_brasil.parquet gerada com indicadores de desocupação, renda média real, massa salarial, informalidade, subutilização e desalento, score de resiliência do mercado de trabalho estadual (0 a 100) e score de vulnerabilidade trabalho/renda; testes reais com fail-hard estrito contra as APIs oficiais do IBGE SIDRA PNAD Contínua (Tabelas 4099 e 6388 v5934) com 9 testes pytest aprovados (191 testes offline totais no repositório); multi-interface completa via SDK (BrazilData.labor.*, get_state_labor_profile, get_labor_force_indicators, get_lowest_unemployment_states), CLI (bdg pnad indicators/profile/earnings/ranking e atalho direto bdg pnad-uf), REST API (/api/v1/labor/state/* e atalho /api/v1/pnad/*) e MCP (bdg_get_labor_force_indicators, bdg_get_state_labor_profile, bdg_list_lowest_unemployment_states, bdg_list_highest_earnings_states) com contenção de prompt injection."
-    },
-    "Homologação do Conector ibge_cnefe (5 Tabelas, dbt, Mart de Geografia e Endereçamento & Live Fail-Hard)"
+    }
   ]
 }

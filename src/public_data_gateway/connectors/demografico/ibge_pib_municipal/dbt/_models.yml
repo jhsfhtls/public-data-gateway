@@ -2,26 +2,50 @@ version: 2
 
 models:
   - name: stg_ibge_pib_municipal
-    description: "Staging tipado da observação PIB municipal proveniente da tabela SIDRA 5938."
+    description: "Staging tipado das contas econômicas municipais provenientes da Tabela SIDRA 5938 do IBGE."
     columns:
       - name: id_municipio
-        description: "Código IBGE do município, preservado como texto."
+        description: "Código IBGE de sete dígitos do município."
+        tests: [not_null]
+      - name: nome_municipio
+        description: "Nome oficial do município."
+        tests: [not_null]
+      - name: sigla_uf
+        description: "Sigla da Unidade Federativa do município."
         tests: [not_null]
       - name: ano
-        description: "Ano civil de referência da observação."
+        description: "Ano civil de referência da publicação econômica."
         tests: [not_null]
-      - name: indicador_id
-        description: "Código SIDRA da variável econômica."
+      - name: valor_pib_mil_reais
+        description: "Produto Interno Bruto municipal a preços correntes em mil reais."
         tests: [not_null]
-      - name: indicador
-        description: "Rótulo oficial do indicador SIDRA."
+      - name: valor_impostos_liquidos_mil_reais
+        description: "Impostos líquidos de subsídios sobre produtos a preços correntes em mil reais."
         tests: [not_null]
-      - name: valor_mil_reais
-        description: "PIB municipal corrente em mil reais."
+      - name: vab_total_mil_reais
+        description: "Valor Adicionado Bruto total a preços correntes em mil reais."
+        tests: [not_null]
+      - name: vab_agropecuaria_mil_reais
+        description: "Valor Adicionado Bruto da agropecuária em mil reais."
+        tests: [not_null]
+      - name: vab_industria_mil_reais
+        description: "Valor Adicionado Bruto da indústria em mil reais."
+        tests: [not_null]
+      - name: vab_servicos_mil_reais
+        description: "Valor Adicionado Bruto dos serviços exclusive administração pública em mil reais."
+        tests: [not_null]
+      - name: vab_administracao_publica_mil_reais
+        description: "Valor Adicionado Bruto da administração, defesa, educação e saúde públicas em mil reais."
+        tests: [not_null]
+      - name: participacao_pib_brasil_pct
+        description: "Participação percentual do município no Produto Interno Bruto total do Brasil."
+        tests: [not_null]
+      - name: participacao_pib_uf_pct
+        description: "Participação percentual do município no Produto Interno Bruto da sua UF."
         tests: [not_null]
       - name: fonte
-        description: "Tabela oficial de origem da observação."
+        description: "Identificação da tabela e API oficiais de origem dos dados."
         tests: [not_null]
       - name: extracted_at
-        description: "Instante UTC em que a observação foi consultada."
+        description: "Instante UTC da extração e ingestão dos dados."
         tests: [not_null]
