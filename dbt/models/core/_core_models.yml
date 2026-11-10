@@ -1,6 +1,63 @@
 version: 2
 
 models:
+  - name: fct_pib_municipal_pontual
+    description: "Fato de contas econômicas municipais consolidadas com PIB a preços correntes, VAB setorial e participações relativas."
+    columns:
+      - name: id_municipio
+        description: "Código IBGE de sete dígitos do município."
+        tests: [not_null]
+      - name: nome_municipio
+        description: "Nome oficial do município conformatório."
+        tests: [not_null]
+      - name: sigla_uf
+        description: "Sigla da Unidade Federativa conformatória."
+        tests: [not_null]
+      - name: regiao
+        description: "Grande região geográfica do município."
+        tests: [not_null]
+      - name: is_capital
+        description: "Flag booleano indicando se o município é capital estadual ou federal."
+        tests: [not_null]
+      - name: is_amazonia_legal
+        description: "Flag booleano indicando se o município integra a Amazônia Legal."
+        tests: [not_null]
+      - name: ano
+        description: "Ano civil de referência da publicação do PIB municipal."
+        tests: [not_null]
+      - name: valor_pib_mil_reais
+        description: "PIB municipal a preços correntes em mil reais."
+        tests: [not_null]
+      - name: valor_impostos_liquidos_mil_reais
+        description: "Impostos líquidos de subsídios sobre produtos em mil reais."
+        tests: [not_null]
+      - name: vab_total_mil_reais
+        description: "Valor Adicionado Bruto total municipal a preços correntes em mil reais."
+        tests: [not_null]
+      - name: vab_agropecuaria_mil_reais
+        description: "Valor Adicionado Bruto da agropecuária em mil reais."
+        tests: [not_null]
+      - name: vab_industria_mil_reais
+        description: "Valor Adicionado Bruto da indústria em mil reais."
+        tests: [not_null]
+      - name: vab_servicos_mil_reais
+        description: "Valor Adicionado Bruto dos serviços exclusive administração pública em mil reais."
+        tests: [not_null]
+      - name: vab_administracao_publica_mil_reais
+        description: "Valor Adicionado Bruto da administração pública em mil reais."
+        tests: [not_null]
+      - name: participacao_pib_brasil_pct
+        description: "Participação percentual do município no PIB do Brasil."
+        tests: [not_null]
+      - name: participacao_pib_uf_pct
+        description: "Participação percentual do município no PIB da sua UF."
+        tests: [not_null]
+      - name: fonte
+        description: "Identificação da tabela oficial do SIDRA de origem."
+        tests: [not_null]
+      - name: extracted_at
+        description: "Instante UTC de extração e ingestão dos dados oficiais."
+        tests: [not_null]
   - name: dim_municipio
     description: "Dimensão conformatória de municípios brasileiros com suporte a SCD2 e atributos para análise regional."
     columns:

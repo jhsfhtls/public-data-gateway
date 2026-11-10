@@ -544,7 +544,7 @@ sources:
   - P02
   rice_score: 580
   roadmap_wave: 4
-  status: CATALOGED
+  status: HOMOLOGATED
 - source_id: ibge_censo2022
   name: 'IBGE: Microdados do Censo Demográfico 2022'
   agency: Instituto Brasileiro de Geografia e Estatística (IBGE)
