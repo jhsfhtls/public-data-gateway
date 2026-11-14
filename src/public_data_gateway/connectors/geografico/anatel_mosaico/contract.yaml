@@ -1,0 +1,527 @@
+schema_version: "3.1.0"
+contract_id: "ODCS-BR-ANATEL-MOSAICO-001"
+source_id: "anatel_mosaico"
+version: "1.0.0"
+name: "ANATEL: Sistema Mosaico de Estações e Cobertura de Telecomunicações"
+agency: "Agência Nacional de Telecomunicações (ANATEL)"
+official_url: "https://sistemas.anatel.gov.br/mosaico/"
+
+legal_framework:
+  statutes:
+    - name: "Lei nº 9.472/1997"
+      description: "Lei Geral de Telecomunicações (LGT): dispõe sobre a organização dos serviços de telecomunicações e criação da ANATEL"
+    - name: "Lei nº 13.116/2015"
+      description: "Lei Geral das Antenas: estabelece normas gerais para implantação e compartilhamento da infraestrutura de telecomunicações"
+    - name: "Resolução ANATEL nº 719/2020"
+      description: "Aprova o Regulamento Geral de Licenciamento e normas do Sistema Mosaico"
+    - name: "Decreto nº 8.777/2016"
+      description: "Institui a Política de Dados Abertos do Poder Executivo Federal"
+
+data_governance:
+  grain: "municipio_telecom_estacoes"
+  primary_keys:
+    - "id_municipio"
+    - "sigla_uf"
+  reference_date_column: "reference_date"
+  min_expected_rows: 5
+  max_volume_drop_pct: 15.0
+  freshness_sla_hours: 720
+  lgpd_tier: "PUBLIC_NON_PERSONAL"
+  ml_feature_domains:
+    - "telecom_towers"
+    - "broadband_coverage"
+    - "5g_readiness"
+    - "digital_connectivity"
+
+schema:
+  tables:
+    mosaico_estacoes_smp:
+      description: "Estações Rádio Base (ERBs) licenciadas do Serviço Móvel Pessoal (SMP) por tecnologia (5G NR, 4G LTE, 3G, 2G) e município"
+      grain: "id_municipio, ano_mes_referencia"
+      primary_keys: ["id_municipio", "ano_mes_referencia"]
+      min_expected_rows: 5
+      columns:
+        - name: "id_municipio"
+          data_type: "string"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Código IBGE de 7 dígitos identificador único do município"
+        - name: "nome_municipio"
+          data_type: "string"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Nome oficial do município"
+        - name: "sigla_uf"
+          data_type: "string"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Sigla de 2 letras da Unidade Federativa"
+        - name: "id_uf"
+          data_type: "string"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Código IBGE de 2 dígitos da Unidade Federativa"
+        - name: "ano_mes_referencia"
+          data_type: "string"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Competência mensal de referência do licenciamento no formato AAAA-MM"
+        - name: "total_erbs_licenciadas"
+          data_type: "integer"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Contagem total de Estações Rádio Base (ERBs) licenciadas no município"
+        - name: "erbs_5g_nr"
+          data_type: "integer"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Quantidade de estações licenciadas com tecnologia 5G NR"
+        - name: "erbs_4g_lte"
+          data_type: "integer"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Quantidade de estações licenciadas com tecnologia 4G LTE"
+        - name: "erbs_3g_wcdma"
+          data_type: "integer"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Quantidade de estações licenciadas com tecnologia 3G WCDMA"
+        - name: "erbs_2g_gsm"
+          data_type: "integer"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Quantidade de estações licenciadas com tecnologia 2G GSM"
+        - name: "operadoras_ativas_smp"
+          data_type: "integer"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Número de operadoras SMP com estações ativas licenciadas no município"
+        - name: "operadora_lider_erbs"
+          data_type: "string"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Nome da operadora com maior volume de ERBs licenciadas no município"
+        - name: "densidade_erbs_por_10k_hab"
+          data_type: "double"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Densidade de Estações Rádio Base por 10 mil habitantes"
+        - name: "densidade_erbs_por_100km2"
+          data_type: "double"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Densidade espacial de Estações Rádio Base por 100 quilômetros quadrados"
+        - name: "cobertura_urbana_5g_pct"
+          data_type: "double"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Percentual de cobertura urbana estimada de sinal 5G"
+        - name: "cobertura_urbana_4g_pct"
+          data_type: "double"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Percentual de cobertura urbana estimada de sinal 4G"
+        - name: "source_url"
+          data_type: "string"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "URL do portal ou API oficial do Sistema Mosaico ANATEL"
+        - name: "reference_date"
+          data_type: "string"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Data de referência ISO-8601 da base ANATEL"
+        - name: "extracted_at"
+          data_type: "string"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Timestamp ISO-8601 UTC da extração"
+
+    mosaico_banda_larga_scm:
+      description: "Infraestrutura de Banda Larga Fixa (SCM), presença de backhaul em fibra óptica e acessos FTTH por município"
+      grain: "id_municipio, ano_mes_referencia"
+      primary_keys: ["id_municipio", "ano_mes_referencia"]
+      min_expected_rows: 5
+      columns:
+        - name: "id_municipio"
+          data_type: "string"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Código IBGE de 7 dígitos do município"
+        - name: "nome_municipio"
+          data_type: "string"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Nome oficial do município"
+        - name: "sigla_uf"
+          data_type: "string"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Sigla de 2 letras da Unidade Federativa"
+        - name: "ano_mes_referencia"
+          data_type: "string"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Competência mensal de referência no formato AAAA-MM"
+        - name: "possui_backhaul_fibra"
+          data_type: "boolean"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Indicador booleano de disponibilidade de transporte backhaul em fibra óptica"
+        - name: "total_acessos_scm"
+          data_type: "integer"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Total de acessos ativos em serviço de comunicação multimídia (banda larga fixa)"
+        - name: "acessos_fibra_ftth"
+          data_type: "integer"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Total de acessos fixos via fibra óptica (FTTH/FTTB)"
+        - name: "acessos_cabo_coaxial"
+          data_type: "integer"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Total de acessos fixos via cabo coaxial ou xDSL"
+        - name: "acessos_radio_satelite"
+          data_type: "integer"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Total de acessos fixos via rádio terrestre ou satélite"
+        - name: "participacao_fibra_pct"
+          data_type: "double"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Percentual de acessos em fibra óptica sobre o total de banda larga fixa"
+        - name: "velocidade_mediana_mbps"
+          data_type: "double"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Velocidade mediana contratada de download em Mbps no município"
+        - name: "prestadoras_scm_ativas"
+          data_type: "integer"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Número de prestadoras SCM com base ativa no município"
+        - name: "indice_hhi_concentracao_scm"
+          data_type: "double"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Índice Herfindahl-Hirschman (HHI) de concentração de mercado SCM (0 a 10000)"
+        - name: "source_url"
+          data_type: "string"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "URL oficial da fonte ANATEL"
+        - name: "reference_date"
+          data_type: "string"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Data de referência ISO-8601"
+        - name: "extracted_at"
+          data_type: "string"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Timestamp ISO-8601 UTC da extração"
+
+    mosaico_espectro_radiofrequencia:
+      description: "Alocação de faixas de radiofrequência e largura de banda licenciada por tecnologia e município"
+      grain: "id_municipio, faixa_frequencia_mhz"
+      primary_keys: ["id_municipio", "faixa_frequencia_mhz"]
+      min_expected_rows: 5
+      columns:
+        - name: "id_municipio"
+          data_type: "string"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Código IBGE de 7 dígitos do município"
+        - name: "nome_municipio"
+          data_type: "string"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Nome oficial do município"
+        - name: "sigla_uf"
+          data_type: "string"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Sigla de 2 letras da Unidade Federativa"
+        - name: "faixa_frequencia_mhz"
+          data_type: "string"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Faixa de espectro licenciada em MHz (ex.: 700 MHz, 1800 MHz, 2600 MHz, 3500 MHz)"
+        - name: "geracao_tecnologica"
+          data_type: "string"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Geração tecnológica principal associada à faixa (4G, 5G Standalone, 3G)"
+        - name: "largura_banda_agregada_mhz"
+          data_type: "double"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Largura de banda total agregada alocada na faixa em MHz"
+        - name: "estacoes_licenciadas_faixa"
+          data_type: "integer"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Quantidade de estações operando nesta faixa de radiofrequência"
+        - name: "potencia_media_eirp_dbm"
+          data_type: "double"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Potência efetiva isotropicamente radiada (EIRP) média em dBm"
+        - name: "status_limpeza_faixa"
+          data_type: "string"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Status regulatório de desocupação e liberação da faixa (LIBERADA, EM_TRANSICAO)"
+        - name: "source_url"
+          data_type: "string"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "URL oficial do espectro ANATEL"
+        - name: "reference_date"
+          data_type: "string"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Data de referência ISO-8601"
+        - name: "extracted_at"
+          data_type: "string"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Timestamp ISO-8601 UTC da extração"
+
+    mosaico_cobertura_setores:
+      description: "Indicadores percentuais de cobertura populacional, territorial, rodovias e escolas conectadas"
+      grain: "id_municipio, ano_mes_referencia"
+      primary_keys: ["id_municipio", "ano_mes_referencia"]
+      min_expected_rows: 5
+      columns:
+        - name: "id_municipio"
+          data_type: "string"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Código IBGE de 7 dígitos do município"
+        - name: "nome_municipio"
+          data_type: "string"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Nome oficial do município"
+        - name: "sigla_uf"
+          data_type: "string"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Sigla de 2 letras da Unidade Federativa"
+        - name: "ano_mes_referencia"
+          data_type: "string"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Competência mensal de referência no formato AAAA-MM"
+        - name: "populacao_coberta_4g_pct"
+          data_type: "double"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Percentual da população municipal total coberta por sinal 4G LTE"
+        - name: "populacao_coberta_5g_pct"
+          data_type: "double"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Percentual da população municipal total coberta por sinal 5G NR"
+        - name: "area_geografica_coberta_movel_pct"
+          data_type: "double"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Percentual da área geográfica total do município com cobertura móvel"
+        - name: "cobertura_rodovias_federais_pct"
+          data_type: "double"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Percentual de cobertura de sinal móvel em trechos rodoviários federais no município"
+        - name: "localidades_rurais_conectadas_pct"
+          data_type: "double"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Percentual de localidades rurais e distritos atendidos por conectividade móvel"
+        - name: "escolas_publicas_conectadas_pct"
+          data_type: "double"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Percentual de escolas públicas municipais e estaduais com acesso ativo à internet"
+        - name: "source_url"
+          data_type: "string"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "URL oficial dos mapas de cobertura ANATEL"
+        - name: "reference_date"
+          data_type: "string"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Data de referência ISO-8601"
+        - name: "extracted_at"
+          data_type: "string"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Timestamp ISO-8601 UTC da extração"
+
+    features_telecom_conectividade_municipios_brasil:
+      description: "Gold Feature Store consolidando indicadores de infraestrutura móvel, fibra óptica e scores de conectividade digital por município"
+      grain: "id_municipio"
+      primary_keys: ["id_municipio"]
+      min_expected_rows: 5
+      columns:
+        - name: "id_municipio"
+          data_type: "string"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Código IBGE de 7 dígitos do município"
+        - name: "sigla_uf"
+          data_type: "string"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Sigla de 2 letras da Unidade Federativa"
+        - name: "nome_municipio"
+          data_type: "string"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Nome oficial do município"
+        - name: "total_erbs_licenciadas"
+          data_type: "integer"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Total de Estações Rádio Base licenciadas no município"
+        - name: "erbs_5g_nr"
+          data_type: "integer"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Total de estações com tecnologia 5G NR"
+        - name: "proporcao_erbs_5g_pct"
+          data_type: "double"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Proporção percentual de estações 5G em relação ao parque total de ERBs"
+        - name: "densidade_erbs_por_10k_hab"
+          data_type: "double"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Densidade de ERBs licenciadas por 10 mil habitantes"
+        - name: "possui_backhaul_fibra"
+          data_type: "boolean"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Indicador booleano de existência de backhaul de fibra óptica"
+        - name: "participacao_fibra_ftth_pct"
+          data_type: "double"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Percentual de acessos banda larga fixa via fibra FTTH"
+        - name: "velocidade_mediana_mbps"
+          data_type: "double"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Velocidade mediana de banda larga fixa em Mbps"
+        - name: "populacao_coberta_5g_pct"
+          data_type: "double"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Percentual da população com cobertura 5G estimada"
+        - name: "score_conectividade_digital"
+          data_type: "double"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Score composto de conectividade digital municipal normalizado de 0 a 100"
+        - name: "score_maturidade_5g"
+          data_type: "double"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Score de maturidade e adensamento 5G normalizado de 0 a 100"
+        - name: "classificacao_infraestrutura_telecom"
+          data_type: "string"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Classificação estrutural da conectividade municipal (HUB_5G_FIBRA_AVANCADO, CONECTIVIDADE_CONSOLIDADA, EXPANSAO_INFRAESTRUTURA, GAP_CONECTIVIDADE)"
+        - name: "reference_date"
+          data_type: "string"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Data de referência ISO-8601 da apuração"
+        - name: "extracted_at"
+          data_type: "string"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Timestamp ISO-8601 UTC da geração da Feature Store"

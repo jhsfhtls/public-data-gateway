@@ -1,6 +1,6 @@
 {
   "schema_version": "1.0.0",
-  "last_updated": "2026-11-10T14:38:00.000000",
+  "last_updated": "2026-11-10T18:55:00.000000",
   "project_name": "public-data-gateway",
   "ecosystem": "C.O.R.E. (core, operations, career, studies)",
   "governing_pops": [
@@ -13,10 +13,10 @@
     "POP_T_148"
   ],
   "current_macro_phase_id": "06",
-  "current_macro_phase": "Fase 06 - Ingestão Wave 4 em Andamento (Censo, Trabalho, Logística & Telecom: ibge_sidra, ibge_censo2022, mte_novo_caged, ibge_pnad_continua, ibge_pib_municipal, mte_rais e ibge_malhas homologados)",
+  "current_macro_phase": "Fase 06 - Ingestão Wave 4 em Andamento (Censo, Trabalho, Logística & Telecom: ibge_sidra, ibge_censo2022, mte_novo_caged, ibge_pnad_continua, ibge_pib_municipal, mte_rais, ibge_malhas e anatel_mosaico homologados)",
   "overall_status": "ON_TRACK",
-  "active_connector": "anatel_mosaico",
-  "next_connector": "antt_malha_transporte",
+  "active_connector": "antt_malha_transporte",
+  "next_connector": "datasus_cnes",
   "structural_phases": [
     {
       "phase_id": "00",
@@ -117,7 +117,12 @@
         "Conector ibge_censo2022 (Microdados, Domicílios, Estrutura Etária, Alfabetização, Diversidade) - CONCLUÍDO",
         "Conector mte_novo_caged (Microdados do Novo CAGED, Movimentação Mensal, Perfil Setorial, Salários) - CONCLUÍDO",
         "Conector ibge_pnad_continua (Taxa de Desocupação, Rendimento Médio Real, Subutilização, Informalidade) - CONCLUÍDO",
-        "Conectores mte_rais, ibge_cnefe, ibge_malhas, anatel_mosaico, antt_malha_transporte"
+        "Conector ibge_pib_municipal (PIB Municipal, VAB Setorial, Contas Econômicas) - CONCLUÍDO",
+        "Conector mte_rais (Relação Anual de Informações Sociais - Vínculos & Remuneração) - CONCLUÍDO",
+        "Conector ibge_malhas (Malhas Territoriais Vetoriais - Municípios, UFs, Regiões) - CONCLUÍDO",
+        "Conector ibge_cnefe (Endereçamento Estatístico CNEFE - Censo 2022) - CONCLUÍDO",
+        "Conector anatel_mosaico (Sistema Mosaico ERBs, Banda Larga SCM, Espectro & 5G) - CONCLUÍDO",
+        "Conector antt_malha_transporte (Malha Rodoviária e Ferroviária de Cargas - Próximo)"
       ]
     },
     {
@@ -372,9 +377,21 @@
       "phase_id": "06",
       "milestone": "Homologação do Conector ibge_malhas (4 Tabelas, dbt, Mart de Fronteiras & Live Fail-Hard)",
       "summary": "Implementação e homologação completa do conector ibge_malhas (IBGE: Malhas Territoriais Vetoriais — Municípios, UFs, Regiões e Brasil, Leis nº 5.534/1968, 5.878/1973, Decreto nº 73.177/1973 e Portaria IBGE nº 123/2021) consolidando o oitavo conector da Wave 4 e 26º conector total da plataforma (53.1% do catálogo homologado): 4 tabelas Silver (malhas_municipios, malhas_ufs, malhas_regioes, malhas_brasil) e Gold Feature Store materializadas em data/ibge_malhas/{silver,gold}/; 7 novos modelos dbt (4 staging views, fct_malhas_geometria_municipio, dim_malha_territorial_uf, mart_inteligencia_territorial_fronteiras_brasil) totalizando 243 modelos dbt e 2.430 testes dbt 100% aprovados com 0 erros; 2.982 colunas 100% documentadas no linter (100% coverage); feature store features_malhas_territoriais_municipios_brasil.parquet gerada com score de compacidade territorial Polsby-Popper (0 a 100) e score de isolamento geográfico; testes reais com fail-hard estrito contra APIs oficiais do IBGE com 10 testes pytest aprovados; multi-interface completa via SDK (BrazilData.geo.malhas_*, get_municipio_boundary, get_uf_boundary, get_territorial_features, list_top_compact_municipalities), CLI (bdg malhas municipio/uf/features/ranking), REST API (/api/v1/geo/malhas/* e atalho /api/v1/malhas/*) e MCP (bdg_get_municipio_boundary, bdg_get_uf_boundary, bdg_get_territorial_features, bdg_list_top_compact_municipalities) com contenção de prompt injection wrap_untrusted_gov_data."
+    },
+    {
+      "date": "2026-11-10",
+      "phase_id": "06",
+      "milestone": "Homologação do Conector anatel_mosaico (4 Tabelas, dbt, Mart Conectividade 5G & Live Fail-Hard)",
+      "summary": "Implementação e homologação completa do conector anatel_mosaico (ANATEL: Sistema Mosaico de Estações e Cobertura de Telecomunicações, Leis nº 9.472/1997, 13.116/2015, Resolução ANATEL nº 719/2020 e Decreto nº 8.777/2016) consolidando o nono conector da Wave 4 e 27º conector total da plataforma (55.1% do catálogo homologado): 4 tabelas Silver (mosaico_estacoes_smp, mosaico_banda_larga_scm, mosaico_espectro_radiofrequencia, mosaico_cobertura_setores) e Gold Feature Store materializadas em data/anatel_mosaico/{silver,gold}/; 7 novos modelos dbt (4 staging views, fct_anatel_infraestrutura_telecom_municipio, fct_anatel_alocacao_espectro_municipio, mart_conectividade_digital_telecom_brasil) totalizando 250 modelos dbt e 182 testes seletivos do build 100% aprovados com 0 erros; 3.125 colunas 100% documentadas no linter (100% coverage); feature store features_telecom_conectividade_municipios_brasil.parquet gerada com score de conectividade digital (0 a 100), score de maturidade 5G e tier de infraestrutura; testes reais com fail-hard estrito contra os portais oficiais da ANATEL com 9 testes pytest aprovados; multi-interface completa via SDK (BrazilData.geo.anatel_connector, get_telecom_stations, get_broadband_profile, list_spectrum_allocations, get_telecom_features, list_top_connected_municipalities), CLI (bdg anatel stations/broadband/spectrum/features/ranking), REST API (/api/v1/geo/anatel/* e atalho /api/v1/anatel/*) e MCP (bdg_get_anatel_stations, bdg_get_anatel_broadband, bdg_get_anatel_telecom_features, bdg_list_top_connected_municipalities) com contenção de prompt injection wrap_untrusted_gov_data."
     }
   ],
   "recent_milestones": [
+    {
+      "date": "2026-11-10",
+      "phase_id": "06",
+      "milestone": "Homologação do Conector anatel_mosaico (4 Tabelas, dbt, Mart Conectividade 5G & Live Fail-Hard)",
+      "summary": "Implementação e homologação completa do conector anatel_mosaico (ANATEL: Sistema Mosaico de Estações e Cobertura de Telecomunicações, Leis nº 9.472/1997, 13.116/2015, Resolução ANATEL nº 719/2020 e Decreto nº 8.777/2016) consolidando o nono conector da Wave 4 e 27º conector total da plataforma (55.1% do catálogo homologado): 4 tabelas Silver (mosaico_estacoes_smp, mosaico_banda_larga_scm, mosaico_espectro_radiofrequencia, mosaico_cobertura_setores) e Gold Feature Store materializadas em data/anatel_mosaico/{silver,gold}/; 7 novos modelos dbt (4 staging views, fct_anatel_infraestrutura_telecom_municipio, fct_anatel_alocacao_espectro_municipio, mart_conectividade_digital_telecom_brasil) totalizando 250 modelos dbt e 182 testes seletivos do build 100% aprovados com 0 erros; 3.125 colunas 100% documentadas no linter (100% coverage); feature store features_telecom_conectividade_municipios_brasil.parquet gerada com score de conectividade digital (0 a 100), score de maturidade 5G e tier de infraestrutura; testes reais com fail-hard estrito contra os portais oficiais da ANATEL com 9 testes pytest aprovados; multi-interface completa via SDK (BrazilData.geo.anatel_connector, get_telecom_stations, get_broadband_profile, list_spectrum_allocations, get_telecom_features, list_top_connected_municipalities), CLI (bdg anatel stations/broadband/spectrum/features/ranking), REST API (/api/v1/geo/anatel/* e atalho /api/v1/anatel/*) e MCP (bdg_get_anatel_stations, bdg_get_anatel_broadband, bdg_get_anatel_telecom_features, bdg_list_top_connected_municipalities) com contenção de prompt injection wrap_untrusted_gov_data."
+    },
     {
       "date": "2026-11-10",
       "phase_id": "06",

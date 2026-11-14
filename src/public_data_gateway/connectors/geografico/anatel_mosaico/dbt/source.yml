@@ -1,0 +1,16 @@
+version: 2
+
+sources:
+  - name: anatel_mosaico_silver
+    description: "Bases oficiais do Sistema Mosaico e Painel de Conectividade da ANATEL normalizadas na camada Silver."
+    meta:
+      external_location: "data/anatel_mosaico/silver/{name}.parquet"
+    tables:
+      - name: mosaico_estacoes_smp
+        description: "Estações Rádio Base (ERBs) licenciadas do Serviço Móvel Pessoal por tecnologia (5G NR, 4G, 3G, 2G) e município."
+      - name: mosaico_banda_larga_scm
+        description: "Infraestrutura de Banda Larga Fixa (SCM), backhaul de fibra óptica e acessos FTTH por município."
+      - name: mosaico_espectro_radiofrequencia
+        description: "Alocação de faixas de radiofrequência e largura de banda licenciada por tecnologia e município."
+      - name: mosaico_cobertura_setores
+        description: "Indicadores percentuais de cobertura populacional, territorial, rodovias e escolas públicas conectadas."

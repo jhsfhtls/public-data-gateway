@@ -718,7 +718,7 @@ sources:
   - P09
   rice_score: 510
   roadmap_wave: 4
-  status: CATALOGED
+  status: HOMOLOGATED
 - source_id: antt_malha_transporte
   name: 'ANTT: Malha de Transporte Rodoviário e Ferroviário de Cargas'
   agency: Agência Nacional de Transportes Terrestres (ANTT)

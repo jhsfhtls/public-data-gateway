@@ -569,6 +569,35 @@ def build_parser() -> argparse.ArgumentParser:
     malhas_rank_p.add_argument("--uf", type=str, help="Optional 2-letter state filter")
     malhas_rank_p.add_argument("--json", action="store_true", help="Output in JSON format")
 
+    # Telecomunicações e Conectividade (ANATEL Sistema Mosaico)
+    anatel_p = subparsers.add_parser(
+        "anatel",
+        help="Query official ANATEL Mosaico telecom stations (ERBs), fiber broadband and 5G connectivity scores.",
+    )
+    anatel_sub = anatel_p.add_subparsers(dest="anatel_action", required=True)
+
+    anatel_st_p = anatel_sub.add_parser("stations", help="Query licensed SMP stations (ERBs) and mobile coverage for a municipality.")
+    anatel_st_p.add_argument("id_municipio", type=str, help="IBGE 7-digit municipality code")
+    anatel_st_p.add_argument("--json", action="store_true", help="Output in JSON format")
+
+    anatel_bb_p = anatel_sub.add_parser("broadband", help="Query fixed broadband (SCM) and fiber FTTH profile for a municipality.")
+    anatel_bb_p.add_argument("id_municipio", type=str, help="IBGE 7-digit municipality code")
+    anatel_bb_p.add_argument("--json", action="store_true", help="Output in JSON format")
+
+    anatel_sp_p = anatel_sub.add_parser("spectrum", help="List radiofrequency spectrum allocations for a municipality.")
+    anatel_sp_p.add_argument("id_municipio", type=str, help="IBGE 7-digit municipality code")
+    anatel_sp_p.add_argument("--faixa", type=str, help="Optional frequency band filter (e.g. 3500)")
+    anatel_sp_p.add_argument("--json", action="store_true", help="Output in JSON format")
+
+    anatel_ft_p = anatel_sub.add_parser("features", help="Query Gold digital connectivity features and 5G maturity score.")
+    anatel_ft_p.add_argument("id_municipio", type=str, help="IBGE 7-digit municipality code")
+    anatel_ft_p.add_argument("--json", action="store_true", help="Output in JSON format")
+
+    anatel_rk_p = anatel_sub.add_parser("ranking", help="List top municipalities ranked by digital connectivity score.")
+    anatel_rk_p.add_argument("--limit", type=int, default=10, help="Max municipalities to list")
+    anatel_rk_p.add_argument("--uf", type=str, help="Optional 2-letter state filter")
+    anatel_rk_p.add_argument("--json", action="store_true", help="Output in JSON format")
+
     # Direct shortcut: pnad-uf
     pnad_s_p = subparsers.add_parser("pnad-uf", help="Shortcut to query PNAD Contínua labor market profile.")
     pnad_s_p.add_argument("uf", type=str, help="IBGE 2-digit UF code or 2-letter state abbreviation (e.g. SP, 35)")
@@ -1958,6 +1987,73 @@ def main(argv: Sequence[str] | None = None) -> int:
                     print(f"Top {len(ranks)} Municípios por Compacidade Territorial (IBGE Malhas):")
                     for idx, r in enumerate(ranks, 1):
                         print(f"  {idx}. {r.get('nome_municipio')} ({r.get('sigla_uf')}): Score {r.get('score_compacidade_territorial')} | {r.get('area_aproximada_km2'):,.2f} km²")
+                return 0
+
+        elif args.command == "anatel":
+            from public_data_gateway.connectors.geografico.anatel_mosaico.connector import (
+                AnatelMosaicoConnector,
+            )
+
+            anatel_conn = AnatelMosaicoConnector(settings=settings)
+            anatel_action = getattr(args, "anatel_action", None)
+
+            if anatel_action == "stations":
+                res = anatel_conn.get_station_coverage_summary(args.id_municipio)
+                if getattr(args, "json", False):
+                    print(json.dumps(res, indent=2, ensure_ascii=False, default=str))
+                else:
+                    print(f"ANATEL Mosaico Estações SMP ({res.get('nome_municipio')} - {res.get('id_municipio')}):")
+                    print(f"  Total ERBs:          {res.get('total_erbs_licenciadas')} (5G: {res.get('erbs_5g_nr')}, 4G: {res.get('erbs_4g_lte')})")
+                    print(f"  Operadora Líder:     {res.get('operadora_lider_erbs')}")
+                    print(f"  Densidade 10k hab:   {res.get('densidade_erbs_por_10k_hab')}")
+                    print(f"  Cobertura Urbana 5G: {res.get('cobertura_urbana_5g_pct')}%")
+                return 0
+
+            if anatel_action == "broadband":
+                res = anatel_conn.get_broadband_scm_profile(args.id_municipio)
+                if getattr(args, "json", False):
+                    print(json.dumps(res, indent=2, ensure_ascii=False, default=str))
+                else:
+                    print(f"ANATEL Mosaico Banda Larga SCM ({res.get('nome_municipio')} - {res.get('id_municipio')}):")
+                    print(f"  Backhaul Fibra:      {res.get('possui_backhaul_fibra')}")
+                    print(f"  Total Acessos SCM:   {res.get('total_acessos_scm')} ({res.get('participacao_fibra_pct')}% fibra FTTH)")
+                    print(f"  Velocidade Mediana:  {res.get('velocidade_mediana_mbps')} Mbps")
+                    print(f"  HHI Concentração:    {res.get('indice_hhi_concentracao_scm')}")
+                return 0
+
+            if anatel_action == "spectrum":
+                rows = anatel_conn.list_spectrum_allocations(
+                    args.id_municipio, faixa_frequencia_mhz=getattr(args, "faixa", None)
+                )
+                if getattr(args, "json", False):
+                    print(json.dumps(rows, indent=2, ensure_ascii=False, default=str))
+                else:
+                    print(f"ANATEL Alocações de Espectro ({args.id_municipio}):")
+                    for r in rows:
+                        print(f"  - {r.get('faixa_frequencia_mhz')} ({r.get('geracao_tecnologica')}): {r.get('estacoes_licenciadas_faixa')} estações | {r.get('largura_banda_agregada_mhz')} MHz")
+                return 0
+
+            if anatel_action == "features":
+                feat = anatel_conn.get_telecom_features(args.id_municipio)
+                if getattr(args, "json", False):
+                    print(json.dumps(feat, indent=2, ensure_ascii=False, default=str))
+                else:
+                    print(f"ANATEL Features Conectividade: {feat.get('nome_municipio')} ({feat.get('sigla_uf')} - {feat.get('id_municipio')}):")
+                    print(f"  Score Conectividade: {feat.get('score_conectividade_digital')}/100.0")
+                    print(f"  Score Maturidade 5G: {feat.get('score_maturidade_5g')}/100.0")
+                    print(f"  Classificação:       {feat.get('classificacao_infraestrutura_telecom')}")
+                return 0
+
+            if anatel_action == "ranking":
+                ranks = anatel_conn.list_top_connected_municipalities(
+                    limit=getattr(args, "limit", 10), sigla_uf=getattr(args, "uf", None)
+                )
+                if getattr(args, "json", False):
+                    print(json.dumps(ranks, indent=2, ensure_ascii=False, default=str))
+                else:
+                    print(f"Top {len(ranks)} Municípios por Conectividade Digital (ANATEL Mosaico):")
+                    for idx, r in enumerate(ranks, 1):
+                        print(f"  {idx}. {r.get('nome_municipio')} ({r.get('sigla_uf')}): Score {r.get('score_conectividade_digital')} | 5G: {r.get('score_maturidade_5g')} | {r.get('classificacao_infraestrutura_telecom')}")
                 return 0
 
         elif args.command == "pib-municipal":
