@@ -217,6 +217,7 @@
       "status": "PENDING",
       "completion_date": null,
       "deliverables": [
+        "DISCLAIMER OPEN CORE (Separação Público vs. Privado): Este repositório público fornece a engine genérica de espelhamento (adaptadores S3/R2/MotherDuck/BigQuery via env vars) e os metadados de Freshness/SLA no catálogo; já a infraestrutura produtiva (IaC Terraform/Pulumi, buckets reais, orquestração 24/7, credenciais, billing e camada SaaS/API paga) residirá em um repositório privado separado que consome este pacote como dependência",
         "Arquitetura de Lakehouse na Nuvem: Espelhamento contínuo dos datasets Silver e Gold (Parquet ZSTD) para Object Storage global (AWS S3 ou Cloudflare R2 com custo zero de egress)",
         "Pipeline de Ingestão em Lote e CDC (Change Data Capture): Rotinas agendadas (Cron/Airflow/GitHub Actions) para baixar dumps massivos (ex: 55M CNPJs RFB, CVM DFP/ITR anual) e sincronizar deltas incrementais sem depender de chamadas pontuais às APIs governamentais",
         "Public Data Warehouse Serverless: Disponibilização de catálogo DuckDB / MotherDuck / BigQuery permitindo consultas analíticas em milissegundos sobre todo o patrimônio de dados públicos do Brasil",
