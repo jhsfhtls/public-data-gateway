@@ -1925,6 +1925,89 @@ def create_app(settings: GatewaySettings | None = None) -> FastAPI:
         except ValueError as exc:
             raise HTTPException(status_code=400, detail=str(exc)) from exc
 
+    @app.get("/api/v1/education/enem/top-municipalities")
+    async def get_top_enem_municipalities(
+        limit: int = Query(10, ge=1, le=50, description="Max municipalities to list"),
+        uf: str | None = Query(None, description="Filter by 2-letter state abbreviation"),
+    ) -> list[dict[str, Any]]:
+        from public_data_gateway.connectors.educacao.inep_enem.connector import (
+            INEPEnemConnector,
+        )
+
+        conn = INEPEnemConnector(settings=app_settings)
+        try:
+            return conn.list_top_enem_municipalities(limit=limit, sigla_uf=uf)
+        except ValueError as exc:
+            raise HTTPException(status_code=400, detail=str(exc)) from exc
+
+    @app.get("/api/v1/education/enem/features/{id_municipio}")
+    async def get_enem_features(id_municipio: str) -> dict[str, Any]:
+        from public_data_gateway.connectors.educacao.inep_enem.connector import (
+            INEPEnemConnector,
+        )
+
+        conn = INEPEnemConnector(settings=app_settings)
+        try:
+            return conn.get_enem_performance_equity_features(id_municipio)
+        except ValueError as exc:
+            raise HTTPException(status_code=400, detail=str(exc)) from exc
+
+    @app.get("/api/v1/education/enem/networks/{id_municipio}")
+    async def get_enem_networks(
+        id_municipio: str,
+        rede: str | None = Query(
+            None, description="Optional school network dependency filter (e.g. Privada)"
+        ),
+    ) -> list[dict[str, Any]]:
+        from public_data_gateway.connectors.educacao.inep_enem.connector import (
+            INEPEnemConnector,
+        )
+
+        conn = INEPEnemConnector(settings=app_settings)
+        try:
+            return conn.list_enem_scores_by_school_network(
+                id_municipio, dependencia_rede=rede
+            )
+        except ValueError as exc:
+            raise HTTPException(status_code=400, detail=str(exc)) from exc
+
+    @app.get("/api/v1/education/enem/essay/{id_municipio}")
+    async def get_enem_essay(id_municipio: str) -> dict[str, Any]:
+        from public_data_gateway.connectors.educacao.inep_enem.connector import (
+            INEPEnemConnector,
+        )
+
+        conn = INEPEnemConnector(settings=app_settings)
+        try:
+            return conn.get_enem_essay_competencies(id_municipio)
+        except ValueError as exc:
+            raise HTTPException(status_code=400, detail=str(exc)) from exc
+
+    @app.get("/api/v1/education/enem/equity/{id_municipio}")
+    async def get_enem_equity(id_municipio: str) -> dict[str, Any]:
+        from public_data_gateway.connectors.educacao.inep_enem.connector import (
+            INEPEnemConnector,
+        )
+
+        conn = INEPEnemConnector(settings=app_settings)
+        try:
+            return conn.get_enem_socioeconomic_equity(id_municipio)
+        except ValueError as exc:
+            raise HTTPException(status_code=400, detail=str(exc)) from exc
+
+    @app.get("/api/v1/education/enem/scores/{id_municipio}")
+    @app.get("/api/v1/enem/{id_municipio}")
+    async def get_enem_scores(id_municipio: str) -> dict[str, Any]:
+        from public_data_gateway.connectors.educacao.inep_enem.connector import (
+            INEPEnemConnector,
+        )
+
+        conn = INEPEnemConnector(settings=app_settings)
+        try:
+            return conn.get_enem_municipal_area_scores(id_municipio)
+        except ValueError as exc:
+            raise HTTPException(status_code=400, detail=str(exc)) from exc
+
     @app.get("/api/v1/real-estate/onr/top-municipalities")
     async def get_top_onr_municipalities(
         limit: int = Query(10, ge=1, le=50, description="Max municipalities to list"),

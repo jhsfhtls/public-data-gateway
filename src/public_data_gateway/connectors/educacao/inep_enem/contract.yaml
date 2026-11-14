@@ -1,0 +1,569 @@
+schema_version: "3.1.0"
+contract_id: "ODCS-BR-INEP-ENEM-001"
+source_id: "inep_enem"
+version: "1.0.0"
+name: "INEP: Microdados do Exame Nacional do Ensino Médio (ENEM)"
+agency: "Instituto Nacional de Estudos e Pesquisas Educacionais Anísio Teixeira (INEP)"
+official_url: "https://www.gov.br/inep/pt-br/acesso-a-informacao/dados-abertos/microdados/enem"
+
+legal_framework:
+  statutes:
+    - name: "Lei nº 9.394/1996 (LDB)"
+      description: "Lei de Diretrizes e Bases da Educação Nacional que orienta a avaliação nacional do ensino médio e o acesso ao ensino superior"
+    - name: "Portaria MEC nº 438/1998"
+      description: "Institui o Exame Nacional do Ensino Médio (ENEM) como instrumento de avaliação de competências e habilidades dos concluintes"
+    - name: "Lei nº 12.711/2012 (Lei de Cotas / SiSU)"
+      description: "Dispõe sobre o ingresso nas universidades federais e instituições federais de ensino técnico via políticas afirmativas e nota ENEM"
+    - name: "Lei nº 13.709/2018 (LGPD)"
+      description: "Regula a anonimização e proteção de microdados educacionais e socioeconômicos de participantes do ENEM"
+    - name: "Decreto nº 8.777/2016"
+      description: "Institui a Política de Dados Abertos do Poder Executivo Federal aplicável aos microdados públicos do INEP"
+
+data_governance:
+  grain: "municipio_desempenho_equidade_enem"
+  primary_keys:
+    - "id_municipio"
+    - "sigla_uf"
+  reference_date_column: "reference_date"
+  min_expected_rows: 10
+  max_volume_drop_pct: 15.0
+  freshness_sla_hours: 720
+  lgpd_tier: "ANONYMIZED_MICRODATA"
+  ml_feature_domains:
+    - "exam_performance"
+    - "socioeconomic_test_scores"
+
+schema:
+  tables:
+    enem_desempenho_municipal_areas:
+      description: "Desempenho municipal consolidado no ENEM nas quatro áreas de conhecimento TRI (Linguagens, Humanas, Natureza e Matemática), inscritos confirmados e taxa de presença nos 2 dias."
+      grain: "id_municipio, ano_edicao_enem"
+      primary_keys: ["id_municipio", "ano_edicao_enem"]
+      min_expected_rows: 12
+      columns:
+        - name: "id_municipio"
+          data_type: "string"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Código IBGE de 7 dígitos identificador único do município."
+        - name: "nome_municipio"
+          data_type: "string"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Nome oficial do município."
+        - name: "sigla_uf"
+          data_type: "string"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Sigla de 2 letras da Unidade Federativa."
+        - name: "id_uf"
+          data_type: "string"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Código IBGE de 2 dígitos da Unidade Federativa."
+        - name: "regiao"
+          data_type: "string"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Grande região geográfica brasileira segundo o IBGE."
+        - name: "ano_edicao_enem"
+          data_type: "int64"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Ano de aplicação da edição oficial do ENEM."
+        - name: "inscritos_confirmados_enem_ano"
+          data_type: "int64"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Total municipal de participantes com inscrição confirmada na edição do ENEM."
+        - name: "participantes_presentes_2dias_ano"
+          data_type: "int64"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Participantes que compareceram às provas nos dois dias de aplicação do exame."
+        - name: "taxa_presenca_efetiva_2dias_pct"
+          data_type: "float64"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Taxa percentual de presença efetiva nos dois dias de prova em relação aos inscritos (%)."
+        - name: "nota_media_linguagens_codigos_lc"
+          data_type: "float64"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Nota média municipal TRI em Linguagens, Códigos e suas Tecnologias (LC)."
+        - name: "nota_media_ciencias_humanas_ch"
+          data_type: "float64"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Nota média municipal TRI em Ciências Humanas e suas Tecnologias (CH)."
+        - name: "nota_media_ciencias_natureza_cn"
+          data_type: "float64"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Nota média municipal TRI em Ciências da Natureza e suas Tecnologias (CN)."
+        - name: "nota_media_matematica_mt"
+          data_type: "float64"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Nota média municipal TRI em Matemática e suas Tecnologias (MT)."
+        - name: "nota_media_objetivas_tri_geral"
+          data_type: "float64"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Média aritmética municipal das quatro áreas objetivas avaliadas pela TRI."
+        - name: "reference_date"
+          data_type: "string"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Data de referência ISO-8601 da divulgação dos microdados do ENEM."
+        - name: "extracted_at"
+          data_type: "string"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Timestamp ISO-8601 UTC da extração."
+
+    enem_desempenho_rede_ensino:
+      description: "Desempenho no ENEM desagregado por dependência administrativa da escola de conclusão do ensino médio (Federal, Estadual, Privada e EJA/Demais)."
+      grain: "id_municipio, ano_edicao_enem, dependencia_administrativa_escola"
+      primary_keys: ["id_municipio", "ano_edicao_enem", "dependencia_administrativa_escola"]
+      min_expected_rows: 48
+      columns:
+        - name: "id_municipio"
+          data_type: "string"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Código IBGE de 7 dígitos identificador único do município."
+        - name: "nome_municipio"
+          data_type: "string"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Nome oficial do município."
+        - name: "sigla_uf"
+          data_type: "string"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Sigla de 2 letras da Unidade Federativa."
+        - name: "id_uf"
+          data_type: "string"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Código IBGE de 2 dígitos da Unidade Federativa."
+        - name: "regiao"
+          data_type: "string"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Grande região geográfica brasileira segundo o IBGE."
+        - name: "ano_edicao_enem"
+          data_type: "int64"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Ano de aplicação da edição oficial do ENEM."
+        - name: "dependencia_administrativa_escola"
+          data_type: "string"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Dependência administrativa da escola informada no ENEM (Rede Federal, Estadual, Privada ou EJA)."
+        - name: "categoria_escola_enem"
+          data_type: "string"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Categoria analítica padronizada da rede escolar (Publica_Federal, Publica_Estadual, Privada, Publica_EJA_Outros)."
+        - name: "concluintes_participantes_rede"
+          data_type: "int64"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Número de concluintes ou participantes presentes vinculados à respectiva dependência administrativa."
+        - name: "nota_media_objetivas_rede"
+          data_type: "float64"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Média geral nas provas objetivas TRI para os participantes desta rede."
+        - name: "nota_media_matematica_rede"
+          data_type: "float64"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Média TRI em Matemática para os participantes desta rede de ensino."
+        - name: "nota_media_redacao_rede"
+          data_type: "float64"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Nota média na prova de Redação entre participantes desta rede de ensino."
+        - name: "reference_date"
+          data_type: "string"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Data de referência ISO-8601 da divulgação dos microdados do ENEM."
+        - name: "extracted_at"
+          data_type: "string"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Timestamp ISO-8601 UTC da extração."
+
+    enem_redacao_competencias_municipio:
+      description: "Desempenho municipal em Redação e nas competências da matriz de correção do ENEM, redações de excelência (900+) e taxa de nota zero ou anulação."
+      grain: "id_municipio, ano_edicao_enem"
+      primary_keys: ["id_municipio", "ano_edicao_enem"]
+      min_expected_rows: 12
+      columns:
+        - name: "id_municipio"
+          data_type: "string"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Código IBGE de 7 dígitos identificador único do município."
+        - name: "nome_municipio"
+          data_type: "string"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Nome oficial do município."
+        - name: "sigla_uf"
+          data_type: "string"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Sigla de 2 letras da Unidade Federativa."
+        - name: "id_uf"
+          data_type: "string"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Código IBGE de 2 dígitos da Unidade Federativa."
+        - name: "regiao"
+          data_type: "string"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Grande região geográfica brasileira segundo o IBGE."
+        - name: "ano_edicao_enem"
+          data_type: "int64"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Ano de aplicação da edição oficial do ENEM."
+        - name: "nota_media_redacao_enem"
+          data_type: "float64"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Nota média municipal obtida na prova de Redação (escala de 0 a 1000)."
+        - name: "nota_media_comp1_norma_padrao"
+          data_type: "float64"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Nota média municipal na Competência I (domínio da modalidade escrita formal da Língua Portuguesa, 0-200)."
+        - name: "nota_media_comp3_argumentacao"
+          data_type: "float64"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Nota média municipal na Competência III (seleção, organização e interpretação argumentativa, 0-200)."
+        - name: "nota_media_comp5_proposta_intervencao"
+          data_type: "float64"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Nota média municipal na Competência V (proposta de intervenção respeitando os direitos humanos, 0-200)."
+        - name: "redacoes_nota_900_mais_ano"
+          data_type: "int64"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Quantidade absoluta de redações no município com nota igual ou superior a 900 pontos."
+        - name: "proporcao_redacao_900_mais_pct"
+          data_type: "float64"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Percentual de participantes presentes que alcançaram nota igual ou superior a 900 na Redação (%)."
+        - name: "taxa_redacao_zero_ou_anulada_pct"
+          data_type: "float64"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Percentual de provas de Redação zeradas ou anuladas por critérios formais do edital (%)."
+        - name: "reference_date"
+          data_type: "string"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Data de referência ISO-8601 da divulgação dos microdados do ENEM."
+        - name: "extracted_at"
+          data_type: "string"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Timestamp ISO-8601 UTC da extração."
+
+    enem_equidade_socioeconomica_acesso:
+      description: "Indicadores municipais do questionário socioeconômico QSE do ENEM: isenção de taxa, participação da rede pública, acesso à internet domiciliar Q025, gap pública vs. privada e elegibilidade SiSU/ProUni/FIES."
+      grain: "id_municipio, ano_edicao_enem"
+      primary_keys: ["id_municipio", "ano_edicao_enem"]
+      min_expected_rows: 12
+      columns:
+        - name: "id_municipio"
+          data_type: "string"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Código IBGE de 7 dígitos identificador único do município."
+        - name: "nome_municipio"
+          data_type: "string"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Nome oficial do município."
+        - name: "sigla_uf"
+          data_type: "string"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Sigla de 2 letras da Unidade Federativa."
+        - name: "id_uf"
+          data_type: "string"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Código IBGE de 2 dígitos da Unidade Federativa."
+        - name: "regiao"
+          data_type: "string"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Grande região geográfica brasileira segundo o IBGE."
+        - name: "ano_edicao_enem"
+          data_type: "int64"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Ano de aplicação da edição oficial do ENEM."
+        - name: "proporcao_isencao_taxa_inscricao_pct"
+          data_type: "float64"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Percentual de inscritos beneficiados com isenção da taxa de inscrição (CadÚnico / Lei nº 12.799/2013) (%)."
+        - name: "proporcao_concluintes_escola_publica_pct"
+          data_type: "float64"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Participação percentual de estudantes egressos ou concluintes de escolas públicas no total de participantes (%)."
+        - name: "acesso_internet_domiciliar_q025_pct"
+          data_type: "float64"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Percentual de participantes com acesso domiciliar à internet declarado no item Q025 do QSE (%)."
+        - name: "gap_nota_objetiva_privada_vs_publica_pts"
+          data_type: "float64"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Diferença em pontos TRI nas provas objetivas entre concluintes da rede privada e da rede estadual pública."
+        - name: "razao_equidade_publica_privada_enem"
+          data_type: "float64"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Razão entre a média objetiva da rede estadual pública e da rede privada no município (0 a 1)."
+        - name: "aptos_sisu_prouni_fies_nota_450_pct"
+          data_type: "float64"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Percentual de participantes presentes com média >= 450 pontos nas objetivas e nota de redação > 0 aptos a SiSU/ProUni/FIES (%)."
+        - name: "indice_paridade_socioeconomica_qse"
+          data_type: "float64"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Índice sintético de paridade de desempenho entre estratos de menor e maior renda familiar declarada no QSE (0 a 1)."
+        - name: "reference_date"
+          data_type: "string"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Data de referência ISO-8601 da divulgação dos microdados do ENEM."
+        - name: "extracted_at"
+          data_type: "string"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Timestamp ISO-8601 UTC da extração."
+
+    features_enem_desempenho_equidade_municipios_brasil:
+      description: "Feature Store Gold municipal consolidando desempenho cognitivo TRI no ENEM, excelência em Redação (900+), equidade pública-privada, elegibilidade SiSU/ProUni/FIES e classificação analítica em 4 tiers."
+      grain: "id_municipio"
+      primary_keys: ["id_municipio"]
+      min_expected_rows: 12
+      columns:
+        - name: "id_municipio"
+          data_type: "string"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Código IBGE de 7 dígitos identificador único do município."
+        - name: "nome_municipio"
+          data_type: "string"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Nome oficial do município."
+        - name: "sigla_uf"
+          data_type: "string"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Sigla de 2 letras da Unidade Federativa."
+        - name: "id_uf"
+          data_type: "string"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Código IBGE de 2 dígitos da Unidade Federativa."
+        - name: "regiao"
+          data_type: "string"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Grande região geográfica brasileira segundo o IBGE."
+        - name: "ano_edicao_enem"
+          data_type: "int64"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Ano de aplicação da edição oficial do ENEM."
+        - name: "inscritos_confirmados_enem_ano"
+          data_type: "int64"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Total municipal de participantes com inscrição confirmada na edição do ENEM."
+        - name: "participantes_presentes_2dias_ano"
+          data_type: "int64"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Participantes que compareceram às provas nos dois dias de aplicação do exame."
+        - name: "taxa_presenca_efetiva_2dias_pct"
+          data_type: "float64"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Taxa percentual de presença efetiva nos dois dias de prova em relação aos inscritos (%)."
+        - name: "nota_media_ciencias_natureza_cn"
+          data_type: "float64"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Nota média municipal TRI em Ciências da Natureza e suas Tecnologias (CN)."
+        - name: "nota_media_matematica_mt"
+          data_type: "float64"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Nota média municipal TRI em Matemática e suas Tecnologias (MT)."
+        - name: "nota_media_objetivas_tri_geral"
+          data_type: "float64"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Média aritmética municipal das quatro áreas objetivas avaliadas pela TRI."
+        - name: "nota_media_redacao_enem"
+          data_type: "float64"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Nota média municipal obtida na prova de Redação (escala de 0 a 1000)."
+        - name: "proporcao_redacao_900_mais_pct"
+          data_type: "float64"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Percentual de participantes presentes que alcançaram nota igual ou superior a 900 na Redação (%)."
+        - name: "proporcao_concluintes_escola_publica_pct"
+          data_type: "float64"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Participação percentual de egressos ou concluintes da rede pública no exame (%)."
+        - name: "acesso_internet_domiciliar_q025_pct"
+          data_type: "float64"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Percentual de participantes com acesso domiciliar à internet declarado no QSE Q025 (%)."
+        - name: "razao_equidade_publica_privada_enem"
+          data_type: "float64"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Razão entre a média objetiva da rede estadual pública e da rede privada (0 a 1)."
+        - name: "aptos_sisu_prouni_fies_nota_450_pct"
+          data_type: "float64"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Percentual de participantes presentes elegíveis a SiSU/ProUni/FIES (média >= 450 e redação > 0) (%)."
+        - name: "score_desempenho_cognitivo_enem"
+          data_type: "float64"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Score normalizado (0 a 100) composto pela média objetiva TRI (45%), média em Redação (35%) e proporção de notas 900+ (20%)."
+        - name: "score_equidade_acesso_ensino_superior_enem"
+          data_type: "float64"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Score normalizado (0 a 100) de presença efetiva (30%), elegibilidade SiSU/ProUni/FIES (35%) e equidade pública-privada (35%)."
+        - name: "classificacao_desempenho_enem_municipal"
+          data_type: "string"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Classificação analítica do município em 4 tiers de excelência cognitiva e equidade no acesso ao ensino superior."
+        - name: "reference_date"
+          data_type: "string"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Data de referência ISO-8601 da consolidação ENEM."
+        - name: "extracted_at"
+          data_type: "string"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Timestamp ISO-8601 UTC da extração."

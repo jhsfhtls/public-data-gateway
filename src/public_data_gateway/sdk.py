@@ -1144,6 +1144,7 @@ class EducationFacade:
         self._censo_escolar_connector: Any = None
         self._censo_superior_connector: Any = None
         self._ideb_connector: Any = None
+        self._enem_connector: Any = None
 
     @property
     def censo_escolar_connector(self) -> Any:
@@ -1178,6 +1179,16 @@ class EducationFacade:
 
             self._ideb_connector = INEPIdebConnector(settings=self._sdk.settings)
         return self._ideb_connector
+
+    @property
+    def enem_connector(self) -> Any:
+        if self._enem_connector is None:
+            from public_data_gateway.connectors.educacao.inep_enem.connector import (
+                INEPEnemConnector,
+            )
+
+            self._enem_connector = INEPEnemConnector(settings=self._sdk.settings)
+        return self._enem_connector
 
     def get_censo_escolar_infrastructure(self, id_municipio: str) -> dict[str, Any]:
         """Get municipal active schools inventory, broadband internet, labs, and PcD accessibility (INEP)."""
@@ -1272,6 +1283,40 @@ class EducationFacade:
     ) -> list[dict[str, Any]]:
         """List top Brazilian municipalities ranked by composite INEP IDEB educational quality score."""
         return self.ideb_connector.list_top_ideb_municipalities(
+            limit=limit, sigla_uf=sigla_uf
+        )
+
+    def get_enem_municipal_area_scores(self, id_municipio: str) -> dict[str, Any]:
+        """Get official municipal INEP ENEM mean TRI scores across all four knowledge areas and 2-day attendance."""
+        return self.enem_connector.get_enem_municipal_area_scores(id_municipio)
+
+    def list_enem_scores_by_school_network(
+        self, id_municipio: str, dependencia_rede: str | None = None
+    ) -> list[dict[str, Any]]:
+        """List municipal INEP ENEM scores disaggregated by school administrative network."""
+        return self.enem_connector.list_enem_scores_by_school_network(
+            id_municipio=id_municipio, dependencia_rede=dependencia_rede
+        )
+
+    def get_enem_essay_competencies(self, id_municipio: str) -> dict[str, Any]:
+        """Get municipal INEP ENEM Essay mean score, Competencies I/III/V, and 900+ excellence share."""
+        return self.enem_connector.get_enem_essay_competencies(id_municipio)
+
+    def get_enem_socioeconomic_equity(self, id_municipio: str) -> dict[str, Any]:
+        """Get municipal INEP ENEM QSE socioeconomic equity, Q025 internet, and SiSU/ProUni eligibility."""
+        return self.enem_connector.get_enem_socioeconomic_equity(id_municipio)
+
+    def get_enem_performance_equity_features(
+        self, id_municipio: str
+    ) -> dict[str, Any]:
+        """Get normalized Gold INEP ENEM cognitive performance and higher-education equity features."""
+        return self.enem_connector.get_enem_performance_equity_features(id_municipio)
+
+    def list_top_enem_municipalities(
+        self, limit: int = 10, sigla_uf: str | None = None
+    ) -> list[dict[str, Any]]:
+        """List top Brazilian municipalities ranked by composite INEP ENEM performance and equity score."""
+        return self.enem_connector.list_top_enem_municipalities(
             limit=limit, sigla_uf=sigla_uf
         )
 
@@ -2042,6 +2087,40 @@ class BrazilData:
     ) -> list[dict[str, Any]]:
         """Listar municípios líderes em desempenho no IDEB e proficiência SAEB no Brasil (INEP)."""
         return self.education.list_top_ideb_municipalities(
+            limit=limit, sigla_uf=sigla_uf
+        )
+
+    def get_enem_municipal_area_scores(self, id_municipio: str) -> dict[str, Any]:
+        """Consultar notas médias TRI por área de conhecimento e taxa de presença no ENEM (INEP)."""
+        return self.education.get_enem_municipal_area_scores(id_municipio)
+
+    def list_enem_scores_by_school_network(
+        self, id_municipio: str, dependencia_rede: str | None = None
+    ) -> list[dict[str, Any]]:
+        """Listar desempenho no ENEM por dependência administrativa da escola de ensino médio (INEP)."""
+        return self.education.list_enem_scores_by_school_network(
+            id_municipio=id_municipio, dependencia_rede=dependencia_rede
+        )
+
+    def get_enem_essay_competencies(self, id_municipio: str) -> dict[str, Any]:
+        """Consultar nota média na Redação do ENEM, competências I/III/V e proporção 900+ (INEP)."""
+        return self.education.get_enem_essay_competencies(id_municipio)
+
+    def get_enem_socioeconomic_equity(self, id_municipio: str) -> dict[str, Any]:
+        """Consultar indicadores socioeconômicos QSE, isenção, internet Q025 e elegibilidade SiSU/ProUni (INEP)."""
+        return self.education.get_enem_socioeconomic_equity(id_municipio)
+
+    def get_enem_performance_equity_features(
+        self, id_municipio: str
+    ) -> dict[str, Any]:
+        """Consultar features Gold de desempenho cognitivo TRI e equidade no ENEM (INEP)."""
+        return self.education.get_enem_performance_equity_features(id_municipio)
+
+    def list_top_enem_municipalities(
+        self, limit: int = 10, sigla_uf: str | None = None
+    ) -> list[dict[str, Any]]:
+        """Listar municípios líderes em desempenho cognitivo e equidade no ENEM no Brasil (INEP)."""
+        return self.education.list_top_enem_municipalities(
             limit=limit, sigla_uf=sigla_uf
         )
 

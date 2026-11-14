@@ -1317,6 +1317,65 @@ class MCPDispatcher:
                                 },
                             },
                             {
+                                "name": "bdg_get_enem_municipal_area_scores",
+                                "description": "Get official municipal INEP ENEM mean TRI scores across all four objective knowledge areas (LC, CH, CN, MT), confirmed applicants, and 2-day attendance rate.",
+                                "inputSchema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "id_municipio": {
+                                            "type": "string",
+                                            "description": "7-digit IBGE municipality code, 6-digit prefix, 8-digit CEP, or municipality name (e.g. 3550308)",
+                                        },
+                                    },
+                                    "required": ["id_municipio"],
+                                },
+                            },
+                            {
+                                "name": "bdg_get_enem_essay_competencies",
+                                "description": "Get municipal INEP ENEM Essay mean score, Competencies I/III/V scores, 900+ excellence essays share, and zero/void essay rate.",
+                                "inputSchema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "id_municipio": {
+                                            "type": "string",
+                                            "description": "7-digit IBGE municipality code, 6-digit prefix, 8-digit CEP, or municipality name",
+                                        },
+                                    },
+                                    "required": ["id_municipio"],
+                                },
+                            },
+                            {
+                                "name": "bdg_get_enem_performance_equity_features",
+                                "description": "Get normalized Gold INEP ENEM cognitive performance score, higher-education access equity score, SiSU/ProUni/FIES eligibility rate, and 4-tier municipal classification.",
+                                "inputSchema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "id_municipio": {
+                                            "type": "string",
+                                            "description": "7-digit IBGE municipality code, 6-digit prefix, 8-digit CEP, or municipality name",
+                                        },
+                                    },
+                                    "required": ["id_municipio"],
+                                },
+                            },
+                            {
+                                "name": "bdg_list_top_enem_municipalities",
+                                "description": "List top Brazilian municipalities ranked by composite INEP ENEM cognitive performance and higher-education access equity scores.",
+                                "inputSchema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "limit": {
+                                            "type": "integer",
+                                            "description": "Maximum rows (default: 10)",
+                                        },
+                                        "sigla_uf": {
+                                            "type": "string",
+                                            "description": "Optional 2-letter state filter (e.g. PR)",
+                                        },
+                                    },
+                                },
+                            },
+                            {
                                 "name": "bdg_get_onr_property_registry",
                                 "description": "Get official ONR SREI municipal active property registry CNM stock, digital conversion rate, and online certificate emissions.",
                                 "inputSchema": {
@@ -2917,6 +2976,69 @@ class MCPDispatcher:
                     },
                 }
             wrapped = wrap_untrusted_gov_data(result, source_id="inep_ideb")
+            return {
+                "jsonrpc": "2.0",
+                "id": req_id,
+                "result": {"content": [{"type": "text", "text": wrapped}], "isError": False},
+            }
+
+        if tool_name in {
+            "bdg_get_enem_municipal_area_scores",
+            "bdg_get_enem_essay_competencies",
+            "bdg_get_enem_performance_equity_features",
+            "bdg_list_top_enem_municipalities",
+        }:
+            from public_data_gateway.connectors.educacao.inep_enem.connector import (
+                INEPEnemConnector,
+            )
+
+            connector = INEPEnemConnector(settings=self.settings)
+            try:
+                if tool_name == "bdg_get_enem_municipal_area_scores":
+                    result = connector.get_enem_municipal_area_scores(
+                        str(args.get("id_municipio", "")).strip()
+                    )
+                elif tool_name == "bdg_get_enem_essay_competencies":
+                    result = connector.get_enem_essay_competencies(
+                        str(args.get("id_municipio", "")).strip()
+                    )
+                elif tool_name == "bdg_get_enem_performance_equity_features":
+                    result = connector.get_enem_performance_equity_features(
+                        str(args.get("id_municipio", "")).strip()
+                    )
+                else:
+                    raw_uf = args.get("sigla_uf")
+                    result = connector.list_top_enem_municipalities(
+                        limit=int(args.get("limit", 10)),
+                        sigla_uf=str(raw_uf).strip() if raw_uf else None,
+                    )
+            except ValueError as exc:
+                return {
+                    "jsonrpc": "2.0",
+                    "id": req_id,
+                    "result": {
+                        "content": [
+                            {"type": "text", "text": f"INEP ENEM parameter error: {exc}"}
+                        ],
+                        "isError": True,
+                    },
+                }
+
+            if not result:
+                return {
+                    "jsonrpc": "2.0",
+                    "id": req_id,
+                    "result": {
+                        "content": [
+                            {
+                                "type": "text",
+                                "text": "No INEP ENEM data found for the query.",
+                            }
+                        ],
+                        "isError": True,
+                    },
+                }
+            wrapped = wrap_untrusted_gov_data(result, source_id="inep_enem")
             return {
                 "jsonrpc": "2.0",
                 "id": req_id,

@@ -1,0 +1,16 @@
+version: 2
+
+sources:
+  - name: inep_enem_silver
+    description: "Bases oficiais do Exame Nacional do Ensino Médio (INEP/MEC) normalizadas na camada Silver."
+    meta:
+      external_location: "data/inep_enem/silver/{name}.parquet"
+    tables:
+      - name: enem_desempenho_municipal_areas
+        description: "Desempenho municipal consolidado no ENEM nas quatro áreas TRI (LC, CH, CN e MT), inscritos e taxa de presença nos 2 dias."
+      - name: enem_desempenho_rede_ensino
+        description: "Desempenho desagregado no ENEM por dependência administrativa da escola de ensino médio (Federal, Estadual, Privada e EJA)."
+      - name: enem_redacao_competencias_municipio
+        description: "Notas de Redação do ENEM no município, competências I, III e V, redações 900+ e taxa de nota zero/anulação."
+      - name: enem_equidade_socioeconomica_acesso
+        description: "Indicadores QSE do ENEM: isenção de taxa, participação da rede pública, internet Q025, equidade pública-privada e aptidão SiSU/ProUni/FIES."
