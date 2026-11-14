@@ -1,0 +1,16 @@
+version: 2
+
+sources:
+  - name: capitais_iptu_itbi_silver
+    description: "Bases Silver materializadas do conector Capitais IPTU / ITBI (Cadastros Imobiliários Municipais, Transações ITBI, Dinâmica de Preços e Governança CTM)."
+    meta:
+      external_location: "data/capitais_iptu_itbi/silver/{name}.parquet"
+    tables:
+      - name: iptu_itbi_cadastro_imobiliario_municipal
+        description: "Cadastro imobiliário tributário municipal consolidado (IPTU, valor venal e adimplência)."
+      - name: itbi_transacoes_imobiliarias_padrao
+        description: "Transações imobiliárias tributadas por ITBI desagregadas por segmento de imóvel."
+      - name: iptu_itbi_dinamica_precos_bairros
+        description: "Dinâmica de preços por m² declarados no ITBI, defasagem PGV vs. mercado e liquidez."
+      - name: iptu_itbi_governanca_fiscal_geoespacial
+        description: "Governança fiscal e modernização cadastral georreferenciada CTM/SINTER/ONR."

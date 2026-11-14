@@ -159,3 +159,158 @@ models:
         description: "Timestamp ISO-8601 UTC da extração."
         tests:
           - not_null
+
+  - name: mart_mercado_imobiliario_iptu_itbi_capitais_brasil
+    description: "Data Mart analítico dos Cadastros Imobiliários Municipais (IPTU/ITBI): liquidez de transações, preços por m², atualização PGV e governança cadastral CTM/SINTER."
+    columns:
+      - name: id_municipio
+        description: "Código IBGE de 7 dígitos identificador único do município."
+        tests:
+          - not_null
+          - unique
+      - name: nome_municipio
+        description: "Nome oficial da capital municipal."
+        tests:
+          - not_null
+      - name: sigla_uf
+        description: "Sigla de 2 letras da Unidade Federativa."
+        tests:
+          - not_null
+      - name: id_uf
+        description: "Código IBGE de 2 dígitos da Unidade Federativa."
+        tests:
+          - not_null
+      - name: nome_uf
+        description: "Nome completo da Unidade Federativa."
+        tests:
+          - not_null
+      - name: regiao
+        description: "Grande região geográfica brasileira."
+        tests:
+          - not_null
+      - name: ano_exercicio_fiscal
+        description: "Ano de exercício fiscal de referência."
+        tests:
+          - not_null
+      - name: inscricoes_imobiliarias_ativas_iptu
+        description: "Total de inscrições imobiliárias ativas de IPTU no município."
+        tests:
+          - not_null
+      - name: area_construida_tributada_mil_m2
+        description: "Área construída tributada pelo IPTU (milhares de m²)."
+        tests:
+          - not_null
+      - name: valor_venal_total_bilhoes_brl
+        description: "Soma do valor venal cadastrado pela PGV (R$ bilhões)."
+        tests:
+          - not_null
+      - name: valor_venal_medio_m2_brl
+        description: "Valor venal médio por m² na Planta Genérica de Valores (R$/m²)."
+        tests:
+          - not_null
+      - name: aliquota_media_efetiva_iptu_pct
+        description: "Alíquota média efetiva do IPTU (%)."
+        tests:
+          - not_null
+      - name: arrecadacao_iptu_milhoes_brl
+        description: "Arrecadação anual realizada de IPTU (R$ milhões)."
+        tests:
+          - not_null
+      - name: taxa_adimplencia_iptu_pct
+        description: "Percentual de adimplência sobre o lançamento líquido de IPTU (%)."
+        tests:
+          - not_null
+      - name: indice_atualizacao_pgv_pct
+        description: "Grau de atualização da Planta Genérica de Valores (%)."
+        tests:
+          - not_null
+      - name: total_transacoes_itbi_ano
+        description: "Total consolidado anual de transações imobiliárias com ITBI quitado nos 4 segmentos."
+        tests:
+          - not_null
+      - name: volume_total_itbi_milhoes_brl
+        description: "Volume financeiro total transacionado no ITBI nos 4 segmentos (R$ milhões)."
+        tests:
+          - not_null
+      - name: preco_medio_m2_itbi_declarado_brl
+        description: "Preço médio por m² observado nas transações de ITBI (R$/m²)."
+        tests:
+          - not_null
+      - name: variacao_anual_preco_m2_itbi_pct
+        description: "Variação percentual anual do preço por m² declarado no ITBI (%)."
+        tests:
+          - not_null
+      - name: razao_venal_pgv_sobre_mercado_itbi
+        description: "Razão entre valor venal médio PGV e preço de mercado ITBI (0 a 1)."
+        tests:
+          - not_null
+      - name: participacao_lancamentos_novos_pct
+        description: "Participação de imóveis novos no total de transmissões ITBI (%)."
+        tests:
+          - not_null
+      - name: concentracao_uso_residencial_pct
+        description: "Participação de unidades residenciais no estoque total (%)."
+        tests:
+          - not_null
+      - name: indice_liquidez_imobiliaria_itbi_pct
+        description: "Taxa anual de giro do estoque imobiliário via ITBI (%)."
+        tests:
+          - not_null
+      - name: taxa_vacancia_cadastral_estimada_pct
+        description: "Proporção estimada de lotes vazios ou imóveis vagos no cadastro (%)."
+        tests:
+          - not_null
+      - name: cobertura_cadastral_georreferenciada_ctm_pct
+        description: "Cobertura georreferenciada do Cadastro Técnico Multifinalitário (%)."
+        tests:
+          - not_null
+      - name: transacoes_itbi_emissao_digital_pct
+        description: "Proporção de guias e certidões de ITBI processadas 100% digitalmente (%)."
+        tests:
+          - not_null
+      - name: integracao_iptu_sinter_cno_onr_pct
+        description: "Interoperabilidade cadastral entre Prefeitura, SINTER, CNO e ONR (%)."
+        tests:
+          - not_null
+      - name: arrecadacao_itbi_milhoes_brl
+        description: "Arrecadação realizada anual de ITBI (R$ milhões)."
+        tests:
+          - not_null
+      - name: participacao_iptu_itbi_receita_propria_pct
+        description: "Peso combinado de IPTU e ITBI na receita tributária própria municipal (%)."
+        tests:
+          - not_null
+      - name: receita_imobiliaria_per_capita_brl
+        description: "Arrecadação combinada IPTU+ITBI por habitante (R$/hab)."
+        tests:
+          - not_null
+      - name: nivel_transparencia_dados_abertos_pgv
+        description: "Maturidade da abertura de microdados geoespaciais de IPTU/ITBI."
+        tests:
+          - not_null
+      - name: score_dinamismo_mercado_imobiliario_itbi
+        description: "Score normalizado (0 a 100) de dinamismo de preços e liquidez imobiliária no ITBI."
+        tests:
+          - not_null
+      - name: score_governanca_cadastral_fiscal_iptu
+        description: "Score normalizado (0 a 100) de governança cadastral CTM/PGV e adimplência fiscal."
+        tests:
+          - not_null
+      - name: classificacao_mercado_imobiliario_capital
+        description: "Tier analítico em 4 faixas de liquidez imobiliária e governança cadastral da capital."
+        tests:
+          - not_null
+          - accepted_values:
+              values:
+                - "METROPOLE_ALTA_LIQUIDEZ_E_GOVERNANCA_CTM"
+                - "MERCADO_IMOBILIARIO_CONSOLIDADO_PGV_ATUALIZADA"
+                - "MERCADO_URBANO_EM_EXPANSAO_CADASTRAL"
+                - "CAPITAL_PRIORITARIA_MODERNIZACAO_CTM_PGV"
+      - name: reference_date
+        description: "Data de referência ISO-8601 do fechamento fiscal (YYYY-MM-DD)."
+        tests:
+          - not_null
+      - name: extracted_at
+        description: "Timestamp ISO-8601 UTC da extração."
+        tests:
+          - not_null

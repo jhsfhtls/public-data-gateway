@@ -991,6 +991,36 @@ def build_parser() -> argparse.ArgumentParser:
     onr_rk_p.add_argument("--uf", type=str, help="Optional 2-letter state filter")
     onr_rk_p.add_argument("--json", action="store_true", help="Output in JSON format")
 
+    # Capitais IPTU / ITBI (Cadastros Imobiliários Municipais) command group
+    iptu_p = subparsers.add_parser("iptu-itbi", help="Query municipal IPTU property cadastre, ITBI transactions, prices, CTM governance, and rankings.")
+    iptu_sub = iptu_p.add_subparsers(dest="iptu_action", required=True)
+
+    iptu_cad_p = iptu_sub.add_parser("cadastre", help="Get municipal IPTU property cadastre, PGV venal value, and compliance.")
+    iptu_cad_p.add_argument("id_municipio", help="7-digit IBGE municipality code, 8-digit CEP, or municipality name")
+    iptu_cad_p.add_argument("--json", action="store_true", help="Output in JSON format")
+
+    iptu_tx_p = iptu_sub.add_parser("transactions", help="List municipal ITBI transactions by property segment.")
+    iptu_tx_p.add_argument("id_municipio", help="7-digit IBGE municipality code, 8-digit CEP, or municipality name")
+    iptu_tx_p.add_argument("--segmento", type=str, help="Optional segment or category filter (e.g. Residencial, Comercial)")
+    iptu_tx_p.add_argument("--json", action="store_true", help="Output in JSON format")
+
+    iptu_pr_p = iptu_sub.add_parser("prices", help="Get ITBI declared price per m², annual growth, PGV-to-market ratio, and liquidity.")
+    iptu_pr_p.add_argument("id_municipio", help="7-digit IBGE municipality code, 8-digit CEP, or municipality name")
+    iptu_pr_p.add_argument("--json", action="store_true", help="Output in JSON format")
+
+    iptu_gov_p = iptu_sub.add_parser("governance", help="Get CTM georeferenced coverage, digital ITBI, and SINTER/CNO/ONR interoperability.")
+    iptu_gov_p.add_argument("id_municipio", help="7-digit IBGE municipality code, 8-digit CEP, or municipality name")
+    iptu_gov_p.add_argument("--json", action="store_true", help="Output in JSON format")
+
+    iptu_ft_p = iptu_sub.add_parser("features", help="Get Gold IPTU/ITBI market dynamism and fiscal governance features.")
+    iptu_ft_p.add_argument("id_municipio", help="7-digit IBGE municipality code, 8-digit CEP, or municipality name")
+    iptu_ft_p.add_argument("--json", action="store_true", help="Output in JSON format")
+
+    iptu_rk_p = iptu_sub.add_parser("ranking", help="List top Brazilian capitals ranked by ITBI real estate dynamism and CTM governance.")
+    iptu_rk_p.add_argument("--limit", type=int, default=10, help="Max municipalities to list")
+    iptu_rk_p.add_argument("--uf", type=str, help="Optional 2-letter state filter")
+    iptu_rk_p.add_argument("--json", action="store_true", help="Output in JSON format")
+
     # Direct shortcut: pnad-uf
     pnad_s_p = subparsers.add_parser("pnad-uf", help="Shortcut to query PNAD Contínua labor market profile.")
     pnad_s_p.add_argument("uf", type=str, help="IBGE 2-digit UF code or 2-letter state abbreviation (e.g. SP, 35)")
@@ -3408,6 +3438,82 @@ def main(argv: Sequence[str] | None = None) -> int:
                     for idx, r in enumerate(ranks, 1):
                         print(f"  {idx}. {r.get('nome_municipio')} ({r.get('sigla_uf')}): SERP Score {r.get('score_maturidade_digital_srei_serp')} | Liquidez: {r.get('score_liquidez_seguranca_imobiliaria')} | {r.get('classificacao_mercado_registral_imobiliario')}")
                 return 0
+
+        elif args.command == "iptu-itbi":
+            from public_data_gateway.connectors.imobiliario.capitais_iptu_itbi.connector import (
+                CapitaisIptuItbiConnector,
+            )
+
+            iptu_conn = CapitaisIptuItbiConnector(settings=settings)
+            iptu_action = getattr(args, "iptu_action", None)
+            try:
+                if iptu_action == "cadastre":
+                    res = iptu_conn.get_iptu_itbi_property_cadastre(args.id_municipio)
+                    if getattr(args, "json", False):
+                        print(json.dumps(res, indent=2, ensure_ascii=False, default=str))
+                    else:
+                        print(f"Capitais IPTU Cadastro Imobiliário ({res.get('nome_municipio')} - {res.get('id_municipio')}):")
+                        print(f"  Inscrições / Área:   {res.get('inscricoes_imobiliarias_ativas_iptu'):,} | {res.get('area_construida_tributada_mil_m2'):,.1f} mil m²")
+                        print(f"  Venal / Arrecad.:    R$ {res.get('valor_venal_medio_m2_brl')}/m² | IPTU R$ {res.get('arrecadacao_iptu_milhoes_brl')}M ({res.get('taxa_adimplencia_iptu_pct')}% adimplência)")
+                    return 0
+
+                if iptu_action == "transactions":
+                    rows = iptu_conn.list_itbi_transactions_by_segment(
+                        args.id_municipio, segmento_imovel=getattr(args, "segmento", None)
+                    )
+                    if getattr(args, "json", False):
+                        print(json.dumps(rows, indent=2, ensure_ascii=False, default=str))
+                    else:
+                        print(f"Capitais ITBI Transações por Segmento ({args.id_municipio}) - {len(rows)} segmento(s):")
+                        for r in rows:
+                            print(f"  - {r.get('segmento_imovel_itbi')}: {r.get('quantidade_transacoes_itbi_ano'):,} transações | R$ {r.get('valor_transacionado_itbi_milhoes_brl')}M (Ticket R$ {r.get('valor_medio_transacao_mil_brl')}k)")
+                    return 0
+
+                if iptu_action == "prices":
+                    res = iptu_conn.get_iptu_itbi_price_dynamics(args.id_municipio)
+                    if getattr(args, "json", False):
+                        print(json.dumps(res, indent=2, ensure_ascii=False, default=str))
+                    else:
+                        print(f"Capitais IPTU/ITBI Dinâmica de Preços ({res.get('nome_municipio')} - {res.get('id_municipio')}):")
+                        print(f"  Preço ITBI / Var.:   R$ {res.get('preco_medio_m2_itbi_declarado_brl')}/m² ({res.get('variacao_anual_preco_m2_itbi_pct'):+.2f}% a.a.)")
+                        print(f"  PGV/Mercado & Liq.:  {res.get('razao_venal_pgv_sobre_mercado_itbi')}x | Liquidez {res.get('indice_liquidez_imobiliaria_itbi_pct')}%")
+                    return 0
+
+                if iptu_action == "governance":
+                    res = iptu_conn.get_iptu_itbi_fiscal_governance(args.id_municipio)
+                    if getattr(args, "json", False):
+                        print(json.dumps(res, indent=2, ensure_ascii=False, default=str))
+                    else:
+                        print(f"Capitais IPTU/ITBI Governança CTM ({res.get('nome_municipio')} - {res.get('id_municipio')}):")
+                        print(f"  CTM Geo / SINTER:    {res.get('cobertura_cadastral_georreferenciada_ctm_pct')}% CTM | {res.get('integracao_iptu_sinter_cno_onr_pct')}% SINTER/ONR")
+                        print(f"  ITBI Digital / Rec.: {res.get('transacoes_itbi_emissao_digital_pct')}% digital | R$ {res.get('arrecadacao_itbi_milhoes_brl')}M ITBI")
+                    return 0
+
+                if iptu_action == "features":
+                    feat = iptu_conn.get_iptu_itbi_real_estate_features(args.id_municipio)
+                    if getattr(args, "json", False):
+                        print(json.dumps(feat, indent=2, ensure_ascii=False, default=str))
+                    else:
+                        print(f"Capitais IPTU/ITBI Features: {feat.get('nome_municipio')} ({feat.get('sigla_uf')} - {feat.get('id_municipio')}):")
+                        print(f"  Score Dinamismo ITBI:{feat.get('score_dinamismo_mercado_imobiliario_itbi')}/100.0")
+                        print(f"  Score Governança CTM:{feat.get('score_governanca_cadastral_fiscal_iptu')}/100.0")
+                        print(f"  Classificação:       {feat.get('classificacao_mercado_imobiliario_capital')}")
+                    return 0
+
+                if iptu_action == "ranking":
+                    ranks = iptu_conn.list_top_iptu_itbi_capitals(
+                        limit=getattr(args, "limit", 10), sigla_uf=getattr(args, "uf", None)
+                    )
+                    if getattr(args, "json", False):
+                        print(json.dumps(ranks, indent=2, ensure_ascii=False, default=str))
+                    else:
+                        print(f"Top {len(ranks)} Capitais em Dinamismo Imobiliário ITBI & Governança CTM (IPTU/ITBI):")
+                        for idx, r in enumerate(ranks, 1):
+                            print(f"  {idx}. {r.get('nome_municipio')} ({r.get('sigla_uf')}): Dinamismo {r.get('score_dinamismo_mercado_imobiliario_itbi')} | Governança: {r.get('score_governanca_cadastral_fiscal_iptu')} | {r.get('classificacao_mercado_imobiliario_capital')}")
+                    return 0
+            except ValueError as exc:
+                print(f"Erro Capitais IPTU/ITBI: {exc}", file=sys.stderr)
+                return 1
 
         elif args.command == "pib-municipal":
             from public_data_gateway.connectors.demografico.ibge_pib_municipal.connector import (

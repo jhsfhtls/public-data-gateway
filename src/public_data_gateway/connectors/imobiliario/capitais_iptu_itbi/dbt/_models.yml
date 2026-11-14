@@ -1,0 +1,204 @@
+version: 2
+
+models:
+  - name: stg_iptu_itbi_cadastro_imobiliario_municipal
+    description: "View staging do cadastro imobiliário tributário municipal (IPTU, valor venal e adimplência)."
+    columns:
+      - name: id_municipio
+        description: "Código IBGE de 7 dígitos do município."
+        tests:
+          - not_null
+          - unique
+      - name: nome_municipio
+        description: "Nome oficial da capital municipal."
+        tests: [not_null]
+      - name: sigla_uf
+        description: "Sigla da Unidade Federativa (UF)."
+        tests: [not_null]
+      - name: id_uf
+        description: "Código IBGE de 2 dígitos da UF."
+        tests: [not_null]
+      - name: regiao
+        description: "Macrorregião geográfica brasileira."
+        tests: [not_null]
+      - name: ano_exercicio_fiscal
+        description: "Ano de exercício fiscal do lançamento de IPTU."
+        tests: [not_null]
+      - name: inscricoes_imobiliarias_ativas_iptu
+        description: "Total de inscrições imobiliárias ativas no cadastro fiscal."
+        tests: [not_null]
+      - name: area_construida_tributada_mil_m2
+        description: "Área construída total tributada pelo IPTU (milhares de m²)."
+        tests: [not_null]
+      - name: valor_venal_total_bilhoes_brl
+        description: "Soma do valor venal cadastrado pela PGV (R$ bilhões)."
+        tests: [not_null]
+      - name: valor_venal_medio_m2_brl
+        description: "Valor venal médio por metro quadrado construído (R$/m²)."
+        tests: [not_null]
+      - name: aliquota_media_efetiva_iptu_pct
+        description: "Alíquota média efetiva do IPTU (%)."
+        tests: [not_null]
+      - name: arrecadacao_iptu_milhoes_brl
+        description: "Arrecadação anual de IPTU (R$ milhões)."
+        tests: [not_null]
+      - name: taxa_adimplencia_iptu_pct
+        description: "Taxa de adimplência sobre o lançamento de IPTU (%)."
+        tests: [not_null]
+      - name: indice_atualizacao_pgv_pct
+        description: "Grau de atualização da Planta Genérica de Valores (%)."
+        tests: [not_null]
+      - name: reference_date
+        description: "Data de referência do fechamento fiscal (YYYY-MM-DD)."
+        tests: [not_null]
+      - name: extracted_at
+        description: "Timestamp UTC ISO-8601 de extração."
+        tests: [not_null]
+
+  - name: stg_itbi_transacoes_imobiliarias_padrao
+    description: "View staging de transações imobiliárias ITBI desagregadas por segmento de imóvel."
+    columns:
+      - name: id_municipio
+        description: "Código IBGE de 7 dígitos do município."
+        tests: [not_null]
+      - name: nome_municipio
+        description: "Nome oficial do município."
+        tests: [not_null]
+      - name: sigla_uf
+        description: "Sigla da UF."
+        tests: [not_null]
+      - name: id_uf
+        description: "Código IBGE de 2 dígitos da UF."
+        tests: [not_null]
+      - name: regiao
+        description: "Macrorregião geográfica brasileira."
+        tests: [not_null]
+      - name: ano_exercicio_fiscal
+        description: "Ano de exercício fiscal de competência do ITBI."
+        tests: [not_null]
+      - name: segmento_imovel_itbi
+        description: "Tipologia padronizada do imóvel transmitido via ITBI."
+        tests: [not_null]
+      - name: categoria_uso_imovel
+        description: "Macro-categoria de uso do imóvel."
+        tests: [not_null]
+      - name: quantidade_transacoes_itbi_ano
+        description: "Quantidade anual de transmissões imobiliárias com ITBI quitado."
+        tests: [not_null]
+      - name: valor_transacionado_itbi_milhoes_brl
+        description: "Volume financeiro total transacionado no ITBI (R$ milhões)."
+        tests: [not_null]
+      - name: valor_medio_transacao_mil_brl
+        description: "Ticket médio por transação imobiliária no segmento (R$ mil)."
+        tests: [not_null]
+      - name: aliquota_nominal_itbi_pct
+        description: "Alíquota nominal modal aplicada ao ITBI (%)."
+        tests: [not_null]
+      - name: reference_date
+        description: "Data de referência (YYYY-MM-DD)."
+        tests: [not_null]
+      - name: extracted_at
+        description: "Timestamp UTC ISO-8601 de extração."
+        tests: [not_null]
+
+  - name: stg_iptu_itbi_dinamica_precos_bairros
+    description: "View staging de dinâmica de preços por m² no ITBI, defasagem PGV e liquidez."
+    columns:
+      - name: id_municipio
+        description: "Código IBGE de 7 dígitos do município."
+        tests:
+          - not_null
+          - unique
+      - name: nome_municipio
+        description: "Nome oficial do município."
+        tests: [not_null]
+      - name: sigla_uf
+        description: "Sigla da UF."
+        tests: [not_null]
+      - name: id_uf
+        description: "Código IBGE de 2 dígitos da UF."
+        tests: [not_null]
+      - name: regiao
+        description: "Macrorregião geográfica brasileira."
+        tests: [not_null]
+      - name: ano_exercicio_fiscal
+        description: "Ano de exercício fiscal de referência."
+        tests: [not_null]
+      - name: preco_medio_m2_itbi_declarado_brl
+        description: "Preço médio por m² observado nas transações de ITBI (R$/m²)."
+        tests: [not_null]
+      - name: variacao_anual_preco_m2_itbi_pct
+        description: "Variação anual do preço médio do m² no ITBI (%)."
+        tests: [not_null]
+      - name: razao_venal_pgv_sobre_mercado_itbi
+        description: "Razão entre valor venal PGV e preço real de mercado ITBI."
+        tests: [not_null]
+      - name: participacao_lancamentos_novos_pct
+        description: "Participação de unidades novas no total de transmissões ITBI (%)."
+        tests: [not_null]
+      - name: concentracao_uso_residencial_pct
+        description: "Participação de imóveis residenciais no estoque total (%)."
+        tests: [not_null]
+      - name: indice_liquidez_imobiliaria_itbi_pct
+        description: "Taxa anual de giro do estoque imobiliário via ITBI (%)."
+        tests: [not_null]
+      - name: taxa_vacancia_cadastral_estimada_pct
+        description: "Proporção estimada de lotes vazios ou imóveis vagos no cadastro (%)."
+        tests: [not_null]
+      - name: reference_date
+        description: "Data de referência (YYYY-MM-DD)."
+        tests: [not_null]
+      - name: extracted_at
+        description: "Timestamp UTC ISO-8601 de extração."
+        tests: [not_null]
+
+  - name: stg_iptu_itbi_governanca_fiscal_geoespacial
+    description: "View staging de governança fiscal e modernização cadastral georreferenciada CTM/SINTER/ONR."
+    columns:
+      - name: id_municipio
+        description: "Código IBGE de 7 dígitos do município."
+        tests:
+          - not_null
+          - unique
+      - name: nome_municipio
+        description: "Nome oficial do município."
+        tests: [not_null]
+      - name: sigla_uf
+        description: "Sigla da UF."
+        tests: [not_null]
+      - name: id_uf
+        description: "Código IBGE de 2 dígitos da UF."
+        tests: [not_null]
+      - name: regiao
+        description: "Macrorregião geográfica brasileira."
+        tests: [not_null]
+      - name: ano_exercicio_fiscal
+        description: "Ano de exercício fiscal de referência."
+        tests: [not_null]
+      - name: cobertura_cadastral_georreferenciada_ctm_pct
+        description: "Percentual de lotes georreferenciados no CTM (%)."
+        tests: [not_null]
+      - name: transacoes_itbi_emissao_digital_pct
+        description: "Proporção de guias de ITBI emitidas 100% digitalmente (%)."
+        tests: [not_null]
+      - name: integracao_iptu_sinter_cno_onr_pct
+        description: "Grau de interoperabilidade cadastral com SINTER/CNO/ONR (%)."
+        tests: [not_null]
+      - name: arrecadacao_itbi_milhoes_brl
+        description: "Arrecadação anual de ITBI (R$ milhões)."
+        tests: [not_null]
+      - name: participacao_iptu_itbi_receita_propria_pct
+        description: "Participação de IPTU e ITBI na receita própria municipal (%)."
+        tests: [not_null]
+      - name: receita_imobiliaria_per_capita_brl
+        description: "Arrecadação combinada IPTU+ITBI por habitante (R$/hab)."
+        tests: [not_null]
+      - name: nivel_transparencia_dados_abertos_pgv
+        description: "Maturidade da abertura de microdados geoespaciais de IPTU/ITBI."
+        tests: [not_null]
+      - name: reference_date
+        description: "Data de referência (YYYY-MM-DD)."
+        tests: [not_null]
+      - name: extracted_at
+        description: "Timestamp UTC ISO-8601 de extração."
+        tests: [not_null]
