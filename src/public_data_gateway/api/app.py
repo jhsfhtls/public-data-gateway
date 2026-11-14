@@ -2257,6 +2257,89 @@ def create_app(settings: GatewaySettings | None = None) -> FastAPI:
         except (ValueError, KeyError) as exc:
             raise HTTPException(status_code=400, detail=str(exc)) from exc
 
+    @app.get("/api/v1/environment/mapbiomas/top-municipalities")
+    async def get_top_mapbiomas_municipalities(
+        limit: int = Query(10, ge=1, le=50, description="Max municipalities to list"),
+        uf: str | None = Query(None, description="Filter by 2-letter state abbreviation"),
+    ) -> list[dict[str, Any]]:
+        from public_data_gateway.connectors.ambiental.mapbiomas_cobertura.connector import (
+            MapBiomasCoberturaConnector,
+        )
+
+        conn = MapBiomasCoberturaConnector(settings=app_settings)
+        try:
+            return conn.list_top_mapbiomas_municipalities(limit=limit, sigla_uf=uf)
+        except (ValueError, KeyError) as exc:
+            raise HTTPException(status_code=400, detail=str(exc)) from exc
+
+    @app.get("/api/v1/environment/mapbiomas/features/{id_municipio}")
+    async def get_mapbiomas_features(id_municipio: str) -> dict[str, Any]:
+        from public_data_gateway.connectors.ambiental.mapbiomas_cobertura.connector import (
+            MapBiomasCoberturaConnector,
+        )
+
+        conn = MapBiomasCoberturaConnector(settings=app_settings)
+        try:
+            return conn.get_mapbiomas_features(id_municipio)
+        except (ValueError, KeyError) as exc:
+            raise HTTPException(status_code=400, detail=str(exc)) from exc
+
+    @app.get("/api/v1/environment/mapbiomas/transitions/{id_municipio}")
+    async def get_mapbiomas_transitions(
+        id_municipio: str,
+        classe: str | None = Query(
+            None, description="Optional transition class filter (e.g. Floresta_Para_Pastagem)"
+        ),
+    ) -> list[dict[str, Any]]:
+        from public_data_gateway.connectors.ambiental.mapbiomas_cobertura.connector import (
+            MapBiomasCoberturaConnector,
+        )
+
+        conn = MapBiomasCoberturaConnector(settings=app_settings)
+        try:
+            return conn.list_mapbiomas_transitions(
+                id_municipio, classe_transicao_mapbiomas=classe
+            )
+        except (ValueError, KeyError) as exc:
+            raise HTTPException(status_code=400, detail=str(exc)) from exc
+
+    @app.get("/api/v1/environment/mapbiomas/agriculture/{id_municipio}")
+    async def get_mapbiomas_agriculture(id_municipio: str) -> dict[str, Any]:
+        from public_data_gateway.connectors.ambiental.mapbiomas_cobertura.connector import (
+            MapBiomasCoberturaConnector,
+        )
+
+        conn = MapBiomasCoberturaConnector(settings=app_settings)
+        try:
+            return conn.get_mapbiomas_agriculture(id_municipio)
+        except (ValueError, KeyError) as exc:
+            raise HTTPException(status_code=400, detail=str(exc)) from exc
+
+    @app.get("/api/v1/environment/mapbiomas/alerts/{id_municipio}")
+    async def get_mapbiomas_alerts(id_municipio: str) -> dict[str, Any]:
+        from public_data_gateway.connectors.ambiental.mapbiomas_cobertura.connector import (
+            MapBiomasCoberturaConnector,
+        )
+
+        conn = MapBiomasCoberturaConnector(settings=app_settings)
+        try:
+            return conn.get_mapbiomas_alerts(id_municipio)
+        except (ValueError, KeyError) as exc:
+            raise HTTPException(status_code=400, detail=str(exc)) from exc
+
+    @app.get("/api/v1/environment/mapbiomas/land-cover/{id_municipio}")
+    @app.get("/api/v1/mapbiomas/{id_municipio}")
+    async def get_mapbiomas_land_cover(id_municipio: str) -> dict[str, Any]:
+        from public_data_gateway.connectors.ambiental.mapbiomas_cobertura.connector import (
+            MapBiomasCoberturaConnector,
+        )
+
+        conn = MapBiomasCoberturaConnector(settings=app_settings)
+        try:
+            return conn.get_mapbiomas_land_cover(id_municipio)
+        except (ValueError, KeyError) as exc:
+            raise HTTPException(status_code=400, detail=str(exc)) from exc
+
     @app.get("/api/v1/real-estate/onr/top-municipalities")
     async def get_top_onr_municipalities(
         limit: int = Query(10, ge=1, le=50, description="Max municipalities to list"),

@@ -13,10 +13,10 @@
     "POP_T_148"
   ],
   "current_macro_phase_id": "08",
-  "current_macro_phase": "Fase 08 - Ingestão Wave 6 (Meio Ambiente, Agro & Metaportais — 44/49 fontes homologadas [89.8%] com ana_hidroweb_telemetria homologado; Próximo: mapbiomas_cobertura)",
+  "current_macro_phase": "Fase 08 - Ingestão Wave 6 (Meio Ambiente, Agro & Metaportais — 45/49 fontes homologadas [91.8%] com mapbiomas_cobertura homologado; Próximo: sfb_sicar)",
   "overall_status": "ON_TRACK",
-  "active_connector": "mapbiomas_cobertura",
-  "next_connector": "sfb_sicar",
+  "active_connector": "sfb_sicar",
+  "next_connector": "mapa_zarc",
   "structural_phases": [
     {
       "phase_id": "00",
@@ -155,7 +155,8 @@
       "deliverables": [
         "Conector inpe_terrabrasilis (PRODES Anual, Alertas DETER-B por Classe, Uso da Terra e Governança ESG/EUDR) - CONCLUÍDO",
         "Conector ana_hidroweb_telemetria (Estações Telemétricas, Cotas/Vazões por Segmento, Pluviometria e Segurança Hídrica) - CONCLUÍDO",
-        "Conectores Ambientais (mapbiomas_cobertura, sfb_sicar, mapa_zarc)",
+        "Conector mapbiomas_cobertura (Cobertura Anual, Transições por Classe, Pastagens/Irrigação e Alertas Validados) - CONCLUÍDO",
+        "Conectores Ambientais (sfb_sicar, mapa_zarc)",
         "Conectores Metaportais (basedosdados_bq, dadosgov_ckan)"
       ]
     },
@@ -423,6 +424,12 @@
     }
   ],
   "recent_milestones": [
+    {
+      "date": "2026-11-14",
+      "phase_id": "08",
+      "milestone": "Homologação do Conector mapbiomas_cobertura (45/49 Fontes — 91.8%)",
+      "summary": "Implementação e homologação completa do conector mapbiomas_cobertura (MapBiomas: Cobertura e Uso da Terra no Brasil 1985-2024, Lei nº 12.651/2012, Decreto nº 11.367/2023, EUDR EU 2023/1115) alcançando 45/49 fontes homologadas (91.8%): 5 tabelas Medallion (mapbiomas_cobertura_anual_municipio, mapbiomas_transicoes_uso_terra_classe, mapbiomas_agropecuaria_pastagem_irrigacao, mapbiomas_alerta_desmatamento_validado e features_mapbiomas_cobertura_solo) materializadas em data/mapbiomas_cobertura/silver/; 7 novos modelos dbt (4 staging views, fct_mapbiomas_cobertura_uso_terra_municipio, fct_mapbiomas_transicoes_uso_terra_municipio e mart_cobertura_uso_terra_mapbiomas_brasil) totalizando 376 modelos e 5.576 colunas 100% documentadas no linter (206 sources); paridade SQL–Python estrita confirmada (12 municípios, 4 tiers x 3 municípios, zero divergências); paridade multi-interface completa em SDK (EnvironmentFacade.mapbiomas_connector), CLI (bdg mapbiomas), FastAPI (/api/v1/environment/mapbiomas/* e /api/v1/mapbiomas/*) e MCP (bdg_*_mapbiomas* com wrap_untrusted_gov_data); 9 testes pytest (8 offline + 1 live MapBiomas Portal/Plataforma Brasil) aprovados."
+    },
     {
       "date": "2026-11-14",
       "phase_id": "08",

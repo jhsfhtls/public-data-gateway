@@ -49,6 +49,7 @@ model-paths:
   - "../src/public_data_gateway/connectors/imobiliario/capitais_iptu_itbi/dbt"
   - "../src/public_data_gateway/connectors/ambiental/ana_hidroweb_telemetria/dbt"
   - "../src/public_data_gateway/connectors/ambiental/inpe_terrabrasilis/dbt"
+  - "../src/public_data_gateway/connectors/ambiental/mapbiomas_cobertura/dbt"
   - "models"
 
 analysis-paths: ["analyses"]
