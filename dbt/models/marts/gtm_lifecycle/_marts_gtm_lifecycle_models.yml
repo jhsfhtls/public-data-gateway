@@ -1,0 +1,288 @@
+version: 2
+
+models:
+  - name: mart_lifecycle_s01_gtm_icp_ranking
+    description: "Estagio S01 (Captacao & GTM): Ranking de municipios ICP por Solution Pack (P01..P10) para prospecao e ABM."
+    columns:
+      - name: pack_id
+        description: "Identificador do Solution Pack (P01..P10)."
+        tests: [not_null]
+      - name: pack_name
+        description: "Nome comercial da solucao."
+        tests: [not_null]
+      - name: id_municipio
+        description: "Codigo IBGE de 7 digitos do municipio."
+        tests: [not_null]
+      - name: nome_municipio
+        description: "Nome do municipio."
+        tests: [not_null]
+      - name: sigla_uf
+        description: "Sigla da UF."
+        tests: [not_null]
+      - name: regiao
+        description: "Regiao geografica."
+        tests: [not_null]
+      - name: populacao_residente
+        description: "Populacao residente do municipio."
+      - name: pib_per_capita_reais
+        description: "PIB per capita municipal em reais."
+      - name: score_icp_pack_municipio
+        description: "Score ICP composto (0-100) do municipio para o Solution Pack."
+        tests: [not_null]
+      - name: tier_icp_abm
+        description: "Classificacao do municipio para estrategia ABM (TIER_1..TIER_3)."
+        tests: [not_null]
+      - name: gancho_prospeccao_bant
+        description: "Gancho comercial sugerido para qualificacao BANT."
+        tests: [not_null]
+      - name: reference_date
+        description: "Data de referencia."
+        tests: [not_null]
+
+  - name: mart_lifecycle_s02_discovery_dores_roi
+    description: "Estagio S02 (Descoberta & PoC Paga): Quantificacao de dores latentes e impacto financeiro estimado por UF e Pack."
+    columns:
+      - name: pack_id
+        description: "Identificador do Solution Pack."
+        tests: [not_null]
+      - name: pack_name
+        description: "Nome da solucao."
+        tests: [not_null]
+      - name: sigla_uf
+        description: "Sigla da UF."
+        tests: [not_null]
+      - name: regiao
+        description: "Regiao geografica."
+        tests: [not_null]
+      - name: total_municipios_uf
+        description: "Quantidade de municipios na UF."
+        tests: [not_null]
+      - name: score_oportunidade_pack_uf
+        description: "Score de oportunidade do Pack na UF."
+        tests: [not_null]
+      - name: dor_latente_principal
+        description: "Dor de negocio predominante identificada nos dados publicos."
+        tests: [not_null]
+      - name: metrica_dor_quantificada
+        description: "Indicador quantificado que evidencia a dor."
+        tests: [not_null]
+      - name: impacto_financeiro_estimado_brl
+        description: "Ordem de grandeza financeira estimada em BRL para justificar PoC."
+        tests: [not_null]
+      - name: escopo_poc_14d_sugerido
+        description: "Escopo recomendado de PoC paga de 14 dias."
+        tests: [not_null]
+      - name: reference_period
+        description: "Periodo de referencia."
+        tests: [not_null]
+
+  - name: mart_lifecycle_s03_pricing_benchmarks_tam
+    description: "Estagio S03 (Precificacao & Proposta): TAM, SAM, economia media e ancoras de ROI e payback por UF e Pack."
+    columns:
+      - name: pack_id
+        description: "Identificador do Solution Pack."
+        tests: [not_null]
+      - name: pack_name
+        description: "Nome da solucao."
+        tests: [not_null]
+      - name: sigla_uf
+        description: "Sigla da UF."
+        tests: [not_null]
+      - name: regiao
+        description: "Regiao geografica."
+        tests: [not_null]
+      - name: tam_empresas_ativas_uf
+        description: "Total de estabelecimentos ativos na UF (proxy de TAM)."
+        tests: [not_null]
+      - name: sam_compras_publicas_uf_brl
+        description: "Volume homologado de compras publicas na UF (proxy de SAM)."
+        tests: [not_null]
+      - name: economia_media_licitatoria_pct
+        description: "Economia media observada em contratacoes publicas na UF (%)."
+        tests: [not_null]
+      - name: ancora_roi_estimado_pct
+        description: "Ancora de ROI percentual estimado para proposta comercial."
+        tests: [not_null]
+      - name: faixa_payback_meses
+        description: "Faixa estimada de payback em meses."
+        tests: [not_null]
+      - name: reference_period
+        description: "Periodo de referencia."
+        tests: [not_null]
+
+  - name: mart_lifecycle_s04_legal_compliance_dd
+    description: "Estagio S04 (Blindagem Juridica & KYB): Matriz de risco regulatorio e clausulas DPA/LGPD recomendadas por UF e Pack."
+    columns:
+      - name: pack_id
+        description: "Identificador do Solution Pack."
+        tests: [not_null]
+      - name: pack_name
+        description: "Nome da solucao."
+        tests: [not_null]
+      - name: sigla_uf
+        description: "Sigla da UF."
+        tests: [not_null]
+      - name: regiao
+        description: "Regiao geografica."
+        tests: [not_null]
+      - name: total_sancoes_ativas_uf
+        description: "Total de sancoes ativas na UF."
+        tests: [not_null]
+      - name: valor_multas_ativas_uf
+        description: "Valor acumulado de multas ativas na UF."
+        tests: [not_null]
+      - name: indice_risco_compliance_uf
+        description: "Indice medio de risco de compliance fiscal na UF."
+        tests: [not_null]
+      - name: indice_governanca_dados_uf
+        description: "Indice medio de maturidade de dados abertos na UF."
+        tests: [not_null]
+      - name: nivel_rigor_due_diligence
+        description: "Nivel recomendado de rigor para Due Diligence pre-contrato."
+        tests: [not_null]
+      - name: clausula_dpa_lgpd_recomendada
+        description: "Diretriz juridica de DPA e LGPD recomendada para o pacote."
+        tests: [not_null]
+      - name: reference_period
+        description: "Periodo de referencia."
+        tests: [not_null]
+
+  - name: mart_lifecycle_s05_onboarding_quickwins
+    description: "Estagio S05 (Onboarding 14 Dias): Datasets prontos, endpoints prioritarios e Quick-Win de 14 dias por Pack."
+    columns:
+      - name: pack_id
+        description: "Identificador do Solution Pack."
+        tests: [not_null, unique]
+      - name: pack_name
+        description: "Nome da solucao."
+        tests: [not_null]
+      - name: datasets_prontos_silver_gold
+        description: "Tabelas e conectores prontos para consumo imediato."
+        tests: [not_null]
+      - name: endpoints_prioritarios
+        description: "Rotas REST/MCP prioritarias para integracao rapida."
+        tests: [not_null]
+      - name: quick_win_14_dias
+        description: "Entregavel de valor rapido validavel em ate 14 dias."
+        tests: [not_null]
+      - name: tempo_estimado_ativacao_horas
+        description: "Esforco estimado de ativacao inicial em horas."
+        tests: [not_null]
+      - name: reference_period
+        description: "Periodo de referencia."
+        tests: [not_null]
+
+  - name: mart_lifecycle_s06_delivery_feature_blueprint
+    description: "Estagio S06 (Execucao Tecnica & Sprints): Blueprint de arquitetura, features da Feature Store e sprints estimadas por Pack."
+    columns:
+      - name: pack_id
+        description: "Identificador do Solution Pack."
+        tests: [not_null, unique]
+      - name: pack_name
+        description: "Nome da solucao."
+        tests: [not_null]
+      - name: features_chave_feature_store
+        description: "Colunas-chave da Feature Store recomendadas para o pacote."
+        tests: [not_null]
+      - name: blueprint_arquitetura_entrega
+        description: "Padrao arquitetural de implementacao."
+        tests: [not_null]
+      - name: sprints_estimadas_delivery
+        description: "Quantidade estimada de sprints de entrega."
+        tests: [not_null]
+      - name: reference_period
+        description: "Periodo de referencia."
+        tests: [not_null]
+
+  - name: mart_lifecycle_s07_uat_quality_scorecard
+    description: "Estagio S07 (Homologacao, UAT & Aceite): Scorecard objetivo de qualidade, cobertura documental e criterios de aceite por Pack."
+    columns:
+      - name: pack_id
+        description: "Identificador do Solution Pack."
+        tests: [not_null, unique]
+      - name: pack_name
+        description: "Nome da solucao."
+        tests: [not_null]
+      - name: total_municipios_cobertos
+        description: "Total de municipios cobertos na Feature Store Gold."
+        tests: [not_null]
+      - name: total_ufs_cobertas
+        description: "Total de UFs cobertas."
+        tests: [not_null]
+      - name: avg_maturidade_datalake
+        description: "Media nacional do score de governanca e maturidade de dados."
+        tests: [not_null]
+      - name: avg_propensao_b2b
+        description: "Media nacional do score composto de propensao B2B."
+        tests: [not_null]
+      - name: cobertura_documentacao_odcs_pct
+        description: "Percentual de cobertura documental ODCS exigido."
+        tests: [not_null]
+      - name: tolerancia_erro_paridade_sql_python
+        description: "Tolerancia maxima de divergencia entre camada Python e DuckDB SQL."
+        tests: [not_null]
+      - name: criterio_aceite_uat_dod
+        description: "Criterio formal de Definition of Done (DoD) para Termo de Aceite."
+        tests: [not_null]
+      - name: reference_period
+        description: "Periodo de referencia."
+        tests: [not_null]
+
+  - name: mart_lifecycle_s08_sre_freshness_slos
+    description: "Estagio S08 (Sustentacao & SRE): Matriz de cadencia de ingestao, SLA de frescor, SLO de disponibilidade e resiliencia por Pack."
+    columns:
+      - name: pack_id
+        description: "Identificador do Solution Pack."
+        tests: [not_null, unique]
+      - name: pack_name
+        description: "Nome da solucao."
+        tests: [not_null]
+      - name: cadencia_ingestao_recomendada
+        description: "Cadencia recomendada para pipelines de atualizacao."
+        tests: [not_null]
+      - name: freshness_sla_horas
+        description: "SLA maximo de frescor dos dados em horas."
+        tests: [not_null]
+      - name: slo_disponibilidade_pct
+        description: "SLO alvo de disponibilidade da API/Warehouse (%)."
+        tests: [not_null]
+      - name: politica_resiliencia_sre
+        description: "Politica operacional de fallback e tolerancia a falhas."
+        tests: [not_null]
+      - name: reference_period
+        description: "Periodo de referencia."
+        tests: [not_null]
+
+  - name: mart_lifecycle_s09_cs_upsell_matrix
+    description: "Estagio S09 (CS & Expansao ARR): Matriz de recomendacao de proximo Solution Pack (cross-sell/upsell) por UF."
+    columns:
+      - name: pack_id
+        description: "Identificador do Solution Pack atual."
+        tests: [not_null]
+      - name: pack_name
+        description: "Nome da solucao atual."
+        tests: [not_null]
+      - name: sigla_uf
+        description: "Sigla da UF."
+        tests: [not_null]
+      - name: regiao
+        description: "Regiao geografica."
+        tests: [not_null]
+      - name: score_oportunidade_pack_uf
+        description: "Score de oportunidade do pacote atual na UF."
+        tests: [not_null]
+      - name: next_recommended_pack_id
+        description: "Proximo Solution Pack recomendado para expansao ARR."
+        tests: [not_null]
+      - name: tese_expansao_arr
+        description: "Argumento de valor para expansao de contrato (Retainer/Upsell)."
+        tests: [not_null]
+      - name: score_propensao_upsell
+        description: "Score de propensao para expansao."
+        tests: [not_null]
+      - name: recomendacao_operacional_pack
+        description: "Diretriz operacional vigente para a UF."
+        tests: [not_null]
+      - name: reference_period
+        description: "Periodo de referencia."
+        tests: [not_null]

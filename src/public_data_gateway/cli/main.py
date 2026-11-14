@@ -1201,6 +1201,27 @@ def build_parser() -> argparse.ArgumentParser:
     cd_esg_p.add_argument("id_municipio", help="6- or 7-digit IBGE municipality code (e.g. 3550308)")
     cd_esg_p.add_argument("--json", action="store_true", help="Output in JSON format")
 
+    # 9-Stage Solution Pack Lifecycle Reports command group
+    lc_p = subparsers.add_parser(
+        "lifecycle",
+        help="Query 9-stage commercial & delivery lifecycle marts (S01..S09) and build Solution Pack dossiers.",
+    )
+    lc_sub = lc_p.add_subparsers(dest="lifecycle_action", required=True)
+
+    lc_stage_p = lc_sub.add_parser("stage", help="Query a lifecycle stage mart (S01..S09)")
+    lc_stage_p.add_argument("stage_id", help="Stage ID (S01..S09)")
+    lc_stage_p.add_argument("--pack", required=True, dest="pack_id", help="Solution Pack ID (P01..P10)")
+    lc_stage_p.add_argument("--uf", dest="sigla_uf", help="Optional 2-letter state filter")
+    lc_stage_p.add_argument("--municipio", dest="id_municipio", help="Optional IBGE municipality code (S01)")
+    lc_stage_p.add_argument("--limit", type=int, default=10, help="Maximum rows (default: 10)")
+    lc_stage_p.add_argument("--json", action="store_true", help="Output in JSON format")
+
+    lc_dos_p = lc_sub.add_parser("dossier", help="Build a 9-stage executive sales dossier for a Solution Pack")
+    lc_dos_p.add_argument("pack_id", help="Solution Pack ID (P01..P10)")
+    lc_dos_p.add_argument("--uf", required=True, dest="sigla_uf", help="2-letter state code (e.g. SP)")
+    lc_dos_p.add_argument("--municipio", dest="id_municipio", help="Optional IBGE municipality code")
+    lc_dos_p.add_argument("--format", choices=["json", "markdown"], default="markdown", help="Output format")
+
     # Dados.gov.br (CKAN) command group
     dg_p = subparsers.add_parser("dadosgov", help="Query Dados.gov.br (CKAN) publishing organizations, resource formats, LAI governance, API reuse, and rankings.")
     dg_sub = dg_p.add_subparsers(dest="dadosgov_action", required=True)
@@ -4480,6 +4501,36 @@ def main(argv: Sequence[str] | None = None) -> int:
                         f"| ESG/Agro={res.get('score_esg_agro_resiliencia')} "
                         f"| 5G={res.get('score_infra_conectividade_5g')}"
                     )
+                return 0
+
+        elif args.command == "lifecycle":
+            from public_data_gateway.core.lifecycle_reports import LifecycleReportsService
+
+            lc_svc = LifecycleReportsService()
+            if args.lifecycle_action == "stage":
+                rows = lc_svc.get_stage_report(
+                    stage_id=args.stage_id,
+                    pack_id=args.pack_id,
+                    sigla_uf=args.sigla_uf,
+                    id_municipio=args.id_municipio,
+                    limit=args.limit,
+                )
+                if args.json:
+                    print(json.dumps(rows, ensure_ascii=False, indent=2, default=str))
+                else:
+                    for idx, r in enumerate(rows, 1):
+                        print(f"  {idx}. {json.dumps(r, ensure_ascii=False, default=str)}")
+                return 0
+            if args.lifecycle_action == "dossier":
+                dossier = lc_svc.build_sales_dossier(
+                    pack_id=args.pack_id,
+                    sigla_uf=args.sigla_uf,
+                    id_municipio=args.id_municipio,
+                )
+                if args.format == "json":
+                    print(json.dumps(dossier, ensure_ascii=False, indent=2, default=str))
+                else:
+                    print(lc_svc.format_dossier_markdown(dossier))
                 return 0
 
     except Exception as exc:
