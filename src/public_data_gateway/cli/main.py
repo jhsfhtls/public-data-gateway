@@ -871,6 +871,36 @@ def build_parser() -> argparse.ArgumentParser:
     cs_rk_p.add_argument("--uf", type=str, help="Optional 2-letter state filter")
     cs_rk_p.add_argument("--json", action="store_true", help="Output in JSON format")
 
+    # INEP IDEB command group
+    ideb_p = subparsers.add_parser("ideb", help="Query INEP IDEB municipal education quality, SAEB proficiency, biennial evolution, and rankings.")
+    ideb_sub = ideb_p.add_subparsers(dest="ideb_action", required=True)
+
+    ideb_res_p = ideb_sub.add_parser("results", help="Get municipal IDEB biennial results by stage and goal attainment (INEP).")
+    ideb_res_p.add_argument("id_municipio", help="7-digit IBGE municipality code, 8-digit CEP, or municipality name")
+    ideb_res_p.add_argument("--json", action="store_true", help="Output in JSON format")
+
+    ideb_stg_p = ideb_sub.add_parser("stages", help="List observed IDEB vs. INEP projected goal across educational stages and networks.")
+    ideb_stg_p.add_argument("id_municipio", help="7-digit IBGE municipality code, 8-digit CEP, or municipality name")
+    ideb_stg_p.add_argument("--etapa", type=str, help="Optional stage/network filter (e.g. Anos_Iniciais)")
+    ideb_stg_p.add_argument("--json", action="store_true", help="Output in JSON format")
+
+    ideb_saeb_p = ideb_sub.add_parser("saeb", help="Get municipal SAEB Portuguese/Math proficiency and adequate learning share (INEP).")
+    ideb_saeb_p.add_argument("id_municipio", help="7-digit IBGE municipality code, 8-digit CEP, or municipality name")
+    ideb_saeb_p.add_argument("--json", action="store_true", help="Output in JSON format")
+
+    ideb_ev_p = ideb_sub.add_parser("evolution", help="Get municipal biennial IDEB evolution vs. 2021, goal gaps, and INSE equity ratio.")
+    ideb_ev_p.add_argument("id_municipio", help="7-digit IBGE municipality code, 8-digit CEP, or municipality name")
+    ideb_ev_p.add_argument("--json", action="store_true", help="Output in JSON format")
+
+    ideb_ft_p = ideb_sub.add_parser("features", help="Get Gold INEP IDEB education performance and SAEB proficiency/equity features.")
+    ideb_ft_p.add_argument("id_municipio", help="7-digit IBGE municipality code, 8-digit CEP, or municipality name")
+    ideb_ft_p.add_argument("--json", action="store_true", help="Output in JSON format")
+
+    ideb_rk_p = ideb_sub.add_parser("ranking", help="List top Brazilian municipalities ranked by composite INEP IDEB quality score.")
+    ideb_rk_p.add_argument("--limit", type=int, default=10, help="Max municipalities to list")
+    ideb_rk_p.add_argument("--uf", type=str, help="Optional 2-letter state filter")
+    ideb_rk_p.add_argument("--json", action="store_true", help="Output in JSON format")
+
     # Direct shortcut: pnad-uf
     pnad_s_p = subparsers.add_parser("pnad-uf", help="Shortcut to query PNAD Contínua labor market profile.")
     pnad_s_p.add_argument("uf", type=str, help="IBGE 2-digit UF code or 2-letter state abbreviation (e.g. SP, 35)")
@@ -2984,6 +3014,80 @@ def main(argv: Sequence[str] | None = None) -> int:
                     print(f"Top {len(ranks)} Polos Universitários & Educação Superior (INEP Censo Superior):")
                     for idx, r in enumerate(ranks, 1):
                         print(f"  {idx}. {r.get('nome_municipio')} ({r.get('sigla_uf')}): Excelência {r.get('score_excelencia_academica_pesquisa_ies')} | Cap. Humano: {r.get('score_formacao_capital_humano_superior')} | {r.get('classificacao_polo_educacao_superior')}")
+                return 0
+
+        elif args.command == "ideb":
+            from public_data_gateway.connectors.educacao.inep_ideb.connector import (
+                INEPIdebConnector,
+            )
+
+            ideb_conn = INEPIdebConnector()
+            ideb_action = getattr(args, "ideb_action", None)
+            if ideb_action == "results":
+                res = ideb_conn.get_ideb_municipal_results(args.id_municipio)
+                if getattr(args, "json", False):
+                    print(json.dumps(res, indent=2, ensure_ascii=False, default=str))
+                else:
+                    print(f"INEP IDEB Resultados ({res.get('nome_municipio')} - {res.get('id_municipio')}):")
+                    print(f"  Anos Iniciais / Finais: {res.get('ideb_anos_iniciais_rede_publica')} / {res.get('ideb_anos_finais_rede_publica')}")
+                    print(f"  Ensino Médio Púb / Priv:{res.get('ideb_ensino_medio_rede_publica')} / {res.get('ideb_rede_privada_ensino_medio')}")
+                    print(f"  Metas Cumpridas:        {res.get('proporcao_escolas_cumpriram_meta_pct')}% ({res.get('escolas_avaliadas_ideb_municipio')} escolas)")
+                return 0
+
+            if ideb_action == "stages":
+                rows = ideb_conn.list_ideb_stage_network_scores(
+                    args.id_municipio, etapa_ciclo=getattr(args, "etapa", None)
+                )
+                if getattr(args, "json", False):
+                    print(json.dumps(rows, indent=2, ensure_ascii=False, default=str))
+                else:
+                    print(f"INEP IDEB Etapas e Redes ({args.id_municipio}):")
+                    for r in rows:
+                        print(f"  - {r.get('etapa_ciclo_ideb')}: observado {r.get('ideb_observado')} | meta {r.get('meta_projetada_inep')} | saldo {r.get('saldo_sobre_meta_ideb')}")
+                return 0
+
+            if ideb_action == "saeb":
+                res = ideb_conn.get_ideb_saeb_proficiency(args.id_municipio)
+                if getattr(args, "json", False):
+                    print(json.dumps(res, indent=2, ensure_ascii=False, default=str))
+                else:
+                    print(f"INEP IDEB/SAEB Proficiências ({res.get('nome_municipio')} - {res.get('id_municipio')}):")
+                    print(f"  LP / MAT 5º ano:     {res.get('proficiencia_saeb_lp_5ano')} / {res.get('proficiencia_saeb_mat_5ano')}")
+                    print(f"  LP / MAT 9º ano:     {res.get('proficiencia_saeb_lp_9ano')} / {res.get('proficiencia_saeb_mat_9ano')}")
+                    print(f"  Aprendizado Adequado:{res.get('aprendizado_adequado_anos_iniciais_pct')}% AI | {res.get('aprendizado_adequado_anos_finais_pct')}% AF")
+                return 0
+
+            if ideb_action == "evolution":
+                res = ideb_conn.get_ideb_biennial_goals_evolution(args.id_municipio)
+                if getattr(args, "json", False):
+                    print(json.dumps(res, indent=2, ensure_ascii=False, default=str))
+                else:
+                    print(f"INEP IDEB Evolução & Metas ({res.get('nome_municipio')} - {res.get('id_municipio')}):")
+                    print(f"  2021 -> 2023 Var:   {res.get('ideb_edicao_anterior_2021')} ({res.get('variacao_bienal_ideb_pontos'):+.2f} pts)")
+                    print(f"  Equidade INSE Ratio:{res.get('equidade_aprendizagem_inse_ratio')}")
+                return 0
+
+            if ideb_action == "features":
+                feat = ideb_conn.get_ideb_education_quality_features(args.id_municipio)
+                if getattr(args, "json", False):
+                    print(json.dumps(feat, indent=2, ensure_ascii=False, default=str))
+                else:
+                    print(f"INEP IDEB Features: {feat.get('nome_municipio')} ({feat.get('sigla_uf')} - {feat.get('id_municipio')}):")
+                    print(f"  Score Desempenho IDEB: {feat.get('score_desempenho_ideb_municipal')}/100.0")
+                    print(f"  Score SAEB/Equidade:   {feat.get('score_proficiencia_equidade_saeb')}/100.0")
+                    print(f"  Classificação IDEB:    {feat.get('classificacao_qualidade_ideb_municipio')}")
+                return 0
+
+            if ideb_action == "ranking":
+                ranks = ideb_conn.list_top_ideb_municipalities(
+                    limit=getattr(args, "limit", 10), sigla_uf=getattr(args, "uf", None)
+                )
+                if getattr(args, "json", False):
+                    print(json.dumps(ranks, indent=2, ensure_ascii=False, default=str))
+                else:
+                    print(f"Top {len(ranks)} Municípios no IDEB & Equidade SAEB (INEP IDEB):")
+                    for idx, r in enumerate(ranks, 1):
+                        print(f"  {idx}. {r.get('nome_municipio')} ({r.get('sigla_uf')}): IDEB Score {r.get('score_desempenho_ideb_municipal')} | SAEB/INSE: {r.get('score_proficiencia_equidade_saeb')} | {r.get('classificacao_qualidade_ideb_municipio')}")
                 return 0
 
         elif args.command == "pib-municipal":

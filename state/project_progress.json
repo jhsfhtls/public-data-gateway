@@ -1,6 +1,6 @@
 {
   "schema_version": "1.0.0",
-  "last_updated": "2026-11-13T23:18:00.000000",
+  "last_updated": "2026-11-13T23:54:00.000000",
   "project_name": "public-data-gateway",
   "ecosystem": "C.O.R.E. (core, operations, career, studies)",
   "governing_pops": [
@@ -13,10 +13,10 @@
     "POP_T_148"
   ],
   "current_macro_phase_id": "07",
-  "current_macro_phase": "Fase 07 - Ingestão Wave 5 (Saúde, Educação & Setor Notarial — 36/49 fontes homologadas [73.5%] com anvisa_cmed homologado; Próximo: inep_ideb)",
+  "current_macro_phase": "Fase 07 - Ingestão Wave 5 (Saúde, Educação & Setor Notarial — 37/49 fontes homologadas [75.5%] com inep_ideb homologado; Próximo: onr_registro_imoveis)",
   "overall_status": "ON_TRACK",
-  "active_connector": "inep_ideb",
-  "next_connector": "onr_registro_imoveis",
+  "active_connector": "onr_registro_imoveis",
+  "next_connector": "opendatasus_vigilancia",
   "structural_phases": [
     {
       "phase_id": "00",
@@ -139,8 +139,9 @@
         "Conector cnj_justica_aberta (Serventias Extrajudiciais, Produtividade por Atribuição, Emolumentos e Digitalização SREI/ONR/CRC) - CONCLUÍDO",
         "Conector datasus_sinasc (Nascidos Vivos, Assistência Pré-Natal e Parto, Perfil Materno Demográfico e Vitalidade Recém-Nascido) - CONCLUÍDO",
         "Conector anvisa_cmed (Apresentações Ativas CMED, Preços PF/PMC/PMVG por Classe Terapêutica ATC, CAP/SUS e Regime ICMS/PIS-COFINS) - CONCLUÍDO",
+        "Conector inep_ideb (IDEB Bienal por Etapa e Rede, Fluxo Escolar P, Proficiências SAEB LP/MAT, Metas INEP e Equidade INSE) - CONCLUÍDO",
         "Conector DataSUS restante (opendatasus_vigilancia)",
-        "Conectores INEP restantes (IDEB, ENEM) & capes_sucupira",
+        "Conectores INEP restantes (inep_enem) & capes_sucupira",
         "Conectores Notariais restantes (onr_registro_imoveis, capitais_iptu_itbi)"
       ]
     },
@@ -418,6 +419,12 @@
     }
   ],
   "recent_milestones": [
+    {
+      "date": "2026-11-13",
+      "phase_id": "07",
+      "milestone": "Homologação do Conector inep_ideb (4 Tabelas, dbt, Mart Qualidade Educação Básica IDEB/SAEB & Live Fail-Hard)",
+      "summary": "Implementação e homologação completa do conector inep_ideb (INEP: Índice de Desenvolvimento da Educação Básica — Resultados Municipais por Etapa, Notas Observadas vs. Metas INEP por Rede, Proficiências SAEB LP/MAT 5º e 9º Anos, Evolução Bienal 2021-2023 e Equidade INSE, Leis nº 9.394/1996, 13.005/2014 e Decretos nº 6.094/2007 e 8.777/2016) consolidando o nono conector da Wave 5 e 37º conector total da plataforma (75.5% do catálogo homologado): 4 tabelas Silver e Gold Feature Store (features_ideb_qualidade_educacional_municipios_brasil.parquet) materializadas em data/inep_ideb/{silver,gold}/; 7 novos modelos dbt (4 staging views, fct_ideb_desempenho_aprendizagem_municipio, fct_ideb_etapas_redes_municipio, mart_qualidade_educacao_basica_ideb_brasil) totalizando 320 modelos dbt e 4.514 colunas 100% documentadas com 185 checks do build aprovados; paridade rigorosa SQL-Python validada; 8 testes offline e 1 teste live fail-hard aprovados; exposição completa via SDK, CLI, REST API e MCP com wrap_untrusted_gov_data."
+    },
     {
       "date": "2026-11-13",
       "phase_id": "07",

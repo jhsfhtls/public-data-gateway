@@ -1199,6 +1199,65 @@ class MCPDispatcher:
                                 },
                             },
                             {
+                                "name": "bdg_get_ideb_municipal_results",
+                                "description": "Get official municipal IDEB biennial scores across public/private basic education stages, P flow indicator, SAEB N score, and INEP goal fulfillment.",
+                                "inputSchema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "id_municipio": {
+                                            "type": "string",
+                                            "description": "7-digit IBGE municipality code, 8-digit CEP, or municipality name (e.g. 3550308)",
+                                        },
+                                    },
+                                    "required": ["id_municipio"],
+                                },
+                            },
+                            {
+                                "name": "bdg_get_ideb_saeb_proficiency",
+                                "description": "Get municipal SAEB Portuguese and Mathematics average proficiency (5th and 9th grades), adequate learning percentages, and SAEB participation rate (INEP IDEB).",
+                                "inputSchema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "id_municipio": {
+                                            "type": "string",
+                                            "description": "7-digit IBGE municipality code, 8-digit CEP, or municipality name",
+                                        },
+                                    },
+                                    "required": ["id_municipio"],
+                                },
+                            },
+                            {
+                                "name": "bdg_get_ideb_education_quality_features",
+                                "description": "Get normalized Gold INEP IDEB education performance score, SAEB proficiency/equity score, INSE ratio, and 4-tier municipal classification.",
+                                "inputSchema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "id_municipio": {
+                                            "type": "string",
+                                            "description": "7-digit IBGE municipality code, 8-digit CEP, or municipality name",
+                                        },
+                                    },
+                                    "required": ["id_municipio"],
+                                },
+                            },
+                            {
+                                "name": "bdg_list_top_ideb_municipalities",
+                                "description": "List top Brazilian municipalities ranked by composite INEP IDEB educational performance and SAEB proficiency/equity scores.",
+                                "inputSchema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "limit": {
+                                            "type": "integer",
+                                            "description": "Maximum rows (default: 10)",
+                                        },
+                                        "sigla_uf": {
+                                            "type": "string",
+                                            "description": "Optional 2-letter state filter (e.g. PR)",
+                                        },
+                                    },
+                                },
+                            },
+                            {
                                 "name": "bdg_get_labor_force_indicators",
                                 "description": "Query official quarterly labor force, population, and unemployment rate by Brazilian UF from IBGE PNAD Contínua (Tier 1).",
                                 "inputSchema": {
@@ -2614,6 +2673,69 @@ class MCPDispatcher:
                     },
                 }
             wrapped = wrap_untrusted_gov_data(result, source_id="inep_censo_superior")
+            return {
+                "jsonrpc": "2.0",
+                "id": req_id,
+                "result": {"content": [{"type": "text", "text": wrapped}], "isError": False},
+            }
+
+        if tool_name in {
+            "bdg_get_ideb_municipal_results",
+            "bdg_get_ideb_saeb_proficiency",
+            "bdg_get_ideb_education_quality_features",
+            "bdg_list_top_ideb_municipalities",
+        }:
+            from public_data_gateway.connectors.educacao.inep_ideb.connector import (
+                INEPIdebConnector,
+            )
+
+            connector = INEPIdebConnector(settings=self.settings)
+            try:
+                if tool_name == "bdg_get_ideb_municipal_results":
+                    result = connector.get_ideb_municipal_results(
+                        str(args.get("id_municipio", "")).strip()
+                    )
+                elif tool_name == "bdg_get_ideb_saeb_proficiency":
+                    result = connector.get_ideb_saeb_proficiency(
+                        str(args.get("id_municipio", "")).strip()
+                    )
+                elif tool_name == "bdg_get_ideb_education_quality_features":
+                    result = connector.get_ideb_education_quality_features(
+                        str(args.get("id_municipio", "")).strip()
+                    )
+                else:
+                    raw_uf = args.get("sigla_uf")
+                    result = connector.list_top_ideb_municipalities(
+                        limit=int(args.get("limit", 10)),
+                        sigla_uf=str(raw_uf).strip() if raw_uf else None,
+                    )
+            except ValueError as exc:
+                return {
+                    "jsonrpc": "2.0",
+                    "id": req_id,
+                    "result": {
+                        "content": [
+                            {"type": "text", "text": f"INEP IDEB parameter error: {exc}"}
+                        ],
+                        "isError": True,
+                    },
+                }
+
+            if not result:
+                return {
+                    "jsonrpc": "2.0",
+                    "id": req_id,
+                    "result": {
+                        "content": [
+                            {
+                                "type": "text",
+                                "text": "No INEP IDEB data found for the query.",
+                            }
+                        ],
+                        "isError": True,
+                    },
+                }
+            wrapped = wrap_untrusted_gov_data(result, source_id="inep_ideb")
             return {
                 "jsonrpc": "2.0",
                 "id": req_id,

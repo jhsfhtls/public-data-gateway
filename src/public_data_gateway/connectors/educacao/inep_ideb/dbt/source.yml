@@ -1,0 +1,16 @@
+version: 2
+
+sources:
+  - name: inep_ideb_silver
+    description: "Bases oficiais do IDEB e avaliação SAEB (INEP/MEC) normalizadas na camada Silver."
+    meta:
+      external_location: "data/inep_ideb/silver/{name}.parquet"
+    tables:
+      - name: ideb_resultados_municipios
+        description: "Resultados bienais oficiais do IDEB municipal por etapa (Anos Iniciais, Anos Finais, Ensino Médio público e privado), fluxo P e cumprimento de metas."
+      - name: ideb_etapas_redes_ensino
+        description: "Desempenho desagregado do IDEB por etapa de ensino e dependência administrativa (observado vs. meta INEP)."
+      - name: ideb_proficiencia_saeb_aprendizagem
+        description: "Proficiência média na escala SAEB em Língua Portuguesa e Matemática, aprendizado adequado e taxa de participação."
+      - name: ideb_metas_evolucao_bienal
+        description: "Evolução histórica bienal do IDEB, gaps em relação às metas oficiais e razão de equidade socioeconômica INSE."

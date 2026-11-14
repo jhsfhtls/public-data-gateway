@@ -1069,6 +1069,7 @@ class EducationFacade:
         self._sdk = sdk
         self._censo_escolar_connector: Any = None
         self._censo_superior_connector: Any = None
+        self._ideb_connector: Any = None
 
     @property
     def censo_escolar_connector(self) -> Any:
@@ -1093,6 +1094,16 @@ class EducationFacade:
                 settings=self._sdk.settings
             )
         return self._censo_superior_connector
+
+    @property
+    def ideb_connector(self) -> Any:
+        if self._ideb_connector is None:
+            from public_data_gateway.connectors.educacao.inep_ideb.connector import (
+                INEPIdebConnector,
+            )
+
+            self._ideb_connector = INEPIdebConnector(settings=self._sdk.settings)
+        return self._ideb_connector
 
     def get_censo_escolar_infrastructure(self, id_municipio: str) -> dict[str, Any]:
         """Get municipal active schools inventory, broadband internet, labs, and PcD accessibility (INEP)."""
@@ -1155,6 +1166,38 @@ class EducationFacade:
     ) -> list[dict[str, Any]]:
         """List top Brazilian municipalities ranked by composite INEP higher education excellence score."""
         return self.censo_superior_connector.list_top_censo_superior_hubs(
+            limit=limit, sigla_uf=sigla_uf
+        )
+
+    def get_ideb_municipal_results(self, id_municipio: str) -> dict[str, Any]:
+        """Get consolidated municipal IDEB scores, P flow indicator, SAEB N score, and INEP goal fulfillment."""
+        return self.ideb_connector.get_ideb_municipal_results(id_municipio)
+
+    def list_ideb_stage_network_scores(
+        self, id_municipio: str, etapa_ciclo: str | None = None
+    ) -> list[dict[str, Any]]:
+        """List observed IDEB vs. INEP projected goal by educational stage and network."""
+        return self.ideb_connector.list_ideb_stage_network_scores(
+            id_municipio=id_municipio, etapa_ciclo=etapa_ciclo
+        )
+
+    def get_ideb_saeb_proficiency(self, id_municipio: str) -> dict[str, Any]:
+        """Get municipal SAEB Portuguese/Mathematics proficiencies and adequate learning rates."""
+        return self.ideb_connector.get_ideb_saeb_proficiency(id_municipio)
+
+    def get_ideb_biennial_goals_evolution(self, id_municipio: str) -> dict[str, Any]:
+        """Get biennial IDEB evolution vs. 2021, goal gaps, and socioeconomic INSE equity ratio."""
+        return self.ideb_connector.get_ideb_biennial_goals_evolution(id_municipio)
+
+    def get_ideb_education_quality_features(self, id_municipio: str) -> dict[str, Any]:
+        """Get normalized Gold INEP IDEB education performance and SAEB proficiency/equity features."""
+        return self.ideb_connector.get_ideb_education_quality_features(id_municipio)
+
+    def list_top_ideb_municipalities(
+        self, limit: int = 10, sigla_uf: str | None = None
+    ) -> list[dict[str, Any]]:
+        """List top Brazilian municipalities ranked by composite INEP IDEB educational quality score."""
+        return self.ideb_connector.list_top_ideb_municipalities(
             limit=limit, sigla_uf=sigla_uf
         )
 
@@ -1802,6 +1845,38 @@ class BrazilData:
     ) -> list[dict[str, Any]]:
         """Listar municípios líderes em excelência e pesquisa na educação superior (INEP)."""
         return self.education.list_top_censo_superior_hubs(
+            limit=limit, sigla_uf=sigla_uf
+        )
+
+    def get_ideb_municipal_results(self, id_municipio: str) -> dict[str, Any]:
+        """Consultar resultados bienais do IDEB municipal por etapa e cumprimento de metas (INEP)."""
+        return self.education.get_ideb_municipal_results(id_municipio)
+
+    def list_ideb_stage_network_scores(
+        self, id_municipio: str, etapa_ciclo: str | None = None
+    ) -> list[dict[str, Any]]:
+        """Listar notas IDEB observadas versus metas INEP por etapa e dependência administrativa."""
+        return self.education.list_ideb_stage_network_scores(
+            id_municipio=id_municipio, etapa_ciclo=etapa_ciclo
+        )
+
+    def get_ideb_saeb_proficiency(self, id_municipio: str) -> dict[str, Any]:
+        """Consultar proficiências SAEB em Língua Portuguesa e Matemática e aprendizado adequado (INEP)."""
+        return self.education.get_ideb_saeb_proficiency(id_municipio)
+
+    def get_ideb_biennial_goals_evolution(self, id_municipio: str) -> dict[str, Any]:
+        """Consultar evolução bienal do IDEB vs. 2021, gaps de metas e equidade socioeconômica INSE."""
+        return self.education.get_ideb_biennial_goals_evolution(id_municipio)
+
+    def get_ideb_education_quality_features(self, id_municipio: str) -> dict[str, Any]:
+        """Consultar features Gold de desempenho educacional no IDEB e proficiência/equidade SAEB."""
+        return self.education.get_ideb_education_quality_features(id_municipio)
+
+    def list_top_ideb_municipalities(
+        self, limit: int = 10, sigla_uf: str | None = None
+    ) -> list[dict[str, Any]]:
+        """Listar municípios líderes em desempenho no IDEB e proficiência SAEB no Brasil (INEP)."""
+        return self.education.list_top_ideb_municipalities(
             limit=limit, sigla_uf=sigla_uf
         )
 

@@ -1,0 +1,562 @@
+schema_version: "3.1.0"
+contract_id: "ODCS-BR-INEP-IDEB-001"
+source_id: "inep_ideb"
+version: "1.0.0"
+name: "INEP: Índice de Desenvolvimento da Educação Básica (IDEB)"
+agency: "Instituto Nacional de Estudos e Pesquisas Educacionais Anísio Teixeira (INEP)"
+official_url: "https://www.gov.br/inep/pt-br/areas-de-atuacao/pesquisas-estatisticas-e-indicadores/ideb"
+
+legal_framework:
+  statutes:
+    - name: "Lei nº 9.394/1996"
+      description: "Lei de Diretrizes e Bases da Educação Nacional (LDB), estabelecendo padrões de avaliação da qualidade da educação básica"
+    - name: "Decreto nº 6.094/2007"
+      description: "Dispõe sobre o Plano de Metas Compromisso Todos pela Educação e institui o IDEB como indicador oficial de qualidade educacional"
+    - name: "Lei nº 13.005/2014"
+      description: "Aprova o Plano Nacional de Educação (PNE), vinculando a Meta 7 ao atingimento das metas bienais do IDEB por etapa"
+    - name: "Decreto nº 8.777/2016"
+      description: "Institui a Política de Dados Abertos do Poder Executivo Federal"
+
+data_governance:
+  grain: "municipio_ideb_educacao_basica"
+  primary_keys:
+    - "id_municipio"
+    - "sigla_uf"
+    - "cep_8"
+  reference_date_column: "reference_date"
+  min_expected_rows: 5
+  max_volume_drop_pct: 15.0
+  freshness_sla_hours: 720
+  lgpd_tier: "PUBLIC_NON_PERSONAL"
+  ml_feature_domains:
+    - "education_quality_index"
+    - "learning_metrics"
+
+schema:
+  tables:
+    ideb_resultados_municipios:
+      description: "Resultados bienais oficiais do IDEB municipal por etapa (Anos Iniciais, Anos Finais, Ensino Médio público e privado), fluxo escolar P, nota SAEB N e cumprimento de metas INEP"
+      grain: "id_municipio, ano_edicao_ideb"
+      primary_keys: ["id_municipio", "ano_edicao_ideb"]
+      min_expected_rows: 5
+      columns:
+        - name: "id_municipio"
+          data_type: "string"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Código IBGE de 7 dígitos identificador único do município"
+        - name: "nome_municipio"
+          data_type: "string"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Nome oficial do município"
+        - name: "sigla_uf"
+          data_type: "string"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Sigla de 2 letras da Unidade Federativa"
+        - name: "id_uf"
+          data_type: "string"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Código IBGE de 2 dígitos da Unidade Federativa"
+        - name: "cep_8"
+          data_type: "string"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "CEP canônico de 8 dígitos da secretaria municipal de educação de referência"
+        - name: "ano_edicao_ideb"
+          data_type: "int64"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Ano da edição bienal oficial do IDEB apurada pelo INEP"
+        - name: "ideb_anos_iniciais_rede_publica"
+          data_type: "float64"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "IDEB observado nos Anos Iniciais do Ensino Fundamental (1º ao 5º ano) da rede pública (escala 0 a 10)"
+        - name: "ideb_anos_finais_rede_publica"
+          data_type: "float64"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "IDEB observado nos Anos Finais do Ensino Fundamental (6º ao 9º ano) da rede pública (escala 0 a 10)"
+        - name: "ideb_ensino_medio_rede_publica"
+          data_type: "float64"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "IDEB observado no Ensino Médio da rede pública (escala 0 a 10)"
+        - name: "ideb_rede_privada_ensino_medio"
+          data_type: "float64"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "IDEB observado no Ensino Médio da rede privada no município (escala 0 a 10)"
+        - name: "indicador_rendimento_fluxo_medio_p"
+          data_type: "float64"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Indicador médio de rendimento escolar P (fluxo de aprovação entre 0 e 1)"
+        - name: "nota_padronizada_saeb_n_media"
+          data_type: "float64"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Nota média padronizada N no SAEB em Língua Portuguesa e Matemática (escala 0 a 10)"
+        - name: "escolas_avaliadas_ideb_municipio"
+          data_type: "int64"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Quantidade de escolas participantes avaliadas com cálculo oficial do IDEB no município"
+        - name: "proporcao_escolas_cumpriram_meta_pct"
+          data_type: "float64"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Percentual de escolas da rede pública que atingiram ou superaram a meta bienal do IDEB"
+        - name: "reference_date"
+          data_type: "string"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Data de referência oficial da publicação bienal do IDEB pelo INEP (YYYY-MM-DD)"
+        - name: "extracted_at"
+          data_type: "string"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Carimbo temporal ISO-8601 UTC da extração"
+
+    ideb_etapas_redes_ensino:
+      description: "Desempenho desagregado do IDEB por etapa de ensino e dependência administrativa (observado vs. meta INEP)"
+      grain: "id_municipio, ano_edicao_ideb, etapa_ciclo_ideb"
+      primary_keys: ["id_municipio", "ano_edicao_ideb", "etapa_ciclo_ideb"]
+      min_expected_rows: 20
+      columns:
+        - name: "id_municipio"
+          data_type: "string"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Código IBGE de 7 dígitos identificador único do município"
+        - name: "nome_municipio"
+          data_type: "string"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Nome oficial do município"
+        - name: "sigla_uf"
+          data_type: "string"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Sigla de 2 letras da Unidade Federativa"
+        - name: "id_uf"
+          data_type: "string"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Código IBGE de 2 dígitos da Unidade Federativa"
+        - name: "cep_8"
+          data_type: "string"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "CEP canônico de 8 dígitos da secretaria municipal de educação de referência"
+        - name: "ano_edicao_ideb"
+          data_type: "int64"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Ano da edição bienal oficial do IDEB apurada pelo INEP"
+        - name: "etapa_ciclo_ideb"
+          data_type: "string"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Etapa/ciclo de ensino e rede avaliada no IDEB (Anos Iniciais, Anos Finais, Ensino Médio público ou Rede Privada)"
+        - name: "rede_ensino"
+          data_type: "string"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Dependência administrativa agregada da etapa avaliada (Publica ou Privada)"
+        - name: "ideb_observado"
+          data_type: "float64"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Nota IDEB observada na respectiva etapa/rede de ensino"
+        - name: "meta_projetada_inep"
+          data_type: "float64"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Meta oficial projetada pelo INEP/PNE para a etapa e rede na edição"
+        - name: "saldo_sobre_meta_ideb"
+          data_type: "float64"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Diferença em pontos entre o IDEB observado e a meta projetada pelo INEP"
+        - name: "taxa_aprovacao_etapa_pct"
+          data_type: "float64"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Taxa percentual média de aprovação escolar da etapa avaliada"
+        - name: "reference_date"
+          data_type: "string"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Data de referência oficial da publicação bienal do IDEB pelo INEP (YYYY-MM-DD)"
+        - name: "extracted_at"
+          data_type: "string"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Carimbo temporal ISO-8601 UTC da extração"
+
+    ideb_proficiencia_saeb_aprendizagem:
+      description: "Proficiência média na escala SAEB em Língua Portuguesa e Matemática, aprendizado adequado e taxa de participação"
+      grain: "id_municipio, ano_edicao_ideb"
+      primary_keys: ["id_municipio", "ano_edicao_ideb"]
+      min_expected_rows: 5
+      columns:
+        - name: "id_municipio"
+          data_type: "string"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Código IBGE de 7 dígitos identificador único do município"
+        - name: "nome_municipio"
+          data_type: "string"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Nome oficial do município"
+        - name: "sigla_uf"
+          data_type: "string"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Sigla de 2 letras da Unidade Federativa"
+        - name: "id_uf"
+          data_type: "string"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Código IBGE de 2 dígitos da Unidade Federativa"
+        - name: "cep_8"
+          data_type: "string"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "CEP canônico de 8 dígitos da secretaria municipal de educação de referência"
+        - name: "ano_edicao_ideb"
+          data_type: "int64"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Ano da edição bienal oficial do IDEB/SAEB apurada pelo INEP"
+        - name: "proficiencia_saeb_lp_5ano"
+          data_type: "float64"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Proficiência média no SAEB em Língua Portuguesa no 5º ano do Ensino Fundamental"
+        - name: "proficiencia_saeb_mat_5ano"
+          data_type: "float64"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Proficiência média no SAEB em Matemática no 5º ano do Ensino Fundamental"
+        - name: "proficiencia_saeb_lp_9ano"
+          data_type: "float64"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Proficiência média no SAEB em Língua Portuguesa no 9º ano do Ensino Fundamental"
+        - name: "proficiencia_saeb_mat_9ano"
+          data_type: "float64"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Proficiência média no SAEB em Matemática no 9º ano do Ensino Fundamental"
+        - name: "aprendizado_adequado_anos_iniciais_pct"
+          data_type: "float64"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Percentual de estudantes dos Anos Iniciais com aprendizado considerado adequado no SAEB"
+        - name: "aprendizado_adequado_anos_finais_pct"
+          data_type: "float64"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Percentual de estudantes dos Anos Finais com aprendizado considerado adequado no SAEB"
+        - name: "taxa_participacao_saeb_pct"
+          data_type: "float64"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Taxa percentual de participação efetiva dos estudantes elegíveis na prova SAEB"
+        - name: "reference_date"
+          data_type: "string"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Data de referência oficial da publicação bienal do IDEB pelo INEP (YYYY-MM-DD)"
+        - name: "extracted_at"
+          data_type: "string"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Carimbo temporal ISO-8601 UTC da extração"
+
+    ideb_metas_evolucao_bienal:
+      description: "Evolução histórica bienal do IDEB, gaps em relação às metas oficiais por etapa e razão de equidade socioeconômica INSE"
+      grain: "id_municipio, ano_edicao_ideb"
+      primary_keys: ["id_municipio", "ano_edicao_ideb"]
+      min_expected_rows: 5
+      columns:
+        - name: "id_municipio"
+          data_type: "string"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Código IBGE de 7 dígitos identificador único do município"
+        - name: "nome_municipio"
+          data_type: "string"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Nome oficial do município"
+        - name: "sigla_uf"
+          data_type: "string"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Sigla de 2 letras da Unidade Federativa"
+        - name: "id_uf"
+          data_type: "string"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Código IBGE de 2 dígitos da Unidade Federativa"
+        - name: "cep_8"
+          data_type: "string"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "CEP canônico de 8 dígitos da secretaria municipal de educação de referência"
+        - name: "ano_edicao_ideb"
+          data_type: "int64"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Ano da edição bienal oficial do IDEB apurada pelo INEP"
+        - name: "ideb_edicao_anterior_2021"
+          data_type: "float64"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "IDEB médio ponderado observado na edição bienal anterior (2021) para comparação temporal"
+        - name: "variacao_bienal_ideb_pontos"
+          data_type: "float64"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Variação em pontos do IDEB Anos Iniciais da rede pública entre 2021 e a edição vigente"
+        - name: "gap_meta_anos_iniciais_pontos"
+          data_type: "float64"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Diferença em pontos entre o IDEB observado nos Anos Iniciais públicos e a meta INEP"
+        - name: "gap_meta_anos_finais_pontos"
+          data_type: "float64"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Diferença em pontos entre o IDEB observado nos Anos Finais públicos e a meta INEP"
+        - name: "gap_meta_ensino_medio_pontos"
+          data_type: "float64"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Diferença em pontos entre o IDEB observado no Ensino Médio público e a meta INEP"
+        - name: "gap_rede_privada_vs_publica_em"
+          data_type: "float64"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Diferença em pontos entre o IDEB do Ensino Médio privado e o da rede pública"
+        - name: "equidade_aprendizagem_inse_ratio"
+          data_type: "float64"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Razão de equidade de aprendizagem entre estratos de menor e maior nível socioeconômico (INSE)"
+        - name: "reference_date"
+          data_type: "string"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Data de referência oficial da publicação bienal do IDEB pelo INEP (YYYY-MM-DD)"
+        - name: "extracted_at"
+          data_type: "string"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Carimbo temporal ISO-8601 UTC da extração"
+
+    features_ideb_qualidade_educacional_municipios_brasil:
+      description: "Feature store Gold consolidada de desempenho IDEB, proficiência SAEB, equidade INSE e classificação educacional municipal"
+      grain: "id_municipio"
+      primary_keys: ["id_municipio"]
+      min_expected_rows: 5
+      columns:
+        - name: "id_municipio"
+          data_type: "string"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Código IBGE de 7 dígitos identificador único do município"
+        - name: "sigla_uf"
+          data_type: "string"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Sigla de 2 letras da Unidade Federativa"
+        - name: "nome_municipio"
+          data_type: "string"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Nome oficial do município"
+        - name: "cep_8"
+          data_type: "string"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "CEP canônico de 8 dígitos da secretaria municipal de educação de referência"
+        - name: "ano_edicao_ideb"
+          data_type: "int64"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Ano da edição bienal oficial do IDEB"
+        - name: "ideb_anos_iniciais_rede_publica"
+          data_type: "float64"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "IDEB observado nos Anos Iniciais da rede pública"
+        - name: "ideb_anos_finais_rede_publica"
+          data_type: "float64"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "IDEB observado nos Anos Finais da rede pública"
+        - name: "ideb_ensino_medio_rede_publica"
+          data_type: "float64"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "IDEB observado no Ensino Médio da rede pública"
+        - name: "ideb_rede_privada_ensino_medio"
+          data_type: "float64"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "IDEB observado no Ensino Médio da rede privada"
+        - name: "indicador_rendimento_fluxo_medio_p"
+          data_type: "float64"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Indicador médio de fluxo escolar P"
+        - name: "nota_padronizada_saeb_n_media"
+          data_type: "float64"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Nota média padronizada N no SAEB"
+        - name: "proporcao_escolas_cumpriram_meta_pct"
+          data_type: "float64"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Percentual de escolas que atingiram a meta bienal do IDEB"
+        - name: "aprendizado_adequado_anos_iniciais_pct"
+          data_type: "float64"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Percentual de alunos com aprendizado adequado nos Anos Iniciais (SAEB)"
+        - name: "aprendizado_adequado_anos_finais_pct"
+          data_type: "float64"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Percentual de alunos com aprendizado adequado nos Anos Finais (SAEB)"
+        - name: "taxa_participacao_saeb_pct"
+          data_type: "float64"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Taxa percentual de participação na avaliação SAEB"
+        - name: "variacao_bienal_ideb_pontos"
+          data_type: "float64"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Variação em pontos do IDEB público em relação à edição anterior"
+        - name: "equidade_aprendizagem_inse_ratio"
+          data_type: "float64"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Razão de equidade socioeconômica de aprendizagem INSE"
+        - name: "score_desempenho_ideb_municipal"
+          data_type: "float64"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Score normalizado (0-100) composto pelo IDEB observado nas três etapas públicas, cumprimento de metas e fluxo P"
+        - name: "score_proficiencia_equidade_saeb"
+          data_type: "float64"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Score normalizado (0-100) de proficiência adequada SAEB, equidade socioeconômica INSE e participação"
+        - name: "classificacao_qualidade_ideb_municipio"
+          data_type: "string"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Classificação da rede municipal de ensino conforme desempenho no IDEB e proficiência SAEB"
+        - name: "reference_date"
+          data_type: "string"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Data de referência oficial da publicação bienal do IDEB pelo INEP (YYYY-MM-DD)"
+        - name: "extracted_at"
+          data_type: "string"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Carimbo temporal ISO-8601 UTC da extração"

@@ -6067,3 +6067,204 @@ models:
         description: "Timestamp ISO-8601 UTC da extração."
         tests:
           - not_null
+
+  - name: fct_ideb_desempenho_aprendizagem_municipio
+    description: "Tabela Fato Core consolidando resultados bienais do IDEB municipal, proficiências SAEB em Língua Portuguesa e Matemática, evolução histórica, metas e equidade INSE (INEP)."
+    columns:
+      - name: id_municipio
+        description: "Código IBGE de 7 dígitos do município."
+        tests:
+          - not_null
+          - unique
+      - name: nome_municipio
+        description: "Nome oficial do município."
+        tests:
+          - not_null
+      - name: sigla_uf
+        description: "Sigla de 2 letras da Unidade Federativa."
+        tests:
+          - not_null
+      - name: id_uf
+        description: "Código IBGE de 2 dígitos da Unidade Federativa."
+        tests:
+          - not_null
+      - name: nome_uf
+        description: "Nome completo da Unidade Federativa."
+        tests:
+          - not_null
+      - name: regiao
+        description: "Grande região geográfica brasileira."
+        tests:
+          - not_null
+      - name: cep_8
+        description: "CEP canônico de 8 dígitos da secretaria municipal de educação de referência."
+        tests:
+          - not_null
+      - name: ano_edicao_ideb
+        description: "Ano da edição bienal oficial do IDEB apurada pelo INEP."
+        tests:
+          - not_null
+      - name: ideb_anos_iniciais_rede_publica
+        description: "IDEB observado nos Anos Iniciais do Ensino Fundamental da rede pública."
+        tests:
+          - not_null
+      - name: ideb_anos_finais_rede_publica
+        description: "IDEB observado nos Anos Finais do Ensino Fundamental da rede pública."
+        tests:
+          - not_null
+      - name: ideb_ensino_medio_rede_publica
+        description: "IDEB observado no Ensino Médio da rede pública."
+        tests:
+          - not_null
+      - name: ideb_rede_privada_ensino_medio
+        description: "IDEB observado no Ensino Médio da rede privada no município."
+        tests:
+          - not_null
+      - name: indicador_rendimento_fluxo_medio_p
+        description: "Indicador médio de rendimento escolar P (fluxo de aprovação entre 0 e 1)."
+        tests:
+          - not_null
+      - name: nota_padronizada_saeb_n_media
+        description: "Nota média padronizada N no SAEB em Língua Portuguesa e Matemática."
+        tests:
+          - not_null
+      - name: escolas_avaliadas_ideb_municipio
+        description: "Quantidade de escolas participantes avaliadas com cálculo oficial do IDEB."
+        tests:
+          - not_null
+      - name: proporcao_escolas_cumpriram_meta_pct
+        description: "Percentual de escolas da rede pública que atingiram ou superaram a meta bienal (%)."
+        tests:
+          - not_null
+      - name: proficiencia_saeb_lp_5ano
+        description: "Proficiência média no SAEB em Língua Portuguesa no 5º ano."
+        tests:
+          - not_null
+      - name: proficiencia_saeb_mat_5ano
+        description: "Proficiência média no SAEB em Matemática no 5º ano."
+        tests:
+          - not_null
+      - name: proficiencia_saeb_lp_9ano
+        description: "Proficiência média no SAEB em Língua Portuguesa no 9º ano."
+        tests:
+          - not_null
+      - name: proficiencia_saeb_mat_9ano
+        description: "Proficiência média no SAEB em Matemática no 9º ano."
+        tests:
+          - not_null
+      - name: aprendizado_adequado_anos_iniciais_pct
+        description: "Percentual de estudantes dos Anos Iniciais com aprendizado adequado no SAEB (%)."
+        tests:
+          - not_null
+      - name: aprendizado_adequado_anos_finais_pct
+        description: "Percentual de estudantes dos Anos Finais com aprendizado adequado no SAEB (%)."
+        tests:
+          - not_null
+      - name: taxa_participacao_saeb_pct
+        description: "Taxa percentual de participação efetiva na avaliação SAEB (%)."
+        tests:
+          - not_null
+      - name: ideb_edicao_anterior_2021
+        description: "IDEB médio observado na edição bienal anterior (2021)."
+        tests:
+          - not_null
+      - name: variacao_bienal_ideb_pontos
+        description: "Variação em pontos do IDEB Anos Iniciais públicos frente à edição 2021."
+        tests:
+          - not_null
+      - name: gap_meta_anos_iniciais_pontos
+        description: "Diferença em pontos entre IDEB observado e meta nos Anos Iniciais públicos."
+        tests:
+          - not_null
+      - name: gap_meta_anos_finais_pontos
+        description: "Diferença em pontos entre IDEB observado e meta nos Anos Finais públicos."
+        tests:
+          - not_null
+      - name: gap_meta_ensino_medio_pontos
+        description: "Diferença em pontos entre IDEB observado e meta no Ensino Médio público."
+        tests:
+          - not_null
+      - name: gap_rede_privada_vs_publica_em
+        description: "Diferença em pontos entre IDEB do Ensino Médio privado e da rede pública."
+        tests:
+          - not_null
+      - name: equidade_aprendizagem_inse_ratio
+        description: "Razão de equidade de aprendizagem entre estratos socioeconômicos INSE."
+        tests:
+          - not_null
+      - name: reference_date
+        description: "Data de referência ISO-8601 da publicação bienal do IDEB."
+        tests:
+          - not_null
+      - name: extracted_at
+        description: "Timestamp ISO-8601 UTC da extração."
+        tests:
+          - not_null
+
+  - name: fct_ideb_etapas_redes_municipio
+    description: "Tabela Fato Core de desempenho do IDEB desagregado por etapa de ensino e dependência administrativa comparada às metas projetadas pelo INEP."
+    columns:
+      - name: id_municipio
+        description: "Código IBGE de 7 dígitos do município."
+        tests:
+          - not_null
+      - name: nome_municipio
+        description: "Nome oficial do município."
+        tests:
+          - not_null
+      - name: sigla_uf
+        description: "Sigla de 2 letras da Unidade Federativa."
+        tests:
+          - not_null
+      - name: id_uf
+        description: "Código IBGE de 2 dígitos da Unidade Federativa."
+        tests:
+          - not_null
+      - name: nome_uf
+        description: "Nome completo da Unidade Federativa."
+        tests:
+          - not_null
+      - name: regiao
+        description: "Grande região geográfica brasileira."
+        tests:
+          - not_null
+      - name: cep_8
+        description: "CEP canônico de 8 dígitos da secretaria municipal de educação de referência."
+        tests:
+          - not_null
+      - name: ano_edicao_ideb
+        description: "Ano da edição bienal oficial do IDEB apurada pelo INEP."
+        tests:
+          - not_null
+      - name: etapa_ciclo_ideb
+        description: "Etapa/ciclo de ensino e rede avaliada no IDEB."
+        tests:
+          - not_null
+      - name: rede_ensino
+        description: "Dependência administrativa agregada (Publica ou Privada)."
+        tests:
+          - not_null
+      - name: ideb_observado
+        description: "Nota IDEB observada na etapa e rede de ensino avaliada."
+        tests:
+          - not_null
+      - name: meta_projetada_inep
+        description: "Meta oficial projetada pelo INEP/PNE para a etapa."
+        tests:
+          - not_null
+      - name: saldo_sobre_meta_ideb
+        description: "Diferença em pontos entre o IDEB observado e a meta projetada."
+        tests:
+          - not_null
+      - name: taxa_aprovacao_etapa_pct
+        description: "Taxa percentual média de aprovação escolar da etapa avaliada (%)."
+        tests:
+          - not_null
+      - name: reference_date
+        description: "Data de referência ISO-8601 da publicação bienal do IDEB."
+        tests:
+          - not_null
+      - name: extracted_at
+        description: "Timestamp ISO-8601 UTC da extração."
+        tests:
+          - not_null
