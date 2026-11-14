@@ -2174,6 +2174,89 @@ def create_app(settings: GatewaySettings | None = None) -> FastAPI:
         except ValueError as exc:
             raise HTTPException(status_code=400, detail=str(exc)) from exc
 
+    @app.get("/api/v1/environment/hidroweb/top-municipalities")
+    async def get_top_hidroweb_municipalities(
+        limit: int = Query(10, ge=1, le=50, description="Max municipalities to list"),
+        uf: str | None = Query(None, description="Filter by 2-letter state abbreviation"),
+    ) -> list[dict[str, Any]]:
+        from public_data_gateway.connectors.ambiental.ana_hidroweb_telemetria.connector import (
+            AnaHidrowebConnector,
+        )
+
+        conn = AnaHidrowebConnector(settings=app_settings)
+        try:
+            return conn.list_top_hidroweb_municipalities(limit=limit, sigla_uf=uf)
+        except (ValueError, KeyError) as exc:
+            raise HTTPException(status_code=400, detail=str(exc)) from exc
+
+    @app.get("/api/v1/environment/hidroweb/features/{id_municipio}")
+    async def get_hidroweb_features(id_municipio: str) -> dict[str, Any]:
+        from public_data_gateway.connectors.ambiental.ana_hidroweb_telemetria.connector import (
+            AnaHidrowebConnector,
+        )
+
+        conn = AnaHidrowebConnector(settings=app_settings)
+        try:
+            return conn.get_hidroweb_hydrology_features(id_municipio)
+        except (ValueError, KeyError) as exc:
+            raise HTTPException(status_code=400, detail=str(exc)) from exc
+
+    @app.get("/api/v1/environment/hidroweb/flows/{id_municipio}")
+    async def get_hidroweb_flows(
+        id_municipio: str,
+        segmento: str | None = Query(
+            None, description="Optional hydrological segment filter (e.g. Rio_Principal)"
+        ),
+    ) -> list[dict[str, Any]]:
+        from public_data_gateway.connectors.ambiental.ana_hidroweb_telemetria.connector import (
+            AnaHidrowebConnector,
+        )
+
+        conn = AnaHidrowebConnector(settings=app_settings)
+        try:
+            return conn.list_hidroweb_flows(
+                id_municipio, tipo_monitoramento_hidrologico=segmento
+            )
+        except (ValueError, KeyError) as exc:
+            raise HTTPException(status_code=400, detail=str(exc)) from exc
+
+    @app.get("/api/v1/environment/hidroweb/rainfall/{id_municipio}")
+    async def get_hidroweb_rainfall(id_municipio: str) -> dict[str, Any]:
+        from public_data_gateway.connectors.ambiental.ana_hidroweb_telemetria.connector import (
+            AnaHidrowebConnector,
+        )
+
+        conn = AnaHidrowebConnector(settings=app_settings)
+        try:
+            return conn.get_hidroweb_rainfall(id_municipio)
+        except (ValueError, KeyError) as exc:
+            raise HTTPException(status_code=400, detail=str(exc)) from exc
+
+    @app.get("/api/v1/environment/hidroweb/security/{id_municipio}")
+    async def get_hidroweb_security(id_municipio: str) -> dict[str, Any]:
+        from public_data_gateway.connectors.ambiental.ana_hidroweb_telemetria.connector import (
+            AnaHidrowebConnector,
+        )
+
+        conn = AnaHidrowebConnector(settings=app_settings)
+        try:
+            return conn.get_hidroweb_water_security(id_municipio)
+        except (ValueError, KeyError) as exc:
+            raise HTTPException(status_code=400, detail=str(exc)) from exc
+
+    @app.get("/api/v1/environment/hidroweb/stations/{id_municipio}")
+    @app.get("/api/v1/hidroweb/{id_municipio}")
+    async def get_hidroweb_stations(id_municipio: str) -> dict[str, Any]:
+        from public_data_gateway.connectors.ambiental.ana_hidroweb_telemetria.connector import (
+            AnaHidrowebConnector,
+        )
+
+        conn = AnaHidrowebConnector(settings=app_settings)
+        try:
+            return conn.get_hidroweb_stations(id_municipio)
+        except (ValueError, KeyError) as exc:
+            raise HTTPException(status_code=400, detail=str(exc)) from exc
+
     @app.get("/api/v1/real-estate/onr/top-municipalities")
     async def get_top_onr_municipalities(
         limit: int = Query(10, ge=1, le=50, description="Max municipalities to list"),

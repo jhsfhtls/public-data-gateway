@@ -1,6 +1,6 @@
 {
   "schema_version": "1.0.0",
-  "last_updated": "2026-11-14T09:10:00.000000",
+  "last_updated": "2026-11-14T09:24:00.000000",
   "project_name": "public-data-gateway",
   "ecosystem": "C.O.R.E. (core, operations, career, studies)",
   "governing_pops": [
@@ -13,10 +13,10 @@
     "POP_T_148"
   ],
   "current_macro_phase_id": "08",
-  "current_macro_phase": "Fase 08 - Ingestão Wave 6 (Meio Ambiente, Agro & Metaportais — 43/49 fontes homologadas [87.8%] com inpe_terrabrasilis homologado; Próximo: ana_hidroweb)",
+  "current_macro_phase": "Fase 08 - Ingestão Wave 6 (Meio Ambiente, Agro & Metaportais — 44/49 fontes homologadas [89.8%] com ana_hidroweb_telemetria homologado; Próximo: mapbiomas_cobertura)",
   "overall_status": "ON_TRACK",
-  "active_connector": "ana_hidroweb",
-  "next_connector": "mapbiomas",
+  "active_connector": "mapbiomas_cobertura",
+  "next_connector": "sfb_sicar",
   "structural_phases": [
     {
       "phase_id": "00",
@@ -154,7 +154,8 @@
       "completion_date": null,
       "deliverables": [
         "Conector inpe_terrabrasilis (PRODES Anual, Alertas DETER-B por Classe, Uso da Terra e Governança ESG/EUDR) - CONCLUÍDO",
-        "Conectores Ambientais (ana_hidroweb, mapbiomas, sfb_sicar, mapa_zarc)",
+        "Conector ana_hidroweb_telemetria (Estações Telemétricas, Cotas/Vazões por Segmento, Pluviometria e Segurança Hídrica) - CONCLUÍDO",
+        "Conectores Ambientais (mapbiomas_cobertura, sfb_sicar, mapa_zarc)",
         "Conectores Metaportais (basedosdados_bq, dadosgov_ckan)"
       ]
     },
@@ -422,6 +423,12 @@
     }
   ],
   "recent_milestones": [
+    {
+      "date": "2026-11-14",
+      "phase_id": "08",
+      "milestone": "Homologação do Conector ana_hidroweb_telemetria (44/49 Fontes — 89.8%)",
+      "summary": "Implementação e homologação completa do conector ana_hidroweb_telemetria (ANA: Rede Hidrometeorológica Nacional — HidroWeb & Telemetria, Lei nº 9.433/1997, Lei nº 9.984/2000, Resolução ANA nº 1.041/2018) avançando a Wave 6 para 44/49 fontes homologadas (89.8%): 5 tabelas Medallion (hidroweb_estacoes_telemetricas_rede, hidroweb_cotas_vazoes_bacia, hidroweb_pluviometria_estiagem_cheias, hidroweb_qualidade_seguranca_hidrica e features_ana_hidroweb_hidrologia) materializadas em data/ana_hidroweb_telemetria/silver/; 7 novos modelos dbt (4 staging views, fct_hidroweb_telemetria_seguranca_hidrica_municipio, fct_hidroweb_vazoes_bacia_municipio e mart_seguranca_hidrica_hidroweb_brasil) totalizando 369 modelos e 5.463 colunas 100% documentadas no linter (202 sources); paridade SQL–Python estrita confirmada (12 municípios, 4 tiers x 3 municípios, zero divergências); paridade multi-interface completa em SDK (EnvironmentFacade.hidroweb_connector), CLI (bdg hidroweb), FastAPI (/api/v1/environment/hidroweb/* e /api/v1/hidroweb/*) e MCP (bdg_*_hidroweb* com wrap_untrusted_gov_data); 9 testes pytest (8 offline + 1 live ANA HidroWeb Portal/WebService Telemetria) aprovados."
+    },
     {
       "date": "2026-11-14",
       "phase_id": "08",

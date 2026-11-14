@@ -1494,6 +1494,65 @@ class MCPDispatcher:
                                 },
                             },
                             {
+                                "name": "bdg_get_hidroweb_stations",
+                                "description": "Get official municipal ANA HidroWeb telemetric station network coverage, fluviometric/pluviometric counts, and transmission availability.",
+                                "inputSchema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "id_municipio": {
+                                            "type": "string",
+                                            "description": "7-digit IBGE municipality code, 6-digit prefix, or 8-digit CEP (e.g. 4106902)",
+                                        },
+                                    },
+                                    "required": ["id_municipio"],
+                                },
+                            },
+                            {
+                                "name": "bdg_get_hidroweb_water_security",
+                                "description": "Get municipal ANA HidroWeb water quality (IQA), water security index (ISH), water balance commitment, and grant regularization.",
+                                "inputSchema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "id_municipio": {
+                                            "type": "string",
+                                            "description": "7-digit IBGE municipality code, 6-digit prefix, or 8-digit CEP",
+                                        },
+                                    },
+                                    "required": ["id_municipio"],
+                                },
+                            },
+                            {
+                                "name": "bdg_get_hidroweb_hydrology_features",
+                                "description": "Get normalized Gold ANA HidroWeb hydro telemetry, river flow/level averages, composite water security score, and 4-tier classification.",
+                                "inputSchema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "id_municipio": {
+                                            "type": "string",
+                                            "description": "7-digit IBGE municipality code, 6-digit prefix, or 8-digit CEP",
+                                        },
+                                    },
+                                    "required": ["id_municipio"],
+                                },
+                            },
+                            {
+                                "name": "bdg_list_top_hidroweb_municipalities",
+                                "description": "List top Brazilian municipalities ranked by composite ANA HidroWeb water security and telemetry resilience score.",
+                                "inputSchema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "limit": {
+                                            "type": "integer",
+                                            "description": "Maximum rows (default: 10)",
+                                        },
+                                        "sigla_uf": {
+                                            "type": "string",
+                                            "description": "Optional 2-letter state filter (e.g. PR)",
+                                        },
+                                    },
+                                },
+                            },
+                            {
                                 "name": "bdg_get_onr_property_registry",
                                 "description": "Get official ONR SREI municipal active property registry CNM stock, digital conversion rate, and online certificate emissions.",
                                 "inputSchema": {
@@ -3342,6 +3401,69 @@ class MCPDispatcher:
                     },
                 }
             wrapped = wrap_untrusted_gov_data(result, source_id="inpe_terrabrasilis")
+            return {
+                "jsonrpc": "2.0",
+                "id": req_id,
+                "result": {"content": [{"type": "text", "text": wrapped}], "isError": False},
+            }
+
+        if tool_name in {
+            "bdg_get_hidroweb_stations",
+            "bdg_get_hidroweb_water_security",
+            "bdg_get_hidroweb_hydrology_features",
+            "bdg_list_top_hidroweb_municipalities",
+        }:
+            from public_data_gateway.connectors.ambiental.ana_hidroweb_telemetria.connector import (
+                AnaHidrowebConnector,
+            )
+
+            connector = AnaHidrowebConnector(settings=self.settings)
+            try:
+                if tool_name == "bdg_get_hidroweb_stations":
+                    result: Any = connector.get_hidroweb_stations(
+                        str(args.get("id_municipio", "")).strip()
+                    )
+                elif tool_name == "bdg_get_hidroweb_water_security":
+                    result = connector.get_hidroweb_water_security(
+                        str(args.get("id_municipio", "")).strip()
+                    )
+                elif tool_name == "bdg_get_hidroweb_hydrology_features":
+                    result = connector.get_hidroweb_hydrology_features(
+                        str(args.get("id_municipio", "")).strip()
+                    )
+                else:
+                    raw_uf = args.get("sigla_uf")
+                    result = connector.list_top_hidroweb_municipalities(
+                        limit=int(args.get("limit", 10)),
+                        sigla_uf=str(raw_uf).strip() if raw_uf else None,
+                    )
+            except (ValueError, KeyError) as exc:
+                return {
+                    "jsonrpc": "2.0",
+                    "id": req_id,
+                    "result": {
+                        "content": [
+                            {"type": "text", "text": f"ANA HidroWeb parameter error: {exc}"}
+                        ],
+                        "isError": True,
+                    },
+                }
+
+            if not result:
+                return {
+                    "jsonrpc": "2.0",
+                    "id": req_id,
+                    "result": {
+                        "content": [
+                            {
+                                "type": "text",
+                                "text": "No ANA HidroWeb data found for the query.",
+                            }
+                        ],
+                        "isError": True,
+                    },
+                }
+            wrapped = wrap_untrusted_gov_data(result, source_id="ana_hidroweb_telemetria")
             return {
                 "jsonrpc": "2.0",
                 "id": req_id,
