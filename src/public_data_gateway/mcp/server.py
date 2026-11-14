@@ -1553,6 +1553,65 @@ class MCPDispatcher:
                                 },
                             },
                             {
+                                "name": "bdg_get_mapbiomas_land_cover",
+                                "description": "Get official municipal MapBiomas annual native vegetation, agricultural area, urban surface, and water cover.",
+                                "inputSchema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "id_municipio": {
+                                            "type": "string",
+                                            "description": "7-digit IBGE municipality code, 6-digit prefix, or 8-digit CEP (e.g. 1302603)",
+                                        },
+                                    },
+                                    "required": ["id_municipio"],
+                                },
+                            },
+                            {
+                                "name": "bdg_get_mapbiomas_alerts",
+                                "description": "Get municipal MapBiomas Alerta validated deforestation alerts, embargo overlaps, and protected-area incidence.",
+                                "inputSchema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "id_municipio": {
+                                            "type": "string",
+                                            "description": "7-digit IBGE municipality code, 6-digit prefix, or 8-digit CEP",
+                                        },
+                                    },
+                                    "required": ["id_municipio"],
+                                },
+                            },
+                            {
+                                "name": "bdg_get_mapbiomas_features",
+                                "description": "Get normalized Gold MapBiomas land-cover preservation, agricultural sustainability, and 4-tier classification.",
+                                "inputSchema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "id_municipio": {
+                                            "type": "string",
+                                            "description": "7-digit IBGE municipality code, 6-digit prefix, or 8-digit CEP",
+                                        },
+                                    },
+                                    "required": ["id_municipio"],
+                                },
+                            },
+                            {
+                                "name": "bdg_list_top_mapbiomas_municipalities",
+                                "description": "List top Brazilian municipalities ranked by composite MapBiomas land-cover sustainability score.",
+                                "inputSchema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "limit": {
+                                            "type": "integer",
+                                            "description": "Maximum rows (default: 10)",
+                                        },
+                                        "sigla_uf": {
+                                            "type": "string",
+                                            "description": "Optional 2-letter state filter (e.g. AM)",
+                                        },
+                                    },
+                                },
+                            },
+                            {
                                 "name": "bdg_get_onr_property_registry",
                                 "description": "Get official ONR SREI municipal active property registry CNM stock, digital conversion rate, and online certificate emissions.",
                                 "inputSchema": {
@@ -3464,6 +3523,69 @@ class MCPDispatcher:
                     },
                 }
             wrapped = wrap_untrusted_gov_data(result, source_id="ana_hidroweb_telemetria")
+            return {
+                "jsonrpc": "2.0",
+                "id": req_id,
+                "result": {"content": [{"type": "text", "text": wrapped}], "isError": False},
+            }
+
+        if tool_name in {
+            "bdg_get_mapbiomas_land_cover",
+            "bdg_get_mapbiomas_alerts",
+            "bdg_get_mapbiomas_features",
+            "bdg_list_top_mapbiomas_municipalities",
+        }:
+            from public_data_gateway.connectors.ambiental.mapbiomas_cobertura.connector import (
+                MapBiomasCoberturaConnector,
+            )
+
+            connector = MapBiomasCoberturaConnector(settings=self.settings)
+            try:
+                if tool_name == "bdg_get_mapbiomas_land_cover":
+                    result: Any = connector.get_mapbiomas_land_cover(
+                        str(args.get("id_municipio", "")).strip()
+                    )
+                elif tool_name == "bdg_get_mapbiomas_alerts":
+                    result = connector.get_mapbiomas_alerts(
+                        str(args.get("id_municipio", "")).strip()
+                    )
+                elif tool_name == "bdg_get_mapbiomas_features":
+                    result = connector.get_mapbiomas_features(
+                        str(args.get("id_municipio", "")).strip()
+                    )
+                else:
+                    raw_uf = args.get("sigla_uf")
+                    result = connector.list_top_mapbiomas_municipalities(
+                        limit=int(args.get("limit", 10)),
+                        sigla_uf=str(raw_uf).strip() if raw_uf else None,
+                    )
+            except (ValueError, KeyError) as exc:
+                return {
+                    "jsonrpc": "2.0",
+                    "id": req_id,
+                    "result": {
+                        "content": [
+                            {"type": "text", "text": f"MapBiomas parameter error: {exc}"}
+                        ],
+                        "isError": True,
+                    },
+                }
+
+            if not result:
+                return {
+                    "jsonrpc": "2.0",
+                    "id": req_id,
+                    "result": {
+                        "content": [
+                            {
+                                "type": "text",
+                                "text": "No MapBiomas data found for the query.",
+                            }
+                        ],
+                        "isError": True,
+                    },
+                }
+            wrapped = wrap_untrusted_gov_data(result, source_id="mapbiomas_cobertura")
             return {
                 "jsonrpc": "2.0",
                 "id": req_id,

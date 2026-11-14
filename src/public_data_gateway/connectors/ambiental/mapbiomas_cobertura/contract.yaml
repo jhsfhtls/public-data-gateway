@@ -1,0 +1,495 @@
+schema_version: "3.1.0"
+contract_id: "ODCS-BR-MAPBIOMAS-COBERTURA-001"
+source_id: "mapbiomas_cobertura"
+version: "1.0.0"
+name: "MapBiomas: Cobertura e Uso da Terra no Brasil (1985-2024)"
+agency: "Projeto MapBiomas"
+official_url: "https://mapbiomas.org/"
+
+legal_framework:
+  statutes:
+    - name: "Lei nº 12.651/2012 (Código Florestal)"
+      description: "Define parâmetros de proteção da vegetação nativa, Áreas de Preservação Permanente e Reserva Legal"
+    - name: "Decreto nº 11.367/2023 & Plano PPCDAm / PPCerrado"
+      description: "Estabelece diretrizes federais de monitoramento de cobertura do solo e combate ao desmatamento"
+    - name: "Regulação EUDR (EU 2023/1115) & Resolução BCB nº 140/2021"
+      description: "Exige rastreabilidade de cadeias agropecuárias livres de conversão florestal após 2020 e conformidade socioambiental"
+    - name: "Lei nº 12.527/2011 (LAI) & Política de Dados Abertos MapBiomas"
+      description: "Garante acesso público às séries anuais de uso e cobertura da terra e alertas validados em alta resolução"
+
+data_governance:
+  grain: "municipio_colecao_mapbiomas"
+  primary_keys:
+    - "id_municipio"
+    - "sigla_uf"
+  reference_date_column: "reference_date"
+  min_expected_rows: 10
+  max_volume_drop_pct: 15.0
+  freshness_sla_hours: 24
+  lgpd_tier: "PUBLIC_NON_PERSONAL"
+  ml_feature_domains:
+    - "land_use"
+    - "land_cover_transition"
+
+schema:
+  tables:
+    mapbiomas_cobertura_anual_municipio:
+      description: "Balanço anual municipal de cobertura vegetal nativa, uso agropecuário, área urbana e corpos d'água (Coleção MapBiomas)."
+      grain: "id_municipio, ano_colecao"
+      primary_keys: ["id_municipio", "ano_colecao"]
+      min_expected_rows: 12
+      columns:
+        - name: "id_municipio"
+          data_type: "string"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Código IBGE de 7 dígitos do município."
+        - name: "nome_municipio"
+          data_type: "string"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Nome oficial do município."
+        - name: "sigla_uf"
+          data_type: "string"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Sigla de 2 letras da Unidade Federativa."
+        - name: "id_uf"
+          data_type: "string"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Código IBGE de 2 dígitos da UF."
+        - name: "regiao"
+          data_type: "string"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Grande região geográfica brasileira."
+        - name: "bioma_predominante"
+          data_type: "string"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Bioma predominante no município."
+        - name: "ano_colecao"
+          data_type: "int64"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Ano da Coleção MapBiomas consolidada."
+        - name: "area_total_municipio_ha"
+          data_type: "float64"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Área territorial total mapeada em hectares."
+        - name: "area_floresta_nativa_ha"
+          data_type: "float64"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Área de formação florestal nativa em hectares."
+        - name: "area_formacao_campestre_savana_ha"
+          data_type: "float64"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Área de formação savânica, campestre e alagável nativa (ha)."
+        - name: "area_agropecuaria_total_ha"
+          data_type: "float64"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Área total de pastagem, agricultura e silvicultura (ha)."
+        - name: "area_nao_vegetada_urbana_ha"
+          data_type: "float64"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Área urbanizada, mineração e infraestrutura não vegetada (ha)."
+        - name: "area_corpos_dagua_ha"
+          data_type: "float64"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Superfície de corpos d'água continentais e costeiros (ha)."
+        - name: "cobertura_nativa_pct"
+          data_type: "float64"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Percentual do território municipal com vegetação nativa (0-100)."
+        - name: "indice_preservacao_nativa"
+          data_type: "float64"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Índice composto de preservação da cobertura nativa (0-100)."
+        - name: "reference_date"
+          data_type: "string"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Data de referência ISO YYYY-MM-DD."
+
+    mapbiomas_transicoes_uso_terra_classe:
+      description: "Matriz municipal de transições anuais de uso e cobertura da terra desagregada por classe de transição MapBiomas."
+      grain: "id_municipio, classe_transicao_mapbiomas"
+      primary_keys: ["id_municipio", "classe_transicao_mapbiomas"]
+      min_expected_rows: 48
+      columns:
+        - name: "id_municipio"
+          data_type: "string"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Código IBGE de 7 dígitos do município."
+        - name: "nome_municipio"
+          data_type: "string"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Nome oficial do município."
+        - name: "sigla_uf"
+          data_type: "string"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Sigla da UF."
+        - name: "id_uf"
+          data_type: "string"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Código IBGE da UF."
+        - name: "regiao"
+          data_type: "string"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Grande região geográfica."
+        - name: "bioma_predominante"
+          data_type: "string"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Bioma predominante no município."
+        - name: "classe_transicao_mapbiomas"
+          data_type: "string"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Classe de transição (Floresta_Para_Pastagem, Floresta_Para_Agricultura, Pastagem_Para_Agricultura, Regeneracao_Vegetacao_Nativa)."
+        - name: "area_transicao_ha"
+          data_type: "float64"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Área convertida na classe de transição em hectares."
+        - name: "participacao_transicao_pct"
+          data_type: "float64"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Participação percentual da classe sobre o total transicionado (%)."
+        - name: "taxa_conversao_liquida_pct"
+          data_type: "float64"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Taxa normalizada de pressão de conversão no segmento (0-100)."
+        - name: "intensidade_pressao_transicao_pct"
+          data_type: "float64"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Intensidade relativa de pressão sobre bordas nativas (%)."
+        - name: "reference_date"
+          data_type: "string"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Data de referência ISO YYYY-MM-DD."
+
+    mapbiomas_agropecuaria_pastagem_irrigacao:
+      description: "Detalhamento de pastagens, agricultura temporária/perene, qualidade de pastagens e áreas irrigadas no município."
+      grain: "id_municipio"
+      primary_keys: ["id_municipio"]
+      min_expected_rows: 12
+      columns:
+        - name: "id_municipio"
+          data_type: "string"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Código IBGE de 7 dígitos do município."
+        - name: "nome_municipio"
+          data_type: "string"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Nome oficial do município."
+        - name: "sigla_uf"
+          data_type: "string"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Sigla da UF."
+        - name: "id_uf"
+          data_type: "string"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Código IBGE da UF."
+        - name: "regiao"
+          data_type: "string"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Grande região geográfica."
+        - name: "bioma_predominante"
+          data_type: "string"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Bioma predominante no município."
+        - name: "area_pastagem_ha"
+          data_type: "float64"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Área ocupada por pastagens (ha)."
+        - name: "area_agricultura_temporaria_ha"
+          data_type: "float64"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Área de lavouras temporárias (ha)."
+        - name: "area_agricultura_perene_silvicultura_ha"
+          data_type: "float64"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Área de lavouras perenes e silvicultura (ha)."
+        - name: "pastagem_degradada_pct"
+          data_type: "float64"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Percentual de pastagens com indícios de degradação severa/moderada (%)."
+        - name: "area_irrigada_ha"
+          data_type: "float64"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Área agrícola com infraestrutura de irrigação mapeada (ha)."
+        - name: "indice_sustentabilidade_agro"
+          data_type: "float64"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Índice composto de sustentabilidade agropecuária (0-100)."
+        - name: "reference_date"
+          data_type: "string"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Data de referência ISO YYYY-MM-DD."
+
+    mapbiomas_alerta_desmatamento_validado:
+      description: "Alertas de desmatamento validados em alta resolução pelo MapBiomas Alerta, sobreposição com áreas protegidas e embargos."
+      grain: "id_municipio"
+      primary_keys: ["id_municipio"]
+      min_expected_rows: 12
+      columns:
+        - name: "id_municipio"
+          data_type: "string"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Código IBGE de 7 dígitos do município."
+        - name: "nome_municipio"
+          data_type: "string"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Nome oficial do município."
+        - name: "sigla_uf"
+          data_type: "string"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Sigla da UF."
+        - name: "id_uf"
+          data_type: "string"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Código IBGE da UF."
+        - name: "regiao"
+          data_type: "string"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Grande região geográfica."
+        - name: "bioma_predominante"
+          data_type: "string"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Bioma predominante no município."
+        - name: "qtd_alertas_mapbiomas_ano"
+          data_type: "int64"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Quantidade de alertas validados no ano de referência."
+        - name: "area_desmatada_validada_ha"
+          data_type: "float64"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Área total validada de supressão vegetal em hectares."
+        - name: "alertas_com_embargo_ou_autuacao_pct"
+          data_type: "float64"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Percentual de alertas com cruzamento positivo de fiscalização/embargo (%)."
+        - name: "alertas_em_area_protegida_pct"
+          data_type: "float64"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Percentual de alertas incidentes em UC, TI ou APP (%)."
+        - name: "velocidade_regeneracao_liquida_pct"
+          data_type: "float64"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Taxa de regeneração secundária relativa à perda bruta (%)."
+        - name: "indice_integridade_territorial"
+          data_type: "float64"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Índice composto de integridade territorial sem desmatamento ilegal (0-100)."
+        - name: "reference_date"
+          data_type: "string"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Data de referência ISO YYYY-MM-DD."
+
+    features_mapbiomas_cobertura_solo:
+      description: "Tabela de features Gold de cobertura, transições e integridade territorial MapBiomas pronta para ML e crédito sustentável (P01, P06 & P09)."
+      grain: "id_municipio"
+      primary_keys: ["id_municipio"]
+      min_expected_rows: 12
+      columns:
+        - name: "id_municipio"
+          data_type: "string"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Código IBGE de 7 dígitos do município."
+        - name: "nome_municipio"
+          data_type: "string"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Nome oficial do município."
+        - name: "sigla_uf"
+          data_type: "string"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Sigla da UF."
+        - name: "id_uf"
+          data_type: "string"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Código IBGE da UF."
+        - name: "regiao"
+          data_type: "string"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Grande região geográfica."
+        - name: "bioma_predominante"
+          data_type: "string"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Bioma predominante no município."
+        - name: "ano_colecao"
+          data_type: "int64"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Ano da Coleção MapBiomas."
+        - name: "cobertura_nativa_pct"
+          data_type: "float64"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Percentual de cobertura vegetal nativa (0-100)."
+        - name: "area_agropecuaria_total_ha"
+          data_type: "float64"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Área agropecuária total mapeada (ha)."
+        - name: "area_desmatada_validada_ha"
+          data_type: "float64"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Área desmatada validada pelo MapBiomas Alerta (ha)."
+        - name: "indice_preservacao_nativa"
+          data_type: "float64"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Subíndice de preservação de vegetação nativa (0-100)."
+        - name: "indice_sustentabilidade_agro"
+          data_type: "float64"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Subíndice de sustentabilidade agropecuária (0-100)."
+        - name: "indice_integridade_territorial"
+          data_type: "float64"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Subíndice de integridade territorial (0-100)."
+        - name: "taxa_conversao_media_pct"
+          data_type: "float64"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Taxa média de pressão de conversão entre classes de transição (%)."
+        - name: "score_sustentabilidade_mapbiomas"
+          data_type: "float64"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Score composto de sustentabilidade e integridade de cobertura do solo MapBiomas (0-100)."
+        - name: "tier_sustentabilidade_mapbiomas"
+          data_type: "string"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Classificação municipal em 4 tiers de sustentabilidade MapBiomas."
+        - name: "reference_date"
+          data_type: "string"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Data de referência ISO YYYY-MM-DD."

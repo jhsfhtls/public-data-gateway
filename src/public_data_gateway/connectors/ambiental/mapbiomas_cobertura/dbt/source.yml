@@ -1,0 +1,25 @@
+version: 2
+
+sources:
+  - name: mapbiomas_cobertura_silver
+    description: "Tabelas Silver do conector MapBiomas: Cobertura e Uso da Terra no Brasil (1985-2024)."
+    meta:
+      owner: "data-engineering@public-data-gateway"
+      source_id: "mapbiomas_cobertura"
+    tables:
+      - name: mapbiomas_cobertura_anual_municipio
+        description: "Balanço anual municipal de cobertura vegetal nativa, uso agropecuário, área urbana e corpos d'água."
+        meta:
+          external_location: "data/mapbiomas_cobertura/silver/mapbiomas_cobertura_anual_municipio.parquet"
+      - name: mapbiomas_transicoes_uso_terra_classe
+        description: "Matriz municipal de transições anuais de uso da terra por classe MapBiomas."
+        meta:
+          external_location: "data/mapbiomas_cobertura/silver/mapbiomas_transicoes_uso_terra_classe.parquet"
+      - name: mapbiomas_agropecuaria_pastagem_irrigacao
+        description: "Detalhamento de pastagens, agricultura temporária/perene, degradação e irrigação."
+        meta:
+          external_location: "data/mapbiomas_cobertura/silver/mapbiomas_agropecuaria_pastagem_irrigacao.parquet"
+      - name: mapbiomas_alerta_desmatamento_validado
+        description: "Alertas de desmatamento validados em alta resolução pelo MapBiomas Alerta."
+        meta:
+          external_location: "data/mapbiomas_cobertura/silver/mapbiomas_alerta_desmatamento_validado.parquet"

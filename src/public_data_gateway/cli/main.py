@@ -1051,6 +1051,36 @@ def build_parser() -> argparse.ArgumentParser:
     hw_rk_p.add_argument("--uf", type=str, help="Optional 2-letter state filter")
     hw_rk_p.add_argument("--json", action="store_true", help="Output in JSON format")
 
+    # MapBiomas Cobertura & Uso da Terra command group
+    mb_p = subparsers.add_parser("mapbiomas", help="Query MapBiomas annual land cover, transitions, pastures/irrigation, validated alerts, and rankings.")
+    mb_sub = mb_p.add_subparsers(dest="mapbiomas_action", required=True)
+
+    mb_lc_p = mb_sub.add_parser("land-cover", help="Get municipal MapBiomas annual native vegetation, agriculture, and water surface.")
+    mb_lc_p.add_argument("id_municipio", help="7-digit IBGE municipality code, 6-digit prefix, or 8-digit CEP")
+    mb_lc_p.add_argument("--json", action="store_true", help="Output in JSON format")
+
+    mb_tr_p = mb_sub.add_parser("transitions", help="List municipal MapBiomas land-use transition matrix by transition class.")
+    mb_tr_p.add_argument("id_municipio", help="7-digit IBGE municipality code, 6-digit prefix, or 8-digit CEP")
+    mb_tr_p.add_argument("--classe", type=str, help="Optional transition class filter (e.g. Floresta_Para_Pastagem)")
+    mb_tr_p.add_argument("--json", action="store_true", help="Output in JSON format")
+
+    mb_ag_p = mb_sub.add_parser("agriculture", help="Get municipal pastures, temporary/perennial crops, degradation, and irrigated area.")
+    mb_ag_p.add_argument("id_municipio", help="7-digit IBGE municipality code, 6-digit prefix, or 8-digit CEP")
+    mb_ag_p.add_argument("--json", action="store_true", help="Output in JSON format")
+
+    mb_al_p = mb_sub.add_parser("alerts", help="Get municipal MapBiomas Alerta validated deforestation alerts and overlap metrics.")
+    mb_al_p.add_argument("id_municipio", help="7-digit IBGE municipality code, 6-digit prefix, or 8-digit CEP")
+    mb_al_p.add_argument("--json", action="store_true", help="Output in JSON format")
+
+    mb_ft_p = mb_sub.add_parser("features", help="Get Gold MapBiomas land-cover sustainability score and 4-tier classification.")
+    mb_ft_p.add_argument("id_municipio", help="7-digit IBGE municipality code, 6-digit prefix, or 8-digit CEP")
+    mb_ft_p.add_argument("--json", action="store_true", help="Output in JSON format")
+
+    mb_rk_p = mb_sub.add_parser("ranking", help="List top Brazilian municipalities ranked by MapBiomas sustainability score.")
+    mb_rk_p.add_argument("--limit", type=int, default=10, help="Max municipalities to list")
+    mb_rk_p.add_argument("--uf", type=str, help="Optional 2-letter state filter")
+    mb_rk_p.add_argument("--json", action="store_true", help="Output in JSON format")
+
     # ONR Registro de Imóveis (SREI/SERP/CNM) command group
     onr_p = subparsers.add_parser("onr", help="Query ONR SREI real estate registries, transactions, credit guarantees, SERP, and rankings.")
     onr_sub = onr_p.add_subparsers(dest="onr_action", required=True)
@@ -3668,6 +3698,78 @@ def main(argv: Sequence[str] | None = None) -> int:
                     return 0
             except (ValueError, KeyError) as exc:
                 print(f"Erro ANA HidroWeb: {exc}", file=sys.stderr)
+                return 1
+
+        elif args.command == "mapbiomas":
+            from public_data_gateway.connectors.ambiental.mapbiomas_cobertura.connector import (
+                MapBiomasCoberturaConnector,
+            )
+
+            mb_conn = MapBiomasCoberturaConnector(settings=settings)
+            mb_action = getattr(args, "mapbiomas_action", None)
+            try:
+                if mb_action == "land-cover":
+                    res = mb_conn.get_mapbiomas_land_cover(args.id_municipio)
+                    if getattr(args, "json", False):
+                        print(json.dumps(res, indent=2, ensure_ascii=False, default=str))
+                    else:
+                        print(f"MapBiomas Cobertura ({res.get('nome_municipio')} - {res.get('id_municipio')}):")
+                        print(f"  Nativa: {res.get('cobertura_nativa_pct')}% | Agro: {res.get('area_agropecuaria_total_ha')} ha")
+                    return 0
+
+                if mb_action == "transitions":
+                    rows = mb_conn.list_mapbiomas_transitions(
+                        args.id_municipio,
+                        classe_transicao_mapbiomas=getattr(args, "classe", None),
+                    )
+                    if getattr(args, "json", False):
+                        print(json.dumps(rows, indent=2, ensure_ascii=False, default=str))
+                    else:
+                        print(f"MapBiomas Transições ({args.id_municipio}): {len(rows)} classes")
+                        for r in rows:
+                            print(f"  - {r.get('classe_transicao_mapbiomas')}: {r.get('area_transicao_ha')} ha ({r.get('participacao_transicao_pct')}%)")
+                    return 0
+
+                if mb_action == "agriculture":
+                    res = mb_conn.get_mapbiomas_agriculture(args.id_municipio)
+                    if getattr(args, "json", False):
+                        print(json.dumps(res, indent=2, ensure_ascii=False, default=str))
+                    else:
+                        print(f"MapBiomas Agropecuária ({res.get('nome_municipio')} - {res.get('id_municipio')}):")
+                        print(f"  Pastagem: {res.get('area_pastagem_ha')} ha | Irrigada: {res.get('area_irrigada_ha')} ha")
+                    return 0
+
+                if mb_action == "alerts":
+                    res = mb_conn.get_mapbiomas_alerts(args.id_municipio)
+                    if getattr(args, "json", False):
+                        print(json.dumps(res, indent=2, ensure_ascii=False, default=str))
+                    else:
+                        print(f"MapBiomas Alerta ({res.get('nome_municipio')} - {res.get('id_municipio')}):")
+                        print(f"  Alertas: {res.get('qtd_alertas_mapbiomas_ano')} | Área Desmatada: {res.get('area_desmatada_validada_ha')} ha")
+                    return 0
+
+                if mb_action == "features":
+                    res = mb_conn.get_mapbiomas_features(args.id_municipio)
+                    if getattr(args, "json", False):
+                        print(json.dumps(res, indent=2, ensure_ascii=False, default=str))
+                    else:
+                        print(f"MapBiomas Gold ({res.get('nome_municipio')} - {res.get('id_municipio')}):")
+                        print(f"  Score: {res.get('score_sustentabilidade_mapbiomas')} | Tier: {res.get('tier_sustentabilidade_mapbiomas')}")
+                    return 0
+
+                if mb_action == "ranking":
+                    ranks = mb_conn.list_top_mapbiomas_municipalities(
+                        limit=getattr(args, "limit", 10), sigla_uf=getattr(args, "uf", None)
+                    )
+                    if getattr(args, "json", False):
+                        print(json.dumps(ranks, indent=2, ensure_ascii=False, default=str))
+                    else:
+                        print(f"Top {len(ranks)} Municípios MapBiomas:")
+                        for idx, r in enumerate(ranks, 1):
+                            print(f"  {idx}. {r.get('nome_municipio')} ({r.get('sigla_uf')}): {r.get('score_sustentabilidade_mapbiomas')} | {r.get('tier_sustentabilidade_mapbiomas')}")
+                    return 0
+            except (ValueError, KeyError) as exc:
+                print(f"Erro MapBiomas: {exc}", file=sys.stderr)
                 return 1
 
         elif args.command == "onr":

@@ -1467,6 +1467,7 @@ class EnvironmentFacade:
         self._sdk = sdk
         self._terrabrasilis_connector: Any = None
         self._hidroweb_connector: Any = None
+        self._mapbiomas_connector: Any = None
 
     @property
     def terrabrasilis_connector(self) -> Any:
@@ -1567,6 +1568,53 @@ class EnvironmentFacade:
     ) -> list[dict[str, Any]]:
         """List top Brazilian municipalities ranked by composite ANA HidroWeb water security score."""
         return self.hidroweb_connector.list_top_hidroweb_municipalities(
+            limit=limit, sigla_uf=sigla_uf
+        )
+
+    @property
+    def mapbiomas_connector(self) -> Any:
+        if self._mapbiomas_connector is None:
+            from public_data_gateway.connectors.ambiental.mapbiomas_cobertura.connector import (
+                MapBiomasCoberturaConnector,
+            )
+
+            self._mapbiomas_connector = MapBiomasCoberturaConnector(
+                settings=self._sdk.settings
+            )
+        return self._mapbiomas_connector
+
+    def get_mapbiomas_land_cover(self, id_municipio: str) -> dict[str, Any]:
+        """Get municipal MapBiomas annual native vegetation, agricultural area, and water surface."""
+        return self.mapbiomas_connector.get_mapbiomas_land_cover(id_municipio)
+
+    def list_mapbiomas_transitions(
+        self,
+        id_municipio: str,
+        classe_transicao_mapbiomas: str | None = None,
+    ) -> list[dict[str, Any]]:
+        """List municipal MapBiomas land-use transition matrix by transition class."""
+        return self.mapbiomas_connector.list_mapbiomas_transitions(
+            id_municipio=id_municipio,
+            classe_transicao_mapbiomas=classe_transicao_mapbiomas,
+        )
+
+    def get_mapbiomas_agriculture(self, id_municipio: str) -> dict[str, Any]:
+        """Get municipal MapBiomas pastures, crops, degradation, and irrigated area."""
+        return self.mapbiomas_connector.get_mapbiomas_agriculture(id_municipio)
+
+    def get_mapbiomas_alerts(self, id_municipio: str) -> dict[str, Any]:
+        """Get municipal MapBiomas Alerta validated deforestation alerts and overlaps."""
+        return self.mapbiomas_connector.get_mapbiomas_alerts(id_municipio)
+
+    def get_mapbiomas_features(self, id_municipio: str) -> dict[str, Any]:
+        """Get normalized Gold MapBiomas land-cover sustainability score and 4-tier classification."""
+        return self.mapbiomas_connector.get_mapbiomas_features(id_municipio)
+
+    def list_top_mapbiomas_municipalities(
+        self, limit: int = 10, sigla_uf: str | None = None
+    ) -> list[dict[str, Any]]:
+        """List top Brazilian municipalities ranked by composite MapBiomas sustainability score."""
+        return self.mapbiomas_connector.list_top_mapbiomas_municipalities(
             limit=limit, sigla_uf=sigla_uf
         )
 
@@ -2491,6 +2539,41 @@ class BrazilData:
     ) -> list[dict[str, Any]]:
         """Listar municípios líderes em segurança hídrica e resiliência telemétrica (ANA HidroWeb)."""
         return self.environment.list_top_hidroweb_municipalities(
+            limit=limit, sigla_uf=sigla_uf
+        )
+
+    def get_mapbiomas_land_cover(self, id_municipio: str) -> dict[str, Any]:
+        """Consultar cobertura vegetal nativa, agropecuária e água municipal (MapBiomas)."""
+        return self.environment.get_mapbiomas_land_cover(id_municipio)
+
+    def list_mapbiomas_transitions(
+        self,
+        id_municipio: str,
+        classe_transicao_mapbiomas: str | None = None,
+    ) -> list[dict[str, Any]]:
+        """Listar matriz de transições de uso e cobertura da terra por classe (MapBiomas)."""
+        return self.environment.list_mapbiomas_transitions(
+            id_municipio=id_municipio,
+            classe_transicao_mapbiomas=classe_transicao_mapbiomas,
+        )
+
+    def get_mapbiomas_agriculture(self, id_municipio: str) -> dict[str, Any]:
+        """Consultar pastagens, lavouras temporárias/perenes e áreas irrigadas (MapBiomas)."""
+        return self.environment.get_mapbiomas_agriculture(id_municipio)
+
+    def get_mapbiomas_alerts(self, id_municipio: str) -> dict[str, Any]:
+        """Consultar alertas de desmatamento validados e sobreposições (MapBiomas Alerta)."""
+        return self.environment.get_mapbiomas_alerts(id_municipio)
+
+    def get_mapbiomas_features(self, id_municipio: str) -> dict[str, Any]:
+        """Consultar features Gold de cobertura e sustentabilidade do solo (MapBiomas)."""
+        return self.environment.get_mapbiomas_features(id_municipio)
+
+    def list_top_mapbiomas_municipalities(
+        self, limit: int = 10, sigla_uf: str | None = None
+    ) -> list[dict[str, Any]]:
+        """Listar municípios líderes em sustentabilidade de cobertura do solo (MapBiomas)."""
+        return self.environment.list_top_mapbiomas_municipalities(
             limit=limit, sigla_uf=sigla_uf
         )
 

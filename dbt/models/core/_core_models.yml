@@ -7502,3 +7502,137 @@ models:
       - name: reference_date
         description: "Data de referência ISO-8601 (YYYY-MM-DD)."
         tests: [not_null]
+
+  - name: fct_mapbiomas_cobertura_uso_terra_municipio
+    description: "Fato consolidada por município de cobertura vegetal nativa, agropecuária, pastagens/irrigação e alertas validados MapBiomas."
+    columns:
+      - name: id_municipio
+        description: "Código IBGE de 7 dígitos do município."
+        tests: [not_null, unique]
+      - name: nome_municipio
+        description: "Nome oficial do município."
+        tests: [not_null]
+      - name: sigla_uf
+        description: "Sigla da Unidade Federativa."
+        tests: [not_null]
+      - name: id_uf
+        description: "Código IBGE de 2 dígitos da UF."
+        tests: [not_null]
+      - name: regiao
+        description: "Grande região geográfica brasileira."
+        tests: [not_null]
+      - name: bioma_predominante
+        description: "Bioma predominante no município."
+        tests: [not_null]
+      - name: ano_colecao
+        description: "Ano da Coleção MapBiomas."
+        tests: [not_null]
+      - name: area_total_municipio_ha
+        description: "Área territorial total mapeada (ha)."
+        tests: [not_null]
+      - name: area_floresta_nativa_ha
+        description: "Área de formação florestal nativa (ha)."
+        tests: [not_null]
+      - name: area_formacao_campestre_savana_ha
+        description: "Área de formação campestre/savânica nativa (ha)."
+        tests: [not_null]
+      - name: area_agropecuaria_total_ha
+        description: "Área agropecuária total mapeada (ha)."
+        tests: [not_null]
+      - name: area_nao_vegetada_urbana_ha
+        description: "Área urbanizada e não vegetada (ha)."
+        tests: [not_null]
+      - name: area_corpos_dagua_ha
+        description: "Superfície de corpos d'água (ha)."
+        tests: [not_null]
+      - name: cobertura_nativa_pct
+        description: "Percentual de vegetação nativa (0-100)."
+        tests: [not_null]
+      - name: indice_preservacao_nativa
+        description: "Índice composto de preservação nativa (0-100)."
+        tests: [not_null]
+      - name: area_pastagem_ha
+        description: "Área ocupada por pastagens (ha)."
+        tests: [not_null]
+      - name: area_agricultura_temporaria_ha
+        description: "Área de lavouras temporárias (ha)."
+        tests: [not_null]
+      - name: area_agricultura_perene_silvicultura_ha
+        description: "Área de lavouras perenes e silvicultura (ha)."
+        tests: [not_null]
+      - name: pastagem_degradada_pct
+        description: "Percentual de pastagens degradadas (%)."
+        tests: [not_null]
+      - name: area_irrigada_ha
+        description: "Área agrícola irrigada mapeada (ha)."
+        tests: [not_null]
+      - name: indice_sustentabilidade_agro
+        description: "Índice de sustentabilidade agropecuária (0-100)."
+        tests: [not_null]
+      - name: qtd_alertas_mapbiomas_ano
+        description: "Quantidade de alertas MapBiomas Alerta no ano."
+        tests: [not_null]
+      - name: area_desmatada_validada_ha
+        description: "Área desmatada validada (ha)."
+        tests: [not_null]
+      - name: alertas_com_embargo_ou_autuacao_pct
+        description: "Percentual de alertas com embargo/autuação (%)."
+        tests: [not_null]
+      - name: alertas_em_area_protegida_pct
+        description: "Percentual de alertas em área protegida (%)."
+        tests: [not_null]
+      - name: velocidade_regeneracao_liquida_pct
+        description: "Velocidade de regeneração secundária relativa à perda (%)."
+        tests: [not_null]
+      - name: indice_integridade_territorial
+        description: "Índice de integridade territorial (0-100)."
+        tests: [not_null]
+      - name: area_total_transicionada_ha
+        description: "Área total transicionada entre classes (ha)."
+        tests: [not_null]
+      - name: taxa_conversao_media_pct
+        description: "Taxa média de conversão líquida (%)."
+        tests: [not_null]
+      - name: reference_date
+        description: "Data de referência ISO-8601 (YYYY-MM-DD)."
+        tests: [not_null]
+
+  - name: fct_mapbiomas_transicoes_uso_terra_municipio
+    description: "Fato desagregada da matriz de transições de uso da terra por classe MapBiomas e município."
+    columns:
+      - name: id_municipio
+        description: "Código IBGE de 7 dígitos do município."
+        tests: [not_null]
+      - name: nome_municipio
+        description: "Nome oficial do município."
+        tests: [not_null]
+      - name: sigla_uf
+        description: "Sigla da UF."
+        tests: [not_null]
+      - name: id_uf
+        description: "Código IBGE de 2 dígitos da UF."
+        tests: [not_null]
+      - name: regiao
+        description: "Grande região geográfica brasileira."
+        tests: [not_null]
+      - name: bioma_predominante
+        description: "Bioma predominante."
+        tests: [not_null]
+      - name: classe_transicao_mapbiomas
+        description: "Classe de transição MapBiomas."
+        tests: [not_null]
+      - name: area_transicao_ha
+        description: "Área convertida na classe de transição (ha)."
+        tests: [not_null]
+      - name: participacao_transicao_pct
+        description: "Participação percentual da classe (%)."
+        tests: [not_null]
+      - name: taxa_conversao_liquida_pct
+        description: "Taxa normalizada de conversão no segmento (%)."
+        tests: [not_null]
+      - name: intensidade_pressao_transicao_pct
+        description: "Intensidade relativa de pressão sobre bordas nativas (%)."
+        tests: [not_null]
+      - name: reference_date
+        description: "Data de referência ISO-8601 (YYYY-MM-DD)."
+        tests: [not_null]

@@ -1,0 +1,180 @@
+version: 2
+
+models:
+  - name: stg_mapbiomas_cobertura_anual
+    description: "Staging tipada do balanço anual municipal de cobertura vegetal nativa, uso agropecuário, área urbana e corpos d'água (MapBiomas)."
+    columns:
+      - name: id_municipio
+        description: "Código IBGE de 7 dígitos do município."
+        tests: [not_null, unique]
+      - name: nome_municipio
+        description: "Nome oficial do município."
+        tests: [not_null]
+      - name: sigla_uf
+        description: "Sigla da Unidade Federativa."
+        tests: [not_null]
+      - name: id_uf
+        description: "Código IBGE de 2 dígitos da UF."
+        tests: [not_null]
+      - name: regiao
+        description: "Grande região geográfica brasileira."
+        tests: [not_null]
+      - name: bioma_predominante
+        description: "Bioma predominante no município."
+        tests: [not_null]
+      - name: ano_colecao
+        description: "Ano da Coleção MapBiomas."
+        tests: [not_null]
+      - name: area_total_municipio_ha
+        description: "Área territorial total mapeada (ha)."
+        tests: [not_null]
+      - name: area_floresta_nativa_ha
+        description: "Área de formação florestal nativa (ha)."
+        tests: [not_null]
+      - name: area_formacao_campestre_savana_ha
+        description: "Área de formação savânica/campestre nativa (ha)."
+        tests: [not_null]
+      - name: area_agropecuaria_total_ha
+        description: "Área total de pastagem, agricultura e silvicultura (ha)."
+        tests: [not_null]
+      - name: area_nao_vegetada_urbana_ha
+        description: "Área urbanizada, mineração e infraestrutura (ha)."
+        tests: [not_null]
+      - name: area_corpos_dagua_ha
+        description: "Superfície de corpos d'água (ha)."
+        tests: [not_null]
+      - name: cobertura_nativa_pct
+        description: "Percentual de vegetação nativa no município (0-100)."
+        tests: [not_null]
+      - name: indice_preservacao_nativa
+        description: "Índice composto de preservação nativa (0-100)."
+        tests: [not_null]
+      - name: reference_date
+        description: "Data de referência ISO YYYY-MM-DD."
+        tests: [not_null]
+
+  - name: stg_mapbiomas_transicoes_uso_terra
+    description: "Staging tipada da matriz de transições de uso da terra por classe MapBiomas."
+    columns:
+      - name: id_municipio
+        description: "Código IBGE de 7 dígitos do município."
+        tests: [not_null]
+      - name: nome_municipio
+        description: "Nome oficial do município."
+        tests: [not_null]
+      - name: sigla_uf
+        description: "Sigla da UF."
+        tests: [not_null]
+      - name: id_uf
+        description: "Código IBGE de 2 dígitos da UF."
+        tests: [not_null]
+      - name: regiao
+        description: "Grande região geográfica."
+        tests: [not_null]
+      - name: bioma_predominante
+        description: "Bioma predominante no município."
+        tests: [not_null]
+      - name: classe_transicao_mapbiomas
+        description: "Classe de transição de uso e cobertura da terra."
+        tests: [not_null]
+      - name: area_transicao_ha
+        description: "Área convertida na classe de transição (ha)."
+        tests: [not_null]
+      - name: participacao_transicao_pct
+        description: "Participação percentual da classe no total transicionado (%)."
+        tests: [not_null]
+      - name: taxa_conversao_liquida_pct
+        description: "Taxa normalizada de pressão de conversão no segmento (%)."
+        tests: [not_null]
+      - name: intensidade_pressao_transicao_pct
+        description: "Intensidade relativa de pressão sobre bordas nativas (%)."
+        tests: [not_null]
+      - name: reference_date
+        description: "Data de referência ISO YYYY-MM-DD."
+        tests: [not_null]
+
+  - name: stg_mapbiomas_agropecuaria_pastagem
+    description: "Staging tipada de pastagens, agricultura temporária/perene, degradação e irrigação MapBiomas."
+    columns:
+      - name: id_municipio
+        description: "Código IBGE de 7 dígitos do município."
+        tests: [not_null, unique]
+      - name: nome_municipio
+        description: "Nome oficial do município."
+        tests: [not_null]
+      - name: sigla_uf
+        description: "Sigla da UF."
+        tests: [not_null]
+      - name: id_uf
+        description: "Código IBGE de 2 dígitos da UF."
+        tests: [not_null]
+      - name: regiao
+        description: "Grande região geográfica."
+        tests: [not_null]
+      - name: bioma_predominante
+        description: "Bioma predominante."
+        tests: [not_null]
+      - name: area_pastagem_ha
+        description: "Área ocupada por pastagens (ha)."
+        tests: [not_null]
+      - name: area_agricultura_temporaria_ha
+        description: "Área de lavouras temporárias (ha)."
+        tests: [not_null]
+      - name: area_agricultura_perene_silvicultura_ha
+        description: "Área de lavouras perenes e silvicultura (ha)."
+        tests: [not_null]
+      - name: pastagem_degradada_pct
+        description: "Percentual de pastagens com degradação (%)."
+        tests: [not_null]
+      - name: area_irrigada_ha
+        description: "Área irrigada mapeada (ha)."
+        tests: [not_null]
+      - name: indice_sustentabilidade_agro
+        description: "Índice composto de sustentabilidade agropecuária (0-100)."
+        tests: [not_null]
+      - name: reference_date
+        description: "Data de referência ISO YYYY-MM-DD."
+        tests: [not_null]
+
+  - name: stg_mapbiomas_alertas_validados
+    description: "Staging tipada dos alertas de desmatamento validados pelo MapBiomas Alerta."
+    columns:
+      - name: id_municipio
+        description: "Código IBGE de 7 dígitos do município."
+        tests: [not_null, unique]
+      - name: nome_municipio
+        description: "Nome oficial do município."
+        tests: [not_null]
+      - name: sigla_uf
+        description: "Sigla da UF."
+        tests: [not_null]
+      - name: id_uf
+        description: "Código IBGE de 2 dígitos da UF."
+        tests: [not_null]
+      - name: regiao
+        description: "Grande região geográfica."
+        tests: [not_null]
+      - name: bioma_predominante
+        description: "Bioma predominante."
+        tests: [not_null]
+      - name: qtd_alertas_mapbiomas_ano
+        description: "Quantidade de alertas validados no ano."
+        tests: [not_null]
+      - name: area_desmatada_validada_ha
+        description: "Área validada de supressão vegetal (ha)."
+        tests: [not_null]
+      - name: alertas_com_embargo_ou_autuacao_pct
+        description: "Percentual de alertas com embargo/autuação (%)."
+        tests: [not_null]
+      - name: alertas_em_area_protegida_pct
+        description: "Percentual de alertas em área protegida (%)."
+        tests: [not_null]
+      - name: velocidade_regeneracao_liquida_pct
+        description: "Taxa de regeneração secundária relativa à perda (%)."
+        tests: [not_null]
+      - name: indice_integridade_territorial
+        description: "Índice composto de integridade territorial (0-100)."
+        tests: [not_null]
+      - name: reference_date
+        description: "Data de referência ISO YYYY-MM-DD."
+        tests: [not_null]
