@@ -1,6 +1,6 @@
 {
   "schema_version": "1.0.0",
-  "last_updated": "2026-11-13T21:11:00.000000",
+  "last_updated": "2026-11-13T21:40:00.000000",
   "project_name": "public-data-gateway",
   "ecosystem": "C.O.R.E. (core, operations, career, studies)",
   "governing_pops": [
@@ -13,10 +13,10 @@
     "POP_T_148"
   ],
   "current_macro_phase_id": "07",
-  "current_macro_phase": "Fase 07 - Ingestão Wave 5 (Saúde, Educação & Setor Notarial — 31/49 fontes homologadas [63.3%] com inep_censo_escolar homologado; Próximo: datasus_sim)",
+  "current_macro_phase": "Fase 07 - Ingestão Wave 5 (Saúde, Educação & Setor Notarial — 32/49 fontes homologadas [65.3%] com datasus_sim homologado; Próximo: inep_censo_superior)",
   "overall_status": "ON_TRACK",
-  "active_connector": "datasus_sim",
-  "next_connector": "inep_censo_superior",
+  "active_connector": "inep_censo_superior",
+  "next_connector": "cnj_justica_aberta",
   "structural_phases": [
     {
       "phase_id": "00",
@@ -134,7 +134,8 @@
         "Conector datasus_cnes (Estabelecimentos, Leitos/UTI, Equipamentos Diagnósticos e Força de Trabalho) - CONCLUÍDO",
         "Conector datasus_sih (Produção Hospitalar AIH, Custos SUS/UTI, Morbidade CID-10 e Desfechos/ICSAP) - CONCLUÍDO",
         "Conector inep_censo_escolar (Escolas/Infraestrutura, Matrículas por Etapa, Docentes/AFD e Rendimento/Fluxo) - CONCLUÍDO",
-        "Conectores DataSUS restantes (SIM, SINASC, OpenDataSUS) & anvisa_cmed",
+        "Conector datasus_sim (Óbitos Gerais/DO, Causas Capítulos CID-10, Mortalidade Materno-Infantil e Prematura DCNT/Causas Externas) - CONCLUÍDO",
+        "Conectores DataSUS restantes (SINASC, OpenDataSUS) & anvisa_cmed",
         "Conectores INEP restantes (Superior, IDEB, ENEM) & capes_sucupira",
         "Conectores Notariais (cnj_justica_aberta, onr_registro_imoveis, capitais_iptu_itbi)"
       ]
@@ -413,6 +414,12 @@
     }
   ],
   "recent_milestones": [
+    {
+      "date": "2026-11-13",
+      "phase_id": "07",
+      "milestone": "Homologação do Conector datasus_sim (4 Tabelas, dbt, Mart Mortalidade Epidemiológica SIM & Live Fail-Hard)",
+      "summary": "Implementação e homologação completa do conector datasus_sim (DataSUS: Sistema de Informações sobre Mortalidade - SIM — Óbitos Gerais/DO, Causas Capítulos CID-10, Mortalidade Materno-Infantil e Carga Prematura DCNT/Causas Externas/APVP, Lei nº 6.015/1973, Lei nº 8.080/1990, Portaria SVS/MS nº 116/2009 e Decreto nº 8.777/2016) consolidando o quarto conector da Wave 5 e 32º conector total da plataforma (65.3% do catálogo homologado): 4 tabelas Silver (sim_obitos_gerais_municipio, sim_causas_capitulos_cid10, sim_mortalidade_materno_infantil, sim_mortalidade_prematura_dcnt_externas) e Gold Feature Store (features_sim_mortalidade_causas_cid10_municipios_brasil.parquet) materializadas em data/datasus_sim/{silver,gold}/; 7 novos modelos dbt (4 staging views, fct_sim_mortalidade_vigilancia_municipio, fct_sim_mortalidade_capitulos_cid10_municipio, mart_mortalidade_epidemiologia_sim_brasil) totalizando 285 modelos dbt e 161 checks seletivos do build 100% aprovados com 0 erros; 3.802 colunas 100% documentadas no linter (100% coverage); scores normalizados (0 a 100) de qualidade de vigilância de óbitos e carga de mortalidade evitável; 8 testes offline e 1 teste live fail-hard contra os portais oficiais do DataSUS SIM aprovados; multi-interface completa via SDK (BrazilData.health.sim_connector, get_sim_general_mortality, list_sim_cid10_causes, get_sim_maternal_infant_mortality, get_sim_premature_dcnt_external, get_sim_mortality_features, list_top_sim_surveillance_municipalities), CLI (bdg sim general/cid10/maternal-infant/premature/features/ranking), REST API (/api/v1/health-public/sim/* e atalho /api/v1/sim/*) e MCP (bdg_get_sim_general_mortality, bdg_get_sim_maternal_infant_mortality, bdg_get_sim_mortality_features, bdg_list_top_sim_surveillance_municipalities) com contenção de prompt injection wrap_untrusted_gov_data."
+    },
     {
       "date": "2026-11-13",
       "phase_id": "07",

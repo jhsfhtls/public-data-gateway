@@ -796,12 +796,13 @@ class LaborFacade:
 
 
 class HealthFacade:
-    """Unified developer facade for public health infrastructure, CNES networks, and SIH hospital morbidity analytics."""
+    """Unified developer facade for public health infrastructure, CNES networks, SIH hospitalizations, and SIM mortality analytics."""
 
     def __init__(self, sdk: "BrazilData") -> None:
         self._sdk = sdk
         self._cnes_connector: Any = None
         self._sih_connector: Any = None
+        self._sim_connector: Any = None
 
     @property
     def cnes_connector(self) -> Any:
@@ -822,6 +823,16 @@ class HealthFacade:
 
             self._sih_connector = DataSUSSihConnector(settings=self._sdk.settings)
         return self._sih_connector
+
+    @property
+    def sim_connector(self) -> Any:
+        if self._sim_connector is None:
+            from public_data_gateway.connectors.saude.datasus_sim.connector import (
+                DataSUSSimConnector,
+            )
+
+            self._sim_connector = DataSUSSimConnector(settings=self._sdk.settings)
+        return self._sim_connector
 
     def get_cnes_establishments(self, id_municipio: str) -> dict[str, Any]:
         """Get municipal summary of active health establishments and SUS network share (DataSUS CNES)."""
@@ -882,6 +893,38 @@ class HealthFacade:
     ) -> list[dict[str, Any]]:
         """List top Brazilian municipalities ranked by composite DataSUS SIH/SUS hospital complexity score."""
         return self.sih_connector.list_top_sih_complexity_hubs(
+            limit=limit, sigla_uf=sigla_uf
+        )
+
+    def get_sim_general_mortality(self, id_municipio: str) -> dict[str, Any]:
+        """Get municipal DataSUS SIM general mortality summary, hospital deaths, and ill-defined causes."""
+        return self.sim_connector.get_general_mortality(id_municipio)
+
+    def list_sim_cid10_causes(
+        self, id_municipio: str, capitulo_cid10: str | None = None
+    ) -> list[dict[str, Any]]:
+        """List municipal DataSUS SIM deaths broken down by major CID-10 chapters."""
+        return self.sim_connector.list_cid10_mortality_causes(
+            id_municipio, capitulo_cid10=capitulo_cid10
+        )
+
+    def get_sim_maternal_infant_mortality(self, id_municipio: str) -> dict[str, Any]:
+        """Get municipal infant, neonatal, maternal mortality indicators and investigation share (DataSUS SIM)."""
+        return self.sim_connector.get_maternal_infant_mortality(id_municipio)
+
+    def get_sim_premature_dcnt_external(self, id_municipio: str) -> dict[str, Any]:
+        """Get municipal premature NCD mortality (30-69y), external causes, and YPLL (DataSUS SIM)."""
+        return self.sim_connector.get_premature_dcnt_external_mortality(id_municipio)
+
+    def get_sim_mortality_features(self, id_municipio: str) -> dict[str, Any]:
+        """Get normalized Gold DataSUS SIM surveillance quality and preventable burden features."""
+        return self.sim_connector.get_sim_mortality_features(id_municipio)
+
+    def list_top_sim_surveillance_municipalities(
+        self, limit: int = 10, sigla_uf: str | None = None
+    ) -> list[dict[str, Any]]:
+        """List top Brazilian municipalities ranked by composite DataSUS SIM surveillance quality score."""
+        return self.sim_connector.list_top_sim_surveillance_municipalities(
             limit=limit, sigla_uf=sigla_uf
         )
 
@@ -1389,6 +1432,38 @@ class BrazilData:
     ) -> list[dict[str, Any]]:
         """Listar polos hospitalares líderes em complexidade assistencial SIH/SUS no Brasil."""
         return self.health.list_top_sih_complexity_hubs(
+            limit=limit, sigla_uf=sigla_uf
+        )
+
+    def get_sim_general_mortality(self, id_municipio: str) -> dict[str, Any]:
+        """Consultar mortalidade geral, óbitos hospitalares e causas mal definidas no município (DataSUS SIM)."""
+        return self.health.get_sim_general_mortality(id_municipio)
+
+    def list_sim_cid10_causes(
+        self, id_municipio: str, capitulo_cid10: str | None = None
+    ) -> list[dict[str, Any]]:
+        """Listar distribuição municipal dos óbitos por grandes capítulos da CID-10 (DataSUS SIM)."""
+        return self.health.list_sim_cid10_causes(
+            id_municipio, capitulo_cid10=capitulo_cid10
+        )
+
+    def get_sim_maternal_infant_mortality(self, id_municipio: str) -> dict[str, Any]:
+        """Consultar mortalidade infantil, neonatal, materna e proporção de óbitos investigados (DataSUS SIM)."""
+        return self.health.get_sim_maternal_infant_mortality(id_municipio)
+
+    def get_sim_premature_dcnt_external(self, id_municipio: str) -> dict[str, Any]:
+        """Consultar mortalidade prematura por DCNT (30-69 anos), causas externas e APVP por 1.000 hab (DataSUS SIM)."""
+        return self.health.get_sim_premature_dcnt_external(id_municipio)
+
+    def get_sim_mortality_features(self, id_municipio: str) -> dict[str, Any]:
+        """Consultar features Gold de qualidade da vigilância de óbitos e carga de mortalidade evitável (DataSUS SIM)."""
+        return self.health.get_sim_mortality_features(id_municipio)
+
+    def list_top_sim_surveillance_municipalities(
+        self, limit: int = 10, sigla_uf: str | None = None
+    ) -> list[dict[str, Any]]:
+        """Listar municípios líderes em score de qualidade de vigilância epidemiológica de óbitos no Brasil (DataSUS SIM)."""
+        return self.health.list_top_sim_surveillance_municipalities(
             limit=limit, sigla_uf=sigla_uf
         )
 

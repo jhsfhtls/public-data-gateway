@@ -845,6 +845,65 @@ class MCPDispatcher:
                                 },
                             },
                             {
+                                "name": "bdg_get_sim_general_mortality",
+                                "description": "Get municipal DataSUS SIM general mortality summary, hospital deaths share, and ill-defined causes rate.",
+                                "inputSchema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "id_municipio": {
+                                            "type": "string",
+                                            "description": "7-digit IBGE municipality code (e.g. 3550308)",
+                                        },
+                                    },
+                                    "required": ["id_municipio"],
+                                },
+                            },
+                            {
+                                "name": "bdg_get_sim_maternal_infant_mortality",
+                                "description": "Get municipal DataSUS SIM infant, neonatal, and maternal mortality rates alongside death investigation coverage.",
+                                "inputSchema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "id_municipio": {
+                                            "type": "string",
+                                            "description": "7-digit IBGE municipality code (e.g. 3550308)",
+                                        },
+                                    },
+                                    "required": ["id_municipio"],
+                                },
+                            },
+                            {
+                                "name": "bdg_get_sim_mortality_features",
+                                "description": "Get Gold DataSUS SIM surveillance quality score, preventable mortality burden score, and transition tier.",
+                                "inputSchema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "id_municipio": {
+                                            "type": "string",
+                                            "description": "7-digit IBGE municipality code (e.g. 3550308)",
+                                        },
+                                    },
+                                    "required": ["id_municipio"],
+                                },
+                            },
+                            {
+                                "name": "bdg_list_top_sim_surveillance_municipalities",
+                                "description": "List top Brazilian municipalities ranked by composite DataSUS SIM mortality surveillance quality score.",
+                                "inputSchema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "limit": {
+                                            "type": "integer",
+                                            "description": "Maximum rows (default: 10)",
+                                        },
+                                        "sigla_uf": {
+                                            "type": "string",
+                                            "description": "Optional 2-letter state filter (e.g. SP)",
+                                        },
+                                    },
+                                },
+                            },
+                            {
                                 "name": "bdg_get_censo_escolar_schools",
                                 "description": "Get municipal active schools inventory, broadband internet, science labs, libraries, and PcD accessibility (INEP Censo Escolar).",
                                 "inputSchema": {
@@ -2006,6 +2065,56 @@ class MCPDispatcher:
                     },
                 }
             wrapped = wrap_untrusted_gov_data(result, source_id="datasus_sih")
+            return {
+                "jsonrpc": "2.0",
+                "id": req_id,
+                "result": {"content": [{"type": "text", "text": wrapped}], "isError": False},
+            }
+
+        if tool_name in {
+            "bdg_get_sim_general_mortality",
+            "bdg_get_sim_maternal_infant_mortality",
+            "bdg_get_sim_mortality_features",
+            "bdg_list_top_sim_surveillance_municipalities",
+        }:
+            from public_data_gateway.connectors.saude.datasus_sim.connector import (
+                DataSUSSimConnector,
+            )
+
+            connector = DataSUSSimConnector(settings=self.settings)
+            if tool_name == "bdg_get_sim_general_mortality":
+                result = connector.get_general_mortality(
+                    str(args.get("id_municipio", "")).strip()
+                )
+            elif tool_name == "bdg_get_sim_maternal_infant_mortality":
+                result = connector.get_maternal_infant_mortality(
+                    str(args.get("id_municipio", "")).strip()
+                )
+            elif tool_name == "bdg_get_sim_mortality_features":
+                result = connector.get_sim_mortality_features(
+                    str(args.get("id_municipio", "")).strip()
+                )
+            else:
+                raw_uf = args.get("sigla_uf")
+                result = connector.list_top_sim_surveillance_municipalities(
+                    limit=int(args.get("limit", 10)),
+                    sigla_uf=str(raw_uf).strip() if raw_uf else None,
+                )
+            if not result:
+                return {
+                    "jsonrpc": "2.0",
+                    "id": req_id,
+                    "result": {
+                        "content": [
+                            {
+                                "type": "text",
+                                "text": "No DataSUS SIM data found for the query.",
+                            }
+                        ],
+                        "isError": True,
+                    },
+                }
+            wrapped = wrap_untrusted_gov_data(result, source_id="datasus_sim")
             return {
                 "jsonrpc": "2.0",
                 "id": req_id,
