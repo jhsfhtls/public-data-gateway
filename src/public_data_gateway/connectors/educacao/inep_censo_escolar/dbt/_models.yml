@@ -1,0 +1,245 @@
+version: 2
+
+models:
+  - name: stg_censo_escolar_escolas_infraestrutura
+    description: "Visão padronizada do inventário municipal de escolas ativas e infraestrutura escolar da Educação Básica (INEP)."
+    columns:
+      - name: id_municipio
+        description: "Código IBGE de 7 dígitos do município."
+        tests:
+          - not_null
+          - unique
+      - name: nome_municipio
+        description: "Nome oficial do município."
+        tests:
+          - not_null
+      - name: sigla_uf
+        description: "Sigla de 2 letras da Unidade Federativa."
+        tests:
+          - not_null
+      - name: id_uf
+        description: "Código IBGE de 2 dígitos da Unidade Federativa."
+        tests:
+          - not_null
+      - name: cep_8
+        description: "CEP canônico de 8 dígitos do município."
+        tests:
+          - not_null
+      - name: ano_censo
+        description: "Ano de referência do Censo Escolar INEP."
+        tests:
+          - not_null
+      - name: total_escolas_ativas
+        description: "Total de escolas em atividade na educação básica."
+        tests:
+          - not_null
+      - name: escolas_rede_publica
+        description: "Quantidade de escolas da rede pública."
+        tests:
+          - not_null
+      - name: escolas_rede_privada
+        description: "Quantidade de escolas da rede privada."
+        tests:
+          - not_null
+      - name: proporcao_rede_publica_pct
+        description: "Percentual de escolas da rede pública (%)."
+        tests:
+          - not_null
+      - name: escolas_com_internet_banda_larga_pct
+        description: "Percentual de escolas com internet banda larga (%)."
+        tests:
+          - not_null
+      - name: escolas_com_laboratorio_informatica_pct
+        description: "Percentual de escolas com laboratório de informática (%)."
+        tests:
+          - not_null
+      - name: escolas_com_laboratorio_ciencias_pct
+        description: "Percentual de escolas com laboratório de ciências (%)."
+        tests:
+          - not_null
+      - name: escolas_com_biblioteca_pct
+        description: "Percentual de escolas com biblioteca ou sala de leitura (%)."
+        tests:
+          - not_null
+      - name: escolas_com_quadra_esportiva_pct
+        description: "Percentual de escolas com quadra esportiva (%)."
+        tests:
+          - not_null
+      - name: escolas_acessibilidade_pcd_pct
+        description: "Percentual de escolas acessíveis a PcD (%)."
+        tests:
+          - not_null
+      - name: reference_date
+        description: "Data de referência ISO-8601 da coleta censitária."
+        tests:
+          - not_null
+      - name: extracted_at
+        description: "Timestamp ISO-8601 UTC da extração."
+        tests:
+          - not_null
+
+  - name: stg_censo_escolar_matriculas_etapas
+    description: "Visão padronizada das matrículas da educação básica por etapa/modalidade e tempo integral (INEP)."
+    columns:
+      - name: id_municipio
+        description: "Código IBGE de 7 dígitos do município."
+        tests:
+          - not_null
+      - name: nome_municipio
+        description: "Nome oficial do município."
+        tests:
+          - not_null
+      - name: sigla_uf
+        description: "Sigla de 2 letras da Unidade Federativa."
+        tests:
+          - not_null
+      - name: etapa_ensino
+        description: "Etapa ou modalidade de ensino da educação básica."
+        tests:
+          - not_null
+      - name: matriculas_totais_etapa
+        description: "Total de matrículas na etapa de ensino."
+        tests:
+          - not_null
+      - name: matriculas_rede_publica_etapa
+        description: "Matrículas na rede pública na etapa de ensino."
+        tests:
+          - not_null
+      - name: matriculas_tempo_integral_etapa
+        description: "Matrículas em tempo integral na etapa de ensino."
+        tests:
+          - not_null
+      - name: proporcao_tempo_integral_pct
+        description: "Percentual de matrículas em tempo integral na etapa (%)."
+        tests:
+          - not_null
+      - name: participacao_etapa_total_pct
+        description: "Participação da etapa sobre o total municipal (%)."
+        tests:
+          - not_null
+      - name: media_alunos_por_turma
+        description: "Média de alunos por turma na etapa."
+        tests:
+          - not_null
+      - name: taxa_distorcao_idade_serie_pct
+        description: "Taxa de distorção idade-série na etapa (%)."
+        tests:
+          - not_null
+      - name: reference_date
+        description: "Data de referência ISO-8601 da coleta censitária."
+        tests:
+          - not_null
+      - name: extracted_at
+        description: "Timestamp ISO-8601 UTC da extração."
+        tests:
+          - not_null
+
+  - name: stg_censo_escolar_docentes_qualificacao
+    description: "Visão padronizada de docentes em exercício, escolaridade superior, pós-graduação e indicador AFD (INEP)."
+    columns:
+      - name: id_municipio
+        description: "Código IBGE de 7 dígitos do município."
+        tests:
+          - not_null
+          - unique
+      - name: nome_municipio
+        description: "Nome oficial do município."
+        tests:
+          - not_null
+      - name: sigla_uf
+        description: "Sigla de 2 letras da Unidade Federativa."
+        tests:
+          - not_null
+      - name: ano_censo
+        description: "Ano de referência do Censo Escolar INEP."
+        tests:
+          - not_null
+      - name: total_docentes_exercicio
+        description: "Total de docentes em exercício na educação básica."
+        tests:
+          - not_null
+      - name: docentes_ensino_superior_completo
+        description: "Docentes com ensino superior completo."
+        tests:
+          - not_null
+      - name: proporcao_docentes_superior_pct
+        description: "Percentual de docentes com ensino superior (%)."
+        tests:
+          - not_null
+      - name: docentes_pos_graduacao_pct
+        description: "Percentual de docentes com pós-graduação (%)."
+        tests:
+          - not_null
+      - name: indicador_adequacao_formacao_docente_afd_pct
+        description: "Indicador INEP de Adequação da Formação Docente AFD (%)."
+        tests:
+          - not_null
+      - name: razao_alunos_por_docente
+        description: "Razão de matrículas totais por docente."
+        tests:
+          - not_null
+      - name: reference_date
+        description: "Data de referência ISO-8601 da coleta censitária."
+        tests:
+          - not_null
+      - name: extracted_at
+        description: "Timestamp ISO-8601 UTC da extração."
+        tests:
+          - not_null
+
+  - name: stg_censo_escolar_rendimento_fluxo
+    description: "Visão padronizada de rendimento escolar (aprovação, reprovação, abandono) e jornada em tempo integral (INEP)."
+    columns:
+      - name: id_municipio
+        description: "Código IBGE de 7 dígitos do município."
+        tests:
+          - not_null
+          - unique
+      - name: nome_municipio
+        description: "Nome oficial do município."
+        tests:
+          - not_null
+      - name: sigla_uf
+        description: "Sigla de 2 letras da Unidade Federativa."
+        tests:
+          - not_null
+      - name: ano_censo
+        description: "Ano de referência do Censo Escolar INEP."
+        tests:
+          - not_null
+      - name: total_matriculas_educacao_basica
+        description: "Total de matrículas na educação básica."
+        tests:
+          - not_null
+      - name: matriculas_tempo_integral_total
+        description: "Matrículas em tempo integral no município."
+        tests:
+          - not_null
+      - name: proporcao_tempo_integral_total_pct
+        description: "Percentual de matrículas em tempo integral (%)."
+        tests:
+          - not_null
+      - name: taxa_aprovacao_media_pct
+        description: "Taxa média de aprovação escolar (%)."
+        tests:
+          - not_null
+      - name: taxa_reprovacao_media_pct
+        description: "Taxa média de reprovação escolar (%)."
+        tests:
+          - not_null
+      - name: taxa_abandono_escolar_pct
+        description: "Taxa de abandono escolar (%)."
+        tests:
+          - not_null
+      - name: taxa_distorcao_idade_serie_media_pct
+        description: "Taxa média de distorção idade-série (%)."
+        tests:
+          - not_null
+      - name: reference_date
+        description: "Data de referência ISO-8601 da coleta censitária."
+        tests:
+          - not_null
+      - name: extracted_at
+        description: "Timestamp ISO-8601 UTC da extração."
+        tests:
+          - not_null

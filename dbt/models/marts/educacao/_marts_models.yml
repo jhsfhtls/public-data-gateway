@@ -1,0 +1,163 @@
+version: 2
+
+models:
+  - name: mart_infraestrutura_educacao_basica_brasil
+    description: "Data Mart Gold executivo de infraestrutura escolar, matrículas por etapa, adequação docente (AFD), fluxo educacional e classificação da rede básica municipal (INEP Censo Escolar)."
+    columns:
+      - name: id_municipio
+        description: "Código IBGE de 7 dígitos do município."
+        tests:
+          - unique
+          - not_null
+      - name: nome_municipio
+        description: "Nome oficial do município."
+        tests:
+          - not_null
+      - name: sigla_uf
+        description: "Sigla de 2 letras da Unidade Federativa."
+        tests:
+          - not_null
+      - name: id_uf
+        description: "Código IBGE de 2 dígitos da Unidade Federativa."
+        tests:
+          - not_null
+      - name: nome_uf
+        description: "Nome completo da Unidade Federativa."
+        tests:
+          - not_null
+      - name: regiao
+        description: "Grande região geográfica brasileira."
+        tests:
+          - not_null
+      - name: cep_8
+        description: "CEP canônico de 8 dígitos do município."
+        tests:
+          - not_null
+      - name: ano_censo
+        description: "Ano de referência do Censo Escolar INEP."
+        tests:
+          - not_null
+      - name: total_escolas_ativas
+        description: "Total de escolas em atividade na educação básica."
+        tests:
+          - not_null
+      - name: escolas_rede_publica
+        description: "Quantidade de escolas da rede pública."
+        tests:
+          - not_null
+      - name: escolas_rede_privada
+        description: "Quantidade de escolas da rede privada."
+        tests:
+          - not_null
+      - name: proporcao_rede_publica_pct
+        description: "Percentual de escolas pertencentes à rede pública (%)."
+        tests:
+          - not_null
+      - name: escolas_com_internet_banda_larga_pct
+        description: "Percentual de escolas com internet banda larga (%)."
+        tests:
+          - not_null
+      - name: escolas_com_laboratorio_informatica_pct
+        description: "Percentual de escolas com laboratório de informática (%)."
+        tests:
+          - not_null
+      - name: escolas_com_laboratorio_ciencias_pct
+        description: "Percentual de escolas com laboratório de ciências (%)."
+        tests:
+          - not_null
+      - name: escolas_com_biblioteca_pct
+        description: "Percentual de escolas com biblioteca ou sala de leitura (%)."
+        tests:
+          - not_null
+      - name: escolas_com_quadra_esportiva_pct
+        description: "Percentual de escolas com quadra esportiva (%)."
+        tests:
+          - not_null
+      - name: escolas_acessibilidade_pcd_pct
+        description: "Percentual de escolas com acessibilidade PcD (%)."
+        tests:
+          - not_null
+      - name: total_docentes_exercicio
+        description: "Total de docentes em exercício na educação básica."
+        tests:
+          - not_null
+      - name: docentes_ensino_superior_completo
+        description: "Quantidade de docentes com nível superior completo."
+        tests:
+          - not_null
+      - name: proporcao_docentes_superior_pct
+        description: "Percentual de docentes com ensino superior completo (%)."
+        tests:
+          - not_null
+      - name: docentes_pos_graduacao_pct
+        description: "Percentual de docentes com especialização, mestrado ou doutorado (%)."
+        tests:
+          - not_null
+      - name: indicador_adequacao_formacao_docente_afd_pct
+        description: "Indicador INEP de Adequação da Formação Docente AFD Grupo 1 (%)."
+        tests:
+          - not_null
+      - name: razao_alunos_por_docente
+        description: "Razão entre matrículas totais e docentes em exercício."
+        tests:
+          - not_null
+      - name: total_matriculas_educacao_basica
+        description: "Total de matrículas na educação básica."
+        tests:
+          - not_null
+      - name: matriculas_tempo_integral_total
+        description: "Total de matrículas com jornada em tempo integral."
+        tests:
+          - not_null
+      - name: proporcao_tempo_integral_total_pct
+        description: "Percentual de matrículas em tempo integral (%)."
+        tests:
+          - not_null
+      - name: matriculas_educacao_infantil
+        description: "Matrículas consolidadas na etapa de Educação Infantil (creche e pré-escola)."
+        tests:
+          - not_null
+      - name: matriculas_ensino_fundamental
+        description: "Matrículas consolidadas no Ensino Fundamental (anos iniciais e finais)."
+        tests:
+          - not_null
+      - name: matriculas_ensino_medio
+        description: "Matrículas consolidadas no Ensino Médio."
+        tests:
+          - not_null
+      - name: taxa_aprovacao_media_pct
+        description: "Taxa média de aprovação escolar (%)."
+        tests:
+          - not_null
+      - name: taxa_reprovacao_media_pct
+        description: "Taxa média de reprovação escolar (%)."
+        tests:
+          - not_null
+      - name: taxa_abandono_escolar_pct
+        description: "Taxa de abandono escolar anual (%)."
+        tests:
+          - not_null
+      - name: taxa_distorcao_idade_serie_media_pct
+        description: "Taxa média de distorção idade-série (%)."
+        tests:
+          - not_null
+      - name: score_infraestrutura_escolar_inep
+        description: "Score normalizado (0 a 100) de infraestrutura escolar física, digital e acessibilidade PcD."
+        tests:
+          - not_null
+      - name: score_qualidade_fluxo_educacional
+        description: "Score normalizado (0 a 100) de qualificação docente AFD, tempo integral, aprovação e retenção."
+        tests:
+          - not_null
+      - name: classificacao_rede_educacional_basica
+        description: "Classificação da rede municipal de educação básica em 4 tiers analíticos."
+        tests:
+          - not_null
+      - name: reference_date
+        description: "Data de referência ISO-8601 da coleta censitária."
+        tests:
+          - not_null
+      - name: extracted_at
+        description: "Timestamp ISO-8601 UTC da extração."
+        tests:
+          - not_null

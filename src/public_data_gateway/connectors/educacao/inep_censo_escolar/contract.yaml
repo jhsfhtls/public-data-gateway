@@ -1,0 +1,520 @@
+schema_version: "3.1.0"
+contract_id: "ODCS-BR-INEP-CENSO-ESCOLAR-001"
+source_id: "inep_censo_escolar"
+version: "1.0.0"
+name: "INEP: Microdados do Censo Escolar da Educação Básica"
+agency: "Instituto Nacional de Estudos e Pesquisas Educacionais Anísio Teixeira (INEP)"
+official_url: "https://www.gov.br/inep/pt-br/acesso-a-informacao/dados-abertos/microdados/censo-escolar"
+
+legal_framework:
+  statutes:
+    - name: "Lei nº 9.394/1996"
+      description: "Lei de Diretrizes e Bases da Educação Nacional (LDB), que disciplina a educação escolar e os levantamentos censitários educacionais"
+    - name: "Lei nº 13.005/2014"
+      description: "Aprova o Plano Nacional de Educação (PNE) com metas estruturantes de matrículas integrais, infraestrutura escolar e formação docente"
+    - name: "Portaria MEC nº 316/2007"
+      description: "Institui e regulamenta o Censo Escolar da Educação Básica como levantamento oficial anual via Educacenso/INEP"
+    - name: "Decreto nº 8.777/2016"
+      description: "Institui a Política de Dados Abertos do Poder Executivo Federal"
+
+data_governance:
+  grain: "municipio_educacao_basica_censo_escolar"
+  primary_keys:
+    - "id_municipio"
+    - "sigla_uf"
+    - "cep_8"
+  reference_date_column: "reference_date"
+  min_expected_rows: 5
+  max_volume_drop_pct: 15.0
+  freshness_sla_hours: 720
+  lgpd_tier: "ANONYMIZED_MICRODATA"
+  ml_feature_domains:
+    - "school_infrastructure"
+    - "basic_ed_enrollments"
+
+schema:
+  tables:
+    censo_escolar_escolas_infraestrutura:
+      description: "Inventário municipal de escolas ativas da educação básica por dependência administrativa, conectividade banda larga, laboratórios, biblioteca e acessibilidade PcD"
+      grain: "id_municipio, ano_censo"
+      primary_keys: ["id_municipio", "ano_censo"]
+      min_expected_rows: 5
+      columns:
+        - name: "id_municipio"
+          data_type: "string"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Código IBGE de 7 dígitos identificador único do município"
+        - name: "nome_municipio"
+          data_type: "string"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Nome oficial do município"
+        - name: "sigla_uf"
+          data_type: "string"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Sigla de 2 letras da Unidade Federativa"
+        - name: "id_uf"
+          data_type: "string"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Código IBGE de 2 dígitos da Unidade Federativa"
+        - name: "cep_8"
+          data_type: "string"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "CEP canônico de 8 dígitos da região central / secretaria municipal de educação"
+        - name: "ano_censo"
+          data_type: "int64"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Ano de referência da coleta oficial do Censo Escolar INEP"
+        - name: "total_escolas_ativas"
+          data_type: "int64"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Quantidade total de escolas em atividade na educação básica no município"
+        - name: "escolas_rede_publica"
+          data_type: "int64"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Escolas da rede pública (federal, estadual e municipal)"
+        - name: "escolas_rede_privada"
+          data_type: "int64"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Escolas da rede privada (comunitária, confessional, filantrópica ou particular)"
+        - name: "proporcao_rede_publica_pct"
+          data_type: "float64"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Percentual de escolas ativas pertencentes à rede pública"
+        - name: "escolas_com_internet_banda_larga_pct"
+          data_type: "float64"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Percentual de escolas equipadas com acesso à internet banda larga"
+        - name: "escolas_com_laboratorio_informatica_pct"
+          data_type: "float64"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Percentual de escolas com laboratório de informática ativo"
+        - name: "escolas_com_laboratorio_ciencias_pct"
+          data_type: "float64"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Percentual de escolas equipadas com laboratório de ciências"
+        - name: "escolas_com_biblioteca_pct"
+          data_type: "float64"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Percentual de escolas dotadas de biblioteca ou sala de leitura"
+        - name: "escolas_com_quadra_esportiva_pct"
+          data_type: "float64"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Percentual de escolas com quadra de esportes coberta ou descoberta"
+        - name: "escolas_acessibilidade_pcd_pct"
+          data_type: "float64"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Percentual de escolas com dependências e vias acessíveis a PcD"
+        - name: "reference_date"
+          data_type: "string"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Data de referência ISO-8601 da coleta censitária"
+        - name: "extracted_at"
+          data_type: "string"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Timestamp ISO-8601 UTC da extração"
+
+    censo_escolar_matriculas_etapas:
+      description: "Detalhamento das matrículas de educação básica por etapa/modalidade de ensino, tempo integral, enturmação média e distorção idade-série"
+      grain: "id_municipio, etapa_ensino"
+      primary_keys: ["id_municipio", "etapa_ensino"]
+      min_expected_rows: 15
+      columns:
+        - name: "id_municipio"
+          data_type: "string"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Código IBGE de 7 dígitos do município"
+        - name: "nome_municipio"
+          data_type: "string"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Nome oficial do município"
+        - name: "sigla_uf"
+          data_type: "string"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Sigla de 2 letras da Unidade Federativa"
+        - name: "etapa_ensino"
+          data_type: "string"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Etapa ou modalidade da educação básica (Educacao_Infantil, Ensino_Fundamental_Anos_Iniciais, Ensino_Fundamental_Anos_Finais, Ensino_Medio, Educacao_Profissional_EJA)"
+        - name: "matriculas_totais_etapa"
+          data_type: "int64"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Total de matrículas na etapa de ensino considerando todas as redes"
+        - name: "matriculas_rede_publica_etapa"
+          data_type: "int64"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Matrículas da etapa atendidas pelas redes públicas de ensino"
+        - name: "matriculas_tempo_integral_etapa"
+          data_type: "int64"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Matrículas com jornada escolar em tempo integral (>= 7h diárias) na etapa"
+        - name: "proporcao_tempo_integral_pct"
+          data_type: "float64"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Percentual de matrículas da etapa em tempo integral"
+        - name: "participacao_etapa_total_pct"
+          data_type: "float64"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Participação percentual da etapa sobre as matrículas totais municipais"
+        - name: "media_alunos_por_turma"
+          data_type: "float64"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Média de alunos por turma na etapa de ensino (INEP)"
+        - name: "taxa_distorcao_idade_serie_pct"
+          data_type: "float64"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Taxa de distorção idade-série na etapa de ensino (%)"
+        - name: "reference_date"
+          data_type: "string"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Data de referência ISO-8601 da coleta censitária"
+        - name: "extracted_at"
+          data_type: "string"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Timestamp ISO-8601 UTC da extração"
+
+    censo_escolar_docentes_qualificacao:
+      description: "Indicadores municipais de docentes em regência de classe, titulação superior, pós-graduação e Adequação da Formação Docente (AFD/INEP)"
+      grain: "id_municipio, ano_censo"
+      primary_keys: ["id_municipio", "ano_censo"]
+      min_expected_rows: 5
+      columns:
+        - name: "id_municipio"
+          data_type: "string"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Código IBGE de 7 dígitos do município"
+        - name: "nome_municipio"
+          data_type: "string"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Nome oficial do município"
+        - name: "sigla_uf"
+          data_type: "string"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Sigla de 2 letras da Unidade Federativa"
+        - name: "ano_censo"
+          data_type: "int64"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Ano de referência do Censo Escolar INEP"
+        - name: "total_docentes_exercicio"
+          data_type: "int64"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Total de funções docentes únicas em exercício na educação básica"
+        - name: "docentes_ensino_superior_completo"
+          data_type: "int64"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Docentes com licenciatura ou bacharelado superior completo"
+        - name: "proporcao_docentes_superior_pct"
+          data_type: "float64"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Percentual de docentes com ensino superior completo"
+        - name: "docentes_pos_graduacao_pct"
+          data_type: "float64"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Percentual de docentes com especialização, mestrado ou doutorado"
+        - name: "indicador_adequacao_formacao_docente_afd_pct"
+          data_type: "float64"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Indicador INEP de Adequação da Formação Docente (Grupo 1 — licenciatura na área da disciplina lecionada, %)"
+        - name: "razao_alunos_por_docente"
+          data_type: "float64"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Razão entre matrículas totais e total de docentes em exercício"
+        - name: "reference_date"
+          data_type: "string"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Data de referência ISO-8601 da coleta censitária"
+        - name: "extracted_at"
+          data_type: "string"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Timestamp ISO-8601 UTC da extração"
+
+    censo_escolar_rendimento_fluxo:
+      description: "Taxas municipais consolidadas de rendimento escolar (aprovação, reprovação e abandono), cobertura integral e distorção idade-série"
+      grain: "id_municipio, ano_censo"
+      primary_keys: ["id_municipio", "ano_censo"]
+      min_expected_rows: 5
+      columns:
+        - name: "id_municipio"
+          data_type: "string"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Código IBGE de 7 dígitos do município"
+        - name: "nome_municipio"
+          data_type: "string"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Nome oficial do município"
+        - name: "sigla_uf"
+          data_type: "string"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Sigla de 2 letras da Unidade Federativa"
+        - name: "ano_censo"
+          data_type: "int64"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Ano de referência do Censo Escolar INEP"
+        - name: "total_matriculas_educacao_basica"
+          data_type: "int64"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Total consolidado de matrículas na educação básica do município"
+        - name: "matriculas_tempo_integral_total"
+          data_type: "int64"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Total de matrículas com jornada em tempo integral no município"
+        - name: "proporcao_tempo_integral_total_pct"
+          data_type: "float64"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Percentual consolidado de matrículas em tempo integral (%)"
+        - name: "taxa_aprovacao_media_pct"
+          data_type: "float64"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Taxa média de aprovação escolar na educação básica (%)"
+        - name: "taxa_reprovacao_media_pct"
+          data_type: "float64"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Taxa média de reprovação escolar na educação básica (%)"
+        - name: "taxa_abandono_escolar_pct"
+          data_type: "float64"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Taxa consolidada de abandono/evasão escolar anual (%)"
+        - name: "taxa_distorcao_idade_serie_media_pct"
+          data_type: "float64"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Taxa média de distorção idade-série na rede educacional (%)"
+        - name: "reference_date"
+          data_type: "string"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Data de referência ISO-8601 da coleta censitária"
+        - name: "extracted_at"
+          data_type: "string"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Timestamp ISO-8601 UTC da extração"
+
+    features_censo_escolar_educacao_basica_municipios_brasil:
+      description: "Feature Store Gold municipal de infraestrutura escolar, qualidade do fluxo educacional, adequação docente e classificação da rede básica (INEP)"
+      grain: "id_municipio"
+      primary_keys: ["id_municipio"]
+      min_expected_rows: 5
+      columns:
+        - name: "id_municipio"
+          data_type: "string"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Código IBGE de 7 dígitos do município"
+        - name: "nome_municipio"
+          data_type: "string"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Nome oficial do município"
+        - name: "sigla_uf"
+          data_type: "string"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Sigla de 2 letras da Unidade Federativa"
+        - name: "cep_8"
+          data_type: "string"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "CEP canônico de 8 dígitos do município"
+        - name: "total_escolas_ativas"
+          data_type: "int64"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Total de escolas em atividade na educação básica"
+        - name: "total_matriculas_educacao_basica"
+          data_type: "int64"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Total de matrículas na educação básica"
+        - name: "total_docentes_exercicio"
+          data_type: "int64"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Total de docentes em exercício"
+        - name: "escolas_com_internet_banda_larga_pct"
+          data_type: "float64"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Percentual de escolas com internet banda larga"
+        - name: "escolas_com_laboratorio_ciencias_pct"
+          data_type: "float64"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Percentual de escolas com laboratório de ciências"
+        - name: "proporcao_tempo_integral_total_pct"
+          data_type: "float64"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Percentual de matrículas em tempo integral"
+        - name: "indicador_adequacao_formacao_docente_afd_pct"
+          data_type: "float64"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Indicador AFD de adequação da formação docente (%)"
+        - name: "taxa_aprovacao_media_pct"
+          data_type: "float64"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Taxa média de aprovação escolar (%)"
+        - name: "taxa_abandono_escolar_pct"
+          data_type: "float64"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Taxa de abandono escolar (%)"
+        - name: "taxa_distorcao_idade_serie_media_pct"
+          data_type: "float64"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Taxa média de distorção idade-série (%)"
+        - name: "score_infraestrutura_escolar_inep"
+          data_type: "float64"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Score composto (0 a 100) de infraestrutura física, digital e acessibilidade escolar"
+        - name: "score_qualidade_fluxo_educacional"
+          data_type: "float64"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Score composto (0 a 100) de qualificação docente AFD, tempo integral, aprovação e retenção"
+        - name: "classificacao_rede_educacional_basica"
+          data_type: "string"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Tier analítico da rede municipal de educação básica"
+        - name: "reference_date"
+          data_type: "string"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Data de referência ISO-8601 da coleta censitária"
+        - name: "extracted_at"
+          data_type: "string"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Timestamp ISO-8601 UTC da extração"

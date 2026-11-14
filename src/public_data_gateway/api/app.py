@@ -1379,4 +1379,67 @@ def create_app(settings: GatewaySettings | None = None) -> FastAPI:
         conn = DataSUSSihConnector(settings=app_settings)
         return conn.get_admissions_summary(id_municipio)
 
+    @app.get("/api/v1/education/censo-escolar/top-municipalities")
+    async def get_top_censo_escolar_municipalities(
+        limit: int = Query(10, ge=1, le=50, description="Max municipalities to list"),
+        uf: str | None = Query(None, description="Filter by 2-letter state abbreviation"),
+    ) -> list[dict[str, Any]]:
+        from public_data_gateway.connectors.educacao.inep_censo_escolar.connector import (
+            INEPCensoEscolarConnector,
+        )
+
+        conn = INEPCensoEscolarConnector(settings=app_settings)
+        return conn.list_top_censo_escolar_municipalities(limit=limit, sigla_uf=uf)
+
+    @app.get("/api/v1/education/censo-escolar/features/{id_municipio}")
+    async def get_censo_escolar_features(id_municipio: str) -> dict[str, Any]:
+        from public_data_gateway.connectors.educacao.inep_censo_escolar.connector import (
+            INEPCensoEscolarConnector,
+        )
+
+        conn = INEPCensoEscolarConnector(settings=app_settings)
+        return conn.get_censo_escolar_features(id_municipio)
+
+    @app.get("/api/v1/education/censo-escolar/enrollments/{id_municipio}")
+    async def get_censo_escolar_enrollments(
+        id_municipio: str,
+        etapa: str | None = Query(
+            None, description="Optional educational stage filter (e.g. Ensino_Medio)"
+        ),
+    ) -> list[dict[str, Any]]:
+        from public_data_gateway.connectors.educacao.inep_censo_escolar.connector import (
+            INEPCensoEscolarConnector,
+        )
+
+        conn = INEPCensoEscolarConnector(settings=app_settings)
+        return conn.list_enrollments_by_stage(id_municipio, etapa_ensino=etapa)
+
+    @app.get("/api/v1/education/censo-escolar/teachers/{id_municipio}")
+    async def get_censo_escolar_teachers(id_municipio: str) -> dict[str, Any]:
+        from public_data_gateway.connectors.educacao.inep_censo_escolar.connector import (
+            INEPCensoEscolarConnector,
+        )
+
+        conn = INEPCensoEscolarConnector(settings=app_settings)
+        return conn.get_teacher_qualifications(id_municipio)
+
+    @app.get("/api/v1/education/censo-escolar/flow/{id_municipio}")
+    async def get_censo_escolar_flow(id_municipio: str) -> dict[str, Any]:
+        from public_data_gateway.connectors.educacao.inep_censo_escolar.connector import (
+            INEPCensoEscolarConnector,
+        )
+
+        conn = INEPCensoEscolarConnector(settings=app_settings)
+        return conn.get_yield_flow_indicators(id_municipio)
+
+    @app.get("/api/v1/education/censo-escolar/schools/{id_municipio}")
+    @app.get("/api/v1/censo-escolar/{id_municipio}")
+    async def get_censo_escolar_schools(id_municipio: str) -> dict[str, Any]:
+        from public_data_gateway.connectors.educacao.inep_censo_escolar.connector import (
+            INEPCensoEscolarConnector,
+        )
+
+        conn = INEPCensoEscolarConnector(settings=app_settings)
+        return conn.get_school_infrastructure(id_municipio)
+
     return app

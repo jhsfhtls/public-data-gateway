@@ -886,6 +886,58 @@ class HealthFacade:
         )
 
 
+class EducationFacade:
+    """Unified developer facade for basic education, school infrastructure, and INEP Censo Escolar analytics."""
+
+    def __init__(self, sdk: "BrazilData") -> None:
+        self._sdk = sdk
+        self._censo_escolar_connector: Any = None
+
+    @property
+    def censo_escolar_connector(self) -> Any:
+        if self._censo_escolar_connector is None:
+            from public_data_gateway.connectors.educacao.inep_censo_escolar.connector import (
+                INEPCensoEscolarConnector,
+            )
+
+            self._censo_escolar_connector = INEPCensoEscolarConnector(
+                settings=self._sdk.settings
+            )
+        return self._censo_escolar_connector
+
+    def get_censo_escolar_infrastructure(self, id_municipio: str) -> dict[str, Any]:
+        """Get municipal active schools inventory, broadband internet, labs, and PcD accessibility (INEP)."""
+        return self.censo_escolar_connector.get_school_infrastructure(id_municipio)
+
+    def list_censo_escolar_enrollments(
+        self, id_municipio: str, etapa_ensino: str | None = None
+    ) -> list[dict[str, Any]]:
+        """List municipal basic education enrollments broken down by educational stage (INEP)."""
+        return self.censo_escolar_connector.list_enrollments_by_stage(
+            id_municipio, etapa_ensino=etapa_ensino
+        )
+
+    def get_censo_escolar_teachers(self, id_municipio: str) -> dict[str, Any]:
+        """Get teaching workforce qualification, higher-ed share, and INEP AFD indicator per municipality."""
+        return self.censo_escolar_connector.get_teacher_qualifications(id_municipio)
+
+    def get_censo_escolar_yield_flow(self, id_municipio: str) -> dict[str, Any]:
+        """Get municipal approval, retention/dropout, full-time enrollment, and age-grade distortion rates (INEP)."""
+        return self.censo_escolar_connector.get_yield_flow_indicators(id_municipio)
+
+    def get_censo_escolar_features(self, id_municipio: str) -> dict[str, Any]:
+        """Get normalized Gold INEP Censo Escolar school infrastructure and educational flow quality features."""
+        return self.censo_escolar_connector.get_censo_escolar_features(id_municipio)
+
+    def list_top_censo_escolar_municipalities(
+        self, limit: int = 10, sigla_uf: str | None = None
+    ) -> list[dict[str, Any]]:
+        """List top Brazilian municipalities ranked by composite INEP school infrastructure score."""
+        return self.censo_escolar_connector.list_top_censo_escolar_municipalities(
+            limit=limit, sigla_uf=sigla_uf
+        )
+
+
 class BrazilData:
     """Unified developer SDK facade for querying, normalizing, and enriching Brazilian public datasets."""
 
@@ -913,6 +965,7 @@ class BrazilData:
         self.socioeconomic = SocioeconomicFacade(self)
         self.labor = LaborFacade(self)
         self.health = HealthFacade(self)
+        self.education = EducationFacade(self)
 
     def list_sources(
         self,
@@ -1336,6 +1389,38 @@ class BrazilData:
     ) -> list[dict[str, Any]]:
         """Listar polos hospitalares líderes em complexidade assistencial SIH/SUS no Brasil."""
         return self.health.list_top_sih_complexity_hubs(
+            limit=limit, sigla_uf=sigla_uf
+        )
+
+    def get_censo_escolar_infrastructure(self, id_municipio: str) -> dict[str, Any]:
+        """Consultar inventário de escolas ativas, banda larga, laboratórios e acessibilidade PcD (INEP Censo Escolar)."""
+        return self.education.get_censo_escolar_infrastructure(id_municipio)
+
+    def list_censo_escolar_enrollments(
+        self, id_municipio: str, etapa_ensino: str | None = None
+    ) -> list[dict[str, Any]]:
+        """Listar matrículas municipais da educação básica por etapa/modalidade e tempo integral (INEP Censo Escolar)."""
+        return self.education.list_censo_escolar_enrollments(
+            id_municipio, etapa_ensino=etapa_ensino
+        )
+
+    def get_censo_escolar_teachers(self, id_municipio: str) -> dict[str, Any]:
+        """Consultar qualificação docente, formação superior, pós-graduação e indicador AFD por município (INEP)."""
+        return self.education.get_censo_escolar_teachers(id_municipio)
+
+    def get_censo_escolar_yield_flow(self, id_municipio: str) -> dict[str, Any]:
+        """Consultar rendimento escolar (aprovação, reprovação, abandono) e distorção idade-série no município (INEP)."""
+        return self.education.get_censo_escolar_yield_flow(id_municipio)
+
+    def get_censo_escolar_features(self, id_municipio: str) -> dict[str, Any]:
+        """Consultar features Gold de infraestrutura escolar e qualidade do fluxo educacional básico (INEP)."""
+        return self.education.get_censo_escolar_features(id_municipio)
+
+    def list_top_censo_escolar_municipalities(
+        self, limit: int = 10, sigla_uf: str | None = None
+    ) -> list[dict[str, Any]]:
+        """Listar municípios líderes em infraestrutura escolar e qualidade educacional básica no Brasil (INEP)."""
+        return self.education.list_top_censo_escolar_municipalities(
             limit=limit, sigla_uf=sigla_uf
         )
 
