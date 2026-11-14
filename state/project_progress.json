@@ -1,6 +1,6 @@
 {
   "schema_version": "1.0.0",
-  "last_updated": "2026-11-10T18:55:00.000000",
+  "last_updated": "2026-11-13T20:20:00.000000",
   "project_name": "public-data-gateway",
   "ecosystem": "C.O.R.E. (core, operations, career, studies)",
   "governing_pops": [
@@ -12,11 +12,11 @@
     "POP_T_074",
     "POP_T_148"
   ],
-  "current_macro_phase_id": "06",
-  "current_macro_phase": "Fase 06 - Ingestão Wave 4 em Andamento (Censo, Trabalho, Logística & Telecom: ibge_sidra, ibge_censo2022, mte_novo_caged, ibge_pnad_continua, ibge_pib_municipal, mte_rais, ibge_malhas e anatel_mosaico homologados)",
+  "current_macro_phase_id": "07",
+  "current_macro_phase": "Fase 07 - Ingestão Wave 5 (Saúde, Educação & Setor Notarial — Wave 4 100% Concluída com antt_malha_transporte homologado; Próximo: datasus_cnes)",
   "overall_status": "ON_TRACK",
-  "active_connector": "antt_malha_transporte",
-  "next_connector": "datasus_cnes",
+  "active_connector": "datasus_cnes",
+  "next_connector": "datasus_sih",
   "structural_phases": [
     {
       "phase_id": "00",
@@ -110,8 +110,8 @@
     {
       "phase_id": "06",
       "name": "Ingestão Wave 4 — Censo, Trabalho, Logística & Telecom",
-      "status": "IN_PROGRESS",
-      "completion_date": null,
+      "status": "COMPLETED",
+      "completion_date": "2026-11-13",
       "deliverables": [
         "Conector ibge_sidra (PIB municipal, Censo demográfico, PAM, IPCA e Gini) - CONCLUÍDO",
         "Conector ibge_censo2022 (Microdados, Domicílios, Estrutura Etária, Alfabetização, Diversidade) - CONCLUÍDO",
@@ -122,13 +122,13 @@
         "Conector ibge_malhas (Malhas Territoriais Vetoriais - Municípios, UFs, Regiões) - CONCLUÍDO",
         "Conector ibge_cnefe (Endereçamento Estatístico CNEFE - Censo 2022) - CONCLUÍDO",
         "Conector anatel_mosaico (Sistema Mosaico ERBs, Banda Larga SCM, Espectro & 5G) - CONCLUÍDO",
-        "Conector antt_malha_transporte (Malha Rodoviária e Ferroviária de Cargas - Próximo)"
+        "Conector antt_malha_transporte (Malha Rodoviária, RNTRC, Ferroviária e Matriz Modal) - CONCLUÍDO"
       ]
     },
     {
       "phase_id": "07",
       "name": "Ingestão Wave 5 — Saúde, Educação & Setor Notarial",
-      "status": "PENDING",
+      "status": "IN_PROGRESS",
       "completion_date": null,
       "deliverables": [
         "Conectores DataSUS (CNES, SIH, SIM, SINASC, OpenDataSUS) & anvisa_cmed",
@@ -383,9 +383,21 @@
       "phase_id": "06",
       "milestone": "Homologação do Conector anatel_mosaico (4 Tabelas, dbt, Mart Conectividade 5G & Live Fail-Hard)",
       "summary": "Implementação e homologação completa do conector anatel_mosaico (ANATEL: Sistema Mosaico de Estações e Cobertura de Telecomunicações, Leis nº 9.472/1997, 13.116/2015, Resolução ANATEL nº 719/2020 e Decreto nº 8.777/2016) consolidando o nono conector da Wave 4 e 27º conector total da plataforma (55.1% do catálogo homologado): 4 tabelas Silver (mosaico_estacoes_smp, mosaico_banda_larga_scm, mosaico_espectro_radiofrequencia, mosaico_cobertura_setores) e Gold Feature Store materializadas em data/anatel_mosaico/{silver,gold}/; 7 novos modelos dbt (4 staging views, fct_anatel_infraestrutura_telecom_municipio, fct_anatel_alocacao_espectro_municipio, mart_conectividade_digital_telecom_brasil) totalizando 250 modelos dbt e 182 testes seletivos do build 100% aprovados com 0 erros; 3.125 colunas 100% documentadas no linter (100% coverage); feature store features_telecom_conectividade_municipios_brasil.parquet gerada com score de conectividade digital (0 a 100), score de maturidade 5G e tier de infraestrutura; testes reais com fail-hard estrito contra os portais oficiais da ANATEL com 9 testes pytest aprovados; multi-interface completa via SDK (BrazilData.geo.anatel_connector, get_telecom_stations, get_broadband_profile, list_spectrum_allocations, get_telecom_features, list_top_connected_municipalities), CLI (bdg anatel stations/broadband/spectrum/features/ranking), REST API (/api/v1/geo/anatel/* e atalho /api/v1/anatel/*) e MCP (bdg_get_anatel_stations, bdg_get_anatel_broadband, bdg_get_anatel_telecom_features, bdg_list_top_connected_municipalities) com contenção de prompt injection wrap_untrusted_gov_data."
+    },
+    {
+      "date": "2026-11-13",
+      "phase_id": "06",
+      "milestone": "Conclusão da Wave 4 & Homologação do Conector antt_malha_transporte (4 Tabelas, dbt, Mart Logística Intermodal & Live Fail-Hard)",
+      "summary": "Implementação e homologação completa do conector antt_malha_transporte (ANTT: Malha de Transporte Rodoviário e Ferroviário de Cargas, Leis nº 10.233/2001, 11.442/2007, Resolução ANTT nº 5.982/2022 e Decreto nº 8.777/2016) consolidando o décimo conector da Wave 4 (100% da Wave 4 concluída) e 28º conector total da plataforma (57.1% do catálogo homologado): 4 tabelas Silver (antt_corredores_rodoviarios, antt_frota_rntrc_municipio, antt_malha_ferroviaria_terminais, antt_fluxo_logistico_modal) e Gold Feature Store (features_malha_transporte_logistica_municipios_brasil.parquet) materializadas em data/antt_malha_transporte/{silver,gold}/; 7 novos modelos dbt (4 staging views, fct_antt_infraestrutura_logistica_municipio, fct_antt_matriz_modal_cargas_municipio, mart_logistica_corredores_transporte_brasil) totalizando 257 modelos dbt e 175 checks seletivos do build 100% aprovados com 0 erros; 3.258 colunas 100% documentadas no linter (100% coverage); scores normalizados (0 a 100) de infraestrutura logística e intermodalidade; 8 testes offline e 1 teste live fail-hard contra os portais oficiais da ANTT aprovados; multi-interface completa via SDK (BrazilData.geo.antt_connector, get_highway_corridors, get_rntrc_fleet_profile, get_rail_intermodal_terminals, list_modal_flows, get_logistics_features, list_top_logistics_hubs), CLI (bdg antt highways/rntrc/rail/modals/features/ranking), REST API (/api/v1/geo/antt/* e atalho /api/v1/antt/*) e MCP (bdg_get_antt_highway_corridors, bdg_get_antt_rntrc_fleet, bdg_get_antt_logistics_features, bdg_list_top_logistics_hubs) com contenção de prompt injection wrap_untrusted_gov_data."
     }
   ],
   "recent_milestones": [
+    {
+      "date": "2026-11-13",
+      "phase_id": "06",
+      "milestone": "Conclusão da Wave 4 & Homologação do Conector antt_malha_transporte (4 Tabelas, dbt, Mart Logística Intermodal & Live Fail-Hard)",
+      "summary": "Implementação e homologação completa do conector antt_malha_transporte (ANTT: Malha de Transporte Rodoviário e Ferroviário de Cargas, Leis nº 10.233/2001, 11.442/2007, Resolução ANTT nº 5.982/2022 e Decreto nº 8.777/2016) consolidando o décimo conector da Wave 4 (100% da Wave 4 concluída) e 28º conector total da plataforma (57.1% do catálogo homologado): 4 tabelas Silver (antt_corredores_rodoviarios, antt_frota_rntrc_municipio, antt_malha_ferroviaria_terminais, antt_fluxo_logistico_modal) e Gold Feature Store (features_malha_transporte_logistica_municipios_brasil.parquet) materializadas em data/antt_malha_transporte/{silver,gold}/; 7 novos modelos dbt (4 staging views, fct_antt_infraestrutura_logistica_municipio, fct_antt_matriz_modal_cargas_municipio, mart_logistica_corredores_transporte_brasil) totalizando 257 modelos dbt e 175 checks seletivos do build 100% aprovados com 0 erros; 3.258 colunas 100% documentadas no linter (100% coverage); scores normalizados (0 a 100) de infraestrutura logística e intermodalidade; 8 testes offline e 1 teste live fail-hard contra os portais oficiais da ANTT aprovados; multi-interface completa via SDK (BrazilData.geo.antt_connector, get_highway_corridors, get_rntrc_fleet_profile, get_rail_intermodal_terminals, list_modal_flows, get_logistics_features, list_top_logistics_hubs), CLI (bdg antt highways/rntrc/rail/modals/features/ranking), REST API (/api/v1/geo/antt/* e atalho /api/v1/antt/*) e MCP (bdg_get_antt_highway_corridors, bdg_get_antt_rntrc_fleet, bdg_get_antt_logistics_features, bdg_list_top_logistics_hubs) com contenção de prompt injection wrap_untrusted_gov_data."
+    },
     {
       "date": "2026-11-10",
       "phase_id": "06",

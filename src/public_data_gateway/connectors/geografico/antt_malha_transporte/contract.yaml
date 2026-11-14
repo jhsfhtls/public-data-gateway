@@ -1,0 +1,479 @@
+schema_version: "3.1.0"
+contract_id: "ODCS-BR-ANTT-MALHA-001"
+source_id: "antt_malha_transporte"
+version: "1.0.0"
+name: "ANTT: Malha de Transporte Rodoviário e Ferroviário de Cargas"
+agency: "Agência Nacional de Transportes Terrestres (ANTT)"
+official_url: "https://dados.antt.gov.br/"
+
+legal_framework:
+  statutes:
+    - name: "Lei nº 10.233/2001"
+      description: "Dispõe sobre a reestruturação dos transportes aquaviário e terrestre e cria a ANTT"
+    - name: "Lei nº 11.442/2007"
+      description: "Dispõe sobre o transporte rodoviário de cargas por conta de terceiros e mediante remuneração (RNTRC)"
+    - name: "Resolução ANTT nº 5.982/2022"
+      description: "Regulamenta os procedimentos para inscrição e manutenção no Registro Nacional de Transportadores Rodoviários de Cargas (RNTRC)"
+    - name: "Decreto nº 8.777/2016"
+      description: "Institui a Política de Dados Abertos do Poder Executivo Federal"
+
+data_governance:
+  grain: "municipio_malha_logistica"
+  primary_keys:
+    - "id_municipio"
+    - "sigla_uf"
+  reference_date_column: "reference_date"
+  min_expected_rows: 5
+  max_volume_drop_pct: 15.0
+  freshness_sla_hours: 2160
+  lgpd_tier: "PUBLIC_NON_PERSONAL"
+  ml_feature_domains:
+    - "freight_corridors"
+    - "transport_nodes"
+    - "intermodal_logistics"
+    - "rntrc_fleet"
+
+schema:
+  tables:
+    antt_corredores_rodoviarios:
+      description: "Corredores rodoviários federais, trechos concedidos à iniciativa privada pela ANTT, praças de pedágio e fluxo estimado de veículos pesados por município"
+      grain: "id_municipio, ano_referencia"
+      primary_keys: ["id_municipio", "ano_referencia"]
+      min_expected_rows: 5
+      columns:
+        - name: "id_municipio"
+          data_type: "string"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Código IBGE de 7 dígitos identificador único do município"
+        - name: "nome_municipio"
+          data_type: "string"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Nome oficial do município"
+        - name: "sigla_uf"
+          data_type: "string"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Sigla de 2 letras da Unidade Federativa"
+        - name: "id_uf"
+          data_type: "string"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Código IBGE de 2 dígitos da Unidade Federativa"
+        - name: "ano_referencia"
+          data_type: "integer"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Ano de referência da consolidação da malha rodoviária"
+        - name: "rodovias_federais_principais"
+          data_type: "string"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Relação das principais rodovias federais (BRs) que cruzam ou atendem o município"
+        - name: "extensao_malha_federal_km"
+          data_type: "double"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Extensão da malha rodoviária federal de influência municipal em quilômetros"
+        - name: "trechos_concedidos_antt_km"
+          data_type: "double"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Extensão em quilômetros sob regime de concessão rodoviária regulada pela ANTT"
+        - name: "proporcao_malha_concedida_pct"
+          data_type: "double"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Percentual da malha federal de influência operada via concessão ANTT"
+        - name: "pracas_pedagio_ativas"
+          data_type: "integer"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Quantidade de praças de pedágio ativas no entorno logístico imediato"
+        - name: "volume_medio_diario_vmd_pesados"
+          data_type: "integer"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Volume Médio Diário (VMD) estimado de veículos comerciais pesados"
+        - name: "fluxo_anual_cargas_estimado_ton"
+          data_type: "double"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Volume anual estimado de movimentação rodoviária de cargas em toneladas"
+        - name: "source_url"
+          data_type: "string"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "URL oficial do portal de dados abertos da ANTT"
+        - name: "reference_date"
+          data_type: "string"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Data de referência ISO-8601"
+        - name: "extracted_at"
+          data_type: "string"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Timestamp ISO-8601 UTC da extração"
+
+    antt_frota_rntrc_municipio:
+      description: "Cadastro de transportadores (ETC, TAC, CTC) e frota de veículos pesados habilitados no RNTRC por município"
+      grain: "id_municipio, ano_referencia"
+      primary_keys: ["id_municipio", "ano_referencia"]
+      min_expected_rows: 5
+      columns:
+        - name: "id_municipio"
+          data_type: "string"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Código IBGE de 7 dígitos do município"
+        - name: "nome_municipio"
+          data_type: "string"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Nome oficial do município"
+        - name: "sigla_uf"
+          data_type: "string"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Sigla de 2 letras da Unidade Federativa"
+        - name: "ano_referencia"
+          data_type: "integer"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Ano de referência do registro RNTRC"
+        - name: "total_transportadores_rntrc"
+          data_type: "integer"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Total de transportadores ativos inscritos no RNTRC no município"
+        - name: "transportadores_etc_empresas"
+          data_type: "integer"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Empresas de Transporte Rodoviário de Cargas (ETC) ativas"
+        - name: "transportadores_tac_autonomos"
+          data_type: "integer"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Transportadores Autônomos de Cargas (TAC) ativos"
+        - name: "transportadores_ctc_cooperativas"
+          data_type: "integer"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Cooperativas de Transporte Rodoviário de Cargas (CTC) ativas"
+        - name: "frota_veiculos_habilitados"
+          data_type: "integer"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Total de veículos de carga e implementos habilitados no RNTRC"
+        - name: "capacidade_estatica_total_ton"
+          data_type: "double"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Capacidade estática agregada da frota habilitada em toneladas"
+        - name: "idade_media_frota_anos"
+          data_type: "double"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Idade média estimada dos veículos habilitados em anos"
+        - name: "source_url"
+          data_type: "string"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "URL oficial do portal de dados abertos da ANTT"
+        - name: "reference_date"
+          data_type: "string"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Data de referência ISO-8601"
+        - name: "extracted_at"
+          data_type: "string"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Timestamp ISO-8601 UTC da extração"
+
+    antt_malha_ferroviaria_terminais:
+      description: "Infraestrutura de malha ferroviária concedida, terminais de transbordo intermodal e movimentação em toneladas úteis (TU)"
+      grain: "id_municipio, ano_referencia"
+      primary_keys: ["id_municipio", "ano_referencia"]
+      min_expected_rows: 5
+      columns:
+        - name: "id_municipio"
+          data_type: "string"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Código IBGE de 7 dígitos do município"
+        - name: "nome_municipio"
+          data_type: "string"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Nome oficial do município"
+        - name: "sigla_uf"
+          data_type: "string"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Sigla de 2 letras da Unidade Federativa"
+        - name: "ano_referencia"
+          data_type: "integer"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Ano de referência do acompanhamento ferroviário"
+        - name: "possui_conexao_ferroviaria"
+          data_type: "boolean"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Indicador booleano de integração direta com malha ferroviária de cargas"
+        - name: "concessionarias_ferroviarias"
+          data_type: "string"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Concessionárias ferroviárias operantes no corredor ou NENHUMA quando ausente"
+        - name: "extensao_ferroviaria_km"
+          data_type: "double"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Extensão da malha ferroviária de carga associada ao município em quilômetros"
+        - name: "terminais_carga_intermodal"
+          data_type: "integer"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Número de terminais ferroviários ou retroportuários de transbordo intermodal"
+        - name: "movimentacao_ferroviaria_anual_tu"
+          data_type: "double"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Movimentação ferroviária anual estimada em toneladas úteis (TU)"
+        - name: "principais_mercadorias_ferrovia"
+          data_type: "string"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Principais grupos de mercadorias movimentadas no corredor ferroviário"
+        - name: "source_url"
+          data_type: "string"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "URL oficial do portal de dados abertos da ANTT"
+        - name: "reference_date"
+          data_type: "string"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Data de referência ISO-8601"
+        - name: "extracted_at"
+          data_type: "string"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Timestamp ISO-8601 UTC da extração"
+
+    antt_fluxo_logistico_modal:
+      description: "Matriz modal comparativa de escoamento de cargas, custo logístico e confiabilidade operacional por município e modal"
+      grain: "id_municipio, modal_transporte"
+      primary_keys: ["id_municipio", "modal_transporte"]
+      min_expected_rows: 5
+      columns:
+        - name: "id_municipio"
+          data_type: "string"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Código IBGE de 7 dígitos do município"
+        - name: "nome_municipio"
+          data_type: "string"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Nome oficial do município"
+        - name: "sigla_uf"
+          data_type: "string"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Sigla de 2 letras da Unidade Federativa"
+        - name: "modal_transporte"
+          data_type: "string"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Modal de transporte de cargas (Rodoviario, Ferroviario, Hidroviario/Cabotagem)"
+        - name: "participacao_modal_cargas_pct"
+          data_type: "double"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Participação percentual do modal na matriz de cargas do polo"
+        - name: "custo_tonelada_km_brl"
+          data_type: "double"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Custo logístico médio estimado por tonelada-quilômetro em reais (R$)"
+        - name: "velocidade_media_comercial_kmh"
+          data_type: "double"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Velocidade comercial média nos corredores do modal em km/h"
+        - name: "indice_confiabilidade_corredor"
+          data_type: "double"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Índice composto de confiabilidade e regularidade operacional do modal (0 a 100)"
+        - name: "source_url"
+          data_type: "string"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "URL oficial do portal de dados abertos da ANTT"
+        - name: "reference_date"
+          data_type: "string"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Data de referência ISO-8601"
+        - name: "extracted_at"
+          data_type: "string"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Timestamp ISO-8601 UTC da extração"
+
+    features_malha_transporte_logistica_municipios_brasil:
+      description: "Gold Feature Store consolidando extensão concedida, frota RNTRC, intermodalidade ferroviária e scores logísticos municipais"
+      grain: "id_municipio"
+      primary_keys: ["id_municipio"]
+      min_expected_rows: 5
+      columns:
+        - name: "id_municipio"
+          data_type: "string"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Código IBGE de 7 dígitos do município"
+        - name: "sigla_uf"
+          data_type: "string"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Sigla de 2 letras da Unidade Federativa"
+        - name: "nome_municipio"
+          data_type: "string"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Nome oficial do município"
+        - name: "extensao_malha_federal_km"
+          data_type: "double"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Extensão da malha rodoviária federal de influência municipal em km"
+        - name: "proporcao_malha_concedida_pct"
+          data_type: "double"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Percentual de extensão federal sob concessão regulada pela ANTT"
+        - name: "volume_medio_diario_vmd_pesados"
+          data_type: "integer"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Volume médio diário de veículos pesados nos corredores do município"
+        - name: "total_transportadores_rntrc"
+          data_type: "integer"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Total de transportadores ativos registrados no RNTRC"
+        - name: "frota_veiculos_habilitados"
+          data_type: "integer"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Quantidade de veículos habilitados para transporte de cargas no RNTRC"
+        - name: "possui_conexao_ferroviaria"
+          data_type: "boolean"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Indicador booleano de conectividade direta à malha ferroviária"
+        - name: "terminais_carga_intermodal"
+          data_type: "integer"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Total de terminais intermodais de transbordo integrados ao polo"
+        - name: "score_infraestrutura_logistica"
+          data_type: "double"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Score composto de capacidade e infraestrutura logística terrestre normalizado de 0 a 100"
+        - name: "score_intermodalidade_cargas"
+          data_type: "double"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Score de integração rodoferroviária e hidroviária de cargas normalizado de 0 a 100"
+        - name: "classificacao_nodo_logistico"
+          data_type: "string"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Classificação estratégica do polo logístico (HUB_LOGISTICO_INTERMODAL_NACIONAL, CORREDOR_RODOFERROVIARIO_CONSOLIDADO, POLO_RODOVIARIO_REGIONAL, ACESSO_LOGISTICO_SECUNDARIO)"
+        - name: "reference_date"
+          data_type: "string"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Data de referência ISO-8601 da apuração"
+        - name: "extracted_at"
+          data_type: "string"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Timestamp ISO-8601 UTC da geração da Feature Store"

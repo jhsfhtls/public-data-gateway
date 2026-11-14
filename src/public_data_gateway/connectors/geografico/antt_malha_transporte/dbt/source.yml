@@ -1,0 +1,16 @@
+version: 2
+
+sources:
+  - name: antt_malha_transporte_silver
+    description: "Bases oficiais da ANTT (Concessões Rodoviárias, RNTRC, SAFF/Ferrovias e Matriz Modal) normalizadas na camada Silver."
+    meta:
+      external_location: "data/antt_malha_transporte/silver/{name}.parquet"
+    tables:
+      - name: antt_corredores_rodoviarios
+        description: "Corredores rodoviários federais, trechos concedidos pela ANTT, praças de pedágio e VMD de veículos pesados por município."
+      - name: antt_frota_rntrc_municipio
+        description: "Cadastro Nacional de Transportadores Rodoviários de Cargas (RNTRC), transportadores ETC/TAC/CTC, frota e capacidade por município."
+      - name: antt_malha_ferroviaria_terminais
+        description: "Conectividade ferroviária, concessionárias, extensão de linhas, terminais intermodais e movimentação anual em TKU/TU por município."
+      - name: antt_fluxo_logistico_modal
+        description: "Matriz modal de escoamento de cargas (Rodoviário, Ferroviário e Hidroviário/Cabotagem), custo por TKU, velocidade comercial e confiabilidade."

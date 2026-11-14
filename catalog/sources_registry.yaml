@@ -743,7 +743,7 @@ sources:
   - P09
   rice_score: 500
   roadmap_wave: 4
-  status: CATALOGED
+  status: HOMOLOGATED
 - source_id: datasus_cnes
   name: 'DataSUS: Cadastro Nacional de Estabelecimentos de Saúde (CNES)'
   agency: Ministério da Saúde / DataSUS

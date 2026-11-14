@@ -154,6 +154,48 @@ class GeoFacade:
             limit=limit, sigla_uf=sigla_uf
         )
 
+    @property
+    def antt_connector(self) -> Any:
+        if not hasattr(self, "_antt_conn") or self._antt_conn is None:
+            from public_data_gateway.connectors.geografico.antt_malha_transporte import (
+                AnttMalhaTransporteConnector,
+            )
+
+            self._antt_conn = AnttMalhaTransporteConnector(settings=self._sdk.settings)
+        return self._antt_conn
+
+    def get_highway_corridors(self, id_municipio: str) -> dict[str, Any]:
+        """Get federal highway corridors, concessions, tolls and heavy VMD (ANTT)."""
+        return self.antt_connector.get_highway_corridors(id_municipio)
+
+    def get_rntrc_fleet_profile(self, id_municipio: str) -> dict[str, Any]:
+        """Get RNTRC freight carrier registry (ETC/TAC/CTC) and fleet capacity (ANTT)."""
+        return self.antt_connector.get_rntrc_fleet_profile(id_municipio)
+
+    def get_rail_intermodal_terminals(self, id_municipio: str) -> dict[str, Any]:
+        """Get rail connectivity, intermodal cargo terminals and rail volumes (ANTT)."""
+        return self.antt_connector.get_rail_intermodal_terminals(id_municipio)
+
+    def list_modal_flows(
+        self, id_municipio: str, modal_transporte: str | None = None
+    ) -> list[dict[str, Any]]:
+        """List freight modal split (road/rail/waterway), TKU cost and reliability (ANTT)."""
+        return self.antt_connector.list_modal_flows(
+            id_municipio, modal_transporte=modal_transporte
+        )
+
+    def get_logistics_features(self, id_municipio: str) -> dict[str, Any]:
+        """Get logistics infrastructure and intermodality features from the Gold Feature Store."""
+        return self.antt_connector.get_logistics_features(id_municipio)
+
+    def list_top_logistics_hubs(
+        self, limit: int = 10, sigla_uf: str | None = None
+    ) -> list[dict[str, Any]]:
+        """List top municipalities ranked by composite ANTT logistics infrastructure score."""
+        return self.antt_connector.list_top_logistics_hubs(
+            limit=limit, sigla_uf=sigla_uf
+        )
+
 
 class ProcurementFacade:
     """Public procurement query interface powered by PNCP (Lei nº 14.133/2021)."""
@@ -1100,6 +1142,36 @@ class BrazilData:
     ) -> list[dict[str, Any]]:
         """Listar municípios com maior score de conectividade digital no Brasil (ANATEL Mosaico)."""
         return self.geo.list_top_connected_municipalities(limit=limit, sigla_uf=sigla_uf)
+
+    def get_highway_corridors(self, id_municipio: str) -> dict[str, Any]:
+        """Consultar corredores rodoviários federais, concessões ANTT, pedágios e VMD de pesados (ANTT)."""
+        return self.geo.get_highway_corridors(id_municipio)
+
+    def get_rntrc_fleet_profile(self, id_municipio: str) -> dict[str, Any]:
+        """Consultar cadastro RNTRC de transportadores (ETC/TAC/CTC), frota habilitada e capacidade (ANTT)."""
+        return self.geo.get_rntrc_fleet_profile(id_municipio)
+
+    def get_rail_intermodal_terminals(self, id_municipio: str) -> dict[str, Any]:
+        """Consultar conectividade ferroviária, concessionárias e terminais intermodais de carga (ANTT)."""
+        return self.geo.get_rail_intermodal_terminals(id_municipio)
+
+    def list_modal_flows(
+        self, id_municipio: str, modal_transporte: str | None = None
+    ) -> list[dict[str, Any]]:
+        """Listar repartição modal de cargas, custo por TKU e confiabilidade do corredor (ANTT)."""
+        return self.geo.list_modal_flows(
+            id_municipio, modal_transporte=modal_transporte
+        )
+
+    def get_logistics_features(self, id_municipio: str) -> dict[str, Any]:
+        """Consultar features Gold de infraestrutura logística e intermodalidade municipal (ANTT)."""
+        return self.geo.get_logistics_features(id_municipio)
+
+    def list_top_logistics_hubs(
+        self, limit: int = 10, sigla_uf: str | None = None
+    ) -> list[dict[str, Any]]:
+        """Listar municípios líderes em score de infraestrutura logística e intermodalidade no Brasil (ANTT)."""
+        return self.geo.list_top_logistics_hubs(limit=limit, sigla_uf=sigla_uf)
 
     def get_municipal_gdp_detail(self, id_municipio: str, year: int = 2023) -> dict[str, Any] | None:
         """Consultar contas econômicas municipais detalhadas (PIB, VAB setorial, impostos e participações) do IBGE."""

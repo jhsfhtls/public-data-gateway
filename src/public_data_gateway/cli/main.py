@@ -598,6 +598,39 @@ def build_parser() -> argparse.ArgumentParser:
     anatel_rk_p.add_argument("--uf", type=str, help="Optional 2-letter state filter")
     anatel_rk_p.add_argument("--json", action="store_true", help="Output in JSON format")
 
+    # Transporte e Logística de Cargas (ANTT Malha Rodoviária, RNTRC e Ferroviária)
+    antt_p = subparsers.add_parser(
+        "antt",
+        help="Query official ANTT highway corridors, RNTRC freight fleet, rail terminals and intermodal logistics scores.",
+    )
+    antt_sub = antt_p.add_subparsers(dest="antt_action", required=True)
+
+    antt_hw_p = antt_sub.add_parser("highways", help="Query federal highway corridors, ANTT concessions and heavy vehicle traffic (VMD).")
+    antt_hw_p.add_argument("id_municipio", type=str, help="IBGE 7-digit municipality code")
+    antt_hw_p.add_argument("--json", action="store_true", help="Output in JSON format")
+
+    antt_rn_p = antt_sub.add_parser("rntrc", help="Query RNTRC registered freight carriers (ETC/TAC/CTC) and fleet capacity.")
+    antt_rn_p.add_argument("id_municipio", type=str, help="IBGE 7-digit municipality code")
+    antt_rn_p.add_argument("--json", action="store_true", help="Output in JSON format")
+
+    antt_rl_p = antt_sub.add_parser("rail", help="Query rail freight connectivity, concessions and intermodal terminals.")
+    antt_rl_p.add_argument("id_municipio", type=str, help="IBGE 7-digit municipality code")
+    antt_rl_p.add_argument("--json", action="store_true", help="Output in JSON format")
+
+    antt_md_p = antt_sub.add_parser("modals", help="List freight modal share, TKU cost and corridor reliability.")
+    antt_md_p.add_argument("id_municipio", type=str, help="IBGE 7-digit municipality code")
+    antt_md_p.add_argument("--modal", type=str, help="Optional modal filter (e.g. Ferroviario, Rodoviario)")
+    antt_md_p.add_argument("--json", action="store_true", help="Output in JSON format")
+
+    antt_ft_p = antt_sub.add_parser("features", help="Query Gold logistics infrastructure and intermodality features.")
+    antt_ft_p.add_argument("id_municipio", type=str, help="IBGE 7-digit municipality code")
+    antt_ft_p.add_argument("--json", action="store_true", help="Output in JSON format")
+
+    antt_rk_p = antt_sub.add_parser("ranking", help="List top municipalities ranked by composite ANTT logistics score.")
+    antt_rk_p.add_argument("--limit", type=int, default=10, help="Max municipalities to list")
+    antt_rk_p.add_argument("--uf", type=str, help="Optional 2-letter state filter")
+    antt_rk_p.add_argument("--json", action="store_true", help="Output in JSON format")
+
     # Direct shortcut: pnad-uf
     pnad_s_p = subparsers.add_parser("pnad-uf", help="Shortcut to query PNAD Contínua labor market profile.")
     pnad_s_p.add_argument("uf", type=str, help="IBGE 2-digit UF code or 2-letter state abbreviation (e.g. SP, 35)")
@@ -2054,6 +2087,83 @@ def main(argv: Sequence[str] | None = None) -> int:
                     print(f"Top {len(ranks)} Municípios por Conectividade Digital (ANATEL Mosaico):")
                     for idx, r in enumerate(ranks, 1):
                         print(f"  {idx}. {r.get('nome_municipio')} ({r.get('sigla_uf')}): Score {r.get('score_conectividade_digital')} | 5G: {r.get('score_maturidade_5g')} | {r.get('classificacao_infraestrutura_telecom')}")
+                return 0
+
+        elif args.command == "antt":
+            from public_data_gateway.connectors.geografico.antt_malha_transporte.connector import (
+                AnttMalhaTransporteConnector,
+            )
+
+            antt_conn = AnttMalhaTransporteConnector(settings=settings)
+            antt_action = getattr(args, "antt_action", None)
+
+            if antt_action == "highways":
+                res = antt_conn.get_highway_corridors(args.id_municipio)
+                if getattr(args, "json", False):
+                    print(json.dumps(res, indent=2, ensure_ascii=False, default=str))
+                else:
+                    print(f"ANTT Corredores Rodoviários ({res.get('nome_municipio')} - {res.get('id_municipio')}):")
+                    print(f"  Rodovias BRs:        {res.get('rodovias_federais_principais')}")
+                    print(f"  Malha / Concedida:   {res.get('extensao_malha_federal_km')} km ({res.get('proporcao_malha_concedida_pct')}% concedida)")
+                    print(f"  Praças de Pedágio:   {res.get('pracas_pedagio_ativas')}")
+                    print(f"  VMD Veículos Pesados:{res.get('volume_medio_diario_vmd_pesados')}/dia")
+                return 0
+
+            if antt_action == "rntrc":
+                res = antt_conn.get_rntrc_fleet_profile(args.id_municipio)
+                if getattr(args, "json", False):
+                    print(json.dumps(res, indent=2, ensure_ascii=False, default=str))
+                else:
+                    print(f"ANTT Cadastro RNTRC ({res.get('nome_municipio')} - {res.get('id_municipio')}):")
+                    print(f"  Transportadores:     {res.get('total_transportadores_rntrc')} (ETC: {res.get('transportadores_etc_empresas')}, TAC: {res.get('transportadores_tac_autonomos')}, CTC: {res.get('transportadores_ctc_cooperativas')})")
+                    print(f"  Frota Habilitada:    {res.get('frota_veiculos_habilitados')} veículos")
+                    print(f"  Capacidade Estática: {res.get('capacidade_estatica_total_ton')} ton (Idade média: {res.get('idade_media_frota_anos')} anos)")
+                return 0
+
+            if antt_action == "rail":
+                res = antt_conn.get_rail_intermodal_terminals(args.id_municipio)
+                if getattr(args, "json", False):
+                    print(json.dumps(res, indent=2, ensure_ascii=False, default=str))
+                else:
+                    print(f"ANTT Malha Ferroviária & Terminais ({res.get('nome_municipio')} - {res.get('id_municipio')}):")
+                    print(f"  Conexão Ferroviária: {res.get('possui_conexao_ferroviaria')} ({res.get('concessionarias_ferroviarias')})")
+                    print(f"  Extensão / Terminais:{res.get('extensao_ferroviaria_km')} km | {res.get('terminais_carga_intermodal')} terminais intermodais")
+                    print(f"  Movimentação Anual:  {res.get('movimentacao_ferroviaria_anual_tu')} mil TU")
+                return 0
+
+            if antt_action == "modals":
+                rows = antt_conn.list_modal_flows(
+                    args.id_municipio, modal_transporte=getattr(args, "modal", None)
+                )
+                if getattr(args, "json", False):
+                    print(json.dumps(rows, indent=2, ensure_ascii=False, default=str))
+                else:
+                    print(f"ANTT Matriz Modal de Cargas ({args.id_municipio}):")
+                    for r in rows:
+                        print(f"  - {r.get('modal_transporte')}: {r.get('participacao_modal_cargas_pct')}% | R$ {r.get('custo_tonelada_km_brl')}/TKU | {r.get('velocidade_media_comercial_kmh')} km/h | Confiabilidade {r.get('indice_confiabilidade_corredor')}")
+                return 0
+
+            if antt_action == "features":
+                feat = antt_conn.get_logistics_features(args.id_municipio)
+                if getattr(args, "json", False):
+                    print(json.dumps(feat, indent=2, ensure_ascii=False, default=str))
+                else:
+                    print(f"ANTT Features Logísticas: {feat.get('nome_municipio')} ({feat.get('sigla_uf')} - {feat.get('id_municipio')}):")
+                    print(f"  Score Infra Logística:{feat.get('score_infraestrutura_logistica')}/100.0")
+                    print(f"  Score Intermodalidade:{feat.get('score_intermodalidade_cargas')}/100.0")
+                    print(f"  Classificação Nó:     {feat.get('classificacao_nodo_logistico')}")
+                return 0
+
+            if antt_action == "ranking":
+                ranks = antt_conn.list_top_logistics_hubs(
+                    limit=getattr(args, "limit", 10), sigla_uf=getattr(args, "uf", None)
+                )
+                if getattr(args, "json", False):
+                    print(json.dumps(ranks, indent=2, ensure_ascii=False, default=str))
+                else:
+                    print(f"Top {len(ranks)} Municípios por Infraestrutura Logística (ANTT):")
+                    for idx, r in enumerate(ranks, 1):
+                        print(f"  {idx}. {r.get('nome_municipio')} ({r.get('sigla_uf')}): Score {r.get('score_infraestrutura_logistica')} | Intermodal: {r.get('score_intermodalidade_cargas')} | {r.get('classificacao_nodo_logistico')}")
                 return 0
 
         elif args.command == "pib-municipal":
