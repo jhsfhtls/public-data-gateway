@@ -445,6 +445,19 @@ class JudicialFacade:
             limit=limit, sigla_uf=sigla_uf
         )
 
+    @property
+    def onr_connector(self) -> Any:
+        if (
+            not hasattr(self, "_onr_connector")
+            or getattr(self, "_onr_connector", None) is None
+        ):
+            from public_data_gateway.connectors.imobiliario.onr_registro_imoveis.connector import (
+                ONRRegistroImoveisConnector,
+            )
+
+            self._onr_connector = ONRRegistroImoveisConnector(settings=self._sdk.settings)
+        return self._onr_connector
+
 
 class CompanyFacade:
     """Corporate registries, tax regimes, and regional fiscal incentives (RFB & SUFRAMA)."""
@@ -1202,6 +1215,56 @@ class EducationFacade:
         )
 
 
+class RealEstateFacade:
+    """Electronic real estate registry, property transactions, credit guarantees & SERP efficiency (ONR/SREI)."""
+
+    def __init__(self, sdk: "BrazilData") -> None:
+        self._sdk = sdk
+        self._onr_connector: Any = None
+
+    @property
+    def onr_connector(self) -> Any:
+        if self._onr_connector is None:
+            from public_data_gateway.connectors.imobiliario.onr_registro_imoveis.connector import (
+                ONRRegistroImoveisConnector,
+            )
+
+            self._onr_connector = ONRRegistroImoveisConnector(settings=self._sdk.settings)
+        return self._onr_connector
+
+    def get_onr_property_registry(self, id_municipio: str) -> dict[str, Any]:
+        """Get municipal active CNM property registry stock and SREI digital certificate emissions (ONR)."""
+        return self.onr_connector.get_onr_property_registry(id_municipio)
+
+    def list_onr_transactions_by_nature(
+        self, id_municipio: str, natureza_ato: str | None = None
+    ) -> list[dict[str, Any]]:
+        """List municipal real estate acts and declared financial volume by legal nature (ONR)."""
+        return self.onr_connector.list_onr_transactions_by_nature(
+            id_municipio=id_municipio, natureza_ato=natureza_ato
+        )
+
+    def get_onr_real_estate_credit_guarantees(self, id_municipio: str) -> dict[str, Any]:
+        """Get fiduciary lien credit volume, Home Equity CGI contracts, and foreclosure rate (ONR)."""
+        return self.onr_connector.get_onr_real_estate_credit_guarantees(id_municipio)
+
+    def get_onr_serp_interoperability(self, id_municipio: str) -> dict[str, Any]:
+        """Get SERP/SAEC interoperability, nato-digital titles, SLA, and CNIB/Penhora orders (ONR)."""
+        return self.onr_connector.get_onr_serp_interoperability(id_municipio)
+
+    def get_onr_real_estate_features(self, id_municipio: str) -> dict[str, Any]:
+        """Get Gold ONR/SREI digital maturity score, real estate liquidity score, and tier features."""
+        return self.onr_connector.get_onr_real_estate_features(id_municipio)
+
+    def list_top_onr_real_estate_municipalities(
+        self, limit: int = 10, sigla_uf: str | None = None
+    ) -> list[dict[str, Any]]:
+        """List top Brazilian municipalities ranked by ONR SREI/SERP digital maturity and liquidity."""
+        return self.onr_connector.list_top_onr_real_estate_municipalities(
+            limit=limit, sigla_uf=sigla_uf
+        )
+
+
 class BrazilData:
     """Unified developer SDK facade for querying, normalizing, and enriching Brazilian public datasets."""
 
@@ -1230,6 +1293,7 @@ class BrazilData:
         self.labor = LaborFacade(self)
         self.health = HealthFacade(self)
         self.education = EducationFacade(self)
+        self.real_estate = RealEstateFacade(self)
 
     def list_sources(
         self,
@@ -1877,6 +1941,38 @@ class BrazilData:
     ) -> list[dict[str, Any]]:
         """Listar municípios líderes em desempenho no IDEB e proficiência SAEB no Brasil (INEP)."""
         return self.education.list_top_ideb_municipalities(
+            limit=limit, sigla_uf=sigla_uf
+        )
+
+    def get_onr_property_registry(self, id_municipio: str) -> dict[str, Any]:
+        """Consultar acervo municipal de matrículas CNM e emissões digitais SREI/ONR."""
+        return self.real_estate.get_onr_property_registry(id_municipio)
+
+    def list_onr_transactions_by_nature(
+        self, id_municipio: str, natureza_ato: str | None = None
+    ) -> list[dict[str, Any]]:
+        """Listar atos registrais e volume financeiro imobiliário por natureza jurídica (ONR)."""
+        return self.real_estate.list_onr_transactions_by_nature(
+            id_municipio=id_municipio, natureza_ato=natureza_ato
+        )
+
+    def get_onr_real_estate_credit_guarantees(self, id_municipio: str) -> dict[str, Any]:
+        """Consultar garantias imobiliárias, alienação fiduciária, Home Equity CGI e execuções (ONR)."""
+        return self.real_estate.get_onr_real_estate_credit_guarantees(id_municipio)
+
+    def get_onr_serp_interoperability(self, id_municipio: str) -> dict[str, Any]:
+        """Consultar interoperabilidade SERP/SAEC, títulos nato-digitais, SLA e ordens CNIB/Penhora."""
+        return self.real_estate.get_onr_serp_interoperability(id_municipio)
+
+    def get_onr_real_estate_features(self, id_municipio: str) -> dict[str, Any]:
+        """Consultar features Gold de maturidade digital SREI/SERP e liquidez imobiliária (ONR)."""
+        return self.real_estate.get_onr_real_estate_features(id_municipio)
+
+    def list_top_onr_real_estate_municipalities(
+        self, limit: int = 10, sigla_uf: str | None = None
+    ) -> list[dict[str, Any]]:
+        """Listar municípios líderes em maturidade digital SREI/SERP e liquidez imobiliária (ONR)."""
+        return self.real_estate.list_top_onr_real_estate_municipalities(
             limit=limit, sigla_uf=sigla_uf
         )
 

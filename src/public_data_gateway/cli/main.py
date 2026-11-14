@@ -901,6 +901,36 @@ def build_parser() -> argparse.ArgumentParser:
     ideb_rk_p.add_argument("--uf", type=str, help="Optional 2-letter state filter")
     ideb_rk_p.add_argument("--json", action="store_true", help="Output in JSON format")
 
+    # ONR Registro de Imóveis (SREI/SERP/CNM) command group
+    onr_p = subparsers.add_parser("onr", help="Query ONR SREI real estate registries, transactions, credit guarantees, SERP, and rankings.")
+    onr_sub = onr_p.add_subparsers(dest="onr_action", required=True)
+
+    onr_reg_p = onr_sub.add_parser("registry", help="Get municipal CNM property registry stock and SREI digital certificates (ONR).")
+    onr_reg_p.add_argument("id_municipio", help="7-digit IBGE municipality code, 8-digit CEP, or municipality name")
+    onr_reg_p.add_argument("--json", action="store_true", help="Output in JSON format")
+
+    onr_tx_p = onr_sub.add_parser("transactions", help="List municipal real estate acts and declared financial volume by legal nature (ONR).")
+    onr_tx_p.add_argument("id_municipio", help="7-digit IBGE municipality code, 8-digit CEP, or municipality name")
+    onr_tx_p.add_argument("--natureza", type=str, help="Optional act nature filter (e.g. Compra_Venda)")
+    onr_tx_p.add_argument("--json", action="store_true", help="Output in JSON format")
+
+    onr_cr_p = onr_sub.add_parser("credit", help="Get fiduciary lien real estate credit guarantees, Home Equity CGI, and defaults (ONR).")
+    onr_cr_p.add_argument("id_municipio", help="7-digit IBGE municipality code, 8-digit CEP, or municipality name")
+    onr_cr_p.add_argument("--json", action="store_true", help="Output in JSON format")
+
+    onr_srp_p = onr_sub.add_parser("serp", help="Get SERP/SAEC interoperability, nato-digital titles, SLA, and CNIB/Penhora orders (ONR).")
+    onr_srp_p.add_argument("id_municipio", help="7-digit IBGE municipality code, 8-digit CEP, or municipality name")
+    onr_srp_p.add_argument("--json", action="store_true", help="Output in JSON format")
+
+    onr_ft_p = onr_sub.add_parser("features", help="Get Gold ONR/SREI digital maturity and real estate liquidity features.")
+    onr_ft_p.add_argument("id_municipio", help="7-digit IBGE municipality code, 8-digit CEP, or municipality name")
+    onr_ft_p.add_argument("--json", action="store_true", help="Output in JSON format")
+
+    onr_rk_p = onr_sub.add_parser("ranking", help="List top Brazilian municipalities ranked by composite ONR SREI/SERP maturity score.")
+    onr_rk_p.add_argument("--limit", type=int, default=10, help="Max municipalities to list")
+    onr_rk_p.add_argument("--uf", type=str, help="Optional 2-letter state filter")
+    onr_rk_p.add_argument("--json", action="store_true", help="Output in JSON format")
+
     # Direct shortcut: pnad-uf
     pnad_s_p = subparsers.add_parser("pnad-uf", help="Shortcut to query PNAD Contínua labor market profile.")
     pnad_s_p.add_argument("uf", type=str, help="IBGE 2-digit UF code or 2-letter state abbreviation (e.g. SP, 35)")
@@ -3088,6 +3118,81 @@ def main(argv: Sequence[str] | None = None) -> int:
                     print(f"Top {len(ranks)} Municípios no IDEB & Equidade SAEB (INEP IDEB):")
                     for idx, r in enumerate(ranks, 1):
                         print(f"  {idx}. {r.get('nome_municipio')} ({r.get('sigla_uf')}): IDEB Score {r.get('score_desempenho_ideb_municipal')} | SAEB/INSE: {r.get('score_proficiencia_equidade_saeb')} | {r.get('classificacao_qualidade_ideb_municipio')}")
+                return 0
+
+        elif args.command == "onr":
+            from public_data_gateway.connectors.imobiliario.onr_registro_imoveis.connector import (
+                ONRRegistroImoveisConnector,
+            )
+
+            onr_conn = ONRRegistroImoveisConnector()
+            onr_action = getattr(args, "onr_action", None)
+            if onr_action == "registry":
+                res = onr_conn.get_onr_property_registry(args.id_municipio)
+                if getattr(args, "json", False):
+                    print(json.dumps(res, indent=2, ensure_ascii=False, default=str))
+                else:
+                    print(f"ONR SREI Acervo de Matrículas ({res.get('nome_municipio')} - {res.get('id_municipio')}):")
+                    print(f"  Serventias / CNM:     {res.get('serventias_ri_integradas_srei')} RI | {res.get('total_matriculas_ativas_cnm'):,} matrículas")
+                    print(f"  Conversão CNM Digital:{res.get('taxa_conversao_cnm_digital_pct')}% | Novas/ano: {res.get('novas_matriculas_abertas_ano'):,}")
+                    print(f"  Certidões Digitais:   {res.get('certidoes_digitais_srei_ano'):,}")
+                return 0
+
+            if onr_action == "transactions":
+                rows = onr_conn.list_onr_transactions_by_nature(
+                    args.id_municipio, natureza_ato=getattr(args, "natureza", None)
+                )
+                if getattr(args, "json", False):
+                    print(json.dumps(rows, indent=2, ensure_ascii=False, default=str))
+                else:
+                    print(f"ONR SREI Transações e Atos Registrais ({args.id_municipio}):")
+                    for r in rows:
+                        print(f"  - {r.get('natureza_ato_registral')}: {r.get('quantidade_atos_registrados_ano'):,} atos | R$ {r.get('volume_financeiro_declarado_milhoes_brl')}M | e-Prot: {r.get('proporcao_protocolo_eletronico_srei_pct')}%")
+                return 0
+
+            if onr_action == "credit":
+                res = onr_conn.get_onr_real_estate_credit_guarantees(args.id_municipio)
+                if getattr(args, "json", False):
+                    print(json.dumps(res, indent=2, ensure_ascii=False, default=str))
+                else:
+                    print(f"ONR Garantias e Crédito Imobiliário ({res.get('nome_municipio')} - {res.get('id_municipio')}):")
+                    print(f"  Alienação Fiduciária: {res.get('contratos_alienacao_fiduciaria_ano'):,} contratos | R$ {res.get('volume_credito_imobiliario_garantido_milhoes_brl')}M")
+                    print(f"  SFI/SBPE / Home Eq.:  {res.get('participacao_sfi_sbpe_pmcmv_pct')}% | {res.get('contratos_home_equity_cgi_ano'):,} CGI")
+                    print(f"  Execução Garantia:    {res.get('taxa_execucao_garantia_fiduciaria_pct')}% ({res.get('consolidacoes_propriedade_inadimplencia_ano')} consolidações)")
+                return 0
+
+            if onr_action == "serp":
+                res = onr_conn.get_onr_serp_interoperability(args.id_municipio)
+                if getattr(args, "json", False):
+                    print(json.dumps(res, indent=2, ensure_ascii=False, default=str))
+                else:
+                    print(f"ONR Interoperabilidade SERP/SAEC ({res.get('nome_municipio')} - {res.get('id_municipio')}):")
+                    print(f"  Integração / NatoDig: {res.get('indice_integracao_serp_saec_pct')}% SERP | {res.get('proporcao_titulos_nato_digitais_extrato_pct')}% nato-digitais")
+                    print(f"  SLA Qualificação/Cert:{res.get('prazo_medio_qualificacao_registral_dias')} dias | {res.get('prazo_medio_certidao_eletronica_horas')} horas")
+                    print(f"  Ordens CNIB / Penhora:{res.get('ordens_indisponibilidade_cnib_processadas_ano'):,} CNIB | {res.get('penhoras_online_arisp_srei_ano'):,} ARISP")
+                return 0
+
+            if onr_action == "features":
+                feat = onr_conn.get_onr_real_estate_features(args.id_municipio)
+                if getattr(args, "json", False):
+                    print(json.dumps(feat, indent=2, ensure_ascii=False, default=str))
+                else:
+                    print(f"ONR/SREI Features Registrais Imobiliárias: {feat.get('nome_municipio')} ({feat.get('sigla_uf')} - {feat.get('id_municipio')}):")
+                    print(f"  Score Maturidade SERP: {feat.get('score_maturidade_digital_srei_serp')}/100.0")
+                    print(f"  Score Liquidez/Seg.:   {feat.get('score_liquidez_seguranca_imobiliaria')}/100.0")
+                    print(f"  Classificação Mercado: {feat.get('classificacao_mercado_registral_imobiliario')}")
+                return 0
+
+            if onr_action == "ranking":
+                ranks = onr_conn.list_top_onr_real_estate_municipalities(
+                    limit=getattr(args, "limit", 10), sigla_uf=getattr(args, "uf", None)
+                )
+                if getattr(args, "json", False):
+                    print(json.dumps(ranks, indent=2, ensure_ascii=False, default=str))
+                else:
+                    print(f"Top {len(ranks)} Municípios em Maturidade Digital SERP & Liquidez Imobiliária (ONR):")
+                    for idx, r in enumerate(ranks, 1):
+                        print(f"  {idx}. {r.get('nome_municipio')} ({r.get('sigla_uf')}): SERP Score {r.get('score_maturidade_digital_srei_serp')} | Liquidez: {r.get('score_liquidez_seguranca_imobiliaria')} | {r.get('classificacao_mercado_registral_imobiliario')}")
                 return 0
 
         elif args.command == "pib-municipal":

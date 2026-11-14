@@ -6268,3 +6268,210 @@ models:
         description: "Timestamp ISO-8601 UTC da extração."
         tests:
           - not_null
+
+  - name: fct_onr_acervo_garantias_serp_municipio
+    description: "Tabela Fato Core consolidando acervo de matrículas CNM, garantias fiduciárias de crédito imobiliário e interoperabilidade eletrônica SERP/ONR por município."
+    columns:
+      - name: id_municipio
+        description: "Código IBGE de 7 dígitos identificador único do município."
+        tests:
+          - not_null
+          - unique
+          - relationships:
+              to: ref('dim_municipio')
+              field: id_municipio
+      - name: nome_municipio
+        description: "Nome oficial do município."
+        tests:
+          - not_null
+      - name: sigla_uf
+        description: "Sigla de 2 letras da Unidade Federativa."
+        tests:
+          - not_null
+      - name: id_uf
+        description: "Código IBGE de 2 dígitos da Unidade Federativa."
+        tests:
+          - not_null
+      - name: nome_uf
+        description: "Nome completo da Unidade Federativa."
+        tests:
+          - not_null
+      - name: regiao
+        description: "Grande região geográfica brasileira."
+        tests:
+          - not_null
+      - name: cep_8
+        description: "CEP canônico de 8 dígitos da circunscrição registral de referência no município."
+        tests:
+          - not_null
+      - name: competencia_referencia
+        description: "Competência consolidada de referência estatística ONR/SREI."
+        tests:
+          - not_null
+      - name: serventias_ri_integradas_srei
+        description: "Quantidade de Ofícios de Registro de Imóveis integrados ao SREI/ONR no município."
+        tests:
+          - not_null
+      - name: total_matriculas_ativas_cnm
+        description: "Estoque total de matrículas imobiliárias ativas sob Código Nacional de Matrícula (CNM)."
+        tests:
+          - not_null
+      - name: matriculas_urbanas_ativas
+        description: "Quantidade de matrículas imobiliárias urbanas ativas no município."
+        tests:
+          - not_null
+      - name: matriculas_rurais_georreferenciadas
+        description: "Quantidade de matrículas rurais georreferenciadas integradas ao SIGEF/CNM."
+        tests:
+          - not_null
+      - name: taxa_conversao_cnm_digital_pct
+        description: "Percentual do acervo de matrículas convertido ao padrão estruturado digital CNM (%)."
+        tests:
+          - not_null
+      - name: novas_matriculas_abertas_ano
+        description: "Quantidade de novas matrículas imobiliárias abertas no exercício anual."
+        tests:
+          - not_null
+      - name: certidoes_digitais_srei_ano
+        description: "Quantidade anual de certidões imobiliárias digitais emitidas via SAEC/SREI."
+        tests:
+          - not_null
+      - name: visualizacoes_matricula_online_ano
+        description: "Quantidade anual de visualizações de matrículas eletrônicas via plataforma ONR."
+        tests:
+          - not_null
+      - name: contratos_alienacao_fiduciaria_ano
+        description: "Quantidade anual de contratos de alienação fiduciária em garantia registrados."
+        tests:
+          - not_null
+      - name: volume_credito_imobiliario_garantido_milhoes_brl
+        description: "Volume financeiro anual de crédito imobiliário garantido por alienação fiduciária (milhões BRL)."
+        tests:
+          - not_null
+      - name: participacao_sfi_sbpe_pmcmv_pct
+        description: "Participação percentual das transmissões financiadas por SFI/SBPE/PMCMV (%)."
+        tests:
+          - not_null
+      - name: contratos_home_equity_cgi_ano
+        description: "Quantidade anual de operações de Crédito com Garantia de Imóvel (Home Equity / CGI)."
+        tests:
+          - not_null
+      - name: intimacoes_purgacao_mora_fiduciaria_ano
+        description: "Quantidade anual de intimações extrajudiciais de purgação da mora fiduciária."
+        tests:
+          - not_null
+      - name: consolidacoes_propriedade_inadimplencia_ano
+        description: "Quantidade anual de consolidações de propriedade por inadimplência fiduciária."
+        tests:
+          - not_null
+      - name: taxa_execucao_garantia_fiduciaria_pct
+        description: "Taxa percentual de execução/consolidação sobre contratos de alienação fiduciária (%)."
+        tests:
+          - not_null
+      - name: indice_integracao_serp_saec_pct
+        description: "Índice percentual de interoperabilidade eletrônica no SERP/SAEC/SREI (%)."
+        tests:
+          - not_null
+      - name: proporcao_titulos_nato_digitais_extrato_pct
+        description: "Percentual de títulos ingressados via extrato eletrônico nato-digital XML/JSON (%)."
+        tests:
+          - not_null
+      - name: prazo_medio_qualificacao_registral_dias
+        description: "Prazo médio em dias úteis para qualificação e prática do registro imobiliário."
+        tests:
+          - not_null
+      - name: prazo_medio_certidao_eletronica_horas
+        description: "Prazo médio em horas para expedição de certidão eletrônica de matrícula via SAEC/ONR."
+        tests:
+          - not_null
+      - name: ordens_indisponibilidade_cnib_processadas_ano
+        description: "Ordens anuais de indisponibilidade de bens via CNIB processadas eletronicamente."
+        tests:
+          - not_null
+      - name: penhoras_online_arisp_srei_ano
+        description: "Averbações anuais de penhora judicial recebidas via Penhora Online SREI."
+        tests:
+          - not_null
+      - name: taxa_nota_devolutiva_exigencia_pct
+        description: "Taxa percentual de títulos prenotados que geraram nota devolutiva de exigência (%)."
+        tests:
+          - not_null
+      - name: reference_date
+        description: "Data de referência ISO-8601 da consolidação anual ONR/SREI."
+        tests:
+          - not_null
+      - name: extracted_at
+        description: "Timestamp ISO-8601 UTC da extração."
+        tests:
+          - not_null
+
+  - name: fct_onr_transacoes_natureza_municipio
+    description: "Tabela Fato Core desagregando atos registrais imobiliários, volume financeiro declarado, ticket médio e protocolização SREI por natureza jurídica."
+    columns:
+      - name: id_municipio
+        description: "Código IBGE de 7 dígitos identificador único do município."
+        tests:
+          - not_null
+          - relationships:
+              to: ref('dim_municipio')
+              field: id_municipio
+      - name: nome_municipio
+        description: "Nome oficial do município."
+        tests:
+          - not_null
+      - name: sigla_uf
+        description: "Sigla de 2 letras da Unidade Federativa."
+        tests:
+          - not_null
+      - name: id_uf
+        description: "Código IBGE de 2 dígitos da Unidade Federativa."
+        tests:
+          - not_null
+      - name: nome_uf
+        description: "Nome completo da Unidade Federativa."
+        tests:
+          - not_null
+      - name: regiao
+        description: "Grande região geográfica brasileira."
+        tests:
+          - not_null
+      - name: cep_8
+        description: "CEP canônico de 8 dígitos da circunscrição registral de referência no município."
+        tests:
+          - not_null
+      - name: competencia_referencia
+        description: "Competência consolidada de referência estatística ONR/SREI."
+        tests:
+          - not_null
+      - name: natureza_ato_registral
+        description: "Natureza do ato registral imobiliário praticado."
+        tests:
+          - not_null
+      - name: categoria_operacao
+        description: "Categoria funcional da operação no mercado imobiliário."
+        tests:
+          - not_null
+      - name: quantidade_atos_registrados_ano
+        description: "Quantidade anual de atos protocolados e registrados na natureza informada."
+        tests:
+          - not_null
+      - name: volume_financeiro_declarado_milhoes_brl
+        description: "Volume financeiro total declarado nos títulos da natureza registral (milhões BRL)."
+        tests:
+          - not_null
+      - name: ticket_medio_ato_brl
+        description: "Valor médio declarado por ato registrado na natureza informada (BRL)."
+        tests:
+          - not_null
+      - name: proporcao_protocolo_eletronico_srei_pct
+        description: "Percentual de títulos da natureza protocolados via e-Protocolo SREI/SAEC (%)."
+        tests:
+          - not_null
+      - name: reference_date
+        description: "Data de referência ISO-8601 da consolidação anual ONR/SREI."
+        tests:
+          - not_null
+      - name: extracted_at
+        description: "Timestamp ISO-8601 UTC da extração."
+        tests:
+          - not_null

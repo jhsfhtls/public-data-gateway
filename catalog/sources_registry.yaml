@@ -986,7 +986,7 @@ sources:
   - P03
   rice_score: 450
   roadmap_wave: 5
-  status: CATALOGED
+  status: HOMOLOGATED
 - source_id: opendatasus_vigilancia
   name: 'OpenDataSUS: Notificações de Síndromes e Vigilância Epidemiológica'
   agency: Ministério da Saúde

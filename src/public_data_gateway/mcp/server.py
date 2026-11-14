@@ -1258,6 +1258,65 @@ class MCPDispatcher:
                                 },
                             },
                             {
+                                "name": "bdg_get_onr_property_registry",
+                                "description": "Get official ONR SREI municipal active property registry CNM stock, digital conversion rate, and online certificate emissions.",
+                                "inputSchema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "id_municipio": {
+                                            "type": "string",
+                                            "description": "7-digit IBGE municipality code, 8-digit CEP, or municipality name (e.g. 3550308)",
+                                        },
+                                    },
+                                    "required": ["id_municipio"],
+                                },
+                            },
+                            {
+                                "name": "bdg_get_onr_real_estate_credit_guarantees",
+                                "description": "Get municipal fiduciary lien real estate credit volume, SFI/SBPE financing share, Home Equity CGI contracts, and foreclosure execution rate (ONR).",
+                                "inputSchema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "id_municipio": {
+                                            "type": "string",
+                                            "description": "7-digit IBGE municipality code, 8-digit CEP, or municipality name",
+                                        },
+                                    },
+                                    "required": ["id_municipio"],
+                                },
+                            },
+                            {
+                                "name": "bdg_get_onr_real_estate_features",
+                                "description": "Get normalized Gold ONR/SREI SERP digital maturity score, real estate liquidity/security score, and 4-tier municipal classification.",
+                                "inputSchema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "id_municipio": {
+                                            "type": "string",
+                                            "description": "7-digit IBGE municipality code, 8-digit CEP, or municipality name",
+                                        },
+                                    },
+                                    "required": ["id_municipio"],
+                                },
+                            },
+                            {
+                                "name": "bdg_list_top_onr_real_estate_municipalities",
+                                "description": "List top Brazilian municipalities ranked by composite ONR SREI/SERP digital maturity and real estate liquidity scores.",
+                                "inputSchema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "limit": {
+                                            "type": "integer",
+                                            "description": "Maximum rows (default: 10)",
+                                        },
+                                        "sigla_uf": {
+                                            "type": "string",
+                                            "description": "Optional 2-letter state filter (e.g. SP)",
+                                        },
+                                    },
+                                },
+                            },
+                            {
                                 "name": "bdg_get_labor_force_indicators",
                                 "description": "Query official quarterly labor force, population, and unemployment rate by Brazilian UF from IBGE PNAD Contínua (Tier 1).",
                                 "inputSchema": {
@@ -2736,6 +2795,69 @@ class MCPDispatcher:
                     },
                 }
             wrapped = wrap_untrusted_gov_data(result, source_id="inep_ideb")
+            return {
+                "jsonrpc": "2.0",
+                "id": req_id,
+                "result": {"content": [{"type": "text", "text": wrapped}], "isError": False},
+            }
+
+        if tool_name in {
+            "bdg_get_onr_property_registry",
+            "bdg_get_onr_real_estate_credit_guarantees",
+            "bdg_get_onr_real_estate_features",
+            "bdg_list_top_onr_real_estate_municipalities",
+        }:
+            from public_data_gateway.connectors.imobiliario.onr_registro_imoveis.connector import (
+                ONRRegistroImoveisConnector,
+            )
+
+            connector = ONRRegistroImoveisConnector(settings=self.settings)
+            try:
+                if tool_name == "bdg_get_onr_property_registry":
+                    result = connector.get_onr_property_registry(
+                        str(args.get("id_municipio", "")).strip()
+                    )
+                elif tool_name == "bdg_get_onr_real_estate_credit_guarantees":
+                    result = connector.get_onr_real_estate_credit_guarantees(
+                        str(args.get("id_municipio", "")).strip()
+                    )
+                elif tool_name == "bdg_get_onr_real_estate_features":
+                    result = connector.get_onr_real_estate_features(
+                        str(args.get("id_municipio", "")).strip()
+                    )
+                else:
+                    raw_uf = args.get("sigla_uf")
+                    result = connector.list_top_onr_real_estate_municipalities(
+                        limit=int(args.get("limit", 10)),
+                        sigla_uf=str(raw_uf).strip() if raw_uf else None,
+                    )
+            except ValueError as exc:
+                return {
+                    "jsonrpc": "2.0",
+                    "id": req_id,
+                    "result": {
+                        "content": [
+                            {"type": "text", "text": f"ONR SREI parameter error: {exc}"}
+                        ],
+                        "isError": True,
+                    },
+                }
+
+            if not result:
+                return {
+                    "jsonrpc": "2.0",
+                    "id": req_id,
+                    "result": {
+                        "content": [
+                            {
+                                "type": "text",
+                                "text": "No ONR Registro de Imóveis data found for the query.",
+                            }
+                        ],
+                        "isError": True,
+                    },
+                }
+            wrapped = wrap_untrusted_gov_data(result, source_id="onr_registro_imoveis")
             return {
                 "jsonrpc": "2.0",
                 "id": req_id,

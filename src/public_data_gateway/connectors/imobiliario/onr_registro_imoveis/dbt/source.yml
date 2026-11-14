@@ -1,0 +1,16 @@
+version: 2
+
+sources:
+  - name: onr_registro_imoveis_silver
+    description: "Bases oficiais do Sistema de Registro Eletrônico de Imóveis (ONR/SREI/SERP) normalizadas na camada Silver."
+    meta:
+      external_location: "data/onr_registro_imoveis/silver/{name}.parquet"
+    tables:
+      - name: onr_matriculas_acervo_municipio
+        description: "Acervo municipal de matrículas imobiliárias ativas, conversão digital ao Código Nacional de Matrícula (CNM) e emissões digitais SREI."
+      - name: onr_transacoes_atos_natureza
+        description: "Atos registrais imobiliários, volume financeiro declarado, ticket médio e protocolização eletrônica por natureza jurídica."
+      - name: onr_garantias_credito_imobiliario
+        description: "Contratos de alienação fiduciária, volume de crédito imobiliário garantido, home equity CGI e execuções/consolidações."
+      - name: onr_interoperabilidade_serp_eficiencia
+        description: "Interoperabilidade eletrônica no SERP/SAEC, títulos nato-digitais, prazo médio de qualificação e ordens CNIB/Penhora Online."

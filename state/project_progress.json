@@ -1,6 +1,6 @@
 {
   "schema_version": "1.0.0",
-  "last_updated": "2026-11-13T23:54:00.000000",
+  "last_updated": "2026-11-14T00:21:00.000000",
   "project_name": "public-data-gateway",
   "ecosystem": "C.O.R.E. (core, operations, career, studies)",
   "governing_pops": [
@@ -13,10 +13,10 @@
     "POP_T_148"
   ],
   "current_macro_phase_id": "07",
-  "current_macro_phase": "Fase 07 - Ingestão Wave 5 (Saúde, Educação & Setor Notarial — 37/49 fontes homologadas [75.5%] com inep_ideb homologado; Próximo: onr_registro_imoveis)",
+  "current_macro_phase": "Fase 07 - Ingestão Wave 5 (Saúde, Educação & Setor Notarial — 38/49 fontes homologadas [77.6%] com onr_registro_imoveis homologado; Próximo: opendatasus_vigilancia)",
   "overall_status": "ON_TRACK",
-  "active_connector": "onr_registro_imoveis",
-  "next_connector": "opendatasus_vigilancia",
+  "active_connector": "opendatasus_vigilancia",
+  "next_connector": "inep_enem",
   "structural_phases": [
     {
       "phase_id": "00",
@@ -140,9 +140,10 @@
         "Conector datasus_sinasc (Nascidos Vivos, Assistência Pré-Natal e Parto, Perfil Materno Demográfico e Vitalidade Recém-Nascido) - CONCLUÍDO",
         "Conector anvisa_cmed (Apresentações Ativas CMED, Preços PF/PMC/PMVG por Classe Terapêutica ATC, CAP/SUS e Regime ICMS/PIS-COFINS) - CONCLUÍDO",
         "Conector inep_ideb (IDEB Bienal por Etapa e Rede, Fluxo Escolar P, Proficiências SAEB LP/MAT, Metas INEP e Equidade INSE) - CONCLUÍDO",
+        "Conector onr_registro_imoveis (Acervo CNM, Transações por Natureza, Garantias Alienação Fiduciária/CGI e Interoperabilidade SERP/SAEC) - CONCLUÍDO",
         "Conector DataSUS restante (opendatasus_vigilancia)",
         "Conectores INEP restantes (inep_enem) & capes_sucupira",
-        "Conectores Notariais restantes (onr_registro_imoveis, capitais_iptu_itbi)"
+        "Conector Notarial restante (capitais_iptu_itbi)"
       ]
     },
     {
@@ -419,6 +420,12 @@
     }
   ],
   "recent_milestones": [
+    {
+      "date": "2026-11-14",
+      "phase_id": "07",
+      "milestone": "Homologação do Conector onr_registro_imoveis (4 Tabelas Silver + Gold Feature Store, 7 modelos dbt, 327 modelos dbt / 4.659 colunas, 38/49 [77.6%])",
+      "impact": "Conector onr_registro_imoveis (ODCS-BR-ONR-REGISTRO-IMOVEIS-001) homologado com probe live fail-hard em https://onr.org.br/ e https://mapa.onr.org.br/, paridade SQL-Python (22 colunas compartilhadas com zero divergências), facade RealEstateFacade/BrazilData, CLI bdg onr, 6+1 rotas REST API, 4 tools MCP e 9 testes dedicados (8 offline + 1 live). Próximo conector Wave 5: opendatasus_vigilancia."
+    },
     {
       "date": "2026-11-13",
       "phase_id": "07",
