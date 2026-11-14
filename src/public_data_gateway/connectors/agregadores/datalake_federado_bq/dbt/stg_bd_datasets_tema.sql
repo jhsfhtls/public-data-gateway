@@ -10,4 +10,4 @@ select
     cast(latencia_atualizacao_dias as integer) as latencia_atualizacao_dias,
     cast(elegivel_join_federado_pct as double) as elegivel_join_federado_pct,
     cast(reference_date as varchar) as reference_date
-from read_parquet('data/basedosdados_bq/silver/bd_datasets_publicos_tema.parquet')
+from read_parquet('data/datalake_federado_bq/silver/bd_datasets_publicos_tema.parquet')

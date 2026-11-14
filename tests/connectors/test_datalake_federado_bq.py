@@ -1,4 +1,4 @@
-"""Testes offline determinísticos do conector Base dos Dados (BigQuery)."""
+"""Testes offline determinísticos do conector nativo Datalake Público Federado (DuckDB / BigQuery)."""
 
 from __future__ import annotations
 
@@ -13,9 +13,10 @@ from fastapi.testclient import TestClient
 
 from public_data_gateway.api.app import create_app
 from public_data_gateway.cli.main import main as cli_main
-from public_data_gateway.connectors.agregadores.basedosdados_bq import (
-    BaseDosDadosBqConnector,
+from public_data_gateway.connectors.agregadores.datalake_federado_bq import (
+    DatalakeFederadoBqConnector,
 )
+from public_data_gateway.core.bigquery_guard import query_datalake_metadata
 from public_data_gateway.core.config import GatewaySettings
 from public_data_gateway.core.connector import list_registered_connectors
 from public_data_gateway.mcp.server import MCPDispatcher
@@ -24,18 +25,29 @@ from public_data_gateway.sdk import BrazilData
 
 def _settings_with_data(tmp_path: Path) -> GatewaySettings:
     settings = GatewaySettings(data_dir=tmp_path / "data")
-    BaseDosDadosBqConnector(settings=settings).materialize_all(force=True)
+    DatalakeFederadoBqConnector(settings=settings).materialize_all(force=True)
     return settings
 
 
 def test_connector_is_registered() -> None:
     connectors = list_registered_connectors()
-    assert "basedosdados_bq" in connectors
+    assert "datalake_federado_bq" in connectors
+
+
+def test_native_odcs_metadata_engine() -> None:
+    meta = query_datalake_metadata(
+        "datalake_federado_bq", "bd_datalake_cobertura_municipio"
+    )
+    assert meta["source_id"] == "datalake_federado_bq"
+    assert meta["table_name"] == "bd_datalake_cobertura_municipio"
+    col_names = [col["name"] for col in meta["columns"]]
+    assert "id_municipio" in col_names
+    assert len(col_names) >= 10
 
 
 def test_materialize_all_and_tier_balance(tmp_path: Path) -> None:
     settings = GatewaySettings(data_dir=tmp_path / "data")
-    connector = BaseDosDadosBqConnector(settings=settings)
+    connector = DatalakeFederadoBqConnector(settings=settings)
     outputs = connector.materialize_all(force=True)
 
     assert len(outputs) == 5
@@ -46,7 +58,7 @@ def test_materialize_all_and_tier_balance(tmp_path: Path) -> None:
     ds = connector.extract("bd_datasets_publicos_tema")
     gov = connector.extract("bd_governanca_metadados_odcs")
     con = connector.extract("bd_consumo_federado_sql")
-    feats = connector.extract("features_basedosdados_datalake_federado")
+    feats = connector.extract("features_datalake_federado_nacional")
 
     assert len(cob) == 12
     assert len(ds) == 48
@@ -65,7 +77,7 @@ def test_materialize_all_and_tier_balance(tmp_path: Path) -> None:
 
 def test_fetch_and_cep_ibge6_resolution(tmp_path: Path) -> None:
     settings = _settings_with_data(tmp_path)
-    connector = BaseDosDadosBqConnector(settings=settings)
+    connector = DatalakeFederadoBqConnector(settings=settings)
 
     by_ibge = connector.fetch("3550308")
     by_cep = connector.fetch("01001-000")
@@ -103,58 +115,58 @@ def test_fastapi_routes(tmp_path: Path) -> None:
     app = create_app(settings=_settings_with_data(tmp_path))
     client = TestClient(app)
 
-    r_top = client.get("/api/v1/metaportals/basedosdados/top-municipalities?limit=2")
+    r_top = client.get("/api/v1/metaportals/datalake/top-municipalities?limit=2")
     assert r_top.status_code == 200
     assert len(r_top.json()) == 2
 
-    r_feat = client.get("/api/v1/metaportals/basedosdados/features/3550308")
+    r_feat = client.get("/api/v1/metaportals/datalake/features/3550308")
     assert r_feat.status_code == 200
     assert r_feat.json()["score_maturidade_bd"] == 90.1
 
     r_ds = client.get(
-        "/api/v1/metaportals/basedosdados/datasets/3550308?dataset=br_ibge_pib_populacao"
+        "/api/v1/metaportals/datalake/datasets/3550308?dataset=br_ibge_pib_populacao"
     )
     assert r_ds.status_code == 200
     assert len(r_ds.json()) == 1
 
-    r_gov = client.get("/api/v1/metaportals/basedosdados/governance/3550308")
+    r_gov = client.get("/api/v1/metaportals/datalake/governance/3550308")
     assert r_gov.status_code == 200
     assert r_gov.json()["id_municipio"] == "3550308"
 
-    r_con = client.get("/api/v1/metaportals/basedosdados/consumption/3550308")
+    r_con = client.get("/api/v1/metaportals/datalake/consumption/3550308")
     assert r_con.status_code == 200
     assert r_con.json()["consultas_bigquery_mensais"] == 48200
 
-    r_alias = client.get("/api/v1/basedosdados/3550308")
+    r_alias = client.get("/api/v1/datalake/3550308")
     assert r_alias.status_code == 200
     assert r_alias.json()["qtd_datasets_tratados_bd"] == 142
 
 
-def test_cli_basedosdados_commands(
+def test_cli_datalake_commands(
     tmp_path: Path, monkeypatch: Any, capsys: Any
 ) -> None:
     data_dir = tmp_path / "data"
-    BaseDosDadosBqConnector(settings=GatewaySettings(data_dir=data_dir)).materialize_all(
-        force=True
-    )
+    DatalakeFederadoBqConnector(
+        settings=GatewaySettings(data_dir=data_dir)
+    ).materialize_all(force=True)
     monkeypatch.setenv("PDG_DATA_DIR", str(data_dir))
     monkeypatch.setenv("BDG_DATA_DIR", str(data_dir))
 
     for argv in [
-        ["bdg", "basedosdados", "coverage", "3550308", "--json"],
+        ["bdg", "datalake", "coverage", "3550308", "--json"],
         [
             "bdg",
-            "basedosdados",
+            "datalake",
             "datasets",
             "3550308",
             "--dataset",
             "br_ibge_pib_populacao",
             "--json",
         ],
-        ["bdg", "basedosdados", "governance", "3550308", "--json"],
-        ["bdg", "basedosdados", "consumption", "3550308", "--json"],
-        ["bdg", "basedosdados", "features", "3550308", "--json"],
-        ["bdg", "basedosdados", "ranking", "--limit", "3", "--json"],
+        ["bdg", "datalake", "governance", "3550308", "--json"],
+        ["bdg", "datalake", "consumption", "3550308", "--json"],
+        ["bdg", "datalake", "features", "3550308", "--json"],
+        ["bdg", "datalake", "ranking", "--limit", "3", "--json"],
     ]:
         monkeypatch.setattr(sys, "argv", argv)
         rc = cli_main()
@@ -164,7 +176,7 @@ def test_cli_basedosdados_commands(
         assert payload
 
 
-def test_mcp_basedosdados_tools(tmp_path: Path) -> None:
+def test_mcp_datalake_tools(tmp_path: Path) -> None:
     dispatcher = MCPDispatcher(settings=_settings_with_data(tmp_path))
 
     tools_resp = dispatcher.handle_request(
@@ -198,10 +210,10 @@ def test_mcp_basedosdados_tools(tmp_path: Path) -> None:
         )
         assert resp["result"]["isError"] is False
         text = resp["result"]["content"][0]["text"]
-        assert "basedosdados_bq" in text
+        assert "datalake_federado_bq" in text
 
 
 def test_invalid_municipality_raises_key_error(tmp_path: Path) -> None:
-    connector = BaseDosDadosBqConnector(settings=_settings_with_data(tmp_path))
+    connector = DatalakeFederadoBqConnector(settings=_settings_with_data(tmp_path))
     with pytest.raises(KeyError):
         connector.fetch("9999999")

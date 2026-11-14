@@ -1,15 +1,18 @@
-"""BigQuery FinOps Guard & Base dos Dados Metadata Bridge."""
+"""BigQuery FinOps Guard & Native ODCS v3.1 Lakehouse Metadata Engine."""
 
+import logging
 import re
+from pathlib import Path
 from typing import Any
 
-import httpx
+import yaml
+
+logger = logging.getLogger(__name__)
 
 _SELECT_STAR_PATTERN = re.compile(r"\bSELECT\s+\*\b", re.IGNORECASE)
 _MUTATING_SQL_PATTERN = re.compile(
     r"\b(DROP|DELETE|TRUNCATE|UPDATE|INSERT|CREATE|ALTER)\b", re.IGNORECASE
 )
-_BD_GRAPHQL_ENDPOINT = "https://backend.basedosdados.org/api/v1/graphql"
 
 
 def validate_bigquery_sql(sql: str) -> None:
@@ -24,52 +27,96 @@ def validate_bigquery_sql(sql: str) -> None:
         )
 
 
-def query_basedosdados_metadata(
-    dataset_id: str,
-    table_id: str,
-    timeout: float = 15.0,
+def _load_contract_yaml(contract_path: Path) -> dict[str, Any]:
+    """Load an ODCS v3.1 contract YAML file safely."""
+    with open(contract_path, encoding="utf-8") as handle:
+        data = yaml.safe_load(handle)
+    return data if isinstance(data, dict) else {}
+
+
+def _format_table_metadata(
+    contract: dict[str, Any], table: dict[str, Any], fallback_source_id: str
 ) -> dict[str, Any]:
-    """Fetch table schema and partition metadata from Base dos Dados GraphQL API."""
-    query = """
-    query GetTableMetadata($dataset: String!, $table: String!) {
-        allTable(dataset_Slug: $dataset, slug: $table) {
-            edges {
-                node {
-                    id
-                    slug
-                    name
-                    description
-                    columns {
-                        edges {
-                            node {
-                                name
-                                description
-                                type
-                            }
-                        }
-                    }
-                }
-            }
+    """Build normalized schema metadata for a contract table."""
+    source_meta = contract.get("source", {})
+    raw_columns = table.get("columns", [])
+    columns = [
+        {
+            "name": str(col.get("name", "")),
+            "type": str(col.get("type", "")),
+            "nullable": bool(col.get("nullable", True)),
+            "description": str(col.get("description", "")),
         }
-    }
-    """
-    payload = {
-        "query": query,
-        "variables": {"dataset": dataset_id, "table": table_id},
+        for col in raw_columns
+        if isinstance(col, dict)
+    ]
+    return {
+        "source_id": str(source_meta.get("source_id", fallback_source_id)),
+        "contract_id": str(contract.get("id", "")),
+        "table_name": str(table.get("name", "")),
+        "description": str(table.get("description", "")),
+        "primary_key": list(table.get("primary_key", [])),
+        "sla": dict(contract.get("sla", {}))
+        if isinstance(contract.get("sla"), dict)
+        else {},
+        "columns": columns,
     }
 
-    try:
-        with httpx.Client(timeout=timeout) as client:
-            resp = client.post(_BD_GRAPHQL_ENDPOINT, json=payload)
-            resp.raise_for_status()
-            data = resp.json()
-            edges = data.get("data", {}).get("allTable", {}).get("edges", [])
-            if not edges:
-                return {}
-            node = edges[0].get("node", {})
-            return node
-    except (httpx.HTTPError, OSError):
+
+def query_datalake_metadata(
+    dataset_id: str,
+    table_id: str | None = None,
+    repo_root: Path | None = None,
+) -> dict[str, Any]:
+    """Resolve table schema and SLA metadata directly from local ODCS v3.1 contracts."""
+    if not dataset_id or not dataset_id.strip():
         return {}
+
+    target_dataset = dataset_id.strip()
+    resolved_root = (
+        Path(repo_root).resolve()
+        if repo_root is not None
+        else Path(__file__).resolve().parents[3]
+    )
+    connectors_dir = resolved_root / "src" / "public_data_gateway" / "connectors"
+    if not connectors_dir.is_dir():
+        return {}
+
+    for contract_path in sorted(connectors_dir.glob("*/*/contract.yaml")):
+        try:
+            contract = _load_contract_yaml(contract_path)
+        except (OSError, yaml.YAMLError) as exc:
+            logger.warning("Failed to read ODCS contract %s: %s", contract_path, exc)
+            continue
+
+        source_meta = contract.get("source", {})
+        contract_source_id = (
+            str(source_meta.get("source_id", ""))
+            if isinstance(source_meta, dict)
+            else ""
+        )
+        if target_dataset not in (contract_source_id, contract_path.parent.name):
+            continue
+
+        tables = [t for t in contract.get("tables", []) if isinstance(t, dict)]
+        if table_id:
+            matched = next((t for t in tables if t.get("name") == table_id), None)
+            if matched is None:
+                return {}
+            return _format_table_metadata(contract, matched, target_dataset)
+
+        return {
+            "source_id": contract_source_id or target_dataset,
+            "contract_id": str(contract.get("id", "")),
+            "sla": dict(contract.get("sla", {}))
+            if isinstance(contract.get("sla"), dict)
+            else {},
+            "tables": [
+                _format_table_metadata(contract, tbl, target_dataset) for tbl in tables
+            ],
+        }
+
+    return {}
 
 
 def estimate_and_query_bigquery(

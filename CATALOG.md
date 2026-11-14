@@ -26,7 +26,7 @@ Este catálogo consolida formalmente as **49 bases de dados públicas e APIs gov
 | :--- | :---: | :---: | :--- |
 | `FEDERATED_API` | 26 | 53.1% | APIs REST / OData síncronas de borda e baixa latência (< 300 ms) |
 | `LAKEHOUSE_BATCH` | 21 | 42.9% | Dumps colunares e volumosos em DuckDB / Parquet com streaming |
-| `BIGQUERY_FEDERATED` | 2 | 4.1% | Consultas SQL em datalake federado (Base dos Dados / MapBiomas) |
+| `BIGQUERY_FEDERATED` | 2 | 4.1% | Consultas SQL em datalake federado (Datalake Federado SQL / MapBiomas) |
 
 ### 1.2. Distribuição por Classificação LGPD
 
@@ -55,7 +55,7 @@ Este catálogo consolida formalmente as **49 bases de dados públicas e APIs gov
 | `10_compras_publicas` | **Compras Públicas, Licitações & Contratos** | 2 | `W2, W3` | Repositório unificado da Lei nº 14.133/2021 (PNCP) com editais, atas e contratos de todos os entes federados e catálogo unificado CATMAT/CATSER. | 🟢 Ativo |
 | `11_agronegocio_meio_ambiente` | **Agronegócio, Terra & Meio Ambiente** | 5 | `W6` | 7+ milhões de imóveis rurais com polígonos de reserva legal e APP (SICAR/CAR), desmatamento e alertas por satélite (INPE DETER/PRODES), uso da terra (MapBiomas) e zoneamento climático (ZARC). | 🟢 Ativo |
 | `12_imobiliario_cartorial` | **Imobiliário, Notarial & Cartorial** | 3 | `W5` | Cadastro nacional de cartórios e produtividade (CNJ Justiça Aberta), transações registradas (ONR) e cadastros imobiliários municipais (IPTU/ITBI). | 🟢 Ativo |
-| `13_metaportais_agregadores` | **Metaportais & Hubs Agregadores** | 3 | `W1, W6` | Plataformas de facilitação técnica que unificam e padronizam centenas de fontes em protocolos únicos (Base dos Dados, BrasilAPI, Dados.gov.br). | 🟢 Ativo |
+| `13_metaportais_agregadores` | **Metaportais & Hubs Agregadores** | 3 | `W1, W6` | Plataformas de facilitação técnica que unificam e padronizam centenas de fontes em protocolos únicos (Datalake Federado SQL, BrasilAPI, Dados.gov.br). | 🟢 Ativo |
 
 ---
 
@@ -68,7 +68,7 @@ Este catálogo consolida formalmente as **49 bases de dados públicas e APIs gov
 | **Wave 3** | Mercado de Capitais, Balanços Contábeis & Finanças Públicas | 6 | 610–680 | `FEDERATED_API, LAKEHOUSE_BATCH` | `cvm_dfp_itr`, `mdic_comexstat`, `cvm_fundos` (+3) | 🟢 100% Homologada |
 | **Wave 4** | Censo Demográfico, Trabalho, Renda, Logística & Telecomunicações | 10 | 500–590 | `FEDERATED_API, LAKEHOUSE_BATCH` | `ibge_sidra`, `ibge_pib_municipal`, `ibge_censo2022` (+7) | 🟢 100% Homologada |
 | **Wave 5** | Saúde Pública, Educação, Capital Humano & Serviços Notariais | 14 | 410–480 | `FEDERATED_API, LAKEHOUSE_BATCH` | `datasus_cnes`, `datasus_sih`, `inep_censo_escolar` (+11) | 🟢 100% Homologada |
-| **Wave 6** | Meio Ambiente, Agronegócio, Monitoramento Satelital & Metaportais | 7 | 340–390 | `BIGQUERY_FEDERATED, FEDERATED_API, LAKEHOUSE_BATCH` | `basedosdados_bq`, `inpe_terrabrasilis`, `ana_hidroweb_telemetria` (+4) | 🟢 100% Homologada |
+| **Wave 6** | Meio Ambiente, Agronegócio, Monitoramento Satelital & Metaportais | 7 | 340–390 | `BIGQUERY_FEDERATED, FEDERATED_API, LAKEHOUSE_BATCH` | `datalake_federado_bq`, `inpe_terrabrasilis`, `ana_hidroweb_telemetria` (+4) | 🟢 100% Homologada |
 
 ---
 
@@ -120,7 +120,7 @@ Ordenada por **Onda de Implementação (`roadmap_wave`)**, **Score RICE decresce
 | `opendatasus_vigilancia` | [OpenDataSUS: Notificações de Síndromes e Vigilância Epidemiológica](https://opendatasus.saude.gov.br/)<br/>*Ministério da Saúde* | Saúde Pública | **W5** | 440 | `FEDERATED_API`<br/>`REST_JSON` | `id_municipio`<br/>`sigla_uf` | `ANONYMIZED_MICRODATA` | `P01` `P02` | `HOMOLOGATED` |
 | `capitais_iptu_itbi` | [Capitais: Cadastros Imobiliários Municipais (IPTU / ITBI)](https://dados.gov.br/)<br/>*Prefeituras Municipais das Capitais* | Imobiliário, Notarial | **W5** | 430 | `FEDERATED_API`<br/>`REST_JSON` | `cep_8`<br/>`id_municipio`<br/>`sigla_uf` | `PUBLIC_NON_PERSONAL` | `P01` `P03` | `HOMOLOGATED` |
 | `capes_sucupira` | [CAPES: Plataforma Sucupira (Pós-Graduação Stricto Sensu)](https://dadosabertos.capes.gov.br/)<br/>*Coordenação de Aperfeiçoamento de Pessoal de Nível Superior (CAPES)* | Educação | **W5** | 410 | `FEDERATED_API`<br/>`REST_JSON` | `id_municipio`<br/>`sigla_uf` | `PUBLIC_NON_PERSONAL` | `P01` `P02` | `HOMOLOGATED` |
-| `basedosdados_bq` | [Base dos Dados: Datalake Público Federado (BigQuery)](https://basedosdados.org/)<br/>*Base dos Dados* | Metaportais | **W6** | 390 | `BIGQUERY_FEDERATED`<br/>`BIGQUERY_SQL` | `id_municipio`<br/>`sigla_uf`<br/>`cnpj_14`<br/>`cep_8` | `PUBLIC_NON_PERSONAL` | `P01` `P02` `P03` `P04` `P05` `P06` | `HOMOLOGATED` |
+| `datalake_federado_bq` | [PDG: Datalake Público Federado & Catálogo Nacional SQL (DuckDB / BigQuery)](https://www.gov.br/conecta/catalogo/)<br/>*Infraestrutura Nacional de Dados (IND / GOV.BR) & PDG* | Metaportais | **W6** | 390 | `BIGQUERY_FEDERATED`<br/>`BIGQUERY_SQL` | `id_municipio`<br/>`sigla_uf`<br/>`cnpj_14`<br/>`cep_8` | `PUBLIC_NON_PERSONAL` | `P01` `P02` `P03` `P04` `P05` `P06` | `HOMOLOGATED` |
 | `inpe_terrabrasilis` | [INPE: Plataforma TerraBrasilis (DETER & PRODES)](http://terrabrasilis.dpi.inpe.br/)<br/>*Instituto Nacional de Pesquisas Espaciais (INPE)* | Agronegócio, Terra | **W6** | 390 | `FEDERATED_API`<br/>`REST_JSON` | `id_municipio`<br/>`sigla_uf` | `PUBLIC_NON_PERSONAL` | `P01` `P06` `P09` | `HOMOLOGATED` |
 | `ana_hidroweb_telemetria` | [ANA: Rede Hidrometeorológica Nacional (HidroWeb)](https://www.snirh.gov.br/hidroweb/)<br/>*Agência Nacional de Águas e Saneamento Básico (ANA)* | Agronegócio, Terra | **W6** | 380 | `FEDERATED_API`<br/>`REST_JSON` | `id_municipio`<br/>`sigla_uf` | `PUBLIC_NON_PERSONAL` | `P01` `P09` | `HOMOLOGATED` |
 | `mapbiomas_cobertura` | [MapBiomas: Cobertura e Uso da Terra no Brasil (1985-2024)](https://mapbiomas.org/)<br/>*Projeto MapBiomas* | Agronegócio, Terra | **W6** | 370 | `BIGQUERY_FEDERATED`<br/>`BIGQUERY_SQL` | `id_municipio`<br/>`sigla_uf` | `PUBLIC_NON_PERSONAL` | `P01` `P06` `P09` | `HOMOLOGATED` |

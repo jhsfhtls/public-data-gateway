@@ -7884,8 +7884,8 @@ models:
         description: "Data de referência ISO-8601 (YYYY-MM-DD)."
         tests: [not_null]
 
-  - name: fct_basedosdados_datalake_municipio
-    description: "Fato consolidado municipal de cobertura, governança e eficiência SQL do datalake Base dos Dados (BigQuery)."
+  - name: fct_datalake_federado_municipio
+    description: "Fato consolidado municipal de cobertura, governança e eficiência SQL do Datalake Público Federado (DuckDB / BigQuery)."
     columns:
       - name: id_municipio
         description: "Código IBGE de 7 dígitos do município (STRING)."
@@ -7915,7 +7915,7 @@ models:
         description: "Taxa de atualização mensal das tabelas tratadas (%)."
         tests: [not_null]
       - name: indice_cobertura_datalake_bd
-        description: "Subíndice sintético de cobertura do datalake Base dos Dados (0-100)."
+        description: "Subíndice sintético de cobertura do Datalake Público Federado (0-100)."
         tests: [not_null]
       - name: dicionario_padronizado_pct
         description: "Percentual de variáveis com dicionário padronizado (%)."
@@ -7927,7 +7927,7 @@ models:
         description: "Disponibilidade SLA para consultas BigQuery SQL (%)."
         tests: [not_null]
       - name: indice_governanca_bd
-        description: "Subíndice sintético de governança de metadados Base dos Dados (0-100)."
+        description: "Subíndice sintético de governança de metadados do Datalake Público Federado (0-100)."
         tests: [not_null]
       - name: consultas_bigquery_mensais
         description: "Volume mensal de consultas BigQuery filtrando o município."
@@ -7942,14 +7942,14 @@ models:
         description: "Taxa de reuso em joins analíticos cross-domain (%)."
         tests: [not_null]
       - name: indice_eficiencia_federada_bd
-        description: "Subíndice sintético de eficiência federada Base dos Dados (0-100)."
+        description: "Subíndice sintético de eficiência federada do Datalake Público Federado (0-100)."
         tests: [not_null]
       - name: reference_date
         description: "Data de referência ISO-8601 (YYYY-MM-DD)."
         tests: [not_null]
 
-  - name: fct_basedosdados_datasets_tema_municipio
-    description: "Fato municipal por tema de datasets públicos tratados na Base dos Dados (BigQuery)."
+  - name: fct_datalake_federado_datasets_tema_municipio
+    description: "Fato municipal por tema de datasets públicos tratados no Datalake Público Federado (DuckDB / BigQuery)."
     columns:
       - name: id_municipio
         description: "Código IBGE de 7 dígitos do município (STRING)."
@@ -7967,7 +7967,7 @@ models:
         description: "Macrorregião geográfica brasileira."
         tests: [not_null]
       - name: dataset_bd_id
-        description: "Identificador oficial do dataset na Base dos Dados."
+        description: "Identificador temático oficial do dataset no Datalake Público Federado."
         tests: [not_null]
       - name: qtd_registros_municipio
         description: "Quantidade de registros municipais no dataset temático."

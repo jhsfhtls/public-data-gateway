@@ -1731,7 +1731,7 @@ class MCPDispatcher:
                             },
                             {
                                 "name": "bdg_get_bd_coverage",
-                                "description": "Get official Base dos Dados (BigQuery) municipal treated dataset and table coverage metrics.",
+                                "description": "Get official Federated Public Datalake (DuckDB / BigQuery) municipal treated dataset and table coverage metrics.",
                                 "inputSchema": {
                                     "type": "object",
                                     "properties": {
@@ -1745,7 +1745,7 @@ class MCPDispatcher:
                             },
                             {
                                 "name": "bdg_get_bd_governance",
-                                "description": "Get municipal Base dos Dados dictionary standardization and canonical key governance metrics.",
+                                "description": "Get municipal Federated Public Datalake dictionary standardization and canonical key governance metrics.",
                                 "inputSchema": {
                                     "type": "object",
                                     "properties": {
@@ -1759,7 +1759,7 @@ class MCPDispatcher:
                             },
                             {
                                 "name": "bdg_get_bd_features",
-                                "description": "Get normalized Gold Base dos Dados datalake maturity score and 4-tier classification.",
+                                "description": "Get normalized Gold Federated Public Datalake maturity score and 4-tier classification.",
                                 "inputSchema": {
                                     "type": "object",
                                     "properties": {
@@ -1773,7 +1773,7 @@ class MCPDispatcher:
                             },
                             {
                                 "name": "bdg_list_top_bd_municipalities",
-                                "description": "List top Brazilian municipalities ranked by composite Base dos Dados datalake maturity score.",
+                                "description": "List top Brazilian municipalities ranked by composite Federated Public Datalake maturity score.",
                                 "inputSchema": {
                                     "type": "object",
                                     "properties": {
@@ -3958,11 +3958,11 @@ class MCPDispatcher:
             "bdg_get_bd_features",
             "bdg_list_top_bd_municipalities",
         }:
-            from public_data_gateway.connectors.agregadores.basedosdados_bq.connector import (
-                BaseDosDadosBqConnector,
+            from public_data_gateway.connectors.agregadores.datalake_federado_bq.connector import (
+                DatalakeFederadoBqConnector,
             )
 
-            connector = BaseDosDadosBqConnector(settings=self.settings)
+            connector = DatalakeFederadoBqConnector(settings=self.settings)
             try:
                 if tool_name == "bdg_get_bd_coverage":
                     result: Any = connector.get_bd_coverage(
@@ -3989,7 +3989,7 @@ class MCPDispatcher:
                         "content": [
                             {
                                 "type": "text",
-                                "text": f"Base dos Dados parameter error: {exc}",
+                                "text": f"Datalake Público Federado parameter error: {exc}",
                             }
                         ],
                         "isError": True,
@@ -4004,13 +4004,13 @@ class MCPDispatcher:
                         "content": [
                             {
                                 "type": "text",
-                                "text": "No Base dos Dados data found for the query.",
+                                "text": "No Datalake Público Federado data found for the query.",
                             }
                         ],
                         "isError": True,
                     },
                 }
-            wrapped = wrap_untrusted_gov_data(result, source_id="basedosdados_bq")
+            wrapped = wrap_untrusted_gov_data(result, source_id="datalake_federado_bq")
             return {
                 "jsonrpc": "2.0",
                 "id": req_id,

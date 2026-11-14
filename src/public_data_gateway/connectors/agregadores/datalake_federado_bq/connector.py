@@ -1,7 +1,7 @@
-"""Conector oficial Base dos Dados: Datalake Público Federado (BigQuery).
+"""Conector oficial PDG: Datalake Público Federado & Catálogo Nacional SQL (DuckDB / BigQuery).
 
-Consolida indicadores municipais do Datalake Público Federado da Base dos Dados
-(BigQuery): cobertura de datasets e tabelas tratadas, temas públicos
+Consolida indicadores municipais do Datalake Público Federado Nacional
+(DuckDB / BigQuery): cobertura de datasets e tabelas tratadas, temas públicos
 padronizados, governança de chaves canônicas, eficiência de consultas SQL
 federadas e features Gold de maturidade do datalake.
 """
@@ -19,13 +19,14 @@ import pyarrow as pa
 import pyarrow.parquet as pq
 import requests
 
+from public_data_gateway.core.bigquery_guard import query_datalake_metadata
 from public_data_gateway.core.config import GatewaySettings
 from public_data_gateway.core.connector import BaseConnector, register_connector
 
 logger = logging.getLogger(__name__)
 
-BD_PORTAL_URL = "https://basedosdados.org/"
-BD_GRAPHQL_URL = "https://api.basedosdados.org/api/v1/graphql"
+IND_PORTAL_URL = "https://www.gov.br/conecta/catalogo/"
+DADOSGOV_PORTAL_URL = "https://dados.gov.br/"
 
 DEFAULT_REFERENCE_DATE = "2025-03-31"
 
@@ -69,7 +70,7 @@ _IBGE_ALIASES: dict[str, str] = {
     "5208700": "5208707",
 }
 
-# Perfis municipais calibrados para os 4 tiers Base dos Dados (3 municípios por tier):
+# Perfis municipais calibrados para os 4 tiers do Datalake Federado (3 municípios por tier):
 # (qtd_datasets, qtd_tabelas, completude_ibge, atualiz_mensal, idx_cobertura,
 #  dic_padr_pct, conf_chaves_pct, disp_bq_pct, idx_governanca,
 #  consultas_mes, efic_part_pct, custo_scan_mb, reuso_pct, idx_eficiencia, base_reg)
@@ -145,7 +146,7 @@ _TABLE_BUILDERS: dict[str, str] = {
     "bd_datasets_publicos_tema": "_build_datasets_tema",
     "bd_governanca_metadados_odcs": "_build_governanca_metadados",
     "bd_consumo_federado_sql": "_build_consumo_federado",
-    "features_basedosdados_datalake_federado": "_build_features_bd",
+    "features_datalake_federado_nacional": "_build_features_bd",
 }
 
 
@@ -194,56 +195,61 @@ def _normalize_identifier(identifier: str) -> str:
         return _IBGE6_TO_MUN[cleaned]
     raise KeyError(
         f"Município/CEP '{identifier}' não encontrado na referência canônica "
-        "da Base dos Dados."
+        "do Datalake Público Federado."
     )
 
 
-class BaseDosDadosBqConnector(BaseConnector):
-    """Conector oficial Base dos Dados: Datalake Público Federado (BigQuery)."""
+class DatalakeFederadoBqConnector(BaseConnector):
+    """Conector oficial PDG: Datalake Público Federado & Catálogo Nacional SQL (DuckDB / BigQuery)."""
 
     def __init__(
         self,
-        source_id: str = "basedosdados_bq",
+        source_id: str = "datalake_federado_bq",
         settings: GatewaySettings | None = None,
     ) -> None:
         super().__init__(source_id=source_id, settings=settings)
 
     def test_connection(self) -> dict[str, Any]:
-        """Verifica conectividade com o portal Base dos Dados e API GraphQL."""
+        """Verifica conectividade com catálogos públicos nacionais e metadados ODCS locais."""
+        headers = {"User-Agent": self.settings.user_agent}
         portal_status: int | None = None
-        graphql_status: int | None = None
+        catalog_status: int | None = None
         last_error: str | None = None
         try:
-            resp = requests.get(BD_PORTAL_URL, timeout=15)
+            resp = requests.get(IND_PORTAL_URL, headers=headers, timeout=15)
             portal_status = resp.status_code
         except requests.RequestException as exc:
-            last_error = f"BD Portal error: {exc}"
+            last_error = f"IND Portal error: {exc}"
 
         try:
-            resp_gql = requests.post(
-                BD_GRAPHQL_URL,
-                json={"query": "{ __typename }"},
-                timeout=15,
-            )
-            graphql_status = resp_gql.status_code
+            resp_cat = requests.get(DADOSGOV_PORTAL_URL, headers=headers, timeout=15)
+            catalog_status = resp_cat.status_code
         except requests.RequestException as exc:
             if last_error is None:
-                last_error = f"BD GraphQL error: {exc}"
+                last_error = f"Dados.gov.br Catalog error: {exc}"
 
-        ok = portal_status == 200 or graphql_status == 200
+        meta = query_datalake_metadata(
+            self.source_id, "bd_datalake_cobertura_municipio"
+        )
+        odcs_columns_verified = len(meta.get("columns", []))
+
+        ok = (
+            portal_status == 200 or catalog_status == 200
+        ) and odcs_columns_verified > 0
         return {
             "source_id": self.source_id,
             "ok": ok,
             "portal_status": portal_status,
-            "graphql_status": graphql_status,
-            "portal_url": BD_PORTAL_URL,
-            "graphql_url": BD_GRAPHQL_URL,
+            "catalog_status": catalog_status,
+            "portal_url": IND_PORTAL_URL,
+            "catalog_url": DADOSGOV_PORTAL_URL,
+            "odcs_columns_verified": odcs_columns_verified,
             "error": None if ok else last_error,
             "checked_at": datetime.now(UTC).isoformat(),
         }
 
     def fetch(self, identifier: str, **kwargs: Any) -> dict[str, Any]:
-        """Consulta consolidada Base dos Dados para município ou CEP."""
+        """Consulta consolidada no Datalake Público Federado para município ou CEP."""
         id_mun = _normalize_identifier(identifier)
         nome, sigla_uf, id_uf, regiao, cep_8 = _MUN_META[id_mun]
         return {
@@ -263,19 +269,21 @@ class BaseDosDadosBqConnector(BaseConnector):
         }
 
     def get_bd_coverage(self, id_municipio: str) -> dict[str, Any]:
-        """Retorna cobertura de datasets e tabelas tratadas Base dos Dados."""
+        """Retorna cobertura de datasets e tabelas tratadas do Datalake Público Federado."""
         id_mun = _normalize_identifier(id_municipio)
         for row in self.extract("bd_datalake_cobertura_municipio"):
             if row["id_municipio"] == id_mun:
                 return row
-        raise ValueError(f"Município sem cobertura Base dos Dados: {id_municipio}")
+        raise ValueError(
+            f"Município sem cobertura no Datalake Público Federado: {id_municipio}"
+        )
 
     def list_bd_datasets(
         self,
         id_municipio: str,
         dataset_bd_id: str | None = None,
     ) -> list[dict[str, Any]]:
-        """Lista datasets públicos tratados na Base dos Dados por tema."""
+        """Lista datasets públicos tratados no Datalake Público Federado por tema."""
         id_mun = _normalize_identifier(id_municipio)
         rows = [
             r
@@ -295,31 +303,35 @@ class BaseDosDadosBqConnector(BaseConnector):
         for row in self.extract("bd_governanca_metadados_odcs"):
             if row["id_municipio"] == id_mun:
                 return row
-        raise ValueError(f"Município sem governança Base dos Dados: {id_municipio}")
+        raise ValueError(
+            f"Município sem governança no Datalake Público Federado: {id_municipio}"
+        )
 
     def get_bd_consumption(self, id_municipio: str) -> dict[str, Any]:
-        """Retorna consumo de consultas BigQuery e eficiência federada."""
+        """Retorna consumo de consultas SQL federadas e eficiência analítica."""
         id_mun = _normalize_identifier(id_municipio)
         for row in self.extract("bd_consumo_federado_sql"):
             if row["id_municipio"] == id_mun:
                 return row
-        raise ValueError(f"Município sem consumo SQL Base dos Dados: {id_municipio}")
+        raise ValueError(
+            f"Município sem consumo SQL no Datalake Público Federado: {id_municipio}"
+        )
 
     def get_bd_features(self, id_municipio: str) -> dict[str, Any]:
-        """Retorna features Gold de maturidade do datalake Base dos Dados."""
+        """Retorna features Gold de maturidade do Datalake Público Federado."""
         id_mun = _normalize_identifier(id_municipio)
-        for row in self.extract("features_basedosdados_datalake_federado"):
+        for row in self.extract("features_datalake_federado_nacional"):
             if row["id_municipio"] == id_mun:
                 return row
         raise KeyError(
-            f"Features Base dos Dados indisponíveis para município '{id_mun}'."
+            f"Features do Datalake Público Federado indisponíveis para município '{id_mun}'."
         )
 
     def list_top_bd_municipalities(
         self, limit: int = 10, sigla_uf: str | None = None
     ) -> list[dict[str, Any]]:
-        """Lista municípios ordenados pelo score de maturidade Base dos Dados."""
-        rows = self.extract("features_basedosdados_datalake_federado")
+        """Lista municípios ordenados pelo score de maturidade do Datalake Federado."""
+        rows = self.extract("features_datalake_federado_nacional")
         if sigla_uf:
             uf_upper = sigla_uf.strip().upper()
             rows = [r for r in rows if str(r.get("sigla_uf", "")).upper() == uf_upper]
@@ -336,7 +348,7 @@ class BaseDosDadosBqConnector(BaseConnector):
         """Extrai registros Silver materializados em Parquet (ou gera sob demanda)."""
         if dataset not in _TABLE_BUILDERS:
             raise ValueError(
-                f"Dataset Base dos Dados desconhecido: '{dataset}'. "
+                f"Dataset do Datalake Público Federado desconhecido: '{dataset}'. "
                 f"Opções válidas: {', '.join(_TABLE_BUILDERS)}"
             )
         silver_path = self._silver_path(dataset)
@@ -348,7 +360,9 @@ class BaseDosDadosBqConnector(BaseConnector):
     def materialize(self, dataset: str, force: bool = False) -> Path:
         """Materializa tabela Silver específica em Parquet ZSTD."""
         if dataset not in _TABLE_BUILDERS:
-            raise ValueError(f"Dataset Base dos Dados inválido: {dataset}")
+            raise ValueError(
+                f"Dataset do Datalake Público Federado inválido: {dataset}"
+            )
         silver_path = self._silver_path(dataset)
         if silver_path.exists() and not force:
             return silver_path
@@ -360,7 +374,7 @@ class BaseDosDadosBqConnector(BaseConnector):
         return silver_path
 
     def materialize_all(self, force: bool = False) -> dict[str, Path]:
-        """Materializa todas as 5 tabelas Silver do conector Base dos Dados."""
+        """Materializa todas as 5 tabelas Silver do conector Datalake Público Federado."""
         return {
             dataset: self.materialize(dataset, force=force)
             for dataset in _TABLE_BUILDERS
@@ -368,7 +382,10 @@ class BaseDosDadosBqConnector(BaseConnector):
 
     def _silver_path(self, dataset: str) -> Path:
         return (
-            self.settings.data_dir / "basedosdados_bq" / "silver" / f"{dataset}.parquet"
+            self.settings.data_dir
+            / "datalake_federado_bq"
+            / "silver"
+            / f"{dataset}.parquet"
         )
 
     def _build_cobertura_municipio(self) -> list[dict[str, Any]]:
@@ -500,4 +517,4 @@ class BaseDosDadosBqConnector(BaseConnector):
         return rows
 
 
-register_connector("basedosdados_bq", BaseDosDadosBqConnector)
+register_connector("datalake_federado_bq", DatalakeFederadoBqConnector)

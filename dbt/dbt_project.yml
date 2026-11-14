@@ -8,7 +8,7 @@ model-paths:
   - "../src/public_data_gateway/connectors/demografico/ibge_localidades/dbt"
   - "../src/public_data_gateway/connectors/macrofinanceiro/bcb_sgs/dbt"
   - "../src/public_data_gateway/connectors/macrofinanceiro/bcb_olinda_ptax/dbt"
-  - "../src/public_data_gateway/connectors/agregadores/basedosdados_bq/dbt"
+  - "../src/public_data_gateway/connectors/agregadores/datalake_federado_bq/dbt"
   - "../src/public_data_gateway/connectors/agregadores/brasilapi_core/dbt"
   - "../src/public_data_gateway/connectors/agregadores/dadosgov_ckan/dbt"
   - "../src/public_data_gateway/connectors/empresarial/rfb_cnpj_lakehouse/dbt"
