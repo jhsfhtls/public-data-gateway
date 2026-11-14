@@ -362,6 +362,72 @@ def create_app(settings: GatewaySettings | None = None) -> FastAPI:
         conn = TstCndtConnector(settings=app_settings)
         return conn.search_debitos(termo)
 
+    # 9b. Extrajudicial Notary Offices & Productivity Routes (CNJ Justiça Aberta)
+    @app.get("/api/v1/judicial/justica-aberta/top-municipalities")
+    async def get_top_justica_aberta_municipalities(
+        limit: int = Query(10, ge=1, le=50, description="Max municipalities to list"),
+        uf: str | None = Query(None, description="Filter by 2-letter state abbreviation"),
+    ) -> list[dict[str, Any]]:
+        from public_data_gateway.connectors.judicial.cnj_justica_aberta.connector import (
+            CNJJusticaAbertaConnector,
+        )
+
+        conn = CNJJusticaAbertaConnector(settings=app_settings)
+        return conn.list_top_notary_efficiency_municipalities(limit=limit, sigla_uf=uf)
+
+    @app.get("/api/v1/judicial/justica-aberta/features/{id_municipio}")
+    async def get_justica_aberta_features(id_municipio: str) -> dict[str, Any]:
+        from public_data_gateway.connectors.judicial.cnj_justica_aberta.connector import (
+            CNJJusticaAbertaConnector,
+        )
+
+        conn = CNJJusticaAbertaConnector(settings=app_settings)
+        return conn.get_justica_aberta_features(id_municipio)
+
+    @app.get("/api/v1/judicial/justica-aberta/productivity/{id_municipio}")
+    async def get_justica_aberta_productivity(
+        id_municipio: str,
+        atribuicao: str | None = Query(
+            None, description="Optional cartorial attribution filter (e.g. Registro_Imoveis)"
+        ),
+    ) -> list[dict[str, Any]]:
+        from public_data_gateway.connectors.judicial.cnj_justica_aberta.connector import (
+            CNJJusticaAbertaConnector,
+        )
+
+        conn = CNJJusticaAbertaConnector(settings=app_settings)
+        return conn.list_productivity_by_attribution(
+            id_municipio, atribuicao_cartorial=atribuicao
+        )
+
+    @app.get("/api/v1/judicial/justica-aberta/emoluments/{id_municipio}")
+    async def get_justica_aberta_emoluments(id_municipio: str) -> dict[str, Any]:
+        from public_data_gateway.connectors.judicial.cnj_justica_aberta.connector import (
+            CNJJusticaAbertaConnector,
+        )
+
+        conn = CNJJusticaAbertaConnector(settings=app_settings)
+        return conn.get_emoluments_revenue(id_municipio)
+
+    @app.get("/api/v1/judicial/justica-aberta/digitalization/{id_municipio}")
+    async def get_justica_aberta_digitalization(id_municipio: str) -> dict[str, Any]:
+        from public_data_gateway.connectors.judicial.cnj_justica_aberta.connector import (
+            CNJJusticaAbertaConnector,
+        )
+
+        conn = CNJJusticaAbertaConnector(settings=app_settings)
+        return conn.get_digitalization_compliance(id_municipio)
+
+    @app.get("/api/v1/judicial/justica-aberta/offices/{id_municipio}")
+    @app.get("/api/v1/justica-aberta/{id_municipio}")
+    async def get_justica_aberta_offices(id_municipio: str) -> dict[str, Any]:
+        from public_data_gateway.connectors.judicial.cnj_justica_aberta.connector import (
+            CNJJusticaAbertaConnector,
+        )
+
+        conn = CNJJusticaAbertaConnector(settings=app_settings)
+        return conn.get_notary_offices_registry(id_municipio)
+
     # 10. Corporate Fiscal Incentives & SUFRAMA Routes (PIM / ZFM / ALC)
     @app.get("/api/v1/company/suframa/projetos")
     @app.get("/api/v1/suframa/projetos")

@@ -1,0 +1,16 @@
+version: 2
+
+sources:
+  - name: cnj_justica_aberta_silver
+    description: "Bases oficiais do Justiça Aberta (CNJ / Corregedoria Nacional de Justiça) normalizadas na camada Silver."
+    meta:
+      external_location: "data/cnj_justica_aberta/silver/{name}.parquet"
+    tables:
+      - name: justica_aberta_serventias_cadastro
+        description: "Cadastro municipal de serventias extrajudiciais ativas, provimento por titular/interino e especialidades."
+      - name: justica_aberta_produtividade_atribuicao
+        description: "Produtividade semestral de atos praticados, certidões, meio eletrônico e prazos por atribuição cartorial."
+      - name: justica_aberta_arrecadacao_emolumentos
+        description: "Arrecadação bruta semestral de emolumentos, repasses institucionais e custeio operacional das serventias."
+      - name: justica_aberta_regularidade_digitalizacao
+        description: "Digitalização de acervo histórico, integração ao SREI/ONR/CRC, inspeções correcionais e prepostos."

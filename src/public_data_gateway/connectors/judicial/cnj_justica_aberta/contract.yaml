@@ -1,0 +1,527 @@
+schema_version: "3.1.0"
+contract_id: "ODCS-BR-CNJ-JUSTICA-ABERTA-001"
+source_id: "cnj_justica_aberta"
+version: "1.0.0"
+name: "CNJ: Justiça Aberta (Cadastro e Produtividade de Cartórios)"
+agency: "Conselho Nacional de Justiça (CNJ)"
+official_url: "https://www.cnj.jus.br/corregedoria/justica_aberta/"
+
+legal_framework:
+  statutes:
+    - name: "Lei nº 8.935/1994"
+      description: "Regulamenta o art. 236 da Constituição Federal, dispondo sobre serviços notariais e de registro (Lei dos Cartórios)"
+    - name: "Lei nº 6.015/1973"
+      description: "Dispõe sobre os Registros Públicos no Brasil (Civil de Pessoas Naturais, Pessoas Jurídicas, Títulos e Documentos e Registro de Imóveis)"
+    - name: "Lei nº 10.169/2000"
+      description: "Estabelece normas gerais para a fixação de emolumentos relativos aos atos praticados pelos serviços notariais e de registro"
+    - name: "Provimento CNJ nº 24/2012 e Provimento CNJ nº 149/2023"
+      description: "Código Nacional de Normas da Corregedoria Nacional de Justiça (Extrajudicial) e alimentação semestral obrigatória do Justiça Aberta"
+    - name: "Decreto nº 8.777/2016"
+      description: "Institui a Política de Dados Abertos do Poder Executivo e recomenda transparência ativa institucional"
+
+data_governance:
+  grain: "municipio_serventia_extrajudicial_semestre"
+  primary_keys:
+    - "id_municipio"
+    - "sigla_uf"
+  reference_date_column: "reference_date"
+  min_expected_rows: 5
+  max_volume_drop_pct: 15.0
+  freshness_sla_hours: 720
+  lgpd_tier: "PUBLIC_CORPORATE_QSA"
+  ml_feature_domains:
+    - "notary_offices"
+    - "cartorial_productivity"
+
+schema:
+  tables:
+    justica_aberta_serventias_cadastro:
+      description: "Cadastro municipal de serventias extrajudiciais ativas, provimento por delegatário titular vs. interino e distribuição por especialidade notarial/registral (CNJ Justiça Aberta)"
+      grain: "id_municipio, semestre_referencia"
+      primary_keys: ["id_municipio", "semestre_referencia"]
+      min_expected_rows: 5
+      columns:
+        - name: "id_municipio"
+          data_type: "string"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Código IBGE de 7 dígitos identificador único do município"
+        - name: "nome_municipio"
+          data_type: "string"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Nome oficial do município"
+        - name: "sigla_uf"
+          data_type: "string"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Sigla de 2 letras da Unidade Federativa"
+        - name: "id_uf"
+          data_type: "string"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Código IBGE de 2 dígitos da Unidade Federativa"
+        - name: "semestre_referencia"
+          data_type: "string"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Semestre de referência da prestação semestral no Justiça Aberta (ex.: 2025-S2)"
+        - name: "total_serventias_ativas"
+          data_type: "int64"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Quantidade total de serventias extrajudiciais ativas no município"
+        - name: "serventias_providas_titular"
+          data_type: "int64"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Serventias providas por delegatário concursado titular"
+        - name: "serventias_vagas_interino"
+          data_type: "int64"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Serventias vagas atualmente respondidas por interino designado"
+        - name: "taxa_provimento_titular_pct"
+          data_type: "float64"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Percentual de serventias providas por delegatário titular (%)"
+        - name: "oficios_registro_imoveis"
+          data_type: "int64"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Quantidade de Ofícios de Registro de Imóveis (RI) ativos no município"
+        - name: "tabelionatos_notas_protesto"
+          data_type: "int64"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Quantidade de Tabelionatos de Notas e de Protesto de Títulos ativos no município"
+        - name: "oficios_registro_civil_rcpn"
+          data_type: "int64"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Quantidade de Ofícios de Registro Civil das Pessoas Naturais (RCPN) e PJ/Títulos"
+        - name: "reference_date"
+          data_type: "string"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Data de referência ISO-8601 da janela semestral apurada"
+        - name: "extracted_at"
+          data_type: "string"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Timestamp ISO-8601 UTC da extração"
+
+    justica_aberta_produtividade_atribuicao:
+      description: "Produtividade semestral por atribuição extrajudicial (Registro de Imóveis, Notas, Protesto e Registro Civil), atos praticados, certidões, eletrônica e prazos"
+      grain: "id_municipio, semestre_referencia, atribuicao_cartorial"
+      primary_keys: ["id_municipio", "semestre_referencia", "atribuicao_cartorial"]
+      min_expected_rows: 20
+      columns:
+        - name: "id_municipio"
+          data_type: "string"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Código IBGE de 7 dígitos identificador único do município"
+        - name: "nome_municipio"
+          data_type: "string"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Nome oficial do município"
+        - name: "sigla_uf"
+          data_type: "string"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Sigla de 2 letras da UF"
+        - name: "id_uf"
+          data_type: "string"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Código IBGE de 2 dígitos da UF"
+        - name: "semestre_referencia"
+          data_type: "string"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Semestre de referência da produtividade"
+        - name: "atribuicao_cartorial"
+          data_type: "string"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Atribuição cartorial padronizada (Registro_Imoveis, Tabelionato_Notas, Protesto_Titulos, Registro_Civil_RCPN)"
+        - name: "serventias_atribuicao"
+          data_type: "int64"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Quantidade de serventias com competência na atribuição"
+        - name: "atos_praticados_semestre"
+          data_type: "int64"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Total de atos notariais ou registrais praticados no semestre na atribuição"
+        - name: "certidoes_expedidas_semestre"
+          data_type: "int64"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Total de certidões expedidas no semestre na atribuição"
+        - name: "participacao_atos_municipio_pct"
+          data_type: "float64"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Participação percentual da atribuição no total de atos do município (%)"
+        - name: "proporcao_atos_eletronicos_e_notariado_pct"
+          data_type: "float64"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Proporção de atos realizados por meio eletrônico via SREI/ONR, e-Notariado ou CRC (%)"
+        - name: "prazo_medio_emissao_dias"
+          data_type: "float64"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Prazo médio de emissão de registros e certidões em dias úteis"
+        - name: "reference_date"
+          data_type: "string"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Data de referência ISO-8601 da apuração"
+        - name: "extracted_at"
+          data_type: "string"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Timestamp ISO-8601 UTC da extração"
+
+    justica_aberta_arrecadacao_emolumentos:
+      description: "Arrecadação bruta semestral de emolumentos cartoriais, repasses a fundos estaduais do Judiciário/FUNARPEN, custeio operacional e gratuidade RCPN"
+      grain: "id_municipio, semestre_referencia"
+      primary_keys: ["id_municipio", "semestre_referencia"]
+      min_expected_rows: 5
+      columns:
+        - name: "id_municipio"
+          data_type: "string"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Código IBGE de 7 dígitos identificador único do município"
+        - name: "nome_municipio"
+          data_type: "string"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Nome oficial do município"
+        - name: "sigla_uf"
+          data_type: "string"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Sigla de 2 letras da UF"
+        - name: "id_uf"
+          data_type: "string"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Código IBGE de 2 dígitos da UF"
+        - name: "semestre_referencia"
+          data_type: "string"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Semestre de referência da prestação financeira"
+        - name: "arrecadacao_bruta_emolumentos_brl"
+          data_type: "float64"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Arrecadação bruta consolidada de emolumentos extrajudiciais no município (BRL)"
+        - name: "repasses_fundos_judiciario_funarpen_brl"
+          data_type: "float64"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Total de repasses estatutários ao Fundo do Judiciário, FUNARPEN, MP e compensação RCPN (BRL)"
+        - name: "custeio_operacional_serventias_brl"
+          data_type: "float64"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Despesas operacionais de folha, infraestrutura tecnológica e manutenção reportadas (BRL)"
+        - name: "arrecadacao_media_por_serventia_brl"
+          data_type: "float64"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Arrecadação bruta média por serventia ativa no município no semestre (BRL)"
+        - name: "ticket_medio_emolumento_por_ato_brl"
+          data_type: "float64"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Ticket médio de emolumento por ato praticado (BRL)"
+        - name: "taxa_repasse_institucional_pct"
+          data_type: "float64"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Percentual médio da arrecadação bruta destinado a fundos institucionais (%)"
+        - name: "atos_gratuitos_ressarcidos_rcpn"
+          data_type: "int64"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Quantidade de atos gratuitos de Registro Civil ressarcidos no semestre"
+        - name: "reference_date"
+          data_type: "string"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Data de referência ISO-8601 da apuração"
+        - name: "extracted_at"
+          data_type: "string"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Timestamp ISO-8601 UTC da extração"
+
+    justica_aberta_regularidade_digitalizacao:
+      description: "Indicadores de modernização tecnológica, digitalização de acervo, integração SREI/ONR/CRC, inspeções correcionais e prepostos das serventias"
+      grain: "id_municipio, semestre_referencia"
+      primary_keys: ["id_municipio", "semestre_referencia"]
+      min_expected_rows: 5
+      columns:
+        - name: "id_municipio"
+          data_type: "string"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Código IBGE de 7 dígitos identificador único do município"
+        - name: "nome_municipio"
+          data_type: "string"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Nome oficial do município"
+        - name: "sigla_uf"
+          data_type: "string"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Sigla de 2 letras da UF"
+        - name: "id_uf"
+          data_type: "string"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Código IBGE de 2 dígitos da UF"
+        - name: "semestre_referencia"
+          data_type: "string"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Semestre de referência da apuração correcional"
+        - name: "acervo_historico_digitalizado_pct"
+          data_type: "float64"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Percentual do acervo registral histórico digitalizado nos cartórios do município (%)"
+        - name: "serventias_integradas_srei_onr_crc_pct"
+          data_type: "float64"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Percentual de serventias plenamente integradas ao SREI/ONR, e-Notariado e CRC Nacional (%)"
+        - name: "indice_transparencia_prestacao_contas_cnj_pct"
+          data_type: "float64"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Taxa de adimplência e tempestividade no envio de relatórios ao Justiça Aberta CNJ (%)"
+        - name: "inspecoes_corregedoria_em_dia_pct"
+          data_type: "float64"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Percentual de serventias com inspeções ordinárias das corregedorias estaduais em dia (%)"
+        - name: "reclamacoes_disciplinares_por_100k_atos"
+          data_type: "float64"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Taxa de reclamações disciplinares ou representações por 100 mil atos praticados"
+        - name: "forca_trabalho_prepostos_escreventes"
+          data_type: "int64"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Efetivo total de escreventes, auxiliares e prepostos contratados pelas serventias"
+        - name: "atos_por_escrevente_semestre"
+          data_type: "float64"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Produtividade média semestral de atos praticados por preposto/escrevente"
+        - name: "reference_date"
+          data_type: "string"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Data de referência ISO-8601 da apuração"
+        - name: "extracted_at"
+          data_type: "string"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Timestamp ISO-8601 UTC da extração"
+
+    features_justica_aberta_cartorios_serventias_municipios_brasil:
+      description: "Gold Feature Store municipal consolidando eficiência cartorial, modernização SREI/e-Notariado, arrecadação de emolumentos e classificação do polo notarial/imobiliário"
+      grain: "id_municipio, semestre_referencia"
+      primary_keys: ["id_municipio", "semestre_referencia"]
+      min_expected_rows: 5
+      columns:
+        - name: "id_municipio"
+          data_type: "string"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Código IBGE de 7 dígitos identificador único do município"
+        - name: "nome_municipio"
+          data_type: "string"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Nome oficial do município"
+        - name: "sigla_uf"
+          data_type: "string"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Sigla de 2 letras da UF"
+        - name: "id_uf"
+          data_type: "string"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Código IBGE de 2 dígitos da UF"
+        - name: "semestre_referencia"
+          data_type: "string"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Semestre de referência dos dados cartoriais CNJ"
+        - name: "total_serventias_ativas"
+          data_type: "int64"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Quantidade total de serventias extrajudiciais ativas"
+        - name: "taxa_provimento_titular_pct"
+          data_type: "float64"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Percentual de serventias providas por delegatário titular (%)"
+        - name: "oficios_registro_imoveis"
+          data_type: "int64"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Quantidade de Ofícios de Registro de Imóveis no município"
+        - name: "total_atos_praticados_semestre"
+          data_type: "int64"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Total de atos praticados no semestre em todas as atribuições"
+        - name: "atos_registro_imoveis_semestre"
+          data_type: "int64"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Total de atos praticados em Registro de Imóveis no semestre"
+        - name: "proporcao_atos_eletronicos_media_pct"
+          data_type: "float64"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Proporção média de atos eletrônicos praticados entre as atribuições (%)"
+        - name: "arrecadacao_bruta_emolumentos_brl"
+          data_type: "float64"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Arrecadação bruta consolidada de emolumentos no município (BRL)"
+        - name: "arrecadacao_media_por_serventia_brl"
+          data_type: "float64"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Arrecadação média semestral por serventia ativa (BRL)"
+        - name: "acervo_historico_digitalizado_pct"
+          data_type: "float64"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Percentual de acervo histórico digitalizado (%)"
+        - name: "serventias_integradas_srei_onr_crc_pct"
+          data_type: "float64"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Percentual de integração eletrônica ao SREI/ONR/CRC (%)"
+        - name: "indice_transparencia_prestacao_contas_cnj_pct"
+          data_type: "float64"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Índice de transparência e tempestividade junto ao CNJ (%)"
+        - name: "score_eficiencia_modernizacao_cartorial"
+          data_type: "float64"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Score normalizado (0-100) de eficiência operacional e modernização digital cartorial"
+        - name: "score_dinamismo_notarial_imobiliario"
+          data_type: "float64"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Score normalizado (0-100) de dinamismo econômico notarial e imobiliário"
+        - name: "classificacao_polo_notarial_cartorial"
+          data_type: "string"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Tier analítico de eficiência do ecossistema cartorial municipal"
+        - name: "reference_date"
+          data_type: "string"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Data de referência ISO-8601 dos indicadores"

@@ -1,0 +1,245 @@
+version: 2
+
+models:
+  - name: stg_justica_aberta_serventias_cadastro
+    description: "Staging view do cadastro municipal de serventias extrajudiciais ativas e provimento titular/interino (CNJ Justiça Aberta)."
+    columns:
+      - name: id_municipio
+        description: "Código IBGE de 7 dígitos do município."
+        tests:
+          - not_null
+          - unique
+      - name: nome_municipio
+        description: "Nome oficial do município."
+        tests:
+          - not_null
+      - name: sigla_uf
+        description: "Sigla de 2 letras da UF."
+        tests:
+          - not_null
+      - name: id_uf
+        description: "Código IBGE de 2 dígitos da UF."
+        tests:
+          - not_null
+      - name: semestre_referencia
+        description: "Semestre de referência da prestação no Justiça Aberta."
+        tests:
+          - not_null
+      - name: total_serventias_ativas
+        description: "Total de serventias extrajudiciais ativas no município."
+        tests:
+          - not_null
+      - name: serventias_providas_titular
+        description: "Quantidade de serventias providas por delegatário concursado titular."
+        tests:
+          - not_null
+      - name: serventias_vagas_interino
+        description: "Quantidade de serventias vagas sob interinidade."
+        tests:
+          - not_null
+      - name: taxa_provimento_titular_pct
+        description: "Percentual de serventias providas por delegatário titular (%)."
+        tests:
+          - not_null
+      - name: oficios_registro_imoveis
+        description: "Quantidade de Ofícios de Registro de Imóveis ativos."
+        tests:
+          - not_null
+      - name: tabelionatos_notas_protesto
+        description: "Quantidade de Tabelionatos de Notas e de Protesto ativos."
+        tests:
+          - not_null
+      - name: oficios_registro_civil_rcpn
+        description: "Quantidade de Ofícios de Registro Civil das Pessoas Naturais (RCPN)."
+        tests:
+          - not_null
+      - name: reference_date
+        description: "Data de referência ISO-8601 da janela semestral."
+        tests:
+          - not_null
+      - name: extracted_at
+        description: "Timestamp ISO-8601 UTC da extração."
+        tests:
+          - not_null
+
+  - name: stg_justica_aberta_produtividade_atribuicao
+    description: "Staging view da produtividade semestral de atos e certidões por atribuição cartorial (CNJ Justiça Aberta)."
+    columns:
+      - name: id_municipio
+        description: "Código IBGE de 7 dígitos do município."
+        tests:
+          - not_null
+      - name: nome_municipio
+        description: "Nome oficial do município."
+        tests:
+          - not_null
+      - name: sigla_uf
+        description: "Sigla de 2 letras da UF."
+        tests:
+          - not_null
+      - name: id_uf
+        description: "Código IBGE de 2 dígitos da UF."
+        tests:
+          - not_null
+      - name: semestre_referencia
+        description: "Semestre de referência da apuração."
+        tests:
+          - not_null
+      - name: atribuicao_cartorial
+        description: "Atribuição extrajudicial padronizada."
+        tests:
+          - not_null
+      - name: serventias_atribuicao
+        description: "Quantidade de serventias na atribuição."
+        tests:
+          - not_null
+      - name: atos_praticados_semestre
+        description: "Total de atos praticados no semestre na atribuição."
+        tests:
+          - not_null
+      - name: certidoes_expedidas_semestre
+        description: "Total de certidões expedidas no semestre na atribuição."
+        tests:
+          - not_null
+      - name: participacao_atos_municipio_pct
+        description: "Participação percentual da atribuição nos atos do município (%)."
+        tests:
+          - not_null
+      - name: proporcao_atos_eletronicos_e_notariado_pct
+        description: "Proporção de atos praticados em meio eletrônico SREI/e-Notariado/CRC (%)."
+        tests:
+          - not_null
+      - name: prazo_medio_emissao_dias
+        description: "Prazo médio de emissão de atos e certidões em dias úteis."
+        tests:
+          - not_null
+      - name: reference_date
+        description: "Data de referência ISO-8601 da apuração."
+        tests:
+          - not_null
+      - name: extracted_at
+        description: "Timestamp ISO-8601 UTC da extração."
+        tests:
+          - not_null
+
+  - name: stg_justica_aberta_arrecadacao_emolumentos
+    description: "Staging view da arrecadação semestral de emolumentos, repasses e gratuidades RCPN (CNJ Justiça Aberta)."
+    columns:
+      - name: id_municipio
+        description: "Código IBGE de 7 dígitos do município."
+        tests:
+          - not_null
+          - unique
+      - name: nome_municipio
+        description: "Nome oficial do município."
+        tests:
+          - not_null
+      - name: sigla_uf
+        description: "Sigla de 2 letras da UF."
+        tests:
+          - not_null
+      - name: id_uf
+        description: "Código IBGE de 2 dígitos da UF."
+        tests:
+          - not_null
+      - name: semestre_referencia
+        description: "Semestre de referência da prestação financeira."
+        tests:
+          - not_null
+      - name: arrecadacao_bruta_emolumentos_brl
+        description: "Arrecadação bruta consolidada de emolumentos no município (BRL)."
+        tests:
+          - not_null
+      - name: repasses_fundos_judiciario_funarpen_brl
+        description: "Repasses estatutários a fundos do Judiciário/FUNARPEN e ressarcimento (BRL)."
+        tests:
+          - not_null
+      - name: custeio_operacional_serventias_brl
+        description: "Despesas operacionais reportadas das serventias (BRL)."
+        tests:
+          - not_null
+      - name: arrecadacao_media_por_serventia_brl
+        description: "Arrecadação bruta média por serventia ativa (BRL)."
+        tests:
+          - not_null
+      - name: ticket_medio_emolumento_por_ato_brl
+        description: "Ticket médio de emolumento por ato praticado (BRL)."
+        tests:
+          - not_null
+      - name: taxa_repasse_institucional_pct
+        description: "Percentual de repasses sobre a arrecadação bruta (%)."
+        tests:
+          - not_null
+      - name: atos_gratuitos_ressarcidos_rcpn
+        description: "Total de atos gratuitos ressarcidos de Registro Civil no semestre."
+        tests:
+          - not_null
+      - name: reference_date
+        description: "Data de referência ISO-8601 da apuração."
+        tests:
+          - not_null
+      - name: extracted_at
+        description: "Timestamp ISO-8601 UTC da extração."
+        tests:
+          - not_null
+
+  - name: stg_justica_aberta_regularidade_digitalizacao
+    description: "Staging view de modernização digital, integração ONR/SREI/CRC, inspeções correcionais e força de trabalho cartorial."
+    columns:
+      - name: id_municipio
+        description: "Código IBGE de 7 dígitos do município."
+        tests:
+          - not_null
+          - unique
+      - name: nome_municipio
+        description: "Nome oficial do município."
+        tests:
+          - not_null
+      - name: sigla_uf
+        description: "Sigla de 2 letras da UF."
+        tests:
+          - not_null
+      - name: id_uf
+        description: "Código IBGE de 2 dígitos da UF."
+        tests:
+          - not_null
+      - name: semestre_referencia
+        description: "Semestre de referência da apuração correcional."
+        tests:
+          - not_null
+      - name: acervo_historico_digitalizado_pct
+        description: "Percentual do acervo registral histórico digitalizado (%)."
+        tests:
+          - not_null
+      - name: serventias_integradas_srei_onr_crc_pct
+        description: "Percentual de serventias integradas ao SREI/ONR/e-Notariado/CRC (%)."
+        tests:
+          - not_null
+      - name: indice_transparencia_prestacao_contas_cnj_pct
+        description: "Adimplência na prestação semestral de contas ao CNJ Justiça Aberta (%)."
+        tests:
+          - not_null
+      - name: inspecoes_corregedoria_em_dia_pct
+        description: "Percentual de serventias com inspeções ordinárias em dia (%)."
+        tests:
+          - not_null
+      - name: reclamacoes_disciplinares_por_100k_atos
+        description: "Taxa de representações disciplinares por 100 mil atos."
+        tests:
+          - not_null
+      - name: forca_trabalho_prepostos_escreventes
+        description: "Total de escreventes, auxiliares e prepostos contratados."
+        tests:
+          - not_null
+      - name: atos_por_escrevente_semestre
+        description: "Produtividade média semestral de atos por escrevente/preposto."
+        tests:
+          - not_null
+      - name: reference_date
+        description: "Data de referência ISO-8601 da apuração."
+        tests:
+          - not_null
+      - name: extracted_at
+        description: "Timestamp ISO-8601 UTC da extração."
+        tests:
+          - not_null

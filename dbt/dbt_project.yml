@@ -38,6 +38,7 @@ model-paths:
   - "../src/public_data_gateway/connectors/saude/datasus_sim/dbt"
   - "../src/public_data_gateway/connectors/educacao/inep_censo_escolar/dbt"
   - "../src/public_data_gateway/connectors/educacao/inep_censo_superior/dbt"
+  - "../src/public_data_gateway/connectors/judicial/cnj_justica_aberta/dbt"
   - "models"
 
 analysis-paths: ["analyses"]

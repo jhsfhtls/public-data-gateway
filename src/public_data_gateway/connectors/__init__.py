@@ -25,6 +25,7 @@ import public_data_gateway.connectors.geografico.antt_malha_transporte  # noqa: 
 import public_data_gateway.connectors.geografico.ibge_cnefe  # noqa: F401
 import public_data_gateway.connectors.geografico.ibge_malhas  # noqa: F401
 import public_data_gateway.connectors.judicial.cnj_datajud  # noqa: F401
+import public_data_gateway.connectors.judicial.cnj_justica_aberta  # noqa: F401
 import public_data_gateway.connectors.judicial.tst_cndt  # noqa: F401
 import public_data_gateway.connectors.macrofinanceiro.bcb_ifdata  # noqa: F401
 import public_data_gateway.connectors.macrofinanceiro.bcb_olinda_ptax  # noqa: F401

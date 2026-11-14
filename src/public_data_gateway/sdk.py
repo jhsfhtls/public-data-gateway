@@ -398,6 +398,53 @@ class JudicialFacade:
         """Search Banco Nacional de Devedores Trabalhistas (BNDT) records."""
         return self.tst_connector.search_debitos(termo)
 
+    @property
+    def justica_aberta_connector(self) -> Any:
+        if (
+            not hasattr(self, "_justica_aberta_connector")
+            or getattr(self, "_justica_aberta_connector", None) is None
+        ):
+            from public_data_gateway.connectors.judicial.cnj_justica_aberta.connector import (
+                CNJJusticaAbertaConnector,
+            )
+
+            self._justica_aberta_connector = CNJJusticaAbertaConnector(
+                settings=self._sdk.settings
+            )
+        return self._justica_aberta_connector
+
+    def get_justica_aberta_offices(self, id_municipio: str) -> dict[str, Any]:
+        """Get municipal extrajudicial notary offices registry and titular tenure (CNJ Justiça Aberta)."""
+        return self.justica_aberta_connector.get_notary_offices_registry(id_municipio)
+
+    def list_justica_aberta_productivity(
+        self, id_municipio: str, atribuicao_cartorial: str | None = None
+    ) -> list[dict[str, Any]]:
+        """List notary acts, certificates, and e-Notariado/SREI share by attribution (CNJ Justiça Aberta)."""
+        return self.justica_aberta_connector.list_productivity_by_attribution(
+            id_municipio=id_municipio, atribuicao_cartorial=atribuicao_cartorial
+        )
+
+    def get_justica_aberta_emoluments(self, id_municipio: str) -> dict[str, Any]:
+        """Get municipal cartorial emoluments revenue, statutory transfers, and unit ticket (CNJ)."""
+        return self.justica_aberta_connector.get_emoluments_revenue(id_municipio)
+
+    def get_justica_aberta_digitalization(self, id_municipio: str) -> dict[str, Any]:
+        """Get historical archive digitization, SREI/ONR/CRC integration, and transparency profile."""
+        return self.justica_aberta_connector.get_digitalization_compliance(id_municipio)
+
+    def get_justica_aberta_features(self, id_municipio: str) -> dict[str, Any]:
+        """Get Gold CNJ Justiça Aberta cartorial efficiency and real-estate/notary dynamism features."""
+        return self.justica_aberta_connector.get_justica_aberta_features(id_municipio)
+
+    def list_top_justica_aberta_municipalities(
+        self, limit: int = 10, sigla_uf: str | None = None
+    ) -> list[dict[str, Any]]:
+        """List top Brazilian municipalities ranked by composite CNJ cartorial efficiency score."""
+        return self.justica_aberta_connector.list_top_notary_efficiency_municipalities(
+            limit=limit, sigla_uf=sigla_uf
+        )
+
 
 class CompanyFacade:
     """Corporate registries, tax regimes, and regional fiscal incentives (RFB & SUFRAMA)."""
@@ -1131,6 +1178,38 @@ class BrazilData:
     def get_labor_risk(self, cnpj_or_cpf: str) -> dict[str, Any]:
         """Assess labor compliance and BNDT risk profile (TST)."""
         return self.judicial.labor_risk(cnpj_or_cpf)
+
+    def get_justica_aberta_offices(self, id_municipio: str) -> dict[str, Any]:
+        """Consultar cadastro de cartórios/serventias extrajudiciais e provimento titular (CNJ)."""
+        return self.judicial.get_justica_aberta_offices(id_municipio)
+
+    def list_justica_aberta_productivity(
+        self, id_municipio: str, atribuicao_cartorial: str | None = None
+    ) -> list[dict[str, Any]]:
+        """Listar produtividade cartorial de atos, certidões e e-Notariado por atribuição (CNJ)."""
+        return self.judicial.list_justica_aberta_productivity(
+            id_municipio=id_municipio, atribuicao_cartorial=atribuicao_cartorial
+        )
+
+    def get_justica_aberta_emoluments(self, id_municipio: str) -> dict[str, Any]:
+        """Consultar arrecadação de emolumentos, repasses e ticket médio por ato (CNJ)."""
+        return self.judicial.get_justica_aberta_emoluments(id_municipio)
+
+    def get_justica_aberta_digitalization(self, id_municipio: str) -> dict[str, Any]:
+        """Consultar digitalização histórica e integração SREI/ONR/CRC dos cartórios (CNJ)."""
+        return self.judicial.get_justica_aberta_digitalization(id_municipio)
+
+    def get_justica_aberta_features(self, id_municipio: str) -> dict[str, Any]:
+        """Consultar features Gold de eficiência cartorial e dinamismo notarial/imobiliário (CNJ)."""
+        return self.judicial.get_justica_aberta_features(id_municipio)
+
+    def list_top_justica_aberta_municipalities(
+        self, limit: int = 10, sigla_uf: str | None = None
+    ) -> list[dict[str, Any]]:
+        """Listar municípios líderes em eficiência e modernização cartorial (CNJ Justiça Aberta)."""
+        return self.judicial.list_top_justica_aberta_municipalities(
+            limit=limit, sigla_uf=sigla_uf
+        )
 
     def get_suframa_status(self, cnpj_or_inscricao: str) -> dict[str, Any]:
         """Query official SUFRAMA registration and incentive status (PIM / ZFM / ALC)."""

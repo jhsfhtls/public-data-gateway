@@ -891,7 +891,7 @@ sources:
   - P04
   rice_score: 460
   roadmap_wave: 5
-  status: CATALOGED
+  status: HOMOLOGATED
 - source_id: datasus_sinasc
   name: 'DataSUS: Sistema de Informações sobre Nascidos Vivos (SINASC)'
   agency: Ministério da Saúde / DataSUS
