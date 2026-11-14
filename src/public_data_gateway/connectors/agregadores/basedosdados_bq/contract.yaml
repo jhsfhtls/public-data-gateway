@@ -1,0 +1,222 @@
+apiVersion: v3.1.0
+kind: DataContract
+id: ODCS-BR-BD-BQ-001
+name: Base dos Dados Datalake Público Federado (BigQuery)
+version: 1.0.0
+status: active
+domain: agregadores
+owner: public-data-gateway
+description: >
+  Contrato oficial ODCS v3.1 para consolidação de metadados e cobertura
+  municipal do Datalake Público Federado da Base dos Dados (BigQuery):
+  cobertura de tabelas tratadas por município, datasets temáticos (IBGE,
+  RAIS/CAGED, INEP, MapBiomas), governança de chaves canônicas, eficiência de
+  consultas SQL federadas e features Gold de maturidade do datalake.
+source:
+  source_id: basedosdados_bq
+  agency: Base dos Dados
+  official_url: https://basedosdados.org/
+  graphql_url: https://api.basedosdados.org/api/v1/graphql
+  protocol: BIGQUERY_SQL
+  auth_type: GCP_ADC
+  lgpd_tier: PUBLIC_NON_PERSONAL
+  update_frequency: Contínua
+  legal_basis:
+    - Lei nº 12.527/2011 (Lei de Acesso à Informação - LAI)
+    - Decreto nº 8.777/2016 (Política de Dados Abertos do Poder Executivo Federal)
+sla:
+  freshness: "2025-03-31"
+  completeness_threshold_pct: 100.0
+  key_integrity: STRING_7_DIGITS_IBGE
+tables:
+  - name: bd_datalake_cobertura_municipio
+    description: Cobertura municipal de datasets e tabelas tratadas na Base dos Dados (BigQuery).
+    primary_key: [id_municipio]
+    columns:
+      - name: id_municipio
+        type: string
+        nullable: false
+      - name: nome_municipio
+        type: string
+        nullable: false
+      - name: sigla_uf
+        type: string
+        nullable: false
+      - name: id_uf
+        type: string
+        nullable: false
+      - name: regiao
+        type: string
+        nullable: false
+      - name: qtd_datasets_tratados_bd
+        type: integer
+        nullable: false
+      - name: qtd_tabelas_bigquery_municipio
+        type: integer
+        nullable: false
+      - name: completude_chaves_ibge_pct
+        type: double
+        nullable: false
+      - name: taxa_atualizacao_mensal_pct
+        type: double
+        nullable: false
+      - name: indice_cobertura_datalake_bd
+        type: double
+        nullable: false
+      - name: reference_date
+        type: string
+        nullable: false
+  - name: bd_datasets_publicos_tema
+    description: Detalhamento por tema/dataset público tratado (IBGE, RAIS, INEP, MapBiomas) por município.
+    primary_key: [id_municipio, dataset_bd_id]
+    columns:
+      - name: id_municipio
+        type: string
+        nullable: false
+      - name: nome_municipio
+        type: string
+        nullable: false
+      - name: sigla_uf
+        type: string
+        nullable: false
+      - name: id_uf
+        type: string
+        nullable: false
+      - name: regiao
+        type: string
+        nullable: false
+      - name: dataset_bd_id
+        type: string
+        nullable: false
+      - name: qtd_registros_municipio
+        type: integer
+        nullable: false
+      - name: completude_colunas_pct
+        type: double
+        nullable: false
+      - name: latencia_atualizacao_dias
+        type: integer
+        nullable: false
+      - name: elegivel_join_federado_pct
+        type: double
+        nullable: false
+      - name: reference_date
+        type: string
+        nullable: false
+  - name: bd_governanca_metadados_odcs
+    description: Governança de dicionários, conformidade de chaves canônicas e disponibilidade BigQuery SQL.
+    primary_key: [id_municipio]
+    columns:
+      - name: id_municipio
+        type: string
+        nullable: false
+      - name: nome_municipio
+        type: string
+        nullable: false
+      - name: sigla_uf
+        type: string
+        nullable: false
+      - name: id_uf
+        type: string
+        nullable: false
+      - name: regiao
+        type: string
+        nullable: false
+      - name: dicionario_padronizado_pct
+        type: double
+        nullable: false
+      - name: conformidade_chaves_canonicas_pct
+        type: double
+        nullable: false
+      - name: disponibilidade_bq_sql_pct
+        type: double
+        nullable: false
+      - name: indice_governanca_bd
+        type: double
+        nullable: false
+      - name: reference_date
+        type: string
+        nullable: false
+  - name: bd_consumo_federado_sql
+    description: Volume de consultas BigQuery, eficiência de particionamento e reuso cross-domain.
+    primary_key: [id_municipio]
+    columns:
+      - name: id_municipio
+        type: string
+        nullable: false
+      - name: nome_municipio
+        type: string
+        nullable: false
+      - name: sigla_uf
+        type: string
+        nullable: false
+      - name: id_uf
+        type: string
+        nullable: false
+      - name: regiao
+        type: string
+        nullable: false
+      - name: consultas_bigquery_mensais
+        type: integer
+        nullable: false
+      - name: eficiencia_particionamento_pct
+        type: double
+        nullable: false
+      - name: custo_medio_scan_mb
+        type: double
+        nullable: false
+      - name: taxa_reuso_cross_domain_pct
+        type: double
+        nullable: false
+      - name: indice_eficiencia_federada_bd
+        type: double
+        nullable: false
+      - name: reference_date
+        type: string
+        nullable: false
+  - name: features_basedosdados_datalake_federado
+    description: Feature store Gold de maturidade e cobertura federada Base dos Dados (4 tiers).
+    primary_key: [id_municipio]
+    columns:
+      - name: id_municipio
+        type: string
+        nullable: false
+      - name: nome_municipio
+        type: string
+        nullable: false
+      - name: sigla_uf
+        type: string
+        nullable: false
+      - name: id_uf
+        type: string
+        nullable: false
+      - name: regiao
+        type: string
+        nullable: false
+      - name: qtd_datasets_tratados_bd
+        type: integer
+        nullable: false
+      - name: qtd_tabelas_bigquery_municipio
+        type: integer
+        nullable: false
+      - name: completude_chaves_ibge_pct
+        type: double
+        nullable: false
+      - name: indice_cobertura_datalake_bd
+        type: double
+        nullable: false
+      - name: indice_governanca_bd
+        type: double
+        nullable: false
+      - name: indice_eficiencia_federada_bd
+        type: double
+        nullable: false
+      - name: score_maturidade_bd
+        type: double
+        nullable: false
+      - name: tier_maturidade_bd
+        type: string
+        nullable: false
+      - name: reference_date
+        type: string
+        nullable: false

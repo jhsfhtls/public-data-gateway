@@ -1730,6 +1730,65 @@ class MCPDispatcher:
                                 },
                             },
                             {
+                                "name": "bdg_get_bd_coverage",
+                                "description": "Get official Base dos Dados (BigQuery) municipal treated dataset and table coverage metrics.",
+                                "inputSchema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "id_municipio": {
+                                            "type": "string",
+                                            "description": "7-digit IBGE municipality code, 6-digit prefix, or 8-digit CEP",
+                                        }
+                                    },
+                                    "required": ["id_municipio"],
+                                },
+                            },
+                            {
+                                "name": "bdg_get_bd_governance",
+                                "description": "Get municipal Base dos Dados dictionary standardization and canonical key governance metrics.",
+                                "inputSchema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "id_municipio": {
+                                            "type": "string",
+                                            "description": "7-digit IBGE municipality code, 6-digit prefix, or 8-digit CEP",
+                                        }
+                                    },
+                                    "required": ["id_municipio"],
+                                },
+                            },
+                            {
+                                "name": "bdg_get_bd_features",
+                                "description": "Get normalized Gold Base dos Dados datalake maturity score and 4-tier classification.",
+                                "inputSchema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "id_municipio": {
+                                            "type": "string",
+                                            "description": "7-digit IBGE municipality code, 6-digit prefix, or 8-digit CEP",
+                                        }
+                                    },
+                                    "required": ["id_municipio"],
+                                },
+                            },
+                            {
+                                "name": "bdg_list_top_bd_municipalities",
+                                "description": "List top Brazilian municipalities ranked by composite Base dos Dados datalake maturity score.",
+                                "inputSchema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "limit": {
+                                            "type": "integer",
+                                            "description": "Maximum rows (default: 10)",
+                                        },
+                                        "sigla_uf": {
+                                            "type": "string",
+                                            "description": "Optional 2-letter state filter (e.g. SP)",
+                                        },
+                                    },
+                                },
+                            },
+                            {
                                 "name": "bdg_get_onr_property_registry",
                                 "description": "Get official ONR SREI municipal active property registry CNM stock, digital conversion rate, and online certificate emissions.",
                                 "inputSchema": {
@@ -3828,6 +3887,71 @@ class MCPDispatcher:
                     },
                 }
             wrapped = wrap_untrusted_gov_data(result, source_id="mapa_zarc")
+            return {
+                "jsonrpc": "2.0",
+                "id": req_id,
+                "result": {"content": [{"type": "text", "text": wrapped}], "isError": False},
+            }
+
+        if tool_name in {
+            "bdg_get_bd_coverage",
+            "bdg_get_bd_governance",
+            "bdg_get_bd_features",
+            "bdg_list_top_bd_municipalities",
+        }:
+            from public_data_gateway.connectors.agregadores.basedosdados_bq.connector import (
+                BaseDosDadosBqConnector,
+            )
+
+            connector = BaseDosDadosBqConnector(settings=self.settings)
+            try:
+                if tool_name == "bdg_get_bd_coverage":
+                    result: Any = connector.get_bd_coverage(
+                        str(args.get("id_municipio", ""))
+                    )
+                elif tool_name == "bdg_get_bd_governance":
+                    result = connector.get_bd_governance(
+                        str(args.get("id_municipio", ""))
+                    )
+                elif tool_name == "bdg_get_bd_features":
+                    result = connector.get_bd_features(
+                        str(args.get("id_municipio", ""))
+                    )
+                else:
+                    result = connector.list_top_bd_municipalities(
+                        limit=int(args.get("limit", 10)),
+                        sigla_uf=args.get("sigla_uf"),
+                    )
+            except (ValueError, KeyError) as exc:
+                return {
+                    "jsonrpc": "2.0",
+                    "id": req_id,
+                    "result": {
+                        "content": [
+                            {
+                                "type": "text",
+                                "text": f"Base dos Dados parameter error: {exc}",
+                            }
+                        ],
+                        "isError": True,
+                    },
+                }
+
+            if not result:
+                return {
+                    "jsonrpc": "2.0",
+                    "id": req_id,
+                    "result": {
+                        "content": [
+                            {
+                                "type": "text",
+                                "text": "No Base dos Dados data found for the query.",
+                            }
+                        ],
+                        "isError": True,
+                    },
+                }
+            wrapped = wrap_untrusted_gov_data(result, source_id="basedosdados_bq")
             return {
                 "jsonrpc": "2.0",
                 "id": req_id,
