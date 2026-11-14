@@ -1083,7 +1083,7 @@ sources:
   - P02
   rice_score: 410
   roadmap_wave: 5
-  status: CATALOGED
+  status: HOMOLOGATED
 - source_id: inpe_terrabrasilis
   name: 'INPE: Plataforma TerraBrasilis (DETER & PRODES)'
   agency: Instituto Nacional de Pesquisas Espaciais (INPE)

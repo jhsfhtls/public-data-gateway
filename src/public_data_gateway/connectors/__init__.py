@@ -15,6 +15,7 @@ import public_data_gateway.connectors.demografico.ibge_censo2022  # noqa: F401
 import public_data_gateway.connectors.demografico.ibge_localidades  # noqa: F401
 import public_data_gateway.connectors.demografico.ibge_pib_municipal  # noqa: F401
 import public_data_gateway.connectors.demografico.ibge_sidra  # noqa: F401
+import public_data_gateway.connectors.educacao.capes_sucupira  # noqa: F401
 import public_data_gateway.connectors.educacao.inep_censo_escolar  # noqa: F401
 import public_data_gateway.connectors.educacao.inep_censo_superior  # noqa: F401
 import public_data_gateway.connectors.educacao.inep_enem  # noqa: F401

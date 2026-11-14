@@ -2008,6 +2008,89 @@ def create_app(settings: GatewaySettings | None = None) -> FastAPI:
         except ValueError as exc:
             raise HTTPException(status_code=400, detail=str(exc)) from exc
 
+    @app.get("/api/v1/education/sucupira/top-municipalities")
+    async def get_top_sucupira_municipalities(
+        limit: int = Query(10, ge=1, le=50, description="Max municipalities to list"),
+        uf: str | None = Query(None, description="Filter by 2-letter state abbreviation"),
+    ) -> list[dict[str, Any]]:
+        from public_data_gateway.connectors.educacao.capes_sucupira.connector import (
+            CapesSucupiraConnector,
+        )
+
+        conn = CapesSucupiraConnector(settings=app_settings)
+        try:
+            return conn.list_top_sucupira_municipalities(limit=limit, sigla_uf=uf)
+        except ValueError as exc:
+            raise HTTPException(status_code=400, detail=str(exc)) from exc
+
+    @app.get("/api/v1/education/sucupira/features/{id_municipio}")
+    async def get_sucupira_features(id_municipio: str) -> dict[str, Any]:
+        from public_data_gateway.connectors.educacao.capes_sucupira.connector import (
+            CapesSucupiraConnector,
+        )
+
+        conn = CapesSucupiraConnector(settings=app_settings)
+        try:
+            return conn.get_sucupira_postgrad_features(id_municipio)
+        except ValueError as exc:
+            raise HTTPException(status_code=400, detail=str(exc)) from exc
+
+    @app.get("/api/v1/education/sucupira/students/{id_municipio}")
+    async def get_sucupira_students(
+        id_municipio: str,
+        area: str | None = Query(
+            None, description="Optional CAPES knowledge field filter (e.g. Engenharias)"
+        ),
+    ) -> list[dict[str, Any]]:
+        from public_data_gateway.connectors.educacao.capes_sucupira.connector import (
+            CapesSucupiraConnector,
+        )
+
+        conn = CapesSucupiraConnector(settings=app_settings)
+        try:
+            return conn.list_sucupira_students_by_area(
+                id_municipio, grande_area_conhecimento=area
+            )
+        except ValueError as exc:
+            raise HTTPException(status_code=400, detail=str(exc)) from exc
+
+    @app.get("/api/v1/education/sucupira/faculty/{id_municipio}")
+    async def get_sucupira_faculty(id_municipio: str) -> dict[str, Any]:
+        from public_data_gateway.connectors.educacao.capes_sucupira.connector import (
+            CapesSucupiraConnector,
+        )
+
+        conn = CapesSucupiraConnector(settings=app_settings)
+        try:
+            return conn.get_sucupira_faculty_research(id_municipio)
+        except ValueError as exc:
+            raise HTTPException(status_code=400, detail=str(exc)) from exc
+
+    @app.get("/api/v1/education/sucupira/production/{id_municipio}")
+    async def get_sucupira_production(id_municipio: str) -> dict[str, Any]:
+        from public_data_gateway.connectors.educacao.capes_sucupira.connector import (
+            CapesSucupiraConnector,
+        )
+
+        conn = CapesSucupiraConnector(settings=app_settings)
+        try:
+            return conn.get_sucupira_scientific_production(id_municipio)
+        except ValueError as exc:
+            raise HTTPException(status_code=400, detail=str(exc)) from exc
+
+    @app.get("/api/v1/education/sucupira/programs/{id_municipio}")
+    @app.get("/api/v1/sucupira/{id_municipio}")
+    async def get_sucupira_programs(id_municipio: str) -> dict[str, Any]:
+        from public_data_gateway.connectors.educacao.capes_sucupira.connector import (
+            CapesSucupiraConnector,
+        )
+
+        conn = CapesSucupiraConnector(settings=app_settings)
+        try:
+            return conn.get_sucupira_program_evaluation(id_municipio)
+        except ValueError as exc:
+            raise HTTPException(status_code=400, detail=str(exc)) from exc
+
     @app.get("/api/v1/real-estate/onr/top-municipalities")
     async def get_top_onr_municipalities(
         limit: int = Query(10, ge=1, le=50, description="Max municipalities to list"),

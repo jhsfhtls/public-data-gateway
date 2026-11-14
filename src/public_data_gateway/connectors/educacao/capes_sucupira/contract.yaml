@@ -1,0 +1,569 @@
+schema_version: "3.1.0"
+contract_id: "ODCS-BR-CAPES-SUCUPIRA-001"
+source_id: "capes_sucupira"
+version: "1.0.0"
+name: "CAPES: Plataforma Sucupira (Pós-Graduação Stricto Sensu)"
+agency: "Coordenação de Aperfeiçoamento de Pessoal de Nível Superior (CAPES)"
+official_url: "https://dadosabertos.capes.gov.br/"
+
+legal_framework:
+  statutes:
+    - name: "Lei nº 8.405/1992"
+      description: "Autoriza o Poder Executivo a instituir a Fundação Coordenação de Aperfeiçoamento de Pessoal de Nível Superior (CAPES)"
+    - name: "Decreto nº 11.238/2022"
+      description: "Aprova o Estatuto da CAPES e define suas atribuições na avaliação e fomento da pós-graduação stricto sensu"
+    - name: "Portaria CAPES nº 182/2018 & Portaria MEC nº 389/2017"
+      description: "Regulam os processos da Avaliação Quadrienal da Pós-Graduação Stricto Sensu e a oferta de mestrados e doutorados profissionais"
+    - name: "Lei nº 13.709/2018 (LGPD)"
+      description: "Regula a proteção e anonimização de dados públicos agregados de discentes, docentes e produção científica"
+    - name: "Decreto nº 8.777/2016"
+      description: "Institui a Política de Dados Abertos do Poder Executivo Federal aplicável ao portal de Dados Abertos da CAPES"
+
+data_governance:
+  grain: "municipio_pos_graduacao_sucupira"
+  primary_keys:
+    - "id_municipio"
+    - "sigla_uf"
+  reference_date_column: "reference_date"
+  min_expected_rows: 10
+  max_volume_drop_pct: 15.0
+  freshness_sla_hours: 720
+  lgpd_tier: "PUBLIC_NON_PERSONAL"
+  ml_feature_domains:
+    - "postgrad_programs"
+    - "academic_production"
+
+schema:
+  tables:
+    sucupira_programas_avaliacao:
+      description: "Programas de pós-graduação stricto sensu (mestrado e doutorado acadêmico/profissional) avaliados pela CAPES por município e nota quadrienal."
+      grain: "id_municipio, ano_base_sucupira"
+      primary_keys: ["id_municipio", "ano_base_sucupira"]
+      min_expected_rows: 12
+      columns:
+        - name: "id_municipio"
+          data_type: "string"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Código IBGE de 7 dígitos identificador único do município."
+        - name: "nome_municipio"
+          data_type: "string"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Nome oficial do município."
+        - name: "sigla_uf"
+          data_type: "string"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Sigla de 2 letras da Unidade Federativa."
+        - name: "id_uf"
+          data_type: "string"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Código IBGE de 2 dígitos da Unidade Federativa."
+        - name: "regiao"
+          data_type: "string"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Grande região geográfica brasileira segundo o IBGE."
+        - name: "ano_base_sucupira"
+          data_type: "int64"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Ano-base de referência da coleta CAPES Sucupira."
+        - name: "total_programas_stricto_sensu_ano"
+          data_type: "int64"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Total de programas de pós-graduação stricto sensu em funcionamento no município."
+        - name: "programas_nota_6_7_excelencia_ano"
+          data_type: "int64"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Quantidade de programas com conceito CAPES 6 ou 7 (padrão internacional de excelência)."
+        - name: "programas_doutorado_ativo_ano"
+          data_type: "int64"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Programas que ofertam curso de doutorado ativo no município."
+        - name: "ies_ofertantes_pos_graduacao_ano"
+          data_type: "int64"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Quantidade de Instituições de Ensino Superior ofertantes de pós-graduação stricto sensu."
+        - name: "nota_media_capes_programas"
+          data_type: "float64"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Conceito médio ponderado dos programas avaliados pela CAPES (escala 3.0 a 7.0)."
+        - name: "prop_programas_excelencia_6_7_pct"
+          data_type: "float64"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Proporção percentual de programas com conceito CAPES 6 ou 7 (%)."
+        - name: "prop_programas_profissionais_pct"
+          data_type: "float64"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Proporção percentual de programas na modalidade mestrado/doutorado profissional (%)."
+        - name: "reference_date"
+          data_type: "string"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Data de referência do ciclo anual CAPES Sucupira (YYYY-MM-DD)."
+        - name: "extracted_at"
+          data_type: "string"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Timestamp UTC ISO-8601 da materialização."
+
+    sucupira_discentes_titulados_area:
+      description: "Discentes matriculados, titulados (mestres e doutores) e bolsistas CAPES desagregados por grande área de conhecimento no município."
+      grain: "id_municipio, ano_base_sucupira, grande_area_conhecimento"
+      primary_keys: ["id_municipio", "ano_base_sucupira", "grande_area_conhecimento"]
+      min_expected_rows: 48
+      columns:
+        - name: "id_municipio"
+          data_type: "string"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Código IBGE de 7 dígitos identificador único do município."
+        - name: "nome_municipio"
+          data_type: "string"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Nome oficial do município."
+        - name: "sigla_uf"
+          data_type: "string"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Sigla de 2 letras da Unidade Federativa."
+        - name: "id_uf"
+          data_type: "string"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Código IBGE de 2 dígitos da Unidade Federativa."
+        - name: "regiao"
+          data_type: "string"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Grande região geográfica brasileira segundo o IBGE."
+        - name: "ano_base_sucupira"
+          data_type: "int64"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Ano-base de referência da coleta CAPES Sucupira."
+        - name: "grande_area_conhecimento"
+          data_type: "string"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Grande área do conhecimento CAPES (Engenharias_e_Computacao, Ciencias_Biologicas_e_Saude, Ciencias_Humanas_e_Sociais, Ciencias_Exatas_e_Agrarias)."
+        - name: "matriculados_mestrado_area"
+          data_type: "int64"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Discentes com matrícula ativa em cursos de mestrado na grande área."
+        - name: "matriculados_doutorado_area"
+          data_type: "int64"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Discentes com matrícula ativa em cursos de doutorado na grande área."
+        - name: "titulados_mestres_ano"
+          data_type: "int64"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Mestres titulados no ano-base na grande área."
+        - name: "titulados_doutores_ano"
+          data_type: "int64"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Doutores titulados no ano-base na grande área."
+        - name: "bolsistas_capes_area"
+          data_type: "int64"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Discentes contemplados com bolsas CAPES na grande área."
+        - name: "taxa_titulacao_doutorado_pct"
+          data_type: "float64"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Participação percentual de doutores sobre o total de titulados na grande área (%)."
+        - name: "reference_date"
+          data_type: "string"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Data de referência do ciclo anual CAPES Sucupira (YYYY-MM-DD)."
+        - name: "extracted_at"
+          data_type: "string"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Timestamp UTC ISO-8601 da materialização."
+
+    sucupira_docentes_pesquisa:
+      description: "Corpo docente permanente, bolsistas de produtividade CNPq, dedicação exclusiva e linhas/projetos de pesquisa em atividade."
+      grain: "id_municipio, ano_base_sucupira"
+      primary_keys: ["id_municipio", "ano_base_sucupira"]
+      min_expected_rows: 12
+      columns:
+        - name: "id_municipio"
+          data_type: "string"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Código IBGE de 7 dígitos identificador único do município."
+        - name: "nome_municipio"
+          data_type: "string"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Nome oficial do município."
+        - name: "sigla_uf"
+          data_type: "string"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Sigla de 2 letras da Unidade Federativa."
+        - name: "id_uf"
+          data_type: "string"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Código IBGE de 2 dígitos da Unidade Federativa."
+        - name: "regiao"
+          data_type: "string"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Grande região geográfica brasileira segundo o IBGE."
+        - name: "ano_base_sucupira"
+          data_type: "int64"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Ano-base de referência da coleta CAPES Sucupira."
+        - name: "total_docentes_permanentes_ano"
+          data_type: "int64"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Total de docentes permanentes vinculados aos programas stricto sensu."
+        - name: "docentes_bolsistas_pq_cnpq_ano"
+          data_type: "int64"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Docentes permanentes com bolsa de Produtividade em Pesquisa (PQ) do CNPq."
+        - name: "razao_discentes_por_docente"
+          data_type: "float64"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Razão média de discentes matriculados por docente permanente."
+        - name: "taxa_docentes_dedicacao_exclusiva_pct"
+          data_type: "float64"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Percentual de docentes permanentes em regime de dedicação exclusiva (%)."
+        - name: "taxa_doutores_internacionalizacao_pct"
+          data_type: "float64"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Percentual de docentes com doutorado ou pós-doutorado no exterior (%)."
+        - name: "linhas_pesquisa_ativas_ano"
+          data_type: "int64"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Total de linhas de pesquisa ativas registradas na Plataforma Sucupira."
+        - name: "projetos_financiamento_externo_ano"
+          data_type: "int64"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Projetos de pesquisa com financiamento externo ou cooperação empresarial/agências."
+        - name: "reference_date"
+          data_type: "string"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Data de referência do ciclo anual CAPES Sucupira (YYYY-MM-DD)."
+        - name: "extracted_at"
+          data_type: "string"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Timestamp UTC ISO-8601 da materialização."
+
+    sucupira_producao_cientifica_teses:
+      description: "Produção intelectual Qualis A1/A2, teses e dissertações defendidas, patentes/software, acesso aberto e fomento estimado em bolsas."
+      grain: "id_municipio, ano_base_sucupira"
+      primary_keys: ["id_municipio", "ano_base_sucupira"]
+      min_expected_rows: 12
+      columns:
+        - name: "id_municipio"
+          data_type: "string"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Código IBGE de 7 dígitos identificador único do município."
+        - name: "nome_municipio"
+          data_type: "string"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Nome oficial do município."
+        - name: "sigla_uf"
+          data_type: "string"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Sigla de 2 letras da Unidade Federativa."
+        - name: "id_uf"
+          data_type: "string"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Código IBGE de 2 dígitos da Unidade Federativa."
+        - name: "regiao"
+          data_type: "string"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Grande região geográfica brasileira segundo o IBGE."
+        - name: "ano_base_sucupira"
+          data_type: "int64"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Ano-base de referência da coleta CAPES Sucupira."
+        - name: "artigos_qualis_a1_a2_ano"
+          data_type: "int64"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Artigos publicados em periódicos estratificados como Qualis A1 ou A2 no ano."
+        - name: "teses_dissertacoes_defendidas_ano"
+          data_type: "int64"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Total de teses de doutorado e dissertações de mestrado defendidas e depositadas."
+        - name: "producao_tecnica_patentes_software_ano"
+          data_type: "int64"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Produtos técnicos e tecnológicos (patentes, registros de software e processos)."
+        - name: "indice_impacto_producao_por_docente"
+          data_type: "float64"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Razão anual de artigos Qualis A1/A2 e produções técnicas por docente permanente."
+        - name: "taxa_acesso_aberto_repositorio_pct"
+          data_type: "float64"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Percentual de trabalhos de conclusão disponíveis em acesso aberto no Catálogo CAPES (%)."
+        - name: "colaboracoes_internacionais_coautoria_pct"
+          data_type: "float64"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Percentual de publicações científicas com coautoria internacional (%)."
+        - name: "fomento_bolsas_estimado_milhoes_brl"
+          data_type: "float64"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Valor anual estimado de fomento em bolsas de pós-graduação no município (R$ milhões)."
+        - name: "reference_date"
+          data_type: "string"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Data de referência do ciclo anual CAPES Sucupira (YYYY-MM-DD)."
+        - name: "extracted_at"
+          data_type: "string"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Timestamp UTC ISO-8601 da materialização."
+
+    features_capes_sucupira_pos_graduacao:
+      description: "Feature store Gold municipal de densidade e excelência da pós-graduação stricto sensu, produção científica Qualis A1/A2, inovação e capital humano avançado."
+      grain: "id_municipio"
+      primary_keys: ["id_municipio"]
+      min_expected_rows: 12
+      columns:
+        - name: "id_municipio"
+          data_type: "string"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Código IBGE de 7 dígitos identificador único do município."
+        - name: "nome_municipio"
+          data_type: "string"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Nome oficial do município."
+        - name: "sigla_uf"
+          data_type: "string"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Sigla de 2 letras da Unidade Federativa."
+        - name: "id_uf"
+          data_type: "string"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Código IBGE de 2 dígitos da Unidade Federativa."
+        - name: "regiao"
+          data_type: "string"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Grande região geográfica brasileira segundo o IBGE."
+        - name: "ano_base_sucupira"
+          data_type: "int64"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Ano-base de referência da coleta CAPES Sucupira."
+        - name: "total_programas_stricto_sensu_ano"
+          data_type: "int64"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Total de programas stricto sensu no município."
+        - name: "programas_nota_6_7_excelencia_ano"
+          data_type: "int64"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Total de programas nota 6 ou 7 CAPES no município."
+        - name: "nota_media_capes_programas"
+          data_type: "float64"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Conceito médio dos programas avaliados pela CAPES."
+        - name: "prop_programas_excelencia_6_7_pct"
+          data_type: "float64"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Proporção de programas com conceito 6 ou 7 (%)."
+        - name: "total_matriculados_pos_graduacao_ano"
+          data_type: "int64"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Total agregado de discentes matriculados em mestrado e doutorado no município."
+        - name: "total_titulados_mestres_doutores_ano"
+          data_type: "int64"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Total agregado de mestres e doutores titulados no ano-base."
+        - name: "total_docentes_permanentes_ano"
+          data_type: "int64"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Total de docentes permanentes no município."
+        - name: "razao_discentes_por_docente"
+          data_type: "float64"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Razão de discentes matriculados por docente permanente."
+        - name: "artigos_qualis_a1_a2_ano"
+          data_type: "int64"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Artigos Qualis A1/A2 publicados no ano-base."
+        - name: "indice_impacto_producao_por_docente"
+          data_type: "float64"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Índice de produção científica e técnica por docente."
+        - name: "fomento_bolsas_estimado_milhoes_brl"
+          data_type: "float64"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Fomento anual estimado em bolsas de pós-graduação (R$ milhões)."
+        - name: "score_densidade_excelencia_stricto_sensu"
+          data_type: "float64"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Score normalizado (0-100) de densidade e excelência da pós-graduação stricto sensu."
+        - name: "score_producao_cientifica_inovacao"
+          data_type: "float64"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Score normalizado (0-100) de produção científica Qualis A1/A2, inovação técnica e internacionalização."
+        - name: "score_composto_ecossistema_pos_graduacao"
+          data_type: "float64"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Score composto (0-100) do ecossistema municipal de pós-graduação e pesquisa."
+        - name: "perfil_pos_graduacao_sucupira"
+          data_type: "string"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Classificação estratégica do ecossistema municipal de pós-graduação stricto sensu."
+        - name: "reference_date"
+          data_type: "string"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Data de referência do ciclo anual CAPES Sucupira (YYYY-MM-DD)."
+        - name: "extracted_at"
+          data_type: "string"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Timestamp UTC ISO-8601 da materialização."

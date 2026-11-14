@@ -1,25 +1,25 @@
-# Implementation Plan — `capitais_iptu_itbi` (`ODCS-BR-CAPITAIS-IPTU-ITBI-001`)
+# Implementation Plan — `capes_sucupira` (`ODCS-BR-CAPES-SUCUPIRA-001`)
 
-> **Fase 07 — Ingestão Wave 5 (`12_imobiliario_cartorial` / `imobiliario`)**  
-> **Conector #41 de 49 (`83.7%` do catálogo homologado) — Próximo: `capes_sucupira`**  
-> **Branch / Worktree:** `feat/conn-capitais-iptu-itbi` em `../worktrees/feat-conn-capitais-iptu-itbi`
+> **Fase 07 — Ingestão Wave 5 (`07_educacao_capital_humano` / `educacao`)**  
+> **Conector #42 de 49 (`85.7%` do catálogo homologado) — Wave 5 100% concluída! Próximo (Wave 6): `inpe_terrabrasilis`**  
+> **Branch / Worktree:** `feat/conn-capes-sucupira` em `../worktrees/feat-conn-capes-sucupira`
 
 ## Arquitetura Medallion & Gates de Execução (11 Gates)
 
-- **Gate 0 — Worktree & Junctions:** Worktree isolado `feat/conn-capitais-iptu-itbi` a partir de `main` (`769d387`), junctions para `.venv` e `data/*` (excluindo `data/reference`), `brasil.duckdb` copiado e instalação editável local (`pip install --no-deps -e .`).
+- **Gate 0 — Worktree & Junctions:** Worktree isolado `feat/conn-capes-sucupira` a partir de `main` (`77c4b55`), junctions para `.venv` e `data`, e apontamento editável local em `.venv`.
 - **Gates 1–3 — Contrato ODCS, Conector & Materialização:**
-  - `src/public_data_gateway/connectors/imobiliario/capitais_iptu_itbi/contract.yaml` (`ODCS-BR-CAPITAIS-IPTU-ITBI-001`).
-  - `CapitaisIptuItbiConnector` (`connector.py`) registrado em `capitais_iptu_itbi`, materializando 4 tabelas Silver (`iptu_itbi_cadastro_imobiliario_municipal`, `itbi_transacoes_imobiliarias_padrao`, `iptu_itbi_dinamica_precos_bairros`, `iptu_itbi_governanca_fiscal_geoespacial`) e 1 Gold Feature Store (`features_iptu_itbi_mercado_imobiliario_capitais`) em `data/capitais_iptu_itbi/{silver,gold}/`.
-  - Probe fail-hard `probe_live()` nos portais oficiais (`https://dados.gov.br/` e `https://www.prefeitura.sp.gov.br/cidade/secretarias/fazenda/servicos/itbi/`).
+  - `src/public_data_gateway/connectors/educacao/capes_sucupira/contract.yaml` (`ODCS-BR-CAPES-SUCUPIRA-001`).
+  - `CapesSucupiraConnector` (`connector.py`) registrado em `capes_sucupira`, materializando 4 tabelas Silver (`sucupira_programas_avaliacao`, `sucupira_discentes_titulados_area`, `sucupira_docentes_pesquisa`, `sucupira_producao_cientifica_teses`) e 1 Gold Feature Store (`features_capes_sucupira_pos_graduacao`) em `data/capes_sucupira/{silver,gold}/`.
+  - Probe fail-hard `probe_live_endpoints()` nos portais oficiais da CAPES (`https://dadosabertos.capes.gov.br/api/3/action/package_list` e `https://www.gov.br/capes/pt-br/acesso-a-informacao/dados-abertos`).
 - **Gates 4–7 — Camadas dbt, Documentação 100% & Paridade SQL–Python:**
-  - 4 staging views (`stg_iptu_itbi_cadastro_imobiliario_municipal`, `stg_itbi_transacoes_imobiliarias_padrao`, `stg_iptu_itbi_dinamica_precos_bairros`, `stg_iptu_itbi_governanca_fiscal_geoespacial`) registradas em `dbt/dbt_project.yml`.
-  - 2 fatos core (`fct_iptu_itbi_cadastro_precos_governanca_municipio`, `fct_itbi_transacoes_segmento_municipio`) e 1 mart (`mart_mercado_imobiliario_iptu_itbi_capitais_brasil`).
-  - Execução de `dbt build`, `dbt docs generate`, `scripts/lint_dbt_docs.py` (`APPROVED` — 348 modelos / 5.085 colunas / 190 fontes) e validação de paridade estrita SQL–Python (23 colunas compartilhadas, zero divergências).
+  - 4 staging views (`stg_sucupira_programas_avaliacao`, `stg_sucupira_discentes_titulados_area`, `stg_sucupira_docentes_pesquisa`, `stg_sucupira_producao_cientifica_teses`) registradas em `dbt/dbt_project.yml`.
+  - 2 fatos core (`fct_sucupira_pos_graduacao_pesquisa_municipio`, `fct_sucupira_discentes_area_municipio`) e 1 mart (`mart_pos_graduacao_capes_sucupira_brasil`).
+  - Execução de `dbt build` (`PASS=144 WARN=0 ERROR=0`), `dbt docs generate`, `scripts/lint_dbt_docs.py` (`APPROVED` — 355 modelos / 5.217 colunas / 194 fontes) e validação de paridade estrita SQL–Python (`DBT_ROWS: 12`, `PARITY_DIFFS: []`).
 - **Gate 8 — Paridade Multi-Interface:**
-  - `RealEstateFacade.iptu_itbi_connector` e `BrazilData` (`sdk.py`), grupo CLI `bdg iptu-itbi` (`cadastre`, `transactions`, `prices`, `governance`, `features`, `ranking` em `cli/main.py`), 6 rotas REST `/api/v1/real-estate/iptu-itbi/*` + `/api/v1/iptu-itbi/{id_municipio}` (`api/app.py`) e 4 tools MCP `bdg_*_iptu_itbi*` com `wrap_untrusted_gov_data(result, source_id="capitais_iptu_itbi")` em `mcp/server.py`.
+  - `EducationFacade.sucupira_connector` e `BrazilData` (`sdk.py`), grupo CLI `bdg sucupira` (`programs`, `students`, `faculty`, `production`, `features`, `ranking` em `cli/main.py`), 7 rotas REST (`/api/v1/education/sucupira/*` + `/api/v1/sucupira/{id_municipio}` em `api/app.py`) e 4 tools MCP `bdg_*_sucupira*` com `wrap_untrusted_gov_data(result, source_id="capes_sucupira")` em `mcp/server.py`.
 - **Gate 9 — Suíte de Testes:**
-  - `tests/connectors/test_capitais_iptu_itbi.py` (8 testes offline) e `tests/connectors/test_capitais_iptu_itbi_live.py` (1 teste `@pytest.mark.live`).
+  - `tests/connectors/test_capes_sucupira.py` (8 testes offline) e `tests/connectors/test_capes_sucupira_live.py` (1 teste `@pytest.mark.live`).
 - **Gate 10 — Governança, Renderers & Verificação Completa:**
   - Atualização de `catalog/sources_registry.yaml` (`HOMOLOGATED`), `state/project_progress.json`, `CATALOG.md`, `JORNADA_IMPLEMENTACAO.md`, normalização UTF-8 LF sem BOM, `ruff check .`, `--check` renderers, `lint_dbt_docs.py` e `pytest -m "not live"`.
 - **Gate 11 — Commit, PR, Merge & Revalidação Canônica:**
-  - Commit `feat(real-estate): add capitais_iptu_itbi connector`, PR com checks verdes, squash-merge em `main`, remoção segura das junctions/worktree, reinstalação editável canônica, revalidação end-to-end em `public-data-gateway` e acompanhamento do CI em `main`.
+  - Commit `feat(education): add capes_sucupira connector`, PR com checks verdes, squash-merge em `main`, remoção segura das junctions/worktree, restauração do `.pth` editável canônico, revalidação end-to-end em `public-data-gateway` e acompanhamento do CI em `main`.
