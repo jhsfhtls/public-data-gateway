@@ -330,3 +330,140 @@ models:
         description: "Timestamp ISO-8601 UTC da geração."
         tests:
           - not_null
+
+  - name: mart_mortalidade_epidemiologia_sim_brasil
+    description: "Data Mart executivo de mortalidade por grandes capítulos CID-10, vigilância de óbitos infantis/maternos, carga evitável e transição epidemiológica (DataSUS SIM)."
+    columns:
+      - name: id_municipio
+        description: "Código IBGE de 7 dígitos do município."
+        tests:
+          - not_null
+          - unique
+      - name: nome_municipio
+        description: "Nome oficial do município."
+        tests:
+          - not_null
+      - name: sigla_uf
+        description: "Sigla de 2 letras da Unidade Federativa."
+        tests:
+          - not_null
+      - name: id_uf
+        description: "Código IBGE de 2 dígitos da Unidade Federativa."
+        tests:
+          - not_null
+      - name: nome_uf
+        description: "Nome completo da Unidade Federativa."
+        tests:
+          - not_null
+      - name: regiao
+        description: "Grande região geográfica do Brasil segundo o IBGE."
+        tests:
+          - not_null
+      - name: ano_referencia
+        description: "Ano epidemiológico de referência das Declarações de Óbito no SIM."
+        tests:
+          - not_null
+      - name: total_obitos_registrados
+        description: "Total de óbitos por residência registrados no SIM."
+        tests:
+          - not_null
+      - name: taxa_bruta_mortalidade_1000_hab
+        description: "Taxa bruta de mortalidade geral por 1.000 habitantes."
+        tests:
+          - not_null
+      - name: obitos_hospitalares
+        description: "Total de óbitos ocorridos em ambiente hospitalar."
+        tests:
+          - not_null
+      - name: proporcao_obitos_hospitalares_pct
+        description: "Percentual de óbitos ocorridos em estabelecimentos hospitalares (%)."
+        tests:
+          - not_null
+      - name: obitos_causas_mal_definidas
+        description: "Total de óbitos atribuídos a causas mal definidas (Capítulo XVIII CID-10)."
+        tests:
+          - not_null
+      - name: proporcao_causas_mal_definidas_pct
+        description: "Percentual de óbitos por causas mal definidas (%)."
+        tests:
+          - not_null
+      - name: obitos_infantis_menores_1_ano
+        description: "Óbitos de menores de 1 ano residentes no município."
+        tests:
+          - not_null
+      - name: obitos_neonatais_precoce_tardio
+        description: "Óbitos neonatais ocorridos de 0 a 27 dias de vida."
+        tests:
+          - not_null
+      - name: taxa_mortalidade_infantil_1000_nv
+        description: "Taxa de Mortalidade Infantil (TMI) por 1.000 nascidos vivos."
+        tests:
+          - not_null
+      - name: obitos_maternos_declarados
+        description: "Quantidade de óbitos maternos declarados."
+        tests:
+          - not_null
+      - name: razao_mortalidade_materna_100k_nv
+        description: "Razão de Mortalidade Materna (RMM) por 100.000 nascidos vivos."
+        tests:
+          - not_null
+      - name: proporcao_obitos_infantis_investigados_pct
+        description: "Percentual de óbitos infantis oportunamente investigados (%)."
+        tests:
+          - not_null
+      - name: obitos_prematuros_dcnt_30_69_anos
+        description: "Óbitos prematuros (30 a 69 anos) pelo conjunto das principais DCNT."
+        tests:
+          - not_null
+      - name: proporcao_mortalidade_prematura_dcnt_pct
+        description: "Participação percentual dos óbitos prematuros por DCNT (%)."
+        tests:
+          - not_null
+      - name: taxa_mortalidade_causas_externas_100k_hab
+        description: "Taxa de mortalidade por causas externas por 100.000 habitantes."
+        tests:
+          - not_null
+      - name: taxa_mortalidade_acidentes_transporte_100k_hab
+        description: "Taxa de mortalidade por acidentes de transporte terrestre por 100.000 habitantes."
+        tests:
+          - not_null
+      - name: anos_potenciais_vida_perdidos_1000_hab
+        description: "Anos Potenciais de Vida Perdidos (APVP) antes dos 70 anos por 1.000 habitantes."
+        tests:
+          - not_null
+      - name: circulatorio_obitos
+        description: "Total de óbitos por doenças do aparelho circulatório (Capítulo IX CID-10)."
+        tests:
+          - not_null
+      - name: neoplasias_obitos
+        description: "Total de óbitos por neoplasias e tumores (Capítulo II CID-10)."
+        tests:
+          - not_null
+      - name: respiratorio_obitos
+        description: "Total de óbitos por doenças do aparelho respiratório (Capítulo X CID-10)."
+        tests:
+          - not_null
+      - name: causas_externas_obitos
+        description: "Total de óbitos por causas externas de morbidade e mortalidade (Capítulo XX CID-10)."
+        tests:
+          - not_null
+      - name: score_qualidade_vigilancia_obitos_sim
+        description: "Score normalizado (0 a 100) da qualidade da informação e vigilância de óbitos no SIM."
+        tests:
+          - not_null
+      - name: score_carga_mortalidade_evitavel
+        description: "Score normalizado (0 a 100) da carga evitável de causas externas, APVP e mortalidade infantil."
+        tests:
+          - not_null
+      - name: perfil_transicao_epidemiologica_mortalidade
+        description: "Classificação hierárquica da transição epidemiológica e vigilância de mortalidade do município."
+        tests:
+          - not_null
+      - name: reference_date
+        description: "Data de referência ISO-8601 da série."
+        tests:
+          - not_null
+      - name: extracted_at
+        description: "Timestamp ISO-8601 UTC da geração."
+        tests:
+          - not_null

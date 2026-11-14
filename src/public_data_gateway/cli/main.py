@@ -691,6 +691,36 @@ def build_parser() -> argparse.ArgumentParser:
     sih_rk_p.add_argument("--uf", type=str, help="Optional 2-letter state filter")
     sih_rk_p.add_argument("--json", action="store_true", help="Output in JSON format")
 
+    # DataSUS SIM (Sistema de Informações sobre Mortalidade) command group
+    sim_p = subparsers.add_parser("sim", help="Query DataSUS SIM general mortality, CID-10 causes, maternal-infant rates, and preventable burden.")
+    sim_sub = sim_p.add_subparsers(dest="sim_action", required=True)
+
+    sim_gen_p = sim_sub.add_parser("general", help="Get municipal DataSUS SIM general mortality and ill-defined causes summary.")
+    sim_gen_p.add_argument("id_municipio", help="7-digit IBGE municipality code (e.g. 3550308)")
+    sim_gen_p.add_argument("--json", action="store_true", help="Output in JSON format")
+
+    sim_cid_p = sim_sub.add_parser("cid10", help="List municipal DataSUS SIM deaths broken down by major CID-10 chapters.")
+    sim_cid_p.add_argument("id_municipio", help="7-digit IBGE municipality code")
+    sim_cid_p.add_argument("--capitulo", type=str, help="Optional CID-10 chapter filter (e.g. Circulatorio)")
+    sim_cid_p.add_argument("--json", action="store_true", help="Output in JSON format")
+
+    sim_mat_p = sim_sub.add_parser("maternal-infant", help="Get municipal infant, neonatal, and maternal mortality rates and investigation share.")
+    sim_mat_p.add_argument("id_municipio", help="7-digit IBGE municipality code")
+    sim_mat_p.add_argument("--json", action="store_true", help="Output in JSON format")
+
+    sim_pre_p = sim_sub.add_parser("premature", help="Get premature NCD mortality (30-69y), external causes, and YPLL indicators.")
+    sim_pre_p.add_argument("id_municipio", help="7-digit IBGE municipality code")
+    sim_pre_p.add_argument("--json", action="store_true", help="Output in JSON format")
+
+    sim_ft_p = sim_sub.add_parser("features", help="Get Gold DataSUS SIM surveillance quality and preventable mortality burden features.")
+    sim_ft_p.add_argument("id_municipio", help="7-digit IBGE municipality code")
+    sim_ft_p.add_argument("--json", action="store_true", help="Output in JSON format")
+
+    sim_rk_p = sim_sub.add_parser("ranking", help="List top municipalities ranked by DataSUS SIM mortality surveillance score.")
+    sim_rk_p.add_argument("--limit", type=int, default=10, help="Max municipalities to list")
+    sim_rk_p.add_argument("--uf", type=str, help="Optional 2-letter state filter")
+    sim_rk_p.add_argument("--json", action="store_true", help="Output in JSON format")
+
     # INEP Censo Escolar (Educação Básica) command group
     ce_p = subparsers.add_parser("censo-escolar", help="Query INEP Censo Escolar schools, enrollments, teachers, flow, and education scores.")
     ce_sub = ce_p.add_subparsers(dest="censo_escolar_action", required=True)
@@ -2398,6 +2428,78 @@ def main(argv: Sequence[str] | None = None) -> int:
                     print(f"Top {len(ranks)} Polos de Complexidade Hospitalar (DataSUS SIH/SUS):")
                     for idx, r in enumerate(ranks, 1):
                         print(f"  {idx}. {r.get('nome_municipio')} ({r.get('sigla_uf')}): Complexidade {r.get('score_complexidade_assistencial_sih')} | Pressão: {r.get('score_pressao_morbidade_hospitalar')} | {r.get('perfil_epidemiologico_hospitalar')}")
+                return 0
+
+        elif args.command == "sim":
+            from public_data_gateway.connectors.saude.datasus_sim.connector import (
+                DataSUSSimConnector,
+            )
+
+            sim_conn = DataSUSSimConnector()
+            sim_action = getattr(args, "sim_action", None)
+            if sim_action == "general":
+                res = sim_conn.get_general_mortality(args.id_municipio)
+                if getattr(args, "json", False):
+                    print(json.dumps(res, indent=2, ensure_ascii=False, default=str))
+                else:
+                    print(f"DataSUS SIM Mortalidade Geral ({res.get('nome_municipio')} - {res.get('id_municipio')}):")
+                    print(f"  Total Óbitos / TBM:   {res.get('total_obitos_registrados')} ({res.get('taxa_bruta_mortalidade_1000_hab')}/1k hab)")
+                    print(f"  Hosp / Mal Definidas: {res.get('proporcao_obitos_hospitalares_pct')}% hosp | {res.get('proporcao_causas_mal_definidas_pct')}% mal def.")
+                return 0
+
+            if sim_action == "cid10":
+                rows = sim_conn.list_cid10_mortality_causes(
+                    args.id_municipio, capitulo_cid10=getattr(args, "capitulo", None)
+                )
+                if getattr(args, "json", False):
+                    print(json.dumps(rows, indent=2, ensure_ascii=False, default=str))
+                else:
+                    print(f"DataSUS SIM Causas de Óbito CID-10 ({args.id_municipio}):")
+                    for r in rows:
+                        print(f"  - {r.get('capitulo_cid10')}: {r.get('obitos_capitulo')} óbitos ({r.get('participacao_capitulo_pct')}%) | Taxa {r.get('taxa_mortalidade_especifica_100k_hab')}/100k | Idade média {r.get('idade_media_obito_capitulo_anos')} anos")
+                return 0
+
+            if sim_action == "maternal-infant":
+                res = sim_conn.get_maternal_infant_mortality(args.id_municipio)
+                if getattr(args, "json", False):
+                    print(json.dumps(res, indent=2, ensure_ascii=False, default=str))
+                else:
+                    print(f"DataSUS SIM Mortalidade Materno-Infantil ({res.get('nome_municipio')} - {res.get('id_municipio')}):")
+                    print(f"  Óbitos <1a / TMI:     {res.get('obitos_infantis_menores_1_ano')} (TMI {res.get('taxa_mortalidade_infantil_1000_nv')}/1k NV)")
+                    print(f"  RMM / Investigação:   {res.get('razao_mortalidade_materna_100k_nv')}/100k NV | {res.get('proporcao_obitos_infantis_investigados_pct')}% investigados")
+                return 0
+
+            if sim_action == "premature":
+                res = sim_conn.get_premature_dcnt_external_mortality(args.id_municipio)
+                if getattr(args, "json", False):
+                    print(json.dumps(res, indent=2, ensure_ascii=False, default=str))
+                else:
+                    print(f"DataSUS SIM Carga Prematura & Causas Externas ({res.get('nome_municipio')} - {res.get('id_municipio')}):")
+                    print(f"  DCNT 30-69 anos:      {res.get('obitos_prematuros_dcnt_30_69_anos')} ({res.get('proporcao_mortalidade_prematura_dcnt_pct')}%)")
+                    print(f"  Externas / APVP:      {res.get('taxa_mortalidade_causas_externas_100k_hab')}/100k hab | APVP {res.get('anos_potenciais_vida_perdidos_1000_hab')}/1k hab")
+                return 0
+
+            if sim_action == "features":
+                feat = sim_conn.get_sim_mortality_features(args.id_municipio)
+                if getattr(args, "json", False):
+                    print(json.dumps(feat, indent=2, ensure_ascii=False, default=str))
+                else:
+                    print(f"DataSUS SIM Features Vigilância Epidemiológica: {feat.get('nome_municipio')} ({feat.get('sigla_uf')} - {feat.get('id_municipio')}):")
+                    print(f"  Score Vigilância SIM: {feat.get('score_qualidade_vigilancia_obitos_sim')}/100.0")
+                    print(f"  Score Carga Evitável: {feat.get('score_carga_mortalidade_evitavel')}/100.0")
+                    print(f"  Perfil Transição:     {feat.get('perfil_transicao_epidemiologica_mortalidade')}")
+                return 0
+
+            if sim_action == "ranking":
+                ranks = sim_conn.list_top_sim_surveillance_municipalities(
+                    limit=getattr(args, "limit", 10), sigla_uf=getattr(args, "uf", None)
+                )
+                if getattr(args, "json", False):
+                    print(json.dumps(ranks, indent=2, ensure_ascii=False, default=str))
+                else:
+                    print(f"Top {len(ranks)} Redes Municipais em Vigilância SIM (DataSUS):")
+                    for idx, r in enumerate(ranks, 1):
+                        print(f"  {idx}. {r.get('nome_municipio')} ({r.get('sigla_uf')}): Vigilância {r.get('score_qualidade_vigilancia_obitos_sim')} | Carga: {r.get('score_carga_mortalidade_evitavel')} | {r.get('perfil_transicao_epidemiologica_mortalidade')}")
                 return 0
 
         elif args.command == "censo-escolar":

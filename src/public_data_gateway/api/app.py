@@ -1379,6 +1379,69 @@ def create_app(settings: GatewaySettings | None = None) -> FastAPI:
         conn = DataSUSSihConnector(settings=app_settings)
         return conn.get_admissions_summary(id_municipio)
 
+    @app.get("/api/v1/health-public/sim/top-municipalities")
+    async def get_top_sim_surveillance_municipalities(
+        limit: int = Query(10, ge=1, le=50, description="Max municipalities to list"),
+        uf: str | None = Query(None, description="Filter by 2-letter state abbreviation"),
+    ) -> list[dict[str, Any]]:
+        from public_data_gateway.connectors.saude.datasus_sim.connector import (
+            DataSUSSimConnector,
+        )
+
+        conn = DataSUSSimConnector(settings=app_settings)
+        return conn.list_top_sim_surveillance_municipalities(limit=limit, sigla_uf=uf)
+
+    @app.get("/api/v1/health-public/sim/features/{id_municipio}")
+    async def get_sim_mortality_features(id_municipio: str) -> dict[str, Any]:
+        from public_data_gateway.connectors.saude.datasus_sim.connector import (
+            DataSUSSimConnector,
+        )
+
+        conn = DataSUSSimConnector(settings=app_settings)
+        return conn.get_sim_mortality_features(id_municipio)
+
+    @app.get("/api/v1/health-public/sim/cid10/{id_municipio}")
+    async def get_sim_cid10_causes(
+        id_municipio: str,
+        capitulo: str | None = Query(
+            None, description="Optional CID-10 chapter filter (e.g. Circulatorio)"
+        ),
+    ) -> list[dict[str, Any]]:
+        from public_data_gateway.connectors.saude.datasus_sim.connector import (
+            DataSUSSimConnector,
+        )
+
+        conn = DataSUSSimConnector(settings=app_settings)
+        return conn.list_cid10_mortality_causes(id_municipio, capitulo_cid10=capitulo)
+
+    @app.get("/api/v1/health-public/sim/maternal-infant/{id_municipio}")
+    async def get_sim_maternal_infant(id_municipio: str) -> dict[str, Any]:
+        from public_data_gateway.connectors.saude.datasus_sim.connector import (
+            DataSUSSimConnector,
+        )
+
+        conn = DataSUSSimConnector(settings=app_settings)
+        return conn.get_maternal_infant_mortality(id_municipio)
+
+    @app.get("/api/v1/health-public/sim/premature/{id_municipio}")
+    async def get_sim_premature(id_municipio: str) -> dict[str, Any]:
+        from public_data_gateway.connectors.saude.datasus_sim.connector import (
+            DataSUSSimConnector,
+        )
+
+        conn = DataSUSSimConnector(settings=app_settings)
+        return conn.get_premature_dcnt_external_mortality(id_municipio)
+
+    @app.get("/api/v1/health-public/sim/general/{id_municipio}")
+    @app.get("/api/v1/sim/{id_municipio}")
+    async def get_sim_general_mortality(id_municipio: str) -> dict[str, Any]:
+        from public_data_gateway.connectors.saude.datasus_sim.connector import (
+            DataSUSSimConnector,
+        )
+
+        conn = DataSUSSimConnector(settings=app_settings)
+        return conn.get_general_mortality(id_municipio)
+
     @app.get("/api/v1/education/censo-escolar/top-municipalities")
     async def get_top_censo_escolar_municipalities(
         limit: int = Query(10, ge=1, le=50, description="Max municipalities to list"),

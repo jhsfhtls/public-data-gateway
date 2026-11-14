@@ -1,0 +1,16 @@
+version: 2
+
+sources:
+  - name: datasus_sim_silver
+    description: "Bases oficiais do DataSUS Sistema de Informações sobre Mortalidade (SIM) normalizadas na camada Silver."
+    meta:
+      external_location: "data/datasus_sim/silver/{name}.parquet"
+    tables:
+      - name: sim_obitos_gerais_municipio
+        description: "Consolidação municipal dos óbitos gerais registrados no SIM, mortalidade hospitalar e causas mal definidas."
+      - name: sim_causas_capitulos_cid10
+        description: "Distribuição municipal dos óbitos por grandes capítulos de causa básica na CID-10."
+      - name: sim_mortalidade_materno_infantil
+        description: "Indicadores municipais de mortalidade infantil, neonatal, materna e proporção de óbitos infantis investigados."
+      - name: sim_mortalidade_prematura_dcnt_externas
+        description: "Mortalidade prematura por DCNT (30-69 anos), causas externas, trânsito e APVP por 1.000 habitantes."

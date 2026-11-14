@@ -1,0 +1,221 @@
+version: 2
+
+models:
+  - name: stg_sim_obitos_gerais_municipio
+    description: "Visão padronizada dos óbitos gerais, taxa bruta de mortalidade e qualidade do preenchimento de causas no SIM por município."
+    columns:
+      - name: id_municipio
+        description: "Código IBGE de 7 dígitos do município."
+        tests:
+          - not_null
+          - unique
+      - name: nome_municipio
+        description: "Nome oficial do município."
+        tests:
+          - not_null
+      - name: sigla_uf
+        description: "Sigla de 2 letras da Unidade Federativa."
+        tests:
+          - not_null
+      - name: id_uf
+        description: "Código IBGE de 2 dígitos da Unidade Federativa."
+        tests:
+          - not_null
+      - name: ano_referencia
+        description: "Ano epidemiológico de referência das Declarações de Óbito."
+        tests:
+          - not_null
+      - name: total_obitos_registrados
+        description: "Total de óbitos por residência registrados no SIM."
+        tests:
+          - not_null
+      - name: taxa_bruta_mortalidade_1000_hab
+        description: "Taxa bruta de mortalidade geral por 1.000 habitantes."
+        tests:
+          - not_null
+      - name: obitos_hospitalares
+        description: "Quantidade de óbitos ocorridos em estabelecimento hospitalar."
+        tests:
+          - not_null
+      - name: proporcao_obitos_hospitalares_pct
+        description: "Percentual de óbitos ocorridos em estabelecimento hospitalar (%)."
+        tests:
+          - not_null
+      - name: obitos_causas_mal_definidas
+        description: "Óbitos com causa básica classificada no Capítulo XVIII da CID-10 (causas mal definidas)."
+        tests:
+          - not_null
+      - name: proporcao_causas_mal_definidas_pct
+        description: "Percentual de óbitos por causas mal definidas sobre o total registrado (%)."
+        tests:
+          - not_null
+      - name: source_url
+        description: "URL oficial DataSUS SIM."
+        tests:
+          - not_null
+      - name: reference_date
+        description: "Data de referência ISO-8601 da extração."
+        tests:
+          - not_null
+      - name: extracted_at
+        description: "Timestamp ISO-8601 UTC da extração."
+        tests:
+          - not_null
+
+  - name: stg_sim_causas_capitulos_cid10
+    description: "Visão padronizada da distribuição municipal dos óbitos por grandes capítulos de causa básica da CID-10."
+    columns:
+      - name: id_municipio
+        description: "Código IBGE de 7 dígitos do município."
+        tests:
+          - not_null
+      - name: nome_municipio
+        description: "Nome oficial do município."
+        tests:
+          - not_null
+      - name: sigla_uf
+        description: "Sigla de 2 letras da Unidade Federativa."
+        tests:
+          - not_null
+      - name: capitulo_cid10
+        description: "Grande capítulo CID-10 da causa básica do óbito."
+        tests:
+          - not_null
+      - name: obitos_capitulo
+        description: "Total de óbitos atribuídos ao capítulo CID-10."
+        tests:
+          - not_null
+      - name: participacao_capitulo_pct
+        description: "Participação percentual do capítulo CID-10 sobre o total de óbitos municipais (%)."
+        tests:
+          - not_null
+      - name: taxa_mortalidade_especifica_100k_hab
+        description: "Taxa específica de mortalidade por 100.000 habitantes para o capítulo CID-10."
+        tests:
+          - not_null
+      - name: idade_media_obito_capitulo_anos
+        description: "Idade média ao óbito (em anos) no capítulo CID-10."
+        tests:
+          - not_null
+      - name: source_url
+        description: "URL oficial DataSUS SIM."
+        tests:
+          - not_null
+      - name: reference_date
+        description: "Data de referência ISO-8601 da série."
+        tests:
+          - not_null
+      - name: extracted_at
+        description: "Timestamp ISO-8601 UTC da extração."
+        tests:
+          - not_null
+
+  - name: stg_sim_mortalidade_materno_infantil
+    description: "Visão padronizada de mortalidade infantil, neonatal, materna e investigação epidemiológica de óbitos infantis."
+    columns:
+      - name: id_municipio
+        description: "Código IBGE de 7 dígitos do município."
+        tests:
+          - not_null
+          - unique
+      - name: nome_municipio
+        description: "Nome oficial do município."
+        tests:
+          - not_null
+      - name: sigla_uf
+        description: "Sigla de 2 letras da Unidade Federativa."
+        tests:
+          - not_null
+      - name: ano_referencia
+        description: "Ano epidemiológico de referência."
+        tests:
+          - not_null
+      - name: obitos_infantis_menores_1_ano
+        description: "Quantidade de óbitos de menores de 1 ano residentes."
+        tests:
+          - not_null
+      - name: obitos_neonatais_precoce_tardio
+        description: "Óbitos neonatais ocorridos de 0 a 27 dias de vida."
+        tests:
+          - not_null
+      - name: taxa_mortalidade_infantil_1000_nv
+        description: "Taxa de Mortalidade Infantil (TMI) por 1.000 nascidos vivos."
+        tests:
+          - not_null
+      - name: obitos_maternos_declarados
+        description: "Quantidade de óbitos maternos declarados no município."
+        tests:
+          - not_null
+      - name: razao_mortalidade_materna_100k_nv
+        description: "Razão de Mortalidade Materna (RMM) por 100.000 nascidos vivos."
+        tests:
+          - not_null
+      - name: proporcao_obitos_infantis_investigados_pct
+        description: "Percentual de óbitos infantis oportunamente investigados pela vigilância (%)."
+        tests:
+          - not_null
+      - name: source_url
+        description: "URL oficial DataSUS SIM."
+        tests:
+          - not_null
+      - name: reference_date
+        description: "Data de referência ISO-8601 da série."
+        tests:
+          - not_null
+      - name: extracted_at
+        description: "Timestamp ISO-8601 UTC da extração."
+        tests:
+          - not_null
+
+  - name: stg_sim_mortalidade_prematura_dcnt_externas
+    description: "Visão padronizada da carga prematura por DCNT (30-69 anos), causas externas, trânsito e APVP no SIM."
+    columns:
+      - name: id_municipio
+        description: "Código IBGE de 7 dígitos do município."
+        tests:
+          - not_null
+          - unique
+      - name: nome_municipio
+        description: "Nome oficial do município."
+        tests:
+          - not_null
+      - name: sigla_uf
+        description: "Sigla de 2 letras da Unidade Federativa."
+        tests:
+          - not_null
+      - name: ano_referencia
+        description: "Ano epidemiológico de referência."
+        tests:
+          - not_null
+      - name: obitos_prematuros_dcnt_30_69_anos
+        description: "Óbitos prematuros entre 30 e 69 anos pelos principais grupos de DCNT."
+        tests:
+          - not_null
+      - name: proporcao_mortalidade_prematura_dcnt_pct
+        description: "Participação percentual dos óbitos prematuros por DCNT sobre o total municipal (%)."
+        tests:
+          - not_null
+      - name: taxa_mortalidade_causas_externas_100k_hab
+        description: "Taxa de mortalidade por causas externas por 100.000 habitantes."
+        tests:
+          - not_null
+      - name: taxa_mortalidade_acidentes_transporte_100k_hab
+        description: "Taxa de mortalidade por acidentes de transporte terrestre por 100.000 habitantes."
+        tests:
+          - not_null
+      - name: anos_potenciais_vida_perdidos_1000_hab
+        description: "Anos Potenciais de Vida Perdidos (APVP) antes dos 70 anos por 1.000 habitantes."
+        tests:
+          - not_null
+      - name: source_url
+        description: "URL oficial DataSUS SIM."
+        tests:
+          - not_null
+      - name: reference_date
+        description: "Data de referência ISO-8601 da série."
+        tests:
+          - not_null
+      - name: extracted_at
+        description: "Timestamp ISO-8601 UTC da extração."
+        tests:
+          - not_null

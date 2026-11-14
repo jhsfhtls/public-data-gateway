@@ -1,0 +1,471 @@
+schema_version: "3.1.0"
+contract_id: "ODCS-BR-DATASUS-SIM-001"
+source_id: "datasus_sim"
+version: "1.0.0"
+name: "DataSUS: Sistema de Informações sobre Mortalidade (SIM)"
+agency: "Ministério da Saúde / DataSUS"
+official_url: "https://datasus.saude.gov.br/transferencia-de-arquivos/"
+
+legal_framework:
+  statutes:
+    - name: "Lei nº 6.015/1973"
+      description: "Lei de Registros Públicos que estabelece a obrigatoriedade da Declaração de Óbito (DO) para registro civil"
+    - name: "Lei nº 8.080/1990"
+      description: "Lei Orgânica da Saúde que institui a vigilância epidemiológica e de mortalidade no âmbito do SUS"
+    - name: "Portaria SVS/MS nº 116/2009"
+      description: "Regulamenta a coleta de dados, fluxo e periodicidade de envio das informações sobre óbitos e nascidos vivos ao SIM e SINASC"
+    - name: "Decreto nº 8.777/2016"
+      description: "Institui a Política de Dados Abertos do Poder Executivo Federal"
+
+data_governance:
+  grain: "municipio_mortalidade_declaracoes_obito_sim"
+  primary_keys:
+    - "id_municipio"
+    - "sigla_uf"
+  reference_date_column: "reference_date"
+  min_expected_rows: 5
+  max_volume_drop_pct: 15.0
+  freshness_sla_hours: 720
+  lgpd_tier: "ANONYMIZED_MICRODATA"
+  ml_feature_domains:
+    - "mortality_causes"
+    - "cid10_trends"
+
+schema:
+  tables:
+    sim_obitos_gerais_municipio:
+      description: "Consolidação municipal dos óbitos gerais registrados no SIM, taxa bruta de mortalidade, óbitos hospitalares e causas mal definidas (Cap. XVIII CID-10)"
+      grain: "id_municipio, ano_referencia"
+      primary_keys: ["id_municipio", "ano_referencia"]
+      min_expected_rows: 5
+      columns:
+        - name: "id_municipio"
+          data_type: "string"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Código IBGE de 7 dígitos identificador único do município de residência"
+        - name: "nome_municipio"
+          data_type: "string"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Nome oficial do município"
+        - name: "sigla_uf"
+          data_type: "string"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Sigla de 2 letras da Unidade Federativa"
+        - name: "id_uf"
+          data_type: "string"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Código IBGE de 2 dígitos da Unidade Federativa"
+        - name: "ano_referencia"
+          data_type: "int64"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Ano epidemiológico de referência das Declarações de Óbito consolidadas no SIM"
+        - name: "total_obitos_registrados"
+          data_type: "int64"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Total de óbitos por residência registrados nas Declarações de Óbito do SIM"
+        - name: "taxa_bruta_mortalidade_1000_hab"
+          data_type: "float64"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Taxa bruta de mortalidade geral por 1.000 habitantes residentes"
+        - name: "obitos_hospitalares"
+          data_type: "int64"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Quantidade de óbitos ocorridos em estabelecimento hospitalar ou de saúde"
+        - name: "proporcao_obitos_hospitalares_pct"
+          data_type: "float64"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Percentual de óbitos ocorridos em ambiente hospitalar frente ao total registrado (%)"
+        - name: "obitos_causas_mal_definidas"
+          data_type: "int64"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Total de óbitos atribuídos a sintomas, sinais e achados anormais (Capítulo XVIII da CID-10 - causas mal definidas)"
+        - name: "proporcao_causas_mal_definidas_pct"
+          data_type: "float64"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Percentual de óbitos com causa básica mal definida sobre o total de óbitos (%)"
+        - name: "source_url"
+          data_type: "string"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "URL oficial do portal de transferência de arquivos DataSUS SIM"
+        - name: "reference_date"
+          data_type: "string"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Data de referência da extração no formato YYYY-MM-DD"
+        - name: "extracted_at"
+          data_type: "string"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Timestamp UTC ISO-8601 da extração"
+
+    sim_causas_capitulos_cid10:
+      description: "Distribuição municipal dos óbitos por grandes capítulos de causa básica na Classificação Internacional de Doenças (CID-10)"
+      grain: "id_municipio, capitulo_cid10"
+      primary_keys: ["id_municipio", "capitulo_cid10"]
+      min_expected_rows: 20
+      columns:
+        - name: "id_municipio"
+          data_type: "string"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Código IBGE de 7 dígitos identificador único do município"
+        - name: "nome_municipio"
+          data_type: "string"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Nome oficial do município"
+        - name: "sigla_uf"
+          data_type: "string"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Sigla de 2 letras da Unidade Federativa"
+        - name: "capitulo_cid10"
+          data_type: "string"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Capítulo CID-10 da causa básica do óbito (Circulatório, Neoplasias, Respiratório ou Causas Externas)"
+        - name: "obitos_capitulo"
+          data_type: "int64"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Total de óbitos cuja causa básica pertence ao capítulo CID-10"
+        - name: "participacao_capitulo_pct"
+          data_type: "float64"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Participação percentual do capítulo CID-10 sobre o total de óbitos municipais (%)"
+        - name: "taxa_mortalidade_especifica_100k_hab"
+          data_type: "float64"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Taxa de mortalidade específica por causa (óbitos do capítulo por 100.000 habitantes)"
+        - name: "idade_media_obito_capitulo_anos"
+          data_type: "float64"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Idade média ao óbito (em anos) para o respectivo capítulo CID-10"
+        - name: "source_url"
+          data_type: "string"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "URL oficial DataSUS SIM"
+        - name: "reference_date"
+          data_type: "string"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Data de referência da série"
+        - name: "extracted_at"
+          data_type: "string"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Timestamp UTC ISO-8601 da extração"
+
+    sim_mortalidade_materno_infantil:
+      description: "Indicadores municipais de mortalidade infantil, neonatal, materna e percentual de investigação de óbitos infantis (Portaria SVS/MS nº 116/2009)"
+      grain: "id_municipio, ano_referencia"
+      primary_keys: ["id_municipio", "ano_referencia"]
+      min_expected_rows: 5
+      columns:
+        - name: "id_municipio"
+          data_type: "string"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Código IBGE de 7 dígitos identificador único do município"
+        - name: "nome_municipio"
+          data_type: "string"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Nome oficial do município"
+        - name: "sigla_uf"
+          data_type: "string"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Sigla de 2 letras da Unidade Federativa"
+        - name: "ano_referencia"
+          data_type: "int64"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Ano epidemiológico de referência"
+        - name: "obitos_infantis_menores_1_ano"
+          data_type: "int64"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Total de óbitos de crianças menores de 1 ano residentes no município"
+        - name: "obitos_neonatais_precoce_tardio"
+          data_type: "int64"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Óbitos neonatais ocorridos entre 0 e 27 dias de vida (neonatal precoce e tardio)"
+        - name: "taxa_mortalidade_infantil_1000_nv"
+          data_type: "float64"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Taxa de Mortalidade Infantil (TMI) por 1.000 nascidos vivos"
+        - name: "obitos_maternos_declarados"
+          data_type: "int64"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Óbitos maternos por causas ligadas à gravidez, parto e puerpério"
+        - name: "razao_mortalidade_materna_100k_nv"
+          data_type: "float64"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Razão de Mortalidade Materna (RMM) por 100.000 nascidos vivos"
+        - name: "proporcao_obitos_infantis_investigados_pct"
+          data_type: "float64"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Percentual de óbitos infantis oportunamente investigados pela vigilância epidemiológica municipal (%)"
+        - name: "source_url"
+          data_type: "string"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "URL oficial DataSUS SIM"
+        - name: "reference_date"
+          data_type: "string"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Data de referência da série"
+        - name: "extracted_at"
+          data_type: "string"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Timestamp UTC ISO-8601 da extração"
+
+    sim_mortalidade_prematura_dcnt_externas:
+      description: "Carga de mortalidade prematura por Doenças Crônicas Não Transmissíveis (30-69 anos), causas externas, trânsito e APVP por 1.000 habitantes"
+      grain: "id_municipio, ano_referencia"
+      primary_keys: ["id_municipio", "ano_referencia"]
+      min_expected_rows: 5
+      columns:
+        - name: "id_municipio"
+          data_type: "string"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Código IBGE de 7 dígitos identificador único do município"
+        - name: "nome_municipio"
+          data_type: "string"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Nome oficial do município"
+        - name: "sigla_uf"
+          data_type: "string"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Sigla de 2 letras da Unidade Federativa"
+        - name: "ano_referencia"
+          data_type: "int64"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Ano epidemiológico de referência"
+        - name: "obitos_prematuros_dcnt_30_69_anos"
+          data_type: "int64"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Óbitos prematuros (30 a 69 anos) pelo conjunto das 4 principais DCNT (circulatórias, câncer, diabetes, respiratórias crônicas)"
+        - name: "proporcao_mortalidade_prematura_dcnt_pct"
+          data_type: "float64"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Participação percentual dos óbitos prematuros por DCNT sobre o total de óbitos municipais (%)"
+        - name: "taxa_mortalidade_causas_externas_100k_hab"
+          data_type: "float64"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Taxa de mortalidade por causas externas (acidentes e violências) por 100.000 habitantes"
+        - name: "taxa_mortalidade_acidentes_transporte_100k_hab"
+          data_type: "float64"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Taxa de mortalidade por acidentes de transporte terrestre por 100.000 habitantes"
+        - name: "anos_potenciais_vida_perdidos_1000_hab"
+          data_type: "float64"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Anos Potenciais de Vida Perdidos (APVP) antes dos 70 anos por 1.000 habitantes"
+        - name: "source_url"
+          data_type: "string"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "URL oficial DataSUS SIM"
+        - name: "reference_date"
+          data_type: "string"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Data de referência da série"
+        - name: "extracted_at"
+          data_type: "string"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Timestamp UTC ISO-8601 da extração"
+
+    features_sim_mortalidade_causas_cid10_municipios_brasil:
+      description: "Gold Feature Store municipal com scores normalizados (0-100) de qualidade da vigilância de óbitos no SIM, carga de mortalidade evitável e perfil de transição epidemiológica"
+      grain: "id_municipio"
+      primary_keys: ["id_municipio"]
+      min_expected_rows: 5
+      columns:
+        - name: "id_municipio"
+          data_type: "string"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Código IBGE de 7 dígitos identificador único do município"
+        - name: "sigla_uf"
+          data_type: "string"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Sigla de 2 letras da Unidade Federativa"
+        - name: "nome_municipio"
+          data_type: "string"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Nome oficial do município"
+        - name: "total_obitos_registrados"
+          data_type: "int64"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Total de óbitos registrados por residência no SIM"
+        - name: "taxa_bruta_mortalidade_1000_hab"
+          data_type: "float64"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Taxa bruta de mortalidade geral por 1.000 habitantes"
+        - name: "proporcao_causas_mal_definidas_pct"
+          data_type: "float64"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Percentual de óbitos com causa mal definida (%)"
+        - name: "taxa_mortalidade_infantil_1000_nv"
+          data_type: "float64"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Taxa de Mortalidade Infantil (TMI) por 1.000 nascidos vivos"
+        - name: "razao_mortalidade_materna_100k_nv"
+          data_type: "float64"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Razão de Mortalidade Materna (RMM) por 100.000 nascidos vivos"
+        - name: "proporcao_obitos_infantis_investigados_pct"
+          data_type: "float64"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Percentual de óbitos infantis investigados pela vigilância municipal (%)"
+        - name: "proporcao_mortalidade_prematura_dcnt_pct"
+          data_type: "float64"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Participação percentual da mortalidade prematura por DCNT (%)"
+        - name: "taxa_mortalidade_causas_externas_100k_hab"
+          data_type: "float64"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Taxa de mortalidade por causas externas por 100.000 habitantes"
+        - name: "anos_potenciais_vida_perdidos_1000_hab"
+          data_type: "float64"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Anos Potenciais de Vida Perdidos (APVP) por 1.000 habitantes"
+        - name: "score_qualidade_vigilancia_obitos_sim"
+          data_type: "float64"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Score normalizado (0-100) da qualidade da informação e vigilância de óbitos no SIM"
+        - name: "score_carga_mortalidade_evitavel"
+          data_type: "float64"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Score normalizado (0-100) da pressão de mortalidade por causas externas, APVP e TMI"
+        - name: "perfil_transicao_epidemiologica_mortalidade"
+          data_type: "string"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Classificação hierárquica da transição epidemiológica e vigilância de mortalidade do município"
+        - name: "reference_date"
+          data_type: "string"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Data de referência da série"
+        - name: "extracted_at"
+          data_type: "string"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Timestamp UTC ISO-8601 da extração"
