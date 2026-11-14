@@ -1,0 +1,10 @@
+version: 2
+
+sources:
+  - name: openalex_api
+    description: "OpenAlex open scientific works dataset."
+    meta:
+      external_location: "data/openalex_api/silver/{name}.parquet"
+    tables:
+      - name: openalex_works
+        description: "Normalized scientific works and citation counts."

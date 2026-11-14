@@ -3195,4 +3195,41 @@ def create_app(settings: GatewaySettings | None = None) -> FastAPI:
         except ValueError as exc:
             raise HTTPException(status_code=400, detail=str(exc)) from exc
 
+    @app.get("/api/v1/public-apis/global/country/{code}")
+    async def get_rest_country(code: str) -> dict[str, Any]:
+        from public_data_gateway.connectors.demografico.rest_countries import RestCountriesConnector
+
+        try:
+            return RestCountriesConnector(settings=app_settings).fetch_country(code=code)
+        except ValueError as exc:
+            raise HTTPException(status_code=400, detail=str(exc)) from exc
+
+    @app.get("/api/v1/public-apis/global/openalex")
+    async def get_openalex_works(
+        q: str = Query(..., description="Scientific search query"),
+        per_page: int = Query(5, ge=1, le=25),
+    ) -> dict[str, Any]:
+        from public_data_gateway.connectors.educacao.openalex_api import OpenAlexApiConnector
+
+        conn = OpenAlexApiConnector(settings=app_settings)
+        try:
+            rows = conn.normalize_records(conn.fetch_works(query=q, per_page=per_page))
+            return {"source_id": "openalex_api", "count": len(rows), "records": rows}
+        except ValueError as exc:
+            raise HTTPException(status_code=400, detail=str(exc)) from exc
+
+    @app.get("/api/v1/public-apis/global/gdelt")
+    async def get_gdelt_articles(
+        q: str = Query(..., description="GDELT news query"),
+        maxrecords: int = Query(5, ge=1, le=25),
+    ) -> dict[str, Any]:
+        from public_data_gateway.connectors.agregadores.gdelt_doc_api import GdeltDocApiConnector
+
+        conn = GdeltDocApiConnector(settings=app_settings)
+        try:
+            rows = conn.normalize_records(conn.fetch_articles(query=q, maxrecords=maxrecords))
+            return {"source_id": "gdelt_doc_api", "count": len(rows), "records": rows}
+        except ValueError as exc:
+            raise HTTPException(status_code=400, detail=str(exc)) from exc
+
     return app

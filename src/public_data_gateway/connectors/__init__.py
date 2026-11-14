@@ -9,6 +9,7 @@ import public_data_gateway.connectors.agregadores.aneel_anp_ckan  # noqa: F401
 import public_data_gateway.connectors.agregadores.brasilapi_core  # noqa: F401
 import public_data_gateway.connectors.agregadores.dadosgov_ckan  # noqa: F401
 import public_data_gateway.connectors.agregadores.datalake_federado_bq  # noqa: F401
+import public_data_gateway.connectors.agregadores.gdelt_doc_api  # noqa: F401
 import public_data_gateway.connectors.agregadores.huggingface_inference  # noqa: F401
 import public_data_gateway.connectors.agregadores.nasa_youtube_open_ml  # noqa: F401
 import public_data_gateway.connectors.agregadores.upgini_adapter  # noqa: F401
@@ -31,11 +32,13 @@ import public_data_gateway.connectors.demografico.ibge_censo2022  # noqa: F401
 import public_data_gateway.connectors.demografico.ibge_localidades  # noqa: F401
 import public_data_gateway.connectors.demografico.ibge_pib_municipal  # noqa: F401
 import public_data_gateway.connectors.demografico.ibge_sidra  # noqa: F401
+import public_data_gateway.connectors.demografico.rest_countries  # noqa: F401
 import public_data_gateway.connectors.educacao.capes_sucupira  # noqa: F401
 import public_data_gateway.connectors.educacao.inep_censo_escolar  # noqa: F401
 import public_data_gateway.connectors.educacao.inep_censo_superior  # noqa: F401
 import public_data_gateway.connectors.educacao.inep_enem  # noqa: F401
 import public_data_gateway.connectors.educacao.inep_ideb  # noqa: F401
+import public_data_gateway.connectors.educacao.openalex_api  # noqa: F401
 import public_data_gateway.connectors.empresarial.cnpja_open  # noqa: F401
 import public_data_gateway.connectors.empresarial.company_enrich_apollo_bdc  # noqa: F401
 import public_data_gateway.connectors.empresarial.gleif_lei  # noqa: F401

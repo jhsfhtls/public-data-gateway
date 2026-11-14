@@ -2180,6 +2180,39 @@ class MCPDispatcher:
                                 },
                             },
                             {
+                                "name": "bdg_lookup_country",
+                                "description": "Normalize country ISO-3166 metadata via REST Countries v3.1.",
+                                "inputSchema": {
+                                    "type": "object",
+                                    "properties": {"code": {"type": "string"}},
+                                    "required": ["code"],
+                                },
+                            },
+                            {
+                                "name": "bdg_search_openalex_works",
+                                "description": "Search open scientific works & citations via OpenAlex API.",
+                                "inputSchema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "query": {"type": "string"},
+                                        "per_page": {"type": "integer"},
+                                    },
+                                    "required": ["query"],
+                                },
+                            },
+                            {
+                                "name": "bdg_query_gdelt_doc",
+                                "description": "Query global news articles and sentiment streams via GDELT Project Doc 2.0.",
+                                "inputSchema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "query": {"type": "string"},
+                                        "maxrecords": {"type": "integer"},
+                                    },
+                                    "required": ["query"],
+                                },
+                            },
+                            {
                                 "name": "bdg_get_onr_property_registry",
                                 "description": "Get official ONR SREI municipal active property registry CNM stock, digital conversion rate, and online certificate emissions.",
                                 "inputSchema": {
@@ -5086,6 +5119,22 @@ class MCPDispatcher:
             "bdg_lookup_b2b_domain_profile": (
                 "company_enrich_apollo_bdc",
                 lambda sdk: sdk.public_apis.lookup_b2b_domain_profile(str(args["domain"])),
+            ),
+            "bdg_lookup_country": (
+                "rest_countries",
+                lambda sdk: sdk.public_apis.lookup_country(str(args.get("code", "BRA"))),
+            ),
+            "bdg_search_openalex_works": (
+                "openalex_api",
+                lambda sdk: sdk.public_apis.search_openalex_works(
+                    str(args["query"]), per_page=int(args.get("per_page", 5))
+                ),
+            ),
+            "bdg_query_gdelt_doc": (
+                "gdelt_doc_api",
+                lambda sdk: sdk.public_apis.query_gdelt_doc(
+                    str(args["query"]), maxrecords=int(args.get("maxrecords", 5))
+                ),
             ),
         }
         if tool_name in wave10_5a_handlers:

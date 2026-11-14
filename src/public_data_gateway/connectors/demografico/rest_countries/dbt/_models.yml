@@ -1,0 +1,46 @@
+version: 2
+
+models:
+  - name: stg_rest_countries_iso
+    description: "Staging view for REST Countries ISO-3166 records."
+    columns:
+      - name: cca2
+        description: "ISO-3166-1 alpha-2 country code."
+        tests: [not_null]
+      - name: cca3
+        description: "ISO-3166-1 alpha-3 country code."
+        tests: [not_null]
+      - name: common_name
+        description: "Country common name."
+        tests: [not_null]
+      - name: region
+        description: "Geographic region."
+      - name: subregion
+        description: "Geographic subregion."
+      - name: population
+        description: "Estimated national population."
+        tests: [not_null]
+      - name: extracted_at
+        description: "UTC ISO-8601 extraction timestamp."
+
+  - name: dim_paises_iso_3166
+    description: "Intradomain dimension table for ISO-3166 countries."
+    columns:
+      - name: cca2
+        description: "ISO-3166-1 alpha-2 country code."
+        tests: [not_null]
+      - name: cca3
+        description: "ISO-3166-1 alpha-3 country code."
+        tests: [not_null, unique]
+      - name: common_name
+        description: "Country common name."
+        tests: [not_null]
+      - name: region
+        description: "Geographic region."
+      - name: subregion
+        description: "Geographic subregion."
+      - name: population
+        description: "Estimated national population."
+        tests: [not_null]
+      - name: extracted_at
+        description: "UTC ISO-8601 extraction timestamp."

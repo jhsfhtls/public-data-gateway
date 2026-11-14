@@ -456,6 +456,8 @@ apis:
   gateway_method: lookup_country
   status: HOMOLOGATED
   notes: Normalizacao ISO-3166 (Alpha-2/3), DDI, moedas, idiomas, fronteiras e populacao.
+  medallion_parity: true
+  connector_id: rest_countries
 - api_id: openalex_api
   name: OpenAlex Scientific Graph API
   block: BLOCO_4_GLOBAL_PESQUISA
@@ -470,6 +472,8 @@ apis:
   status: HOMOLOGATED
   notes: Catalogo cientifico aberto com artigos, autores, conceitos e ROR IDs para
     NLP/grafos.
+  medallion_parity: true
+  connector_id: openalex_api
 - api_id: gdelt_doc_api
   name: GDELT Project Doc 2.0 API
   block: BLOCO_4_GLOBAL_PESQUISA
@@ -484,3 +488,5 @@ apis:
   status: HOMOLOGATED
   notes: Monitoramento global de noticias, volume de mencoes e score de sentimento
     quase em tempo real.
+  medallion_parity: true
+  connector_id: gdelt_doc_api

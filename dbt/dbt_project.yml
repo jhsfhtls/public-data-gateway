@@ -80,6 +80,9 @@ model-paths:
   - "../src/public_data_gateway/connectors/geografico/nominatim_osm/dbt"
   - "../src/public_data_gateway/connectors/geografico/opencep/dbt"
   - "../src/public_data_gateway/connectors/geografico/viacep/dbt"
+  - "../src/public_data_gateway/connectors/demografico/rest_countries/dbt"
+  - "../src/public_data_gateway/connectors/educacao/openalex_api/dbt"
+  - "../src/public_data_gateway/connectors/agregadores/gdelt_doc_api/dbt"
   - "models"
 
 analysis-paths: ["analyses"]

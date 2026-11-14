@@ -1,0 +1,10 @@
+version: 2
+
+sources:
+  - name: rest_countries
+    description: "REST Countries v3.1 ISO-3166 dataset."
+    meta:
+      external_location: "data/rest_countries/silver/{name}.parquet"
+    tables:
+      - name: rest_countries_iso
+        description: "Normalized country metadata from REST Countries."
