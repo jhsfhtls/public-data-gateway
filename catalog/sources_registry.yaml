@@ -915,7 +915,7 @@ sources:
   - P02
   rice_score: 450
   roadmap_wave: 5
-  status: CATALOGED
+  status: HOMOLOGATED
 - source_id: anvisa_cmed
   name: 'ANVISA: Câmara de Regulação do Mercado de Medicamentos (CMED)'
   agency: Agência Nacional de Vigilância Sanitária (ANVISA)

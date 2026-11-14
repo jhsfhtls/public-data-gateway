@@ -1,0 +1,527 @@
+schema_version: "3.1.0"
+contract_id: "ODCS-BR-DATASUS-SINASC-001"
+source_id: "datasus_sinasc"
+version: "1.0.0"
+name: "DataSUS: Sistema de Informações sobre Nascidos Vivos (SINASC)"
+agency: "Ministério da Saúde / DataSUS"
+official_url: "https://datasus.saude.gov.br/transferencia-de-arquivos/"
+
+legal_framework:
+  statutes:
+    - name: "Lei nº 6.015/1973"
+      description: "Lei de Registros Públicos que vincula o registro civil de nascimento à Declaração de Nascido Vivo (DNV)"
+    - name: "Lei nº 8.080/1990"
+      description: "Lei Orgânica da Saúde que fundamenta os sistemas nacionais de vigilância epidemiológica e saúde materno-infantil"
+    - name: "Lei nº 12.662/2012"
+      description: "Assegura validade nacional à Declaração de Nascido Vivo (DNV), define seu conteúdo e regula o fluxo do SINASC"
+    - name: "Portaria SVS/MS nº 116/2009"
+      description: "Regulamenta a coleta de dados, fluxo e periodicidade de envio das informações sobre nascidos vivos ao SINASC"
+    - name: "Decreto nº 8.777/2016"
+      description: "Institui a Política de Dados Abertos do Poder Executivo Federal"
+
+data_governance:
+  grain: "municipio_nascidos_vivos_dnv_sinasc"
+  primary_keys:
+    - "id_municipio"
+    - "sigla_uf"
+  reference_date_column: "reference_date"
+  min_expected_rows: 5
+  max_volume_drop_pct: 15.0
+  freshness_sla_hours: 720
+  lgpd_tier: "ANONYMIZED_MICRODATA"
+  ml_feature_domains:
+    - "live_births"
+    - "maternal_indicators"
+
+schema:
+  tables:
+    sinasc_nascidos_vivos_municipio:
+      description: "Consolidação municipal dos nascidos vivos registrados nas Declarações de Nascido Vivo (DNV), taxa bruta de natalidade, partos hospitalares e via de parto cesáreo"
+      grain: "id_municipio, ano_referencia"
+      primary_keys: ["id_municipio", "ano_referencia"]
+      min_expected_rows: 5
+      columns:
+        - name: "id_municipio"
+          data_type: "string"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Código IBGE de 7 dígitos identificador único do município de residência materna"
+        - name: "nome_municipio"
+          data_type: "string"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Nome oficial do município"
+        - name: "sigla_uf"
+          data_type: "string"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Sigla de 2 letras da Unidade Federativa"
+        - name: "id_uf"
+          data_type: "string"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Código IBGE de 2 dígitos da Unidade Federativa"
+        - name: "ano_referencia"
+          data_type: "int64"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Ano epidemiológico de referência das Declarações de Nascido Vivo no SINASC"
+        - name: "total_nascidos_vivos"
+          data_type: "int64"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Total de nascidos vivos por residência materna registrados no SINASC"
+        - name: "taxa_bruta_natalidade_1000_hab"
+          data_type: "float64"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Taxa bruta de natalidade por 1.000 habitantes residentes"
+        - name: "nascidos_vivos_hospitalares"
+          data_type: "int64"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Quantidade de nascidos vivos com parto ocorrido em estabelecimento hospitalar"
+        - name: "proporcao_partos_hospitalares_pct"
+          data_type: "float64"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Proporção de nascidos vivos em ambiente hospitalar sobre o total de nascimentos (%)"
+        - name: "nascidos_vivos_parto_cesareo"
+          data_type: "int64"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Quantidade de nascidos vivos por via de parto cesáreo"
+        - name: "proporcao_partos_cesareos_pct"
+          data_type: "float64"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Proporção de nascimentos por parto cesáreo no município (%)"
+        - name: "source_url"
+          data_type: "string"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "URL oficial DataSUS SINASC"
+        - name: "reference_date"
+          data_type: "string"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Data de referência ISO-8601 da série"
+        - name: "extracted_at"
+          data_type: "string"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Timestamp UTC ISO-8601 da extração"
+
+    sinasc_assistencia_prenatal_parto:
+      description: "Estratificação municipal dos nascidos vivos por faixa de consultas pré-natal (adequado 7+, intermediário 4-6, inadequado 1-3 e sem assistência), início no 1º trimestre e cesárea"
+      grain: "id_municipio, faixa_assistencia_prenatal"
+      primary_keys: ["id_municipio", "faixa_assistencia_prenatal"]
+      min_expected_rows: 20
+      columns:
+        - name: "id_municipio"
+          data_type: "string"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Código IBGE de 7 dígitos do município"
+        - name: "nome_municipio"
+          data_type: "string"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Nome oficial do município"
+        - name: "sigla_uf"
+          data_type: "string"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Sigla de 2 letras da UF"
+        - name: "id_uf"
+          data_type: "string"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Código IBGE de 2 dígitos da UF"
+        - name: "ano_referencia"
+          data_type: "int64"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Ano epidemiológico de referência do SINASC"
+        - name: "faixa_assistencia_prenatal"
+          data_type: "string"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Faixa padronizada de consultas pré-natal realizadas pela gestante"
+        - name: "nascidos_vivos_faixa"
+          data_type: "int64"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Quantidade de nascidos vivos registrados na faixa de assistência pré-natal"
+        - name: "participacao_faixa_prenatal_pct"
+          data_type: "float64"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Participação percentual da faixa no total de nascidos vivos do município (%)"
+        - name: "inicio_prenatal_primeiro_trimestre_pct"
+          data_type: "float64"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Proporção de gestantes na faixa com início oportuno do pré-natal no 1º trimestre gestacional (%)"
+        - name: "proporcao_cesarea_faixa_pct"
+          data_type: "float64"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Proporção de partos cesáreos observada na faixa de assistência pré-natal (%)"
+        - name: "idade_media_materna_faixa_anos"
+          data_type: "float64"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Idade média das mães na faixa de consultas pré-natal (anos)"
+        - name: "source_url"
+          data_type: "string"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "URL oficial DataSUS SINASC"
+        - name: "reference_date"
+          data_type: "string"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Data de referência ISO-8601 da série"
+        - name: "extracted_at"
+          data_type: "string"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Timestamp UTC ISO-8601 da extração"
+
+    sinasc_perfil_materno_demografico:
+      description: "Perfil sociodemográfico materno no SINASC: idade média ao parto, gravidez na adolescência (<20 anos), gestação tardia (>=35 anos) e alta escolaridade (>=12 anos de estudo)"
+      grain: "id_municipio, ano_referencia"
+      primary_keys: ["id_municipio", "ano_referencia"]
+      min_expected_rows: 5
+      columns:
+        - name: "id_municipio"
+          data_type: "string"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Código IBGE de 7 dígitos do município"
+        - name: "nome_municipio"
+          data_type: "string"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Nome oficial do município"
+        - name: "sigla_uf"
+          data_type: "string"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Sigla de 2 letras da UF"
+        - name: "id_uf"
+          data_type: "string"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Código IBGE de 2 dígitos da UF"
+        - name: "ano_referencia"
+          data_type: "int64"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Ano epidemiológico de referência do SINASC"
+        - name: "idade_media_materna_anos"
+          data_type: "float64"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Idade média das mães de nascidos vivos no município (anos)"
+        - name: "maes_adolescentes_menores_20_anos"
+          data_type: "int64"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Quantidade de nascidos vivos de mães com idade inferior a 20 anos"
+        - name: "proporcao_gravidez_adolescencia_pct"
+          data_type: "float64"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Proporção de nascidos vivos de mães menores de 20 anos (%)"
+        - name: "maes_35_anos_ou_mais"
+          data_type: "int64"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Quantidade de nascidos vivos de mães com 35 anos ou mais de idade"
+        - name: "proporcao_gestacao_tardia_35_mais_pct"
+          data_type: "float64"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Proporção de nascidos vivos de mães com 35 anos ou mais (%)"
+        - name: "proporcao_escolaridade_materna_12_anos_mais_pct"
+          data_type: "float64"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Proporção de mães com 12 anos ou mais de escolaridade formal concluída (%)"
+        - name: "source_url"
+          data_type: "string"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "URL oficial DataSUS SINASC"
+        - name: "reference_date"
+          data_type: "string"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Data de referência ISO-8601 da série"
+        - name: "extracted_at"
+          data_type: "string"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Timestamp UTC ISO-8601 da extração"
+
+    sinasc_condicoes_vitalidade_recem_nascido:
+      description: "Indicadores de risco perinatal e vitalidade neonatal no SINASC: baixo peso (<2.500 g), prematuridade (<37 semanas), Apgar no 5º minuto adequado (7-10) e anomalias congênitas"
+      grain: "id_municipio, ano_referencia"
+      primary_keys: ["id_municipio", "ano_referencia"]
+      min_expected_rows: 5
+      columns:
+        - name: "id_municipio"
+          data_type: "string"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Código IBGE de 7 dígitos do município"
+        - name: "nome_municipio"
+          data_type: "string"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Nome oficial do município"
+        - name: "sigla_uf"
+          data_type: "string"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Sigla de 2 letras da UF"
+        - name: "id_uf"
+          data_type: "string"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Código IBGE de 2 dígitos da UF"
+        - name: "ano_referencia"
+          data_type: "int64"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Ano epidemiológico de referência do SINASC"
+        - name: "nascidos_baixo_peso_menor_2500g"
+          data_type: "int64"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Total de nascidos vivos com peso ao nascer inferior a 2.500 gramas"
+        - name: "proporcao_baixo_peso_nascer_pct"
+          data_type: "float64"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Proporção de nascidos vivos com baixo peso ao nascer (<2.500 g) (%)"
+        - name: "nascidos_prematuros_menor_37_sem"
+          data_type: "int64"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Total de nascidos vivos com idade gestacional inferior a 37 semanas"
+        - name: "proporcao_prematuridade_pct"
+          data_type: "float64"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Taxa percentual de nascimentos prematuros (<37 semanas) (%)"
+        - name: "proporcao_apgar_5min_adequado_7_10_pct"
+          data_type: "float64"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Proporção de recém-nascidos com escore de Apgar adequado (7 a 10) no 5º minuto (%)"
+        - name: "taxa_anomalias_congenitas_10k_nv"
+          data_type: "float64"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Prevalência de anomalias congênitas notificadas na DNV por 10.000 nascidos vivos"
+        - name: "source_url"
+          data_type: "string"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "URL oficial DataSUS SINASC"
+        - name: "reference_date"
+          data_type: "string"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Data de referência ISO-8601 da série"
+        - name: "extracted_at"
+          data_type: "string"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Timestamp UTC ISO-8601 da extração"
+
+    features_sinasc_natalidade_saude_perinatal_municipios_brasil:
+      description: "Gold Feature Store municipal com scores normalizados (0-100) de qualidade da assistência pré-natal SINASC, vitalidade perinatal e classificação da rede materno-infantil"
+      grain: "id_municipio"
+      primary_keys: ["id_municipio"]
+      min_expected_rows: 5
+      columns:
+        - name: "id_municipio"
+          data_type: "string"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Código IBGE de 7 dígitos identificador único do município"
+        - name: "sigla_uf"
+          data_type: "string"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Sigla de 2 letras da Unidade Federativa"
+        - name: "nome_municipio"
+          data_type: "string"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Nome oficial do município"
+        - name: "ano_referencia"
+          data_type: "int64"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Ano epidemiológico de referência do SINASC"
+        - name: "total_nascidos_vivos"
+          data_type: "int64"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Total de nascidos vivos registrados por residência materna no SINASC"
+        - name: "taxa_bruta_natalidade_1000_hab"
+          data_type: "float64"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Taxa bruta de natalidade por 1.000 habitantes residentes"
+        - name: "proporcao_partos_hospitalares_pct"
+          data_type: "float64"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Percentual de nascimentos ocorridos em ambiente hospitalar (%)"
+        - name: "proporcao_partos_cesareos_pct"
+          data_type: "float64"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Percentual de nascimentos por via de parto cesáreo (%)"
+        - name: "cobertura_prenatal_7_mais_consultas_pct"
+          data_type: "float64"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Percentual de gestantes com cobertura pré-natal adequada de 7 ou mais consultas (%)"
+        - name: "inicio_prenatal_oportuno_1_trim_pct"
+          data_type: "float64"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Percentual de gestantes na faixa adequada com início oportuno do pré-natal no 1º trimestre (%)"
+        - name: "proporcao_gravidez_adolescencia_pct"
+          data_type: "float64"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Proporção de nascidos vivos de mães adolescentes menores de 20 anos (%)"
+        - name: "proporcao_escolaridade_materna_12_anos_mais_pct"
+          data_type: "float64"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Proporção de mães com 12 anos ou mais de escolaridade formal (%)"
+        - name: "proporcao_baixo_peso_nascer_pct"
+          data_type: "float64"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Proporção de recém-nascidos com baixo peso ao nascer (<2.500 g) (%)"
+        - name: "proporcao_prematuridade_pct"
+          data_type: "float64"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Proporção de nascidos vivos prematuros (<37 semanas gestacionais) (%)"
+        - name: "proporcao_apgar_5min_adequado_7_10_pct"
+          data_type: "float64"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Proporção de recém-nascidos com escore de Apgar 7-10 no 5º minuto (%)"
+        - name: "score_qualidade_assistencia_prenatal_sinasc"
+          data_type: "float64"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Score normalizado (0-100) da qualidade e oportunidade da assistência pré-natal no SINASC"
+        - name: "score_vitalidade_protecao_perinatal"
+          data_type: "float64"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Score normalizado (0-100) de proteção perinatal (baixo peso, prematuridade, Apgar e parto hospitalar)"
+        - name: "classificacao_rede_materno_perinatal"
+          data_type: "string"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Classificação hierárquica da rede de atenção materno-infantil e perinatal do município"
+        - name: "reference_date"
+          data_type: "string"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Data de referência ISO-8601 da série"
+        - name: "extracted_at"
+          data_type: "string"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Timestamp UTC ISO-8601 da extração"

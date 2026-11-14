@@ -751,6 +751,36 @@ def build_parser() -> argparse.ArgumentParser:
     sim_rk_p.add_argument("--uf", type=str, help="Optional 2-letter state filter")
     sim_rk_p.add_argument("--json", action="store_true", help="Output in JSON format")
 
+    # DataSUS SINASC (Sistema de Informações sobre Nascidos Vivos) command group
+    sn_p = subparsers.add_parser("sinasc", help="Query DataSUS SINASC live births, prenatal care, maternal profile, newborn vitality, and perinatal scores.")
+    sn_sub = sn_p.add_subparsers(dest="sinasc_action", required=True)
+
+    sn_bir_p = sn_sub.add_parser("births", help="Get municipal DataSUS SINASC live births summary, birth rate, and delivery route.")
+    sn_bir_p.add_argument("id_municipio", help="7-digit IBGE municipality code (e.g. 3550308)")
+    sn_bir_p.add_argument("--json", action="store_true", help="Output in JSON format")
+
+    sn_pre_p = sn_sub.add_parser("prenatal", help="List municipal DataSUS SINASC live births stratified by prenatal care bracket.")
+    sn_pre_p.add_argument("id_municipio", help="7-digit IBGE municipality code")
+    sn_pre_p.add_argument("--faixa", type=str, help="Optional prenatal bracket filter (e.g. Adequado_Mais_7)")
+    sn_pre_p.add_argument("--json", action="store_true", help="Output in JSON format")
+
+    sn_mat_p = sn_sub.add_parser("maternal", help="Get municipal maternal demographic and schooling profile (DataSUS SINASC).")
+    sn_mat_p.add_argument("id_municipio", help="7-digit IBGE municipality code")
+    sn_mat_p.add_argument("--json", action="store_true", help="Output in JSON format")
+
+    sn_vit_p = sn_sub.add_parser("vitality", help="Get newborn low birth weight, prematurity, Apgar 5m, and anomalies indicators (SINASC).")
+    sn_vit_p.add_argument("id_municipio", help="7-digit IBGE municipality code")
+    sn_vit_p.add_argument("--json", action="store_true", help="Output in JSON format")
+
+    sn_ft_p = sn_sub.add_parser("features", help="Get Gold DataSUS SINASC prenatal care quality and perinatal vitality features.")
+    sn_ft_p.add_argument("id_municipio", help="7-digit IBGE municipality code")
+    sn_ft_p.add_argument("--json", action="store_true", help="Output in JSON format")
+
+    sn_rk_p = sn_sub.add_parser("ranking", help="List top municipalities ranked by DataSUS SINASC prenatal quality score.")
+    sn_rk_p.add_argument("--limit", type=int, default=10, help="Max municipalities to list")
+    sn_rk_p.add_argument("--uf", type=str, help="Optional 2-letter state filter")
+    sn_rk_p.add_argument("--json", action="store_true", help="Output in JSON format")
+
     # INEP Censo Escolar (Educação Básica) command group
     ce_p = subparsers.add_parser("censo-escolar", help="Query INEP Censo Escolar schools, enrollments, teachers, flow, and education scores.")
     ce_sub = ce_p.add_subparsers(dest="censo_escolar_action", required=True)
@@ -2632,6 +2662,78 @@ def main(argv: Sequence[str] | None = None) -> int:
                     print(f"Top {len(ranks)} Redes Municipais em Vigilância SIM (DataSUS):")
                     for idx, r in enumerate(ranks, 1):
                         print(f"  {idx}. {r.get('nome_municipio')} ({r.get('sigla_uf')}): Vigilância {r.get('score_qualidade_vigilancia_obitos_sim')} | Carga: {r.get('score_carga_mortalidade_evitavel')} | {r.get('perfil_transicao_epidemiologica_mortalidade')}")
+                return 0
+
+        elif args.command == "sinasc":
+            from public_data_gateway.connectors.saude.datasus_sinasc.connector import (
+                DataSUSSinascConnector,
+            )
+
+            sn_conn = DataSUSSinascConnector()
+            sn_action = getattr(args, "sinasc_action", None)
+            if sn_action == "births":
+                res = sn_conn.get_live_births_summary(args.id_municipio)
+                if getattr(args, "json", False):
+                    print(json.dumps(res, indent=2, ensure_ascii=False, default=str))
+                else:
+                    print(f"DataSUS SINASC Nascidos Vivos ({res.get('nome_municipio')} - {res.get('id_municipio')}):")
+                    print(f"  Nascidos Vivos / TBN: {res.get('total_nascidos_vivos')} (TBN {res.get('taxa_bruta_natalidade_1000_hab')}/1k hab)")
+                    print(f"  Hospitalar / Cesáreo: {res.get('proporcao_partos_hospitalares_pct')}% hosp | {res.get('proporcao_partos_cesareos_pct')}% cesáreo")
+                return 0
+
+            if sn_action == "prenatal":
+                rows = sn_conn.list_prenatal_care_breakdown(
+                    args.id_municipio, faixa_assistencia_prenatal=getattr(args, "faixa", None)
+                )
+                if getattr(args, "json", False):
+                    print(json.dumps(rows, indent=2, ensure_ascii=False, default=str))
+                else:
+                    print(f"DataSUS SINASC Assistência Pré-Natal ({args.id_municipio}):")
+                    for r in rows:
+                        print(f"  - {r.get('faixa_assistencia_prenatal')}: {r.get('nascidos_vivos_faixa')} NV ({r.get('participacao_faixa_prenatal_pct')}%) | 1º Trim {r.get('inicio_prenatal_primeiro_trimestre_pct')}% | Cesárea {r.get('proporcao_cesarea_faixa_pct')}%")
+                return 0
+
+            if sn_action == "maternal":
+                res = sn_conn.get_maternal_demographic_profile(args.id_municipio)
+                if getattr(args, "json", False):
+                    print(json.dumps(res, indent=2, ensure_ascii=False, default=str))
+                else:
+                    print(f"DataSUS SINASC Perfil Materno ({res.get('nome_municipio')} - {res.get('id_municipio')}):")
+                    print(f"  Idade Média / <20a:   {res.get('idade_media_materna_anos')} anos | {res.get('proporcao_gravidez_adolescencia_pct')}% <20 anos")
+                    print(f"  >=35a / >=12a Estudo: {res.get('proporcao_gestacao_tardia_35_mais_pct')}% >=35a | {res.get('proporcao_escolaridade_materna_12_anos_mais_pct')}% >=12 anos estudo")
+                return 0
+
+            if sn_action == "vitality":
+                res = sn_conn.get_newborn_vitality_conditions(args.id_municipio)
+                if getattr(args, "json", False):
+                    print(json.dumps(res, indent=2, ensure_ascii=False, default=str))
+                else:
+                    print(f"DataSUS SINASC Vitalidade Neonatal ({res.get('nome_municipio')} - {res.get('id_municipio')}):")
+                    print(f"  Baixo Peso / Premat.: {res.get('proporcao_baixo_peso_nascer_pct')}% <2500g | {res.get('proporcao_prematuridade_pct')}% <37 sem")
+                    print(f"  Apgar 7-10 / Anomal.: {res.get('proporcao_apgar_5min_adequado_7_10_pct')}% Apgar | {res.get('taxa_anomalias_congenitas_10k_nv')}/10k NV")
+                return 0
+
+            if sn_action == "features":
+                feat = sn_conn.get_sinasc_perinatal_features(args.id_municipio)
+                if getattr(args, "json", False):
+                    print(json.dumps(feat, indent=2, ensure_ascii=False, default=str))
+                else:
+                    print(f"DataSUS SINASC Features Perinatais: {feat.get('nome_municipio')} ({feat.get('sigla_uf')} - {feat.get('id_municipio')}):")
+                    print(f"  Score Pré-Natal:      {feat.get('score_qualidade_assistencia_prenatal_sinasc')}/100.0")
+                    print(f"  Score Vitalidade:     {feat.get('score_vitalidade_protecao_perinatal')}/100.0")
+                    print(f"  Classificação Rede:   {feat.get('classificacao_rede_materno_perinatal')}")
+                return 0
+
+            if sn_action == "ranking":
+                ranks = sn_conn.list_top_sinasc_prenatal_municipalities(
+                    limit=getattr(args, "limit", 10), sigla_uf=getattr(args, "uf", None)
+                )
+                if getattr(args, "json", False):
+                    print(json.dumps(ranks, indent=2, ensure_ascii=False, default=str))
+                else:
+                    print(f"Top {len(ranks)} Redes Municipais Materno-Perinatais (DataSUS SINASC):")
+                    for idx, r in enumerate(ranks, 1):
+                        print(f"  {idx}. {r.get('nome_municipio')} ({r.get('sigla_uf')}): Pré-Natal {r.get('score_qualidade_assistencia_prenatal_sinasc')} | Vitalidade: {r.get('score_vitalidade_protecao_perinatal')} | {r.get('classificacao_rede_materno_perinatal')}")
                 return 0
 
         elif args.command == "censo-escolar":
