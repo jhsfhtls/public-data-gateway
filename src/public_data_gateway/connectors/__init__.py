@@ -40,6 +40,7 @@ import public_data_gateway.connectors.saude.datasus_cnes  # noqa: F401
 import public_data_gateway.connectors.saude.datasus_sih  # noqa: F401
 import public_data_gateway.connectors.saude.datasus_sim  # noqa: F401
 import public_data_gateway.connectors.saude.datasus_sinasc  # noqa: F401
+import public_data_gateway.connectors.saude.opendatasus_vigilancia  # noqa: F401
 import public_data_gateway.connectors.trabalho.ibge_pnad_continua  # noqa: F401
 import public_data_gateway.connectors.trabalho.mte_novo_caged  # noqa: F401
 import public_data_gateway.connectors.trabalho.mte_rais  # noqa: F401

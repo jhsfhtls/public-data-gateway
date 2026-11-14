@@ -6475,3 +6475,202 @@ models:
         description: "Timestamp ISO-8601 UTC da extração."
         tests:
           - not_null
+
+  - name: fct_vigilancia_srag_imunizacao_cievs_municipio
+    description: "Tabela Fato Core integrando notificações SG/SRAG (e-SUS/SIVEP-Gripe), cobertura vacinal SI-PNI e capacidade de resposta rápida CIEVS/GAL-LACEN por município."
+    columns:
+      - name: id_municipio
+        description: "Código IBGE de 7 dígitos identificador único do município."
+        tests:
+          - not_null
+          - unique
+          - relationships:
+              to: ref('dim_municipio')
+              field: id_municipio
+      - name: nome_municipio
+        description: "Nome oficial do município."
+        tests:
+          - not_null
+      - name: sigla_uf
+        description: "Sigla de 2 letras da Unidade Federativa."
+        tests:
+          - not_null
+      - name: id_uf
+        description: "Código IBGE de 2 dígitos da Unidade Federativa."
+        tests:
+          - not_null
+      - name: nome_uf
+        description: "Nome completo da Unidade Federativa."
+        tests:
+          - not_null
+      - name: regiao
+        description: "Grande região geográfica brasileira."
+        tests:
+          - not_null
+      - name: ano_epidemiologico
+        description: "Ano epidemiológico de referência da consolidação SVSA/OpenDataSUS."
+        tests:
+          - not_null
+      - name: notificacoes_sindrome_gripal_esus_ano
+        description: "Notificações anuais de Síndrome Gripal (SG) registradas no e-SUS Notifica."
+        tests:
+          - not_null
+      - name: internacoes_srag_sivep_ano
+        description: "Hospitalizações anuais por Síndrome Respiratória Aguda Grave (SRAG) no SIVEP-Gripe."
+        tests:
+          - not_null
+      - name: taxa_incidencia_srag_100k_hab
+        description: "Taxa municipal de incidência de hospitalizações SRAG por 100 mil habitantes."
+        tests:
+          - not_null
+      - name: internacoes_srag_uti_ano
+        description: "Total de internações SRAG com suporte em Unidade de Terapia Intensiva (UTI)."
+        tests:
+          - not_null
+      - name: proporcao_srag_uti_pct
+        description: "Percentual de internações SRAG que evoluíram para leito de UTI (%)."
+        tests:
+          - not_null
+      - name: obitos_srag_confirmados_ano
+        description: "Óbitos hospitalares confirmados por Síndrome Respiratória Aguda Grave no ano."
+        tests:
+          - not_null
+      - name: letalidade_hospitalar_srag_pct
+        description: "Taxa de letalidade hospitalar entre casos de SRAG no SIVEP-Gripe (%)."
+        tests:
+          - not_null
+      - name: confirmacao_laboratorial_rt_pcr_srag_pct
+        description: "Percentual de casos SRAG com investigação diagnóstica por RT-PCR/painel viral encerrada (%)."
+        tests:
+          - not_null
+      - name: doses_aplicadas_calendario_pni_ano
+        description: "Volume anual de doses aplicadas e registradas na RNDS/SI-PNI."
+        tests:
+          - not_null
+      - name: salas_vacina_ativas_cnes
+        description: "Quantidade de salas de vacinação ativas vinculadas ao CNES no município."
+        tests:
+          - not_null
+      - name: cobertura_pentavalente_d3_pct
+        description: "Cobertura vacinal da 3ª dose de Pentavalente (DTP+HB+Hib) em menores de 1 ano (%)."
+        tests:
+          - not_null
+      - name: cobertura_poliomielite_vip_pct
+        description: "Cobertura vacinal de Poliomielite Inativada (VIP - 3 doses) em menores de 1 ano (%)."
+        tests:
+          - not_null
+      - name: cobertura_triplice_viral_d1_pct
+        description: "Cobertura vacinal da 1ª dose de Tríplice Viral em crianças de 1 ano (%)."
+        tests:
+          - not_null
+      - name: homogeneidade_cobertura_vacinal_pni_pct
+        description: "Percentual de imunobiológicos prioritários do calendário básico que atingiram a meta PNI (%)."
+        tests:
+          - not_null
+      - name: taxa_abandono_esquema_multidose_pct
+        description: "Taxa percentual média de abandono entre a 1ª e a última dose de esquemas vacinais multidoses (%)."
+        tests:
+          - not_null
+      - name: unidades_sentinela_vigilancia_ativas
+        description: "Número de unidades sentinelas ativas de vigilância epidemiológica no município."
+        tests:
+          - not_null
+      - name: notificacoes_imediatas_24h_cievs_pct
+        description: "Percentual de eventos de notificação imediata reportados em até 24 horas ao CIEVS (%)."
+        tests:
+          - not_null
+      - name: investigacoes_epidemiologicas_48h_pct
+        description: "Percentual de investigações de campo iniciadas em até 48 horas após a notificação (%)."
+        tests:
+          - not_null
+      - name: tempo_medio_liberacao_gal_lacen_horas
+        description: "Tempo médio de liberação de laudos laboratoriais no sistema GAL/LACEN (horas)."
+        tests:
+          - not_null
+      - name: indice_bloqueio_vetorial_arboviroses_pct
+        description: "Percentual de focos e casos suspeitos de arboviroses com bloqueio vetorial oportuno (%)."
+        tests:
+          - not_null
+      - name: surtos_investigados_encerrados_pct
+        description: "Percentual de surtos notificados com investigação epidemiológica concluída e encerrada (%)."
+        tests:
+          - not_null
+      - name: integracao_rnds_esus_sinan_pct
+        description: "Índice de interoperabilidade e envio tempestivo das bases locais à RNDS/e-SUS/SINAN (%)."
+        tests:
+          - not_null
+      - name: reference_date
+        description: "Data de referência ISO-8601 da consolidação epidemiológica."
+        tests:
+          - not_null
+      - name: extracted_at
+        description: "Timestamp ISO-8601 UTC da extração."
+        tests:
+          - not_null
+
+  - name: fct_vigilancia_agravos_sinan_municipio
+    description: "Tabela Fato Core desagregando agravos de notificação compulsória no SINAN por grupo epidemiológico e via de transmissão."
+    columns:
+      - name: id_municipio
+        description: "Código IBGE de 7 dígitos identificador único do município."
+        tests:
+          - not_null
+          - relationships:
+              to: ref('dim_municipio')
+              field: id_municipio
+      - name: nome_municipio
+        description: "Nome oficial do município."
+        tests:
+          - not_null
+      - name: sigla_uf
+        description: "Sigla de 2 letras da Unidade Federativa."
+        tests:
+          - not_null
+      - name: id_uf
+        description: "Código IBGE de 2 dígitos da Unidade Federativa."
+        tests:
+          - not_null
+      - name: nome_uf
+        description: "Nome completo da Unidade Federativa."
+        tests:
+          - not_null
+      - name: regiao
+        description: "Grande região geográfica brasileira."
+        tests:
+          - not_null
+      - name: ano_epidemiologico
+        description: "Ano epidemiológico de referência dos registros SINAN."
+        tests:
+          - not_null
+      - name: grupo_agravo_sinan
+        description: "Agrupamento de doenças e agravos de notificação compulsória no SINAN."
+        tests:
+          - not_null
+      - name: categoria_transmissao
+        description: "Via predominante de transmissão ou vigilância do grupo de agravos."
+        tests:
+          - not_null
+      - name: casos_notificados_ano
+        description: "Total anual de fichas de notificação investigadas no SINAN para o grupo."
+        tests:
+          - not_null
+      - name: casos_confirmados_ano
+        description: "Casos confirmados por critério laboratorial ou clínico-epidemiológico no grupo."
+        tests:
+          - not_null
+      - name: taxa_incidencia_confirmada_100k_hab
+        description: "Taxa anual de incidência de casos confirmados por 100 mil habitantes no grupo."
+        tests:
+          - not_null
+      - name: proporcao_encerramento_oportuno_sinan_pct
+        description: "Percentual de notificações SINAN encerradas oportunamente dentro do prazo normativo (%)."
+        tests:
+          - not_null
+      - name: reference_date
+        description: "Data de referência ISO-8601 da consolidação epidemiológica."
+        tests:
+          - not_null
+      - name: extracted_at
+        description: "Timestamp ISO-8601 UTC da extração."
+        tests:
+          - not_null

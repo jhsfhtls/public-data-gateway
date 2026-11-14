@@ -1,0 +1,569 @@
+schema_version: "3.1.0"
+contract_id: "ODCS-BR-OPENDATASUS-VIGILANCIA-001"
+source_id: "opendatasus_vigilancia"
+version: "1.0.0"
+name: "OpenDataSUS: Notificações de Síndromes e Vigilância Epidemiológica"
+agency: "Ministério da Saúde / SVSA / DataSUS"
+official_url: "https://opendatasus.saude.gov.br/"
+
+legal_framework:
+  statutes:
+    - name: "Lei nº 6.259/1975"
+      description: "Dispõe sobre a organização das ações de Vigilância Epidemiológica, Programa Nacional de Imunizações e notificação compulsória de doenças"
+    - name: "Lei nº 8.080/1990"
+      description: "Lei Orgânica da Saúde que institui o Sistema Único de Saúde (SUS) e define competências de vigilância epidemiológica e sanitária"
+    - name: "Portaria de Consolidação GM/MS nº 4/2017"
+      description: "Define a Lista Nacional de Notificação Compulsória de Doenças, Agravos e Eventos de Saúde Pública nos serviços públicos e privados"
+    - name: "Lei nº 13.709/2018 (LGPD)"
+      description: "Regula anonimização e agregação territorial de microdados epidemiológicos públicos (e-SUS Notifica, SIVEP-Gripe, SINAN e SI-PNI)"
+    - name: "Decreto nº 8.777/2016"
+      description: "Institui a Política de Dados Abertos do Poder Executivo Federal aplicável aos portais OpenDataSUS"
+
+data_governance:
+  grain: "municipio_vigilancia_epidemiologica_imunizacao"
+  primary_keys:
+    - "id_municipio"
+    - "sigla_uf"
+  reference_date_column: "reference_date"
+  min_expected_rows: 10
+  max_volume_drop_pct: 15.0
+  freshness_sla_hours: 168
+  lgpd_tier: "ANONYMIZED_MICRODATA"
+  ml_feature_domains:
+    - "epidemiological_surveillance"
+    - "vaccination_coverage"
+
+schema:
+  tables:
+    vigilancia_sindromes_respiratorias_srag_municipio:
+      description: "Monitoramento municipal de Síndrome Gripal (e-SUS Notifica) e Síndrome Respiratória Aguda Grave (SIVEP-Gripe): internações, UTI, óbitos, letalidade e confirmação RT-PCR."
+      grain: "id_municipio, ano_epidemiologico"
+      primary_keys: ["id_municipio", "ano_epidemiologico"]
+      min_expected_rows: 12
+      columns:
+        - name: "id_municipio"
+          data_type: "string"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Código IBGE de 7 dígitos identificador único do município."
+        - name: "nome_municipio"
+          data_type: "string"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Nome oficial do município."
+        - name: "sigla_uf"
+          data_type: "string"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Sigla de 2 letras da Unidade Federativa."
+        - name: "id_uf"
+          data_type: "string"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Código IBGE de 2 dígitos da Unidade Federativa."
+        - name: "regiao"
+          data_type: "string"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Grande região geográfica brasileira segundo o IBGE."
+        - name: "ano_epidemiologico"
+          data_type: "int64"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Ano epidemiológico de referência da consolidação SVSA/OpenDataSUS."
+        - name: "notificacoes_sindrome_gripal_esus_ano"
+          data_type: "int64"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Notificações anuais de Síndrome Gripal (SG) registradas no e-SUS Notifica."
+        - name: "internacoes_srag_sivep_ano"
+          data_type: "int64"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Hospitalizações anuais por Síndrome Respiratória Aguda Grave (SRAG) no SIVEP-Gripe."
+        - name: "taxa_incidencia_srag_100k_hab"
+          data_type: "float64"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Taxa municipal de incidência de hospitalizações SRAG por 100 mil habitantes."
+        - name: "internacoes_srag_uti_ano"
+          data_type: "int64"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Total de internações SRAG com suporte em Unidade de Terapia Intensiva (UTI)."
+        - name: "proporcao_srag_uti_pct"
+          data_type: "float64"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Percentual de internações SRAG que evoluíram para leito de UTI (%)."
+        - name: "obitos_srag_confirmados_ano"
+          data_type: "int64"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Óbitos hospitalares confirmados por Síndrome Respiratória Aguda Grave no ano."
+        - name: "letalidade_hospitalar_srag_pct"
+          data_type: "float64"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Taxa de letalidade hospitalar entre casos de SRAG no SIVEP-Gripe (%)."
+        - name: "confirmacao_laboratorial_rt_pcr_srag_pct"
+          data_type: "float64"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Percentual de casos SRAG com investigação diagnóstica por RT-PCR/painel viral encerrada (%)."
+        - name: "reference_date"
+          data_type: "string"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Data de referência ISO-8601 da consolidação epidemiológica."
+        - name: "extracted_at"
+          data_type: "string"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Timestamp ISO-8601 UTC da extração."
+
+    vigilancia_agravos_notificacao_sinan:
+      description: "Desagregação municipal de agravos de notificação compulsória no SINAN por grupo epidemiológico e categoria de transmissão."
+      grain: "id_municipio, grupo_agravo_sinan"
+      primary_keys: ["id_municipio", "grupo_agravo_sinan"]
+      min_expected_rows: 48
+      columns:
+        - name: "id_municipio"
+          data_type: "string"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Código IBGE de 7 dígitos identificador único do município."
+        - name: "nome_municipio"
+          data_type: "string"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Nome oficial do município."
+        - name: "sigla_uf"
+          data_type: "string"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Sigla de 2 letras da Unidade Federativa."
+        - name: "id_uf"
+          data_type: "string"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Código IBGE de 2 dígitos da Unidade Federativa."
+        - name: "regiao"
+          data_type: "string"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Grande região geográfica brasileira segundo o IBGE."
+        - name: "ano_epidemiologico"
+          data_type: "int64"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Ano epidemiológico de referência dos registros SINAN."
+        - name: "grupo_agravo_sinan"
+          data_type: "string"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Agrupamento de doenças e agravos de notificação compulsória no SINAN."
+        - name: "categoria_transmissao"
+          data_type: "string"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Via predominante de transmissão ou vigilância do grupo de agravos."
+        - name: "casos_notificados_ano"
+          data_type: "int64"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Total anual de fichas de notificação investigadas no SINAN para o grupo."
+        - name: "casos_confirmados_ano"
+          data_type: "int64"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Casos confirmados por critério laboratorial ou clínico-epidemiológico no grupo."
+        - name: "taxa_incidencia_confirmada_100k_hab"
+          data_type: "float64"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Taxa anual de incidência de casos confirmados por 100 mil habitantes no grupo."
+        - name: "proporcao_encerramento_oportuno_sinan_pct"
+          data_type: "float64"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Percentual de notificações SINAN encerradas oportunamente dentro do prazo normativo (%)."
+        - name: "reference_date"
+          data_type: "string"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Data de referência ISO-8601 da consolidação epidemiológica."
+        - name: "extracted_at"
+          data_type: "string"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Timestamp ISO-8601 UTC da extração."
+
+    vigilancia_cobertura_vacinal_sipni_municipio:
+      description: "Consolidado municipal do Sistema de Informação do Programa Nacional de Imunizações (SI-PNI / RNDS): doses aplicadas, salas de vacina, coberturas-chave, homogeneidade e taxa de abandono."
+      grain: "id_municipio, ano_epidemiologico"
+      primary_keys: ["id_municipio", "ano_epidemiologico"]
+      min_expected_rows: 12
+      columns:
+        - name: "id_municipio"
+          data_type: "string"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Código IBGE de 7 dígitos identificador único do município."
+        - name: "nome_municipio"
+          data_type: "string"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Nome oficial do município."
+        - name: "sigla_uf"
+          data_type: "string"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Sigla de 2 letras da Unidade Federativa."
+        - name: "id_uf"
+          data_type: "string"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Código IBGE de 2 dígitos da Unidade Federativa."
+        - name: "regiao"
+          data_type: "string"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Grande região geográfica brasileira segundo o IBGE."
+        - name: "ano_epidemiologico"
+          data_type: "int64"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Ano epidemiológico de apuração das coberturas vacinais do SI-PNI."
+        - name: "doses_aplicadas_calendario_pni_ano"
+          data_type: "int64"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Volume anual de doses aplicadas e registradas na Rede Nacional de Dados em Saúde (RNDS/SI-PNI)."
+        - name: "salas_vacina_ativas_cnes"
+          data_type: "int64"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Quantidade de salas de vacinação ativas vinculadas ao CNES no município."
+        - name: "cobertura_pentavalente_d3_pct"
+          data_type: "float64"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Cobertura vacinal da 3ª dose de Pentavalente (DTP+HB+Hib) em menores de 1 ano (%)."
+        - name: "cobertura_poliomielite_vip_pct"
+          data_type: "float64"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Cobertura vacinal de Poliomielite Inativada (VIP - 3 doses) em menores de 1 ano (%)."
+        - name: "cobertura_triplice_viral_d1_pct"
+          data_type: "float64"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Cobertura vacinal da 1ª dose de Tríplice Viral (Sarampo, Caxumba e Rubéola) em crianças de 1 ano (%)."
+        - name: "homogeneidade_cobertura_vacinal_pni_pct"
+          data_type: "float64"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Percentual de imunobiológicos prioritários do calendário básico que atingiram a meta PNI (%)."
+        - name: "taxa_abandono_esquema_multidose_pct"
+          data_type: "float64"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Taxa percentual média de abandono entre a 1ª e a última dose de esquemas vacinais multidoses (%)."
+        - name: "reference_date"
+          data_type: "string"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Data de referência ISO-8601 da consolidação vacinal."
+        - name: "extracted_at"
+          data_type: "string"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Timestamp ISO-8601 UTC da extração."
+
+    vigilancia_capacidade_resposta_cievs_lacen:
+      description: "Indicadores municipais de prontidão CIEVS/SVSA, vigilância sentinela, tempo de resposta laboratorial GAL/LACEN, bloqueio vetorial e integração RNDS."
+      grain: "id_municipio, ano_epidemiologico"
+      primary_keys: ["id_municipio", "ano_epidemiologico"]
+      min_expected_rows: 12
+      columns:
+        - name: "id_municipio"
+          data_type: "string"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Código IBGE de 7 dígitos identificador único do município."
+        - name: "nome_municipio"
+          data_type: "string"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Nome oficial do município."
+        - name: "sigla_uf"
+          data_type: "string"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Sigla de 2 letras da Unidade Federativa."
+        - name: "id_uf"
+          data_type: "string"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Código IBGE de 2 dígitos da Unidade Federativa."
+        - name: "regiao"
+          data_type: "string"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Grande região geográfica brasileira segundo o IBGE."
+        - name: "ano_epidemiologico"
+          data_type: "int64"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Ano epidemiológico de avaliação da capacidade CIEVS/LACEN."
+        - name: "unidades_sentinela_vigilancia_ativas"
+          data_type: "int64"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Número de unidades sentinelas ativas de vigilância epidemiológica no município."
+        - name: "notificacoes_imediatas_24h_cievs_pct"
+          data_type: "float64"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Percentual de eventos de notificação imediata reportados em até 24 horas ao CIEVS (%)."
+        - name: "investigacoes_epidemiologicas_48h_pct"
+          data_type: "float64"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Percentual de investigações de campo iniciadas em até 48 horas após a notificação (%)."
+        - name: "tempo_medio_liberacao_gal_lacen_horas"
+          data_type: "float64"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Tempo médio de liberação de laudos laboratoriais no sistema GAL/LACEN (horas)."
+        - name: "indice_bloqueio_vetorial_arboviroses_pct"
+          data_type: "float64"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Percentual de focos e casos suspeitos de arboviroses com bloqueio vetorial oportuno (%)."
+        - name: "surtos_investigados_encerrados_pct"
+          data_type: "float64"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Percentual de surtos notificados com investigação epidemiológica concluída e encerrada (%)."
+        - name: "integracao_rnds_esus_sinan_pct"
+          data_type: "float64"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Índice de interoperabilidade e envio tempestivo das bases locais à RNDS/e-SUS/SINAN (%)."
+        - name: "reference_date"
+          data_type: "string"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Data de referência ISO-8601 da apuração CIEVS."
+        - name: "extracted_at"
+          data_type: "string"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Timestamp ISO-8601 UTC da extração."
+
+    features_opendatasus_vigilancia_epidemiologica_municipios_brasil:
+      description: "Gold Feature Store municipal unificando indicadores SRAG, SINAN, cobertura vacinal SI-PNI, prontidão CIEVS/RNDS, scores compostos (0-100) e classificação epidemiológica em 4 tiers."
+      grain: "id_municipio"
+      primary_keys: ["id_municipio"]
+      min_expected_rows: 12
+      columns:
+        - name: "id_municipio"
+          data_type: "string"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Código IBGE de 7 dígitos identificador único do município."
+        - name: "nome_municipio"
+          data_type: "string"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Nome oficial do município."
+        - name: "sigla_uf"
+          data_type: "string"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Sigla de 2 letras da Unidade Federativa."
+        - name: "id_uf"
+          data_type: "string"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Código IBGE de 2 dígitos da Unidade Federativa."
+        - name: "regiao"
+          data_type: "string"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Grande região geográfica brasileira segundo o IBGE."
+        - name: "ano_epidemiologico"
+          data_type: "int64"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Ano epidemiológico consolidado das séries OpenDataSUS."
+        - name: "notificacoes_sindrome_gripal_esus_ano"
+          data_type: "int64"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Total anual de notificações de Síndrome Gripal no e-SUS Notifica."
+        - name: "internacoes_srag_sivep_ano"
+          data_type: "int64"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Total anual de internações por Síndrome Respiratória Aguda Grave no SIVEP-Gripe."
+        - name: "taxa_incidencia_srag_100k_hab"
+          data_type: "float64"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Taxa de incidência de hospitalizações SRAG por 100 mil habitantes."
+        - name: "letalidade_hospitalar_srag_pct"
+          data_type: "float64"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Taxa de letalidade hospitalar dos casos de SRAG no município (%)."
+        - name: "confirmacao_laboratorial_rt_pcr_srag_pct"
+          data_type: "float64"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Percentual de casos SRAG com confirmação diagnóstica via RT-PCR/painel viral (%)."
+        - name: "total_casos_confirmados_sinan_ano"
+          data_type: "int64"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Soma anual de casos confirmados de todos os grupos de notificação no SINAN."
+        - name: "incidencia_arboviroses_100k_hab"
+          data_type: "float64"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Taxa anual de incidência confirmada de arboviroses por 100 mil habitantes."
+        - name: "proporcao_encerramento_oportuno_sinan_pct"
+          data_type: "float64"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Média municipal de encerramento oportuno das fichas de investigação no SINAN (%)."
+        - name: "cobertura_pentavalente_d3_pct"
+          data_type: "float64"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Cobertura vacinal da 3ª dose de Pentavalente no SI-PNI (%)."
+        - name: "cobertura_triplice_viral_d1_pct"
+          data_type: "float64"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Cobertura vacinal da 1ª dose de Tríplice Viral no SI-PNI (%)."
+        - name: "homogeneidade_cobertura_vacinal_pni_pct"
+          data_type: "float64"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Percentual de imunobiológicos do calendário PNI acima da meta nacional (%)."
+        - name: "notificacoes_imediatas_24h_cievs_pct"
+          data_type: "float64"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Percentual de eventos de saúde pública reportados ao CIEVS em até 24 horas (%)."
+        - name: "score_prontidao_vigilancia_epidemiologica"
+          data_type: "float64"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Score normalizado (0 a 100) da prontidão laboratorial RT-PCR, encerramento SINAN, resposta CIEVS 24h e RNDS."
+        - name: "score_protecao_imunizacao_coletiva_pni"
+          data_type: "float64"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Score normalizado (0 a 100) da proteção vacinal coletiva e homogeneidade no SI-PNI."
+        - name: "classificacao_vigilancia_epidemiologica_municipal"
+          data_type: "string"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Classificação hierárquica municipal da prontidão epidemiológica e proteção vacinal (4 tiers)."
+        - name: "reference_date"
+          data_type: "string"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Data de referência ISO-8601 da série."
+        - name: "extracted_at"
+          data_type: "string"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Timestamp ISO-8601 UTC da geração."

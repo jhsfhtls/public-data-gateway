@@ -1,0 +1,16 @@
+version: 2
+
+sources:
+  - name: opendatasus_vigilancia_silver
+    description: "Bases oficiais OpenDataSUS de Síndromes Respiratórias (e-SUS/SIVEP-Gripe), SINAN, cobertura vacinal SI-PNI e capacidade CIEVS/GAL-LACEN normalizadas na camada Silver."
+    meta:
+      external_location: "data/opendatasus_vigilancia/silver/{name}.parquet"
+    tables:
+      - name: vigilancia_sindromes_respiratorias_srag_municipio
+        description: "Monitoramento municipal de Síndrome Gripal (e-SUS Notifica) e internações SRAG (SIVEP-Gripe), UTI, óbitos e confirmação RT-PCR."
+      - name: vigilancia_agravos_notificacao_sinan
+        description: "Desagregação municipal de agravos de notificação compulsória no SINAN por grupo epidemiológico e via de transmissão."
+      - name: vigilancia_cobertura_vacinal_sipni_municipio
+        description: "Consolidado municipal do Programa Nacional de Imunizações (SI-PNI/RNDS) com doses aplicadas, salas de vacina e coberturas-chave."
+      - name: vigilancia_capacidade_resposta_cievs_lacen
+        description: "Indicadores municipais de prontidão CIEVS 24h/48h, tempo de liberação laboratorial GAL/LACEN e interoperabilidade RNDS."

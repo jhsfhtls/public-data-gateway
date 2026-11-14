@@ -1010,7 +1010,7 @@ sources:
   - P02
   rice_score: 440
   roadmap_wave: 5
-  status: CATALOGED
+  status: HOMOLOGATED
 - source_id: inep_enem
   name: 'INEP: Microdados do Exame Nacional do Ensino Médio (ENEM)'
   agency: Instituto Nacional de Estudos e Pesquisas Educacionais Anísio Teixeira (INEP)
