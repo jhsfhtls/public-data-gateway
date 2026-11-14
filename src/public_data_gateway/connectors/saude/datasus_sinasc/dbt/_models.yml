@@ -1,0 +1,245 @@
+version: 2
+
+models:
+  - name: stg_sinasc_nascidos_vivos_municipio
+    description: "Visão padronizada dos nascidos vivos, taxa bruta de natalidade e via de parto hospitalar e cesárea no SINASC por município."
+    columns:
+      - name: id_municipio
+        description: "Código IBGE de 7 dígitos do município."
+        tests:
+          - not_null
+          - unique
+      - name: nome_municipio
+        description: "Nome oficial do município."
+        tests:
+          - not_null
+      - name: sigla_uf
+        description: "Sigla de 2 letras da Unidade Federativa."
+        tests:
+          - not_null
+      - name: id_uf
+        description: "Código IBGE de 2 dígitos da Unidade Federativa."
+        tests:
+          - not_null
+      - name: ano_referencia
+        description: "Ano epidemiológico de referência das Declarações de Nascido Vivo (DNV)."
+        tests:
+          - not_null
+      - name: total_nascidos_vivos
+        description: "Total de nascidos vivos por residência materna registrados no SINASC."
+        tests:
+          - not_null
+      - name: taxa_bruta_natalidade_1000_hab
+        description: "Taxa bruta de natalidade por 1.000 habitantes residentes."
+        tests:
+          - not_null
+      - name: nascidos_vivos_hospitalares
+        description: "Quantidade de nascidos vivos com parto ocorrido em estabelecimento hospitalar."
+        tests:
+          - not_null
+      - name: proporcao_partos_hospitalares_pct
+        description: "Percentual de partos realizados em ambiente hospitalar (%)."
+        tests:
+          - not_null
+      - name: nascidos_vivos_parto_cesareo
+        description: "Quantidade de nascidos vivos por via de parto cesáreo."
+        tests:
+          - not_null
+      - name: proporcao_partos_cesareos_pct
+        description: "Percentual de nascidos vivos por parto cesáreo no município (%)."
+        tests:
+          - not_null
+      - name: source_url
+        description: "URL oficial DataSUS SINASC."
+        tests:
+          - not_null
+      - name: reference_date
+        description: "Data de referência ISO-8601 da extração."
+        tests:
+          - not_null
+      - name: extracted_at
+        description: "Timestamp ISO-8601 UTC da extração."
+        tests:
+          - not_null
+
+  - name: stg_sinasc_assistencia_prenatal_parto
+    description: "Visão padronizada da estratificação municipal dos nascidos vivos por faixa de consultas pré-natal e início oportuno."
+    columns:
+      - name: id_municipio
+        description: "Código IBGE de 7 dígitos do município."
+        tests:
+          - not_null
+      - name: nome_municipio
+        description: "Nome oficial do município."
+        tests:
+          - not_null
+      - name: sigla_uf
+        description: "Sigla de 2 letras da Unidade Federativa."
+        tests:
+          - not_null
+      - name: id_uf
+        description: "Código IBGE de 2 dígitos da Unidade Federativa."
+        tests:
+          - not_null
+      - name: ano_referencia
+        description: "Ano epidemiológico de referência do SINASC."
+        tests:
+          - not_null
+      - name: faixa_assistencia_prenatal
+        description: "Faixa padronizada de consultas pré-natal realizadas pela gestante."
+        tests:
+          - not_null
+      - name: nascidos_vivos_faixa
+        description: "Quantidade de nascidos vivos registrados na faixa de assistência pré-natal."
+        tests:
+          - not_null
+      - name: participacao_faixa_prenatal_pct
+        description: "Participação percentual da faixa sobre o total de nascidos vivos municipais (%)."
+        tests:
+          - not_null
+      - name: inicio_prenatal_primeiro_trimestre_pct
+        description: "Percentual de gestantes na faixa com início oportuno do pré-natal no 1º trimestre (%)."
+        tests:
+          - not_null
+      - name: proporcao_cesarea_faixa_pct
+        description: "Proporção de partos cesáreos registrada na faixa pré-natal (%)."
+        tests:
+          - not_null
+      - name: idade_media_materna_faixa_anos
+        description: "Idade média das mães na faixa de consultas pré-natal (anos)."
+        tests:
+          - not_null
+      - name: source_url
+        description: "URL oficial DataSUS SINASC."
+        tests:
+          - not_null
+      - name: reference_date
+        description: "Data de referência ISO-8601 da extração."
+        tests:
+          - not_null
+      - name: extracted_at
+        description: "Timestamp ISO-8601 UTC da extração."
+        tests:
+          - not_null
+
+  - name: stg_sinasc_perfil_materno_demografico
+    description: "Visão padronizada do perfil demográfico e escolaridade materna no SINASC por município."
+    columns:
+      - name: id_municipio
+        description: "Código IBGE de 7 dígitos do município."
+        tests:
+          - not_null
+          - unique
+      - name: nome_municipio
+        description: "Nome oficial do município."
+        tests:
+          - not_null
+      - name: sigla_uf
+        description: "Sigla de 2 letras da Unidade Federativa."
+        tests:
+          - not_null
+      - name: id_uf
+        description: "Código IBGE de 2 dígitos da Unidade Federativa."
+        tests:
+          - not_null
+      - name: ano_referencia
+        description: "Ano epidemiológico de referência do SINASC."
+        tests:
+          - not_null
+      - name: idade_media_materna_anos
+        description: "Idade média das mães ao nascimento no município (anos)."
+        tests:
+          - not_null
+      - name: maes_adolescentes_menores_20_anos
+        description: "Quantidade de nascidos vivos de mães com idade inferior a 20 anos."
+        tests:
+          - not_null
+      - name: proporcao_gravidez_adolescencia_pct
+        description: "Percentual de nascimentos de mães adolescentes menores de 20 anos (%)."
+        tests:
+          - not_null
+      - name: maes_35_anos_ou_mais
+        description: "Quantidade de nascidos vivos de mães com 35 anos ou mais."
+        tests:
+          - not_null
+      - name: proporcao_gestacao_tardia_35_mais_pct
+        description: "Percentual de nascimentos de mães com 35 anos ou mais (%)."
+        tests:
+          - not_null
+      - name: proporcao_escolaridade_materna_12_anos_mais_pct
+        description: "Percentual de mães com 12 anos ou mais de estudo formal concluído (%)."
+        tests:
+          - not_null
+      - name: source_url
+        description: "URL oficial DataSUS SINASC."
+        tests:
+          - not_null
+      - name: reference_date
+        description: "Data de referência ISO-8601 da extração."
+        tests:
+          - not_null
+      - name: extracted_at
+        description: "Timestamp ISO-8601 UTC da extração."
+        tests:
+          - not_null
+
+  - name: stg_sinasc_condicoes_vitalidade_recem_nascido
+    description: "Visão padronizada de vitalidade neonatal e risco perinatal no SINASC por município."
+    columns:
+      - name: id_municipio
+        description: "Código IBGE de 7 dígitos do município."
+        tests:
+          - not_null
+          - unique
+      - name: nome_municipio
+        description: "Nome oficial do município."
+        tests:
+          - not_null
+      - name: sigla_uf
+        description: "Sigla de 2 letras da Unidade Federativa."
+        tests:
+          - not_null
+      - name: id_uf
+        description: "Código IBGE de 2 dígitos da Unidade Federativa."
+        tests:
+          - not_null
+      - name: ano_referencia
+        description: "Ano epidemiológico de referência do SINASC."
+        tests:
+          - not_null
+      - name: nascidos_baixo_peso_menor_2500g
+        description: "Total de recém-nascidos com peso ao nascer inferior a 2.500 gramas."
+        tests:
+          - not_null
+      - name: proporcao_baixo_peso_nascer_pct
+        description: "Percentual de nascidos vivos com baixo peso ao nascer (<2.500 g) (%)."
+        tests:
+          - not_null
+      - name: nascidos_prematuros_menor_37_sem
+        description: "Total de nascidos vivos prematuros (<37 semanas gestacionais)."
+        tests:
+          - not_null
+      - name: proporcao_prematuridade_pct
+        description: "Taxa percentual de nascimentos prematuros no município (%)."
+        tests:
+          - not_null
+      - name: proporcao_apgar_5min_adequado_7_10_pct
+        description: "Percentual de recém-nascidos com escore de Apgar 7 a 10 no 5º minuto (%)."
+        tests:
+          - not_null
+      - name: taxa_anomalias_congenitas_10k_nv
+        description: "Prevalência de anomalias congênitas notificadas por 10.000 nascidos vivos."
+        tests:
+          - not_null
+      - name: source_url
+        description: "URL oficial DataSUS SINASC."
+        tests:
+          - not_null
+      - name: reference_date
+        description: "Data de referência ISO-8601 da extração."
+        tests:
+          - not_null
+      - name: extracted_at
+        description: "Timestamp ISO-8601 UTC da extração."
+        tests:
+          - not_null

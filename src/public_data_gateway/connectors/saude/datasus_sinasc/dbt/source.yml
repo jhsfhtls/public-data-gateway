@@ -1,0 +1,16 @@
+version: 2
+
+sources:
+  - name: datasus_sinasc_silver
+    description: "Bases oficiais do DataSUS Sistema de Informações sobre Nascidos Vivos (SINASC) normalizadas na camada Silver."
+    meta:
+      external_location: "data/datasus_sinasc/silver/{name}.parquet"
+    tables:
+      - name: sinasc_nascidos_vivos_municipio
+        description: "Consolidação municipal dos nascidos vivos registrados nas DNVs, taxa de natalidade, partos hospitalares e partos cesáreos."
+      - name: sinasc_assistencia_prenatal_parto
+        description: "Estratificação municipal dos nascidos vivos por faixa de consultas pré-natal, início no 1º trimestre e via de parto."
+      - name: sinasc_perfil_materno_demografico
+        description: "Perfil sociodemográfico materno municipal no SINASC: idade média, gravidez na adolescência, gestação tardia e escolaridade."
+      - name: sinasc_condicoes_vitalidade_recem_nascido
+        description: "Indicadores de vitalidade neonatal e risco perinatal: baixo peso (<2.500g), prematuridade (<37 semanas), Apgar 5º min e anomalias congênitas."

@@ -963,6 +963,65 @@ class MCPDispatcher:
                                 },
                             },
                             {
+                                "name": "bdg_get_sinasc_live_births",
+                                "description": "Get municipal DataSUS SINASC live births volume, crude birth rate, hospital deliveries, and cesarean share.",
+                                "inputSchema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "id_municipio": {
+                                            "type": "string",
+                                            "description": "7-digit IBGE municipality code (e.g. 3550308)",
+                                        },
+                                    },
+                                    "required": ["id_municipio"],
+                                },
+                            },
+                            {
+                                "name": "bdg_get_sinasc_newborn_vitality",
+                                "description": "Get municipal newborn vitality indicators (low birth weight, prematurity, Apgar 5m, and congenital anomalies) from DataSUS SINASC.",
+                                "inputSchema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "id_municipio": {
+                                            "type": "string",
+                                            "description": "7-digit IBGE municipality code (e.g. 3550308)",
+                                        },
+                                    },
+                                    "required": ["id_municipio"],
+                                },
+                            },
+                            {
+                                "name": "bdg_get_sinasc_perinatal_features",
+                                "description": "Get Gold DataSUS SINASC prenatal care quality score, perinatal vitality score, and maternal-perinatal tier classification.",
+                                "inputSchema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "id_municipio": {
+                                            "type": "string",
+                                            "description": "7-digit IBGE municipality code (e.g. 3550308)",
+                                        },
+                                    },
+                                    "required": ["id_municipio"],
+                                },
+                            },
+                            {
+                                "name": "bdg_list_top_sinasc_prenatal_municipalities",
+                                "description": "List top Brazilian municipalities ranked by composite DataSUS SINASC prenatal care quality score.",
+                                "inputSchema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "limit": {
+                                            "type": "integer",
+                                            "description": "Maximum rows (default: 10)",
+                                        },
+                                        "sigla_uf": {
+                                            "type": "string",
+                                            "description": "Optional 2-letter state filter (e.g. SP)",
+                                        },
+                                    },
+                                },
+                            },
+                            {
                                 "name": "bdg_get_censo_escolar_schools",
                                 "description": "Get municipal active schools inventory, broadband internet, science labs, libraries, and PcD accessibility (INEP Censo Escolar).",
                                 "inputSchema": {
@@ -2283,6 +2342,56 @@ class MCPDispatcher:
                     },
                 }
             wrapped = wrap_untrusted_gov_data(result, source_id="datasus_sim")
+            return {
+                "jsonrpc": "2.0",
+                "id": req_id,
+                "result": {"content": [{"type": "text", "text": wrapped}], "isError": False},
+            }
+
+        if tool_name in {
+            "bdg_get_sinasc_live_births",
+            "bdg_get_sinasc_newborn_vitality",
+            "bdg_get_sinasc_perinatal_features",
+            "bdg_list_top_sinasc_prenatal_municipalities",
+        }:
+            from public_data_gateway.connectors.saude.datasus_sinasc.connector import (
+                DataSUSSinascConnector,
+            )
+
+            connector = DataSUSSinascConnector(settings=self.settings)
+            if tool_name == "bdg_get_sinasc_live_births":
+                result = connector.get_live_births_summary(
+                    str(args.get("id_municipio", "")).strip()
+                )
+            elif tool_name == "bdg_get_sinasc_newborn_vitality":
+                result = connector.get_newborn_vitality_conditions(
+                    str(args.get("id_municipio", "")).strip()
+                )
+            elif tool_name == "bdg_get_sinasc_perinatal_features":
+                result = connector.get_sinasc_perinatal_features(
+                    str(args.get("id_municipio", "")).strip()
+                )
+            else:
+                raw_uf = args.get("sigla_uf")
+                result = connector.list_top_sinasc_prenatal_municipalities(
+                    limit=int(args.get("limit", 10)),
+                    sigla_uf=str(raw_uf).strip() if raw_uf else None,
+                )
+            if not result:
+                return {
+                    "jsonrpc": "2.0",
+                    "id": req_id,
+                    "result": {
+                        "content": [
+                            {
+                                "type": "text",
+                                "text": "No DataSUS SINASC data found for the query.",
+                            }
+                        ],
+                        "isError": True,
+                    },
+                }
+            wrapped = wrap_untrusted_gov_data(result, source_id="datasus_sinasc")
             return {
                 "jsonrpc": "2.0",
                 "id": req_id,

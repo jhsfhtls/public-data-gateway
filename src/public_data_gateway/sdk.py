@@ -843,13 +843,14 @@ class LaborFacade:
 
 
 class HealthFacade:
-    """Unified developer facade for public health infrastructure, CNES networks, SIH hospitalizations, and SIM mortality analytics."""
+    """Unified developer facade for public health infrastructure, CNES networks, SIH hospitalizations, SIM mortality, and SINASC live births analytics."""
 
     def __init__(self, sdk: "BrazilData") -> None:
         self._sdk = sdk
         self._cnes_connector: Any = None
         self._sih_connector: Any = None
         self._sim_connector: Any = None
+        self._sinasc_connector: Any = None
 
     @property
     def cnes_connector(self) -> Any:
@@ -880,6 +881,16 @@ class HealthFacade:
 
             self._sim_connector = DataSUSSimConnector(settings=self._sdk.settings)
         return self._sim_connector
+
+    @property
+    def sinasc_connector(self) -> Any:
+        if self._sinasc_connector is None:
+            from public_data_gateway.connectors.saude.datasus_sinasc.connector import (
+                DataSUSSinascConnector,
+            )
+
+            self._sinasc_connector = DataSUSSinascConnector(settings=self._sdk.settings)
+        return self._sinasc_connector
 
     def get_cnes_establishments(self, id_municipio: str) -> dict[str, Any]:
         """Get municipal summary of active health establishments and SUS network share (DataSUS CNES)."""
@@ -972,6 +983,38 @@ class HealthFacade:
     ) -> list[dict[str, Any]]:
         """List top Brazilian municipalities ranked by composite DataSUS SIM surveillance quality score."""
         return self.sim_connector.list_top_sim_surveillance_municipalities(
+            limit=limit, sigla_uf=sigla_uf
+        )
+
+    def get_sinasc_live_births(self, id_municipio: str) -> dict[str, Any]:
+        """Get municipal DataSUS SINASC live births volume, birth rate, hospital births, and cesarean share."""
+        return self.sinasc_connector.get_live_births_summary(id_municipio)
+
+    def list_sinasc_prenatal_care(
+        self, id_municipio: str, faixa_assistencia_prenatal: str | None = None
+    ) -> list[dict[str, Any]]:
+        """List municipal DataSUS SINASC live births stratified by prenatal visits bracket."""
+        return self.sinasc_connector.list_prenatal_care_breakdown(
+            id_municipio, faixa_assistencia_prenatal=faixa_assistencia_prenatal
+        )
+
+    def get_sinasc_maternal_profile(self, id_municipio: str) -> dict[str, Any]:
+        """Get municipal maternal demographic profile (mean age, adolescent and >=12y schooling shares)."""
+        return self.sinasc_connector.get_maternal_demographic_profile(id_municipio)
+
+    def get_sinasc_newborn_vitality(self, id_municipio: str) -> dict[str, Any]:
+        """Get municipal newborn vitality indicators (low birth weight, prematurity, Apgar 5m, congenital anomalies)."""
+        return self.sinasc_connector.get_newborn_vitality_conditions(id_municipio)
+
+    def get_sinasc_perinatal_features(self, id_municipio: str) -> dict[str, Any]:
+        """Get normalized Gold DataSUS SINASC prenatal care quality and perinatal vitality features."""
+        return self.sinasc_connector.get_sinasc_perinatal_features(id_municipio)
+
+    def list_top_sinasc_prenatal_municipalities(
+        self, limit: int = 10, sigla_uf: str | None = None
+    ) -> list[dict[str, Any]]:
+        """List top Brazilian municipalities ranked by composite DataSUS SINASC prenatal quality score."""
+        return self.sinasc_connector.list_top_sinasc_prenatal_municipalities(
             limit=limit, sigla_uf=sigla_uf
         )
 
@@ -1588,6 +1631,38 @@ class BrazilData:
     ) -> list[dict[str, Any]]:
         """Listar municípios líderes em score de qualidade de vigilância epidemiológica de óbitos no Brasil (DataSUS SIM)."""
         return self.health.list_top_sim_surveillance_municipalities(
+            limit=limit, sigla_uf=sigla_uf
+        )
+
+    def get_sinasc_live_births(self, id_municipio: str) -> dict[str, Any]:
+        """Consultar nascidos vivos, taxa bruta de natalidade, partos hospitalares e partos cesáreos no município (DataSUS SINASC)."""
+        return self.health.get_sinasc_live_births(id_municipio)
+
+    def list_sinasc_prenatal_care(
+        self, id_municipio: str, faixa_assistencia_prenatal: str | None = None
+    ) -> list[dict[str, Any]]:
+        """Listar nascidos vivos estratificados por faixa de consultas pré-natal e início oportuno no município (DataSUS SINASC)."""
+        return self.health.list_sinasc_prenatal_care(
+            id_municipio, faixa_assistencia_prenatal=faixa_assistencia_prenatal
+        )
+
+    def get_sinasc_maternal_profile(self, id_municipio: str) -> dict[str, Any]:
+        """Consultar perfil demográfico materno (idade média, gravidez na adolescência e escolaridade >=12 anos) (DataSUS SINASC)."""
+        return self.health.get_sinasc_maternal_profile(id_municipio)
+
+    def get_sinasc_newborn_vitality(self, id_municipio: str) -> dict[str, Any]:
+        """Consultar vitalidade neonatal (baixo peso <2.500g, prematuridade, Apgar 7-10 e anomalias congênitas) (DataSUS SINASC)."""
+        return self.health.get_sinasc_newborn_vitality(id_municipio)
+
+    def get_sinasc_perinatal_features(self, id_municipio: str) -> dict[str, Any]:
+        """Consultar features Gold de qualidade da assistência pré-natal e proteção perinatal (DataSUS SINASC)."""
+        return self.health.get_sinasc_perinatal_features(id_municipio)
+
+    def list_top_sinasc_prenatal_municipalities(
+        self, limit: int = 10, sigla_uf: str | None = None
+    ) -> list[dict[str, Any]]:
+        """Listar municípios líderes em qualidade da assistência pré-natal e saúde perinatal no Brasil (DataSUS SINASC)."""
+        return self.health.list_top_sinasc_prenatal_municipalities(
             limit=limit, sigla_uf=sigla_uf
         )
 

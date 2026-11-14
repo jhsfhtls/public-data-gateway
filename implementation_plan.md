@@ -1,26 +1,25 @@
-# Plano de Implementação: cnj_justica_aberta (11-Gate Protocol)
+# Implementation Plan — `datasus_sinasc` (`ODCS-BR-DATASUS-SINASC-001`)
 
-## 1. Contexto do Conector
-- **Fonte:** `cnj_justica_aberta` (CNJ: Justiça Aberta - Cadastro e Produtividade de Cartórios)
-- **Agência:** Conselho Nacional de Justiça (CNJ)
-- **Legislação:** Lei nº 8.935/1994 (Lei dos Cartórios), Lei nº 6.015/1973 (Registros Públicos), Lei nº 10.169/2000 (Emolumentos), Provimentos CNJ nº 24/2012 e nº 149/2023 e Decreto nº 8.777/2016 (Dados Abertos).
-- **Segmento:** `12_imobiliario_cartorial` (Wave 5)
-- **Protocolo:** `REST_JSON` / Portais Oficiais CNJ Justiça Aberta (`https://www.cnj.jus.br/corregedoria/justica_aberta/` e `https://www.cnj.jus.br/programas-e-acoes/corregedoria-nacional-de-justica/`)
-- **Chaves Canônicas:** `id_municipio`, `sigla_uf`
+> **Fase 07 — Ingestão Wave 5 (`06_saude_publica` / `saude`)**  
+> **Conector #35 de 49 (`71.4%` do catálogo homologado)**  
+> **Branch / Worktree:** `feat/conn-datasus-sinasc` em `../worktrees/feat-conn-datasus-sinasc`
 
-## 2. Status dos 11 Gates
-- [x] **Gate 1: Contrato ODCS v3.1:** `contract.yaml` (`ODCS-BR-CNJ-JUSTICA-ABERTA-001`, 4 tabelas Silver e 1 Gold Feature Store).
-- [x] **Gate 2: Ingestão Medallion:** `connector.py` (`CNJJusticaAbertaConnector`) com extração de 4 tabelas Silver (`justica_aberta_serventias_cadastro`, `justica_aberta_produtividade_atribuicao`, `justica_aberta_arrecadacao_emolumentos`, `justica_aberta_regularidade_digitalizacao`), Gold Feature Store (`features_justica_aberta_cartorios_serventias_municipios_brasil.parquet`), scores normalizados (0-100) de eficiência/modernização cartorial e dinamismo notarial/imobiliário, registro dinâmico `register_connector` e `verify_live_connectivity()` / `verify_live()`.
-- [x] **Gate 3: Baseline Parquet:** Materializado em `data/cnj_justica_aberta/{silver,gold}/`.
-- [x] **Gate 4: dbt Staging:** 4 views staging (`stg_justica_aberta_serventias_cadastro`, `stg_justica_aberta_produtividade_atribuicao`, `stg_justica_aberta_arrecadacao_emolumentos`, `stg_justica_aberta_regularidade_digitalizacao`) com 100% de documentação e testes `not_null` / `unique`.
-- [x] **Gate 5: dbt Core:** `fct_justica_aberta_serventias_arrecadacao_municipio.sql` e `fct_justica_aberta_produtividade_atribuicao_municipio.sql` documentados em `_core_models.yml`.
-- [x] **Gate 6: dbt Data Mart:** `mart_produtividade_serventias_extrajudiciais_brasil.sql` documentado em `dbt/models/marts/judicial/_marts_judicial_models.yml` com paridade exata frente à Feature Store Python.
-- [x] **Gate 7: dbt Build & Tests:** Build seletivo (`+mart_produtividade_serventias_extrajudiciais_brasil +fct_justica_aberta_produtividade_atribuicao_municipio`) com `PASS=165 TOTAL=165` e `lint_dbt_docs.py` aprovado com 100% de cobertura (299 modelos, 4.083 colunas, 162 fontes).
-- [x] **Gate 8: Paridade Multi-Interface:**
-  - SDK: `BrazilData.judicial.justica_aberta_connector`, `get_justica_aberta_offices`, `list_justica_aberta_productivity`, `get_justica_aberta_emoluments`, `get_justica_aberta_digitalization`, `get_justica_aberta_features`, `list_top_justica_aberta_municipalities`.
-  - CLI: `bdg justica-aberta offices`, `productivity`, `emoluments`, `digitalization`, `features`, `ranking`.
-  - REST API: `/api/v1/judicial/justica-aberta/*` e atalho `/api/v1/justica-aberta/{id_municipio}`.
-  - MCP: `bdg_get_justica_aberta_offices`, `bdg_get_justica_aberta_emoluments`, `bdg_get_justica_aberta_features`, `bdg_list_top_justica_aberta_municipalities` com `<untrusted_gov_data>`.
-- [x] **Gate 9: Testes Pytest:** 8 testes offline + 1 teste live fail-hard contra portais oficiais do CNJ Justiça Aberta.
-- [x] **Gate 10: Catálogo & Progresso:** `catalog/sources_registry.yaml` atualizado para `HOMOLOGATED` (34/49 fontes homologadas — 69.4%, sexto conector da Wave 5), `project_progress.json`, `CATALOG.md` e `JORNADA_IMPLEMENTACAO.md` sincronizados.
-- [ ] **Gate 11: CI/CD & PR:** PR aberto via GitHub CLI, monitoramento de 100% dos checks verdes e squash-merge em `main`.
+## Arquitetura Medallion & Gates de Execução (11 Gates)
+
+- **Gate 0 — Worktree & Junctions:** Worktree isolado `feat/conn-datasus-sinasc` a partir de `main` (`64f3194`), junctions para `.venv` e `data/*` (excluindo `data/reference`), `brasil.duckdb` sincronizado e instalação editável local (`pip install --no-deps -e .`).
+- **Gates 1–3 — Contrato ODCS, Conector & Materialização:**
+  - `src/public_data_gateway/connectors/saude/datasus_sinasc/contract.yaml` (`ODCS-BR-DATASUS-SINASC-001`).
+  - `DataSUSSinascConnector` (`connector.py`) registrado em `datasus_sinasc`, materializando 4 tabelas Silver (`sinasc_nascidos_vivos_municipio`, `sinasc_assistencia_prenatal_parto`, `sinasc_perfil_materno_demografico`, `sinasc_condicoes_vitalidade_recem_nascido`) e 1 Gold Feature Store (`features_sinasc_natalidade_saude_perinatal_municipios_brasil.parquet`) em `data/datasus_sinasc/{silver,gold}/`.
+  - Probe fail-hard `verify_live()` nos endpoints OpenDataSUS e API Dados Abertos Saúde.
+- **Gates 4–7 — Camadas dbt, Documentação 100% & Paridade SQL–Python:**
+  - 4 staging views (`stg_sinasc_*`) registradas em `dbt/dbt_project.yml`.
+  - 2 fatos core (`fct_sinasc_nascidos_vivos_vitalidade_municipio`, `fct_sinasc_assistencia_prenatal_parto_municipio`) e 1 mart (`mart_natalidade_saude_perinatal_sinasc_brasil`).
+  - Execução de `dbt build`, `dbt docs generate` e `scripts/lint_dbt_docs.py` (`APPROVED`), além de validação de paridade estrita SQL–Python (tolerância `1e-6`).
+- **Gate 8 — Paridade Multi-Interface:**
+  - `HealthFacade` e `BrazilData` (`sdk.py`), subcomando CLI `sinasc` (`cli/main.py`), endpoints REST `/api/v1/health-public/sinasc/*` e `/api/v1/sinasc/{id_municipio}` (`api/app.py`) e tools MCP (`bdg_*` com `wrap_untrusted_gov_data` em `mcp/server.py`).
+- **Gate 9 — Suíte de Testes:**
+  - `tests/connectors/test_datasus_sinasc.py` (8 testes offline) e `tests/connectors/test_datasus_sinasc_live.py` (1 teste `@pytest.mark.live`).
+- **Gate 10 — Governança, Renderers & Verificação Completa:**
+  - Atualização de `catalog/sources_registry.yaml` (`HOMOLOGATED`), `state/project_progress.json`, `CATALOG.md`, `JORNADA_IMPLEMENTACAO.md`, normalização UTF-8 LF sem BOM, `ruff check .`, `--check` renderers, `lint_dbt_docs.py` e `pytest -m "not live"`.
+- **Gate 11 — Commit, PR, Merge & Revalidação Canônica:**
+  - Commit `feat(health): add datasus_sinasc connector`, PR com 4/4 checks verdes, squash-merge em `main`, remoção segura do worktree/junctions, reinstalação editável canônica e revalidação end-to-end em `public-data-gateway`.
