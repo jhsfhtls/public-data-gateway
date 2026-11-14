@@ -242,6 +242,65 @@ class MCPDispatcher:
                                 },
                             },
                             {
+                                "name": "bdg_get_justica_aberta_offices",
+                                "description": "Get municipal extrajudicial notary offices registry, Real Estate offices, and titular tenure share (CNJ Justiça Aberta).",
+                                "inputSchema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "id_municipio": {
+                                            "type": "string",
+                                            "description": "7-digit IBGE municipality code (e.g. 3550308)",
+                                        },
+                                    },
+                                    "required": ["id_municipio"],
+                                },
+                            },
+                            {
+                                "name": "bdg_get_justica_aberta_emoluments",
+                                "description": "Get municipal notary emoluments revenue, statutory transfers, and unit ticket (CNJ Justiça Aberta).",
+                                "inputSchema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "id_municipio": {
+                                            "type": "string",
+                                            "description": "7-digit IBGE municipality code (e.g. 3550308)",
+                                        },
+                                    },
+                                    "required": ["id_municipio"],
+                                },
+                            },
+                            {
+                                "name": "bdg_get_justica_aberta_features",
+                                "description": "Get Gold CNJ Justiça Aberta cartorial efficiency score, real-estate dynamism score, and notary hub classification.",
+                                "inputSchema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "id_municipio": {
+                                            "type": "string",
+                                            "description": "7-digit IBGE municipality code (e.g. 3550308)",
+                                        },
+                                    },
+                                    "required": ["id_municipio"],
+                                },
+                            },
+                            {
+                                "name": "bdg_list_top_justica_aberta_municipalities",
+                                "description": "List top Brazilian municipalities ranked by composite CNJ Justiça Aberta cartorial efficiency score.",
+                                "inputSchema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "limit": {
+                                            "type": "integer",
+                                            "description": "Maximum rows (default: 10)",
+                                        },
+                                        "sigla_uf": {
+                                            "type": "string",
+                                            "description": "Optional 2-letter state filter (e.g. SP)",
+                                        },
+                                    },
+                                },
+                            },
+                            {
                                 "name": "bdg_get_suframa_status",
                                 "description": "Query official SUFRAMA registration, incentive approval, and operational status in Polo Industrial de Manaus and ALCs (Tier 1).",
                                 "inputSchema": {
@@ -1368,6 +1427,56 @@ class MCPDispatcher:
             doc = args.get("documento") or args.get("cnpj_or_cpf") or ""
             res = tst_conn.get_labor_risk(doc)
             wrapped = wrap_untrusted_gov_data(res, source_id="tst_cndt")
+            return {
+                "jsonrpc": "2.0",
+                "id": req_id,
+                "result": {"content": [{"type": "text", "text": wrapped}], "isError": False},
+            }
+
+        if tool_name in {
+            "bdg_get_justica_aberta_offices",
+            "bdg_get_justica_aberta_emoluments",
+            "bdg_get_justica_aberta_features",
+            "bdg_list_top_justica_aberta_municipalities",
+        }:
+            from public_data_gateway.connectors.judicial.cnj_justica_aberta.connector import (
+                CNJJusticaAbertaConnector,
+            )
+
+            ja_conn = CNJJusticaAbertaConnector(settings=self.settings)
+            if tool_name == "bdg_get_justica_aberta_offices":
+                result = ja_conn.get_notary_offices_registry(
+                    str(args.get("id_municipio", "")).strip()
+                )
+            elif tool_name == "bdg_get_justica_aberta_emoluments":
+                result = ja_conn.get_emoluments_revenue(
+                    str(args.get("id_municipio", "")).strip()
+                )
+            elif tool_name == "bdg_get_justica_aberta_features":
+                result = ja_conn.get_justica_aberta_features(
+                    str(args.get("id_municipio", "")).strip()
+                )
+            else:
+                raw_uf = args.get("sigla_uf")
+                result = ja_conn.list_top_notary_efficiency_municipalities(
+                    limit=int(args.get("limit", 10)),
+                    sigla_uf=str(raw_uf).strip() if raw_uf else None,
+                )
+            if not result:
+                return {
+                    "jsonrpc": "2.0",
+                    "id": req_id,
+                    "result": {
+                        "content": [
+                            {
+                                "type": "text",
+                                "text": "No CNJ Justiça Aberta data found for the query.",
+                            }
+                        ],
+                        "isError": True,
+                    },
+                }
+            wrapped = wrap_untrusted_gov_data(result, source_id="cnj_justica_aberta")
             return {
                 "jsonrpc": "2.0",
                 "id": req_id,

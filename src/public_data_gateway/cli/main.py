@@ -170,6 +170,36 @@ def build_parser() -> argparse.ArgumentParser:
     jud_deb_p.add_argument("termo", type=str, help="Document, court, or NUP")
     jud_deb_p.add_argument("--json", action="store_true", help="Output in JSON format")
 
+    # CNJ Justiça Aberta (Cartórios / Serventias Extrajudiciais) command group
+    ja_p = subparsers.add_parser("justica-aberta", help="Query CNJ Justiça Aberta extrajudicial notary registry, productivity, emoluments, and hubs.")
+    ja_sub = ja_p.add_subparsers(dest="justica_aberta_action", required=True)
+
+    ja_off_p = ja_sub.add_parser("offices", help="Get municipal notary offices inventory and titular tenure (CNJ Justiça Aberta).")
+    ja_off_p.add_argument("id_municipio", help="7-digit IBGE municipality code (e.g. 3550308)")
+    ja_off_p.add_argument("--json", action="store_true", help="Output in JSON format")
+
+    ja_prd_p = ja_sub.add_parser("productivity", help="List semiannual notary acts and e-Notariado share by attribution.")
+    ja_prd_p.add_argument("id_municipio", help="7-digit IBGE municipality code")
+    ja_prd_p.add_argument("--atribuicao", type=str, help="Optional cartorial attribution filter (e.g. Registro_Imoveis)")
+    ja_prd_p.add_argument("--json", action="store_true", help="Output in JSON format")
+
+    ja_emo_p = ja_sub.add_parser("emoluments", help="Get municipal emoluments revenue, statutory transfers, and unit ticket (CNJ).")
+    ja_emo_p.add_argument("id_municipio", help="7-digit IBGE municipality code")
+    ja_emo_p.add_argument("--json", action="store_true", help="Output in JSON format")
+
+    ja_dig_p = ja_sub.add_parser("digitalization", help="Get archive digitization, SREI/ONR/CRC integration, and transparency profile.")
+    ja_dig_p.add_argument("id_municipio", help="7-digit IBGE municipality code")
+    ja_dig_p.add_argument("--json", action="store_true", help="Output in JSON format")
+
+    ja_ft_p = ja_sub.add_parser("features", help="Get Gold CNJ Justiça Aberta efficiency and real-estate dynamism features.")
+    ja_ft_p.add_argument("id_municipio", help="7-digit IBGE municipality code")
+    ja_ft_p.add_argument("--json", action="store_true", help="Output in JSON format")
+
+    ja_rk_p = ja_sub.add_parser("ranking", help="List top Brazilian municipalities ranked by CNJ cartorial efficiency score.")
+    ja_rk_p.add_argument("--limit", type=int, default=10, help="Max municipalities to list")
+    ja_rk_p.add_argument("--uf", type=str, help="Optional 2-letter state filter")
+    ja_rk_p.add_argument("--json", action="store_true", help="Output in JSON format")
+
     # Company, Tax Regimes & Fiscal Incentives
     comp_p = subparsers.add_parser(
         "company", help="Query corporate registries, tax regimes and fiscal incentives (SUFRAMA/RFB)."
@@ -1166,6 +1196,78 @@ def main(argv: Sequence[str] | None = None) -> int:
                     print(f"Found {len(rows)} BNDT debtor entries matching '{args.termo}':")
                     for r in rows:
                         print(f"  - [{r.get('tribunal_origem')}] NUP: {r.get('numero_processo_nup')} | R$ {r.get('valor_debito', 0.0):,.2f} | {r.get('situacao_exigibilidade')}")
+                return 0
+
+        if args.command == "justica-aberta":
+            from public_data_gateway.connectors.judicial.cnj_justica_aberta.connector import (
+                CNJJusticaAbertaConnector,
+            )
+
+            ja_conn = CNJJusticaAbertaConnector(settings=settings)
+            ja_action = getattr(args, "justica_aberta_action", None)
+            if ja_action == "offices":
+                res = ja_conn.get_notary_offices_registry(args.id_municipio)
+                if getattr(args, "json", False):
+                    print(json.dumps(res, indent=2, ensure_ascii=False, default=str))
+                else:
+                    print(f"CNJ Justiça Aberta Serventias ({res.get('nome_municipio')} - {res.get('id_municipio')}):")
+                    print(f"  Serventias Ativas: {res.get('total_serventias_ativas')} ({res.get('taxa_provimento_titular_pct')}% providas titular)")
+                    print(f"  Registro Imóveis:  {res.get('oficios_registro_imoveis')} | Notas/Protesto: {res.get('tabelionatos_notas_protesto')} | RCPN: {res.get('oficios_registro_civil_rcpn')}")
+                return 0
+
+            if ja_action == "productivity":
+                rows = ja_conn.list_productivity_by_attribution(
+                    args.id_municipio, atribuicao_cartorial=getattr(args, "atribuicao", None)
+                )
+                if getattr(args, "json", False):
+                    print(json.dumps(rows, indent=2, ensure_ascii=False, default=str))
+                else:
+                    print(f"CNJ Justiça Aberta Produtividade por Atribuição ({args.id_municipio}):")
+                    for r in rows:
+                        print(f"  - {r.get('atribuicao_cartorial')}: {r.get('atos_praticados_semestre')} atos | {r.get('proporcao_atos_eletronicos_e_notariado_pct')}% eletrônico | prazo {r.get('prazo_medio_emissao_dias')}d")
+                return 0
+
+            if ja_action == "emoluments":
+                res = ja_conn.get_emoluments_revenue(args.id_municipio)
+                if getattr(args, "json", False):
+                    print(json.dumps(res, indent=2, ensure_ascii=False, default=str))
+                else:
+                    print(f"CNJ Justiça Aberta Emolumentos ({res.get('nome_municipio')} - {res.get('id_municipio')}):")
+                    print(f"  Arrecadação Bruta: R$ {res.get('arrecadacao_bruta_emolumentos_brl', 0.0):,.2f}")
+                    print(f"  Média/Serventia:   R$ {res.get('arrecadacao_media_por_serventia_brl', 0.0):,.2f} | Ticket/Ato: R$ {res.get('ticket_medio_emolumento_por_ato_brl', 0.0):,.2f}")
+                return 0
+
+            if ja_action == "digitalization":
+                res = ja_conn.get_digitalization_compliance(args.id_municipio)
+                if getattr(args, "json", False):
+                    print(json.dumps(res, indent=2, ensure_ascii=False, default=str))
+                else:
+                    print(f"CNJ Justiça Aberta Digitalização ({res.get('nome_municipio')} - {res.get('id_municipio')}):")
+                    print(f"  Acervo Digitaliz.: {res.get('acervo_historico_digitalizado_pct')}% | Integração SREI/ONR/CRC: {res.get('serventias_integradas_srei_onr_crc_pct')}%")
+                    print(f"  Transparência CNJ: {res.get('indice_transparencia_prestacao_contas_cnj_pct')}% | Prepostos: {res.get('forca_trabalho_prepostos_escreventes')}")
+                return 0
+
+            if ja_action == "features":
+                feat = ja_conn.get_justica_aberta_features(args.id_municipio)
+                if getattr(args, "json", False):
+                    print(json.dumps(feat, indent=2, ensure_ascii=False, default=str))
+                else:
+                    print(f"CNJ Justiça Aberta Features Cartoriais: {feat.get('nome_municipio')} ({feat.get('sigla_uf')} - {feat.get('id_municipio')}):")
+                    print(f"  Score Eficiência:    {feat.get('score_eficiencia_modernizacao_cartorial')}/100.0")
+                    print(f"  Score Dinamismo:     {feat.get('score_dinamismo_notarial_imobiliario')}/100.0")
+                    print(f"  Classificação Polo:  {feat.get('classificacao_polo_notarial_cartorial')}")
+                return 0
+
+            if ja_action == "ranking":
+                ranks = ja_conn.list_top_notary_efficiency_municipalities(
+                    limit=getattr(args, "limit", 10), sigla_uf=getattr(args, "uf", None)
+                )
+                if getattr(args, "json", False):
+                    print(json.dumps(ranks, indent=2, ensure_ascii=False, default=str))
+                else:
+                    print(f"Top {len(ranks)} Polos Notariais & Registrais (CNJ Justiça Aberta):")
+                    for idx, r in enumerate(ranks, 1):
+                        print(f"  {idx}. {r.get('nome_municipio')} ({r.get('sigla_uf')}): Eficiência {r.get('score_eficiencia_modernizacao_cartorial')} | Dinamismo: {r.get('score_dinamismo_notarial_imobiliario')} | {r.get('classificacao_polo_notarial_cartorial')}")
                 return 0
 
         if args.command in {"company", "suframa", "tax-incentives"}:

@@ -1,6 +1,6 @@
 {
   "schema_version": "1.0.0",
-  "last_updated": "2026-11-13T22:05:00.000000",
+  "last_updated": "2026-11-13T22:25:00.000000",
   "project_name": "public-data-gateway",
   "ecosystem": "C.O.R.E. (core, operations, career, studies)",
   "governing_pops": [
@@ -13,10 +13,10 @@
     "POP_T_148"
   ],
   "current_macro_phase_id": "07",
-  "current_macro_phase": "Fase 07 - Ingestão Wave 5 (Saúde, Educação & Setor Notarial — 33/49 fontes homologadas [67.3%] com inep_censo_superior homologado; Próximo: cnj_justica_aberta)",
+  "current_macro_phase": "Fase 07 - Ingestão Wave 5 (Saúde, Educação & Setor Notarial — 34/49 fontes homologadas [69.4%] com cnj_justica_aberta homologado; Próximo: datasus_sinasc)",
   "overall_status": "ON_TRACK",
-  "active_connector": "cnj_justica_aberta",
-  "next_connector": "datasus_sinasc",
+  "active_connector": "datasus_sinasc",
+  "next_connector": "anvisa_cmed",
   "structural_phases": [
     {
       "phase_id": "00",
@@ -136,9 +136,10 @@
         "Conector inep_censo_escolar (Escolas/Infraestrutura, Matrículas por Etapa, Docentes/AFD e Rendimento/Fluxo) - CONCLUÍDO",
         "Conector datasus_sim (Óbitos Gerais/DO, Causas Capítulos CID-10, Mortalidade Materno-Infantil e Prematura DCNT/Causas Externas) - CONCLUÍDO",
         "Conector inep_censo_superior (Instituições IES/IGC, Cursos CINE/ENADE, Matrículas/TCG/TDA e Corpo Docente) - CONCLUÍDO",
+        "Conector cnj_justica_aberta (Serventias Extrajudiciais, Produtividade por Atribuição, Emolumentos e Digitalização SREI/ONR/CRC) - CONCLUÍDO",
         "Conectores DataSUS restantes (SINASC, OpenDataSUS) & anvisa_cmed",
-        "Conectores INEP restantes (Superior, IDEB, ENEM) & capes_sucupira",
-        "Conectores Notariais (cnj_justica_aberta, onr_registro_imoveis, capitais_iptu_itbi)"
+        "Conectores INEP restantes (IDEB, ENEM) & capes_sucupira",
+        "Conectores Notariais restantes (onr_registro_imoveis, capitais_iptu_itbi)"
       ]
     },
     {
@@ -415,6 +416,12 @@
     }
   ],
   "recent_milestones": [
+    {
+      "date": "2026-11-13",
+      "phase_id": "07",
+      "milestone": "Homologação do Conector cnj_justica_aberta (4 Tabelas, dbt, Mart Serventias Extrajudiciais & Live Fail-Hard)",
+      "summary": "Implementação e homologação completa do conector cnj_justica_aberta (CNJ: Justiça Aberta — Cadastro de Serventias, Produtividade por Atribuição, Arrecadação de Emolumentos e Digitalização SREI/ONR/CRC, Leis nº 8.935/1994, 6.015/1973, 10.169/2000 e Provimento CNJ nº 149/2023) consolidando o sexto conector da Wave 5 e 34º conector total da plataforma (69.4% do catálogo homologado): 4 tabelas Silver e Gold Feature Store (features_justica_aberta_cartorios_serventias_municipios_brasil.parquet) materializadas em data/cnj_justica_aberta/{silver,gold}/; 7 novos modelos dbt (4 staging views, fct_justica_aberta_serventias_arrecadacao_municipio, fct_justica_aberta_produtividade_atribuicao_municipio, mart_produtividade_serventias_extrajudiciais_brasil) totalizando 299 modelos dbt e 4.083 colunas 100% documentadas com 165 checks do build aprovados; 8 testes offline e 1 teste live fail-hard aprovados; multi-interface completa via SDK, CLI, REST API e MCP com wrap_untrusted_gov_data."
+    },
     {
       "date": "2026-11-13",
       "milestone": "Homologação do conector INEP Censo da Educação Superior (ODCS v3.1 + Medallion 5 tabelas + dbt + SDK/CLI/API/MCP + Pytest/Live) — 33/49 fontes homologadas (67.3%)",
