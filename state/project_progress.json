@@ -214,15 +214,16 @@
     {
       "phase_id": "11",
       "name": "Cloud Lakehouse Mirror: Public Data Warehouse na Nuvem (S3 / Cloudflare R2 + DuckDB / MotherDuck / BigQuery)",
-      "status": "PENDING",
+      "status": "IN_PROGRESS",
       "completion_date": null,
       "deliverables": [
         "DISCLAIMER OPEN CORE (Separação Público vs. Privado): Este repositório público fornece a engine genérica de espelhamento (adaptadores S3/R2/MotherDuck/BigQuery via env vars) e os metadados de Freshness/SLA no catálogo; já a infraestrutura produtiva (IaC Terraform/Pulumi, buckets reais, orquestração 24/7, credenciais, billing e camada SaaS/API paga) residirá em um repositório privado separado que consome este pacote como dependência",
-        "Arquitetura de Lakehouse na Nuvem: Espelhamento contínuo dos datasets Silver e Gold (Parquet ZSTD) para Object Storage global (AWS S3 ou Cloudflare R2 com custo zero de egress)",
-        "Pipeline de Ingestão em Lote e CDC (Change Data Capture): Rotinas agendadas (Cron/Airflow/GitHub Actions) para baixar dumps massivos (ex: 55M CNPJs RFB, CVM DFP/ITR anual) e sincronizar deltas incrementais sem depender de chamadas pontuais às APIs governamentais",
-        "Public Data Warehouse Serverless: Disponibilização de catálogo DuckDB / MotherDuck / BigQuery permitindo consultas analíticas em milissegundos sobre todo o patrimônio de dados públicos do Brasil",
-        "Estratégia FinOps e Resiliência contra Quedas de Portais: Eliminação de latências e instabilidades governamentais (Serpro, CVM, BCB), reduzindo o tempo de consulta de 2-5s para 5-15ms e economizando custos de infraestrutura",
-        "Mapeamento e Auditoria de Freshness SLA por Fonte: Avaliar e cadastrar para cada uma das 49 fontes os metadados de frequência e latência de atualização (update_frequency, freshness_sla_hours e cron_schedule_expression) para orquestrar jobs de ingestão diferenciados (diário para PTAX/Câmbio, mensal para Comex/SGS, trimestral/anual para DFP/CNPJ) na Fase 11"
+        "[PUBLIC OPEN CORE ENTREGUE] Auditoria de Freshness SLA por Fonte: freshness_sla_hours e cron_schedule_expression cadastrados em 100% das 49 fontes (sources_registry.yaml) e 29 APIs públicas (public_apis_registry.yaml) com FreshnessSlaAuditor",
+        "[PUBLIC OPEN CORE ENTREGUE] Engine Genérica de Cloud Lakehouse Mirror (CloudLakehouseMirror): Suporte a S3, Cloudflare R2 (AWS SigV4 via env vars) e backend local para espelhamento de Parquet ZSTD Silver/Gold e manifestos SHA-256",
+        "[PUBLIC OPEN CORE ENTREGUE] Engine de Ingestão em Lote & CDC Delta (CdcDeltaTracker): Detecção incremental NEW/MODIFIED/UNCHANGED via SHA-256 e contagem de linhas Parquet com estado persistido",
+        "[PUBLIC OPEN CORE ENTREGUE] Adaptadores Serverless Public Data Warehouse (PublicWarehouseAdapter): Geração de DDL e publicação de views/tabelas externas para DuckDB, MotherDuck e BigQuery com guarda read-only e FinOps bytes limit",
+        "[PUBLIC OPEN CORE ENTREGUE] Paridade nas 4 Interfaces: SDK (BrazilData.lakehouse), FastAPI (/api/v1/lakehouse/*), CLI (bdg lakehouse *) e MCP (bdg_lakehouse_*)",
+        "[PENDENTE — REPO PRIVADO] Infraestrutura produtiva (Terraform/Pulumi, buckets reais S3/R2, orquestração 24/7, credenciais e camada SaaS paga) no repositório privado após validação do usuário"
       ]
     }
   ],

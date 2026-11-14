@@ -169,6 +169,18 @@ def validate_registry(data: dict[str, Any]) -> None:
             if p not in VALID_PRODUCTS:
                 raise ValueError(f"Source '{sid}' has invalid solution pack code: '{p}'")
 
+        sla_hours = src.get("freshness_sla_hours")
+        if not isinstance(sla_hours, int) or sla_hours <= 0:
+            raise ValueError(
+                f"Source '{sid}' invalid freshness_sla_hours: {sla_hours} (must be positive integer)"
+            )
+
+        cron_expr = src.get("cron_schedule_expression")
+        if not isinstance(cron_expr, str) or len(cron_expr.split()) != 5:
+            raise ValueError(
+                f"Source '{sid}' invalid cron_schedule_expression: '{cron_expr}' (must have 5 cron fields)"
+            )
+
 
 def render_markdown(data: dict[str, Any]) -> str:
     """Render the master CATALOG.md deterministically from validated data."""
@@ -387,7 +399,24 @@ def render_markdown(data: dict[str, Any]) -> str:
         "",
         "---",
         "",
-        "## 8. Instruções de Manutenção & Verificação de Integridade",
+        "## 8. Matriz de Freshness, SLA & Agendamento Cron (Phase 11)",
+        "",
+        "Todas as **49 fontes governamentais** possuem metas explícitas de `freshness_sla_hours` e `cron_schedule_expression` para orquestração de mirror/CDC em nuvem:",
+        "",
+        "| ID Fonte | Frequência Oficial | SLA Freshness (h) | Expressão Cron (UTC) | Modo de Acesso |",
+        "| :--- | :--- | :---: | :--- | :--- |",
+    ])
+    for s in sorted_sources:
+        lines.append(
+            f"| `{s['source_id']}` | {s['update_frequency']} | `{s['freshness_sla_hours']}h` | "
+            f"`{s['cron_schedule_expression']}` | `{s['access_mode']}` |"
+        )
+
+    lines.extend([
+        "",
+        "---",
+        "",
+        "## 9. Instruções de Manutenção & Verificação de Integridade",
         "",
         "O arquivo `CATALOG.md` é gerado de forma **100% determinística** a partir de `catalog/sources_registry.yaml` e `catalog/public_apis_registry.yaml`.",
         "",
