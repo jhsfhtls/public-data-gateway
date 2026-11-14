@@ -1,0 +1,24 @@
+version: 2
+
+sources:
+  - name: datalake_federado_bq
+    description: "Datalake Público Federado & Catálogo Nacional SQL (DuckDB / BigQuery)."
+    meta:
+      external_root: "data/datalake_federado_bq/silver"
+    tables:
+      - name: bd_datalake_cobertura_municipio
+        description: "Cobertura municipal de datasets e tabelas tratadas no Datalake Público Federado."
+        meta:
+          external_location: "read_parquet('data/datalake_federado_bq/silver/bd_datalake_cobertura_municipio.parquet')"
+      - name: bd_datasets_publicos_tema
+        description: "Detalhamento por tema/dataset público tratado (IBGE, RAIS, INEP, MapBiomas)."
+        meta:
+          external_location: "read_parquet('data/datalake_federado_bq/silver/bd_datasets_publicos_tema.parquet')"
+      - name: bd_governanca_metadados_odcs
+        description: "Governança de dicionários, chaves canônicas e disponibilidade BigQuery SQL."
+        meta:
+          external_location: "read_parquet('data/datalake_federado_bq/silver/bd_governanca_metadados_odcs.parquet')"
+      - name: bd_consumo_federado_sql
+        description: "Consultas mensais BigQuery, eficiência de particionamento e reuso cross-domain."
+        meta:
+          external_location: "read_parquet('data/datalake_federado_bq/silver/bd_consumo_federado_sql.parquet')"

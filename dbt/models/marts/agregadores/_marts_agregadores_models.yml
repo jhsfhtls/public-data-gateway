@@ -30,8 +30,8 @@ models:
         tests:
           - not_null
 
-  - name: mart_maturidade_datalake_basedosdados_brasil
-    description: "Data Mart Gold de maturidade, cobertura e eficiência SQL federada do datalake Base dos Dados (BigQuery) por município."
+  - name: mart_maturidade_datalake_federado_brasil
+    description: "Data Mart Gold de maturidade, cobertura e eficiência SQL federada do Datalake Público Federado (DuckDB / BigQuery) por município."
     columns:
       - name: id_municipio
         description: "Código IBGE de 7 dígitos do município (STRING)."
@@ -58,19 +58,19 @@ models:
         description: "Completude percentual de chaves canônicas IBGE (%)."
         tests: [not_null]
       - name: indice_cobertura_datalake_bd
-        description: "Subíndice sintético de cobertura do datalake Base dos Dados (0-100)."
+        description: "Subíndice sintético de cobertura do Datalake Público Federado (0-100)."
         tests: [not_null]
       - name: indice_governanca_bd
-        description: "Subíndice sintético de governança de metadados Base dos Dados (0-100)."
+        description: "Subíndice sintético de governança de metadados do Datalake Público Federado (0-100)."
         tests: [not_null]
       - name: indice_eficiencia_federada_bd
-        description: "Subíndice sintético de eficiência federada Base dos Dados (0-100)."
+        description: "Subíndice sintético de eficiência federada do Datalake Público Federado (0-100)."
         tests: [not_null]
       - name: score_maturidade_bd
-        description: "Score composto de maturidade do datalake Base dos Dados (0-100)."
+        description: "Score composto de maturidade do Datalake Público Federado (0-100)."
         tests: [not_null]
       - name: tier_maturidade_bd
-        description: "Classificação municipal em 4 tiers de maturidade Base dos Dados."
+        description: "Classificação municipal em 4 tiers de maturidade do Datalake Público Federado."
         tests: [not_null]
       - name: reference_date
         description: "Data de referência ISO-8601 (YYYY-MM-DD)."

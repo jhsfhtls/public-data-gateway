@@ -1,22 +1,22 @@
 apiVersion: v3.1.0
 kind: DataContract
-id: ODCS-BR-BD-BQ-001
-name: Base dos Dados Datalake Público Federado (BigQuery)
+id: ODCS-BR-DL-BQ-001
+name: PDG Datalake Público Federado & Catálogo Nacional SQL (DuckDB / BigQuery)
 version: 1.0.0
 status: active
 domain: agregadores
 owner: public-data-gateway
 description: >
   Contrato oficial ODCS v3.1 para consolidação de metadados e cobertura
-  municipal do Datalake Público Federado da Base dos Dados (BigQuery):
+  municipal do Datalake Público Federado Nacional (DuckDB / BigQuery):
   cobertura de tabelas tratadas por município, datasets temáticos (IBGE,
   RAIS/CAGED, INEP, MapBiomas), governança de chaves canônicas, eficiência de
   consultas SQL federadas e features Gold de maturidade do datalake.
 source:
-  source_id: basedosdados_bq
-  agency: Base dos Dados
-  official_url: https://basedosdados.org/
-  graphql_url: https://api.basedosdados.org/api/v1/graphql
+  source_id: datalake_federado_bq
+  agency: Infraestrutura Nacional de Dados (IND / GOV.BR) & PDG
+  official_url: https://www.gov.br/conecta/catalogo/
+  catalog_url: https://dados.gov.br/
   protocol: BIGQUERY_SQL
   auth_type: GCP_ADC
   lgpd_tier: PUBLIC_NON_PERSONAL
@@ -30,7 +30,7 @@ sla:
   key_integrity: STRING_7_DIGITS_IBGE
 tables:
   - name: bd_datalake_cobertura_municipio
-    description: Cobertura municipal de datasets e tabelas tratadas na Base dos Dados (BigQuery).
+    description: Cobertura municipal de datasets e tabelas tratadas no Datalake Público Federado (DuckDB / BigQuery).
     primary_key: [id_municipio]
     columns:
       - name: id_municipio
@@ -174,8 +174,8 @@ tables:
       - name: reference_date
         type: string
         nullable: false
-  - name: features_basedosdados_datalake_federado
-    description: Feature store Gold de maturidade e cobertura federada Base dos Dados (4 tiers).
+  - name: features_datalake_federado_nacional
+    description: Feature store Gold de maturidade e cobertura federada do Datalake Público Nacional (4 tiers).
     primary_key: [id_municipio]
     columns:
       - name: id_municipio

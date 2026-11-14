@@ -10,4 +10,4 @@ select
     cast(taxa_atualizacao_mensal_pct as double) as taxa_atualizacao_mensal_pct,
     cast(indice_cobertura_datalake_bd as double) as indice_cobertura_datalake_bd,
     cast(reference_date as varchar) as reference_date
-from read_parquet('data/basedosdados_bq/silver/bd_datalake_cobertura_municipio.parquet')
+from read_parquet('data/datalake_federado_bq/silver/bd_datalake_cobertura_municipio.parquet')

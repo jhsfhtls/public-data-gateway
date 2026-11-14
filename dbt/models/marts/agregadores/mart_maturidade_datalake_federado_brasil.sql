@@ -1,5 +1,5 @@
 with fct as (
-    select * from {{ ref('fct_basedosdados_datalake_municipio') }}
+    select * from {{ ref('fct_datalake_federado_municipio') }}
 ),
 scored as (
     select

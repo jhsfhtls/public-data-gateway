@@ -9,4 +9,4 @@ select
     cast(disponibilidade_bq_sql_pct as double) as disponibilidade_bq_sql_pct,
     cast(indice_governanca_bd as double) as indice_governanca_bd,
     cast(reference_date as varchar) as reference_date
-from read_parquet('data/basedosdados_bq/silver/bd_governanca_metadados_odcs.parquet')
+from read_parquet('data/datalake_federado_bq/silver/bd_governanca_metadados_odcs.parquet')

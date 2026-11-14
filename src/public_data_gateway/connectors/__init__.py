@@ -5,9 +5,9 @@ energia, saude, transito, etc.
 """
 
 # Ensure built-in connectors are imported and registered
-import public_data_gateway.connectors.agregadores.basedosdados_bq  # noqa: F401
 import public_data_gateway.connectors.agregadores.brasilapi_core  # noqa: F401
 import public_data_gateway.connectors.agregadores.dadosgov_ckan  # noqa: F401
+import public_data_gateway.connectors.agregadores.datalake_federado_bq  # noqa: F401
 import public_data_gateway.connectors.ambiental.ana_hidroweb_telemetria  # noqa: F401
 import public_data_gateway.connectors.ambiental.inpe_terrabrasilis  # noqa: F401
 import public_data_gateway.connectors.ambiental.mapa_zarc  # noqa: F401

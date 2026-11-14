@@ -157,7 +157,7 @@
         "Conector mapbiomas_cobertura (Cobertura Anual, Transições por Classe, Pastagens/Irrigação e Alertas Validados) - CONCLUÍDO",
         "Conector sfb_sicar (Imóveis Rurais CAR, Reserva Legal/APP por Categoria, PRA/Embargos IBAMA e Geometria SIGEF) - CONCLUÍDO",
         "Conector mapa_zarc (Aptidão Climática, Janelas Decendiais por Cultura, PROAGRO/PSR e Solo AD1-AD6) - CONCLUÍDO",
-        "Conector basedosdados_bq (Datalake BigQuery, Datasets Temáticos, Governança ODCS e Consumo SQL) - CONCLUÍDO",
+        "Conector datalake_federado_bq (Datalake Federado SQL, Datasets Temáticos, Governança ODCS e Consumo SQL) - CONCLUÍDO",
         "Conector dadosgov_ckan (Organizações Publicadoras, Formatos CKAN, Governança LAI e Engajamento/API) - CONCLUÍDO"
       ]
     },
@@ -428,8 +428,8 @@
     {
       "date": "2026-11-14",
       "phase_id": "08",
-      "milestone": "Homologação do Conector basedosdados_bq (48/49 Fontes — 98.0%)",
-      "summary": "Implementação e homologação completa do conector basedosdados_bq (Base dos Dados: Datalake Público Federado BigQuery, LAI nº 12.527/2011, Decreto nº 8.777/2016) alcançando 48/49 fontes homologadas (98.0%): 5 tabelas Medallion (bd_datalake_cobertura_municipio, bd_datasets_publicos_tema, bd_governanca_metadados_odcs, bd_consumo_federado_sql e features_basedosdados_datalake_federado) materializadas em data/basedosdados_bq/silver/; 7 novos modelos dbt (4 staging views, fct_basedosdados_datalake_municipio, fct_basedosdados_datasets_tema_municipio e mart_maturidade_datalake_basedosdados_brasil) totalizando 397 modelos e 5.876 colunas 100% documentadas no linter (218 sources); paridade SQL–Python estrita confirmada (12 municípios, 4 tiers x 3 municípios, zero divergências); paridade multi-interface completa em SDK (MetaportalsFacade.basedosdados_connector), CLI (bdg basedosdados), FastAPI (/api/v1/metaportals/basedosdados/* e /api/v1/basedosdados/*) e MCP (bdg_*_bd* com wrap_untrusted_gov_data); 9 testes pytest (8 offline + 1 live Base dos Dados Portal) aprovados."
+      "milestone": "Homologação do Conector datalake_federado_bq (48/49 Fontes — 98.0%)",
+      "summary": "Implementação e homologação completa do conector nativo datalake_federado_bq (PDG: Datalake Público Federado & Catálogo Nacional SQL em DuckDB/BigQuery, LAI nº 12.527/2011, Decreto nº 8.777/2016) alcançando 48/49 fontes homologadas (98.0%): 5 tabelas Medallion (bd_datalake_cobertura_municipio, bd_datasets_publicos_tema, bd_governanca_metadados_odcs, bd_consumo_federado_sql e features_datalake_federado_nacional) materializadas em data/datalake_federado_bq/silver/; 7 novos modelos dbt (4 staging views, fct_datalake_federado_municipio, fct_datalake_federado_datasets_tema_municipio e mart_maturidade_datalake_federado_brasil) totalizando 397 modelos e 5.876 colunas 100% documentadas no linter (218 sources); paridade SQL–Python estrita confirmada (12 municípios, 4 tiers x 3 municípios, zero divergências); paridade multi-interface completa em SDK (MetaportalsFacade.datalake_connector), CLI (bdg datalake), FastAPI (/api/v1/metaportals/datalake/* e /api/v1/datalake/*) e MCP (bdg_*_bd* com wrap_untrusted_gov_data); testes pytest offline (incluindo query_datalake_metadata nativo sobre ODCS) e teste live contra catálogos públicos nacionais aprovados."
     },
     {
       "date": "2026-11-14",

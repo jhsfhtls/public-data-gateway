@@ -238,7 +238,7 @@ def render_markdown(data: dict[str, Any]) -> str:
         "| :--- | :---: | :---: | :--- |",
         f"| `FEDERATED_API` | {mode_counts.get('FEDERATED_API', 0)} | {mode_counts.get('FEDERATED_API', 0) / total_sources * 100:.1f}% | APIs REST / OData síncronas de borda e baixa latência (< 300 ms) |",
         f"| `LAKEHOUSE_BATCH` | {mode_counts.get('LAKEHOUSE_BATCH', 0)} | {mode_counts.get('LAKEHOUSE_BATCH', 0) / total_sources * 100:.1f}% | Dumps colunares e volumosos em DuckDB / Parquet com streaming |",
-        f"| `BIGQUERY_FEDERATED` | {mode_counts.get('BIGQUERY_FEDERATED', 0)} | {mode_counts.get('BIGQUERY_FEDERATED', 0) / total_sources * 100:.1f}% | Consultas SQL em datalake federado (Base dos Dados / MapBiomas) |",
+        f"| `BIGQUERY_FEDERATED` | {mode_counts.get('BIGQUERY_FEDERATED', 0)} | {mode_counts.get('BIGQUERY_FEDERATED', 0) / total_sources * 100:.1f}% | Consultas SQL em datalake federado (Datalake Federado SQL / MapBiomas) |",
         "",
         "### 1.2. Distribuição por Classificação LGPD",
         "",

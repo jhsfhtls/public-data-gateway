@@ -10,4 +10,4 @@ select
     cast(taxa_reuso_cross_domain_pct as double) as taxa_reuso_cross_domain_pct,
     cast(indice_eficiencia_federada_bd as double) as indice_eficiencia_federada_bd,
     cast(reference_date as varchar) as reference_date
-from read_parquet('data/basedosdados_bq/silver/bd_consumo_federado_sql.parquet')
+from read_parquet('data/datalake_federado_bq/silver/bd_consumo_federado_sql.parquet')

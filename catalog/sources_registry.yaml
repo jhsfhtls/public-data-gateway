@@ -56,7 +56,7 @@ segments:
 - segment_id: 13_metaportais_agregadores
   name: Metaportais & Hubs Agregadores
   description: Plataformas de facilitação técnica que unificam e padronizam centenas
-    de fontes em protocolos únicos (Base dos Dados, BrasilAPI, Dados.gov.br).
+    de fontes em protocolos únicos (Datalake Federado SQL, BrasilAPI, Dados.gov.br).
 sources:
 - source_id: ibge_localidades
   name: IBGE Localidades & Malha Territorial
@@ -1109,10 +1109,10 @@ sources:
   rice_score: 390
   roadmap_wave: 6
   status: HOMOLOGATED
-- source_id: basedosdados_bq
-  name: 'Base dos Dados: Datalake Público Federado (BigQuery)'
-  agency: Base dos Dados
-  official_url: https://basedosdados.org/
+- source_id: datalake_federado_bq
+  name: 'PDG: Datalake Público Federado & Catálogo Nacional SQL (DuckDB / BigQuery)'
+  agency: Infraestrutura Nacional de Dados (IND / GOV.BR) & PDG
+  official_url: https://www.gov.br/conecta/catalogo/
   segment_id: 13_metaportais_agregadores
   segment_name: Metaportais & Hubs Agregadores
   access_mode: BIGQUERY_FEDERATED
