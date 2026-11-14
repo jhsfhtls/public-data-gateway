@@ -2875,4 +2875,46 @@ def create_app(settings: GatewaySettings | None = None) -> FastAPI:
         except (ValueError, KeyError, FileNotFoundError) as exc:
             raise HTTPException(status_code=400, detail=str(exc)) from exc
 
+    @app.get("/api/v1/lifecycle/stages/{stage_id}")
+    async def get_lifecycle_stage_report(
+        stage_id: str,
+        pack_id: str = Query(..., description="Solution Pack ID (P01..P10)"),
+        uf: str | None = Query(None, description="Optional 2-letter state filter"),
+        id_municipio: str | None = Query(None, description="Optional IBGE code (S01)"),
+        limit: int = Query(10, ge=1, le=100, description="Max rows"),
+    ) -> list[dict[str, Any]]:
+        from public_data_gateway.core.lifecycle_reports import LifecycleReportsService
+
+        svc = LifecycleReportsService(settings=app_settings)
+        try:
+            return svc.get_stage_report(
+                stage_id=stage_id,
+                pack_id=pack_id,
+                sigla_uf=uf,
+                id_municipio=id_municipio,
+                limit=limit,
+            )
+        except (ValueError, FileNotFoundError) as exc:
+            raise HTTPException(status_code=400, detail=str(exc)) from exc
+
+    @app.get("/api/v1/lifecycle/dossier/{pack_id}")
+    async def get_lifecycle_sales_dossier(
+        pack_id: str,
+        uf: str = Query(..., description="2-letter state abbreviation (e.g. SP)"),
+        id_municipio: str | None = Query(None, description="Optional IBGE code"),
+        limit: int = Query(5, ge=1, le=50, description="Top ICP municipalities in S01"),
+    ) -> dict[str, Any]:
+        from public_data_gateway.core.lifecycle_reports import LifecycleReportsService
+
+        svc = LifecycleReportsService(settings=app_settings)
+        try:
+            return svc.build_sales_dossier(
+                pack_id=pack_id,
+                sigla_uf=uf,
+                id_municipio=id_municipio,
+                limit=limit,
+            )
+        except (ValueError, FileNotFoundError) as exc:
+            raise HTTPException(status_code=400, detail=str(exc)) from exc
+
     return app

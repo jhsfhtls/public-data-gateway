@@ -1860,6 +1860,54 @@ class CrossDomainFacade:
         return self.service.get_esg_agro_infra(id_municipio)
 
 
+class LifecycleFacade:
+    """Sub-facade for 9-Stage Solution Pack Lifecycle Reports (S01..S09) and Sales Dossiers."""
+
+    def __init__(self, sdk: "BrazilData") -> None:
+        self._sdk = sdk
+        self._service: Any = None
+
+    @property
+    def service(self) -> Any:
+        if self._service is None:
+            from public_data_gateway.core.lifecycle_reports import LifecycleReportsService
+
+            self._service = LifecycleReportsService(settings=self._sdk.settings)
+        return self._service
+
+    def get_stage_report(
+        self,
+        stage_id: str,
+        pack_id: str,
+        sigla_uf: str | None = None,
+        id_municipio: str | None = None,
+        limit: int = 10,
+    ) -> list[dict[str, Any]]:
+        """Query a lifecycle stage mart (S01..S09) for a Solution Pack (P01..P10)."""
+        return self.service.get_stage_report(
+            stage_id=stage_id,
+            pack_id=pack_id,
+            sigla_uf=sigla_uf,
+            id_municipio=id_municipio,
+            limit=limit,
+        )
+
+    def build_sales_dossier(
+        self,
+        pack_id: str,
+        sigla_uf: str,
+        id_municipio: str | None = None,
+        limit: int = 5,
+    ) -> dict[str, Any]:
+        """Build a complete 9-stage commercial and delivery dossier for a Solution Pack."""
+        return self.service.build_sales_dossier(
+            pack_id=pack_id,
+            sigla_uf=sigla_uf,
+            id_municipio=id_municipio,
+            limit=limit,
+        )
+
+
 class BrazilData:
     """Unified developer SDK facade for querying, normalizing, and enriching Brazilian public datasets."""
 
@@ -1892,6 +1940,7 @@ class BrazilData:
         self.environment = EnvironmentFacade(self)
         self.metaportals = MetaportalsFacade(self)
         self.cross_domain = CrossDomainFacade(self)
+        self.lifecycle = LifecycleFacade(self)
 
     def list_sources(
         self,

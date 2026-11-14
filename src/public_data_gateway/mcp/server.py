@@ -1901,6 +1901,58 @@ class MCPDispatcher:
                                 },
                             },
                             {
+                                "name": "bdg_get_lifecycle_stage_report",
+                                "description": "Query a 9-stage commercial & delivery lifecycle mart (S01..S09) for a Solution Pack (P01..P10).",
+                                "inputSchema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "stage_id": {
+                                            "type": "string",
+                                            "description": "Lifecycle stage ID (S01..S09)",
+                                        },
+                                        "pack_id": {
+                                            "type": "string",
+                                            "description": "Solution Pack ID (P01..P10)",
+                                        },
+                                        "sigla_uf": {
+                                            "type": "string",
+                                            "description": "Optional 2-letter state filter",
+                                        },
+                                        "id_municipio": {
+                                            "type": "string",
+                                            "description": "Optional 6- or 7-digit IBGE municipality code (for S01)",
+                                        },
+                                        "limit": {
+                                            "type": "integer",
+                                            "description": "Maximum rows (default: 10)",
+                                        },
+                                    },
+                                    "required": ["stage_id", "pack_id"],
+                                },
+                            },
+                            {
+                                "name": "bdg_generate_solution_dossier",
+                                "description": "Generate a unified 9-stage (S01..S09) commercial & delivery dossier for a Solution Pack (P01..P10) in a Brazilian state.",
+                                "inputSchema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "pack_id": {
+                                            "type": "string",
+                                            "description": "Solution Pack ID (P01..P10)",
+                                        },
+                                        "sigla_uf": {
+                                            "type": "string",
+                                            "description": "2-letter state abbreviation (e.g. SP)",
+                                        },
+                                        "id_municipio": {
+                                            "type": "string",
+                                            "description": "Optional IBGE municipality code",
+                                        },
+                                    },
+                                    "required": ["pack_id", "sigla_uf"],
+                                },
+                            },
+                            {
                                 "name": "bdg_get_onr_property_registry",
                                 "description": "Get official ONR SREI municipal active property registry CNM stock, digital conversion rate, and online certificate emissions.",
                                 "inputSchema": {
@@ -4577,6 +4629,65 @@ class MCPDispatcher:
                             "type": "text",
                             "text": wrap_untrusted_gov_data(
                                 data, source_id="cross_domain_gold"
+                            ),
+                        }
+                    ],
+                    "isError": False,
+                },
+            }
+
+        if tool_name == "bdg_get_lifecycle_stage_report":
+            from public_data_gateway.core.lifecycle_reports import LifecycleReportsService
+
+            stage_id = str(args.get("stage_id", "")).strip()
+            pack_id = str(args.get("pack_id", "")).strip()
+            if not stage_id or not pack_id:
+                raise ValueError("Missing required parameters: stage_id and pack_id")
+            data = LifecycleReportsService(settings=self.settings).get_stage_report(
+                stage_id=stage_id,
+                pack_id=pack_id,
+                sigla_uf=args.get("sigla_uf"),
+                id_municipio=args.get("id_municipio"),
+                limit=int(args.get("limit", 10)),
+            )
+            return {
+                "jsonrpc": "2.0",
+                "id": req_id,
+                "result": {
+                    "content": [
+                        {
+                            "type": "text",
+                            "text": wrap_untrusted_gov_data(
+                                data, source_id="gtm_lifecycle_gold"
+                            ),
+                        }
+                    ],
+                    "isError": False,
+                },
+            }
+
+        if tool_name == "bdg_generate_solution_dossier":
+            from public_data_gateway.core.lifecycle_reports import LifecycleReportsService
+
+            pack_id = str(args.get("pack_id", "")).strip()
+            sigla_uf = str(args.get("sigla_uf", "")).strip()
+            if not pack_id or not sigla_uf:
+                raise ValueError("Missing required parameters: pack_id and sigla_uf")
+            svc = LifecycleReportsService(settings=self.settings)
+            dossier = svc.build_sales_dossier(
+                pack_id=pack_id,
+                sigla_uf=sigla_uf,
+                id_municipio=args.get("id_municipio"),
+            )
+            return {
+                "jsonrpc": "2.0",
+                "id": req_id,
+                "result": {
+                    "content": [
+                        {
+                            "type": "text",
+                            "text": wrap_untrusted_gov_data(
+                                dossier, source_id="gtm_lifecycle_gold"
                             ),
                         }
                     ],
