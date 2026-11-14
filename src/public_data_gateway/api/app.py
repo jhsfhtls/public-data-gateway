@@ -1764,4 +1764,82 @@ def create_app(settings: GatewaySettings | None = None) -> FastAPI:
         conn = INEPCensoSuperiorConnector(settings=app_settings)
         return conn.get_institutions_summary(id_municipio)
 
+    @app.get("/api/v1/education/ideb/top-municipalities")
+    async def get_top_ideb_municipalities(
+        limit: int = Query(10, ge=1, le=50, description="Max municipalities to list"),
+        uf: str | None = Query(None, description="Filter by 2-letter state abbreviation"),
+    ) -> list[dict[str, Any]]:
+        from public_data_gateway.connectors.educacao.inep_ideb.connector import (
+            INEPIdebConnector,
+        )
+
+        conn = INEPIdebConnector(settings=app_settings)
+        return conn.list_top_ideb_municipalities(limit=limit, sigla_uf=uf)
+
+    @app.get("/api/v1/education/ideb/features/{id_municipio}")
+    async def get_ideb_features(id_municipio: str) -> dict[str, Any]:
+        from public_data_gateway.connectors.educacao.inep_ideb.connector import (
+            INEPIdebConnector,
+        )
+
+        conn = INEPIdebConnector(settings=app_settings)
+        try:
+            return conn.get_ideb_education_quality_features(id_municipio)
+        except ValueError as exc:
+            raise HTTPException(status_code=400, detail=str(exc)) from exc
+
+    @app.get("/api/v1/education/ideb/stages/{id_municipio}")
+    async def get_ideb_stages(
+        id_municipio: str,
+        etapa: str | None = Query(
+            None, description="Optional IDEB stage/network filter (e.g. Anos_Iniciais)"
+        ),
+    ) -> list[dict[str, Any]]:
+        from public_data_gateway.connectors.educacao.inep_ideb.connector import (
+            INEPIdebConnector,
+        )
+
+        conn = INEPIdebConnector(settings=app_settings)
+        try:
+            return conn.list_ideb_stage_network_scores(id_municipio, etapa_ciclo=etapa)
+        except ValueError as exc:
+            raise HTTPException(status_code=400, detail=str(exc)) from exc
+
+    @app.get("/api/v1/education/ideb/saeb/{id_municipio}")
+    async def get_ideb_saeb(id_municipio: str) -> dict[str, Any]:
+        from public_data_gateway.connectors.educacao.inep_ideb.connector import (
+            INEPIdebConnector,
+        )
+
+        conn = INEPIdebConnector(settings=app_settings)
+        try:
+            return conn.get_ideb_saeb_proficiency(id_municipio)
+        except ValueError as exc:
+            raise HTTPException(status_code=400, detail=str(exc)) from exc
+
+    @app.get("/api/v1/education/ideb/evolution/{id_municipio}")
+    async def get_ideb_evolution(id_municipio: str) -> dict[str, Any]:
+        from public_data_gateway.connectors.educacao.inep_ideb.connector import (
+            INEPIdebConnector,
+        )
+
+        conn = INEPIdebConnector(settings=app_settings)
+        try:
+            return conn.get_ideb_biennial_goals_evolution(id_municipio)
+        except ValueError as exc:
+            raise HTTPException(status_code=400, detail=str(exc)) from exc
+
+    @app.get("/api/v1/education/ideb/results/{id_municipio}")
+    @app.get("/api/v1/ideb/{id_municipio}")
+    async def get_ideb_results(id_municipio: str) -> dict[str, Any]:
+        from public_data_gateway.connectors.educacao.inep_ideb.connector import (
+            INEPIdebConnector,
+        )
+
+        conn = INEPIdebConnector(settings=app_settings)
+        try:
+            return conn.get_ideb_municipal_results(id_municipio)
+        except ValueError as exc:
+            raise HTTPException(status_code=400, detail=str(exc)) from exc
+
     return app

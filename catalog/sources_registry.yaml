@@ -962,7 +962,7 @@ sources:
   - P02
   rice_score: 450
   roadmap_wave: 5
-  status: CATALOGED
+  status: HOMOLOGATED
 - source_id: onr_registro_imoveis
   name: 'ONR: Sistema de Registro Eletrônico de Imóveis (SREI)'
   agency: Operador Nacional do Registro de Imóveis Eletrônico (ONR)
