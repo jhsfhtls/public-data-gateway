@@ -175,14 +175,15 @@
     },
     {
       "phase_id": "10",
-      "name": "Expansão de Fronteira: Centralização de APIs Públicas para Analytics & ML, Conecta GOV.BR & Geoespaciais",
+      "name": "Expansão de Fronteira: Centralização de APIs Públicas para Analytics, KYC/KYB, Inteligência Regulatória & ML",
       "status": "PENDING",
       "completion_date": null,
       "deliverables": [
         "Auditoria e varredura do Conecta GOV.BR (https://www.gov.br/conecta/catalogo/) e do catálogo public-apis para mapear, selecionar e homologar novas APIs públicas úteis para Analytics, Engenharia de Dados e Machine Learning",
-        "Enriquecimento Cadastral & Geolocalização (validado que BrasilAPI já está homologada): integração de ViaCEP, OpenCEP, Nominatim (OpenStreetMap), Mapbox API, Google Maps (Geocoding/Places/Routes), CompanyEnrich, Apollo, BigDataCorp e ReceitaWS",
-        "Analytics, Economia & Dados Governamentais (validado que 7 conectores IBGE e 3 conectores Banco Central já estão homologados): integração de AwesomeAPI (câmbio/cripto em tempo real), World Bank API (~16 mil indicadores globais) e Observatório da OMS (WHO GHO)",
-        "Machine Learning & Engenharia de Atributos: integração de Open-Meteo (variáveis exógenas climáticas históricas e horárias), Hugging Face Inference (embeddings, NER e sentimento via HTTP), Alpha Vantage (séries financeiras/indicadores técnicos), YouTube/NASA APIs (NLP e visão computacional) e suporte ao ecossistema Upgini",
+        "Bloco 1 — Enriquecimento Cadastral, Geolocalização, KYC/KYB & Antifraude (validado que BrasilAPI, cgu_ceis_cnep e cgu_pep já estão homologados): integração de Minha Receita e CNPJa Open API (fallback em cascata/load balancing para QSA/Simples), RDAP Registro.br, GLEIF API (holdings globais), IP-API / BGPView (ASN/proxy), ViaCEP, OpenCEP, Nominatim (OSM), Mapbox, Google Maps, CompanyEnrich, Apollo, BigDataCorp e ReceitaWS",
+        "Bloco 2 — Inteligência de Mercado, Regulatórias & Economia (validado que 7 conectores IBGE, 3 do BCB, pncp_contratacoes, cvm_dfp_itr e cvm_fundos já estão homologados): integração de brapi (B3/FIIs/dividendos), IPEA Data (OData v4), ANEEL e ANP (CKAN DataStore), Câmara dos Deputados e Senado Federal (cota parlamentar/proposições), AwesomeAPI, World Bank API e Observatório da OMS (WHO GHO)",
+        "Bloco 3 — Feature Engineering Espacial, Mobilidade, Clima & ML: integração de Overpass API (POIs OSM por raio), OSRM (matriz origem-destino viária), NASA POWER API (radiação/precipitação), Open-Elevation / OpenTopoData (altitude SRTM), Open-Meteo, Hugging Face Inference (embeddings/NER/sentimento), Alpha Vantage, YouTube/NASA APIs e suporte ao ecossistema Upgini",
+        "Bloco 4 — Dados Globais, Demografia & Pesquisa: integração de REST Countries (ISO-3166/moedas/fronteiras), OpenAlex API (artigos/autores/ROR) e GDELT Project API (notícias e sentimento global em tempo quase real)",
         "Bipartição da documentação oficial, dbt e catálogo mestre estruturada em: 1) Catálogo APIs Gov Brasil e 2) Catálogo Outras APIs Públicas & Globais (Analytics/ML), mantendo padrão ODCS v3.1, camadas Medallion, rate limits e FinOps"
       ]
     },
