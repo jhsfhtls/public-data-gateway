@@ -1,0 +1,495 @@
+schema_version: "3.1.0"
+contract_id: "ODCS-BR-DATASUS-SIH-001"
+source_id: "datasus_sih"
+version: "1.0.0"
+name: "DataSUS: Sistema de Informações Hospitalares (SIH/SUS)"
+agency: "Ministério da Saúde / DataSUS"
+official_url: "https://datasus.saude.gov.br/transferencia-de-arquivos/"
+
+legal_framework:
+  statutes:
+    - name: "Lei nº 8.080/1990"
+      description: "Lei Orgânica da Saúde que regulamenta ações e serviços do Sistema Único de Saúde (SUS)"
+    - name: "Portaria GM/MS nº 221/2008"
+      description: "Define a Lista Brasileira de Internações por Condições Sensíveis à Atenção Primária (ICSAP)"
+    - name: "Portaria SAES/MS nº 1.324/2014"
+      description: "Institui o Manual Técnico Operacional do Sistema de Informações Hospitalares do SUS (SIH/SUS - AIH)"
+    - name: "Decreto nº 8.777/2016"
+      description: "Institui a Política de Dados Abertos do Poder Executivo Federal"
+
+data_governance:
+  grain: "municipio_producao_hospitalar_aih"
+  primary_keys:
+    - "id_municipio"
+    - "sigla_uf"
+  reference_date_column: "reference_date"
+  min_expected_rows: 5
+  max_volume_drop_pct: 15.0
+  freshness_sla_hours: 720
+  lgpd_tier: "ANONYMIZED_MICRODATA"
+  ml_feature_domains:
+    - "hospital_admissions"
+    - "hospital_costs_cid10"
+
+schema:
+  tables:
+    sih_internacoes_aih_municipio:
+      description: "Produção municipal de Autorizações de Internação Hospitalar (AIH) aprovadas no SUS, caráter urgência/eletivo e diárias hospitalares"
+      grain: "id_municipio, ano_mes_competencia"
+      primary_keys: ["id_municipio", "ano_mes_competencia"]
+      min_expected_rows: 5
+      columns:
+        - name: "id_municipio"
+          data_type: "string"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Código IBGE de 7 dígitos identificador único do município de atendimento hospitalar"
+        - name: "nome_municipio"
+          data_type: "string"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Nome oficial do município"
+        - name: "sigla_uf"
+          data_type: "string"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Sigla de 2 letras da Unidade Federativa"
+        - name: "id_uf"
+          data_type: "string"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Código IBGE de 2 dígitos da Unidade Federativa"
+        - name: "ano_mes_competencia"
+          data_type: "string"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Competência mensal de processamento das AIHs no formato AAAAMM"
+        - name: "total_internacoes_aih"
+          data_type: "int64"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Total de AIHs pagas e processadas na competência no município"
+        - name: "internacoes_carater_urgencia"
+          data_type: "int64"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Quantidade de internações hospitalares registradas em caráter de urgência/emergência"
+        - name: "internacoes_carater_eletivo"
+          data_type: "int64"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Quantidade de internações hospitalares programadas em caráter eletivo"
+        - name: "proporcao_urgencia_pct"
+          data_type: "float64"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Percentual de internações em caráter de urgência frente ao total de AIHs"
+        - name: "diarias_hospitalares_totais"
+          data_type: "int64"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Total de diárias hospitalares (permanência) computadas nas AIHs"
+        - name: "tempo_medio_permanencia_dias"
+          data_type: "float64"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Tempo médio de permanência hospitalar em dias por internação"
+        - name: "internacoes_por_1000_hab_ano"
+          data_type: "float64"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Taxa anualizada de internações hospitalares SUS por 1.000 habitantes"
+        - name: "source_url"
+          data_type: "string"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "URL oficial do portal de transferência de arquivos DataSUS SIH/SUS"
+        - name: "reference_date"
+          data_type: "string"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Data de referência da competência SIH no formato YYYY-MM-DD"
+        - name: "extracted_at"
+          data_type: "string"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Timestamp UTC ISO-8601 da extração"
+
+    sih_custos_hospitalares_sus:
+      description: "Valor aprovado das AIHs no SUS detalhado por serviços hospitalares, profissionais e alta complexidade UTI"
+      grain: "id_municipio, ano_mes_competencia"
+      primary_keys: ["id_municipio", "ano_mes_competencia"]
+      min_expected_rows: 5
+      columns:
+        - name: "id_municipio"
+          data_type: "string"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Código IBGE de 7 dígitos identificador único do município"
+        - name: "nome_municipio"
+          data_type: "string"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Nome oficial do município"
+        - name: "sigla_uf"
+          data_type: "string"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Sigla de 2 letras da Unidade Federativa"
+        - name: "ano_mes_competencia"
+          data_type: "string"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Competência mensal de faturamento no formato AAAAMM"
+        - name: "valor_total_aih_brl"
+          data_type: "float64"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Valor total aprovado das AIHs pagas no município em reais (BRL)"
+        - name: "valor_servicos_hospitalares_brl"
+          data_type: "float64"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Parcela de serviços hospitalares aprovada nas AIHs em reais (BRL)"
+        - name: "valor_servicos_profissionais_brl"
+          data_type: "float64"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Parcela de honorários profissionais médicos aprovada nas AIHs em reais (BRL)"
+        - name: "valor_uti_alta_complexidade_brl"
+          data_type: "float64"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Valor faturado em diárias e procedimentos de UTI / alta complexidade (BRL)"
+        - name: "ticket_medio_aih_brl"
+          data_type: "float64"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Valor médio aprovado por Autorização de Internação Hospitalar (BRL)"
+        - name: "custo_medio_diaria_brl"
+          data_type: "float64"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Custo médio por dia de internação hospitalar no SUS (BRL)"
+        - name: "proporcao_custo_uti_pct"
+          data_type: "float64"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Participação percentual do faturamento de UTI/alta complexidade sobre o valor total de AIHs"
+        - name: "source_url"
+          data_type: "string"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "URL oficial DataSUS SIH/SUS"
+        - name: "reference_date"
+          data_type: "string"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Data de referência da competência"
+        - name: "extracted_at"
+          data_type: "string"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Timestamp UTC ISO-8601 da extração"
+
+    sih_morbidade_capitulos_cid10:
+      description: "Distribuição das internações hospitalares e custos por capítulos prioritários da CID-10"
+      grain: "id_municipio, capitulo_cid10"
+      primary_keys: ["id_municipio", "capitulo_cid10"]
+      min_expected_rows: 15
+      columns:
+        - name: "id_municipio"
+          data_type: "string"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Código IBGE de 7 dígitos identificador único do município"
+        - name: "nome_municipio"
+          data_type: "string"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Nome oficial do município"
+        - name: "sigla_uf"
+          data_type: "string"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Sigla de 2 letras da Unidade Federativa"
+        - name: "capitulo_cid10"
+          data_type: "string"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Capítulo CID-10 de morbidade principal (Circulatório, Respiratório ou Neoplasias)"
+        - name: "internacoes_capitulo_aih"
+          data_type: "int64"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Total de internações AIH enquadradas no capítulo CID-10"
+        - name: "participacao_capitulo_pct"
+          data_type: "float64"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Participação percentual do capítulo CID-10 sobre o total de internações do município"
+        - name: "valor_total_capitulo_brl"
+          data_type: "float64"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Valor aprovado das AIHs do capítulo CID-10 em reais (BRL)"
+        - name: "tempo_medio_permanencia_dias"
+          data_type: "float64"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Permanência média em dias para internações do capítulo CID-10"
+        - name: "taxa_letalidade_capitulo_pct"
+          data_type: "float64"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Taxa de letalidade hospitalar intra-capítulo CID-10 (%)"
+        - name: "source_url"
+          data_type: "string"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "URL oficial DataSUS SIH/SUS"
+        - name: "reference_date"
+          data_type: "string"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Data de referência da competência"
+        - name: "extracted_at"
+          data_type: "string"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Timestamp UTC ISO-8601 da extração"
+
+    sih_desfechos_mortalidade_hospitalar:
+      description: "Indicadores de desfecho clínico hospitalar (altas, óbitos, utilização de UTI e internações evitáveis ICSAP)"
+      grain: "id_municipio, ano_mes_competencia"
+      primary_keys: ["id_municipio", "ano_mes_competencia"]
+      min_expected_rows: 5
+      columns:
+        - name: "id_municipio"
+          data_type: "string"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Código IBGE de 7 dígitos identificador único do município"
+        - name: "nome_municipio"
+          data_type: "string"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Nome oficial do município"
+        - name: "sigla_uf"
+          data_type: "string"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Sigla de 2 letras da Unidade Federativa"
+        - name: "ano_mes_competencia"
+          data_type: "string"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Competência mensal no formato AAAAMM"
+        - name: "altas_hospitalares"
+          data_type: "int64"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Total de AIHs encerradas com alta médica ou transferência"
+        - name: "obitos_hospitalares"
+          data_type: "int64"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Total de óbitos hospitalares registrados nas AIHs"
+        - name: "taxa_mortalidade_hospitalar_pct"
+          data_type: "float64"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Taxa de mortalidade hospitalar geral (óbitos / total AIHs em %)"
+        - name: "internacoes_com_uti"
+          data_type: "int64"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Quantidade de internações hospitalares com utilização de leito de UTI"
+        - name: "taxa_utilizacao_uti_pct"
+          data_type: "float64"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Percentual de internações com acionamento de UTI"
+        - name: "internacoes_icsap_evitaveis"
+          data_type: "int64"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Internações por Condições Sensíveis à Atenção Primária (ICSAP - Portaria GM/MS 221/2008)"
+        - name: "proporcao_icsap_pct"
+          data_type: "float64"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Percentual de internações potencialmente evitáveis (ICSAP) no município"
+        - name: "source_url"
+          data_type: "string"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "URL oficial DataSUS SIH/SUS"
+        - name: "reference_date"
+          data_type: "string"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Data de referência da competência"
+        - name: "extracted_at"
+          data_type: "string"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Timestamp UTC ISO-8601 da extração"
+
+    features_sih_morbidade_custos_hospitalares_municipios_brasil:
+      description: "Gold Feature Store municipal com scores normalizados (0-100) de complexidade assistencial SIH, pressão de morbidade hospitalar e perfil epidemiológico"
+      grain: "id_municipio"
+      primary_keys: ["id_municipio"]
+      min_expected_rows: 5
+      columns:
+        - name: "id_municipio"
+          data_type: "string"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Código IBGE de 7 dígitos identificador único do município"
+        - name: "sigla_uf"
+          data_type: "string"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Sigla de 2 letras da Unidade Federativa"
+        - name: "nome_municipio"
+          data_type: "string"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Nome oficial do município"
+        - name: "total_internacoes_aih"
+          data_type: "int64"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Total mensal de internações AIH aprovadas no município"
+        - name: "proporcao_urgencia_pct"
+          data_type: "float64"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Percentual de internações em caráter de urgência (%)"
+        - name: "tempo_medio_permanencia_dias"
+          data_type: "float64"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Tempo médio de permanência hospitalar em dias"
+        - name: "valor_total_aih_brl"
+          data_type: "float64"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Valor total aprovado das AIHs no município em reais (BRL)"
+        - name: "ticket_medio_aih_brl"
+          data_type: "float64"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Ticket médio por internação AIH em reais (BRL)"
+        - name: "proporcao_custo_uti_pct"
+          data_type: "float64"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Participação dos custos de UTI sobre o valor total de AIHs (%)"
+        - name: "taxa_mortalidade_hospitalar_pct"
+          data_type: "float64"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Taxa de mortalidade hospitalar geral (%)"
+        - name: "proporcao_icsap_pct"
+          data_type: "float64"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Proporção de internações evitáveis ICSAP (%)"
+        - name: "score_complexidade_assistencial_sih"
+          data_type: "float64"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Score normalizado (0-100) de complexidade cirúrgica e intensiva das internações SIH/SUS"
+        - name: "score_pressao_morbidade_hospitalar"
+          data_type: "float64"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Score normalizado (0-100) de pressão epidemiológica de urgência, taxa de internação e demanda evitável ICSAP"
+        - name: "perfil_epidemiologico_hospitalar"
+          data_type: "string"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Classificação hierárquica da rede hospitalar SIH/SUS no município"
+        - name: "reference_date"
+          data_type: "string"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Data de referência da competência"
+        - name: "extracted_at"
+          data_type: "string"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Timestamp UTC ISO-8601 da extração"

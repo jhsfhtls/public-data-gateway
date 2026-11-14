@@ -793,7 +793,7 @@ sources:
   - P02
   rice_score: 470
   roadmap_wave: 5
-  status: CATALOGED
+  status: HOMOLOGATED
 - source_id: inep_censo_escolar
   name: 'INEP: Microdados do Censo Escolar da Educação Básica'
   agency: Instituto Nacional de Estudos e Pesquisas Educacionais Anísio Teixeira (INEP)

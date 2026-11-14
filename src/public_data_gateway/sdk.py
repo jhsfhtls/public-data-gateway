@@ -796,11 +796,12 @@ class LaborFacade:
 
 
 class HealthFacade:
-    """Unified developer facade for public health infrastructure and CNES network analytics."""
+    """Unified developer facade for public health infrastructure, CNES networks, and SIH hospital morbidity analytics."""
 
     def __init__(self, sdk: "BrazilData") -> None:
         self._sdk = sdk
         self._cnes_connector: Any = None
+        self._sih_connector: Any = None
 
     @property
     def cnes_connector(self) -> Any:
@@ -811,6 +812,16 @@ class HealthFacade:
 
             self._cnes_connector = DataSUSCnesConnector(settings=self._sdk.settings)
         return self._cnes_connector
+
+    @property
+    def sih_connector(self) -> Any:
+        if self._sih_connector is None:
+            from public_data_gateway.connectors.saude.datasus_sih.connector import (
+                DataSUSSihConnector,
+            )
+
+            self._sih_connector = DataSUSSihConnector(settings=self._sdk.settings)
+        return self._sih_connector
 
     def get_cnes_establishments(self, id_municipio: str) -> dict[str, Any]:
         """Get municipal summary of active health establishments and SUS network share (DataSUS CNES)."""
@@ -841,6 +852,38 @@ class HealthFacade:
     ) -> list[dict[str, Any]]:
         """List top Brazilian municipalities ranked by composite CNES hospital capacity score."""
         return self.cnes_connector.list_top_health_hubs(limit=limit, sigla_uf=sigla_uf)
+
+    def get_sih_admissions(self, id_municipio: str) -> dict[str, Any]:
+        """Get municipal hospital admissions summary (AIH), urgency share, and mean length of stay (DataSUS SIH/SUS)."""
+        return self.sih_connector.get_admissions_summary(id_municipio)
+
+    def get_sih_hospital_costs(self, id_municipio: str) -> dict[str, Any]:
+        """Get municipal SIH/SUS approved AIH hospital billing and ICU cost share (DataSUS SIH/SUS)."""
+        return self.sih_connector.get_hospital_costs(id_municipio)
+
+    def list_sih_cid10_morbidity(
+        self, id_municipio: str, capitulo_cid10: str | None = None
+    ) -> list[dict[str, Any]]:
+        """List municipal SIH/SUS hospital admissions broken down by priority CID-10 chapters."""
+        return self.sih_connector.list_cid10_morbidity(
+            id_municipio, capitulo_cid10=capitulo_cid10
+        )
+
+    def get_sih_mortality_outcomes(self, id_municipio: str) -> dict[str, Any]:
+        """Get municipal SIH/SUS clinical outcomes (discharges, hospital deaths, ICU use, and ICSAP share)."""
+        return self.sih_connector.get_mortality_outcomes(id_municipio)
+
+    def get_sih_morbidity_features(self, id_municipio: str) -> dict[str, Any]:
+        """Get normalized Gold SIH hospital complexity and epidemiological pressure features."""
+        return self.sih_connector.get_sih_morbidity_features(id_municipio)
+
+    def list_top_sih_complexity_hubs(
+        self, limit: int = 10, sigla_uf: str | None = None
+    ) -> list[dict[str, Any]]:
+        """List top Brazilian municipalities ranked by composite DataSUS SIH/SUS hospital complexity score."""
+        return self.sih_connector.list_top_sih_complexity_hubs(
+            limit=limit, sigla_uf=sigla_uf
+        )
 
 
 class BrazilData:
@@ -1263,6 +1306,38 @@ class BrazilData:
     ) -> list[dict[str, Any]]:
         """Listar polos hospitalares líderes em capacidade assistencial de saúde no Brasil (DataSUS CNES)."""
         return self.health.list_top_health_hubs(limit=limit, sigla_uf=sigla_uf)
+
+    def get_sih_admissions(self, id_municipio: str) -> dict[str, Any]:
+        """Consultar produção mensal de internações hospitalares (AIH) e caráter de atendimento no SUS (DataSUS SIH)."""
+        return self.health.get_sih_admissions(id_municipio)
+
+    def get_sih_hospital_costs(self, id_municipio: str) -> dict[str, Any]:
+        """Consultar faturamento aprovado de AIH, ticket médio e parcela UTI no município (DataSUS SIH)."""
+        return self.health.get_sih_hospital_costs(id_municipio)
+
+    def list_sih_cid10_morbidity(
+        self, id_municipio: str, capitulo_cid10: str | None = None
+    ) -> list[dict[str, Any]]:
+        """Listar distribuição das internações e custos por capítulos prioritários CID-10 no município (DataSUS SIH)."""
+        return self.health.list_sih_cid10_morbidity(
+            id_municipio, capitulo_cid10=capitulo_cid10
+        )
+
+    def get_sih_mortality_outcomes(self, id_municipio: str) -> dict[str, Any]:
+        """Consultar desfechos hospitalares (altas, óbitos, utilização de UTI e internações evitáveis ICSAP) (DataSUS SIH)."""
+        return self.health.get_sih_mortality_outcomes(id_municipio)
+
+    def get_sih_morbidity_features(self, id_municipio: str) -> dict[str, Any]:
+        """Consultar features Gold de complexidade cirúrgica/intensiva e pressão de morbidade SIH/SUS."""
+        return self.health.get_sih_morbidity_features(id_municipio)
+
+    def list_top_sih_complexity_hubs(
+        self, limit: int = 10, sigla_uf: str | None = None
+    ) -> list[dict[str, Any]]:
+        """Listar polos hospitalares líderes em complexidade assistencial SIH/SUS no Brasil."""
+        return self.health.list_top_sih_complexity_hubs(
+            limit=limit, sigla_uf=sigla_uf
+        )
 
     def resolve_municipality(
         self, code_or_name: str | int, uf: str | None = None
