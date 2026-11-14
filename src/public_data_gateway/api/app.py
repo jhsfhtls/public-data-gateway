@@ -2086,4 +2086,86 @@ def create_app(settings: GatewaySettings | None = None) -> FastAPI:
         except ValueError as exc:
             raise HTTPException(status_code=400, detail=str(exc)) from exc
 
+    # Capitais IPTU / ITBI (Cadastros Imobiliários Municipais) routes
+    @app.get("/api/v1/real-estate/iptu-itbi/top-municipalities")
+    async def get_top_iptu_itbi_capitals(
+        limit: int = 10,
+        uf: str | None = None,
+    ) -> list[dict[str, Any]]:
+        from public_data_gateway.connectors.imobiliario.capitais_iptu_itbi.connector import (
+            CapitaisIptuItbiConnector,
+        )
+
+        conn = CapitaisIptuItbiConnector(settings=app_settings)
+        try:
+            return conn.list_top_iptu_itbi_capitals(limit=limit, sigla_uf=uf)
+        except ValueError as exc:
+            raise HTTPException(status_code=400, detail=str(exc)) from exc
+
+    @app.get("/api/v1/real-estate/iptu-itbi/features/{id_municipio}")
+    async def get_iptu_itbi_features(id_municipio: str) -> dict[str, Any]:
+        from public_data_gateway.connectors.imobiliario.capitais_iptu_itbi.connector import (
+            CapitaisIptuItbiConnector,
+        )
+
+        conn = CapitaisIptuItbiConnector(settings=app_settings)
+        try:
+            return conn.get_iptu_itbi_real_estate_features(id_municipio)
+        except ValueError as exc:
+            raise HTTPException(status_code=400, detail=str(exc)) from exc
+
+    @app.get("/api/v1/real-estate/iptu-itbi/transactions/{id_municipio}")
+    async def get_iptu_itbi_transactions(
+        id_municipio: str,
+        segmento: str | None = None,
+    ) -> list[dict[str, Any]]:
+        from public_data_gateway.connectors.imobiliario.capitais_iptu_itbi.connector import (
+            CapitaisIptuItbiConnector,
+        )
+
+        conn = CapitaisIptuItbiConnector(settings=app_settings)
+        try:
+            return conn.list_itbi_transactions_by_segment(
+                id_municipio=id_municipio, segmento_imovel=segmento
+            )
+        except ValueError as exc:
+            raise HTTPException(status_code=400, detail=str(exc)) from exc
+
+    @app.get("/api/v1/real-estate/iptu-itbi/prices/{id_municipio}")
+    async def get_iptu_itbi_prices(id_municipio: str) -> dict[str, Any]:
+        from public_data_gateway.connectors.imobiliario.capitais_iptu_itbi.connector import (
+            CapitaisIptuItbiConnector,
+        )
+
+        conn = CapitaisIptuItbiConnector(settings=app_settings)
+        try:
+            return conn.get_iptu_itbi_price_dynamics(id_municipio)
+        except ValueError as exc:
+            raise HTTPException(status_code=400, detail=str(exc)) from exc
+
+    @app.get("/api/v1/real-estate/iptu-itbi/governance/{id_municipio}")
+    async def get_iptu_itbi_governance(id_municipio: str) -> dict[str, Any]:
+        from public_data_gateway.connectors.imobiliario.capitais_iptu_itbi.connector import (
+            CapitaisIptuItbiConnector,
+        )
+
+        conn = CapitaisIptuItbiConnector(settings=app_settings)
+        try:
+            return conn.get_iptu_itbi_fiscal_governance(id_municipio)
+        except ValueError as exc:
+            raise HTTPException(status_code=400, detail=str(exc)) from exc
+
+    @app.get("/api/v1/real-estate/iptu-itbi/cadastre/{id_municipio}")
+    @app.get("/api/v1/iptu-itbi/{id_municipio}")
+    async def get_iptu_itbi_cadastre(id_municipio: str) -> dict[str, Any]:
+        from public_data_gateway.connectors.imobiliario.capitais_iptu_itbi.connector import (
+            CapitaisIptuItbiConnector,
+        )
+
+        conn = CapitaisIptuItbiConnector(settings=app_settings)
+        try:
+            return conn.get_iptu_itbi_property_cadastre(id_municipio)
+        except ValueError as exc:
+            raise HTTPException(status_code=400, detail=str(exc)) from exc
+
     return app

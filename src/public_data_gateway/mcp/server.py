@@ -1435,6 +1435,65 @@ class MCPDispatcher:
                                 },
                             },
                             {
+                                "name": "bdg_get_iptu_itbi_property_cadastre",
+                                "description": "Query municipal IPTU property cadastre, taxed area, PGV venal value, revenue, and compliance rate.",
+                                "inputSchema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "id_municipio": {
+                                            "type": "string",
+                                            "description": "7-digit IBGE municipality code, 6-digit code, 8-digit CEP, or municipality name",
+                                        },
+                                    },
+                                    "required": ["id_municipio"],
+                                },
+                            },
+                            {
+                                "name": "bdg_get_iptu_itbi_price_dynamics",
+                                "description": "Query municipal ITBI declared price per m², YoY appreciation, PGV-to-market ratio, and real estate liquidity.",
+                                "inputSchema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "id_municipio": {
+                                            "type": "string",
+                                            "description": "7-digit IBGE municipality code, 6-digit code, 8-digit CEP, or municipality name",
+                                        },
+                                    },
+                                    "required": ["id_municipio"],
+                                },
+                            },
+                            {
+                                "name": "bdg_get_iptu_itbi_real_estate_features",
+                                "description": "Query Gold IPTU/ITBI market dynamism score, fiscal CTM governance score, and analytical tier.",
+                                "inputSchema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "id_municipio": {
+                                            "type": "string",
+                                            "description": "7-digit IBGE municipality code, 6-digit code, 8-digit CEP, or municipality name",
+                                        },
+                                    },
+                                    "required": ["id_municipio"],
+                                },
+                            },
+                            {
+                                "name": "bdg_list_top_iptu_itbi_capitals",
+                                "description": "List top Brazilian capitals ranked by ITBI real estate dynamism and CTM/PGV fiscal governance.",
+                                "inputSchema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "limit": {
+                                            "type": "integer",
+                                            "description": "Maximum rows (default: 10)",
+                                        },
+                                        "sigla_uf": {
+                                            "type": "string",
+                                            "description": "Optional 2-letter state filter (e.g. SP)",
+                                        },
+                                    },
+                                },
+                            },
+                            {
                                 "name": "bdg_get_labor_force_indicators",
                                 "description": "Query official quarterly labor force, population, and unemployment rate by Brazilian UF from IBGE PNAD Contínua (Tier 1).",
                                 "inputSchema": {
@@ -3102,6 +3161,69 @@ class MCPDispatcher:
                     },
                 }
             wrapped = wrap_untrusted_gov_data(result, source_id="onr_registro_imoveis")
+            return {
+                "jsonrpc": "2.0",
+                "id": req_id,
+                "result": {"content": [{"type": "text", "text": wrapped}], "isError": False},
+            }
+
+        if tool_name in {
+            "bdg_get_iptu_itbi_property_cadastre",
+            "bdg_get_iptu_itbi_price_dynamics",
+            "bdg_get_iptu_itbi_real_estate_features",
+            "bdg_list_top_iptu_itbi_capitals",
+        }:
+            from public_data_gateway.connectors.imobiliario.capitais_iptu_itbi.connector import (
+                CapitaisIptuItbiConnector,
+            )
+
+            connector = CapitaisIptuItbiConnector(settings=self.settings)
+            try:
+                if tool_name == "bdg_get_iptu_itbi_property_cadastre":
+                    result = connector.get_iptu_itbi_property_cadastre(
+                        str(args.get("id_municipio", "")).strip()
+                    )
+                elif tool_name == "bdg_get_iptu_itbi_price_dynamics":
+                    result = connector.get_iptu_itbi_price_dynamics(
+                        str(args.get("id_municipio", "")).strip()
+                    )
+                elif tool_name == "bdg_get_iptu_itbi_real_estate_features":
+                    result = connector.get_iptu_itbi_real_estate_features(
+                        str(args.get("id_municipio", "")).strip()
+                    )
+                else:
+                    raw_uf = args.get("sigla_uf")
+                    result = connector.list_top_iptu_itbi_capitals(
+                        limit=int(args.get("limit", 10)),
+                        sigla_uf=str(raw_uf).strip() if raw_uf else None,
+                    )
+            except ValueError as exc:
+                return {
+                    "jsonrpc": "2.0",
+                    "id": req_id,
+                    "result": {
+                        "content": [
+                            {"type": "text", "text": f"Capitais IPTU/ITBI parameter error: {exc}"}
+                        ],
+                        "isError": True,
+                    },
+                }
+
+            if not result:
+                return {
+                    "jsonrpc": "2.0",
+                    "id": req_id,
+                    "result": {
+                        "content": [
+                            {
+                                "type": "text",
+                                "text": "No Capitais IPTU/ITBI data found for the query.",
+                            }
+                        ],
+                        "isError": True,
+                    },
+                }
+            wrapped = wrap_untrusted_gov_data(result, source_id="capitais_iptu_itbi")
             return {
                 "jsonrpc": "2.0",
                 "id": req_id,

@@ -1,0 +1,401 @@
+schema_version: "3.1.0"
+contract_id: "ODCS-BR-CAPITAIS-IPTU-ITBI-001"
+source_id: "capitais_iptu_itbi"
+version: "1.0.0"
+name: "Capitais: Cadastros Imobiliários Municipais (IPTU / ITBI)"
+agency: "Prefeituras Municipais das Capitais Brasileiras"
+official_url: "https://dados.gov.br/"
+
+legal_framework:
+  statutes:
+    - name: "Constituição Federal de 1988 (Art. 156, incisos I e II)"
+      description: "Atribui aos Municípios a competência tributária para instituir IPTU e ITBI sobre propriedade e transmissão imobiliária"
+    - name: "Lei nº 5.172/1966 (Código Tributário Nacional — CTN, Arts. 32 a 41)"
+      description: "Define fato gerador, base de cálculo pelo valor venal e contribuintes do IPTU e do ITBI"
+    - name: "Lei nº 10.257/2001 (Estatuto da Cidade)"
+      description: "Disciplina instrumentos de política urbana, Cadastro Técnico Multifinalitário e IPTU progressivo no tempo"
+    - name: "Lei nº 12.527/2011 (LAI) e Decreto nº 8.777/2016"
+      description: "Estabelecem transparência ativa e política de dados abertos aplicável às bases agregadas de cadastros municipais"
+
+data_governance:
+  grain: "municipio_cadastro_iptu_itbi_anual"
+  primary_keys:
+    - "id_municipio"
+    - "sigla_uf"
+  reference_date_column: "reference_date"
+  min_expected_rows: 10
+  max_volume_drop_pct: 10.0
+  freshness_sla_hours: 720
+  lgpd_tier: "PUBLIC_NON_PERSONAL"
+  ml_feature_domains:
+    - "property_valuation"
+    - "municipal_cadastre"
+
+schema:
+  tables:
+    iptu_itbi_cadastro_imobiliario_municipal:
+      description: "Cadastro imobiliário tributário municipal consolidado: inscrições ativas de IPTU, área construída tributada, valor venal, alíquota efetiva, arrecadação e adimplência."
+      grain: "id_municipio, ano_exercicio_fiscal"
+      primary_keys: ["id_municipio", "ano_exercicio_fiscal"]
+      min_expected_rows: 10
+      columns:
+        - name: "id_municipio"
+          data_type: "string"
+          is_nullable: false
+          description: "Código IBGE de 7 dígitos do município"
+        - name: "nome_municipio"
+          data_type: "string"
+          is_nullable: false
+          description: "Nome oficial da capital municipal"
+        - name: "sigla_uf"
+          data_type: "string"
+          is_nullable: false
+          description: "Sigla da Unidade Federativa (UF)"
+        - name: "id_uf"
+          data_type: "string"
+          is_nullable: false
+          description: "Código IBGE de 2 dígitos da UF"
+        - name: "regiao"
+          data_type: "string"
+          is_nullable: false
+          description: "Macrorregião geográfica brasileira"
+        - name: "ano_exercicio_fiscal"
+          data_type: "int64"
+          is_nullable: false
+          description: "Ano de exercício fiscal de referência do lançamento de IPTU"
+        - name: "inscricoes_imobiliarias_ativas_iptu"
+          data_type: "int64"
+          is_nullable: false
+          description: "Total de inscrições imobiliárias prediais e territoriais ativas no cadastro fiscal"
+        - name: "area_construida_tributada_mil_m2"
+          data_type: "float64"
+          is_nullable: false
+          description: "Área construída total tributada pelo IPTU em milhares de metros quadrados"
+        - name: "valor_venal_total_bilhoes_brl"
+          data_type: "float64"
+          is_nullable: false
+          description: "Soma do valor venal cadastrado pela Planta Genérica de Valores em bilhões de reais"
+        - name: "valor_venal_medio_m2_brl"
+          data_type: "float64"
+          is_nullable: false
+          description: "Valor venal médio por metro quadrado construído em reais (R$/m²)"
+        - name: "aliquota_media_efetiva_iptu_pct"
+          data_type: "float64"
+          is_nullable: false
+          description: "Alíquota média efetiva do IPTU ponderada pela base venal (%)"
+        - name: "arrecadacao_iptu_milhoes_brl"
+          data_type: "float64"
+          is_nullable: false
+          description: "Arrecadação realizada anual de IPTU em milhões de reais"
+        - name: "taxa_adimplencia_iptu_pct"
+          data_type: "float64"
+          is_nullable: false
+          description: "Percentual de adimplência sobre o lançamento líquido anual do IPTU (%)"
+        - name: "indice_atualizacao_pgv_pct"
+          data_type: "float64"
+          is_nullable: false
+          description: "Grau de atualização da Planta Genérica de Valores frente ao ciclo de revisão cadastral (%)"
+        - name: "reference_date"
+          data_type: "string"
+          is_nullable: false
+          description: "Data de referência do fechamento fiscal consolidado (YYYY-MM-DD)"
+        - name: "extracted_at"
+          data_type: "string"
+          is_nullable: false
+          description: "Timestamp UTC ISO-8601 de extração e materialização"
+
+    itbi_transacoes_imobiliarias_padrao:
+      description: "Transações imobiliárias tributadas por ITBI desagregadas por segmento de imóvel (apartamentos, casas, comercial e terrenos)."
+      grain: "id_municipio, ano_exercicio_fiscal, segmento_imovel_itbi"
+      primary_keys: ["id_municipio", "ano_exercicio_fiscal", "segmento_imovel_itbi"]
+      min_expected_rows: 40
+      columns:
+        - name: "id_municipio"
+          data_type: "string"
+          is_nullable: false
+          description: "Código IBGE de 7 dígitos do município"
+        - name: "nome_municipio"
+          data_type: "string"
+          is_nullable: false
+          description: "Nome oficial do município"
+        - name: "sigla_uf"
+          data_type: "string"
+          is_nullable: false
+          description: "Sigla da UF"
+        - name: "id_uf"
+          data_type: "string"
+          is_nullable: false
+          description: "Código IBGE de 2 dígitos da UF"
+        - name: "regiao"
+          data_type: "string"
+          is_nullable: false
+          description: "Macrorregião geográfica brasileira"
+        - name: "ano_exercicio_fiscal"
+          data_type: "int64"
+          is_nullable: false
+          description: "Ano de exercício fiscal de competência do ITBI"
+        - name: "segmento_imovel_itbi"
+          data_type: "string"
+          is_nullable: false
+          description: "Tipologia padronizada do imóvel transmitido via ITBI"
+        - name: "categoria_uso_imovel"
+          data_type: "string"
+          is_nullable: false
+          description: "Macro-categoria de uso do imóvel (Residencial, Nao_Residencial ou Territorial)"
+        - name: "quantidade_transacoes_itbi_ano"
+          data_type: "int64"
+          is_nullable: false
+          description: "Quantidade de transmissões imobiliárias com guia de ITBI quitada no ano"
+        - name: "valor_transacionado_itbi_milhoes_brl"
+          data_type: "float64"
+          is_nullable: false
+          description: "Volume financeiro total transacionado e avaliado no ITBI em milhões de reais"
+        - name: "valor_medio_transacao_mil_brl"
+          data_type: "float64"
+          is_nullable: false
+          description: "Ticket médio por transação imobiliária no segmento em milhares de reais"
+        - name: "aliquota_nominal_itbi_pct"
+          data_type: "float64"
+          is_nullable: false
+          description: "Alíquota modal aplicada ao ITBI no município (%)"
+        - name: "reference_date"
+          data_type: "string"
+          is_nullable: false
+          description: "Data de referência (YYYY-MM-DD)"
+        - name: "extracted_at"
+          data_type: "string"
+          is_nullable: false
+          description: "Timestamp UTC ISO-8601 de extração"
+
+    iptu_itbi_dinamica_precos_bairros:
+      description: "Dinâmica de preços por m² declarados no ITBI, defasagem PGV vs. mercado, novos lançamentos e liquidez imobiliária municipal."
+      grain: "id_municipio, ano_exercicio_fiscal"
+      primary_keys: ["id_municipio", "ano_exercicio_fiscal"]
+      min_expected_rows: 10
+      columns:
+        - name: "id_municipio"
+          data_type: "string"
+          is_nullable: false
+          description: "Código IBGE de 7 dígitos do município"
+        - name: "nome_municipio"
+          data_type: "string"
+          is_nullable: false
+          description: "Nome oficial do município"
+        - name: "sigla_uf"
+          data_type: "string"
+          is_nullable: false
+          description: "Sigla da UF"
+        - name: "id_uf"
+          data_type: "string"
+          is_nullable: false
+          description: "Código IBGE de 2 dígitos da UF"
+        - name: "regiao"
+          data_type: "string"
+          is_nullable: false
+          description: "Macrorregião geográfica brasileira"
+        - name: "ano_exercicio_fiscal"
+          data_type: "int64"
+          is_nullable: false
+          description: "Ano de exercício fiscal de referência"
+        - name: "preco_medio_m2_itbi_declarado_brl"
+          data_type: "float64"
+          is_nullable: false
+          description: "Preço médio por m² observado nas transações reais de ITBI (R$/m²)"
+        - name: "variacao_anual_preco_m2_itbi_pct"
+          data_type: "float64"
+          is_nullable: false
+          description: "Variação percentual interanual do preço médio do m² no ITBI (%)"
+        - name: "razao_venal_pgv_sobre_mercado_itbi"
+          data_type: "float64"
+          is_nullable: false
+          description: "Razão entre valor venal médio PGV/IPTU e preço real observado no ITBI (0 a 1)"
+        - name: "participacao_lancamentos_novos_pct"
+          data_type: "float64"
+          is_nullable: false
+          description: "Participação de unidades novas ou primeira transmissão sobre o total de ITBI (%)"
+        - name: "concentracao_uso_residencial_pct"
+          data_type: "float64"
+          is_nullable: false
+          description: "Participação das unidades residenciais no total de inscrições imobiliárias (%)"
+        - name: "indice_liquidez_imobiliaria_itbi_pct"
+          data_type: "float64"
+          is_nullable: false
+          description: "Taxa anual de giro do estoque: transações ITBI sobre inscrições ativas (%)"
+        - name: "taxa_vacancia_cadastral_estimada_pct"
+          data_type: "float64"
+          is_nullable: false
+          description: "Proporção estimada de lotes vazios ou imóveis com baixa ocupação cadastral (%)"
+        - name: "reference_date"
+          data_type: "string"
+          is_nullable: false
+          description: "Data de referência (YYYY-MM-DD)"
+        - name: "extracted_at"
+          data_type: "string"
+          is_nullable: false
+          description: "Timestamp UTC ISO-8601 de extração"
+
+    iptu_itbi_governanca_fiscal_geoespacial:
+      description: "Governança fiscal e modernização cadastral: cobertura georreferenciada CTM, emissão digital de ITBI, interoperabilidade SINTER/ONR e receita per capita."
+      grain: "id_municipio, ano_exercicio_fiscal"
+      primary_keys: ["id_municipio", "ano_exercicio_fiscal"]
+      min_expected_rows: 10
+      columns:
+        - name: "id_municipio"
+          data_type: "string"
+          is_nullable: false
+          description: "Código IBGE de 7 dígitos do município"
+        - name: "nome_municipio"
+          data_type: "string"
+          is_nullable: false
+          description: "Nome oficial do município"
+        - name: "sigla_uf"
+          data_type: "string"
+          is_nullable: false
+          description: "Sigla da UF"
+        - name: "id_uf"
+          data_type: "string"
+          is_nullable: false
+          description: "Código IBGE de 2 dígitos da UF"
+        - name: "regiao"
+          data_type: "string"
+          is_nullable: false
+          description: "Macrorregião geográfica brasileira"
+        - name: "ano_exercicio_fiscal"
+          data_type: "int64"
+          is_nullable: false
+          description: "Ano de exercício fiscal de referência"
+        - name: "cobertura_cadastral_georreferenciada_ctm_pct"
+          data_type: "float64"
+          is_nullable: false
+          description: "Percentual de lotes urbanos georreferenciados no Cadastro Técnico Multifinalitário (%)"
+        - name: "transacoes_itbi_emissao_digital_pct"
+          data_type: "float64"
+          is_nullable: false
+          description: "Proporção de guias e certidões de ITBI processadas 100% digitalmente (%)"
+        - name: "integracao_iptu_sinter_cno_onr_pct"
+          data_type: "float64"
+          is_nullable: false
+          description: "Grau de interoperabilidade cadastral entre Prefeitura, SINTER, CNO e ONR/SREI (%)"
+        - name: "arrecadacao_itbi_milhoes_brl"
+          data_type: "float64"
+          is_nullable: false
+          description: "Arrecadação realizada anual de ITBI em milhões de reais"
+        - name: "participacao_iptu_itbi_receita_propria_pct"
+          data_type: "float64"
+          is_nullable: false
+          description: "Peso combinado de IPTU e ITBI na receita tributária própria municipal (%)"
+        - name: "receita_imobiliaria_per_capita_brl"
+          data_type: "float64"
+          is_nullable: false
+          description: "Arrecadação somada de IPTU e ITBI por habitante (R$/hab)"
+        - name: "nivel_transparencia_dados_abertos_pgv"
+          data_type: "string"
+          is_nullable: false
+          description: "Maturidade da abertura de microdados geoespaciais de IPTU/ITBI (ALTO, MEDIO, EM_EVOLUCAO)"
+        - name: "reference_date"
+          data_type: "string"
+          is_nullable: false
+          description: "Data de referência (YYYY-MM-DD)"
+        - name: "extracted_at"
+          data_type: "string"
+          is_nullable: false
+          description: "Timestamp UTC ISO-8601 de extração"
+
+    features_iptu_itbi_mercado_imobiliario_capitais:
+      description: "Feature store Gold consolidada do mercado imobiliário e governança cadastral municipal (IPTU/ITBI) com scores normalizados e classificação de tier."
+      grain: "id_municipio"
+      primary_keys: ["id_municipio"]
+      min_expected_rows: 10
+      columns:
+        - name: "id_municipio"
+          data_type: "string"
+          is_nullable: false
+          description: "Código IBGE de 7 dígitos do município"
+        - name: "nome_municipio"
+          data_type: "string"
+          is_nullable: false
+          description: "Nome oficial do município"
+        - name: "sigla_uf"
+          data_type: "string"
+          is_nullable: false
+          description: "Sigla da UF"
+        - name: "id_uf"
+          data_type: "string"
+          is_nullable: false
+          description: "Código IBGE de 2 dígitos da UF"
+        - name: "regiao"
+          data_type: "string"
+          is_nullable: false
+          description: "Macrorregião geográfica brasileira"
+        - name: "ano_exercicio_fiscal"
+          data_type: "int64"
+          is_nullable: false
+          description: "Ano de exercício fiscal de referência"
+        - name: "inscricoes_imobiliarias_ativas_iptu"
+          data_type: "int64"
+          is_nullable: false
+          description: "Total de inscrições imobiliárias ativas de IPTU"
+        - name: "valor_venal_medio_m2_brl"
+          data_type: "float64"
+          is_nullable: false
+          description: "Valor venal médio por m² na PGV municipal (R$/m²)"
+        - name: "arrecadacao_iptu_milhoes_brl"
+          data_type: "float64"
+          is_nullable: false
+          description: "Arrecadação anual de IPTU (R$ milhões)"
+        - name: "taxa_adimplencia_iptu_pct"
+          data_type: "float64"
+          is_nullable: false
+          description: "Taxa de adimplência do IPTU (%)"
+        - name: "preco_medio_m2_itbi_declarado_brl"
+          data_type: "float64"
+          is_nullable: false
+          description: "Preço médio por m² observado nas transações de ITBI (R$/m²)"
+        - name: "variacao_anual_preco_m2_itbi_pct"
+          data_type: "float64"
+          is_nullable: false
+          description: "Variação anual do preço por m² no ITBI (%)"
+        - name: "razao_venal_pgv_sobre_mercado_itbi"
+          data_type: "float64"
+          is_nullable: false
+          description: "Razão entre valor venal PGV e preço real de mercado ITBI"
+        - name: "indice_liquidez_imobiliaria_itbi_pct"
+          data_type: "float64"
+          is_nullable: false
+          description: "Giro anual do estoque imobiliário via ITBI (%)"
+        - name: "cobertura_cadastral_georreferenciada_ctm_pct"
+          data_type: "float64"
+          is_nullable: false
+          description: "Cobertura georreferenciada do Cadastro Técnico Multifinalitário (%)"
+        - name: "integracao_iptu_sinter_cno_onr_pct"
+          data_type: "float64"
+          is_nullable: false
+          description: "Interoperabilidade cadastral com SINTER/CNO/ONR (%)"
+        - name: "arrecadacao_itbi_milhoes_brl"
+          data_type: "float64"
+          is_nullable: false
+          description: "Arrecadação anual de ITBI (R$ milhões)"
+        - name: "participacao_iptu_itbi_receita_propria_pct"
+          data_type: "float64"
+          is_nullable: false
+          description: "Participação de IPTU+ITBI na receita tributária própria (%)"
+        - name: "score_dinamismo_mercado_imobiliario_itbi"
+          data_type: "float64"
+          is_nullable: false
+          description: "Score normalizado (0 a 100) de dinamismo de preços e liquidez imobiliária no ITBI"
+        - name: "score_governanca_cadastral_fiscal_iptu"
+          data_type: "float64"
+          is_nullable: false
+          description: "Score normalizado (0 a 100) de governança cadastral georreferenciada CTM/PGV e adimplência fiscal"
+        - name: "classificacao_mercado_imobiliario_capital"
+          data_type: "string"
+          is_nullable: false
+          description: "Tier consolidado de liquidez imobiliária e governança cadastral fiscal da capital"
+        - name: "reference_date"
+          data_type: "string"
+          is_nullable: false
+          description: "Data de referência (YYYY-MM-DD)"
+        - name: "extracted_at"
+          data_type: "string"
+          is_nullable: false
+          description: "Timestamp UTC ISO-8601 de extração"

@@ -26,6 +26,7 @@ import public_data_gateway.connectors.geografico.anatel_mosaico  # noqa: F401
 import public_data_gateway.connectors.geografico.antt_malha_transporte  # noqa: F401
 import public_data_gateway.connectors.geografico.ibge_cnefe  # noqa: F401
 import public_data_gateway.connectors.geografico.ibge_malhas  # noqa: F401
+import public_data_gateway.connectors.imobiliario.capitais_iptu_itbi  # noqa: F401
 import public_data_gateway.connectors.imobiliario.onr_registro_imoveis  # noqa: F401
 import public_data_gateway.connectors.judicial.cnj_datajud  # noqa: F401
 import public_data_gateway.connectors.judicial.cnj_justica_aberta  # noqa: F401

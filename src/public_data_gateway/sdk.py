@@ -1327,6 +1327,17 @@ class RealEstateFacade:
     def __init__(self, sdk: "BrazilData") -> None:
         self._sdk = sdk
         self._onr_connector: Any = None
+        self._iptu_itbi_connector: Any = None
+
+    @property
+    def iptu_itbi_connector(self) -> Any:
+        if self._iptu_itbi_connector is None:
+            from public_data_gateway.connectors.imobiliario.capitais_iptu_itbi.connector import (
+                CapitaisIptuItbiConnector,
+            )
+
+            self._iptu_itbi_connector = CapitaisIptuItbiConnector(settings=self._sdk.settings)
+        return self._iptu_itbi_connector
 
     @property
     def onr_connector(self) -> Any:
@@ -1367,6 +1378,38 @@ class RealEstateFacade:
     ) -> list[dict[str, Any]]:
         """List top Brazilian municipalities ranked by ONR SREI/SERP digital maturity and liquidity."""
         return self.onr_connector.list_top_onr_real_estate_municipalities(
+            limit=limit, sigla_uf=sigla_uf
+        )
+
+    def get_iptu_itbi_property_cadastre(self, id_municipio: str) -> dict[str, Any]:
+        """Get municipal IPTU property cadastre, PGV venal value, revenue, and compliance."""
+        return self.iptu_itbi_connector.get_iptu_itbi_property_cadastre(id_municipio)
+
+    def list_itbi_transactions_by_segment(
+        self, id_municipio: str, segmento_imovel: str | None = None
+    ) -> list[dict[str, Any]]:
+        """List municipal ITBI real estate transactions by property segment or usage category."""
+        return self.iptu_itbi_connector.list_itbi_transactions_by_segment(
+            id_municipio=id_municipio, segmento_imovel=segmento_imovel
+        )
+
+    def get_iptu_itbi_price_dynamics(self, id_municipio: str) -> dict[str, Any]:
+        """Get ITBI declared price per m², annual growth, PGV-to-market ratio, and liquidity."""
+        return self.iptu_itbi_connector.get_iptu_itbi_price_dynamics(id_municipio)
+
+    def get_iptu_itbi_fiscal_governance(self, id_municipio: str) -> dict[str, Any]:
+        """Get CTM georeferenced coverage, digital ITBI, and SINTER/CNO/ONR interoperability."""
+        return self.iptu_itbi_connector.get_iptu_itbi_fiscal_governance(id_municipio)
+
+    def get_iptu_itbi_real_estate_features(self, id_municipio: str) -> dict[str, Any]:
+        """Get Gold IPTU/ITBI market dynamism score, fiscal governance score, and tier features."""
+        return self.iptu_itbi_connector.get_iptu_itbi_real_estate_features(id_municipio)
+
+    def list_top_iptu_itbi_capitals(
+        self, limit: int = 10, sigla_uf: str | None = None
+    ) -> list[dict[str, Any]]:
+        """List top Brazilian capitals ranked by ITBI real estate dynamism and CTM governance."""
+        return self.iptu_itbi_connector.list_top_iptu_itbi_capitals(
             limit=limit, sigla_uf=sigla_uf
         )
 
@@ -2153,6 +2196,38 @@ class BrazilData:
     ) -> list[dict[str, Any]]:
         """Listar municípios líderes em maturidade digital SREI/SERP e liquidez imobiliária (ONR)."""
         return self.real_estate.list_top_onr_real_estate_municipalities(
+            limit=limit, sigla_uf=sigla_uf
+        )
+
+    def get_iptu_itbi_property_cadastre(self, id_municipio: str) -> dict[str, Any]:
+        """Consultar cadastro imobiliário tributário municipal (IPTU, valor venal e adimplência)."""
+        return self.real_estate.get_iptu_itbi_property_cadastre(id_municipio)
+
+    def list_itbi_transactions_by_segment(
+        self, id_municipio: str, segmento_imovel: str | None = None
+    ) -> list[dict[str, Any]]:
+        """Listar transações imobiliárias ITBI do município por segmento de imóvel."""
+        return self.real_estate.list_itbi_transactions_by_segment(
+            id_municipio=id_municipio, segmento_imovel=segmento_imovel
+        )
+
+    def get_iptu_itbi_price_dynamics(self, id_municipio: str) -> dict[str, Any]:
+        """Consultar dinâmica de preços por m² no ITBI, defasagem PGV e liquidez."""
+        return self.real_estate.get_iptu_itbi_price_dynamics(id_municipio)
+
+    def get_iptu_itbi_fiscal_governance(self, id_municipio: str) -> dict[str, Any]:
+        """Consultar governança cadastral georreferenciada CTM, ITBI digital e SINTER/ONR."""
+        return self.real_estate.get_iptu_itbi_fiscal_governance(id_municipio)
+
+    def get_iptu_itbi_real_estate_features(self, id_municipio: str) -> dict[str, Any]:
+        """Consultar features Gold de dinamismo imobiliário e governança cadastral IPTU/ITBI."""
+        return self.real_estate.get_iptu_itbi_real_estate_features(id_municipio)
+
+    def list_top_iptu_itbi_capitals(
+        self, limit: int = 10, sigla_uf: str | None = None
+    ) -> list[dict[str, Any]]:
+        """Listar capitais ranqueadas por dinamismo imobiliário ITBI e governança cadastral CTM."""
+        return self.real_estate.list_top_iptu_itbi_capitals(
             limit=limit, sigla_uf=sigla_uf
         )
 
