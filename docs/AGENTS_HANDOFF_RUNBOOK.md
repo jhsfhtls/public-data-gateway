@@ -10,11 +10,9 @@
 - **Repositório:** `public-data-gateway` (Open Source Medallion Platform)
 - **Python Virtual Environment:** `.\.venv\Scripts\python.exe` (Nunca use Python/pip global)
 - **Branch Canônica:** `main` (protegida por hooks de lint, branch naming, conventional commits e secrets scan)
-- **Total de Conectores no Catálogo:** **49 fontes oficiais brasileiras** divididas em **9 Waves**
-- **Status Atual:** **49 / 49 homologados (100.0%)**
-- **Waves 1 a 9:** **TODAS CONCLUÍDAS (49/49)** — Próxima etapa: **Fase 09 (Datamarts Cross-Domain & Feature Store Consolidada)**
-  - **Próximo Alvo Imediato:** **`mte_rais`** (Ministério do Trabalho e Emprego: Relação Anual de Informações Sociais)
-  - Waves 4 a 9 concluídas integralmente com 100% de cobertura ODCS v3.1, dbt e testes offline + live.
+- **Total de Conectores no Catálogo:** **49 fontes oficiais brasileiras + 29 APIs Públicas & Globais** (`CATALOG.md`)
+- **Status Atual:** **Fases 00–10 concluídas** (49/49 fontes Gov BR homologadas + Gold Cross-Domain + Lifecycle S01..S09 + Hub 29 APIs Públicas)
+- **Próxima Etapa:** **Fase 10.5** — Elevar todas as 29 APIs da Fase 10 ao padrão completo **11-Gates / Medallion** (`BaseConnector`, `contract.yaml`, `staging` -> `intradomínio` -> `cross_domain`, testes `live` e paridade SDK/FastAPI/CLI/MCP), conforme [ADR-004](adr/ADR-004-connector-medallion-parity-policy.md).
 
 ---
 

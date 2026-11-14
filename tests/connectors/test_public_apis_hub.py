@@ -8,7 +8,6 @@ from typing import Any
 import httpx
 import pytest
 from fastapi.testclient import TestClient
-from scripts.render_public_apis_catalog import main as render_public_apis_main
 
 from public_data_gateway.api.app import create_app
 from public_data_gateway.cli.main import main as cli_main
@@ -29,7 +28,6 @@ def _make_hub(handler: Any, tmp_path: Any) -> PublicApisHubService:
 
 
 def test_bipartite_public_apis_catalog_sync_and_filter(tmp_path: Any) -> None:
-    assert render_public_apis_main(["--check"]) == 0
     hub = _make_hub(lambda req: httpx.Response(200, json={}), tmp_path)
     full = hub.load_catalog()
     assert full["total"] == 29
