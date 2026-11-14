@@ -1,6 +1,6 @@
 {
   "schema_version": "1.0.0",
-  "last_updated": "2026-11-14T14:07:00.000000",
+  "last_updated": "2026-11-14T14:21:00.000000",
   "project_name": "public-data-gateway",
   "ecosystem": "C.O.R.E. (core, operations, career, studies)",
   "governing_pops": [
@@ -13,10 +13,10 @@
     "POP_T_148"
   ],
   "current_macro_phase_id": "08",
-  "current_macro_phase": "Fase 08 - Ingestão Wave 6 (Meio Ambiente, Agro & Metaportais — 47/49 fontes homologadas [95.9%] com mapa_zarc homologado; Próximo: basedosdados_bq)",
+  "current_macro_phase": "Fase 08 - Ingestão Wave 6 (Meio Ambiente, Agro & Metaportais — 48/49 fontes homologadas [98.0%] com basedosdados_bq homologado; Próximo: dadosgov_ckan)",
   "overall_status": "ON_TRACK",
-  "active_connector": "basedosdados_bq",
-  "next_connector": "dadosgov_ckan",
+  "active_connector": "dadosgov_ckan",
+  "next_connector": null,
   "structural_phases": [
     {
       "phase_id": "00",
@@ -158,7 +158,8 @@
         "Conector mapbiomas_cobertura (Cobertura Anual, Transições por Classe, Pastagens/Irrigação e Alertas Validados) - CONCLUÍDO",
         "Conector sfb_sicar (Imóveis Rurais CAR, Reserva Legal/APP por Categoria, PRA/Embargos IBAMA e Geometria SIGEF) - CONCLUÍDO",
         "Conector mapa_zarc (Aptidão Climática, Janelas Decendiais por Cultura, PROAGRO/PSR e Solo AD1-AD6) - CONCLUÍDO",
-        "Conectores Metaportais (basedosdados_bq, dadosgov_ckan)"
+        "Conector basedosdados_bq (Datalake BigQuery, Datasets Temáticos, Governança ODCS e Consumo SQL) - CONCLUÍDO",
+        "Conectores Metaportais (dadosgov_ckan)"
       ]
     },
     {
@@ -425,6 +426,12 @@
     }
   ],
   "recent_milestones": [
+    {
+      "date": "2026-11-14",
+      "phase_id": "08",
+      "milestone": "Homologação do Conector basedosdados_bq (48/49 Fontes — 98.0%)",
+      "summary": "Implementação e homologação completa do conector basedosdados_bq (Base dos Dados: Datalake Público Federado BigQuery, LAI nº 12.527/2011, Decreto nº 8.777/2016) alcançando 48/49 fontes homologadas (98.0%): 5 tabelas Medallion (bd_datalake_cobertura_municipio, bd_datasets_publicos_tema, bd_governanca_metadados_odcs, bd_consumo_federado_sql e features_basedosdados_datalake_federado) materializadas em data/basedosdados_bq/silver/; 7 novos modelos dbt (4 staging views, fct_basedosdados_datalake_municipio, fct_basedosdados_datasets_tema_municipio e mart_maturidade_datalake_basedosdados_brasil) totalizando 397 modelos e 5.876 colunas 100% documentadas no linter (218 sources); paridade SQL–Python estrita confirmada (12 municípios, 4 tiers x 3 municípios, zero divergências); paridade multi-interface completa em SDK (MetaportalsFacade.basedosdados_connector), CLI (bdg basedosdados), FastAPI (/api/v1/metaportals/basedosdados/* e /api/v1/basedosdados/*) e MCP (bdg_*_bd* com wrap_untrusted_gov_data); 9 testes pytest (8 offline + 1 live Base dos Dados Portal) aprovados."
+    },
     {
       "date": "2026-11-14",
       "phase_id": "08",

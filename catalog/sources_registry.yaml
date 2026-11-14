@@ -1138,7 +1138,7 @@ sources:
   - P06
   rice_score: 390
   roadmap_wave: 6
-  status: CATALOGED
+  status: HOMOLOGATED
 - source_id: ana_hidroweb_telemetria
   name: 'ANA: Rede Hidrometeorológica Nacional (HidroWeb)'
   agency: Agência Nacional de Águas e Saneamento Básico (ANA)

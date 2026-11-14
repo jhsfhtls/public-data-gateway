@@ -1715,6 +1715,61 @@ class EnvironmentFacade:
         )
 
 
+class MetaportalsFacade:
+    """Sub-facade for Metaportals & Aggregator Hubs (Base dos Dados BigQuery, Dados.gov.br CKAN)."""
+
+    def __init__(self, sdk: "BrazilData") -> None:
+        self._sdk = sdk
+        self._basedosdados_connector: Any = None
+
+    @property
+    def basedosdados_connector(self) -> Any:
+        if self._basedosdados_connector is None:
+            from public_data_gateway.connectors.agregadores.basedosdados_bq.connector import (
+                BaseDosDadosBqConnector,
+            )
+
+            self._basedosdados_connector = BaseDosDadosBqConnector(
+                settings=self._sdk.settings
+            )
+        return self._basedosdados_connector
+
+    def get_bd_coverage(self, id_municipio: str) -> dict[str, Any]:
+        """Get municipal Base dos Dados (BigQuery) treated dataset and table coverage."""
+        return self.basedosdados_connector.get_bd_coverage(id_municipio)
+
+    def list_bd_datasets(
+        self,
+        id_municipio: str,
+        dataset_bd_id: str | None = None,
+    ) -> list[dict[str, Any]]:
+        """List municipal Base dos Dados public datasets by thematic domain."""
+        return self.basedosdados_connector.list_bd_datasets(
+            id_municipio,
+            dataset_bd_id=dataset_bd_id,
+        )
+
+    def get_bd_governance(self, id_municipio: str) -> dict[str, Any]:
+        """Get municipal Base dos Dados dictionary standardization and canonical key governance."""
+        return self.basedosdados_connector.get_bd_governance(id_municipio)
+
+    def get_bd_consumption(self, id_municipio: str) -> dict[str, Any]:
+        """Get municipal Base dos Dados BigQuery SQL query volume and scan efficiency."""
+        return self.basedosdados_connector.get_bd_consumption(id_municipio)
+
+    def get_bd_features(self, id_municipio: str) -> dict[str, Any]:
+        """Get normalized Gold Base dos Dados datalake maturity score and 4-tier classification."""
+        return self.basedosdados_connector.get_bd_features(id_municipio)
+
+    def list_top_bd_municipalities(
+        self, limit: int = 10, sigla_uf: str | None = None
+    ) -> list[dict[str, Any]]:
+        """List top Brazilian municipalities ranked by composite Base dos Dados maturity score."""
+        return self.basedosdados_connector.list_top_bd_municipalities(
+            limit=limit, sigla_uf=sigla_uf
+        )
+
+
 class BrazilData:
     """Unified developer SDK facade for querying, normalizing, and enriching Brazilian public datasets."""
 
@@ -1745,6 +1800,7 @@ class BrazilData:
         self.education = EducationFacade(self)
         self.real_estate = RealEstateFacade(self)
         self.environment = EnvironmentFacade(self)
+        self.metaportals = MetaportalsFacade(self)
 
     def list_sources(
         self,
@@ -2740,6 +2796,41 @@ class BrazilData:
     ) -> list[dict[str, Any]]:
         """Listar municípios líderes em aptidão agroclimática ZARC (MAPA)."""
         return self.environment.list_top_zarc_municipalities(
+            limit=limit, sigla_uf=sigla_uf
+        )
+
+    def get_bd_coverage(self, id_municipio: str) -> dict[str, Any]:
+        """Consultar cobertura municipal de datasets e tabelas tratadas (Base dos Dados BigQuery)."""
+        return self.metaportals.get_bd_coverage(id_municipio)
+
+    def list_bd_datasets(
+        self,
+        id_municipio: str,
+        dataset_bd_id: str | None = None,
+    ) -> list[dict[str, Any]]:
+        """Listar datasets públicos tratados por tema (Base dos Dados BigQuery)."""
+        return self.metaportals.list_bd_datasets(
+            id_municipio,
+            dataset_bd_id=dataset_bd_id,
+        )
+
+    def get_bd_governance(self, id_municipio: str) -> dict[str, Any]:
+        """Consultar governança de metadados e chaves canônicas (Base dos Dados BigQuery)."""
+        return self.metaportals.get_bd_governance(id_municipio)
+
+    def get_bd_consumption(self, id_municipio: str) -> dict[str, Any]:
+        """Consultar consumo de consultas SQL federadas e eficiência (Base dos Dados BigQuery)."""
+        return self.metaportals.get_bd_consumption(id_municipio)
+
+    def get_bd_features(self, id_municipio: str) -> dict[str, Any]:
+        """Consultar features Gold de maturidade do datalake (Base dos Dados BigQuery)."""
+        return self.metaportals.get_bd_features(id_municipio)
+
+    def list_top_bd_municipalities(
+        self, limit: int = 10, sigla_uf: str | None = None
+    ) -> list[dict[str, Any]]:
+        """Listar municípios líderes em maturidade no datalake Base dos Dados (BigQuery)."""
+        return self.metaportals.list_top_bd_municipalities(
             limit=limit, sigla_uf=sigla_uf
         )
 

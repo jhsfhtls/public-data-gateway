@@ -29,3 +29,49 @@ models:
         description: "Classificação da UF quanto à densidade do ecossistema financeiro (HUB_FINANCEIRO_NACIONAL, POLO_FINANCEIRO_REGIONAL, PRESENCA_DISPERSA)."
         tests:
           - not_null
+
+  - name: mart_maturidade_datalake_basedosdados_brasil
+    description: "Data Mart Gold de maturidade, cobertura e eficiência SQL federada do datalake Base dos Dados (BigQuery) por município."
+    columns:
+      - name: id_municipio
+        description: "Código IBGE de 7 dígitos do município (STRING)."
+        tests: [not_null, unique]
+      - name: nome_municipio
+        description: "Nome oficial do município."
+        tests: [not_null]
+      - name: sigla_uf
+        description: "Sigla da Unidade da Federação (UF)."
+        tests: [not_null]
+      - name: id_uf
+        description: "Código IBGE da UF (STRING)."
+        tests: [not_null]
+      - name: regiao
+        description: "Macrorregião geográfica brasileira."
+        tests: [not_null]
+      - name: qtd_datasets_tratados_bd
+        description: "Quantidade de datasets tratados disponíveis para o município."
+        tests: [not_null]
+      - name: qtd_tabelas_bigquery_municipio
+        description: "Quantidade de tabelas BigQuery com recorte municipal."
+        tests: [not_null]
+      - name: completude_chaves_ibge_pct
+        description: "Completude percentual de chaves canônicas IBGE (%)."
+        tests: [not_null]
+      - name: indice_cobertura_datalake_bd
+        description: "Subíndice sintético de cobertura do datalake Base dos Dados (0-100)."
+        tests: [not_null]
+      - name: indice_governanca_bd
+        description: "Subíndice sintético de governança de metadados Base dos Dados (0-100)."
+        tests: [not_null]
+      - name: indice_eficiencia_federada_bd
+        description: "Subíndice sintético de eficiência federada Base dos Dados (0-100)."
+        tests: [not_null]
+      - name: score_maturidade_bd
+        description: "Score composto de maturidade do datalake Base dos Dados (0-100)."
+        tests: [not_null]
+      - name: tier_maturidade_bd
+        description: "Classificação municipal em 4 tiers de maturidade Base dos Dados."
+        tests: [not_null]
+      - name: reference_date
+        description: "Data de referência ISO-8601 (YYYY-MM-DD)."
+        tests: [not_null]

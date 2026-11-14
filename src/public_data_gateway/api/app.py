@@ -2500,6 +2500,84 @@ def create_app(settings: GatewaySettings | None = None) -> FastAPI:
         except (ValueError, KeyError) as exc:
             raise HTTPException(status_code=400, detail=str(exc)) from exc
 
+    @app.get("/api/v1/metaportals/basedosdados/top-municipalities")
+    async def get_top_bd_municipalities(
+        limit: int = Query(10, ge=1, le=50, description="Max municipalities to list"),
+        uf: str | None = Query(None, description="Optional 2-letter state filter"),
+    ) -> list[dict[str, Any]]:
+        from public_data_gateway.connectors.agregadores.basedosdados_bq.connector import (
+            BaseDosDadosBqConnector,
+        )
+
+        conn = BaseDosDadosBqConnector(settings=app_settings)
+        return conn.list_top_bd_municipalities(limit=limit, sigla_uf=uf)
+
+    @app.get("/api/v1/metaportals/basedosdados/features/{id_municipio}")
+    async def get_bd_features(id_municipio: str) -> dict[str, Any]:
+        from public_data_gateway.connectors.agregadores.basedosdados_bq.connector import (
+            BaseDosDadosBqConnector,
+        )
+
+        conn = BaseDosDadosBqConnector(settings=app_settings)
+        try:
+            return conn.get_bd_features(id_municipio)
+        except (ValueError, KeyError) as exc:
+            raise HTTPException(status_code=400, detail=str(exc)) from exc
+
+    @app.get("/api/v1/metaportals/basedosdados/datasets/{id_municipio}")
+    async def get_bd_datasets(
+        id_municipio: str,
+        dataset: str | None = Query(
+            None, description="Optional Base dos Dados dataset ID filter"
+        ),
+    ) -> list[dict[str, Any]]:
+        from public_data_gateway.connectors.agregadores.basedosdados_bq.connector import (
+            BaseDosDadosBqConnector,
+        )
+
+        conn = BaseDosDadosBqConnector(settings=app_settings)
+        try:
+            return conn.list_bd_datasets(id_municipio, dataset_bd_id=dataset)
+        except (ValueError, KeyError) as exc:
+            raise HTTPException(status_code=400, detail=str(exc)) from exc
+
+    @app.get("/api/v1/metaportals/basedosdados/governance/{id_municipio}")
+    async def get_bd_governance(id_municipio: str) -> dict[str, Any]:
+        from public_data_gateway.connectors.agregadores.basedosdados_bq.connector import (
+            BaseDosDadosBqConnector,
+        )
+
+        conn = BaseDosDadosBqConnector(settings=app_settings)
+        try:
+            return conn.get_bd_governance(id_municipio)
+        except (ValueError, KeyError) as exc:
+            raise HTTPException(status_code=400, detail=str(exc)) from exc
+
+    @app.get("/api/v1/metaportals/basedosdados/consumption/{id_municipio}")
+    async def get_bd_consumption(id_municipio: str) -> dict[str, Any]:
+        from public_data_gateway.connectors.agregadores.basedosdados_bq.connector import (
+            BaseDosDadosBqConnector,
+        )
+
+        conn = BaseDosDadosBqConnector(settings=app_settings)
+        try:
+            return conn.get_bd_consumption(id_municipio)
+        except (ValueError, KeyError) as exc:
+            raise HTTPException(status_code=400, detail=str(exc)) from exc
+
+    @app.get("/api/v1/metaportals/basedosdados/coverage/{id_municipio}")
+    @app.get("/api/v1/basedosdados/{id_municipio}")
+    async def get_bd_coverage(id_municipio: str) -> dict[str, Any]:
+        from public_data_gateway.connectors.agregadores.basedosdados_bq.connector import (
+            BaseDosDadosBqConnector,
+        )
+
+        conn = BaseDosDadosBqConnector(settings=app_settings)
+        try:
+            return conn.get_bd_coverage(id_municipio)
+        except (ValueError, KeyError) as exc:
+            raise HTTPException(status_code=400, detail=str(exc)) from exc
+
     @app.get("/api/v1/real-estate/onr/top-municipalities")
     async def get_top_onr_municipalities(
         limit: int = Query(10, ge=1, le=50, description="Max municipalities to list"),

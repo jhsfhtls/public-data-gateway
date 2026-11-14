@@ -1141,6 +1141,36 @@ def build_parser() -> argparse.ArgumentParser:
     zarc_rk_p.add_argument("--uf", type=str, help="Optional 2-letter state filter")
     zarc_rk_p.add_argument("--json", action="store_true", help="Output in JSON format")
 
+    # Base dos Dados (BigQuery) command group
+    bd_p = subparsers.add_parser("basedosdados", help="Query Base dos Dados (BigQuery) datalake coverage, thematic datasets, governance, SQL efficiency, and rankings.")
+    bd_sub = bd_p.add_subparsers(dest="basedosdados_action", required=True)
+
+    bd_cov_p = bd_sub.add_parser("coverage", help="Get municipal Base dos Dados treated dataset and BigQuery table coverage.")
+    bd_cov_p.add_argument("id_municipio", help="7-digit IBGE municipality code, 6-digit prefix, or 8-digit CEP")
+    bd_cov_p.add_argument("--json", action="store_true", help="Output in JSON format")
+
+    bd_ds_p = bd_sub.add_parser("datasets", help="List municipal Base dos Dados public datasets by thematic domain.")
+    bd_ds_p.add_argument("id_municipio", help="7-digit IBGE municipality code, 6-digit prefix, or 8-digit CEP")
+    bd_ds_p.add_argument("--dataset", type=str, help="Optional dataset ID filter (e.g. br_ibge_pib_populacao)")
+    bd_ds_p.add_argument("--json", action="store_true", help="Output in JSON format")
+
+    bd_gov_p = bd_sub.add_parser("governance", help="Get municipal Base dos Dados dictionary and canonical key governance.")
+    bd_gov_p.add_argument("id_municipio", help="7-digit IBGE municipality code, 6-digit prefix, or 8-digit CEP")
+    bd_gov_p.add_argument("--json", action="store_true", help="Output in JSON format")
+
+    bd_con_p = bd_sub.add_parser("consumption", help="Get municipal Base dos Dados BigQuery SQL query volume and scan efficiency.")
+    bd_con_p.add_argument("id_municipio", help="7-digit IBGE municipality code, 6-digit prefix, or 8-digit CEP")
+    bd_con_p.add_argument("--json", action="store_true", help="Output in JSON format")
+
+    bd_ft_p = bd_sub.add_parser("features", help="Get Gold Base dos Dados datalake maturity score and 4-tier classification.")
+    bd_ft_p.add_argument("id_municipio", help="7-digit IBGE municipality code, 6-digit prefix, or 8-digit CEP")
+    bd_ft_p.add_argument("--json", action="store_true", help="Output in JSON format")
+
+    bd_rk_p = bd_sub.add_parser("ranking", help="List top Brazilian municipalities ranked by Base dos Dados maturity score.")
+    bd_rk_p.add_argument("--limit", type=int, default=10, help="Max municipalities to list")
+    bd_rk_p.add_argument("--uf", type=str, help="Optional 2-letter state filter")
+    bd_rk_p.add_argument("--json", action="store_true", help="Output in JSON format")
+
     # ONR Registro de Imóveis (SREI/SERP/CNM) command group
     onr_p = subparsers.add_parser("onr", help="Query ONR SREI real estate registries, transactions, credit guarantees, SERP, and rankings.")
     onr_sub = onr_p.add_subparsers(dest="onr_action", required=True)
@@ -3974,6 +4004,78 @@ def main(argv: Sequence[str] | None = None) -> int:
                     return 0
             except (ValueError, KeyError) as exc:
                 print(f"Erro MAPA ZARC: {exc}", file=sys.stderr)
+                return 1
+
+        elif args.command == "basedosdados":
+            from public_data_gateway.connectors.agregadores.basedosdados_bq.connector import (
+                BaseDosDadosBqConnector,
+            )
+
+            bd_conn = BaseDosDadosBqConnector()
+            bd_action = getattr(args, "basedosdados_action", "")
+            try:
+                if bd_action == "coverage":
+                    res = bd_conn.get_bd_coverage(args.id_municipio)
+                    if getattr(args, "json", False):
+                        print(json.dumps(res, indent=2, ensure_ascii=False, default=str))
+                    else:
+                        print(f"Base dos Dados Cobertura ({res.get('nome_municipio')} - {res.get('id_municipio')}):")
+                        print(f"  Datasets: {res.get('qtd_datasets_tratados_bd')} | Tabelas BQ: {res.get('qtd_tabelas_bigquery_municipio')} | Completude IBGE: {res.get('completude_chaves_ibge_pct')}%")
+                    return 0
+
+                if bd_action == "datasets":
+                    rows = bd_conn.list_bd_datasets(
+                        args.id_municipio,
+                        dataset_bd_id=getattr(args, "dataset", None),
+                    )
+                    if getattr(args, "json", False):
+                        print(json.dumps(rows, indent=2, ensure_ascii=False, default=str))
+                    else:
+                        print(f"Base dos Dados Datasets ({len(rows)} temas):")
+                        for r in rows:
+                            print(f"  {r.get('dataset_bd_id')}: {r.get('qtd_registros_municipio')} regs | Completude={r.get('completude_colunas_pct')}%")
+                    return 0
+
+                if bd_action == "governance":
+                    res = bd_conn.get_bd_governance(args.id_municipio)
+                    if getattr(args, "json", False):
+                        print(json.dumps(res, indent=2, ensure_ascii=False, default=str))
+                    else:
+                        print(f"Base dos Dados Governança ({res.get('nome_municipio')} - {res.get('id_municipio')}):")
+                        print(f"  Dicionário: {res.get('dicionario_padronizado_pct')}% | Chaves Canônicas: {res.get('conformidade_chaves_canonicas_pct')}%")
+                    return 0
+
+                if bd_action == "consumption":
+                    res = bd_conn.get_bd_consumption(args.id_municipio)
+                    if getattr(args, "json", False):
+                        print(json.dumps(res, indent=2, ensure_ascii=False, default=str))
+                    else:
+                        print(f"Base dos Dados Consumo SQL ({res.get('nome_municipio')} - {res.get('id_municipio')}):")
+                        print(f"  Consultas/mês: {res.get('consultas_bigquery_mensais')} | Particionamento: {res.get('eficiencia_particionamento_pct')}%")
+                    return 0
+
+                if bd_action == "features":
+                    res = bd_conn.get_bd_features(args.id_municipio)
+                    if getattr(args, "json", False):
+                        print(json.dumps(res, indent=2, ensure_ascii=False, default=str))
+                    else:
+                        print(f"Base dos Dados Gold ({res.get('nome_municipio')} - {res.get('id_municipio')}):")
+                        print(f"  Score: {res.get('score_maturidade_bd')} | Tier: {res.get('tier_maturidade_bd')}")
+                    return 0
+
+                if bd_action == "ranking":
+                    ranks = bd_conn.list_top_bd_municipalities(
+                        limit=getattr(args, "limit", 10), sigla_uf=getattr(args, "uf", None)
+                    )
+                    if getattr(args, "json", False):
+                        print(json.dumps(ranks, indent=2, ensure_ascii=False, default=str))
+                    else:
+                        print(f"Top {len(ranks)} Municípios Base dos Dados:")
+                        for idx, r in enumerate(ranks, 1):
+                            print(f"  {idx}. {r.get('nome_municipio')} ({r.get('sigla_uf')}): {r.get('score_maturidade_bd')} | {r.get('tier_maturidade_bd')}")
+                    return 0
+            except (ValueError, KeyError) as exc:
+                print(f"Erro Base dos Dados: {exc}", file=sys.stderr)
                 return 1
 
         elif args.command == "onr":

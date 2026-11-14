@@ -1,0 +1,147 @@
+version: 2
+
+models:
+  - name: stg_bd_datalake_cobertura
+    description: "Staging view de cobertura municipal de datasets e tabelas tratadas na Base dos Dados."
+    columns:
+      - name: id_municipio
+        description: "Código IBGE de 7 dígitos do município (STRING)."
+        tests: [not_null, unique]
+      - name: nome_municipio
+        description: "Nome oficial do município."
+        tests: [not_null]
+      - name: sigla_uf
+        description: "Sigla da Unidade da Federação (UF)."
+        tests: [not_null]
+      - name: id_uf
+        description: "Código IBGE da UF (STRING)."
+        tests: [not_null]
+      - name: regiao
+        description: "Macrorregião geográfica brasileira."
+        tests: [not_null]
+      - name: qtd_datasets_tratados_bd
+        description: "Quantidade de datasets tratados disponíveis para o município."
+        tests: [not_null]
+      - name: qtd_tabelas_bigquery_municipio
+        description: "Quantidade de tabelas BigQuery com recorte municipal."
+        tests: [not_null]
+      - name: completude_chaves_ibge_pct
+        description: "Completude percentual de chaves canônicas IBGE (%)."
+        tests: [not_null]
+      - name: taxa_atualizacao_mensal_pct
+        description: "Taxa de atualização mensal das tabelas tratadas (%)."
+        tests: [not_null]
+      - name: indice_cobertura_datalake_bd
+        description: "Subíndice sintético de cobertura do datalake Base dos Dados (0-100)."
+        tests: [not_null]
+      - name: reference_date
+        description: "Data de referência ISO-8601 (YYYY-MM-DD)."
+        tests: [not_null]
+
+  - name: stg_bd_datasets_tema
+    description: "Staging view de datasets públicos tratados por tema (IBGE, RAIS/CAGED, INEP, MapBiomas)."
+    columns:
+      - name: id_municipio
+        description: "Código IBGE de 7 dígitos do município (STRING)."
+        tests: [not_null]
+      - name: nome_municipio
+        description: "Nome oficial do município."
+        tests: [not_null]
+      - name: sigla_uf
+        description: "Sigla da Unidade da Federação (UF)."
+        tests: [not_null]
+      - name: id_uf
+        description: "Código IBGE da UF (STRING)."
+        tests: [not_null]
+      - name: regiao
+        description: "Macrorregião geográfica brasileira."
+        tests: [not_null]
+      - name: dataset_bd_id
+        description: "Identificador oficial do dataset na Base dos Dados."
+        tests: [not_null]
+      - name: qtd_registros_municipio
+        description: "Quantidade de registros municipais no dataset temático."
+        tests: [not_null]
+      - name: completude_colunas_pct
+        description: "Completude média das colunas do dataset para o município (%)."
+        tests: [not_null]
+      - name: latencia_atualizacao_dias
+        description: "Latência média de atualização do dataset em dias."
+        tests: [not_null]
+      - name: elegivel_join_federado_pct
+        description: "Elegibilidade percentual para join federado por chave canônica (%)."
+        tests: [not_null]
+      - name: reference_date
+        description: "Data de referência ISO-8601 (YYYY-MM-DD)."
+        tests: [not_null]
+
+  - name: stg_bd_governanca_metadados
+    description: "Staging view de governança de dicionários, chaves canônicas e disponibilidade BigQuery SQL."
+    columns:
+      - name: id_municipio
+        description: "Código IBGE de 7 dígitos do município (STRING)."
+        tests: [not_null, unique]
+      - name: nome_municipio
+        description: "Nome oficial do município."
+        tests: [not_null]
+      - name: sigla_uf
+        description: "Sigla da Unidade da Federação (UF)."
+        tests: [not_null]
+      - name: id_uf
+        description: "Código IBGE da UF (STRING)."
+        tests: [not_null]
+      - name: regiao
+        description: "Macrorregião geográfica brasileira."
+        tests: [not_null]
+      - name: dicionario_padronizado_pct
+        description: "Percentual de variáveis com dicionário padronizado (%)."
+        tests: [not_null]
+      - name: conformidade_chaves_canonicas_pct
+        description: "Conformidade de chaves canônicas STRING (IBGE, CNPJ, CEP) (%)."
+        tests: [not_null]
+      - name: disponibilidade_bq_sql_pct
+        description: "Disponibilidade SLA para consultas BigQuery SQL (%)."
+        tests: [not_null]
+      - name: indice_governanca_bd
+        description: "Subíndice sintético de governança de metadados Base dos Dados (0-100)."
+        tests: [not_null]
+      - name: reference_date
+        description: "Data de referência ISO-8601 (YYYY-MM-DD)."
+        tests: [not_null]
+
+  - name: stg_bd_consumo_federado
+    description: "Staging view de consultas BigQuery, particionamento e reuso cross-domain."
+    columns:
+      - name: id_municipio
+        description: "Código IBGE de 7 dígitos do município (STRING)."
+        tests: [not_null, unique]
+      - name: nome_municipio
+        description: "Nome oficial do município."
+        tests: [not_null]
+      - name: sigla_uf
+        description: "Sigla da Unidade da Federação (UF)."
+        tests: [not_null]
+      - name: id_uf
+        description: "Código IBGE da UF (STRING)."
+        tests: [not_null]
+      - name: regiao
+        description: "Macrorregião geográfica brasileira."
+        tests: [not_null]
+      - name: consultas_bigquery_mensais
+        description: "Volume mensal de consultas BigQuery filtrando o município."
+        tests: [not_null]
+      - name: eficiencia_particionamento_pct
+        description: "Eficiência de particionamento e clustering nas tabelas consultadas (%)."
+        tests: [not_null]
+      - name: custo_medio_scan_mb
+        description: "Volume médio escaneado por consulta federada em MB."
+        tests: [not_null]
+      - name: taxa_reuso_cross_domain_pct
+        description: "Taxa de reuso em joins analíticos cross-domain (%)."
+        tests: [not_null]
+      - name: indice_eficiencia_federada_bd
+        description: "Subíndice sintético de eficiência federada Base dos Dados (0-100)."
+        tests: [not_null]
+      - name: reference_date
+        description: "Data de referência ISO-8601 (YYYY-MM-DD)."
+        tests: [not_null]
