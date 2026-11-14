@@ -1,0 +1,10 @@
+version: 2
+
+sources:
+  - name: overpass_osm
+    description: "OpenStreetMap Overpass API urban POI density counts."
+    meta:
+      external_location: "data/overpass_osm/silver/{name}.parquet"
+    tables:
+      - name: osm_poi_counts
+        description: "Normalized OSM POI radius counts by municipality."

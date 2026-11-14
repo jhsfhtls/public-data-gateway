@@ -1,0 +1,10 @@
+version: 2
+
+sources:
+  - name: open_meteo
+    description: "Open-Meteo daily weather forecast and historical climate variables."
+    meta:
+      external_location: "data/open_meteo/silver/{name}.parquet"
+    tables:
+      - name: open_meteo_daily
+        description: "Normalized daily weather observations per municipality."

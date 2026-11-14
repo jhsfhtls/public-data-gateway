@@ -1,0 +1,50 @@
+version: 2
+
+models:
+  - name: stg_open_meteo_daily
+    description: "Staging view for Open-Meteo daily weather variables."
+    columns:
+      - name: id_municipio
+        description: "7-digit IBGE municipality code."
+        tests: [not_null]
+      - name: sigla_uf
+        description: "Federative Unit abbreviation."
+        tests: [not_null]
+      - name: forecast_date
+        description: "ISO-8601 forecast or observation date."
+        tests: [not_null]
+      - name: temp_max_c
+        description: "Daily maximum 2m temperature in Celsius."
+        tests: [not_null]
+      - name: temp_min_c
+        description: "Daily minimum 2m temperature in Celsius."
+        tests: [not_null]
+      - name: precipitation_mm
+        description: "Daily total precipitation in millimeters."
+      - name: extracted_at
+        description: "UTC ISO-8601 extraction timestamp."
+
+  - name: fct_open_meteo_clima_municipio
+    description: "Intradomain fact table of municipal daily weather and thermal amplitude."
+    columns:
+      - name: id_municipio
+        description: "7-digit IBGE municipality code."
+        tests: [not_null]
+      - name: sigla_uf
+        description: "Federative Unit abbreviation."
+        tests: [not_null]
+      - name: forecast_date
+        description: "ISO-8601 forecast date."
+        tests: [not_null]
+      - name: temp_max_c
+        description: "Daily maximum temperature in Celsius."
+        tests: [not_null]
+      - name: temp_min_c
+        description: "Daily minimum temperature in Celsius."
+        tests: [not_null]
+      - name: amplitude_termica_c
+        description: "Daily thermal amplitude (max minus min temperature)."
+      - name: precipitation_mm
+        description: "Daily total precipitation in millimeters."
+      - name: extracted_at
+        description: "UTC ISO-8601 extraction timestamp."

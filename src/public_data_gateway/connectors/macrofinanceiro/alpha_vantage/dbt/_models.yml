@@ -1,0 +1,52 @@
+version: 2
+
+models:
+  - name: stg_alpha_vantage_daily
+    description: "Staging view for Alpha Vantage daily OHLCV market series."
+    columns:
+      - name: symbol
+        description: "Ticker symbol (e.g., EWZ, PETR4.SA)."
+        tests: [not_null]
+      - name: trade_date
+        description: "ISO-8601 trading date."
+        tests: [not_null]
+      - name: open_price
+        description: "Session opening price."
+        tests: [not_null]
+      - name: high_price
+        description: "Session high price."
+      - name: low_price
+        description: "Session low price."
+      - name: close_price
+        description: "Session closing price."
+        tests: [not_null]
+      - name: volume
+        description: "Traded share volume."
+      - name: extracted_at
+        description: "UTC ISO-8601 extraction timestamp."
+
+  - name: fct_alpha_vantage_series
+    description: "Intradomain fact table of Alpha Vantage daily financial time series."
+    columns:
+      - name: symbol
+        description: "Ticker symbol."
+        tests: [not_null]
+      - name: trade_date
+        description: "ISO-8601 trading date."
+        tests: [not_null]
+      - name: open_price
+        description: "Session opening price."
+        tests: [not_null]
+      - name: high_price
+        description: "Session high price."
+      - name: low_price
+        description: "Session low price."
+      - name: close_price
+        description: "Session closing price."
+        tests: [not_null]
+      - name: intraday_return_abs
+        description: "Close minus open intraday price delta."
+      - name: volume
+        description: "Traded share volume."
+      - name: extracted_at
+        description: "UTC ISO-8601 extraction timestamp."

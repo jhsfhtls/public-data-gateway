@@ -2068,6 +2068,88 @@ class PublicApisHubFacade:
             return conn.extract_table(indicator=indicator, top=top).to_pylist()
         return conn.normalize_records(conn.fetch_indicator(indicator=indicator, top=top), indicator=indicator)
 
+    def fetch_open_meteo_forecast(
+        self,
+        lat: float = -23.5505,
+        lon: float = -46.6333,
+        *,
+        persist: bool = False,
+    ) -> list[dict[str, Any]]:
+        """Fetch Open-Meteo daily forecast via Medallion connector."""
+        from public_data_gateway.connectors.ambiental.open_meteo import OpenMeteoConnector
+
+        conn = OpenMeteoConnector(settings=self._sdk.settings)
+        if persist:
+            return conn.extract_table().to_pylist()
+        return conn.normalize_records(conn.fetch_forecast(lat=lat, lon=lon))
+
+    def fetch_nasa_power_daily(
+        self,
+        lat: float = -23.5505,
+        lon: float = -46.6333,
+        *,
+        start: str = "20261101",
+        end: str = "20261105",
+        persist: bool = False,
+    ) -> list[dict[str, Any]]:
+        """Fetch NASA POWER daily agro-climate data via Medallion connector."""
+        from public_data_gateway.connectors.ambiental.nasa_power import NasaPowerConnector
+
+        conn = NasaPowerConnector(settings=self._sdk.settings)
+        if persist:
+            return conn.extract_table().to_pylist()
+        return conn.normalize_records(conn.fetch_daily(lat=lat, lon=lon, start=start, end=end))
+
+    def fetch_elevation(
+        self,
+        lat: float = -23.5505,
+        lon: float = -46.6333,
+        *,
+        persist: bool = False,
+    ) -> dict[str, Any]:
+        """Fetch SRTM terrain elevation via Medallion Open-Elevation connector."""
+        from public_data_gateway.connectors.geografico.open_elevation import OpenElevationConnector
+
+        conn = OpenElevationConnector(settings=self._sdk.settings)
+        if persist:
+            return conn.extract_table().to_pylist()[0]
+        return conn.fetch_elevation(lat=lat, lon=lon)
+
+    def run_hf_inference(self, model: str, inputs: str) -> list[dict[str, Any]]:
+        """Run Hugging Face Inference via Medallion connector."""
+        from public_data_gateway.connectors.agregadores.huggingface_inference import (
+            HuggingFaceInferenceConnector,
+        )
+
+        conn = HuggingFaceInferenceConnector(settings=self._sdk.settings)
+        return conn.normalize_records(conn.run_inference(model=model, inputs=inputs), model_id=model, inputs=inputs)
+
+    def fetch_alpha_vantage_daily(self, symbol: str = "EWZ") -> list[dict[str, Any]]:
+        """Fetch Alpha Vantage daily series via Medallion connector."""
+        from public_data_gateway.connectors.macrofinanceiro.alpha_vantage import (
+            AlphaVantageConnector,
+        )
+
+        conn = AlphaVantageConnector(settings=self._sdk.settings)
+        return conn.normalize_records(conn.fetch_daily(symbol=symbol), symbol=symbol)
+
+    def fetch_nasa_apod(self, date: str | None = None, *, persist: bool = False) -> list[dict[str, Any]]:
+        """Fetch NASA APOD asset metadata via Medallion connector."""
+        from public_data_gateway.connectors.agregadores.nasa_youtube_open_ml import (
+            NasaYoutubeOpenMlConnector,
+        )
+
+        conn = NasaYoutubeOpenMlConnector(settings=self._sdk.settings)
+        if persist:
+            return conn.extract_table().to_pylist()
+        return conn.normalize_records(conn.fetch_nasa_apod(date=date))
+
+    def describe_upgini_features(self) -> dict[str, Any]:
+        """Describe Upgini public ML feature groups via Medallion connector."""
+        from public_data_gateway.connectors.agregadores.upgini_adapter import UpginiAdapterConnector
+
+        return UpginiAdapterConnector(settings=self._sdk.settings).describe_features()
+
 
 class BrazilData:
     """Unified developer SDK facade for querying, normalizing, and enriching Brazilian public datasets."""

@@ -1,0 +1,58 @@
+version: 2
+
+models:
+  - name: stg_overpass_osm_pois
+    description: "Staging view for OpenStreetMap Overpass POI counts."
+    columns:
+      - name: id_municipio
+        description: "7-digit IBGE municipality code."
+        tests: [not_null]
+      - name: sigla_uf
+        description: "Federative Unit abbreviation."
+        tests: [not_null]
+      - name: lat
+        description: "Anchor latitude."
+      - name: lon
+        description: "Anchor longitude."
+      - name: amenity
+        description: "OpenStreetMap amenity tag."
+        tests: [not_null]
+      - name: radius_m
+        description: "Search radius in meters."
+      - name: total_pois
+        description: "Total count of POIs within radius."
+        tests: [not_null]
+      - name: nodes
+        description: "Count of OSM node features."
+      - name: ways
+        description: "Count of OSM way features."
+      - name: extracted_at
+        description: "UTC ISO-8601 extraction timestamp."
+
+  - name: fct_osm_pois_municipio
+    description: "Intradomain fact table of municipal urban POI density via Overpass OSM."
+    columns:
+      - name: id_municipio
+        description: "7-digit IBGE municipality code."
+        tests: [not_null]
+      - name: sigla_uf
+        description: "Federative Unit abbreviation."
+        tests: [not_null]
+      - name: lat
+        description: "Anchor latitude."
+      - name: lon
+        description: "Anchor longitude."
+      - name: amenity
+        description: "OpenStreetMap amenity tag."
+        tests: [not_null]
+      - name: radius_m
+        description: "Search radius in meters."
+      - name: total_pois
+        description: "Total count of POIs within radius."
+        tests: [not_null]
+      - name: nodes
+        description: "Count of OSM node features."
+      - name: ways
+        description: "Count of OSM way features."
+      - name: extracted_at
+        description: "UTC ISO-8601 extraction timestamp."

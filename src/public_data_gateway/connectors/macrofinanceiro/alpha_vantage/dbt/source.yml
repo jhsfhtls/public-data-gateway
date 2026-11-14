@@ -1,0 +1,10 @@
+version: 2
+
+sources:
+  - name: alpha_vantage
+    description: "Alpha Vantage daily OHLCV financial time series."
+    meta:
+      external_location: "data/alpha_vantage/silver/{name}.parquet"
+    tables:
+      - name: alpha_vantage_daily
+        description: "Normalized Alpha Vantage daily OHLCV quotes."

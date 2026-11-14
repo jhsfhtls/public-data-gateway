@@ -286,6 +286,8 @@ apis:
   - P01
   gateway_method: count_osm_pois_radius
   status: HOMOLOGATED
+  medallion_parity: true
+  connector_id: overpass_osm
   notes: Contagem espacial de POIs (escolas, farmacias, bancos, paradas) em raio de coordenada.
 - api_id: osrm_routing
   name: OSRM (Open Source Routing Machine)
@@ -299,6 +301,8 @@ apis:
   - P09
   gateway_method: compute_osrm_route
   status: HOMOLOGATED
+  medallion_parity: true
+  connector_id: osrm_routing
   notes: Distancia viaria real (km) e tempo de deslocamento entre coordenadas (supera Haversine).
 - api_id: open_meteo
   name: Open-Meteo Historical & Forecast
@@ -312,6 +316,8 @@ apis:
   - P09
   gateway_method: fetch_open_meteo_forecast
   status: HOMOLOGATED
+  medallion_parity: true
+  connector_id: open_meteo
   notes: Variaveis exogenas de clima horarias e historicas para modelos de previsao de demanda.
 - api_id: nasa_power
   name: NASA POWER API
@@ -325,6 +331,8 @@ apis:
   - P01
   gateway_method: fetch_nasa_power_daily
   status: HOMOLOGATED
+  medallion_parity: true
+  connector_id: nasa_power
   notes: Radiacao solar, precipitacao, umidade e temperatura para modelos de agro e energia.
 - api_id: open_elevation
   name: Open-Elevation / OpenTopoData (SRTM)
@@ -338,6 +346,8 @@ apis:
   - P09
   gateway_method: fetch_elevation
   status: HOMOLOGATED
+  medallion_parity: true
+  connector_id: open_elevation
   notes: Altitude exata do terreno por lat/lon para risco de alagamento, logistica e engenharia.
 - api_id: huggingface_inference
   name: Hugging Face Inference API
@@ -350,6 +360,8 @@ apis:
   - P02
   gateway_method: run_hf_inference
   status: HOMOLOGATED
+  medallion_parity: true
+  connector_id: huggingface_inference
   notes: Embeddings, NER e analise de sentimento via HTTP sem gerenciar GPUs (HF_TOKEN).
 - api_id: alpha_vantage
   name: Alpha Vantage
@@ -362,6 +374,8 @@ apis:
   - P05
   gateway_method: fetch_alpha_vantage_daily
   status: HOMOLOGATED
+  medallion_parity: true
+  connector_id: alpha_vantage
   notes: Series temporais financeiras e indicadores tecnicos (ALPHA_VANTAGE_API_KEY).
 - api_id: nasa_youtube_open_ml
   name: NASA Open APIs & YouTube Data (NLP / Visao)
@@ -374,6 +388,8 @@ apis:
   - P02
   gateway_method: fetch_nasa_apod
   status: HOMOLOGATED
+  medallion_parity: true
+  connector_id: nasa_youtube_open_ml
   notes: Imagens astronomicas/satelite (DEMO_KEY padrao) e datasets de NLP.
 - api_id: upgini_adapter
   name: Upgini Public Feature Enrichment
@@ -387,6 +403,8 @@ apis:
   - P09
   gateway_method: describe_upgini_features
   status: HOMOLOGATED
+  medallion_parity: true
+  connector_id: upgini_adapter
   notes: Catalogo de features publicas automatizadas integravel a pipelines tabular ML.
 - api_id: rest_countries
   name: REST Countries v3.1

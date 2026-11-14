@@ -3072,4 +3072,66 @@ def create_app(settings: GatewaySettings | None = None) -> FastAPI:
         rows = conn.normalize_records(conn.fetch_indicator(indicator=indicator, top=top), indicator=indicator)
         return {"source_id": "who_gho_odata", "indicator": indicator, "count": len(rows), "records": rows}
 
+    @app.get("/api/v1/public-apis/spatial/osrm-route")
+    async def get_osrm_route(
+        lat1: float = Query(...),
+        lon1: float = Query(...),
+        lat2: float = Query(...),
+        lon2: float = Query(...),
+        profile: str = Query("driving"),
+    ) -> dict[str, Any]:
+        from public_data_gateway.connectors.geografico.osrm_routing import OsrmRoutingConnector
+
+        conn = OsrmRoutingConnector(settings=app_settings)
+        return conn.compute_route(lat1, lon1, lat2, lon2, profile=profile)
+
+    @app.get("/api/v1/public-apis/climate/open-meteo")
+    async def get_open_meteo(
+        lat: float = Query(-23.5505),
+        lon: float = Query(-46.6333),
+    ) -> dict[str, Any]:
+        from public_data_gateway.connectors.ambiental.open_meteo import OpenMeteoConnector
+
+        conn = OpenMeteoConnector(settings=app_settings)
+        rows = conn.normalize_records(conn.fetch_forecast(lat=lat, lon=lon))
+        return {"source_id": "open_meteo", "count": len(rows), "records": rows}
+
+    @app.get("/api/v1/public-apis/climate/nasa-power")
+    async def get_nasa_power(
+        lat: float = Query(-23.5505),
+        lon: float = Query(-46.6333),
+        start: str = Query("20261101"),
+        end: str = Query("20261105"),
+    ) -> dict[str, Any]:
+        from public_data_gateway.connectors.ambiental.nasa_power import NasaPowerConnector
+
+        conn = NasaPowerConnector(settings=app_settings)
+        rows = conn.normalize_records(conn.fetch_daily(lat=lat, lon=lon, start=start, end=end))
+        return {"source_id": "nasa_power", "count": len(rows), "records": rows}
+
+    @app.get("/api/v1/public-apis/spatial/elevation")
+    async def get_open_elevation(
+        lat: float = Query(-23.5505),
+        lon: float = Query(-46.6333),
+    ) -> dict[str, Any]:
+        from public_data_gateway.connectors.geografico.open_elevation import OpenElevationConnector
+
+        return OpenElevationConnector(settings=app_settings).fetch_elevation(lat=lat, lon=lon)
+
+    @app.get("/api/v1/public-apis/ml/nasa-apod")
+    async def get_nasa_apod(date: str | None = Query(None)) -> dict[str, Any]:
+        from public_data_gateway.connectors.agregadores.nasa_youtube_open_ml import (
+            NasaYoutubeOpenMlConnector,
+        )
+
+        conn = NasaYoutubeOpenMlConnector(settings=app_settings)
+        rows = conn.normalize_records(conn.fetch_nasa_apod(date=date))
+        return {"source_id": "nasa_youtube_open_ml", "count": len(rows), "records": rows}
+
+    @app.get("/api/v1/public-apis/ml/upgini-features")
+    async def get_upgini_features() -> dict[str, Any]:
+        from public_data_gateway.connectors.agregadores.upgini_adapter import UpginiAdapterConnector
+
+        return UpginiAdapterConnector(settings=app_settings).describe_features()
+
     return app

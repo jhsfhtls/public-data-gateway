@@ -1,0 +1,38 @@
+contract_id: nasa-power-v1
+source_id: nasa_power
+version: "1.0.0"
+grain: "id_municipio x obs_date"
+primary_keys:
+  - id_municipio
+  - obs_date
+reference_date_column: obs_date
+lgpd_legal_basis: "Dados agroclimaticos abertos de satelite (NASA POWER)"
+min_expected_rows: 1
+max_volume_drop_pct: 50.0
+sentinel_values:
+  - "-1"
+  - "-999"
+  - "999999"
+  - "N/A"
+columns:
+  - name: id_municipio
+    data_type: STRING
+    nullable: false
+  - name: sigla_uf
+    data_type: STRING
+    nullable: false
+  - name: obs_date
+    data_type: STRING
+    nullable: false
+  - name: solar_radiation_kwh_m2
+    data_type: DOUBLE
+    nullable: false
+  - name: precipitation_mm
+    data_type: DOUBLE
+    nullable: true
+  - name: temp_2m_c
+    data_type: DOUBLE
+    nullable: false
+  - name: extracted_at
+    data_type: STRING
+    nullable: false

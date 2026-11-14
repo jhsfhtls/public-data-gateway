@@ -1,0 +1,10 @@
+version: 2
+
+sources:
+  - name: osrm_routing
+    description: "OSRM Open Source Routing Machine road distance and duration."
+    meta:
+      external_location: "data/osrm_routing/silver/{name}.parquet"
+    tables:
+      - name: osrm_routes
+        description: "Normalized OSRM inter-municipal road routes."

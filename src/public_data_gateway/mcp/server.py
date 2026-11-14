@@ -2075,6 +2075,60 @@ class MCPDispatcher:
                                 },
                             },
                             {
+                                "name": "bdg_compute_osrm_route",
+                                "description": "Compute real road distance (km) and travel duration (min) via OSRM.",
+                                "inputSchema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "lat1": {"type": "number"},
+                                        "lon1": {"type": "number"},
+                                        "lat2": {"type": "number"},
+                                        "lon2": {"type": "number"},
+                                    },
+                                    "required": ["lat1", "lon1", "lat2", "lon2"],
+                                },
+                            },
+                            {
+                                "name": "bdg_fetch_open_meteo_forecast",
+                                "description": "Fetch Open-Meteo daily weather forecast variables.",
+                                "inputSchema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "lat": {"type": "number"},
+                                        "lon": {"type": "number"},
+                                    },
+                                },
+                            },
+                            {
+                                "name": "bdg_fetch_nasa_power_daily",
+                                "description": "Fetch NASA POWER solar radiation and agro-climate variables.",
+                                "inputSchema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "lat": {"type": "number"},
+                                        "lon": {"type": "number"},
+                                        "start": {"type": "string"},
+                                        "end": {"type": "string"},
+                                    },
+                                },
+                            },
+                            {
+                                "name": "bdg_fetch_elevation",
+                                "description": "Fetch SRTM terrain altitude in meters via Open-Elevation.",
+                                "inputSchema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "lat": {"type": "number"},
+                                        "lon": {"type": "number"},
+                                    },
+                                },
+                            },
+                            {
+                                "name": "bdg_describe_upgini_features",
+                                "description": "Describe Upgini public ML feature groups.",
+                                "inputSchema": {"type": "object", "properties": {}},
+                            },
+                            {
                                 "name": "bdg_get_onr_property_registry",
                                 "description": "Get official ONR SREI municipal active property registry CNM stock, digital conversion rate, and online certificate emissions.",
                                 "inputSchema": {
@@ -4926,6 +4980,37 @@ class MCPDispatcher:
                     indicator=str(args.get("indicator", "WHOSIS_000001")).strip(),
                     top=int(args.get("top", 10)),
                 ),
+            ),
+            "bdg_compute_osrm_route": (
+                "osrm_routing",
+                lambda sdk: sdk.public_apis.compute_osrm_route(
+                    float(args["lat1"]), float(args["lon1"]), float(args["lat2"]), float(args["lon2"])
+                ),
+            ),
+            "bdg_fetch_open_meteo_forecast": (
+                "open_meteo",
+                lambda sdk: sdk.public_apis.fetch_open_meteo_forecast(
+                    lat=float(args.get("lat", -23.5505)), lon=float(args.get("lon", -46.6333))
+                ),
+            ),
+            "bdg_fetch_nasa_power_daily": (
+                "nasa_power",
+                lambda sdk: sdk.public_apis.fetch_nasa_power_daily(
+                    lat=float(args.get("lat", -23.5505)),
+                    lon=float(args.get("lon", -46.6333)),
+                    start=str(args.get("start", "20261101")),
+                    end=str(args.get("end", "20261105")),
+                ),
+            ),
+            "bdg_fetch_elevation": (
+                "open_elevation",
+                lambda sdk: sdk.public_apis.fetch_elevation(
+                    lat=float(args.get("lat", -23.5505)), lon=float(args.get("lon", -46.6333))
+                ),
+            ),
+            "bdg_describe_upgini_features": (
+                "upgini_adapter",
+                lambda sdk: sdk.public_apis.describe_upgini_features(),
             ),
         }
         if tool_name in wave10_5a_handlers:

@@ -1,0 +1,40 @@
+version: 2
+
+models:
+  - name: stg_open_elevation_points
+    description: "Staging view for Open-Elevation SRTM municipal altitudes."
+    columns:
+      - name: id_municipio
+        description: "7-digit IBGE municipality code."
+        tests: [not_null]
+      - name: sigla_uf
+        description: "Federative Unit abbreviation."
+        tests: [not_null]
+      - name: lat
+        description: "Centroid latitude."
+      - name: lon
+        description: "Centroid longitude."
+      - name: elevation_m
+        description: "Terrain elevation above sea level in meters."
+        tests: [not_null]
+      - name: extracted_at
+        description: "UTC ISO-8601 extraction timestamp."
+
+  - name: dim_elevacao_terreno_municipio
+    description: "Intradomain dimension table of municipal terrain elevation (SRTM)."
+    columns:
+      - name: id_municipio
+        description: "7-digit IBGE municipality code."
+        tests: [not_null, unique]
+      - name: sigla_uf
+        description: "Federative Unit abbreviation."
+        tests: [not_null]
+      - name: lat
+        description: "Centroid latitude."
+      - name: lon
+        description: "Centroid longitude."
+      - name: elevation_m
+        description: "Terrain elevation above sea level in meters."
+        tests: [not_null]
+      - name: extracted_at
+        description: "UTC ISO-8601 extraction timestamp."

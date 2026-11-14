@@ -1,0 +1,36 @@
+version: 2
+
+models:
+  - name: stg_upgini_adapter_features
+    description: "Staging view for Upgini public ML feature enrichment catalog."
+    columns:
+      - name: feature_group_id
+        description: "Unique identifier of the public ML feature group."
+        tests: [not_null]
+      - name: provider
+        description: "Feature enrichment provider name."
+      - name: domain
+        description: "Business/data domain."
+      - name: coverage_scope
+        description: "Geographic coverage scope."
+      - name: status
+        description: "Catalog activation status."
+      - name: extracted_at
+        description: "UTC ISO-8601 extraction timestamp."
+
+  - name: dim_upgini_feature_groups
+    description: "Intradomain dimension table of Upgini public ML feature groups."
+    columns:
+      - name: feature_group_id
+        description: "Unique identifier of the public ML feature group."
+        tests: [not_null, unique]
+      - name: provider
+        description: "Feature enrichment provider name."
+      - name: domain
+        description: "Business/data domain."
+      - name: coverage_scope
+        description: "Geographic coverage scope."
+      - name: status
+        description: "Catalog activation status."
+      - name: extracted_at
+        description: "UTC ISO-8601 extraction timestamp."

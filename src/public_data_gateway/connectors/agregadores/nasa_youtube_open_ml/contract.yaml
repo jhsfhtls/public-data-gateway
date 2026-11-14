@@ -1,0 +1,31 @@
+contract_id: nasa-youtube-open-ml-v1
+source_id: nasa_youtube_open_ml
+version: "1.0.0"
+grain: "apod_date"
+primary_keys:
+  - apod_date
+reference_date_column: apod_date
+lgpd_legal_basis: "Dados cientificos e de visao computacional abertos (NASA Open APIs)"
+min_expected_rows: 1
+max_volume_drop_pct: 50.0
+sentinel_values:
+  - "-1"
+  - "-999"
+  - "999999"
+  - "N/A"
+columns:
+  - name: apod_date
+    data_type: STRING
+    nullable: false
+  - name: title
+    data_type: STRING
+    nullable: false
+  - name: media_type
+    data_type: STRING
+    nullable: false
+  - name: url
+    data_type: STRING
+    nullable: true
+  - name: extracted_at
+    data_type: STRING
+    nullable: false

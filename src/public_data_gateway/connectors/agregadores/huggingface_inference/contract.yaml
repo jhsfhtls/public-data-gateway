@@ -1,0 +1,35 @@
+contract_id: huggingface-inference-v1
+source_id: huggingface_inference
+version: "1.0.0"
+grain: "model_id x input_hash"
+primary_keys:
+  - model_id
+  - input_hash
+reference_date_column: extracted_at
+lgpd_legal_basis: "Sinais NLP publicos agregados sem dados pessoais (Hugging Face Hub)"
+min_expected_rows: 1
+max_volume_drop_pct: 50.0
+sentinel_values:
+  - "-1"
+  - "-999"
+  - "999999"
+  - "N/A"
+columns:
+  - name: model_id
+    data_type: STRING
+    nullable: false
+  - name: input_hash
+    data_type: STRING
+    nullable: false
+  - name: task_type
+    data_type: STRING
+    nullable: false
+  - name: top_label
+    data_type: STRING
+    nullable: false
+  - name: top_score
+    data_type: DOUBLE
+    nullable: false
+  - name: extracted_at
+    data_type: STRING
+    nullable: false

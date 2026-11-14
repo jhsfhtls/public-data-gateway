@@ -641,6 +641,12 @@
       "phase_id": "10.5",
       "milestone": "Conclusão da Wave 10.5A — Padronização Medallion 11-Gates das 7 APIs do Bloco 2",
       "summary": "Elevação completa dos 7 conectores do Bloco 2 (ipeadata_odata, brapi_b3, awesomeapi_fx, aneel_anp_ckan, camara_senado_dados_abertos, world_bank_v2 e who_gho_odata) ao padrão 11-Gates sobre a base compartilhada PublicApiMedallionConnector: contratos ODCS v3.1 (contract.yaml), persistência isolada Bronze/Silver/Gold/Quarantine com Parquet ZSTD + SHA-256, 7 staging views (stg_*) + 7 modelos intradomínio (fct_*/dim_*) + cross-domain mart_cross_domain_global_macro_saude_brasil, paridade nas 4 interfaces (SDK, FastAPI, CLI e MCP com wrap_untrusted_gov_data), testes offline determinísticos e testes live 1-linha."
+    },
+    {
+      "date": "2026-11-14",
+      "phase_id": "10.5",
+      "milestone": "Conclusão da Wave 10.5B — Padronização Medallion 11-Gates das 9 APIs Espaciais, Clima & ML do Bloco 3",
+      "summary": "Elevação completa dos 9 conectores do Bloco 3 (overpass_osm, osrm_routing, open_meteo, nasa_power, open_elevation, huggingface_inference, alpha_vantage, nasa_youtube_open_ml e upgini_adapter) ao padrão 11-Gates: contratos ODCS v3.1, persistência isolada Bronze/Silver/Gold/Quarantine com Parquet ZSTD + SHA-256, 9 staging views (stg_*) + 9 modelos intradomínio (fct_*/dim_*) + cross-domain mart_cross_domain_espacial_clima_ml_brasil, paridade nas 4 interfaces (SDK, FastAPI, CLI e MCP), testes offline determinísticos e testes live 1-linha."
     }
   ]
 }

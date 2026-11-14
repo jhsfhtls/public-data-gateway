@@ -1,0 +1,10 @@
+version: 2
+
+sources:
+  - name: upgini_adapter
+    description: "Upgini automated public ML feature enrichment adapter."
+    meta:
+      external_location: "data/upgini_adapter/silver/{name}.parquet"
+    tables:
+      - name: upgini_feature_catalog
+        description: "Catalog of public ML feature groups exposed by Upgini."

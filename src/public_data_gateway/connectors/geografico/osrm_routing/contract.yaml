@@ -1,0 +1,39 @@
+contract_id: osrm-routing-v1
+source_id: osrm_routing
+version: "1.0.0"
+grain: "origin_municipio x dest_municipio x profile"
+primary_keys:
+  - origin_municipio
+  - dest_municipio
+  - profile
+reference_date_column: extracted_at
+lgpd_legal_basis: "Dados abertos de malha viaria e roteamento (OSRM / OpenStreetMap)"
+min_expected_rows: 1
+max_volume_drop_pct: 50.0
+sentinel_values:
+  - "-1"
+  - "-999"
+  - "999999"
+  - "N/A"
+columns:
+  - name: origin_municipio
+    data_type: STRING
+    nullable: false
+  - name: dest_municipio
+    data_type: STRING
+    nullable: false
+  - name: sigla_uf
+    data_type: STRING
+    nullable: false
+  - name: profile
+    data_type: STRING
+    nullable: false
+  - name: distance_km
+    data_type: DOUBLE
+    nullable: false
+  - name: duration_min
+    data_type: DOUBLE
+    nullable: false
+  - name: extracted_at
+    data_type: STRING
+    nullable: false
