@@ -1953,6 +1953,48 @@ class MCPDispatcher:
                                 },
                             },
                             {
+                                "name": "bdg_list_public_apis_catalog",
+                                "description": "List curated Phase 10 Public & Global APIs (KYC/Geo, Market, Spatial ML, Global Research) filtered by block or Solution Pack.",
+                                "inputSchema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "block": {
+                                            "type": "string",
+                                            "description": "Optional block filter (BLOCO_1_KYC_GEO, BLOCO_2_MERCADO_REGULATORIO, BLOCO_3_ESPACIAL_CLIMA_ML, BLOCO_4_GLOBAL_PESQUISA)",
+                                        },
+                                        "pack_id": {
+                                            "type": "string",
+                                            "description": "Optional Solution Pack filter (P01..P10)",
+                                        },
+                                    },
+                                },
+                            },
+                            {
+                                "name": "bdg_enrich_cnpj_cascade",
+                                "description": "Enrich a Brazilian CNPJ using automatic cascade fallback (Minha Receita -> CNPJa Open -> BrasilAPI -> ReceitaWS).",
+                                "inputSchema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "cnpj": {"type": "string", "description": "14-digit CNPJ"},
+                                    },
+                                    "required": ["cnpj"],
+                                },
+                            },
+                            {
+                                "name": "bdg_count_osm_pois_radius",
+                                "description": "Count OpenStreetMap POIs (schools, pharmacies, banks, etc.) within a radius in meters via Overpass API.",
+                                "inputSchema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "lat": {"type": "number", "description": "Latitude"},
+                                        "lon": {"type": "number", "description": "Longitude"},
+                                        "amenity": {"type": "string", "description": "OSM amenity tag (default: school)"},
+                                        "radius_m": {"type": "integer", "description": "Radius in meters (default: 1000)"},
+                                    },
+                                    "required": ["lat", "lon"],
+                                },
+                            },
+                            {
                                 "name": "bdg_get_onr_property_registry",
                                 "description": "Get official ONR SREI municipal active property registry CNM stock, digital conversion rate, and online certificate emissions.",
                                 "inputSchema": {
@@ -4689,6 +4731,70 @@ class MCPDispatcher:
                             "text": wrap_untrusted_gov_data(
                                 dossier, source_id="gtm_lifecycle_gold"
                             ),
+                        }
+                    ],
+                    "isError": False,
+                },
+            }
+
+        if tool_name == "bdg_list_public_apis_catalog":
+            from public_data_gateway.connectors.public_apis_hub import PublicApisHubService
+
+            cat = PublicApisHubService(settings=self.settings).load_catalog(
+                block=args.get("block"), pack_id=args.get("pack_id")
+            )
+            return {
+                "jsonrpc": "2.0",
+                "id": req_id,
+                "result": {
+                    "content": [
+                        {
+                            "type": "text",
+                            "text": wrap_untrusted_gov_data(cat, source_id="public_apis_hub"),
+                        }
+                    ],
+                    "isError": False,
+                },
+            }
+
+        if tool_name == "bdg_enrich_cnpj_cascade":
+            from public_data_gateway.connectors.public_apis_hub import PublicApisHubService
+
+            cnpj = str(args.get("cnpj", "")).strip()
+            if not cnpj:
+                raise ValueError("Missing required parameter: cnpj")
+            res = PublicApisHubService(settings=self.settings).enrich_cnpj_cascade(cnpj)
+            return {
+                "jsonrpc": "2.0",
+                "id": req_id,
+                "result": {
+                    "content": [
+                        {
+                            "type": "text",
+                            "text": wrap_untrusted_gov_data(res, source_id="public_apis_hub"),
+                        }
+                    ],
+                    "isError": False,
+                },
+            }
+
+        if tool_name == "bdg_count_osm_pois_radius":
+            from public_data_gateway.connectors.public_apis_hub import PublicApisHubService
+
+            res = PublicApisHubService(settings=self.settings).count_osm_pois_radius(
+                float(args["lat"]),
+                float(args["lon"]),
+                amenity=str(args.get("amenity", "school")),
+                radius_m=int(args.get("radius_m", 1000)),
+            )
+            return {
+                "jsonrpc": "2.0",
+                "id": req_id,
+                "result": {
+                    "content": [
+                        {
+                            "type": "text",
+                            "text": wrap_untrusted_gov_data(res, source_id="public_apis_hub"),
                         }
                     ],
                     "isError": False,

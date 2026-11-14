@@ -1908,6 +1908,64 @@ class LifecycleFacade:
         )
 
 
+class PublicApisHubFacade:
+    """Facade exposing Phase 10 Public & Global APIs (KYC/Geo, Market, Spatial ML, Research)."""
+
+    def __init__(self, sdk: "BrazilData") -> None:
+        self._sdk = sdk
+        self._service: Any = None
+
+    @property
+    def service(self) -> Any:
+        if self._service is None:
+            from public_data_gateway.connectors.public_apis_hub import PublicApisHubService
+
+            self._service = PublicApisHubService(settings=self._sdk.settings)
+        return self._service
+
+    def list_catalog(
+        self,
+        *,
+        block: str | None = None,
+        pack_id: str | None = None,
+    ) -> dict[str, Any]:
+        """List curated Public & Global APIs filtered by block or Solution Pack."""
+        return self.service.load_catalog(block=block, pack_id=pack_id)
+
+    def enrich_cnpj_cascade(self, cnpj: str) -> dict[str, Any]:
+        """Enrich CNPJ with automatic cascade fallback (Minha Receita -> CNPJa -> BrasilAPI -> ReceitaWS)."""
+        return self.service.enrich_cnpj_cascade(cnpj)
+
+    def lookup_cep_cascade(self, cep: str) -> dict[str, Any]:
+        """Lookup CEP with automatic cascade fallback (ViaCEP -> OpenCEP -> BrasilAPI)."""
+        return self.service.lookup_cep_cascade(cep)
+
+    def count_osm_pois_radius(
+        self,
+        lat: float,
+        lon: float,
+        *,
+        amenity: str = "school",
+        radius_m: int = 1000,
+    ) -> dict[str, Any]:
+        """Count OpenStreetMap POIs within radius_m around (lat, lon) via Overpass API."""
+        return self.service.count_osm_pois_radius(
+            lat, lon, amenity=amenity, radius_m=radius_m
+        )
+
+    def compute_osrm_route(
+        self,
+        lat1: float,
+        lon1: float,
+        lat2: float,
+        lon2: float,
+        *,
+        profile: str = "driving",
+    ) -> dict[str, Any]:
+        """Compute real road distance (km) and duration (min) via OSRM."""
+        return self.service.compute_osrm_route(lat1, lon1, lat2, lon2, profile=profile)
+
+
 class BrazilData:
     """Unified developer SDK facade for querying, normalizing, and enriching Brazilian public datasets."""
 
@@ -1941,6 +1999,7 @@ class BrazilData:
         self.metaportals = MetaportalsFacade(self)
         self.cross_domain = CrossDomainFacade(self)
         self.lifecycle = LifecycleFacade(self)
+        self.public_apis = PublicApisHubFacade(self)
 
     def list_sources(
         self,

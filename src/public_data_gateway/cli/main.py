@@ -1222,6 +1222,30 @@ def build_parser() -> argparse.ArgumentParser:
     lc_dos_p.add_argument("--municipio", dest="id_municipio", help="Optional IBGE municipality code")
     lc_dos_p.add_argument("--format", choices=["json", "markdown"], default="markdown", help="Output format")
 
+    # Phase 10 Public APIs Hub command group
+    pa_p = subparsers.add_parser(
+        "public-apis",
+        help="Query curated Public & Global APIs Hub (KYC cascade, spatial POIs, OSRM, catalog).",
+    )
+    pa_sub = pa_p.add_subparsers(dest="public_apis_action", required=True)
+
+    pa_cat_p = pa_sub.add_parser("catalog", help="List curated Public & Global APIs")
+    pa_cat_p.add_argument("--block", help="Optional block filter (e.g. BLOCO_1_KYC_GEO)")
+    pa_cat_p.add_argument("--pack", dest="pack_id", help="Optional Solution Pack filter (P01..P10)")
+    pa_cat_p.add_argument("--json", action="store_true", help="Output in JSON format")
+
+    pa_cnpj_p = pa_sub.add_parser("cnpj", help="Cascade CNPJ enrichment (Minha Receita -> CNPJa -> BrasilAPI)")
+    pa_cnpj_p.add_argument("cnpj", help="14-digit CNPJ")
+
+    pa_cep_p = pa_sub.add_parser("cep", help="Cascade CEP lookup (ViaCEP -> OpenCEP -> BrasilAPI)")
+    pa_cep_p.add_argument("cep", help="8-digit CEP")
+
+    pa_pois_p = pa_sub.add_parser("pois", help="Count OpenStreetMap POIs in radius via Overpass API")
+    pa_pois_p.add_argument("--lat", type=float, required=True, help="Latitude")
+    pa_pois_p.add_argument("--lon", type=float, required=True, help="Longitude")
+    pa_pois_p.add_argument("--amenity", default="school", help="OSM amenity tag (default: school)")
+    pa_pois_p.add_argument("--radius", type=int, default=1000, help="Radius in meters (default: 1000)")
+
     # Dados.gov.br (CKAN) command group
     dg_p = subparsers.add_parser("dadosgov", help="Query Dados.gov.br (CKAN) publishing organizations, resource formats, LAI governance, API reuse, and rankings.")
     dg_sub = dg_p.add_subparsers(dest="dadosgov_action", required=True)
@@ -4531,6 +4555,32 @@ def main(argv: Sequence[str] | None = None) -> int:
                     print(json.dumps(dossier, ensure_ascii=False, indent=2, default=str))
                 else:
                     print(lc_svc.format_dossier_markdown(dossier))
+                return 0
+
+        elif args.command == "public-apis":
+            from public_data_gateway.connectors.public_apis_hub import PublicApisHubService
+
+            pa_svc = PublicApisHubService()
+            if args.public_apis_action == "catalog":
+                cat = pa_svc.load_catalog(block=args.block, pack_id=args.pack_id)
+                if args.json:
+                    print(json.dumps(cat, ensure_ascii=False, indent=2, default=str))
+                else:
+                    print(f"Curated Public APIs ({cat['total']}):")
+                    for api in cat["apis"]:
+                        print(f"  - [{api['block']}] {api['api_id']}: {api['name']} ({api['status']})")
+                return 0
+            if args.public_apis_action == "cnpj":
+                print(json.dumps(pa_svc.enrich_cnpj_cascade(args.cnpj), ensure_ascii=False, indent=2, default=str))
+                return 0
+            if args.public_apis_action == "cep":
+                print(json.dumps(pa_svc.lookup_cep_cascade(args.cep), ensure_ascii=False, indent=2, default=str))
+                return 0
+            if args.public_apis_action == "pois":
+                res = pa_svc.count_osm_pois_radius(
+                    args.lat, args.lon, amenity=args.amenity, radius_m=args.radius
+                )
+                print(json.dumps(res, ensure_ascii=False, indent=2, default=str))
                 return 0
 
     except Exception as exc:

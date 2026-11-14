@@ -2917,4 +2917,56 @@ def create_app(settings: GatewaySettings | None = None) -> FastAPI:
         except (ValueError, FileNotFoundError) as exc:
             raise HTTPException(status_code=400, detail=str(exc)) from exc
 
+    @app.get("/api/v1/public-apis/catalog")
+    async def get_public_apis_catalog(
+        block: str | None = Query(None, description="Optional block filter (e.g. BLOCO_1_KYC_GEO)"),
+        pack_id: str | None = Query(None, description="Optional Solution Pack filter (P01..P10)"),
+    ) -> dict[str, Any]:
+        from public_data_gateway.connectors.public_apis_hub import PublicApisHubService
+
+        svc = PublicApisHubService(settings=app_settings)
+        try:
+            return svc.load_catalog(block=block, pack_id=pack_id)
+        except (ValueError, FileNotFoundError) as exc:
+            raise HTTPException(status_code=400, detail=str(exc)) from exc
+
+    @app.get("/api/v1/public-apis/cnpj/{cnpj}")
+    async def enrich_cnpj_public_cascade(cnpj: str) -> dict[str, Any]:
+        from public_data_gateway.connectors.public_apis_hub import PublicApisHubService
+
+        svc = PublicApisHubService(settings=app_settings)
+        try:
+            return svc.enrich_cnpj_cascade(cnpj)
+        except ValueError as exc:
+            raise HTTPException(status_code=400, detail=str(exc)) from exc
+        except RuntimeError as exc:
+            raise HTTPException(status_code=502, detail=str(exc)) from exc
+
+    @app.get("/api/v1/public-apis/cep/{cep}")
+    async def lookup_cep_public_cascade(cep: str) -> dict[str, Any]:
+        from public_data_gateway.connectors.public_apis_hub import PublicApisHubService
+
+        svc = PublicApisHubService(settings=app_settings)
+        try:
+            return svc.lookup_cep_cascade(cep)
+        except ValueError as exc:
+            raise HTTPException(status_code=400, detail=str(exc)) from exc
+        except RuntimeError as exc:
+            raise HTTPException(status_code=502, detail=str(exc)) from exc
+
+    @app.get("/api/v1/public-apis/spatial/pois")
+    async def count_spatial_pois(
+        lat: float = Query(..., description="Latitude"),
+        lon: float = Query(..., description="Longitude"),
+        amenity: str = Query("school", description="OSM amenity tag"),
+        radius_m: int = Query(1000, ge=50, le=10000, description="Radius in meters"),
+    ) -> dict[str, Any]:
+        from public_data_gateway.connectors.public_apis_hub import PublicApisHubService
+
+        svc = PublicApisHubService(settings=app_settings)
+        try:
+            return svc.count_osm_pois_radius(lat, lon, amenity=amenity, radius_m=radius_m)
+        except ValueError as exc:
+            raise HTTPException(status_code=400, detail=str(exc)) from exc
+
     return app
