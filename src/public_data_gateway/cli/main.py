@@ -1171,6 +1171,36 @@ def build_parser() -> argparse.ArgumentParser:
     bd_rk_p.add_argument("--uf", type=str, help="Optional 2-letter state filter")
     bd_rk_p.add_argument("--json", action="store_true", help="Output in JSON format")
 
+    # Cross-Domain Gold & Feature Store command group
+    cd_p = subparsers.add_parser(
+        "cross-domain",
+        help="Query Gold cross-domain marts, consolidated ML Feature Store, and Solution Pack insights.",
+    )
+    cd_sub = cd_p.add_subparsers(dest="cross_domain_action", required=True)
+
+    cd_feat_p = cd_sub.add_parser("features", help="Get consolidated ML Feature Store vector for a municipality")
+    cd_feat_p.add_argument("id_municipio", help="6- or 7-digit IBGE municipality code (e.g. 3550308)")
+    cd_feat_p.add_argument("--json", action="store_true", help="Output in JSON format")
+
+    cd_rank_p = cd_sub.add_parser("ranking", help="List top municipalities ranked by composite B2B propensity score")
+    cd_rank_p.add_argument("--uf", dest="sigla_uf", help="Optional 2-letter state filter (e.g. SP)")
+    cd_rank_p.add_argument("--limit", type=int, default=10, help="Maximum rows (default: 10)")
+    cd_rank_p.add_argument("--json", action="store_true", help="Output in JSON format")
+
+    cd_pack_p = cd_sub.add_parser("insights", help="Get commercial/operational insights for a Solution Pack (P01..P10)")
+    cd_pack_p.add_argument("pack_id", help="Solution Pack ID (P01..P10)")
+    cd_pack_p.add_argument("--uf", dest="sigla_uf", help="Optional 2-letter state filter (e.g. MG)")
+    cd_pack_p.add_argument("--limit", type=int, default=10, help="Maximum rows (default: 10)")
+    cd_pack_p.add_argument("--json", action="store_true", help="Output in JSON format")
+
+    cd_b2b_p = cd_sub.add_parser("territory-b2b", help="Get Territory x B2B x Macro mart for a state (UF)")
+    cd_b2b_p.add_argument("sigla_uf", help="2-letter state code (e.g. SP)")
+    cd_b2b_p.add_argument("--json", action="store_true", help="Output in JSON format")
+
+    cd_esg_p = cd_sub.add_parser("esg-agro", help="Get ESG x Agro x Water Security x 5G mart for a municipality")
+    cd_esg_p.add_argument("id_municipio", help="6- or 7-digit IBGE municipality code (e.g. 3550308)")
+    cd_esg_p.add_argument("--json", action="store_true", help="Output in JSON format")
+
     # Dados.gov.br (CKAN) command group
     dg_p = subparsers.add_parser("dadosgov", help="Query Dados.gov.br (CKAN) publishing organizations, resource formats, LAI governance, API reuse, and rankings.")
     dg_sub = dg_p.add_subparsers(dest="dadosgov_action", required=True)
@@ -4385,6 +4415,71 @@ def main(argv: Sequence[str] | None = None) -> int:
                     print(f"Top {len(top)} Brazilian Municipalities by GDP (IBGE Contas Regionais):")
                     for idx, r in enumerate(top, 1):
                         print(f"  {idx}. {r.get('nome_municipio')} ({r.get('sigla_uf')}): R$ {r.get('valor_pib_mil_reais', 0.0):,.2f} mil | Part. Brasil: {r.get('participacao_pib_brasil_pct')}%")
+                return 0
+
+        elif args.command == "cross-domain":
+            from public_data_gateway.core.cross_domain import CrossDomainService
+
+            cd_svc = CrossDomainService()
+            if args.cross_domain_action == "features":
+                res = cd_svc.get_cross_domain_features(args.id_municipio)
+                if args.json:
+                    print(json.dumps(res, ensure_ascii=False, indent=2, default=str))
+                else:
+                    print(
+                        f"[{res.get('id_municipio')}] {res.get('nome_municipio')} ({res.get('sigla_uf')}) "
+                        f"| B2B Propensity: {res.get('feat_score_propensao_b2b_composto')} "
+                        f"| ESG/Agro: {res.get('feat_score_esg_agro_resiliencia')} "
+                        f"| 5G: {res.get('feat_score_conectividade_5g')}"
+                    )
+                return 0
+            if args.cross_domain_action == "ranking":
+                rows = cd_svc.list_top_cross_domain_municipalities(
+                    limit=args.limit, sigla_uf=args.sigla_uf
+                )
+                if args.json:
+                    print(json.dumps(rows, ensure_ascii=False, indent=2, default=str))
+                else:
+                    for idx, r in enumerate(rows, 1):
+                        print(
+                            f"  {idx}. {r.get('nome_municipio')} ({r.get('sigla_uf')}): "
+                            f"B2B={r.get('feat_score_propensao_b2b_composto')} | "
+                            f"Gov={r.get('feat_score_governanca_datalake')}"
+                        )
+                return 0
+            if args.cross_domain_action == "insights":
+                rows = cd_svc.get_solution_pack_insights(
+                    pack_id=args.pack_id, sigla_uf=args.sigla_uf, limit=args.limit
+                )
+                if args.json:
+                    print(json.dumps(rows, ensure_ascii=False, indent=2, default=str))
+                else:
+                    for idx, r in enumerate(rows, 1):
+                        print(
+                            f"  {idx}. [{r.get('pack_id')}] {r.get('sigla_uf')}: "
+                            f"Score={r.get('score_oportunidade_pack_uf')} | {r.get('recomendacao_operacional_pack')}"
+                        )
+                return 0
+            if args.cross_domain_action == "territory-b2b":
+                res = cd_svc.get_macro_territory_b2b(args.sigla_uf)
+                if args.json:
+                    print(json.dumps(res, ensure_ascii=False, indent=2, default=str))
+                else:
+                    print(
+                        f"[{res.get('sigla_uf')}] Dinamismo B2B={res.get('score_dinamismo_b2b_territorial')} "
+                        f"| Selic={res.get('selic_meta_fim_mes_pct')}% | Regime={res.get('regime_politica_monetaria')}"
+                    )
+                return 0
+            if args.cross_domain_action == "esg-agro":
+                res = cd_svc.get_esg_agro_infra(args.id_municipio)
+                if args.json:
+                    print(json.dumps(res, ensure_ascii=False, indent=2, default=str))
+                else:
+                    print(
+                        f"[{res.get('id_municipio')}] {res.get('nome_municipio')} ({res.get('sigla_uf')}) "
+                        f"| ESG/Agro={res.get('score_esg_agro_resiliencia')} "
+                        f"| 5G={res.get('score_infra_conectividade_5g')}"
+                    )
                 return 0
 
     except Exception as exc:

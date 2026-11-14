@@ -1816,6 +1816,50 @@ class MetaportalsFacade:
         )
 
 
+class CrossDomainFacade:
+    """Sub-facade for Gold Cross-Domain Marts, Consolidated ML Feature Store & Solution Pack Insights."""
+
+    def __init__(self, sdk: "BrazilData") -> None:
+        self._sdk = sdk
+        self._service: Any = None
+
+    @property
+    def service(self) -> Any:
+        if self._service is None:
+            from public_data_gateway.core.cross_domain import CrossDomainService
+
+            self._service = CrossDomainService(settings=self._sdk.settings)
+        return self._service
+
+    def get_features(self, id_municipio: str) -> dict[str, Any]:
+        """Get consolidated ML Feature Store row (with ASOF macro context) for a municipality."""
+        return self.service.get_cross_domain_features(id_municipio)
+
+    def list_top_municipalities(
+        self, limit: int = 10, sigla_uf: str | None = None
+    ) -> list[dict[str, Any]]:
+        """List top municipalities ranked by composite cross-domain B2B propensity score."""
+        return self.service.list_top_cross_domain_municipalities(
+            limit=limit, sigla_uf=sigla_uf
+        )
+
+    def get_solution_pack_insights(
+        self, pack_id: str, sigla_uf: str | None = None, limit: int = 10
+    ) -> list[dict[str, Any]]:
+        """Get commercial and operational insights for a Solution Pack (P01..P10)."""
+        return self.service.get_solution_pack_insights(
+            pack_id=pack_id, sigla_uf=sigla_uf, limit=limit
+        )
+
+    def get_macro_territory_b2b(self, sigla_uf: str) -> dict[str, Any]:
+        """Get cross-domain Territory x B2B x Macro x Public Procurement mart for a state."""
+        return self.service.get_macro_territory_b2b(sigla_uf)
+
+    def get_esg_agro_infra(self, id_municipio: str) -> dict[str, Any]:
+        """Get cross-domain ESG x Agro x Water Security x 5G Telecom mart for a municipality."""
+        return self.service.get_esg_agro_infra(id_municipio)
+
+
 class BrazilData:
     """Unified developer SDK facade for querying, normalizing, and enriching Brazilian public datasets."""
 
@@ -1847,6 +1891,7 @@ class BrazilData:
         self.real_estate = RealEstateFacade(self)
         self.environment = EnvironmentFacade(self)
         self.metaportals = MetaportalsFacade(self)
+        self.cross_domain = CrossDomainFacade(self)
 
     def list_sources(
         self,
@@ -2918,6 +2963,26 @@ class BrazilData:
         """Listar municípios líderes em transparência de dados abertos no Dados.gov.br (CKAN)."""
         return self.metaportals.list_top_ckan_municipalities(
             limit=limit, sigla_uf=sigla_uf
+        )
+
+    def get_cross_domain_features(self, id_municipio: str) -> dict[str, Any]:
+        """Return consolidated cross-domain ML Feature Store vector for a municipality."""
+        return self.cross_domain.get_features(id_municipio)
+
+    def list_top_cross_domain_municipalities(
+        self, limit: int = 10, sigla_uf: str | None = None
+    ) -> list[dict[str, Any]]:
+        """List top municipalities ranked by composite cross-domain B2B propensity score."""
+        return self.cross_domain.list_top_municipalities(
+            limit=limit, sigla_uf=sigla_uf
+        )
+
+    def get_solution_pack_insights(
+        self, pack_id: str, sigla_uf: str | None = None, limit: int = 10
+    ) -> list[dict[str, Any]]:
+        """Return state-level commercial insights for a Solution Pack (P01..P10)."""
+        return self.cross_domain.get_solution_pack_insights(
+            pack_id=pack_id, sigla_uf=sigla_uf, limit=limit
         )
 
     def resolve_municipality(

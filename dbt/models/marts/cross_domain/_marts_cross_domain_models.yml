@@ -1,0 +1,337 @@
+version: 2
+
+models:
+  - name: mart_cross_domain_territorio_b2b_macro_brasil
+    description: "Data Mart Gold cross-domain estadual consolidando Território, Emprego Formal, Densidade Empresarial B2B, Compras Públicas, Sanções e Cenário Macroeconômico."
+    columns:
+      - name: sigla_uf
+        description: "Sigla oficial da Unidade da Federação (UF)."
+        tests: [not_null, unique]
+      - name: regiao
+        description: "Macrorregião geográfica brasileira."
+        tests: [not_null]
+      - name: qtd_municipios_uf
+        description: "Quantidade de municípios na UF."
+        tests: [not_null]
+      - name: pib_total_uf_mil_reais
+        description: "Soma do PIB municipal da UF em mil reais."
+        tests: [not_null]
+      - name: populacao_total_uf
+        description: "População residente agregada na UF."
+        tests: [not_null]
+      - name: pib_per_capita_medio_uf
+        description: "PIB per capita médio dos municípios da UF em reais."
+        tests: [not_null]
+      - name: indice_gini_uf
+        description: "Índice de Gini médio estadual de desigualdade de rendimento."
+        tests: [not_null]
+      - name: saldo_emprego_formal_uf
+        description: "Saldo líquido de admissões menos desligamentos formais na UF."
+        tests: [not_null]
+      - name: salario_medio_admissao_uf
+        description: "Salário médio real de admissão na UF em reais."
+        tests: [not_null]
+      - name: score_aquecimento_trabalho_uf
+        description: "Score médio estadual de aquecimento do mercado de trabalho formal (0-100)."
+        tests: [not_null]
+      - name: total_estabelecimentos_ativos
+        description: "Total de estabelecimentos empresariais ativos na UF."
+        tests: [not_null]
+      - name: total_empresas_distintas
+        description: "Total de empresas distintas por CNPJ básico na UF."
+        tests: [not_null]
+      - name: capital_social_total_uf
+        description: "Soma do capital social empresarial declarado na UF."
+        tests: [not_null]
+      - name: taxa_optantes_simples_pct
+        description: "Percentual de estabelecimentos optantes pelo Simples Nacional (%)."
+        tests: [not_null]
+      - name: total_contratacoes_publicas_uf
+        description: "Quantidade total de contratações públicas homologadas via PNCP na UF."
+        tests: [not_null]
+      - name: valor_homologado_compras_uf
+        description: "Volume financeiro homologado em compras públicas na UF."
+        tests: [not_null]
+      - name: taxa_economia_licitatoria_uf_pct
+        description: "Economia média estimada em processos licitatórios na UF (%)."
+        tests: [not_null]
+      - name: total_sancoes_ativas_uf
+        description: "Total de sanções administrativas ativas registradas para órgãos da UF."
+        tests: [not_null]
+      - name: valor_multas_ativas_uf
+        description: "Valor agregado de multas administrativas ativas na UF."
+        tests: [not_null]
+      - name: macro_ano_mes_referencia
+        description: "Competência macroeconômica de referência (YYYY-MM)."
+        tests: [not_null]
+      - name: selic_meta_fim_mes_pct
+        description: "Taxa Selic meta anual de referência (% a.a.)."
+        tests: [not_null]
+      - name: ipca_acumulado_12m_pct
+        description: "Inflação acumulada IPCA em 12 meses (%)."
+        tests: [not_null]
+      - name: juros_real_ex_post_pct
+        description: "Taxa de juros real ex-post (Selic menos IPCA 12m, %)."
+        tests: [not_null]
+      - name: regime_politica_monetaria
+        description: "Classificação do regime de política monetária vigente."
+        tests: [not_null]
+      - name: score_dinamismo_b2b_territorial
+        description: "Índice composto de dinamismo B2B, emprego e compras públicas por UF (0-100)."
+        tests: [not_null]
+      - name: tier_oportunidade_b2b_uf
+        description: "Classificação estadual em 4 tiers de oportunidade B2B territorial."
+        tests: [not_null]
+
+  - name: mart_cross_domain_esg_agro_infra_brasil
+    description: "Data Mart Gold cross-domain municipal integrando Desmatamento (INPE), Cadastro Ambiental Rural (SICAR), Aptidão Agroclimática (ZARC), Segurança Hídrica (ANA) e Telecom 5G/Fibra (ANATEL)."
+    columns:
+      - name: id_municipio
+        description: "Código IBGE de 7 dígitos do município (STRING)."
+        tests: [not_null, unique]
+      - name: nome_municipio
+        description: "Nome oficial do município."
+        tests: [not_null]
+      - name: sigla_uf
+        description: "Sigla da Unidade da Federação (UF)."
+        tests: [not_null]
+      - name: regiao
+        description: "Macrorregião geográfica brasileira."
+        tests: [not_null]
+      - name: bioma_predominante
+        description: "Bioma predominante no território municipal."
+        tests: [not_null]
+      - name: score_preservacao_conformidade_florestal
+        description: "Score de preservação e conformidade florestal INPE/Código Florestal (0-100)."
+        tests: [not_null]
+      - name: score_pressao_desmatamento_deter
+        description: "Score de pressão de alertas DETER/PRODES no município (0-100)."
+        tests: [not_null]
+      - name: score_composto_risco_esg_territorial
+        description: "Score composto ESG territorial INPE TerraBrasilis (0-100)."
+        tests: [not_null]
+      - name: qtd_imoveis_car_ativos
+        description: "Quantidade de imóveis rurais ativos no SICAR."
+        tests: [not_null]
+      - name: imoveis_livres_embargo_ibama_pct
+        description: "Percentual de imóveis rurais sem embargos IBAMA ativos (%)."
+        tests: [not_null]
+      - name: score_conformidade_sicar
+        description: "Score de conformidade fundiária e ambiental SICAR (0-100)."
+        tests: [not_null]
+      - name: qtd_culturas_zoneadas
+        description: "Quantidade de culturas agrícolas com janelas ZARC no município."
+        tests: [not_null]
+      - name: adesao_zarc_credito_custeio_pct
+        description: "Adesão ao zoneamento ZARC em operações de crédito rural (%)."
+        tests: [not_null]
+      - name: score_aptidao_zarc
+        description: "Score composto de aptidão agroclimática ZARC/PROAGRO (0-100)."
+        tests: [not_null]
+      - name: vazao_media_global_m3s
+        description: "Vazão média observada nas estações telemétricas ANA (m3/s)."
+        tests: [not_null]
+      - name: precipitacao_acumulada_anual_mm
+        description: "Precipitação acumulada anual média em milímetros."
+        tests: [not_null]
+      - name: score_seguranca_hidrica_hidroweb
+        description: "Score composto de segurança hídrica ANA HidroWeb (0-100)."
+        tests: [not_null]
+      - name: populacao_coberta_5g_pct
+        description: "Percentual da população municipal com cobertura 5G (%)."
+        tests: [not_null]
+      - name: participacao_fibra_ftth_pct
+        description: "Participação de acessos em fibra óptica FTTH (%)."
+        tests: [not_null]
+      - name: score_conectividade_digital
+        description: "Score composto de conectividade digital ANATEL (0-100)."
+        tests: [not_null]
+      - name: reference_date
+        description: "Data de referência ISO-8601 (YYYY-MM-DD)."
+        tests: [not_null]
+      - name: score_sustentabilidade_agro_infra
+        description: "Score cross-domain de sustentabilidade ESG, aptidão agro e conectividade (0-100)."
+        tests: [not_null]
+      - name: tier_prontidao_esg_agro
+        description: "Classificação municipal de prontidão ESG, agro e infraestrutura digital."
+        tests: [not_null]
+
+  - name: mart_cross_domain_capital_humano_saude_brasil
+    description: "Data Mart Gold cross-domain municipal integrando Capacidade Assistencial de Saúde (CNES), Qualidade Educacional (IDEB/SAEB) e Mercado de Trabalho Formal (CAGED)."
+    columns:
+      - name: id_municipio
+        description: "Código IBGE de 7 dígitos do município (STRING)."
+        tests: [not_null, unique]
+      - name: nome_municipio
+        description: "Nome oficial do município."
+        tests: [not_null]
+      - name: sigla_uf
+        description: "Sigla da Unidade da Federação (UF)."
+        tests: [not_null]
+      - name: regiao
+        description: "Macrorregião geográfica brasileira."
+        tests: [not_null]
+      - name: total_estabelecimentos_saude
+        description: "Total de estabelecimentos de saúde ativos registrados no CNES."
+        tests: [not_null]
+      - name: total_leitos_hospitalares
+        description: "Quantidade total de leitos hospitalares disponíveis."
+        tests: [not_null]
+      - name: total_leitos_uti
+        description: "Quantidade de leitos de terapia intensiva (UTI)."
+        tests: [not_null]
+      - name: score_capacidade_hospitalar
+        description: "Score composto de capacidade assistencial e hospitalar CNES (0-100)."
+        tests: [not_null]
+      - name: ideb_anos_iniciais_rede_publica
+        description: "Nota IDEB dos anos iniciais da rede pública."
+        tests: [not_null]
+      - name: ideb_anos_finais_rede_publica
+        description: "Nota IDEB dos anos finais da rede pública."
+        tests: [not_null]
+      - name: score_desempenho_ideb_municipal
+        description: "Score composto de desempenho educacional IDEB (0-100)."
+        tests: [not_null]
+      - name: score_proficiencia_equidade_saeb
+        description: "Score de proficiência e equidade SAEB (0-100)."
+        tests: [not_null]
+      - name: saldo_emprego_formal
+        description: "Saldo líquido de admissões menos desligamentos formais no CAGED."
+        tests: [not_null]
+      - name: salario_medio_admissao_reais
+        description: "Salário médio real de admissão formal em reais."
+        tests: [not_null]
+      - name: score_aquecimento_mercado_trabalho
+        description: "Score de aquecimento do mercado de trabalho formal (0-100)."
+        tests: [not_null]
+      - name: reference_date
+        description: "Data de referência ISO-8601 (YYYY-MM-DD)."
+        tests: [not_null]
+      - name: score_capital_humano_saude
+        description: "Score cross-domain de capital humano, saúde e renda formal (0-100)."
+        tests: [not_null]
+      - name: tier_desenvolvimento_humano_local
+        description: "Classificação municipal em 4 tiers de desenvolvimento humano local."
+        tests: [not_null]
+
+  - name: feature_store_cross_domain_municipio
+    description: "Feature Store consolidada Gold por município (5.571 municípios) com alinhamento temporal ASOF JOIN macroeconômico para modelos preditivos de propensão B2B e risco."
+    columns:
+      - name: id_municipio
+        description: "Código IBGE de 7 dígitos do município (STRING)."
+        tests: [not_null, unique]
+      - name: nome_municipio
+        description: "Nome oficial do município."
+        tests: [not_null]
+      - name: sigla_uf
+        description: "Sigla da Unidade da Federação (UF)."
+        tests: [not_null]
+      - name: id_uf
+        description: "Código IBGE de 2 dígitos da UF (STRING)."
+        tests: [not_null]
+      - name: regiao
+        description: "Macrorregião geográfica brasileira."
+        tests: [not_null]
+      - name: is_capital
+        description: "Indicador booleano se o município é capital estadual."
+        tests: [not_null]
+      - name: is_amazonia_legal
+        description: "Indicador booleano se o município integra a Amazônia Legal."
+        tests: [not_null]
+      - name: reference_date
+        description: "Data de referência ISO-8601 (YYYY-MM-DD)."
+        tests: [not_null]
+      - name: pib_per_capita_reais
+        description: "PIB per capita municipal em reais."
+        tests: [not_null]
+      - name: populacao_residente
+        description: "População residente municipal."
+        tests: [not_null]
+      - name: feat_score_socioeconomico
+        description: "Feature normalizada socioeconômica municipal (0-100)."
+        tests: [not_null]
+      - name: feat_score_dinamica_emprego
+        description: "Feature normalizada de dinâmica de emprego formal (0-100)."
+        tests: [not_null]
+      - name: feat_score_saude_assistencial
+        description: "Feature normalizada de capacidade assistencial em saúde (0-100)."
+        tests: [not_null]
+      - name: feat_score_educacao_ideb
+        description: "Feature normalizada de qualidade educacional IDEB (0-100)."
+        tests: [not_null]
+      - name: feat_score_conectividade_5g
+        description: "Feature normalizada de conectividade 5G e fibra FTTH (0-100)."
+        tests: [not_null]
+      - name: feat_score_esg_agro_resiliencia
+        description: "Feature normalizada de sustentabilidade ESG e agro (0-100)."
+        tests: [not_null]
+      - name: feat_score_governanca_datalake
+        description: "Feature normalizada de maturidade e governança do datalake (0-100)."
+        tests: [not_null]
+      - name: feat_score_dinamismo_b2b_uf
+        description: "Feature estadual de dinamismo empresarial B2B e compras públicas (0-100)."
+        tests: [not_null]
+      - name: nota_capag_final
+        description: "Nota CAPAG oficial de capacidade de pagamento municipal (A, B ou C)."
+        tests: [not_null]
+      - name: razao_dcl_rcl_pct
+        description: "Razão entre Dívida Consolidada Líquida e Receita Corrente Líquida (%)."
+        tests: [not_null]
+      - name: macro_selic_asof_pct
+        description: "Taxa Selic meta obtida via ASOF JOIN temporal na data de referência (%)."
+        tests: [not_null]
+      - name: macro_ipca_12m_asof_pct
+        description: "IPCA acumulado 12m obtido via ASOF JOIN temporal (%)."
+        tests: [not_null]
+      - name: macro_juros_real_asof_pct
+        description: "Juros real ex-post obtido via ASOF JOIN temporal (%)."
+        tests: [not_null]
+      - name: feat_score_propensao_b2b_composto
+        description: "Score composto final de propensão B2B e atratividade territorial para ML (0-100)."
+        tests: [not_null]
+      - name: feat_score_risco_compliance_fiscal
+        description: "Score composto de risco ESG e fragilidade fiscal municipal para ML (0-100)."
+        tests: [not_null]
+      - name: tier_maturidade_cross_domain
+        description: "Segmentação municipal consolidada em 4 tiers cross-domain."
+        tests: [not_null]
+
+  - name: mart_solution_packs_insights_brasil
+    description: "Matriz Gold de insights comerciais e operacionais acoplados aos 10 Solution Packs Modulares (P01..P10) por Unidade da Federação."
+    columns:
+      - name: pack_id
+        description: "Identificador oficial do Solution Pack modular (P01 a P10)."
+        tests: [not_null]
+      - name: pack_name
+        description: "Nome oficial do Solution Pack modular."
+        tests: [not_null]
+      - name: sigla_uf
+        description: "Sigla da Unidade da Federação (UF)."
+        tests: [not_null]
+      - name: regiao
+        description: "Macrorregião geográfica brasileira."
+        tests: [not_null]
+      - name: total_municipios_uf
+        description: "Quantidade total de municípios considerados na UF."
+        tests: [not_null]
+      - name: score_dinamismo_b2b_territorial
+        description: "Score de dinamismo B2B territorial da UF (0-100)."
+        tests: [not_null]
+      - name: total_estabelecimentos_ativos
+        description: "Total de estabelecimentos empresariais ativos na UF."
+        tests: [not_null]
+      - name: valor_homologado_compras_uf
+        description: "Volume financeiro homologado em compras públicas na UF."
+        tests: [not_null]
+      - name: total_sancoes_ativas_uf
+        description: "Quantidade de sanções administrativas ativas na UF."
+        tests: [not_null]
+      - name: score_oportunidade_pack_uf
+        description: "Score de oportunidade e prontidão do Solution Pack na UF (0-100)."
+        tests: [not_null]
+      - name: recomendacao_operacional_pack
+        description: "Diretriz operacional automatizada para ativação do pack na UF."
+        tests: [not_null]
+      - name: reference_period
+        description: "Competência macroeconômica de referência dos insights (YYYY-MM)."
+        tests: [not_null]
