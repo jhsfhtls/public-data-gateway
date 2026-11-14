@@ -2340,6 +2340,86 @@ def create_app(settings: GatewaySettings | None = None) -> FastAPI:
         except (ValueError, KeyError) as exc:
             raise HTTPException(status_code=400, detail=str(exc)) from exc
 
+    @app.get("/api/v1/environment/sicar/top-municipalities")
+    async def get_top_sicar_municipalities(
+        limit: int = Query(10, ge=1, le=50, description="Max municipalities to list"),
+        uf: str | None = Query(None, description="Optional 2-letter state filter"),
+    ) -> list[dict[str, Any]]:
+        from public_data_gateway.connectors.ambiental.sfb_sicar.connector import (
+            SfbSicarConnector,
+        )
+
+        conn = SfbSicarConnector(settings=app_settings)
+        return conn.list_top_sicar_municipalities(limit=limit, sigla_uf=uf)
+
+    @app.get("/api/v1/environment/sicar/features/{id_municipio}")
+    async def get_sicar_features(id_municipio: str) -> dict[str, Any]:
+        from public_data_gateway.connectors.ambiental.sfb_sicar.connector import (
+            SfbSicarConnector,
+        )
+
+        conn = SfbSicarConnector(settings=app_settings)
+        try:
+            return conn.get_sicar_features(id_municipio)
+        except (ValueError, KeyError) as exc:
+            raise HTTPException(status_code=400, detail=str(exc)) from exc
+
+    @app.get("/api/v1/environment/sicar/legal-reserve/{id_municipio}")
+    async def get_sicar_legal_reserve(
+        id_municipio: str,
+        categoria: str | None = Query(
+            None, description="Optional property size category filter"
+        ),
+    ) -> list[dict[str, Any]]:
+        from public_data_gateway.connectors.ambiental.sfb_sicar.connector import (
+            SfbSicarConnector,
+        )
+
+        conn = SfbSicarConnector(settings=app_settings)
+        try:
+            return conn.list_sicar_legal_reserve(
+                id_municipio, categoria_imovel_car=categoria
+            )
+        except (ValueError, KeyError) as exc:
+            raise HTTPException(status_code=400, detail=str(exc)) from exc
+
+    @app.get("/api/v1/environment/sicar/pra/{id_municipio}")
+    async def get_sicar_pra(id_municipio: str) -> dict[str, Any]:
+        from public_data_gateway.connectors.ambiental.sfb_sicar.connector import (
+            SfbSicarConnector,
+        )
+
+        conn = SfbSicarConnector(settings=app_settings)
+        try:
+            return conn.get_sicar_pra_compliance(id_municipio)
+        except (ValueError, KeyError) as exc:
+            raise HTTPException(status_code=400, detail=str(exc)) from exc
+
+    @app.get("/api/v1/environment/sicar/geometry/{id_municipio}")
+    async def get_sicar_geometry(id_municipio: str) -> dict[str, Any]:
+        from public_data_gateway.connectors.ambiental.sfb_sicar.connector import (
+            SfbSicarConnector,
+        )
+
+        conn = SfbSicarConnector(settings=app_settings)
+        try:
+            return conn.get_sicar_geometry(id_municipio)
+        except (ValueError, KeyError) as exc:
+            raise HTTPException(status_code=400, detail=str(exc)) from exc
+
+    @app.get("/api/v1/environment/sicar/properties/{id_municipio}")
+    @app.get("/api/v1/sicar/{id_municipio}")
+    async def get_sicar_properties(id_municipio: str) -> dict[str, Any]:
+        from public_data_gateway.connectors.ambiental.sfb_sicar.connector import (
+            SfbSicarConnector,
+        )
+
+        conn = SfbSicarConnector(settings=app_settings)
+        try:
+            return conn.get_sicar_properties(id_municipio)
+        except (ValueError, KeyError) as exc:
+            raise HTTPException(status_code=400, detail=str(exc)) from exc
+
     @app.get("/api/v1/real-estate/onr/top-municipalities")
     async def get_top_onr_municipalities(
         limit: int = Query(10, ge=1, le=50, description="Max municipalities to list"),

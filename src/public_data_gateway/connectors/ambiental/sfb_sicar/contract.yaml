@@ -1,0 +1,477 @@
+schema_version: "3.1.0"
+contract_id: "ODCS-BR-SFB-SICAR-001"
+source_id: "sfb_sicar"
+version: "1.0.0"
+name: "SFB: Sistema Nacional de Cadastro Ambiental Rural (SICAR)"
+agency: "Serviço Florestal Brasileiro (SFB) / MMA"
+official_url: "https://www.car.gov.br/"
+
+legal_framework:
+  statutes:
+    - name: "Lei nº 12.651/2012 (Código Florestal - Art. 29)"
+      description: "Cria o Cadastro Ambiental Rural (CAR) como registro público eletrônico nacional obrigatório para todos os imóveis rurais"
+    - name: "Decreto nº 7.830/2012 & Decreto nº 8.235/2014"
+      description: "Dispõem sobre o Sistema de Cadastro Ambiental Rural (SICAR) e os Programas de Regularização Ambiental (PRA)"
+    - name: "Resolução BCB nº 140/2021 & Regulação EUDR (EU 2023/1115)"
+      description: "Condicionam crédito rural e exportação de commodities à regularidade cadastral CAR e ausência de sobreposição/desmatamento"
+    - name: "Lei nº 12.527/2011 (LAI) & Instrução Normativa MMA nº 2/2014"
+      description: "Regem a publicidade dos polígonos, Reserva Legal, APP e status de análise do SICAR"
+
+data_governance:
+  grain: "municipio_cadastro_sicar"
+  primary_keys:
+    - "id_municipio"
+    - "sigla_uf"
+  reference_date_column: "reference_date"
+  min_expected_rows: 10
+  max_volume_drop_pct: 15.0
+  freshness_sla_hours: 24
+  lgpd_tier: "PUBLIC_NON_PERSONAL"
+  ml_feature_domains:
+    - "rural_properties"
+    - "legal_reserve_polygons"
+
+schema:
+  tables:
+    sicar_imoveis_rurais_municipio:
+      description: "Estoque municipal de imóveis rurais inscritos no SICAR, área cadastrada e percentual com análise concluída."
+      grain: "id_municipio, ano_referencia"
+      primary_keys: ["id_municipio", "ano_referencia"]
+      min_expected_rows: 12
+      columns:
+        - name: "id_municipio"
+          data_type: "string"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Código IBGE de 7 dígitos do município."
+        - name: "nome_municipio"
+          data_type: "string"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Nome oficial do município."
+        - name: "sigla_uf"
+          data_type: "string"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Sigla de 2 letras da Unidade Federativa."
+        - name: "id_uf"
+          data_type: "string"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Código IBGE de 2 dígitos da UF."
+        - name: "regiao"
+          data_type: "string"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Grande região geográfica brasileira."
+        - name: "bioma_predominante"
+          data_type: "string"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Bioma predominante no município."
+        - name: "ano_referencia"
+          data_type: "int64"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Ano de consolidação da base SICAR."
+        - name: "qtd_imoveis_car_ativos"
+          data_type: "int64"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Quantidade total de imóveis rurais ativos inscritos no CAR."
+        - name: "area_cadastrada_car_ha"
+          data_type: "float64"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Área total dos imóveis inscritos no CAR em hectares."
+        - name: "area_media_imovel_ha"
+          data_type: "float64"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Área média por imóvel rural cadastrado (ha)."
+        - name: "imoveis_analise_concluida_pct"
+          data_type: "float64"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Percentual de cadastros com análise técnica estadual/federal concluída (%)."
+        - name: "indice_cobertura_cadastral_car"
+          data_type: "float64"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Índice composto de cobertura e análise cadastral CAR (0-100)."
+        - name: "reference_date"
+          data_type: "string"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Data de referência ISO YYYY-MM-DD."
+
+    sicar_reserva_legal_app_situacao:
+      description: "Situação de Reserva Legal, APP e passivo ambiental desagregada por categoria fundiária de imóvel no SICAR."
+      grain: "id_municipio, categoria_imovel_car"
+      primary_keys: ["id_municipio", "categoria_imovel_car"]
+      min_expected_rows: 48
+      columns:
+        - name: "id_municipio"
+          data_type: "string"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Código IBGE de 7 dígitos do município."
+        - name: "nome_municipio"
+          data_type: "string"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Nome oficial do município."
+        - name: "sigla_uf"
+          data_type: "string"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Sigla da UF."
+        - name: "id_uf"
+          data_type: "string"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Código IBGE da UF."
+        - name: "regiao"
+          data_type: "string"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Grande região geográfica."
+        - name: "bioma_predominante"
+          data_type: "string"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Bioma predominante."
+        - name: "categoria_imovel_car"
+          data_type: "string"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Categoria fundiária (Pequena_Propriedade_Ate_4MF, Media_Propriedade_4a15MF, Grande_Propriedade_Acima_15MF, Assentamento_Territorio_Coletivo)."
+        - name: "qtd_imoveis_categoria"
+          data_type: "int64"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Quantidade de imóveis rurais na categoria."
+        - name: "area_reserva_legal_declarada_ha"
+          data_type: "float64"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Área de Reserva Legal declarada no SICAR (ha)."
+        - name: "area_app_preservada_ha"
+          data_type: "float64"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Área de Preservação Permanente preservada (ha)."
+        - name: "taxa_passivo_ambiental_pct"
+          data_type: "float64"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Percentual de déficit/passivo ambiental em RL ou APP (0-100)."
+        - name: "conformidade_reserva_legal_pct"
+          data_type: "float64"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Conformidade percentual de Reserva Legal na categoria (0-100)."
+        - name: "reference_date"
+          data_type: "string"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Data de referência ISO YYYY-MM-DD."
+
+    sicar_regularizacao_pra_embargos:
+      description: "Adesão ao Programa de Regularização Ambiental (PRA), ausência de sobreposição com TI/UC e elegibilidade para crédito rural."
+      grain: "id_municipio"
+      primary_keys: ["id_municipio"]
+      min_expected_rows: 12
+      columns:
+        - name: "id_municipio"
+          data_type: "string"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Código IBGE de 7 dígitos do município."
+        - name: "nome_municipio"
+          data_type: "string"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Nome oficial do município."
+        - name: "sigla_uf"
+          data_type: "string"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Sigla da UF."
+        - name: "id_uf"
+          data_type: "string"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Código IBGE da UF."
+        - name: "regiao"
+          data_type: "string"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Grande região geográfica."
+        - name: "bioma_predominante"
+          data_type: "string"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Bioma predominante."
+        - name: "qtd_imoveis_aderidos_pra"
+          data_type: "int64"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Quantidade de imóveis com adesão formal ao PRA."
+        - name: "imoveis_sem_sobreposicao_ti_uc_pct"
+          data_type: "float64"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Percentual de imóveis livres de sobreposição com Terras Indígenas e Unidades de Conservação."
+        - name: "imoveis_livres_embargo_ibama_pct"
+          data_type: "float64"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Percentual de imóveis sem embargos ambientais vigentes."
+        - name: "elegibilidade_credito_rural_car_pct"
+          data_type: "float64"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Percentual de imóveis aptos às regras socioambientais do crédito rural (Res. BCB 140/2021)."
+        - name: "velocidade_homologacao_car_pct"
+          data_type: "float64"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Taxa de avanço anual na homologação dos recibos CAR (%)."
+        - name: "indice_governanca_pra"
+          data_type: "float64"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Índice composto de governança PRA e conformidade socioambiental (0-100)."
+        - name: "reference_date"
+          data_type: "string"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Data de referência ISO YYYY-MM-DD."
+
+    sicar_geometria_validacao_sigef:
+      description: "Qualidade geoespacial dos polígonos SICAR, ausência de sobreposição entre imóveis e integração CAR–SIGEF/INCRA."
+      grain: "id_municipio"
+      primary_keys: ["id_municipio"]
+      min_expected_rows: 12
+      columns:
+        - name: "id_municipio"
+          data_type: "string"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Código IBGE de 7 dígitos do município."
+        - name: "nome_municipio"
+          data_type: "string"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Nome oficial do município."
+        - name: "sigla_uf"
+          data_type: "string"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Sigla da UF."
+        - name: "id_uf"
+          data_type: "string"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Código IBGE da UF."
+        - name: "regiao"
+          data_type: "string"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Grande região geográfica."
+        - name: "bioma_predominante"
+          data_type: "string"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Bioma predominante."
+        - name: "poligonos_sem_sobreposicao_pct"
+          data_type: "float64"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Percentual de polígonos sem sobreposição crítica com vizinhos (%)."
+        - name: "integracao_car_sigef_incra_pct"
+          data_type: "float64"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Percentual de imóveis com geometria conciliada com SIGEF/INCRA."
+        - name: "precisao_georreferenciamento_pct"
+          data_type: "float64"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Qualidade geométrica e topológica média dos polígonos (%)."
+        - name: "atualizacao_retificacao_anual_pct"
+          data_type: "float64"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Percentual de cadastros retificados e saneados no ciclo anual."
+        - name: "indice_qualidade_geoespacial_car"
+          data_type: "float64"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Índice composto de qualidade geoespacial e interoperabilidade SIGEF (0-100)."
+        - name: "reference_date"
+          data_type: "string"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Data de referência ISO YYYY-MM-DD."
+
+    features_sfb_sicar_fundiario:
+      description: "Tabela de features Gold de conformidade fundiária, Reserva Legal e elegibilidade EUDR/crédito rural SICAR (P01, P06 & P09)."
+      grain: "id_municipio"
+      primary_keys: ["id_municipio"]
+      min_expected_rows: 12
+      columns:
+        - name: "id_municipio"
+          data_type: "string"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Código IBGE de 7 dígitos do município."
+        - name: "nome_municipio"
+          data_type: "string"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Nome oficial do município."
+        - name: "sigla_uf"
+          data_type: "string"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Sigla da UF."
+        - name: "id_uf"
+          data_type: "string"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Código IBGE da UF."
+        - name: "regiao"
+          data_type: "string"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Grande região geográfica."
+        - name: "bioma_predominante"
+          data_type: "string"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Bioma predominante."
+        - name: "ano_referencia"
+          data_type: "int64"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Ano de referência da base SICAR."
+        - name: "qtd_imoveis_car_ativos"
+          data_type: "int64"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Quantidade de imóveis rurais ativos inscritos no CAR."
+        - name: "area_cadastrada_car_ha"
+          data_type: "float64"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Área total cadastrada no CAR (ha)."
+        - name: "imoveis_livres_embargo_ibama_pct"
+          data_type: "float64"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Percentual de imóveis livres de embargo ambiental."
+        - name: "indice_cobertura_cadastral_car"
+          data_type: "float64"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Subíndice de cobertura e análise cadastral CAR (0-100)."
+        - name: "indice_governanca_pra"
+          data_type: "float64"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Subíndice de governança PRA e regularidade socioambiental (0-100)."
+        - name: "indice_qualidade_geoespacial_car"
+          data_type: "float64"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Subíndice de qualidade geoespacial e SIGEF (0-100)."
+        - name: "taxa_passivo_media_pct"
+          data_type: "float64"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Taxa média de passivo ambiental entre categorias fundiárias (%)."
+        - name: "score_conformidade_sicar"
+          data_type: "float64"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Score composto de conformidade fundiária e ambiental SICAR (0-100)."
+        - name: "tier_conformidade_sicar"
+          data_type: "string"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Classificação municipal em 4 tiers de conformidade SICAR."
+        - name: "reference_date"
+          data_type: "string"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Data de referência ISO YYYY-MM-DD."

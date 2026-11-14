@@ -1,0 +1,25 @@
+version: 2
+
+sources:
+  - name: sfb_sicar_silver
+    description: "Tabelas Silver do conector SFB: Sistema Nacional de Cadastro Ambiental Rural (SICAR)."
+    meta:
+      owner: "data-engineering@public-data-gateway"
+      source_id: "sfb_sicar"
+    tables:
+      - name: sicar_imoveis_rurais_municipio
+        description: "Estoque municipal de imóveis rurais inscritos no SICAR e percentual com análise concluída."
+        meta:
+          external_location: "data/sfb_sicar/silver/sicar_imoveis_rurais_municipio.parquet"
+      - name: sicar_reserva_legal_app_situacao
+        description: "Situação de Reserva Legal, APP e passivo ambiental por categoria fundiária no SICAR."
+        meta:
+          external_location: "data/sfb_sicar/silver/sicar_reserva_legal_app_situacao.parquet"
+      - name: sicar_regularizacao_pra_embargos
+        description: "Adesão ao PRA, ausência de sobreposição com TI/UC e elegibilidade para crédito rural."
+        meta:
+          external_location: "data/sfb_sicar/silver/sicar_regularizacao_pra_embargos.parquet"
+      - name: sicar_geometria_validacao_sigef
+        description: "Qualidade geoespacial dos polígonos SICAR e integração CAR–SIGEF/INCRA."
+        meta:
+          external_location: "data/sfb_sicar/silver/sicar_geometria_validacao_sigef.parquet"

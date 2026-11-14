@@ -192,3 +192,58 @@ models:
       - name: reference_date
         description: "Data de referência ISO-8601 (YYYY-MM-DD)."
         tests: [not_null]
+
+  - name: mart_conformidade_car_sicar_brasil
+    description: "Data Mart Gold de conformidade fundiária, Reserva Legal e elegibilidade EUDR/crédito rural SFB SICAR por município."
+    columns:
+      - name: id_municipio
+        description: "Código IBGE de 7 dígitos do município."
+        tests: [not_null, unique]
+      - name: nome_municipio
+        description: "Nome oficial do município."
+        tests: [not_null]
+      - name: sigla_uf
+        description: "Sigla de 2 letras da Unidade Federativa."
+        tests: [not_null]
+      - name: id_uf
+        description: "Código IBGE de 2 dígitos da UF."
+        tests: [not_null]
+      - name: regiao
+        description: "Grande região geográfica brasileira."
+        tests: [not_null]
+      - name: bioma_predominante
+        description: "Bioma predominante no município."
+        tests: [not_null]
+      - name: ano_referencia
+        description: "Ano de referência SICAR."
+        tests: [not_null]
+      - name: qtd_imoveis_car_ativos
+        description: "Quantidade de imóveis ativos no CAR."
+        tests: [not_null]
+      - name: area_cadastrada_car_ha
+        description: "Área cadastrada no CAR (ha)."
+        tests: [not_null]
+      - name: imoveis_livres_embargo_ibama_pct
+        description: "Percentual de imóveis livres de embargo ambiental."
+        tests: [not_null]
+      - name: indice_cobertura_cadastral_car
+        description: "Subíndice de cobertura cadastral CAR (0-100)."
+        tests: [not_null]
+      - name: indice_governanca_pra
+        description: "Subíndice de governança PRA (0-100)."
+        tests: [not_null]
+      - name: indice_qualidade_geoespacial_car
+        description: "Subíndice de qualidade geoespacial SIGEF (0-100)."
+        tests: [not_null]
+      - name: taxa_passivo_media_pct
+        description: "Taxa média de passivo ambiental (%)."
+        tests: [not_null]
+      - name: score_conformidade_sicar
+        description: "Score composto de conformidade fundiária e ambiental SICAR (0-100)."
+        tests: [not_null]
+      - name: tier_conformidade_sicar
+        description: "Classificação municipal em 4 tiers de conformidade SICAR."
+        tests: [not_null]
+      - name: reference_date
+        description: "Data de referência ISO-8601 (YYYY-MM-DD)."
+        tests: [not_null]
