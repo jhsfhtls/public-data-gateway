@@ -2816,4 +2816,63 @@ def create_app(settings: GatewaySettings | None = None) -> FastAPI:
         except ValueError as exc:
             raise HTTPException(status_code=400, detail=str(exc)) from exc
 
+    @app.get("/api/v1/cross-domain/top-municipalities")
+    async def get_top_cross_domain_municipalities(
+        limit: int = Query(10, ge=1, le=100, description="Max municipalities to list"),
+        uf: str | None = Query(None, description="Optional 2-letter state filter"),
+    ) -> list[dict[str, Any]]:
+        from public_data_gateway.core.cross_domain import CrossDomainService
+
+        svc = CrossDomainService(settings=app_settings)
+        try:
+            return svc.list_top_cross_domain_municipalities(limit=limit, sigla_uf=uf)
+        except (ValueError, FileNotFoundError) as exc:
+            raise HTTPException(status_code=400, detail=str(exc)) from exc
+
+    @app.get("/api/v1/cross-domain/features/{id_municipio}")
+    async def get_cross_domain_features(id_municipio: str) -> dict[str, Any]:
+        from public_data_gateway.core.cross_domain import CrossDomainService
+
+        svc = CrossDomainService(settings=app_settings)
+        try:
+            return svc.get_cross_domain_features(id_municipio)
+        except (ValueError, KeyError, FileNotFoundError) as exc:
+            raise HTTPException(status_code=400, detail=str(exc)) from exc
+
+    @app.get("/api/v1/cross-domain/solution-packs/{pack_id}/insights")
+    async def get_solution_pack_insights(
+        pack_id: str,
+        uf: str | None = Query(None, description="Optional 2-letter state filter"),
+        limit: int = Query(10, ge=1, le=27, description="Max states to return"),
+    ) -> list[dict[str, Any]]:
+        from public_data_gateway.core.cross_domain import CrossDomainService
+
+        svc = CrossDomainService(settings=app_settings)
+        try:
+            return svc.get_solution_pack_insights(
+                pack_id=pack_id, sigla_uf=uf, limit=limit
+            )
+        except (ValueError, FileNotFoundError) as exc:
+            raise HTTPException(status_code=400, detail=str(exc)) from exc
+
+    @app.get("/api/v1/cross-domain/territory-b2b/{sigla_uf}")
+    async def get_cross_domain_territory_b2b(sigla_uf: str) -> dict[str, Any]:
+        from public_data_gateway.core.cross_domain import CrossDomainService
+
+        svc = CrossDomainService(settings=app_settings)
+        try:
+            return svc.get_macro_territory_b2b(sigla_uf)
+        except (ValueError, KeyError, FileNotFoundError) as exc:
+            raise HTTPException(status_code=400, detail=str(exc)) from exc
+
+    @app.get("/api/v1/cross-domain/esg-agro/{id_municipio}")
+    async def get_cross_domain_esg_agro(id_municipio: str) -> dict[str, Any]:
+        from public_data_gateway.core.cross_domain import CrossDomainService
+
+        svc = CrossDomainService(settings=app_settings)
+        try:
+            return svc.get_esg_agro_infra(id_municipio)
+        except (ValueError, KeyError, FileNotFoundError) as exc:
+            raise HTTPException(status_code=400, detail=str(exc)) from exc
+
     return app

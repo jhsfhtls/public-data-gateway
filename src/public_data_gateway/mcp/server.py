@@ -1848,6 +1848,59 @@ class MCPDispatcher:
                                 },
                             },
                             {
+                                "name": "bdg_get_cross_domain_features",
+                                "description": "Get consolidated cross-domain ML Feature Store vector for a Brazilian municipality (territorial, B2B, macro ASOF, ESG/Agro, human capital & health).",
+                                "inputSchema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "id_municipio": {
+                                            "type": "string",
+                                            "description": "6- or 7-digit IBGE municipality code (e.g. 3550308)",
+                                        },
+                                    },
+                                    "required": ["id_municipio"],
+                                },
+                            },
+                            {
+                                "name": "bdg_list_top_cross_domain_municipalities",
+                                "description": "List top Brazilian municipalities ranked by composite cross-domain B2B propensity score.",
+                                "inputSchema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "limit": {
+                                            "type": "integer",
+                                            "description": "Maximum rows (default: 10, max: 100)",
+                                        },
+                                        "sigla_uf": {
+                                            "type": "string",
+                                            "description": "Optional 2-letter state filter (e.g. SP)",
+                                        },
+                                    },
+                                },
+                            },
+                            {
+                                "name": "bdg_get_solution_pack_insights",
+                                "description": "Get commercial and operational insights by Solution Pack (P01..P10) and Brazilian state (UF).",
+                                "inputSchema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "pack_id": {
+                                            "type": "string",
+                                            "description": "Solution Pack ID (P01 to P10)",
+                                        },
+                                        "sigla_uf": {
+                                            "type": "string",
+                                            "description": "Optional 2-letter state filter (e.g. MG)",
+                                        },
+                                        "limit": {
+                                            "type": "integer",
+                                            "description": "Maximum rows (default: 10, max: 27)",
+                                        },
+                                    },
+                                    "required": ["pack_id"],
+                                },
+                            },
+                            {
                                 "name": "bdg_get_onr_property_registry",
                                 "description": "Get official ONR SREI municipal active property registry CNM stock, digital conversion rate, and online certificate emissions.",
                                 "inputSchema": {
@@ -4451,6 +4504,80 @@ class MCPDispatcher:
                         {
                             "type": "text",
                             "text": f"Bulk sync for '{source_id}' approved and queued.",
+                        }
+                    ],
+                    "isError": False,
+                },
+            }
+
+        if tool_name == "bdg_get_cross_domain_features":
+            from public_data_gateway.core.cross_domain import CrossDomainService
+
+            id_mun = str(args.get("id_municipio", "")).strip()
+            if not id_mun:
+                raise ValueError("Missing required parameter: id_municipio")
+            data = CrossDomainService(settings=self.settings).get_cross_domain_features(id_mun)
+            return {
+                "jsonrpc": "2.0",
+                "id": req_id,
+                "result": {
+                    "content": [
+                        {
+                            "type": "text",
+                            "text": wrap_untrusted_gov_data(
+                                data, source_id="cross_domain_gold"
+                            ),
+                        }
+                    ],
+                    "isError": False,
+                },
+            }
+
+        if tool_name == "bdg_list_top_cross_domain_municipalities":
+            from public_data_gateway.core.cross_domain import CrossDomainService
+
+            limit = int(args.get("limit", 10))
+            sigla_uf = args.get("sigla_uf")
+            data = CrossDomainService(settings=self.settings).list_top_cross_domain_municipalities(
+                limit=limit, sigla_uf=sigla_uf
+            )
+            return {
+                "jsonrpc": "2.0",
+                "id": req_id,
+                "result": {
+                    "content": [
+                        {
+                            "type": "text",
+                            "text": wrap_untrusted_gov_data(
+                                data, source_id="cross_domain_gold"
+                            ),
+                        }
+                    ],
+                    "isError": False,
+                },
+            }
+
+        if tool_name == "bdg_get_solution_pack_insights":
+            from public_data_gateway.core.cross_domain import CrossDomainService
+
+            pack_id = str(args.get("pack_id", "")).strip()
+            if not pack_id:
+                raise ValueError("Missing required parameter: pack_id")
+            sigla_uf = args.get("sigla_uf")
+            limit = int(args.get("limit", 10))
+            data = CrossDomainService(settings=self.settings).get_solution_pack_insights(
+                pack_id=pack_id, sigla_uf=sigla_uf, limit=limit
+            )
+            return {
+                "jsonrpc": "2.0",
+                "id": req_id,
+                "result": {
+                    "content": [
+                        {
+                            "type": "text",
+                            "text": wrap_untrusted_gov_data(
+                                data, source_id="cross_domain_gold"
+                            ),
                         }
                     ],
                     "isError": False,
