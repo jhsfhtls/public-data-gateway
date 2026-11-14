@@ -12,16 +12,21 @@ discovery_references:
 blocks:
 - block_id: BLOCO_1_KYC_GEO
   name: Enriquecimento Cadastral, Geolocalizacao, KYC/KYB & Antifraude
-  description: Gateways de fallback em cascata para CNPJ/CEP, geocodificacao, idade de dominio, LEI global e inteligencia de IP/ASN.
+  description: Gateways de fallback em cascata para CNPJ/CEP, geocodificacao, idade
+    de dominio, LEI global e inteligencia de IP/ASN.
 - block_id: BLOCO_2_MERCADO_REGULATORIO
   name: Inteligencia de Mercado, Regulatorias, Economia & Governo
-  description: Cotacoes B3/FIIs, cambio em tempo real, OData IPEA, CKAN ANEEL/ANP, Legislativo (Camara/Senado) e series globais (World Bank/OMS).
+  description: Cotacoes B3/FIIs, cambio em tempo real, OData IPEA, CKAN ANEEL/ANP,
+    Legislativo (Camara/Senado) e series globais (World Bank/OMS).
 - block_id: BLOCO_3_ESPACIAL_CLIMA_ML
   name: Feature Engineering Espacial, Mobilidade, Clima & ML
-  description: POIs em raio espacial (Overpass/OSM), matriz de rotas viarias (OSRM), clima/radiacao (Open-Meteo, NASA POWER), altitude (SRTM), inferencia NLP e feature stores.
+  description: POIs em raio espacial (Overpass/OSM), matriz de rotas viarias (OSRM),
+    clima/radiacao (Open-Meteo, NASA POWER), altitude (SRTM), inferencia NLP e feature
+    stores.
 - block_id: BLOCO_4_GLOBAL_PESQUISA
   name: Dados Globais, Demografia, Pesquisa & Sentimento
-  description: Normalizacao ISO-3166 de paises, grafo cientifico aberto (OpenAlex) e monitoramento global de noticias/sentimento (GDELT).
+  description: Normalizacao ISO-3166 de paises, grafo cientifico aberto (OpenAlex)
+    e monitoramento global de noticias/sentimento (GDELT).
 already_homologated_gov_br:
 - brasilapi_core
 - cgu_ceis_cnep
@@ -53,6 +58,8 @@ apis:
   gateway_method: enrich_cnpj_cascade
   status: HOMOLOGATED
   notes: Camada primaria de baixa latencia para CNPJ, QSA, Simples/MEI e CNAEs.
+  medallion_parity: true
+  connector_id: minha_receita
 - api_id: cnpja_open
   name: CNPJa Open API
   block: BLOCO_1_KYC_GEO
@@ -66,6 +73,8 @@ apis:
   gateway_method: enrich_cnpj_cascade
   status: HOMOLOGATED
   notes: Segundo fallback em cascata para QSA, regime tributario e inscricoes estaduais.
+  medallion_parity: true
+  connector_id: cnpja_open
 - api_id: receitaws
   name: ReceitaWS
   block: BLOCO_1_KYC_GEO
@@ -79,6 +88,8 @@ apis:
   gateway_method: enrich_cnpj_cascade
   status: HOMOLOGATED
   notes: Fallback final da cascata CNPJ (3 req/min na camada gratuita).
+  medallion_parity: true
+  connector_id: receitaws
 - api_id: viacep
   name: ViaCEP
   block: BLOCO_1_KYC_GEO
@@ -91,7 +102,10 @@ apis:
   - P04
   gateway_method: lookup_cep_cascade
   status: HOMOLOGATED
-  notes: Baixa latencia (50-80ms) com codigo IBGE, logradouro, bairro e suporte a busca reversa.
+  notes: Baixa latencia (50-80ms) com codigo IBGE, logradouro, bairro e suporte a
+    busca reversa.
+  medallion_parity: true
+  connector_id: viacep
 - api_id: opencep
   name: OpenCEP
   block: BLOCO_1_KYC_GEO
@@ -105,6 +119,8 @@ apis:
   gateway_method: lookup_cep_cascade
   status: HOMOLOGATED
   notes: Fallback rapido para consulta de CEP e codigo IBGE municipal.
+  medallion_parity: true
+  connector_id: opencep
 - api_id: nominatim_osm
   name: Nominatim (OpenStreetMap)
   block: BLOCO_1_KYC_GEO
@@ -117,7 +133,10 @@ apis:
   - P09
   gateway_method: geocode_nominatim
   status: HOMOLOGATED
-  notes: Geocodificacao direta e reversa aberta (exige User-Agent identificador, 1 req/s).
+  notes: Geocodificacao direta e reversa aberta (exige User-Agent identificador, 1
+    req/s).
+  medallion_parity: true
+  connector_id: nominatim_osm
 - api_id: rdap_registro_br
   name: RDAP Registro.br
   block: BLOCO_1_KYC_GEO
@@ -131,6 +150,8 @@ apis:
   gateway_method: lookup_rdap_registro_br
   status: HOMOLOGATED
   notes: Substituto JSON do WHOIS para idade de dominio .br, titularidade e DNS antifraude.
+  medallion_parity: true
+  connector_id: rdap_registro_br
 - api_id: gleif_lei
   name: GLEIF Global LEI API
   block: BLOCO_1_KYC_GEO
@@ -144,6 +165,8 @@ apis:
   gateway_method: lookup_gleif_lei
   status: HOMOLOGATED
   notes: Validacao global de entidades juridicas (LEI) e arvore de holdings controladoras.
+  medallion_parity: true
+  connector_id: gleif_lei
 - api_id: bgpview_ip_intel
   name: BGPView / IP-API
   block: BLOCO_1_KYC_GEO
@@ -157,6 +180,8 @@ apis:
   gateway_method: lookup_ip_intel
   status: HOMOLOGATED
   notes: Enriquecimento de IP com ASN, prefixo, pais e deteccao de datacenter/hosting.
+  medallion_parity: true
+  connector_id: bgpview_ip_intel
 - api_id: company_enrich_apollo_bdc
   name: CompanyEnrich / Apollo / BigDataCorp (Adaptador B2B Freemium)
   block: BLOCO_1_KYC_GEO
@@ -168,8 +193,11 @@ apis:
   - P04
   - P06
   gateway_method: lookup_b2b_domain_profile
-  status: CATALOGED
-  notes: Adaptador opcional ativado via variaveis de ambiente (COMPANY_ENRICH_API_KEY / APOLLO_API_KEY).
+  status: HOMOLOGATED
+  notes: Adaptador opcional ativado via variaveis de ambiente (COMPANY_ENRICH_API_KEY
+    / APOLLO_API_KEY).
+  medallion_parity: true
+  connector_id: company_enrich_apollo_bdc
 - api_id: brapi_b3
   name: brapi (Cotacoes B3, Dividendos & FIIs)
   block: BLOCO_2_MERCADO_REGULATORIO
@@ -184,7 +212,8 @@ apis:
   status: HOMOLOGATED
   medallion_parity: true
   connector_id: brapi_b3
-  notes: Cotacoes B3, dividendos, FIIs e indicadores fundamentalistas em JSON (BRAPI_TOKEN opcional).
+  notes: Cotacoes B3, dividendos, FIIs e indicadores fundamentalistas em JSON (BRAPI_TOKEN
+    opcional).
 - api_id: awesomeapi_fx
   name: AwesomeAPI (Cambio & Cripto)
   block: BLOCO_2_MERCADO_REGULATORIO
@@ -213,7 +242,8 @@ apis:
   status: HOMOLOGATED
   medallion_parity: true
   connector_id: ipeadata_odata
-  notes: Milhares de series historicas macroeconomicas, sociais e de financas regionais em OData v4.
+  notes: Milhares de series historicas macroeconomicas, sociais e de financas regionais
+    em OData v4.
 - api_id: aneel_anp_ckan
   name: ANEEL & ANP (CKAN DataStore)
   block: BLOCO_2_MERCADO_REGULATORIO
@@ -228,7 +258,8 @@ apis:
   status: HOMOLOGATED
   medallion_parity: true
   connector_id: aneel_anp_ckan
-  notes: Consultas SQL/JSON em tarifas eletricas, geracao distribuida (ANEEL) e combustiveis (ANP).
+  notes: Consultas SQL/JSON em tarifas eletricas, geracao distribuida (ANEEL) e combustiveis
+    (ANP).
 - api_id: camara_senado_dados_abertos
   name: Camara dos Deputados & Senado Federal
   block: BLOCO_2_MERCADO_REGULATORIO
@@ -288,7 +319,8 @@ apis:
   status: HOMOLOGATED
   medallion_parity: true
   connector_id: overpass_osm
-  notes: Contagem espacial de POIs (escolas, farmacias, bancos, paradas) em raio de coordenada.
+  notes: Contagem espacial de POIs (escolas, farmacias, bancos, paradas) em raio de
+    coordenada.
 - api_id: osrm_routing
   name: OSRM (Open Source Routing Machine)
   block: BLOCO_3_ESPACIAL_CLIMA_ML
@@ -303,7 +335,8 @@ apis:
   status: HOMOLOGATED
   medallion_parity: true
   connector_id: osrm_routing
-  notes: Distancia viaria real (km) e tempo de deslocamento entre coordenadas (supera Haversine).
+  notes: Distancia viaria real (km) e tempo de deslocamento entre coordenadas (supera
+    Haversine).
 - api_id: open_meteo
   name: Open-Meteo Historical & Forecast
   block: BLOCO_3_ESPACIAL_CLIMA_ML
@@ -318,7 +351,8 @@ apis:
   status: HOMOLOGATED
   medallion_parity: true
   connector_id: open_meteo
-  notes: Variaveis exogenas de clima horarias e historicas para modelos de previsao de demanda.
+  notes: Variaveis exogenas de clima horarias e historicas para modelos de previsao
+    de demanda.
 - api_id: nasa_power
   name: NASA POWER API
   block: BLOCO_3_ESPACIAL_CLIMA_ML
@@ -333,7 +367,8 @@ apis:
   status: HOMOLOGATED
   medallion_parity: true
   connector_id: nasa_power
-  notes: Radiacao solar, precipitacao, umidade e temperatura para modelos de agro e energia.
+  notes: Radiacao solar, precipitacao, umidade e temperatura para modelos de agro
+    e energia.
 - api_id: open_elevation
   name: Open-Elevation / OpenTopoData (SRTM)
   block: BLOCO_3_ESPACIAL_CLIMA_ML
@@ -348,7 +383,8 @@ apis:
   status: HOMOLOGATED
   medallion_parity: true
   connector_id: open_elevation
-  notes: Altitude exata do terreno por lat/lon para risco de alagamento, logistica e engenharia.
+  notes: Altitude exata do terreno por lat/lon para risco de alagamento, logistica
+    e engenharia.
 - api_id: huggingface_inference
   name: Hugging Face Inference API
   block: BLOCO_3_ESPACIAL_CLIMA_ML
@@ -405,7 +441,8 @@ apis:
   status: HOMOLOGATED
   medallion_parity: true
   connector_id: upgini_adapter
-  notes: Catalogo de features publicas automatizadas integravel a pipelines tabular ML.
+  notes: Catalogo de features publicas automatizadas integravel a pipelines tabular
+    ML.
 - api_id: rest_countries
   name: REST Countries v3.1
   block: BLOCO_4_GLOBAL_PESQUISA
@@ -431,7 +468,8 @@ apis:
   - P06
   gateway_method: search_openalex_works
   status: HOMOLOGATED
-  notes: Catalogo cientifico aberto com artigos, autores, conceitos e ROR IDs para NLP/grafos.
+  notes: Catalogo cientifico aberto com artigos, autores, conceitos e ROR IDs para
+    NLP/grafos.
 - api_id: gdelt_doc_api
   name: GDELT Project Doc 2.0 API
   block: BLOCO_4_GLOBAL_PESQUISA
@@ -444,4 +482,5 @@ apis:
   - P07
   gateway_method: query_gdelt_doc
   status: HOMOLOGATED
-  notes: Monitoramento global de noticias, volume de mencoes e score de sentimento quase em tempo real.
+  notes: Monitoramento global de noticias, volume de mencoes e score de sentimento
+    quase em tempo real.

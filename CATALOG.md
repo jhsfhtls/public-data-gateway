@@ -182,7 +182,7 @@ Gateways de fallback em cascata para CNPJ/CEP, geocodificacao, idade de dominio,
 | `rdap_registro_br` | RDAP Registro.br | `NONE` | 60 | `FREE_UNLIMITED` | P04, P07 | `lookup_rdap_registro_br` | `HOMOLOGATED` |
 | `gleif_lei` | GLEIF Global LEI API | `NONE` | 60 | `FREE_UNLIMITED` | P04, P07 | `lookup_gleif_lei` | `HOMOLOGATED` |
 | `bgpview_ip_intel` | BGPView / IP-API | `NONE` | 45 | `FREE_TIER` | P04, P08 | `lookup_ip_intel` | `HOMOLOGATED` |
-| `company_enrich_apollo_bdc` | CompanyEnrich / Apollo / BigDataCorp (Adaptador B2B Freemium) | `OPTIONAL_KEY` | 30 | `FREEMIUM` | P04, P06 | `lookup_b2b_domain_profile` | `CATALOGED` |
+| `company_enrich_apollo_bdc` | CompanyEnrich / Apollo / BigDataCorp (Adaptador B2B Freemium) | `OPTIONAL_KEY` | 30 | `FREEMIUM` | P04, P06 | `lookup_b2b_domain_profile` | `HOMOLOGATED` |
 
 ### Inteligencia de Mercado, Regulatorias, Economia & Governo (`BLOCO_2_MERCADO_REGULATORIO`)
 

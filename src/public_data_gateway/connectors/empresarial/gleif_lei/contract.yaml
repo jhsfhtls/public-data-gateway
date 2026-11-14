@@ -1,0 +1,31 @@
+contract_id: gleif-lei-v1
+source_id: gleif_lei
+version: "1.0.0"
+grain: "lei"
+primary_keys:
+  - lei
+reference_date_column: extracted_at
+lgpd_legal_basis: "Registro global aberto de Legal Entity Identifiers (GLEIF)"
+min_expected_rows: 1
+max_volume_drop_pct: 50.0
+sentinel_values:
+  - "-1"
+  - "-999"
+  - "999999"
+  - "N/A"
+columns:
+  - name: lei
+    data_type: STRING
+    nullable: false
+  - name: legal_name
+    data_type: STRING
+    nullable: false
+  - name: country
+    data_type: STRING
+    nullable: false
+  - name: entity_status
+    data_type: STRING
+    nullable: false
+  - name: extracted_at
+    data_type: STRING
+    nullable: false

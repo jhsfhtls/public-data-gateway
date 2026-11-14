@@ -1,0 +1,52 @@
+version: 2
+
+models:
+  - name: stg_cnpja_open_offices
+    description: "Staging view for CNPJa Open office records."
+    columns:
+      - name: cnpj
+        description: "14-digit CNPJ."
+        tests: [not_null]
+      - name: razao_social
+        description: "Company legal name."
+        tests: [not_null]
+      - name: situacao_cadastral
+        description: "Registration status."
+        tests: [not_null]
+      - name: cnae_principal
+        description: "Primary CNAE code."
+      - name: sigla_uf
+        description: "Federative Unit abbreviation."
+        tests: [not_null]
+      - name: municipio
+        description: "Municipality name."
+      - name: qsa_count
+        description: "Number of partners in QSA."
+        tests: [not_null]
+      - name: extracted_at
+        description: "UTC ISO-8601 extraction timestamp."
+
+  - name: fct_cnpja_open_offices
+    description: "Intradomain fact table for CNPJa Open company enrichment."
+    columns:
+      - name: cnpj
+        description: "14-digit CNPJ."
+        tests: [not_null, unique]
+      - name: razao_social
+        description: "Company legal name."
+        tests: [not_null]
+      - name: situacao_cadastral
+        description: "Registration status."
+        tests: [not_null]
+      - name: cnae_principal
+        description: "Primary CNAE code."
+      - name: sigla_uf
+        description: "Federative Unit abbreviation."
+        tests: [not_null]
+      - name: municipio
+        description: "Municipality name."
+      - name: qsa_count
+        description: "Number of partners in QSA."
+        tests: [not_null]
+      - name: extracted_at
+        description: "UTC ISO-8601 extraction timestamp."

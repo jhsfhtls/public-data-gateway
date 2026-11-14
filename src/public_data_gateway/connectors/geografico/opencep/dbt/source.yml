@@ -1,0 +1,10 @@
+version: 2
+
+sources:
+  - name: opencep
+    description: "OpenCEP postal code dataset."
+    meta:
+      external_location: "data/opencep/silver/{name}.parquet"
+    tables:
+      - name: opencep_ceps
+        description: "Normalized CEP address records from OpenCEP."

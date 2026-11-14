@@ -70,6 +70,16 @@ model-paths:
   - "../src/public_data_gateway/connectors/geografico/osrm_routing/dbt"
   - "../src/public_data_gateway/connectors/geografico/overpass_osm/dbt"
   - "../src/public_data_gateway/connectors/macrofinanceiro/alpha_vantage/dbt"
+  - "../src/public_data_gateway/connectors/compliance/bgpview_ip_intel/dbt"
+  - "../src/public_data_gateway/connectors/compliance/rdap_registro_br/dbt"
+  - "../src/public_data_gateway/connectors/empresarial/cnpja_open/dbt"
+  - "../src/public_data_gateway/connectors/empresarial/company_enrich_apollo_bdc/dbt"
+  - "../src/public_data_gateway/connectors/empresarial/gleif_lei/dbt"
+  - "../src/public_data_gateway/connectors/empresarial/minha_receita/dbt"
+  - "../src/public_data_gateway/connectors/empresarial/receitaws/dbt"
+  - "../src/public_data_gateway/connectors/geografico/nominatim_osm/dbt"
+  - "../src/public_data_gateway/connectors/geografico/opencep/dbt"
+  - "../src/public_data_gateway/connectors/geografico/viacep/dbt"
   - "models"
 
 analysis-paths: ["analyses"]

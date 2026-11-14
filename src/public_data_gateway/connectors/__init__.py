@@ -20,9 +20,11 @@ import public_data_gateway.connectors.ambiental.nasa_power  # noqa: F401
 import public_data_gateway.connectors.ambiental.open_meteo  # noqa: F401
 import public_data_gateway.connectors.ambiental.sfb_sicar  # noqa: F401
 import public_data_gateway.connectors.comercio_exterior.mdic_comexstat  # noqa: F401
+import public_data_gateway.connectors.compliance.bgpview_ip_intel  # noqa: F401
 import public_data_gateway.connectors.compliance.camara_senado_dados_abertos  # noqa: F401
 import public_data_gateway.connectors.compliance.cgu_ceis_cnep  # noqa: F401
 import public_data_gateway.connectors.compliance.cgu_pep  # noqa: F401
+import public_data_gateway.connectors.compliance.rdap_registro_br  # noqa: F401
 import public_data_gateway.connectors.compras_publicas.comprasgov_catmat  # noqa: F401
 import public_data_gateway.connectors.compras_publicas.pncp_contratacoes  # noqa: F401
 import public_data_gateway.connectors.demografico.ibge_censo2022  # noqa: F401
@@ -34,6 +36,11 @@ import public_data_gateway.connectors.educacao.inep_censo_escolar  # noqa: F401
 import public_data_gateway.connectors.educacao.inep_censo_superior  # noqa: F401
 import public_data_gateway.connectors.educacao.inep_enem  # noqa: F401
 import public_data_gateway.connectors.educacao.inep_ideb  # noqa: F401
+import public_data_gateway.connectors.empresarial.cnpja_open  # noqa: F401
+import public_data_gateway.connectors.empresarial.company_enrich_apollo_bdc  # noqa: F401
+import public_data_gateway.connectors.empresarial.gleif_lei  # noqa: F401
+import public_data_gateway.connectors.empresarial.minha_receita  # noqa: F401
+import public_data_gateway.connectors.empresarial.receitaws  # noqa: F401
 import public_data_gateway.connectors.empresarial.rfb_cnpj_lakehouse  # noqa: F401
 import public_data_gateway.connectors.empresarial.rfb_simples_mei  # noqa: F401
 import public_data_gateway.connectors.empresarial.suframa_pim_zfm  # noqa: F401
@@ -41,9 +48,12 @@ import public_data_gateway.connectors.geografico.anatel_mosaico  # noqa: F401
 import public_data_gateway.connectors.geografico.antt_malha_transporte  # noqa: F401
 import public_data_gateway.connectors.geografico.ibge_cnefe  # noqa: F401
 import public_data_gateway.connectors.geografico.ibge_malhas  # noqa: F401
+import public_data_gateway.connectors.geografico.nominatim_osm  # noqa: F401
 import public_data_gateway.connectors.geografico.open_elevation  # noqa: F401
+import public_data_gateway.connectors.geografico.opencep  # noqa: F401
 import public_data_gateway.connectors.geografico.osrm_routing  # noqa: F401
 import public_data_gateway.connectors.geografico.overpass_osm  # noqa: F401
+import public_data_gateway.connectors.geografico.viacep  # noqa: F401
 import public_data_gateway.connectors.imobiliario.capitais_iptu_itbi  # noqa: F401
 import public_data_gateway.connectors.imobiliario.onr_registro_imoveis  # noqa: F401
 import public_data_gateway.connectors.judicial.cnj_datajud  # noqa: F401

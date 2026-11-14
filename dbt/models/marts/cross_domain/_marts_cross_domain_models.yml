@@ -468,3 +468,49 @@ models:
       - name: total_upgini_feature_groups
         description: "Quantidade de grupos de features Upgini catalogados."
         tests: [not_null]
+
+  - name: mart_cross_domain_kyc_antifraude_brasil
+    description: "Visao cross-domain estadual integrando Feature Store B2B com os 10 conectores Medallion de KYC/KYB, endereçamento, geolocalizacao, RDAP, GLEIF LEI e inteligencia de IP/ASN (Wave 10.5C)."
+    columns:
+      - name: sigla_uf
+        description: "Sigla da Unidade Federativa."
+        tests: [not_null, unique]
+      - name: regiao
+        description: "Macrorregiao brasileira."
+        tests: [not_null]
+      - name: total_municipios_uf
+        description: "Total de municipios na UF."
+        tests: [not_null]
+      - name: avg_propensao_b2b_uf
+        description: "Media estadual do score composto de propensao B2B."
+        tests: [not_null]
+      - name: total_cnpjs_minha_receita
+        description: "Total de CNPJs enriquecidos via Minha Receita na UF."
+        tests: [not_null]
+      - name: total_cnpjs_cnpja
+        description: "Total de CNPJs enriquecidos via CNPJa Open na UF."
+        tests: [not_null]
+      - name: total_cnpjs_receitaws
+        description: "Total de CNPJs enriquecidos via ReceitaWS na UF."
+        tests: [not_null]
+      - name: total_ceps_viacep
+        description: "Total de CEPs normalizados via ViaCEP na UF."
+        tests: [not_null]
+      - name: total_ceps_opencep
+        description: "Total de CEPs normalizados via OpenCEP na UF."
+        tests: [not_null]
+      - name: total_geocodes_nominatim
+        description: "Total de geocodificacoes Nominatim OSM na UF."
+        tests: [not_null]
+      - name: total_rdap_dominios_br
+        description: "Total de dominios .br monitorados via RDAP Registro.br."
+        tests: [not_null]
+      - name: total_gleif_entidades
+        description: "Total de entidades juridicas globais LEI indexadas via GLEIF."
+        tests: [not_null]
+      - name: total_bgp_ips_monitorados
+        description: "Total de IPs e ASNs monitorados via BGPView / ipwho.is."
+        tests: [not_null]
+      - name: total_perfis_b2b
+        description: "Total de perfis corporativos B2B indexados."
+        tests: [not_null]

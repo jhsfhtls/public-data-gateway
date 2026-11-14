@@ -1,0 +1,10 @@
+version: 2
+
+sources:
+  - name: bgpview_ip_intel
+    description: "BGPView / ipwho.is IP ASN intelligence dataset."
+    meta:
+      external_location: "data/bgpview_ip_intel/silver/{name}.parquet"
+    tables:
+      - name: bgpview_ip_intel_ips
+        description: "Normalized IP and ASN intelligence records."

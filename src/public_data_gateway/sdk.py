@@ -2150,6 +2150,61 @@ class PublicApisHubFacade:
 
         return UpginiAdapterConnector(settings=self._sdk.settings).describe_features()
 
+    def geocode_nominatim(
+        self, query: str, *, limit: int = 3, persist: bool = False
+    ) -> list[dict[str, Any]]:
+        """Forward geocode an address using OpenStreetMap Nominatim Medallion connector."""
+        from public_data_gateway.connectors.geografico.nominatim_osm import NominatimOsmConnector
+
+        conn = NominatimOsmConnector(settings=self._sdk.settings)
+        if persist:
+            return conn.extract_table().to_pylist()
+        return conn.normalize_records(conn.fetch_geocode(query=query, limit=limit))
+
+    def lookup_rdap_registro_br(self, domain: str, *, persist: bool = False) -> dict[str, Any]:
+        """Lookup .br domain registration & age metadata via RDAP Registro.br Medallion connector."""
+        from public_data_gateway.connectors.compliance.rdap_registro_br import (
+            RdapRegistroBrConnector,
+        )
+
+        conn = RdapRegistroBrConnector(settings=self._sdk.settings)
+        if persist:
+            return conn.extract_table().to_pylist()[0]
+        return conn.fetch_domain(domain=domain)
+
+    def lookup_gleif_lei(
+        self, query: str, *, limit: int = 5, persist: bool = False
+    ) -> list[dict[str, Any]]:
+        """Search global Legal Entity Identifiers (LEI) via GLEIF Medallion connector."""
+        from public_data_gateway.connectors.empresarial.gleif_lei import GleifLeiConnector
+
+        conn = GleifLeiConnector(settings=self._sdk.settings)
+        if persist:
+            return conn.extract_table().to_pylist()
+        return conn.normalize_records(conn.fetch_lei_records(query=query, limit=limit))
+
+    def lookup_ip_intel(self, ip: str, *, persist: bool = False) -> dict[str, Any]:
+        """Lookup IP ASN and geolocation via BGPView / ipwho.is Medallion connector."""
+        from public_data_gateway.connectors.compliance.bgpview_ip_intel import (
+            BgpviewIpIntelConnector,
+        )
+
+        conn = BgpviewIpIntelConnector(settings=self._sdk.settings)
+        if persist:
+            return conn.extract_table().to_pylist()[0]
+        return conn.fetch_ip(ip=ip)
+
+    def lookup_b2b_domain_profile(self, domain: str, *, persist: bool = False) -> dict[str, Any]:
+        """Lookup optional freemium B2B domain profile via CompanyEnrich Medallion connector."""
+        from public_data_gateway.connectors.empresarial.company_enrich_apollo_bdc import (
+            CompanyEnrichConnector,
+        )
+
+        conn = CompanyEnrichConnector(settings=self._sdk.settings)
+        if persist:
+            return conn.extract_table().to_pylist()[0]
+        return conn.fetch_b2b_profile(domain=domain)
+
 
 class BrazilData:
     """Unified developer SDK facade for querying, normalizing, and enriching Brazilian public datasets."""

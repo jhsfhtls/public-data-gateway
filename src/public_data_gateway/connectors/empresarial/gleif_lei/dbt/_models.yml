@@ -1,0 +1,38 @@
+version: 2
+
+models:
+  - name: stg_gleif_lei_records
+    description: "Staging view for GLEIF LEI records."
+    columns:
+      - name: lei
+        description: "20-character ISO 17442 LEI code."
+        tests: [not_null]
+      - name: legal_name
+        description: "Registered legal entity name."
+        tests: [not_null]
+      - name: country
+        description: "ISO-3166 country code."
+        tests: [not_null]
+      - name: entity_status
+        description: "LEI entity status."
+        tests: [not_null]
+      - name: extracted_at
+        description: "UTC ISO-8601 extraction timestamp."
+
+  - name: dim_gleif_lei_entidades
+    description: "Intradomain dimension table for global LEI entities."
+    columns:
+      - name: lei
+        description: "20-character ISO 17442 LEI code."
+        tests: [not_null, unique]
+      - name: legal_name
+        description: "Registered legal entity name."
+        tests: [not_null]
+      - name: country
+        description: "ISO-3166 country code."
+        tests: [not_null]
+      - name: entity_status
+        description: "LEI entity status."
+        tests: [not_null]
+      - name: extracted_at
+        description: "UTC ISO-8601 extraction timestamp."

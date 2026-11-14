@@ -1,0 +1,10 @@
+version: 2
+
+sources:
+  - name: viacep
+    description: "ViaCEP postal code dataset."
+    meta:
+      external_location: "data/viacep/silver/{name}.parquet"
+    tables:
+      - name: viacep_ceps
+        description: "Normalized CEP address records from ViaCEP."

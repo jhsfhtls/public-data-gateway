@@ -1,0 +1,46 @@
+version: 2
+
+models:
+  - name: stg_bgpview_ip_intel_ips
+    description: "Staging view for IP ASN intelligence."
+    columns:
+      - name: ip
+        description: "IPv4 or IPv6 address."
+        tests: [not_null]
+      - name: ptr_record
+        description: "Reverse DNS / domain."
+      - name: asn
+        description: "Autonomous System Number."
+        tests: [not_null]
+      - name: asn_name
+        description: "Autonomous System organization name."
+      - name: country_code
+        description: "ISO-3166 country code."
+        tests: [not_null]
+      - name: provider_used
+        description: "Provider used for IP lookup."
+        tests: [not_null]
+      - name: extracted_at
+        description: "UTC ISO-8601 extraction timestamp."
+
+  - name: fct_bgpview_ip_asn_intel
+    description: "Intradomain fact table for IP/ASN antifraud intelligence."
+    columns:
+      - name: ip
+        description: "IPv4 or IPv6 address."
+        tests: [not_null, unique]
+      - name: ptr_record
+        description: "Reverse DNS / domain."
+      - name: asn
+        description: "Autonomous System Number."
+        tests: [not_null]
+      - name: asn_name
+        description: "Autonomous System organization name."
+      - name: country_code
+        description: "ISO-3166 country code."
+        tests: [not_null]
+      - name: provider_used
+        description: "Provider used for IP lookup."
+        tests: [not_null]
+      - name: extracted_at
+        description: "UTC ISO-8601 extraction timestamp."

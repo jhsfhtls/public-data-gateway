@@ -1,0 +1,10 @@
+version: 2
+
+sources:
+  - name: receitaws
+    description: "ReceitaWS CNPJ dataset."
+    meta:
+      external_location: "data/receitaws/silver/{name}.parquet"
+    tables:
+      - name: receitaws_cnpjs
+        description: "Normalized CNPJ records from ReceitaWS."
