@@ -45,7 +45,7 @@ def main() -> int:
                 undocumented_columns.append(f"{model_name}.{col_name}")
 
     print("=================================================================")
-    print("dbt Documentation & Metadata Governance Linter (POP_T_177 / POP_T_162)")
+    print("dbt Documentation & Metadata Governance Linter (ODCS v3.1 / ADR-002)")
     print("=================================================================")
     print(f"Total Models Evaluated:  {total_models}")
     print(f"Total Columns Evaluated: {total_columns}")

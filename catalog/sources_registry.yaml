@@ -76,7 +76,7 @@ sources:
   ml_feature_domains:
   - territorial_hierarchy
   - geo_resolution
-  core_products_enabled:
+  solution_packs:
   - P01
   - P02
   - P03
@@ -102,7 +102,7 @@ sources:
   ml_feature_domains:
   - geo_resolution
   - entity_resolution
-  core_products_enabled:
+  solution_packs:
   - P01
   - P02
   - P03
@@ -126,7 +126,7 @@ sources:
   ml_feature_domains:
   - macro_deflators
   - monetary_indicators
-  core_products_enabled:
+  solution_packs:
   - P01
   - P02
   - P05
@@ -149,7 +149,7 @@ sources:
   ml_feature_domains:
   - fx_rates
   - macro_deflators
-  core_products_enabled:
+  solution_packs:
   - P01
   - P05
   rice_score: 820
@@ -177,7 +177,7 @@ sources:
   - firmographics
   - corporate_hierarchy
   - qsa_network
-  core_products_enabled:
+  solution_packs:
   - P01
   - P02
   - P04
@@ -204,7 +204,7 @@ sources:
   ml_feature_domains:
   - public_procurement
   - vendor_risk
-  core_products_enabled:
+  solution_packs:
   - P01
   - P02
   - P04
@@ -229,7 +229,7 @@ sources:
   ml_feature_domains:
   - legal_exposure
   - court_litigation
-  core_products_enabled:
+  solution_packs:
   - P01
   - P02
   - P07
@@ -254,7 +254,7 @@ sources:
   ml_feature_domains:
   - compliance_risk
   - sanction_lists
-  core_products_enabled:
+  solution_packs:
   - P01
   - P06
   - P07
@@ -278,7 +278,7 @@ sources:
   ml_feature_domains:
   - compliance_risk
   - pep_screening
-  core_products_enabled:
+  solution_packs:
   - P01
   - P06
   - P07
@@ -302,7 +302,7 @@ sources:
   ml_feature_domains:
   - tax_regime
   - sme_status
-  core_products_enabled:
+  solution_packs:
   - P01
   - P02
   rice_score: 720
@@ -326,7 +326,7 @@ sources:
   ml_feature_domains:
   - labor_compliance
   - labor_liabilities
-  core_products_enabled:
+  solution_packs:
   - P01
   - P07
   rice_score: 700
@@ -351,7 +351,7 @@ sources:
   ml_feature_domains:
   - tax_incentives
   - industrial_zfm
-  core_products_enabled:
+  solution_packs:
   - P01
   - P09
   rice_score: 610
@@ -374,7 +374,7 @@ sources:
   ml_feature_domains:
   - corporate_financials
   - dre_balance_sheet
-  core_products_enabled:
+  solution_packs:
   - P01
   - P05
   rice_score: 680
@@ -399,7 +399,7 @@ sources:
   ml_feature_domains:
   - trade_fob_flows
   - export_import_metrics
-  core_products_enabled:
+  solution_packs:
   - P01
   - P02
   rice_score: 660
@@ -422,7 +422,7 @@ sources:
   ml_feature_domains:
   - investment_funds
   - nav_liquidity
-  core_products_enabled:
+  solution_packs:
   - P01
   - P05
   rice_score: 650
@@ -445,7 +445,7 @@ sources:
   ml_feature_domains:
   - banking_prudential
   - credit_portfolio
-  core_products_enabled:
+  solution_packs:
   - P01
   - P05
   rice_score: 640
@@ -469,7 +469,7 @@ sources:
   ml_feature_domains:
   - public_debt
   - fiscal_transfers_fpm
-  core_products_enabled:
+  solution_packs:
   - P01
   - P05
   rice_score: 630
@@ -491,7 +491,7 @@ sources:
   ml_feature_domains:
   - item_catalog
   - procurement_pricing
-  core_products_enabled:
+  solution_packs:
   - P01
   - P04
   rice_score: 610
@@ -515,7 +515,7 @@ sources:
   ml_feature_domains:
   - aggregate_indicators
   - demographic_series
-  core_products_enabled:
+  solution_packs:
   - P01
   - P02
   rice_score: 590
@@ -539,7 +539,7 @@ sources:
   ml_feature_domains:
   - municipal_pib
   - vab_sectors
-  core_products_enabled:
+  solution_packs:
   - P01
   - P02
   rice_score: 580
@@ -563,7 +563,7 @@ sources:
   ml_feature_domains:
   - census_tracts
   - socioeconomic_profile
-  core_products_enabled:
+  solution_packs:
   - P01
   - P02
   - P03
@@ -591,7 +591,7 @@ sources:
   - labor_flow
   - admissions_layoffs
   - salary_benchmarks
-  core_products_enabled:
+  solution_packs:
   - P01
   - P02
   rice_score: 570
@@ -614,7 +614,7 @@ sources:
   ml_feature_domains:
   - household_income
   - unemployment_rate
-  core_products_enabled:
+  solution_packs:
   - P01
   - P02
   rice_score: 560
@@ -639,7 +639,7 @@ sources:
   ml_feature_domains:
   - geo_coordinates
   - address_standardization
-  core_products_enabled:
+  solution_packs:
   - P01
   - P03
   rice_score: 560
@@ -665,7 +665,7 @@ sources:
   ml_feature_domains:
   - formal_employment_stock
   - wage_distribution
-  core_products_enabled:
+  solution_packs:
   - P01
   - P02
   rice_score: 550
@@ -689,7 +689,7 @@ sources:
   ml_feature_domains:
   - boundary_polygons
   - spatial_geometries
-  core_products_enabled:
+  solution_packs:
   - P01
   - P03
   rice_score: 540
@@ -713,7 +713,7 @@ sources:
   ml_feature_domains:
   - telecom_towers
   - broadband_coverage
-  core_products_enabled:
+  solution_packs:
   - P01
   - P09
   rice_score: 510
@@ -737,7 +737,7 @@ sources:
   ml_feature_domains:
   - freight_corridors
   - transport_nodes
-  core_products_enabled:
+  solution_packs:
   - P01
   - P03
   - P09
@@ -764,7 +764,7 @@ sources:
   ml_feature_domains:
   - health_facilities
   - icu_beds_capacity
-  core_products_enabled:
+  solution_packs:
   - P01
   - P02
   rice_score: 480
@@ -788,7 +788,7 @@ sources:
   ml_feature_domains:
   - hospital_admissions
   - hospital_costs_cid10
-  core_products_enabled:
+  solution_packs:
   - P01
   - P02
   rice_score: 470
@@ -813,7 +813,7 @@ sources:
   ml_feature_domains:
   - school_infrastructure
   - basic_ed_enrollments
-  core_products_enabled:
+  solution_packs:
   - P01
   - P02
   rice_score: 470
@@ -837,7 +837,7 @@ sources:
   ml_feature_domains:
   - mortality_causes
   - cid10_trends
-  core_products_enabled:
+  solution_packs:
   - P01
   - P02
   rice_score: 460
@@ -862,7 +862,7 @@ sources:
   ml_feature_domains:
   - higher_ed_institutions
   - degree_courses
-  core_products_enabled:
+  solution_packs:
   - P01
   - P02
   rice_score: 460
@@ -886,7 +886,7 @@ sources:
   ml_feature_domains:
   - notary_offices
   - cartorial_productivity
-  core_products_enabled:
+  solution_packs:
   - P01
   - P04
   rice_score: 460
@@ -910,7 +910,7 @@ sources:
   ml_feature_domains:
   - live_births
   - maternal_indicators
-  core_products_enabled:
+  solution_packs:
   - P01
   - P02
   rice_score: 450
@@ -933,7 +933,7 @@ sources:
   ml_feature_domains:
   - regulated_drug_prices
   - maximum_consumer_price
-  core_products_enabled:
+  solution_packs:
   - P01
   - P04
   rice_score: 450
@@ -957,7 +957,7 @@ sources:
   ml_feature_domains:
   - education_quality_index
   - learning_metrics
-  core_products_enabled:
+  solution_packs:
   - P01
   - P02
   rice_score: 450
@@ -981,7 +981,7 @@ sources:
   ml_feature_domains:
   - real_estate_transactions
   - property_registries
-  core_products_enabled:
+  solution_packs:
   - P01
   - P03
   rice_score: 450
@@ -1005,7 +1005,7 @@ sources:
   ml_feature_domains:
   - epidemiological_surveillance
   - vaccination_coverage
-  core_products_enabled:
+  solution_packs:
   - P01
   - P02
   rice_score: 440
@@ -1029,7 +1029,7 @@ sources:
   ml_feature_domains:
   - exam_performance
   - socioeconomic_test_scores
-  core_products_enabled:
+  solution_packs:
   - P01
   - P02
   rice_score: 440
@@ -1054,7 +1054,7 @@ sources:
   ml_feature_domains:
   - property_valuation
   - municipal_cadastre
-  core_products_enabled:
+  solution_packs:
   - P01
   - P03
   rice_score: 430
@@ -1078,7 +1078,7 @@ sources:
   ml_feature_domains:
   - postgrad_programs
   - academic_production
-  core_products_enabled:
+  solution_packs:
   - P01
   - P02
   rice_score: 410
@@ -1102,7 +1102,7 @@ sources:
   ml_feature_domains:
   - deforestation_alerts
   - environmental_compliance
-  core_products_enabled:
+  solution_packs:
   - P01
   - P06
   - P09
@@ -1129,7 +1129,7 @@ sources:
   ml_feature_domains:
   - federated_catalog
   - cross_domain_warehouse
-  core_products_enabled:
+  solution_packs:
   - P01
   - P02
   - P03
@@ -1157,7 +1157,7 @@ sources:
   ml_feature_domains:
   - river_levels
   - hydro_telemetry
-  core_products_enabled:
+  solution_packs:
   - P01
   - P09
   rice_score: 380
@@ -1181,7 +1181,7 @@ sources:
   ml_feature_domains:
   - land_use
   - land_cover_transition
-  core_products_enabled:
+  solution_packs:
   - P01
   - P06
   - P09
@@ -1206,7 +1206,7 @@ sources:
   ml_feature_domains:
   - rural_properties
   - legal_reserve_polygons
-  core_products_enabled:
+  solution_packs:
   - P01
   - P06
   - P09
@@ -1231,7 +1231,7 @@ sources:
   ml_feature_domains:
   - agro_climatic_risk
   - planting_calendar
-  core_products_enabled:
+  solution_packs:
   - P01
   - P09
   rice_score: 350
@@ -1253,7 +1253,7 @@ sources:
   ml_feature_domains:
   - gov_catalog_metadata
   - ckan_api_directory
-  core_products_enabled:
+  solution_packs:
   - P01
   - P02
   rice_score: 340

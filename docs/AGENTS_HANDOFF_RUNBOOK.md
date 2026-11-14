@@ -7,15 +7,14 @@
 
 ## 1. Contexto do Repositório & Ecossistema
 
-- **Repositório:** `C:\Users\jhose\GitOps\public-data-gateway` (Satélite C.O.R.E.)
+- **Repositório:** `public-data-gateway` (Open Source Medallion Platform)
 - **Python Virtual Environment:** `.\.venv\Scripts\python.exe` (Nunca use Python/pip global)
 - **Branch Canônica:** `main` (protegida por hooks de lint, branch naming, conventional commits e secrets scan)
 - **Total de Conectores no Catálogo:** **49 fontes oficiais brasileiras** divididas em **9 Waves**
-- **Status Atual:** **23 / 49 homologados (46.9%)**
-- **Wave Ativa:** **Wave 4 (5 de 10 concluídos)**
-  - Homologados na Wave 4: `ibge_sidra`, `ibge_censo2022`, `mte_novo_caged`, `ibge_pnad_continua`, `ibge_cnefe`
+- **Status Atual:** **49 / 49 homologados (100.0%)**
+- **Waves 1 a 9:** **TODAS CONCLUÍDAS (49/49)** — Próxima etapa: **Fase 09 (Datamarts Cross-Domain & Feature Store Consolidada)**
   - **Próximo Alvo Imediato:** **`mte_rais`** (Ministério do Trabalho e Emprego: Relação Anual de Informações Sociais)
-  - Alvos subsequentes da Wave 4: `ibge_pib_municipal`, `ibge_malhas`, `anatel_mosaico`, `antt_malha_transporte`
+  - Waves 4 a 9 concluídas integralmente com 100% de cobertura ODCS v3.1, dbt e testes offline + live.
 
 ---
 
@@ -23,15 +22,15 @@
 
 | Wave | Nome da Wave | Total Fontes | Homologadas | Status |
 | :---: | :--- | :---: | :---: | :---: |
-| **Wave 1** | Foundation & Core Financial Indicators | 4 | 4 | **100% CONCLUÍDA** (PRs #1-#4) |
-| **Wave 2** | Public Procurement & Anti-Corruption Governance | 8 | 8 | **100% CONCLUÍDA** (PRs #5-#12) |
-| **Wave 3** | Macro-Financial, Corporate Capital Markets & Treasury | 6 | 6 | **100% CONCLUÍDA** (PRs #13-#18) |
-| **Wave 4** | Demographics, Labor Dynamics & Territorial Geocoding | 10 | 5 | **EM ANDAMENTO** (PRs #19-#25) |
-| **Wave 5** | Public Health, SUS Epidemiology & Sanitary Vigilance | 5 | 0 | Planejada |
-| **Wave 6** | Basic, Higher & Postgraduate Education | 4 | 0 | Planejada |
-| **Wave 7** | Agriculture, Environmental Licensing & Land Cadastre | 5 | 0 | Planejada |
-| **Wave 8** | Real Estate, Public Deeds & Notarial Registry | 3 | 0 | Planejada |
-| **Wave 9** | Infrastructure Logistics & Metaportals | 4 | 0 | Planejada |
+| **Wave 1** | Foundation & Core Financial Indicators | 4 | 4 | **100% CONCLUÍDA** |
+| **Wave 2** | Public Procurement & Anti-Corruption Governance | 8 | 8 | **100% CONCLUÍDA** |
+| **Wave 3** | Macro-Financial, Corporate Capital Markets & Treasury | 6 | 6 | **100% CONCLUÍDA** |
+| **Wave 4** | Demographics, Labor Dynamics & Territorial Geocoding | 10 | 10 | **100% CONCLUÍDA** |
+| **Wave 5** | Public Health, SUS Epidemiology & Sanitary Vigilance | 5 | 5 | **100% CONCLUÍDA** |
+| **Wave 6** | Basic, Higher & Postgraduate Education | 4 | 4 | **100% CONCLUÍDA** |
+| **Wave 7** | Agriculture, Environmental Licensing & Land Cadastre | 5 | 5 | **100% CONCLUÍDA** |
+| **Wave 8** | Real Estate, Public Deeds & Notarial Registry | 3 | 3 | **100% CONCLUÍDA** |
+| **Wave 9** | Infrastructure Logistics & Metaportals | 4 | 4 | **100% CONCLUÍDA** |
 
 ---
 
@@ -42,7 +41,7 @@ Para CADA novo conector a ser homologado, execute estritamente os 11 passos abai
 ### Pré-requisito: Git Worktree
 1. Atualize a branch canônica:
    ```powershell
-   cd C:\Users\jhose\GitOps\public-data-gateway
+   cd <repo-root>
    git checkout main
    git pull origin main
    ```
@@ -52,12 +51,12 @@ Para CADA novo conector a ser homologado, execute estritamente os 11 passos abai
    ```
 3. Crie os links de junção (junctions) para o `.venv` e subpastas de `data/`:
    ```powershell
-   cmd /c mklink /J "C:\Users\jhose\GitOps\worktrees\feat-conn-<conector>\.venv" "C:\Users\jhose\GitOps\public-data-gateway\.venv"
-   Get-ChildItem C:\Users\jhose\GitOps\public-data-gateway\data -Directory | Where-Object { $_.Name -ne 'reference' } | ForEach-Object { cmd /c mklink /J "C:\Users\jhose\GitOps\worktrees\feat-conn-<conector>\data\$($_.Name)" "$($_.FullName)" }
+   cmd /c mklink /J "..\worktrees\feat-conn-<conector>\.venv" "<repo-root>\.venv"
+   Get-ChildItem <repo-root>\data -Directory | Where-Object { $_.Name -ne 'reference' } | ForEach-Object { cmd /c mklink /J "..\worktrees\feat-conn-<conector>\data\$($_.Name)" "$($_.FullName)" }
    ```
 4. Instale o pacote em modo editável no worktree:
    ```powershell
-   cd C:\Users\jhose\GitOps\worktrees\feat-conn-<conector>
+   cd ..\worktrees\feat-conn-<conector>
    .\.venv\Scripts\pip.exe install -e . --no-deps
    ```
 
@@ -89,7 +88,7 @@ Para CADA novo conector a ser homologado, execute estritamente os 11 passos abai
 - Executar extração local e sincronizar para o repositório canônico:
   ```powershell
   .\.venv\Scripts\python.exe -c "from public_data_gateway.connectors.<dominio>.<conector>.connector import <Classe>; conn = <Classe>(); conn.extract_all()"
-  robocopy "C:\Users\jhose\GitOps\worktrees\feat-conn-<conector>\data\<conector>" "C:\Users\jhose\GitOps\public-data-gateway\data\<conector>" /E
+  robocopy "..\worktrees\feat-conn-<conector>\data\<conector>" "<repo-root>\data\<conector>" /E
   ```
 
 ### Gate 4: dbt Staging Models & Documentação
@@ -181,7 +180,7 @@ Expor o novo conector nas 4 interfaces da plataforma:
    ```
 6. Retornar ao repositório canônico, atualizar `main` e remover o worktree:
    ```powershell
-   cd C:\Users\jhose\GitOps\public-data-gateway
+   cd <repo-root>
    git checkout main
    git pull origin main
    git worktree remove ../worktrees/feat-conn-<conector> --force

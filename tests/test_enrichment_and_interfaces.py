@@ -1,4 +1,4 @@
-"""Tests for EnrichmentEngine, POP_T_154 shield, REST API, CLI, and MCP Server."""
+"""Tests for EnrichmentEngine, Client Path Shield, REST API, CLI, and MCP Server."""
 
 import csv
 from pathlib import Path
@@ -15,7 +15,7 @@ from brazil_data_gateway.mcp.server import MCPDispatcher
 
 
 def test_enrichment_engine_and_client_path_shield(tmp_settings: GatewaySettings, tmp_path: Path) -> None:
-    """Test territorial enrichment, CWE-1236 CSV safety, and POP_T_154 Client Path Shield."""
+    """Test territorial enrichment, CWE-1236 CSV safety, and Client Path Shield."""
     enricher = EnrichmentEngine(settings=tmp_settings)
 
     table = pa.table(
@@ -26,7 +26,7 @@ def test_enrichment_engine_and_client_path_shield(tmp_settings: GatewaySettings,
         }
     )
 
-    # 1. Enforce POP_T_154: Output path inside data_dir MUST raise ValueError
+    # 1. Enforce Client Path Shield: Output path inside data_dir MUST raise ValueError
     forbidden_out = tmp_settings.data_dir / "forbidden_client_output.csv"
     with pytest.raises(ValueError, match="Client Path Shield"):
         enricher.enrich(

@@ -1,14 +1,14 @@
 <div align="center">
   <h2>Catálogo Mestre de Fontes Públicas & Registros Federativos Brasileiros</h2>
   <p><i>Mapeamento Unificado de 49 Fontes Governamentais nos 13 Macrosegmentos, Ondas 1 a 6 e Chaves Canônicas</i></p>
-  <p><b>Versão:</b> 1.0.0 &nbsp;|&nbsp; <b>Última Atualização:</b> 2026-11-07 &nbsp;|&nbsp; <b>Governança:</b> POP_T_177 • POP_T_176 • POP_T_174 • POP_T_070 • POP_T_148</p>
+  <p><b>Versão:</b> 1.0.0 &nbsp;|&nbsp; <b>Última Atualização:</b> 2026-11-07 &nbsp;|&nbsp; <b>Padrões:</b> ADR-001 • ADR-002 • ADR-003 • ODCS v3.1 • LGPD</p>
   <hr/>
 </div>
 <br/>
 
 # Catálogo Mestre de Fontes Públicas Governamentais (49 Fontes)
 
-Este catálogo consolida formalmente as **49 bases de dados públicas e APIs governamentais do Brasil** integradas ao `public-data-gateway`. As fontes abrangem a totalidade dos **13 macrosegmentos estruturais federativos**, organizadas em **6 Ondas Estratégicas de Implementação** ordenadas por priorização ponderada `RICE` (`POP_B_091`), garantindo integridade cadastral canônica, observabilidade de 5 pilares (`POP_T_074`) e conformidade com a LGPD (`POP_B_051`).
+Este catálogo consolida formalmente as **49 bases de dados públicas e APIs governamentais do Brasil** integradas ao `public-data-gateway`. As fontes abrangem a totalidade dos **13 macrosegmentos estruturais federativos**, organizadas em **6 Ondas Estratégicas de Implementação** ordenadas por priorização ponderada `RICE`, garantindo integridade cadastral canônica (`ADR-002`), observabilidade de 5 pilares (`ODCS v3.1`) e conformidade com a LGPD (`ADR-003`, Lei nº 13.709/2018).
 
 ---
 
@@ -18,7 +18,7 @@ Este catálogo consolida formalmente as **49 bases de dados públicas e APIs gov
 - **Total de Macrosegmentos:** 13 macrosegmentos federativos cobertos (100% de cobertura)
 - **Ondas de Implementação:** 6 ondas estruturadas por retorno analítico e complexidade operacional
 - **Chaves Canônicas Unificadas:** 8 chaves relacionais padronizadas em `STRING` (`id_municipio` 7D, `sigla_uf`, `cnpj_14`, `cpf_masked`, `cep_8`, `cnae_7`, `cbo_6`, `ncm_8`)
-- **Habilitação de Produtos C.O.R.E.:** 10 de 10 Produtos Modulares (`P01` a `P10`) suportados por dados oficiais
+- **Perfis de Capacidade Analítica (Solution Packs):** 10 de 10 Perfis Modulares (`P01` a `P10`) suportados por dados oficiais
 
 ### 1.1. Distribuição por Modo de Acesso
 
@@ -63,12 +63,12 @@ Este catálogo consolida formalmente as **49 bases de dados públicas e APIs gov
 
 | Onda | Foco Estratégico & Justificativa | Total Fontes | Intervalo RICE | Modos de Acesso | Fontes Críticas | Status |
 | :---: | :--- | :---: | :---: | :--- | :--- | :---: |
-| **Wave 1** | APIs de Borda & Séries Macroeconômicas (Baixa Latência < 300ms) | 4 | 820–950 | `FEDERATED_API` | `ibge_localidades`, `brasilapi_core`, `bcb_sgs` (+1) | 🟡 Em Preparação |
-| **Wave 2** | B2B, Compras Públicas, Integridade & Compliance Cadastral | 8 | 610–840 | `FEDERATED_API, LAKEHOUSE_BATCH` | `rfb_cnpj_lakehouse`, `pncp_contratacoes`, `cnj_datajud` (+5) | ⚪ Planejado |
-| **Wave 3** | Mercado de Capitais, Balanços Contábeis & Finanças Públicas | 6 | 610–680 | `FEDERATED_API, LAKEHOUSE_BATCH` | `cvm_dfp_itr`, `mdic_comexstat`, `cvm_fundos` (+3) | ⚪ Planejado |
-| **Wave 4** | Censo Demográfico, Trabalho, Renda, Logística & Telecomunicações | 10 | 500–590 | `FEDERATED_API, LAKEHOUSE_BATCH` | `ibge_sidra`, `ibge_pib_municipal`, `ibge_censo2022` (+7) | ⚪ Planejado |
-| **Wave 5** | Saúde Pública, Educação, Capital Humano & Serviços Notariais | 14 | 410–480 | `FEDERATED_API, LAKEHOUSE_BATCH` | `datasus_cnes`, `datasus_sih`, `inep_censo_escolar` (+11) | ⚪ Planejado |
-| **Wave 6** | Meio Ambiente, Agronegócio, Monitoramento Satelital & Metaportais | 7 | 340–390 | `BIGQUERY_FEDERATED, FEDERATED_API, LAKEHOUSE_BATCH` | `basedosdados_bq`, `inpe_terrabrasilis`, `ana_hidroweb_telemetria` (+4) | ⚪ Planejado |
+| **Wave 1** | APIs de Borda & Séries Macroeconômicas (Baixa Latência < 300ms) | 4 | 820–950 | `FEDERATED_API` | `ibge_localidades`, `brasilapi_core`, `bcb_sgs` (+1) | 🟢 100% Homologada |
+| **Wave 2** | B2B, Compras Públicas, Integridade & Compliance Cadastral | 8 | 610–840 | `FEDERATED_API, LAKEHOUSE_BATCH` | `rfb_cnpj_lakehouse`, `pncp_contratacoes`, `cnj_datajud` (+5) | 🟢 100% Homologada |
+| **Wave 3** | Mercado de Capitais, Balanços Contábeis & Finanças Públicas | 6 | 610–680 | `FEDERATED_API, LAKEHOUSE_BATCH` | `cvm_dfp_itr`, `mdic_comexstat`, `cvm_fundos` (+3) | 🟢 100% Homologada |
+| **Wave 4** | Censo Demográfico, Trabalho, Renda, Logística & Telecomunicações | 10 | 500–590 | `FEDERATED_API, LAKEHOUSE_BATCH` | `ibge_sidra`, `ibge_pib_municipal`, `ibge_censo2022` (+7) | 🟢 100% Homologada |
+| **Wave 5** | Saúde Pública, Educação, Capital Humano & Serviços Notariais | 14 | 410–480 | `FEDERATED_API, LAKEHOUSE_BATCH` | `datasus_cnes`, `datasus_sih`, `inep_censo_escolar` (+11) | 🟢 100% Homologada |
+| **Wave 6** | Meio Ambiente, Agronegócio, Monitoramento Satelital & Metaportais | 7 | 340–390 | `BIGQUERY_FEDERATED, FEDERATED_API, LAKEHOUSE_BATCH` | `basedosdados_bq`, `inpe_terrabrasilis`, `ana_hidroweb_telemetria` (+4) | 🟢 100% Homologada |
 
 ---
 
@@ -76,7 +76,7 @@ Este catálogo consolida formalmente as **49 bases de dados públicas e APIs gov
 
 Ordenada por **Onda de Implementação (`roadmap_wave`)**, **Score RICE decrescente** e **Identificador da Fonte**:
 
-| ID Fonte | Dataset / Órgão Oficial | Macrosegmento | Onda | RICE | Modo / Protocolo | Chaves Canônicas | Tier LGPD | Produtos C.O.R.E. | Status |
+| ID Fonte | Dataset / Órgão Oficial | Macrosegmento | Onda | RICE | Modo / Protocolo | Chaves Canônicas | Tier LGPD | Solution Packs | Status |
 | :--- | :--- | :--- | :---: | :---: | :--- | :--- | :--- | :--- | :---: |
 | `ibge_localidades` | [IBGE Localidades & Malha Territorial](https://servicodados.ibge.gov.br/api/docs/localidades)<br/>*Instituto Brasileiro de Geografia e Estatística (IBGE)* | Geográfico, Logístico | **W1** | 950 | `FEDERATED_API`<br/>`REST_JSON` | `id_municipio`<br/>`sigla_uf` | `PUBLIC_NON_PERSONAL` | `P01` `P02` `P03` | `HOMOLOGATED` |
 | `brasilapi_core` | [BrasilAPI: CEPs, FIPE, Bancos, DDD & CNPJ de Borda](https://brasilapi.com.br/docs)<br/>*Comunidade Open Source BrasilAPI* | Metaportais | **W1** | 880 | `FEDERATED_API`<br/>`REST_JSON` | `cep_8`<br/>`cnpj_14`<br/>`sigla_uf` | `PUBLIC_NON_PERSONAL` | `P01` `P02` `P03` `P04` | `HOMOLOGATED` |
@@ -132,18 +132,18 @@ Ordenada por **Onda de Implementação (`roadmap_wave`)**, **Score RICE decresce
 
 ## 5. Dicionário de Chaves Canônicas & Tipagem Estrita (`ADR-002`)
 
-Conforme estabelecido no **ADR-002** e **POP_T_174**, todas as chaves identificadoras trafegam **compulsoriamente como `STRING`**, impedindo a perda de zeros à esquerda provocada por tipagens numéricas inadequadas:
+Conforme estabelecido no **ADR-002**, todas as chaves identificadoras trafegam **compulsoriamente como `STRING`**, impedindo a perda de zeros à esquerda provocada por tipagens numéricas inadequadas:
 
-| Chave Canônica | Tipo Estrito | Padrão / Máscara Canônica | Algoritmo de Validação | POPs de Ground Truth |
+| Chave Canônica | Tipo Estrito | Padrão / Máscara Canônica | Algoritmo de Validação | Referência Arquitetural & Legal |
 | :--- | :--- | :--- | :--- | :--- |
-| `id_municipio` | `STRING(7)` | IBGE 7 Dígitos (ex: '3550308') | Módulo 10 com pesos [1, 2] | POP_T_174, POP_T_177 |
-| `sigla_uf` | `STRING(2)` | UF Oficial 2 Letras maiúsculas (ex: 'SP') | Tabela IBGE das 27 UFs | POP_T_174, POP_T_177 |
-| `cnpj_14` | `STRING(14)` | CNPJ Canônico Zfill 14D (ex: '00000000000191') | Módulo 11 (2 dígitos verificadores) | POP_T_174, POP_T_175 |
-| `cpf_masked` | `STRING(14)` | Máscara Protegida (ex: '***.123.456-**') | Preservação compulsória Art. 7 LGPD | POP_T_175, POP_B_051 |
-| `cep_8` | `STRING(8)` | CEP Canônico Zfill 8D (ex: '01310100') | DNE Correios / BrasilAPI | POP_T_174, POP_T_177 |
-| `cnae_7` | `STRING(7)` | CNAE Subclasse 2.0 (ex: '6201501') | Tabela CONCLA / IBGE | POP_T_174, POP_T_177 |
-| `cbo_6` | `STRING(6)` | CBO-2002 Ocupação (ex: '212405') | Tabela MTE / CBO | POP_T_174, POP_T_177 |
-| `ncm_8` | `STRING(8)` | Nomenclatura Comum Mercosul (ex: '84713012') | Sistema Harmonizado MDIC | POP_T_174, POP_T_177 |
+| `id_municipio` | `STRING(7)` | IBGE 7 Dígitos (ex: '3550308') | Módulo 10 com pesos [1, 2] | ADR-002, IBGE |
+| `sigla_uf` | `STRING(2)` | UF Oficial 2 Letras maiúsculas (ex: 'SP') | Tabela IBGE das 27 UFs | ADR-002, IBGE |
+| `cnpj_14` | `STRING(14)` | CNPJ Canônico Zfill 14D (ex: '00000000000191') | Módulo 11 (2 dígitos verificadores) | ADR-002, ADR-003, RFB |
+| `cpf_masked` | `STRING(14)` | Máscara Protegida (ex: '***.123.456-**') | Preservação compulsória Art. 7 LGPD | ADR-003, Art. 7 LGPD |
+| `cep_8` | `STRING(8)` | CEP Canônico Zfill 8D (ex: '01310100') | DNE Correios / BrasilAPI | ADR-002, DNE / BrasilAPI |
+| `cnae_7` | `STRING(7)` | CNAE Subclasse 2.0 (ex: '6201501') | Tabela CONCLA / IBGE | ADR-002, CONCLA / IBGE |
+| `cbo_6` | `STRING(6)` | CBO-2002 Ocupação (ex: '212405') | Tabela MTE / CBO | ADR-002, MTE / CBO |
+| `ncm_8` | `STRING(8)` | Nomenclatura Comum Mercosul (ex: '84713012') | Sistema Harmonizado MDIC | ADR-002, MDIC |
 
 ---
 

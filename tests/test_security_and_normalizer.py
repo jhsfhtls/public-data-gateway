@@ -1,4 +1,4 @@
-"""Tests for POP_T_175 security controls, CWE-1236, and canonical normalizers."""
+"""Tests for security controls (CWE-1236, Zip-Bomb guard) and canonical normalizers."""
 
 import zipfile
 from pathlib import Path

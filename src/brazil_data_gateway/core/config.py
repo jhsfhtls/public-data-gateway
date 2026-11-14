@@ -14,7 +14,7 @@ class GatewaySettings:
     )
     data_dir: Path | None = None
     duckdb_memory_limit: str = "4GB"
-    user_agent: str = "brazil-data-gateway/0.1.0 (+https://github.com/jhosefer/brazil-data-gateway)"
+    user_agent: str = "public-data-gateway/0.1.0 (+https://github.com/jhsfhtls/public-data-gateway)"
     cache_ttl_seconds: int = 86400
     bq_max_bytes_billed: int = 1073741824  # 1 GiB safety limit
 

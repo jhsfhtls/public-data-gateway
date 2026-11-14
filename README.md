@@ -1,14 +1,14 @@
 <div align="center">
   <h2>Public Data Gateway — Plataforma Unificada de Dados Públicos, Analytics/ML & Enriquecimento</h2>
-  <p><i>Repositório Satélite Oficial do Ecossistema C.O.R.E.</i></p>
-  <p><b>Versão:</b> 0.1.0 &nbsp;|&nbsp; <b>Governança:</b> POP_T_176 • POP_T_177 • POP_T_175 • POP_T_070 • POP_T_074</p>
+  <p><i>Plataforma Aberta de Integração, Curadoria Medallion e Enriquecimento de Dados Públicos</i></p>
+  <p><b>Versão:</b> 0.1.0 &nbsp;|&nbsp; <b>Governança:</b> ODCS v3.1 • Observabilidade (5 Pilares) • DevSecOps &amp; LGPD • ADR-001..003</p>
   <hr/>
 </div>
 <br/>
 
 # `public-data-gateway`
 
-Barramento modular corporativo que unifica **bases de dados públicas oficiais, APIs governamentais do Brasil e fontes públicas globais** estruturadas nos macrosegmentos estratégicos, curadas em arquitetura **Medallion (`Bronze -> Silver -> Gold / ML Feature Views`)** e expostas simultaneamente via **Python SDK (`PublicData` / `BrazilData`)**, **FastAPI (`/api/v1`)**, **CLI (`pdg` / `bdg`)** e **Servidor MCP (`pdg-mcp` / `bdg-mcp`)** para todo o ecossistema **C.O.R.E.** (`core`, `operations`, `career`, `studies`).
+Barramento modular corporativo que unifica **bases de dados públicas oficiais, APIs governamentais do Brasil e fontes públicas globais** estruturadas nos macrosegmentos estratégicos, curadas em arquitetura **Medallion (`Bronze -> Silver -> Gold / ML Feature Views`)** e expostas simultaneamente via **Python SDK (`PublicData` / `BrazilData`)**, **FastAPI (`/api/v1`)**, **CLI (`pdg` / `bdg`)** e **Servidor MCP (`pdg-mcp` / `bdg-mcp`)** para aplicações analíticas, pipelines de engenharia de dados e agentes de IA.
 
 ---
 
@@ -22,16 +22,16 @@ Barramento modular corporativo que unifica **bases de dados públicas oficiais, 
 
 ## Arquitetura Hexagonal & Diferenciais Enterprise
 
-1. **Medallion Analytics & ML-Ready (`POP_T_143` / `POP_T_002` / `POP_T_128`):**
+1. **Medallion Analytics & ML-Ready (ADR-001 / ADR-002):**
    - **Bronze:** Cache local SQLite (`WAL`) com TTL + snapshots brutos selados com manifesto `SHA-256`.
-   - **Gate 5 Pilares & Quarentena (`POP_T_074` / `POP_T_070`):** Validação automática de *Freshness, Volume, Schema ODCS v3.1, Nulls e Sentinelas*. Lotes governamentais truncados vão para `data/quarantine/` sem corromper `Silver`.
+   - **Gate 5 Pilares & Quarentena (ODCS v3.1):** Validação automática de *Freshness, Volume, Schema ODCS v3.1, Nulls e Sentinelas*. Lotes governamentais truncados vão para `data/quarantine/` sem corromper `Silver`.
    - **Silver:** Parquet `ZSTD` via DuckDB (`atomic swap`), chaves canônicas estritas em `STRING` (`id_municipio` 7D, `cnpj_14`, `cep_8`, `cnae_7`, `cbo_6`), conversão de códigos sentinela (`99`, `999`, `-1`, `"SEM INFORMACAO"`) em `NULL` reais e `reference_date` explícita.
    - **Gold (ML Feature Views):** Vetores de *features* por entidade, deflacionamento monetário (`IPCA`/`IGP-M`/`PTAX`) e suporte nativo a **`ASOF JOIN` (*Point-in-Time*)** prevenindo *Data Leakage* em modelos de Machine Learning.
-2. **Motor de Enriquecimento Híbrido (`EnrichmentEngine` — `POP_T_174` / `POP_T_154`):**
+2. **Motor de Enriquecimento Híbrido (`EnrichmentEngine` — Client Path Shield):**
    - Validação matemática offline de dígitos verificadores Mod-11 (`CNPJ`/`CPF`/`IBGE`) antes de qualquer chamada de rede.
    - Conciliação tolerante a ruído de nomes municipais + UF para `id_municipio` 7D.
-   - Isolamento estrito cross-repo: ao enriquecer bases de clientes do `operations`, lê e grava exclusivamente no diretório isolado do cliente.
-3. **Hardening DevSecOps & LGPD (`POP_T_175` / `POP_B_051`):**
+   - Isolamento estrito de diretórios: ao enriquecer datasets externos, lê e grava exclusivamente no caminho de saída especificado (nunca dentro do Lakehouse interno `data/`).
+3. **Hardening DevSecOps & LGPD (ADR-003):**
    - Proteção contra *Zip Bombs* (`<= 100:1`) e verificação de *Magic Bytes*.
    - Sanitização contra *CSV Formula Injection* (`CWE-1236`) na exportação de planilhas enriquecidas.
    - Envelopamento `<untrusted_gov_data>` nas ferramentas MCP prevenindo *Indirect Prompt Injection* (`OWASP LLM01`).
@@ -61,6 +61,6 @@ pdg schema ibge_localidades
 # Subir servidor REST OpenAPI 3.1
 uvicorn public_data_gateway.api.app:create_app --factory --reload
 
-# Iniciar servidor MCP stdio para agentes C.O.R.E.
+# Iniciar servidor MCP stdio para clientes e agentes de IA compatíveis
 pdg-mcp
 ```

@@ -1,7 +1,7 @@
 """Script to validate catalog/sources_registry.yaml and render CATALOG.md.
 
-Enforces POP_T_148 executive headers, POP_T_162/163 Clean Code standards,
-and deterministic output without wall-clock timestamps for CI --check stability.
+Enforces executive headers, Clean Code standards, and deterministic output
+without wall-clock timestamps for CI --check stability.
 """
 
 from __future__ import annotations
@@ -60,14 +60,14 @@ WAVE_STRATEGIC_FOCUS = {
 }
 
 CANONICAL_KEYS_INFO = [
-    ("id_municipio", "STRING(7)", "IBGE 7 Dígitos (ex: '3550308')", "Módulo 10 com pesos [1, 2]", "POP_T_174, POP_T_177"),
-    ("sigla_uf", "STRING(2)", "UF Oficial 2 Letras maiúsculas (ex: 'SP')", "Tabela IBGE das 27 UFs", "POP_T_174, POP_T_177"),
-    ("cnpj_14", "STRING(14)", "CNPJ Canônico Zfill 14D (ex: '00000000000191')", "Módulo 11 (2 dígitos verificadores)", "POP_T_174, POP_T_175"),
-    ("cpf_masked", "STRING(14)", "Máscara Protegida (ex: '***.123.456-**')", "Preservação compulsória Art. 7 LGPD", "POP_T_175, POP_B_051"),
-    ("cep_8", "STRING(8)", "CEP Canônico Zfill 8D (ex: '01310100')", "DNE Correios / BrasilAPI", "POP_T_174, POP_T_177"),
-    ("cnae_7", "STRING(7)", "CNAE Subclasse 2.0 (ex: '6201501')", "Tabela CONCLA / IBGE", "POP_T_174, POP_T_177"),
-    ("cbo_6", "STRING(6)", "CBO-2002 Ocupação (ex: '212405')", "Tabela MTE / CBO", "POP_T_174, POP_T_177"),
-    ("ncm_8", "STRING(8)", "Nomenclatura Comum Mercosul (ex: '84713012')", "Sistema Harmonizado MDIC", "POP_T_174, POP_T_177"),
+    ("id_municipio", "STRING(7)", "IBGE 7 Dígitos (ex: '3550308')", "Módulo 10 com pesos [1, 2]", "ADR-002, IBGE"),
+    ("sigla_uf", "STRING(2)", "UF Oficial 2 Letras maiúsculas (ex: 'SP')", "Tabela IBGE das 27 UFs", "ADR-002, IBGE"),
+    ("cnpj_14", "STRING(14)", "CNPJ Canônico Zfill 14D (ex: '00000000000191')", "Módulo 11 (2 dígitos verificadores)", "ADR-002, ADR-003, RFB"),
+    ("cpf_masked", "STRING(14)", "Máscara Protegida (ex: '***.123.456-**')", "Preservação compulsória Art. 7 LGPD", "ADR-003, Art. 7 LGPD"),
+    ("cep_8", "STRING(8)", "CEP Canônico Zfill 8D (ex: '01310100')", "DNE Correios / BrasilAPI", "ADR-002, DNE / BrasilAPI"),
+    ("cnae_7", "STRING(7)", "CNAE Subclasse 2.0 (ex: '6201501')", "Tabela CONCLA / IBGE", "ADR-002, CONCLA / IBGE"),
+    ("cbo_6", "STRING(6)", "CBO-2002 Ocupação (ex: '212405')", "Tabela MTE / CBO", "ADR-002, MTE / CBO"),
+    ("ncm_8", "STRING(8)", "Nomenclatura Comum Mercosul (ex: '84713012')", "Sistema Harmonizado MDIC", "ADR-002, MDIC"),
 ]
 
 LGPD_TIERS_INFO = [
@@ -162,12 +162,12 @@ def validate_registry(data: dict[str, Any]) -> None:
             if k not in VALID_CANONICAL_KEYS:
                 raise ValueError(f"Source '{sid}' has invalid canonical_key: '{k}'")
 
-        prods = src.get("core_products_enabled")
+        prods = src.get("solution_packs")
         if not isinstance(prods, list) or not prods:
-            raise ValueError(f"Source '{sid}' core_products_enabled must be a non-empty list")
+            raise ValueError(f"Source '{sid}' solution_packs must be a non-empty list")
         for p in prods:
             if p not in VALID_PRODUCTS:
-                raise ValueError(f"Source '{sid}' has invalid product code: '{p}'")
+                raise ValueError(f"Source '{sid}' has invalid solution pack code: '{p}'")
 
 
 def render_markdown(data: dict[str, Any]) -> str:
@@ -213,14 +213,14 @@ def render_markdown(data: dict[str, Any]) -> str:
         '<div align="center">',
         "  <h2>Catálogo Mestre de Fontes Públicas & Registros Federativos Brasileiros</h2>",
         "  <p><i>Mapeamento Unificado de 49 Fontes Governamentais nos 13 Macrosegmentos, Ondas 1 a 6 e Chaves Canônicas</i></p>",
-        f"  <p><b>Versão:</b> 1.0.0 &nbsp;|&nbsp; <b>Última Atualização:</b> {updated_at} &nbsp;|&nbsp; <b>Governança:</b> POP_T_177 • POP_T_176 • POP_T_174 • POP_T_070 • POP_T_148</p>",
+        f"  <p><b>Versão:</b> 1.0.0 &nbsp;|&nbsp; <b>Última Atualização:</b> {updated_at} &nbsp;|&nbsp; <b>Padrões:</b> ADR-001 • ADR-002 • ADR-003 • ODCS v3.1 • LGPD</p>",
         "  <hr/>",
         "</div>",
         "<br/>",
         "",
         "# Catálogo Mestre de Fontes Públicas Governamentais (49 Fontes)",
         "",
-        "Este catálogo consolida formalmente as **49 bases de dados públicas e APIs governamentais do Brasil** integradas ao `public-data-gateway`. As fontes abrangem a totalidade dos **13 macrosegmentos estruturais federativos**, organizadas em **6 Ondas Estratégicas de Implementação** ordenadas por priorização ponderada `RICE` (`POP_B_091`), garantindo integridade cadastral canônica, observabilidade de 5 pilares (`POP_T_074`) e conformidade com a LGPD (`POP_B_051`).",
+        "Este catálogo consolida formalmente as **49 bases de dados públicas e APIs governamentais do Brasil** integradas ao `public-data-gateway`. As fontes abrangem a totalidade dos **13 macrosegmentos estruturais federativos**, organizadas em **6 Ondas Estratégicas de Implementação** ordenadas por priorização ponderada `RICE`, garantindo integridade cadastral canônica (`ADR-002`), observabilidade de 5 pilares (`ODCS v3.1`) e conformidade com a LGPD (`ADR-003`, Lei nº 13.709/2018).",
         "",
         "---",
         "",
@@ -230,7 +230,7 @@ def render_markdown(data: dict[str, Any]) -> str:
         f"- **Total de Macrosegmentos:** {total_segments} macrosegmentos federativos cobertos (100% de cobertura)",
         "- **Ondas de Implementação:** 6 ondas estruturadas por retorno analítico e complexidade operacional",
         "- **Chaves Canônicas Unificadas:** 8 chaves relacionais padronizadas em `STRING` (`id_municipio` 7D, `sigla_uf`, `cnpj_14`, `cpf_masked`, `cep_8`, `cnae_7`, `cbo_6`, `ncm_8`)",
-        "- **Habilitação de Produtos C.O.R.E.:** 10 de 10 Produtos Modulares (`P01` a `P10`) suportados por dados oficiais",
+        "- **Perfis de Capacidade Analítica (Solution Packs):** 10 de 10 Perfis Modulares (`P01` a `P10`) suportados por dados oficiais",
         "",
         "### 1.1. Distribuição por Modo de Acesso",
         "",
@@ -283,7 +283,12 @@ def render_markdown(data: dict[str, Any]) -> str:
         crit = ", ".join(f"`{s['source_id']}`" for s in w_sources[:3])
         if len(w_sources) > 3:
             crit += f" (+{len(w_sources) - 3})"
-        status_badge = "🟡 Em Preparação" if w == 1 else "⚪ Planejado"
+        if all(s["status"] == "HOMOLOGATED" for s in w_sources):
+            status_badge = "🟢 100% Homologada"
+        elif any(s["status"] == "HOMOLOGATED" for s in w_sources):
+            status_badge = "🟡 Em Progresso"
+        else:
+            status_badge = "⚪ Planejado"
         lines.append(f"| **Wave {w}** | {focus} | {w_cnt} | {min_rice}–{max_rice} | `{modes}` | {crit} | {status_badge} |")
 
     lines.extend([
@@ -294,7 +299,7 @@ def render_markdown(data: dict[str, Any]) -> str:
         "",
         "Ordenada por **Onda de Implementação (`roadmap_wave`)**, **Score RICE decrescente** e **Identificador da Fonte**:",
         "",
-        "| ID Fonte | Dataset / Órgão Oficial | Macrosegmento | Onda | RICE | Modo / Protocolo | Chaves Canônicas | Tier LGPD | Produtos C.O.R.E. | Status |",
+        "| ID Fonte | Dataset / Órgão Oficial | Macrosegmento | Onda | RICE | Modo / Protocolo | Chaves Canônicas | Tier LGPD | Solution Packs | Status |",
         "| :--- | :--- | :--- | :---: | :---: | :--- | :--- | :--- | :--- | :---: |",
     ])
 
@@ -307,7 +312,7 @@ def render_markdown(data: dict[str, Any]) -> str:
         proto = f"`{s['access_mode']}`<br/>`{s['protocol']}`"
         keys = "<br/>".join(f"`{k}`" for k in s["canonical_keys"]) if s["canonical_keys"] else "*(macro)*"
         lgpd = f"`{s['lgpd_tier']}`"
-        prods = " ".join(f"`{p}`" for p in s["core_products_enabled"])
+        prods = " ".join(f"`{p}`" for p in s["solution_packs"])
         status = f"`{s['status']}`"
         lines.append(f"| {sid} | {name_org} | {seg_label} | {wave} | {rice} | {proto} | {keys} | {lgpd} | {prods} | {status} |")
 
@@ -317,14 +322,14 @@ def render_markdown(data: dict[str, Any]) -> str:
         "",
         "## 5. Dicionário de Chaves Canônicas & Tipagem Estrita (`ADR-002`)",
         "",
-        "Conforme estabelecido no **ADR-002** e **POP_T_174**, todas as chaves identificadoras trafegam **compulsoriamente como `STRING`**, impedindo a perda de zeros à esquerda provocada por tipagens numéricas inadequadas:",
+        "Conforme estabelecido no **ADR-002**, todas as chaves identificadoras trafegam **compulsoriamente como `STRING`**, impedindo a perda de zeros à esquerda provocada por tipagens numéricas inadequadas:",
         "",
-        "| Chave Canônica | Tipo Estrito | Padrão / Máscara Canônica | Algoritmo de Validação | POPs de Ground Truth |",
+        "| Chave Canônica | Tipo Estrito | Padrão / Máscara Canônica | Algoritmo de Validação | Referência Arquitetural & Legal |",
         "| :--- | :--- | :--- | :--- | :--- |",
     ])
 
-    for k, t, p, a, pops in CANONICAL_KEYS_INFO:
-        lines.append(f"| `{k}` | `{t}` | {p} | {a} | {pops} |")
+    for k, t, p, a, refs in CANONICAL_KEYS_INFO:
+        lines.append(f"| `{k}` | `{t}` | {p} | {a} | {refs} |")
 
     lines.extend([
         "",

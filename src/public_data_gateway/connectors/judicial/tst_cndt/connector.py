@@ -4,7 +4,7 @@ Governed by:
 - Lei Federal nº 12.440/2011 (Instituição da CNDT e do Banco Nacional de Devedores Trabalhistas - BNDT)
 - Resolução Administrativa TST nº 1.470/2011 (Regulamentação da CNDT)
 - Art. 642-A da CLT (Consolidação das Leis do Trabalho)
-- POP_T_177, POP_T_176, POP_T_175, POP_T_070, POP_T_074
+- ODCS v3.1 Data Contracts, 5-Pillar Observability & Medallion Architecture
 
 Provides unified access to labor compliance records across Brazil:
 1. tst_cndt_certidoes (Certidões emitidas: Negativa, Positiva com Efeito de Negativa, Positiva)

@@ -1,4 +1,4 @@
-"""ODCS v3.1 Data Contracts and 5-Pillar Data Observability Engine (POP_T_070, POP_T_074)."""
+"""ODCS v3.1 Data Contracts and 5-Pillar Data Observability Engine."""
 
 import hashlib
 from pathlib import Path

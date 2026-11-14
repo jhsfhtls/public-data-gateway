@@ -2,7 +2,7 @@
 
 Ingests, normalizes, validates, and materializes all 5 official territorial tables
 from IBGE (municípios, distritos, subdistritos, estados, regiões) across isolated
-Medallion Bronze, Silver, and Gold layers per POP_T_177, POP_T_070, and POP_T_074.
+Medallion Bronze, Silver, and Gold layers per ODCS v3.1 contracts and 5-pillar observability.
 """
 
 from __future__ import annotations

@@ -1,6 +1,6 @@
 """RFB Simples Nacional & MEI Connector — Receita Federal do Brasil & CGSN.
 
-Part of the public-data-gateway Medallion platform (C.O.R.E. Ecosystem).
+Part of the public-data-gateway Medallion platform.
 Implements the 11-Gate Protocol:
 1. Multi-table ingestion (5 tabelas: simples_nacional_cadastral, simei_cadastral,
    simples_sublimites_estaduais, simples_eventos_historico, simples_tabelas_anexos)

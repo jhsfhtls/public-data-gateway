@@ -1,6 +1,6 @@
 """CGU CEIS, CNEP, CEPIM & Leniência Connector — Controladoria-Geral da União.
 
-Part of the public-data-gateway Medallion platform (C.O.R.E. Ecosystem).
+Part of the public-data-gateway Medallion platform.
 Implements the 11-Gate Protocol:
 1. Multi-table ingestion (5 tabelas: cgu_ceis, cgu_cnep, cgu_cepim, cgu_acordos_leniencia, cgu_orgaos_sancionadores)
 2. Isolated storage in data/cgu_ceis_cnep/{bronze, silver, gold, quarantine}/

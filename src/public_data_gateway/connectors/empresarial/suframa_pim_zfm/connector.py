@@ -5,7 +5,7 @@ Governed by:
 - Lei nº 8.387/1991 (Regulamentação e Processo Produtivo Básico - PPB)
 - Art. 40 do ADCT da CF/88 e Emenda Constitucional nº 83/2014 (Prorrogação da ZFM até 2073)
 - Lei Federal nº 10.996/2004 (Desoneração de PIS/COFINS na ZFM)
-- POP_T_177, POP_T_176, POP_T_175, POP_T_070, POP_T_074
+- ODCS v3.1 Data Contracts, 5-Pillar Observability & Medallion Architecture
 
 Provides unified access to corporate tax incentives in the Western Amazon & Free Trade Areas:
 1. suframa_empresas_cadastradas (Empresas inscritas na SUFRAMA, situação, área e UF)

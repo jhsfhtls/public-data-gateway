@@ -1,4 +1,4 @@
-name: PR Lint & C.O.R.E. Satellite Governance
+name: PR Lint & Repository Governance
 
 on:
   pull_request:
@@ -18,7 +18,7 @@ jobs:
           BRANCH: ${{ github.head_ref }}
         run: |
           if [[ ! "$BRANCH" =~ ^(feat|fix|docs|refactor|chore|ci|test|hotfix)/([a-z0-9]+(-[a-z0-9]+)*|[A-Z]+-[0-9]+(-[a-z0-9]+)+)$ ]]; then
-            echo "ERROR: Invalid branch name '$BRANCH'. Expected kebab-case prefix per branch_naming_policy.md."
+            echo "ERROR: Invalid branch name '$BRANCH'. Expected kebab-case prefix (e.g., feat/my-feature, fix/issue-123)."
             exit 1
           fi
           description=${BRANCH#*/}

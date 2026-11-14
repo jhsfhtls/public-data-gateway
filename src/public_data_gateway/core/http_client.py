@@ -47,7 +47,7 @@ class TokenBucketRateLimiter:
 
 
 class CircuitBreaker:
-    """Circuit breaker guarding against cascading remote failures (POP_T_152)."""
+    """Circuit breaker guarding against cascading remote failures."""
 
     def __init__(self, failure_threshold: int = 3, recovery_timeout: float = 30.0) -> None:
         self.failure_threshold = failure_threshold

@@ -2,15 +2,14 @@
   "schema_version": "1.0.0",
   "last_updated": "2026-11-14T14:34:00.000000",
   "project_name": "public-data-gateway",
-  "ecosystem": "C.O.R.E. (core, operations, career, studies)",
-  "governing_pops": [
-    "POP_T_177",
-    "POP_T_176",
-    "POP_T_175",
-    "POP_T_174",
-    "POP_T_070",
-    "POP_T_074",
-    "POP_T_148"
+  "architecture": "Hexagonal Medallion Lakehouse (Bronze -> Silver -> Gold / Feature Store)",
+  "governance_standards": [
+    "ODCS v3.1",
+    "5-Pillar Data Observability",
+    "DevSecOps CWE-1236 / Zip-Bomb Hardening",
+    "Client Path Shield",
+    "ASOF Point-in-Time Joins",
+    "LGPD Privacy Masking"
   ],
   "current_macro_phase_id": "08",
   "current_macro_phase": "Fase 08 - Ingestão Wave 6 (Meio Ambiente, Agro & Metaportais — 49/49 fontes homologadas [100.0%] com dadosgov_ckan homologado; Wave 6 e Catálogo 100% concluídos!)",
@@ -31,11 +30,11 @@
     },
     {
       "phase_id": "01",
-      "name": "Estrutura do Repositório Satélite, CI/CD & DevSecOps",
+      "name": "Estrutura do Repositório, CI/CD & DevSecOps",
       "status": "COMPLETED",
       "completion_date": "2026-11-07",
       "deliverables": [
-        "Repositório satélite brazil-data-gateway inicializado",
+        "Repositório public-data-gateway inicializado com isolamento Medallion e licença MIT",
         "Isolamento Python 3.12 (.venv) e dependências pinadas (requirements.txt, requirements-dev.txt)",
         "Configuração de CI (.github/workflows/ci.yml e pr-lint.yml)",
         "Templates padronizados de Pull Request (feature, bugfix, docs)"
@@ -170,7 +169,7 @@
       "deliverables": [
         "Data Marts analíticos multidisciplinares (B2B x Território x Macro x Compras Públicas)",
         "Feature Store consolidada para modelos preditivos de propensão e risco",
-        "Extração de insights comerciais e operacionais acoplados aos 10 Produtos Modulares C.O.R.E.",
+        "Extração de insights comerciais e operacionais acoplados aos 10 Solution Packs Modulares",
         "Bateria de Regressão Live Global com Rotação Sistemática de IDs: Re-execução obrigatória de testes reais ao vivo contra todos os órgãos públicos, alternando e rotacionando os IDs de consulta (novos CNPJs, novos municípios IBGE, novas moedas, séries BACEN e novos contratos PNCP) para validar a resiliência contínua contra drift em produção sem overfitting a registros pontuais"
       ]
     },
@@ -245,7 +244,7 @@
         "gate_id": "GATE_07",
         "name": "Integracao ao EnrichmentEngine",
         "status": "PLANNED",
-        "criteria": "Disponibilizacao para enriquecimento financeiro e balancos respeitando o Client Path Shield (POP_T_154)."
+        "criteria": "Disponibilizacao para enriquecimento financeiro e balancos respeitando o Client Path Shield."
       },
       {
         "gate_id": "GATE_08",
@@ -278,13 +277,13 @@
       "date": "2026-11-07",
       "phase_id": "00",
       "milestone": "Arquitetura & Governança Fundacional",
-      "summary": "Elaboração das ADR-001 (Storage Híbrido Medallion), ADR-002 (Chaves Canônicas e Quarentena) e ADR-003 (DevSecOps e LGPD) fundamentadas nos POP_T_177, POP_T_176, POP_T_175, POP_T_070 e POP_T_074."
+      "summary": "Elaboração das ADR-001 (Storage Híbrido Medallion), ADR-002 (Chaves Canônicas e Quarentena) e ADR-003 (DevSecOps e LGPD) fundamentadas em padrões ODCS v3.1 e observabilidade em 5 pilares."
     },
     {
       "date": "2026-11-07",
       "phase_id": "01",
-      "milestone": "Setup do Repositório Satélite & Workflows CI",
-      "summary": "Inicialização do repositório satélite brazil-data-gateway com isolamento venv Python 3.12, pyproject.toml, requirements.txt pinados, templates de PR e workflows de CI (pr-lint e ci.yml)."
+      "milestone": "Setup do Repositório & Workflows CI",
+      "summary": "Inicialização do repositório com isolamento venv Python 3.12, pyproject.toml, requirements.txt pinados, templates de PR e workflows de CI (pr-lint e ci.yml)."
     },
     {
       "date": "2026-11-07",
@@ -326,7 +325,7 @@
       "date": "2026-11-08",
       "phase_id": "04",
       "milestone": "Transição de Identidade: Renomeação para public-data-gateway & Registro da Fase 10 (Conecta GOV.BR & Geo/Maps)",
-      "summary": "Renomeação oficial do repositório e projeto para public-data-gateway, integrando suporte simultâneo aos comandos pdg/bdg e pdg-mcp/bdg-mcp, atualização dos vínculos do ecossistema C.O.R.E. e registro da Fase 10 no plano de implementação contemplando a auditoria do Conecta GOV.BR, viabilidade de APIs geoespaciais (Google Maps, OpenStreetMap, Mapbox) e futura bipartição entre catálogo Gov Brasil e catálogo público global."
+      "summary": "Renomeação oficial do repositório e projeto para public-data-gateway, integrando suporte simultâneo aos comandos pdg/bdg e pdg-mcp/bdg-mcp, atualização dos 10 Solution Packs modulares e registro da Fase 10 no plano de implementação contemplando a auditoria do Conecta GOV.BR, viabilidade de APIs geoespaciais (Google Maps, OpenStreetMap, Mapbox) e futura bipartição entre catálogo Gov Brasil e catálogo público global."
     },
     {
       "date": "2026-11-08",

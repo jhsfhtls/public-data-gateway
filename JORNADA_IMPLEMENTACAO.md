@@ -1,14 +1,14 @@
 <div align="center">
-  <h2>Jornada de Implementação — Brazil Data Gateway</h2>
-  <p><i>Painel Vivo de Evolução Arquitetural, Ciclo de Vida de Conectores & Habilitação de Produtos C.O.R.E.</i></p>
-  <p><b>Versão:</b> 1.0.0 &nbsp;|&nbsp; <b>Última Atualização:</b> 2026-11-14T14:34:00.000000 &nbsp;|&nbsp; <b>Governança:</b> POP_T_177 • POP_T_176 • POP_T_175 • POP_T_070 • POP_T_074 • POP_T_148</p>
+  <h2>Jornada de Implementação — Public Data Gateway</h2>
+  <p><i>Painel Vivo de Evolução Arquitetural, Ciclo de Vida de Conectores & Solution Packs Analíticos</i></p>
+  <p><b>Versão:</b> 1.0.0 &nbsp;|&nbsp; <b>Última Atualização:</b> 2026-11-14T14:34:00.000000 &nbsp;|&nbsp; <b>Padrões:</b> ADR-001 • ADR-002 • ADR-003 • ODCS v3.1 • LGPD</p>
   <hr/>
 </div>
 <br/>
 
 # Jornada de Implementação & Painel Vivo de Governança
 
-Este artefato constitui a **Fonte Única da Verdade Operacional (SSOT)** do status de desenvolvimento do `public-data-gateway`. Ele rastreia o avanço das macrofases arquiteturais, o ciclo de vida dos 9 Gates de qualidade por conector, o desbloqueio comercial dos 10 Produtos Modulares do ecossistema C.O.R.E. e o **Runbook Anti-Bus-Factor** para continuidade operacional autônoma.
+Este artefato constitui a **Fonte Única da Verdade Operacional (SSOT)** do status de desenvolvimento do `public-data-gateway`. Ele rastreia o avanço das macrofases arquiteturais, o ciclo de vida dos 9 Gates de qualidade por conector, a matriz de capacidade dos **10 Perfis de Capacidade Analítica (Solution Packs `P01` a `P10`)** e o **Runbook Operacional** para continuidade e reprodutibilidade em ambientes locais e de CI/CD.
 
 ---
 
@@ -16,27 +16,26 @@ Este artefato constitui a **Fonte Única da Verdade Operacional (SSOT)** do stat
 
 - **Macrofase Ativa:** `Fase 08 - Ingestão Wave 6 (Meio Ambiente, Agro & Metaportais — 49/49 fontes homologadas [100.0%] com dadosgov_ckan homologado; Wave 6 e Catálogo 100% concluídos!)`
 - **Status Geral de Governança:** `🟢 ON_TRACK`
-- **Conector Ativo em Desenvolvimento:** `Nenhum (Transição de Fase / Fundação Concluída)`
-- **Próximo Conector na Fila de Execução:** `None` (Wave 1 — Prioridade RICE 950)
+- **Conector Ativo em Desenvolvimento:** `Nenhum (Transição de Fase / Waves 1..6 Concluídas)`
+- **Próxima Etapa Planejada:** `Fase 09 (Marts Cross-Domain & Insights)`
 - **Progresso Estrutural das Macrofases:** **10 de 13 Concluídas (76.9%)**
 - **Universo de Fontes Homologadas no Catálogo:** **49 fontes públicas** nos 13 macrosegmentos
 
 ```mermaid
 flowchart LR
-    F00["Fase 00: ADRs & Governança<br/>✅ CONCLUÍDO"] --> F01["Fase 01: Setup & DevSecOps<br/>✅ CONCLUÍDO"]
-    F01 --> F02["Fase 02: Catálogo & Interfaces<br/>✅ CONCLUÍDO"]
-    F02 --> F03["Fase 03: Wave 1 Borda & Macro<br/>⏳ PRÓXIMO"]
-    F03 --> F04["Fases 04..08: Waves 2 a 6<br/>⚪ PENDENTE"]
+    F00["Fases 00..02: Fundacao & Catalogo<br/>✅ CONCLUÍDO"] --> F03["Fases 03..08: Waves 1 a 6 (49/49)<br/>✅ 100% CONCLUÍDO"]
+    F03 --> F09["Fase 09: Marts Cross-Domain & Live<br/>⏳ PRÓXIMO"]
+    F09 --> F10["Fase 10: Catalogo Global & Geo<br/>⚪ PLANEJADO"]
 ```
 
 ---
 
-## 2. Acompanhamento das Macrofases Estruturais (Fases 00 a 08)
+## 2. Acompanhamento das Macrofases Estruturais (Fases 00 a 10)
 
 | ID | Macrofase de Desenvolvimento | Status | Conclusão | Entregáveis Principais & Evidências |
 | :---: | :--- | :---: | :---: | :--- |
 | **Fase 00** | **Arquitetura, Governança & Decisões Fundacionais (ADRs)** | 🟢 CONCLUÍDO | `2026-11-07` | • ADR-001: Storage Híbrido Medallion (SQLite WAL + DuckDB Parquet ZSTD)<br/>• ADR-002: Chaves Canônicas STRING, Contratos ODCS v3.1 & Quarentena<br/>• ADR-003: Hardening DevSecOps, Proteção LGPD & Client Path Shield |
-| **Fase 01** | **Estrutura do Repositório Satélite, CI/CD & DevSecOps** | 🟢 CONCLUÍDO | `2026-11-07` | • Repositório satélite brazil-data-gateway inicializado<br/>• Isolamento Python 3.12 (.venv) e dependências pinadas (requirements.txt, requirements-dev.txt)<br/>• Configuração de CI (.github/workflows/ci.yml e pr-lint.yml)<br/>• Templates padronizados de Pull Request (feature, bugfix, docs) |
+| **Fase 01** | **Estrutura do Repositório, CI/CD & DevSecOps** | 🟢 CONCLUÍDO | `2026-11-07` | • Repositório public-data-gateway inicializado com isolamento Medallion e licença MIT<br/>• Isolamento Python 3.12 (.venv) e dependências pinadas (requirements.txt, requirements-dev.txt)<br/>• Configuração de CI (.github/workflows/ci.yml e pr-lint.yml)<br/>• Templates padronizados de Pull Request (feature, bugfix, docs) |
 | **Fase 02** | **Fundação do Catálogo (49 Fontes), Normalização Canônica & Interfaces Unificadas** | 🟢 CONCLUÍDO | `2026-11-07` | • Base de referência sanitizada dos 5.571 municípios brasileiros (zero falhas de UF)<br/>• Catálogo formal de 49 fontes governamentais nos 13 macrosegmentos (catalog/sources_registry.yaml)<br/>• Renderizador determinístico do catálogo (scripts/render_catalog.py & CATALOG.md)<br/>• Tracker vivo da jornada de implementação (state/project_progress.json, scripts/render_progress.py & JORNADA_IMPLEMENTACAO.md)<br/>• Validação de integridade (--check) e conformidade ruff 100% verde |
 | **Fase 03-SPIKE** | **Golden Spike: Piloto ibge_localidades com Todas as Tabelas & Camada de Negócio Territorial** | 🟢 CONCLUÍDO | `2026-11-07` | • Ingestão e normalização das 5 tabelas da API (municipios, distritos, subdistritos, estados, regioes)<br/>• Estrutura física isolada data/ibge_localidades/{bronze,silver,gold,quarantine}/<br/>• Encapsulamento dbt no conector (source.yml + 5 staging models + _models.yml com 100% colunas documentadas)<br/>• Camada de negócio territorial (dim_municipio SCD2, dim_distrito, crosswalk 6D/7D, mart_hierarquia_territorial)<br/>• Bateria de testes ao vivo de 1 linha com fail-hard e suite offline com cidades diversas |
 | **Fase 03** | **Ingestão Wave 1 — APIs de Borda & Macroeconomia** | 🟢 CONCLUÍDO | `2026-11-07` | • Conector bcb_sgs (Séries macroeconômicas: IPCA, Selic, IGP-M)<br/>• Conector bcb_olinda_ptax (Cotações PTAX diárias OData v4)<br/>• Conector brasilapi_core (CEPs, bancos, DDDs, borda síncrona) |
@@ -45,7 +44,7 @@ flowchart LR
 | **Fase 06** | **Ingestão Wave 4 — Censo, Trabalho, Logística & Telecom** | 🟢 CONCLUÍDO | `2026-11-13` | • Conector ibge_sidra (PIB municipal, Censo demográfico, PAM, IPCA e Gini) - CONCLUÍDO<br/>• Conector ibge_censo2022 (Microdados, Domicílios, Estrutura Etária, Alfabetização, Diversidade) - CONCLUÍDO<br/>• Conector mte_novo_caged (Microdados do Novo CAGED, Movimentação Mensal, Perfil Setorial, Salários) - CONCLUÍDO<br/>• Conector ibge_pnad_continua (Taxa de Desocupação, Rendimento Médio Real, Subutilização, Informalidade) - CONCLUÍDO<br/>• Conector ibge_pib_municipal (PIB Municipal, VAB Setorial, Contas Econômicas) - CONCLUÍDO<br/>• Conector mte_rais (Relação Anual de Informações Sociais - Vínculos & Remuneração) - CONCLUÍDO<br/>• Conector ibge_malhas (Malhas Territoriais Vetoriais - Municípios, UFs, Regiões) - CONCLUÍDO<br/>• Conector ibge_cnefe (Endereçamento Estatístico CNEFE - Censo 2022) - CONCLUÍDO<br/>• Conector anatel_mosaico (Sistema Mosaico ERBs, Banda Larga SCM, Espectro & 5G) - CONCLUÍDO<br/>• Conector antt_malha_transporte (Malha Rodoviária, RNTRC, Ferroviária e Matriz Modal) - CONCLUÍDO |
 | **Fase 07** | **Ingestão Wave 5 — Saúde, Educação & Setor Notarial** | 🟢 CONCLUÍDO | `2026-11-14` | • Conector datasus_cnes (Estabelecimentos, Leitos/UTI, Equipamentos Diagnósticos e Força de Trabalho) - CONCLUÍDO<br/>• Conector datasus_sih (Produção Hospitalar AIH, Custos SUS/UTI, Morbidade CID-10 e Desfechos/ICSAP) - CONCLUÍDO<br/>• Conector inep_censo_escolar (Escolas/Infraestrutura, Matrículas por Etapa, Docentes/AFD e Rendimento/Fluxo) - CONCLUÍDO<br/>• Conector datasus_sim (Óbitos Gerais/DO, Causas Capítulos CID-10, Mortalidade Materno-Infantil e Prematura DCNT/Causas Externas) - CONCLUÍDO<br/>• Conector inep_censo_superior (Instituições IES/IGC, Cursos CINE/ENADE, Matrículas/TCG/TDA e Corpo Docente) - CONCLUÍDO<br/>• Conector cnj_justica_aberta (Serventias Extrajudiciais, Produtividade por Atribuição, Emolumentos e Digitalização SREI/ONR/CRC) - CONCLUÍDO<br/>• Conector datasus_sinasc (Nascidos Vivos, Assistência Pré-Natal e Parto, Perfil Materno Demográfico e Vitalidade Recém-Nascido) - CONCLUÍDO<br/>• Conector anvisa_cmed (Apresentações Ativas CMED, Preços PF/PMC/PMVG por Classe Terapêutica ATC, CAP/SUS e Regime ICMS/PIS-COFINS) - CONCLUÍDO<br/>• Conector inep_ideb (IDEB Bienal por Etapa e Rede, Fluxo Escolar P, Proficiências SAEB LP/MAT, Metas INEP e Equidade INSE) - CONCLUÍDO<br/>• Conector onr_registro_imoveis (Acervo CNM, Transações por Natureza, Garantias Alienação Fiduciária/CGI e Interoperabilidade SERP/SAEC) - CONCLUÍDO<br/>• Conector opendatasus_vigilancia (e-SUS Notifica SG, SIVEP-Gripe SRAG, SINAN Agravos Compulsórios, SI-PNI Cobertura Vacinal e Prontidão CIEVS/GAL-LACEN) - CONCLUÍDO<br/>• Conector inep_enem (Desempenho TRI LC/CH/CN/MT, Redes Federal/Estadual/Privada/EJA, Redação Competências I/III/V e Equidade QSE/SiSU-ProUni) - CONCLUÍDO<br/>• Conector capitais_iptu_itbi (Cadastro Imobiliário IPTU, Transações ITBI por Segmento, Dinâmica de Preços/PGV e Governança CTM/SINTER) - CONCLUÍDO<br/>• Conector capes_sucupira (Programas Stricto Sensu CAPES 6-7, Discentes/Titulados por Grande Área, Docentes PQ CNPq e Produção Qualis A1/A2) - CONCLUÍDO |
 | **Fase 08** | **Ingestão Wave 6 — Meio Ambiente, Agro & Metaportais** | 🟢 CONCLUÍDO | `2026-11-14` | • Conector inpe_terrabrasilis (PRODES Anual, Alertas DETER-B por Classe, Uso da Terra e Governança ESG/EUDR) - CONCLUÍDO<br/>• Conector ana_hidroweb_telemetria (Estações Telemétricas, Cotas/Vazões por Segmento, Pluviometria e Segurança Hídrica) - CONCLUÍDO<br/>• Conector mapbiomas_cobertura (Cobertura Anual, Transições por Classe, Pastagens/Irrigação e Alertas Validados) - CONCLUÍDO<br/>• Conector sfb_sicar (Imóveis Rurais CAR, Reserva Legal/APP por Categoria, PRA/Embargos IBAMA e Geometria SIGEF) - CONCLUÍDO<br/>• Conector mapa_zarc (Aptidão Climática, Janelas Decendiais por Cultura, PROAGRO/PSR e Solo AD1-AD6) - CONCLUÍDO<br/>• Conector basedosdados_bq (Datalake BigQuery, Datasets Temáticos, Governança ODCS e Consumo SQL) - CONCLUÍDO<br/>• Conector dadosgov_ckan (Organizações Publicadoras, Formatos CKAN, Governança LAI e Engajamento/API) - CONCLUÍDO |
-| **Fase 09** | **Pós-Ingestão Total — Tabelas Gold Analíticas Cross-Domain, Datamarts & Insights** | ⚪ PENDENTE | `—` | • Data Marts analíticos multidisciplinares (B2B x Território x Macro x Compras Públicas)<br/>• Feature Store consolidada para modelos preditivos de propensão e risco<br/>• Extração de insights comerciais e operacionais acoplados aos 10 Produtos Modulares C.O.R.E.<br/>• Bateria de Regressão Live Global com Rotação Sistemática de IDs: Re-execução obrigatória de testes reais ao vivo contra todos os órgãos públicos, alternando e rotacionando os IDs de consulta (novos CNPJs, novos municípios IBGE, novas moedas, séries BACEN e novos contratos PNCP) para validar a resiliência contínua contra drift em produção sem overfitting a registros pontuais |
+| **Fase 09** | **Pós-Ingestão Total — Tabelas Gold Analíticas Cross-Domain, Datamarts & Insights** | ⚪ PENDENTE | `—` | • Data Marts analíticos multidisciplinares (B2B x Território x Macro x Compras Públicas)<br/>• Feature Store consolidada para modelos preditivos de propensão e risco<br/>• Extração de insights comerciais e operacionais acoplados aos 10 Solution Packs Modulares<br/>• Bateria de Regressão Live Global com Rotação Sistemática de IDs: Re-execução obrigatória de testes reais ao vivo contra todos os órgãos públicos, alternando e rotacionando os IDs de consulta (novos CNPJs, novos municípios IBGE, novas moedas, séries BACEN e novos contratos PNCP) para validar a resiliência contínua contra drift em produção sem overfitting a registros pontuais |
 | **Fase 10** | **Expansão de Fronteira: Auditoria Conecta GOV.BR, Google APIs & Inclusão de APIs Públicas Globais e Geoespaciais** | ⚪ PENDENTE | `—` | • Auditoria e varredura do Conecta GOV.BR (https://www.gov.br/conecta/catalogo/) para identificar e homologar APIs governamentais federais adicionais que ficaram fora do catálogo inicial<br/>• Mapeamento, seleção e pré-configuração de APIs públicas globais e geoespaciais de alto valor analítico: Google APIs (Google Maps Geocoding, Places, Routes) e alternativas abertas como OpenStreetMap / Nominatim (https://www.openstreetmap.org/) e Mapbox API (https://www.mapbox.com/)<br/>• Ampliação do escopo do gateway para além das APIs governamentais do Brasil: mapeamento sistemático e suporte a outras APIs públicas úteis (ex.: dados climáticos, câmbio internacional, georreferenciamento global), deixando os conectores pré-configurados<br/>• Bipartição da documentação oficial, dbt e catálogo mestre estruturada em: 1) Catálogo APIs Gov Brasil e 2) Catálogo Outras APIs Públicas & Globais<br/>• Disponibilização de conectores com o mesmo padrão ODCS v3.1, camadas Medallion (Bronze/Silver/Gold) e testes fail-hard com limites de rate limit e FinOps |
 | **Fase 11** | **Cloud Lakehouse Mirror: Public Data Warehouse na Nuvem (S3 / Cloudflare R2 + DuckDB / MotherDuck / BigQuery)** | ⚪ PENDENTE | `—` | • Arquitetura de Lakehouse na Nuvem: Espelhamento contínuo dos datasets Silver e Gold (Parquet ZSTD) para Object Storage global (AWS S3 ou Cloudflare R2 com custo zero de egress)<br/>• Pipeline de Ingestão em Lote e CDC (Change Data Capture): Rotinas agendadas (Cron/Airflow/GitHub Actions) para baixar dumps massivos (ex: 55M CNPJs RFB, CVM DFP/ITR anual) e sincronizar deltas incrementais sem depender de chamadas pontuais às APIs governamentais<br/>• Public Data Warehouse Serverless: Disponibilização de catálogo DuckDB / MotherDuck / BigQuery permitindo consultas analíticas em milissegundos sobre todo o patrimônio de dados públicos do Brasil<br/>• Estratégia FinOps e Resiliência contra Quedas de Portais: Eliminação de latências e instabilidades governamentais (Serpro, CVM, BCB), reduzindo o tempo de consulta de 2-5s para 5-15ms e economizando custos de infraestrutura<br/>• Mapeamento e Auditoria de Freshness SLA por Fonte: Avaliar e cadastrar para cada uma das 49 fontes os metadados de frequência e latência de atualização (update_frequency, freshness_sla_hours e cron_schedule_expression) para orquestrar jobs de ingestão diferenciados (diário para PTAX/Câmbio, mensal para Comex/SGS, trimestral/anual para DFP/CNPJ) na Fase 11 |
 
@@ -55,7 +54,7 @@ flowchart LR
 
 Todo conector integrado ao `public-data-gateway` deve percorrer rigorosamente os **9 Gates de Qualidade** antes de ser promovido a `HOMOLOGATED`. O alvo atual do ciclo de vida é o conector `cvm_dfp_itr` (Wave 3):
 
-| Gate | Nome do Gate de Homologação | Critério Operacional de Aceite (`POP_T_070` / `POP_T_074` / `POP_T_177`) | Status |
+| Gate | Nome do Gate de Homologação | Critério Operacional de Aceite (ODCS v3.1 / ADR-001 / ADR-002) | Status |
 | :---: | :--- | :--- | :---: |
 | **GATE_01** | **Contrato Declarativo ODCS v3.1 das N Tabelas da API** | Schema tipado, chaves primarias STRING e regras semanticas para demonstracoes financeiras CVM (BPA, BPP, DRE, DFC, DMPL, DVA). | ⚪ NÃO INICIADO |
 | **GATE_02** | **Ingestao Bronze Isolada (Todas as Tabelas) & Cache WAL** | Download resiliente das tabelas em data/cvm_dfp_itr/bronze/ com cache SQLite WAL. | ⚪ NÃO INICIADO |
@@ -63,7 +62,7 @@ Todo conector integrado ao `public-data-gateway` deve percorrer rigorosamente os
 | **GATE_04** | **Materializacao Silver Parquet Isolada (Todas as Tabelas)** | Gravacao de demonstracoes financeiras padronizadas em data/cvm_dfp_itr/silver/ com SHA-256. | ⚪ NÃO INICIADO |
 | **GATE_05** | **Validacao dos 5 Pilares & Quarentena** | Aprovacao em Freshness, Volume, Schema, Null Ceiling e Lineage; desvio para data/cvm_dfp_itr/quarantine/ se violado. | ⚪ NÃO INICIADO |
 | **GATE_06** | **Gold Feature View Isolada & ASOF Join ML** | Features fundamentalistas e solvenica em data/cvm_dfp_itr/gold/features_financeiras_cvm.parquet. | ⚪ NÃO INICIADO |
-| **GATE_07** | **Integracao ao EnrichmentEngine** | Disponibilizacao para enriquecimento financeiro e balancos respeitando o Client Path Shield (POP_T_154). | ⚪ NÃO INICIADO |
+| **GATE_07** | **Integracao ao EnrichmentEngine** | Disponibilizacao para enriquecimento financeiro e balancos respeitando o Client Path Shield. | ⚪ NÃO INICIADO |
 | **GATE_08** | **Exposicao Multi-Interface** | Exposicao simultanea via SDK (PublicData / BrazilData), REST (/api/v1/cvm), CLI (pdg cvm) e Servidor MCP. | ⚪ NÃO INICIADO |
 | **GATE_09** | **Bateria de Testes Offline com Periodos Diversos** | Testes unitarios offline com fixtures cobrindo companhias abertas e balancos. | ⚪ NÃO INICIADO |
 | **GATE_10** | **dbt Staging, source.yml e 100% Colunas Documentadas** | Modelos dbt com source.yml proprio, staging, dims, fcts, marts e 100% de colunas documentadas. | ⚪ NÃO INICIADO |
@@ -77,31 +76,31 @@ Estatísticas dinâmicas cruzadas diretamente com o catálogo mestre `catalog/so
 
 | Onda | Foco Estratégico | Total Fontes | RICE Médio | Modos Predominantes | Fontes Âncora | Status da Onda |
 | :---: | :--- | :---: | :---: | :--- | :--- | :---: |
-| **Wave 1** | APIs de Borda & Macroeconomia | 4 | 878 | `FEDERATED_API` | `ibge_localidades`, `brasilapi_core`, `bcb_sgs` (+1) | 🟡 Em Preparação |
-| **Wave 2** | B2B, Compras Públicas & Compliance | 8 | 744 | `FEDERATED_API, LAKEHOUSE_BATCH` | `rfb_cnpj_lakehouse`, `pncp_contratacoes`, `cnj_datajud` (+5) | ⚪ Planejado |
-| **Wave 3** | Mercado de Capitais & Finanças Públicas | 6 | 645 | `FEDERATED_API, LAKEHOUSE_BATCH` | `cvm_dfp_itr`, `mdic_comexstat`, `cvm_fundos` (+3) | ⚪ Planejado |
-| **Wave 4** | Censo, Trabalho, Logística & Telecom | 10 | 553 | `FEDERATED_API, LAKEHOUSE_BATCH` | `ibge_sidra`, `ibge_pib_municipal`, `ibge_censo2022` (+7) | ⚪ Planejado |
-| **Wave 5** | Saúde, Educação & Setor Notarial | 14 | 451 | `FEDERATED_API, LAKEHOUSE_BATCH` | `datasus_cnes`, `datasus_sih`, `inep_censo_escolar` (+11) | ⚪ Planejado |
-| **Wave 6** | Meio Ambiente, Agro & Metaportais | 7 | 369 | `BIGQUERY_FEDERATED, FEDERATED_API, LAKEHOUSE_BATCH` | `inpe_terrabrasilis`, `basedosdados_bq`, `ana_hidroweb_telemetria` (+4) | ⚪ Planejado |
+| **Wave 1** | APIs de Borda & Macroeconomia | 4 | 878 | `FEDERATED_API` | `ibge_localidades`, `brasilapi_core`, `bcb_sgs` (+1) | 🟢 100% Homologada |
+| **Wave 2** | B2B, Compras Públicas & Compliance | 8 | 744 | `FEDERATED_API, LAKEHOUSE_BATCH` | `rfb_cnpj_lakehouse`, `pncp_contratacoes`, `cnj_datajud` (+5) | 🟢 100% Homologada |
+| **Wave 3** | Mercado de Capitais & Finanças Públicas | 6 | 645 | `FEDERATED_API, LAKEHOUSE_BATCH` | `cvm_dfp_itr`, `mdic_comexstat`, `cvm_fundos` (+3) | 🟢 100% Homologada |
+| **Wave 4** | Censo, Trabalho, Logística & Telecom | 10 | 553 | `FEDERATED_API, LAKEHOUSE_BATCH` | `ibge_sidra`, `ibge_pib_municipal`, `ibge_censo2022` (+7) | 🟢 100% Homologada |
+| **Wave 5** | Saúde, Educação & Setor Notarial | 14 | 451 | `FEDERATED_API, LAKEHOUSE_BATCH` | `datasus_cnes`, `datasus_sih`, `inep_censo_escolar` (+11) | 🟢 100% Homologada |
+| **Wave 6** | Meio Ambiente, Agro & Metaportais | 7 | 369 | `BIGQUERY_FEDERATED, FEDERATED_API, LAKEHOUSE_BATCH` | `inpe_terrabrasilis`, `basedosdados_bq`, `ana_hidroweb_telemetria` (+4) | 🟢 100% Homologada |
 
 ---
 
-## 5. Matriz de Habilitação dos 10 Produtos Modulares C.O.R.E.
+## 5. Matriz de Habilitação dos 10 Perfis de Capacidade Analítica (Solution Packs)
 
-O `public-data-gateway` atua como barramento alimentador de dados para os **10 Produtos Modulares** do ecossistema corporativo (definidos em `biz-feasibility-evaluator` e no Catálogo de Ofertas GTM):
+O `public-data-gateway` organiza suas fontes e marts de dados em **10 Perfis de Capacidade Analítica (Solution Packs `P01` a `P10`)** componíveis via SDK (`list_sources(pack_id=...)`), CLI e servidor MCP:
 
-| Produto | Nome Comercial do Módulo | Status de Prontidão no Gateway | Fontes Mapeadas que Viabilizam o Módulo |
+| Pack ID | Nome do Perfil Analítico | Status de Prontidão no Gateway | Fontes Mapeadas que Habilitam o Perfil |
 | :---: | :--- | :--- | :--- |
-| **P01** | **Modern Data Platform & Analytics (Lakehouse as a Service)** | 🟢 Fundação Operacional (SQLite WAL, DuckDB Medallion & Quarentena) | `ibge_localidades`, `brasilapi_core`, `bcb_sgs`, `bcb_olinda_ptax` *(+45 fontes)* |
-| **P02** | **IA Agêntica & Automação Cognitiva (Enterprise AI)** | 🟢 Fundação Operacional (Servidor MCP bdg-mcp & Prompt Shield) | `ibge_localidades`, `brasilapi_core`, `bcb_sgs`, `rfb_cnpj_lakehouse` *(+22 fontes)* |
-| **P03** | **Software FullStack & Mobile Offline-First (Clean Arch/PostGIS)** | 🟢 Base Territorial Pronta (5.571 Municípios Sanitizados) | `ibge_localidades`, `brasilapi_core`, `ibge_censo2022`, `ibge_cnefe` *(+5 fontes)* |
-| **P04** | **Automação Inteligente de Processos (DPA & Power Platform)** | 🟡 Aguardando Ingestão Wave 1/2 (BrasilAPI & PNCP) | `brasilapi_core`, `rfb_cnpj_lakehouse`, `pncp_contratacoes`, `comprasgov_catmat` *(+3 fontes)* |
-| **P05** | **FinOps & Otimização de Custos em Nuvem (Gain-Sharing)** | 🟡 Aguardando Ingestão Wave 1/3 (BCB SGS, PTAX & CVM) | `bcb_sgs`, `bcb_olinda_ptax`, `cvm_dfp_itr`, `cvm_fundos` *(+3 fontes)* |
-| **P06** | **Data Clean Rooms & Parcerias Seguras (Privacidade Diferencial)** | 🟡 Aguardando Ingestão Wave 2 (RFB CNPJ & Quarentena) | `rfb_cnpj_lakehouse`, `cgu_ceis_cnep`, `cgu_pep`, `inpe_terrabrasilis` *(+3 fontes)* |
-| **P07** | **Cibersegurança Corporativa & Homologação Enterprise (SOC 2/BACEN)** | 🟡 Aguardando Ingestão Wave 2 (CGU PEP/CEIS & CNJ DataJud) | `cnj_datajud`, `cgu_ceis_cnep`, `cgu_pep`, `tst_cndt` |
-| **P08** | **AI Red Teaming & Auditoria Ética de Algoritmos (OWASP/SHAP)** | 🟢 Ativo (Proteção CWE-1236, Magic Bytes & Anti-Prompt Injection) | *(em definição)* |
-| **P09** | **Convergência Industrial OT/IT & IoT Analytics (OEE ISO 22400)** | 🟡 Aguardando Ingestão Wave 2/6 (SUFRAMA PIM & ANA Telemetria) | `suframa_pim_zfm`, `anatel_mosaico`, `antt_malha_transporte`, `inpe_terrabrasilis` *(+4 fontes)* |
-| **P10** | **Retainer de Sustentação Contínua & SRE as a Service (ARR 99.9%)** | 🟢 Ativo (5 Pilares de Observabilidade & Health Check API) | *(em definição)* |
+| **P01** | **Modern Data Platform & Analytics (Lakehouse)** | 🟢 100% Operacional (49/49 Fontes Homologadas) | `ibge_localidades`, `brasilapi_core`, `bcb_sgs`, `bcb_olinda_ptax` *(+45 fontes)* |
+| **P02** | **IA Agêntica & Automação LLM (MCP & REST)** | 🟢 100% Operacional (49/49 Fontes Homologadas) | `ibge_localidades`, `brasilapi_core`, `bcb_sgs`, `rfb_cnpj_lakehouse` *(+22 fontes)* |
+| **P03** | **Engenharia FullStack & Geolocalização Offline-First** | 🟢 100% Operacional (49/49 Fontes Homologadas) | `ibge_localidades`, `brasilapi_core`, `ibge_censo2022`, `ibge_cnefe` *(+5 fontes)* |
+| **P04** | **Automação Inteligente de Onboarding & Compliance KYB** | 🟢 100% Operacional (49/49 Fontes Homologadas) | `brasilapi_core`, `rfb_cnpj_lakehouse`, `pncp_contratacoes`, `comprasgov_catmat` *(+3 fontes)* |
+| **P05** | **FinOps & Séries Macroeconômicas / Deflacionamento** | 🟢 100% Operacional (49/49 Fontes Homologadas) | `bcb_sgs`, `bcb_olinda_ptax`, `cvm_dfp_itr`, `cvm_fundos` *(+3 fontes)* |
+| **P06** | **Data Clean Rooms & Benchmarks Anonimizados** | 🟢 100% Operacional (49/49 Fontes Homologadas) | `rfb_cnpj_lakehouse`, `cgu_ceis_cnep`, `cgu_pep`, `inpe_terrabrasilis` *(+3 fontes)* |
+| **P07** | **Due Diligence Corporativa, Sanções & Contencioso (TPRM)** | 🟢 100% Operacional (49/49 Fontes Homologadas) | `cnj_datajud`, `cgu_ceis_cnep`, `cgu_pep`, `tst_cndt` |
+| **P08** | **Segurança de Pipelines & Auditoria de Viés/Qualidade** | 🟢 100% Operacional (49/49 Fontes Homologadas) | *(em definição)* |
+| **P09** | **Inteligência Industrial, Energia, Agro & Meio Ambiente** | 🟢 100% Operacional (49/49 Fontes Homologadas) | `suframa_pim_zfm`, `anatel_mosaico`, `antt_malha_transporte`, `inpe_terrabrasilis` *(+4 fontes)* |
+| **P10** | **Observabilidade de Dados, Contratos ODCS & Confiabilidade SRE** | 🟢 100% Operacional (49/49 Fontes Homologadas) | *(em definição)* |
 
 ---
 
@@ -109,15 +108,15 @@ O `public-data-gateway` atua como barramento alimentador de dados para os **10 P
 
 | Data | Fase | Marco Estrutural Realizado | Resumo Executivo & Impacto |
 | :---: | :---: | :--- | :--- |
-| `2026-11-07` | **Fase 00** | **Arquitetura & Governança Fundacional** | Elaboração das ADR-001 (Storage Híbrido Medallion), ADR-002 (Chaves Canônicas e Quarentena) e ADR-003 (DevSecOps e LGPD) fundamentadas nos POP_T_177, POP_T_176, POP_T_175, POP_T_070 e POP_T_074. |
-| `2026-11-07` | **Fase 01** | **Setup do Repositório Satélite & Workflows CI** | Inicialização do repositório satélite brazil-data-gateway com isolamento venv Python 3.12, pyproject.toml, requirements.txt pinados, templates de PR e workflows de CI (pr-lint e ci.yml). |
+| `2026-11-07` | **Fase 00** | **Arquitetura & Governança Fundacional** | Elaboração das ADR-001 (Storage Híbrido Medallion), ADR-002 (Chaves Canônicas e Quarentena) e ADR-003 (DevSecOps e LGPD) fundamentadas em padrões ODCS v3.1 e observabilidade em 5 pilares. |
+| `2026-11-07` | **Fase 01** | **Setup do Repositório & Workflows CI** | Inicialização do repositório com isolamento venv Python 3.12, pyproject.toml, requirements.txt pinados, templates de PR e workflows de CI (pr-lint e ci.yml). |
 | `2026-11-07` | **Fase 02** | **Catálogo Mestre (49 Fontes), Normalização Canônica & Interfaces Unificadas** | Catalogação formal de 49 fontes públicas nos 13 macrosegmentos e Ondas 1..6; sanitização da base de referência dos 5.571 municípios brasileiros; implementação dos motores determinísticos render_catalog.py e render_progress.py com verificação --check. |
 | `2026-11-07` | **Fase 03-SPIKE** | **Homologação do Golden Spike ibge_localidades (5 Tabelas, dbt, Negócio & Live Fail-Hard)** | Execução completa do Golden Spike: 5 tabelas da API do IBGE (5.571 municípios, 10.751 distritos, 646 subdistritos, 27 UFs, 5 regiões) materializadas em data/ibge_localidades/{bronze,silver,gold}/; 9 modelos dbt (5 staging, dim_municipio, dim_distrito, xwalk_ibge_6d_7d, mart_hierarquia_territorial_brasil) com 109 testes 100% aprovados; 108 colunas 100% documentadas no linter; testes reais de 1 linha com fail-hard e suite com 35 testes unitários/integração 100% verde. |
 | `2026-11-07` | **Fase 03** | **Homologação do Conector bcb_sgs (6 Tabelas, dbt, Mart Macroeconômico & Live Fail-Hard)** | Implementação de ponta a ponta do conector bcb_sgs: 6 tabelas (sgs_catalogo, sgs_ipca, sgs_igpm, sgs_selic, sgs_cdi, sgs_ibcbr) materializadas em data/bcb_sgs/{bronze,silver,gold}/; 9 novos modelos dbt (6 staging, dim_serie_macroeconomica, fct_macro_indicadores_mensal, mart_cenario_macroeconomico_brasil) com 167 testes dbt 100% aprovados; 195 colunas 100% documentadas no linter; testes reais de 1 linha com fail-hard contra os 7 endpoints oficiais do BACEN e suíte offline com 37 testes pytest 100% verde. |
 | `2026-11-07` | **Fase 03** | **Homologação do Conector bcb_olinda_ptax (4 Tabelas, dbt, Mart de Volatilidade Cambial & Live Fail-Hard)** | Implementação de ponta a ponta do conector bcb_olinda_ptax: 4 tabelas (ptax_moedas, ptax_cotacao_dolar, ptax_cotacao_moedas, ptax_boletins) materializadas em data/bcb_olinda_ptax/{bronze,silver,gold}/; 7 novos modelos dbt (4 staging, dim_moeda, fct_cambio_ptax_diario, mart_cambio_volatilidade_brasil) com 220 testes dbt 100% aprovados; 260 colunas 100% documentadas no linter; testes reais de 1 linha com fail-hard contra os endpoints oficiais Olinda PTAX e suíte offline com 42 testes pytest 100% verde. |
 | `2026-11-07` | **Fase 03** | **Homologação do Conector brasilapi_core & Conclusão da Wave 1 (6 Tabelas, dbt, Mart Bancário & Live Fail-Hard)** | Implementação de ponta a ponta do conector brasilapi_core concluindo com sucesso 100% da Wave 1: 6 tabelas (brasilapi_bancos, brasilapi_pix_participantes, brasilapi_corretoras, brasilapi_feriados, brasilapi_ddds, brasilapi_ceps) materializadas em data/brasilapi_core/{bronze,silver,gold}/; 9 novos modelos dbt (6 staging, dim_instituicao_financeira, dim_calendario_nacional, mart_infraestrutura_bancaria_brasil) totalizando 34 modelos e 288 testes dbt 100% aprovados; 337 colunas 100% documentadas no linter; testes reais de 1 linha com fail-hard contra os 6 endpoints da BrasilAPI e suíte offline com 47 testes pytest 100% verde. |
 | `2026-11-08` | **Fase 04** | **Homologação do Conector rfb_cnpj_lakehouse (10 Tabelas, dbt, Mart B2B & Live Fail-Hard)** | Implementação de ponta a ponta do conector rfb_cnpj_lakehouse iniciando a Wave 2: 10 tabelas (rfb_cnaes, rfb_motivos, rfb_municipios, rfb_naturezas, rfb_paises, rfb_qualificacoes, rfb_empresas, rfb_estabelecimentos, rfb_socios, rfb_simples) materializadas em data/rfb_cnpj_lakehouse/{bronze,silver,gold}/; 14 novos modelos dbt (10 staging, dim_empresa, dim_estabelecimento, dim_socio_qsa, mart_densidade_empresarial_brasil) totalizando 48 modelos e 416 testes dbt 100% aprovados; 481 colunas 100% documentadas no linter; testes reais de 1 linha com fail-hard contra o endpoint oficial de CNPJ e suíte offline com 54 testes pytest 100% verde. |
-| `2026-11-08` | **Fase 04** | **Transição de Identidade: Renomeação para public-data-gateway & Registro da Fase 10 (Conecta GOV.BR & Geo/Maps)** | Renomeação oficial do repositório e projeto para public-data-gateway, integrando suporte simultâneo aos comandos pdg/bdg e pdg-mcp/bdg-mcp, atualização dos vínculos do ecossistema C.O.R.E. e registro da Fase 10 no plano de implementação contemplando a auditoria do Conecta GOV.BR, viabilidade de APIs geoespaciais (Google Maps, OpenStreetMap, Mapbox) e futura bipartição entre catálogo Gov Brasil e catálogo público global. |
+| `2026-11-08` | **Fase 04** | **Transição de Identidade: Renomeação para public-data-gateway & Registro da Fase 10 (Conecta GOV.BR & Geo/Maps)** | Renomeação oficial do repositório e projeto para public-data-gateway, integrando suporte simultâneo aos comandos pdg/bdg e pdg-mcp/bdg-mcp, atualização dos 10 Solution Packs modulares e registro da Fase 10 no plano de implementação contemplando a auditoria do Conecta GOV.BR, viabilidade de APIs geoespaciais (Google Maps, OpenStreetMap, Mapbox) e futura bipartição entre catálogo Gov Brasil e catálogo público global. |
 | `2026-11-08` | **Fase 04** | **Homologação do Conector rfb_simples_mei (5 Tabelas, dbt, Mart Tributário & Live Fail-Hard)** | Implementação de ponta a ponta do conector rfb_simples_mei consolidando a Wave 2: 5 tabelas (simples_nacional_cadastral, simei_cadastral, simples_sublimites_estaduais, simples_eventos_historico, simples_tabelas_anexos) materializadas em data/rfb_simples_mei/{bronze,silver,gold}/; 9 novos modelos dbt (5 staging, dim_simples_nacional, dim_simei, dim_sublimites_icms, mart_regimes_tributarios_brasil) totalizando 57 modelos e 477 testes dbt 100% aprovados; 541 colunas 100% documentadas no linter; testes reais de 1 linha com fail-hard contra o endpoint oficial de CNPJ/Simples e suíte offline com 60 testes pytest 100% verde; registro formal da expansão de escopo da Fase 10 para inclusão de APIs públicas globais e geoespaciais (Google APIs, OpenStreetMap, Mapbox). |
 | `2026-11-08` | **Fase 04** | **Homologação do Conector pncp_contratacoes (5 Tabelas, dbt, Mart de Compras Públicas & Live Fail-Hard)** | Implementação completa do conector pncp_contratacoes (Lei nº 14.133/2021): 5 tabelas (pncp_contratacoes, pncp_contratos, pncp_atas, pncp_orgaos, pncp_modalidades) materializadas em data/pncp_contratacoes/{bronze,silver,gold}/; 10 novos modelos dbt (5 staging views, dim_modalidade_licitacao, dim_orgao_publico, fct_contratacao_publica, fct_contrato_administrativo, mart_compras_publicas_brasil) totalizando 67 modelos e 576 testes dbt 100% aprovados; 730 colunas 100% documentadas no linter; testes reais de 1 linha com fail-hard estrito contra a API oficial de produção do PNCP e 65 testes offline aprovados; feature store features_compras_publicas_brasil.parquet gerada com score de maturidade licitatória. |
 | `2026-11-08` | **Fase 04** | **Homologação do Conector cgu_ceis_cnep (5 Tabelas, dbt, Mart de Sanções & Compliance & Live Fail-Hard)** | Implementação completa do conector cgu_ceis_cnep (Leis nº 12.846/2013 e 14.133/2021): 5 tabelas (cgu_ceis, cgu_cnep, cgu_cepim, cgu_acordos_leniencia, cgu_orgaos_sancionadores) materializadas em data/cgu_ceis_cnep/{bronze,silver,gold}/; 9 novos modelos dbt (5 staging views, dim_tipo_sancao, dim_empresa_sancionada, fct_sancao_administrativa, mart_compliance_sancoes_brasil) totalizando 76 modelos e 672 testes dbt 100% aprovados; 846 colunas 100% documentadas no linter; testes reais de 1 linha com fail-hard estrito contra a OpenAPI e endpoints oficiais da CGU; feature store features_compliance_risco_brasil.parquet gerada com score de risco de compliance; multi-interface completa via SDK (PublicData.compliance), CLI (pdg compliance), REST API (/api/v1/compliance) e MCP (bdg_get_compliance_status). |
@@ -145,7 +144,8 @@ Este runbook documenta os procedimentos padronizados para garantir que **qualque
 
 ```powershell
 # 1. Clonar repositório e navegar para a raiz
-cd c:\Users\jhose\GitOps\public-data-gateway
+git clone https://github.com/jhsfhtls/public-data-gateway.git
+cd public-data-gateway
 
 # 2. Criar e ativar o ambiente virtual isolado (.venv)
 py -3.12 -m venv .venv
@@ -173,9 +173,9 @@ python scripts/render_progress.py --check
 ruff check scripts/
 ```
 
-### 7.3. Como Iniciar a Ingestão do Próximo Conector (`ibge_localidades`)
+### 7.3. Checklist de Expansão para Novos Conectores (Pós-Wave 6)
 
-1. **Atualizar o Estado:** Edite `state/project_progress.json` alterando `active_connector: 'ibge_localidades'` e defina a fase como `03`.
-2. **Criar o Contrato:** Crie `src/brazil_data_gateway/connectors/ibge/contract.yaml` (perfil ODCS v3.1) definindo primary keys `id_municipio` e `sigla_uf`.
-3. **Executar os 9 Gates:** Implemente o conector herdando de `BaseConnector`, conecte o cache SQLite WAL, valide os 5 pilares e gere Parquet ZSTD.
-4. **Regenerar os Painéis:** Execute `python scripts/render_progress.py` para sincronizar `JORNADA_IMPLEMENTACAO.md`.
+1. **Atualizar o Catálogo:** Registre a nova fonte em `catalog/sources_registry.yaml` e atualize `state/project_progress.json`.
+2. **Criar o Contrato ODCS v3.1:** Defina `src/public_data_gateway/connectors/<segmento>/<source_id>/contract.yaml` especificando chaves canônicas, sentinelas e regras de observabilidade.
+3. **Executar os Gates:** Implemente o conector herdando de `BaseConnector`, adicione modelos dbt em `_models.yml`, exponha nas 4 interfaces (SDK, CLI, REST, MCP) e valide com `pytest`.
+4. **Regenerar os Painéis:** Execute `python scripts/render_catalog.py` e `python scripts/render_progress.py` para manter os painéis sincronizados.

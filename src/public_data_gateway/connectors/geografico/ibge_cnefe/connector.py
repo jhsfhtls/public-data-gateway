@@ -77,7 +77,7 @@ class IBGECnefeConnector:
             "endpoints": {},
             "status": "PASS",
         }
-        headers = {"User-Agent": "PublicDataGateway/1.0 (+https://github.com/jhosefer/career)"}
+        headers = {"User-Agent": "PublicDataGateway/1.0 (+https://github.com/jhsfhtls/public-data-gateway)"}
 
         # Probe 1: IBGE FTP CNEFE 2022
         try:

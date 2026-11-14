@@ -3,7 +3,7 @@
 Governed by:
 - Resolução CNJ nº 331/2020 (Instituição da Base Nacional de Dados do Poder Judiciário - DataJud)
 - Resolução CNJ nº 46/2007 (Tabelas Processuais Unificadas - TPU)
-- POP_T_177, POP_T_176, POP_T_175, POP_T_070, POP_T_074
+- ODCS v3.1 Data Contracts, 5-Pillar Observability & Medallion Architecture
 
 Provides unified access to procedural metadata across 90+ courts:
 1. cnj_processos (Metadados processuais NUP, partes, valores, fases)

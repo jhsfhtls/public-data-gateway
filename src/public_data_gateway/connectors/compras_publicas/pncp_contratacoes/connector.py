@@ -1,6 +1,6 @@
 """PNCP Contratações e Licitações Públicas Connector — Lei nº 14.133/2021.
 
-Part of the public-data-gateway Medallion platform (C.O.R.E. Ecosystem).
+Part of the public-data-gateway Medallion platform.
 Implements the 11-Gate Protocol:
 1. Multi-table ingestion (5 tabelas: pncp_contratacoes, pncp_contratos, pncp_atas, pncp_orgaos, pncp_modalidades)
 2. Isolated storage in data/pncp_contratacoes/{bronze, silver, gold, quarantine}/
