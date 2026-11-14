@@ -1,0 +1,580 @@
+schema_version: "3.1.0"
+contract_id: "ODCS-BR-ANVISA-CMED-001"
+source_id: "anvisa_cmed"
+version: "1.0.0"
+name: "ANVISA: Câmara de Regulação do Mercado de Medicamentos (CMED)"
+agency: "Agência Nacional de Vigilância Sanitária (ANVISA) / Secretaria-Executiva da CMED"
+official_url: "https://www.gov.br/anvisa/pt-br/assuntos/medicamentos/cmed/precos"
+
+legal_framework:
+  statutes:
+    - name: "Lei nº 10.742/2003"
+      description: "Define normas de regulação para o setor farmacêutico, cria a Câmara de Regulação do Mercado de Medicamentos (CMED) e institui regras de PF, PMC e PMVG"
+    - name: "Lei nº 9.782/1999"
+      description: "Define o Sistema Nacional de Vigilância Sanitária e cria a Agência Nacional de Vigilância Sanitária (ANVISA)"
+    - name: "Resolução CMED nº 2/2004"
+      description: "Aprova critérios para definição de preços de produtos novos e novas apresentações medicamentosas sujeitas ao teto CMED"
+    - name: "Comunicado CMED nº 3/2020 e Resolução CMED nº 3/2011"
+      description: "Estabelece o Coeficiente de Adequação de Preços (CAP) sobre o Preço Máximo de Venda ao Governo (PMVG) e regimes tributários PIS/COFINS"
+
+data_governance:
+  grain: "municipio_polo_farmaceutico_cmed"
+  primary_keys:
+    - "id_municipio"
+    - "sigla_uf"
+    - "cnpj_14"
+  reference_date_column: "reference_date"
+  min_expected_rows: 10
+  max_volume_drop_pct: 15.0
+  freshness_sla_hours: 720
+  lgpd_tier: "PUBLIC_NON_PERSONAL"
+  ml_feature_domains:
+    - "regulated_drug_prices"
+    - "maximum_consumer_price"
+
+schema:
+  tables:
+    cmed_apresentacoes_registradas_municipio:
+      description: "Inventário regulatório de apresentações medicamentosas ativas na tabela CMED por município sede de polo farmacêutico e laboratório âncora"
+      grain: "id_municipio, ano_mes_competencia"
+      primary_keys: ["id_municipio", "ano_mes_competencia"]
+      min_expected_rows: 12
+      columns:
+        - name: "id_municipio"
+          data_type: "string"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Código IBGE de 7 dígitos identificador do município"
+        - name: "nome_municipio"
+          data_type: "string"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Nome oficial do município"
+        - name: "sigla_uf"
+          data_type: "string"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Sigla de 2 letras da Unidade Federativa"
+        - name: "id_uf"
+          data_type: "string"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Código IBGE de 2 dígitos da Unidade Federativa"
+        - name: "ano_mes_competencia"
+          data_type: "string"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Competência mensal da lista CMED no formato AAAAMM"
+        - name: "cnpj_14"
+          data_type: "string"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "CNPJ de 14 dígitos do laboratório ou polo detentor de referência no município"
+        - name: "laboratorio_detentor_referencia"
+          data_type: "string"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Razão social resumida do laboratório ou centro detentor de referência na lista CMED"
+        - name: "total_apresentacoes_ativas_cmed"
+          data_type: "int64"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Total de apresentações medicamentosas com preço regulado ativo na lista CMED"
+        - name: "apresentacoes_genericos"
+          data_type: "int64"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Quantidade de apresentações classificadas como medicamentos genéricos"
+        - name: "apresentacoes_similares"
+          data_type: "int64"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Quantidade de apresentações classificadas como medicamentos similares"
+        - name: "apresentacoes_referencia_novos_biologicos"
+          data_type: "int64"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Quantidade de apresentações de referência, medicamentos novos e produtos biológicos"
+        - name: "participacao_genericos_similares_pct"
+          data_type: "float64"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Participação percentual combinada de medicamentos genéricos e similares no total de apresentações (%)"
+        - name: "apresentacoes_tarja_vermelha_preta_pct"
+          data_type: "float64"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Percentual de apresentações sob prescrição obrigatória (tarja vermelha ou preta) (%)"
+        - name: "apresentacoes_hospitalares_restritas_pct"
+          data_type: "float64"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Percentual de apresentações de uso restrito hospitalar com PF vedado ao varejo PMC (%)"
+        - name: "reference_date"
+          data_type: "string"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Data de referência ISO-8601 da apuração CMED"
+        - name: "extracted_at"
+          data_type: "string"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Timestamp UTC ISO-8601 da extração"
+
+    cmed_precos_regulados_classe_terapeutica:
+      description: "Estratificação municipal de preços máximos regulados PF, PMC e PMVG por grande classe terapêutica ATC"
+      grain: "id_municipio, ano_mes_competencia, classe_terapeutica_atc"
+      primary_keys: ["id_municipio", "ano_mes_competencia", "classe_terapeutica_atc"]
+      min_expected_rows: 48
+      columns:
+        - name: "id_municipio"
+          data_type: "string"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Código IBGE de 7 dígitos do município"
+        - name: "nome_municipio"
+          data_type: "string"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Nome oficial do município"
+        - name: "sigla_uf"
+          data_type: "string"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Sigla de 2 letras da Unidade Federativa"
+        - name: "id_uf"
+          data_type: "string"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Código IBGE de 2 dígitos da Unidade Federativa"
+        - name: "ano_mes_competencia"
+          data_type: "string"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Competência mensal da tabela CMED no formato AAAAMM"
+        - name: "cnpj_14"
+          data_type: "string"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "CNPJ de 14 dígitos do polo farmacêutico ou distribuidor de referência"
+        - name: "classe_terapeutica_atc"
+          data_type: "string"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Grande classe terapêutica padronizada segundo classificação anatômico-terapêutica ATC"
+        - name: "apresentacoes_classe"
+          data_type: "int64"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Quantidade de apresentações medicamentosas registradas na classe terapêutica"
+        - name: "participacao_classe_pct"
+          data_type: "float64"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Participação percentual da classe terapêutica sobre o total de apresentações (%)"
+        - name: "preco_fabrica_pf_medio_brl"
+          data_type: "float64"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Preço Fábrica (PF) médio regulado na classe terapêutica em reais (BRL)"
+        - name: "preco_maximo_consumidor_pmc_medio_brl"
+          data_type: "float64"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Preço Máximo ao Consumidor (PMC) médio regulado na classe terapêutica em reais (BRL)"
+        - name: "preco_maximo_venda_governo_pmvg_medio_brl"
+          data_type: "float64"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Preço Máximo de Venda ao Governo (PMVG) médio com CAP aplicado na classe em reais (BRL)"
+        - name: "desconto_medio_pmvg_sobre_pf_pct"
+          data_type: "float64"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Desconto percentual médio do PMVG frente ao Preço Fábrica PF na classe terapêutica (%)"
+        - name: "reference_date"
+          data_type: "string"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Data de referência ISO-8601 da apuração CMED"
+        - name: "extracted_at"
+          data_type: "string"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Timestamp UTC ISO-8601 da extração"
+
+    cmed_compras_publicas_cap_pmvg:
+      description: "Indicadores de abrangência do Coeficiente de Adequação de Preços (CAP), tetos PMVG e economia potencial nas compras públicas do SUS"
+      grain: "id_municipio, ano_mes_competencia"
+      primary_keys: ["id_municipio", "ano_mes_competencia"]
+      min_expected_rows: 12
+      columns:
+        - name: "id_municipio"
+          data_type: "string"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Código IBGE de 7 dígitos do município"
+        - name: "nome_municipio"
+          data_type: "string"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Nome oficial do município"
+        - name: "sigla_uf"
+          data_type: "string"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Sigla de 2 letras da Unidade Federativa"
+        - name: "id_uf"
+          data_type: "string"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Código IBGE de 2 dígitos da Unidade Federativa"
+        - name: "ano_mes_competencia"
+          data_type: "string"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Competência mensal da tabela CMED no formato AAAAMM"
+        - name: "cnpj_14"
+          data_type: "string"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "CNPJ de 14 dígitos do detentor ou fundo municipal de assistência farmacêutica"
+        - name: "apresentacoes_sujeitas_cap_obrigatorio"
+          data_type: "int64"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Quantidade de apresentações farmacêuticas sujeitas à aplicação obrigatória do CAP nas compras públicas"
+        - name: "proporcao_apresentacoes_cap_pct"
+          data_type: "float64"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Percentual do portfólio CMED enquadrado no Coeficiente de Adequação de Preços CAP (%)"
+        - name: "coeficiente_cap_vigente_pct"
+          data_type: "float64"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Percentual vigente do Coeficiente de Adequação de Preços (CAP) fixado pela CMED (%)"
+        - name: "preco_fabrica_medio_ponderado_brl"
+          data_type: "float64"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Preço Fábrica (PF) médio ponderado das apresentações monitoradas em reais (BRL)"
+        - name: "pmc_medio_ponderado_aliquota_uf_brl"
+          data_type: "float64"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Preço Máximo ao Consumidor (PMC) médio ponderado pela alíquota modal de ICMS da UF em reais (BRL)"
+        - name: "pmvg_medio_ponderado_brl"
+          data_type: "float64"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Preço Máximo de Venda ao Governo (PMVG) médio ponderado após desconto CAP em reais (BRL)"
+        - name: "economia_potencial_pmvg_sobre_pmc_pct"
+          data_type: "float64"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Redução percentual máxima alcançável do PMVG em comparação ao teto PMC de varejo (%)"
+        - name: "conformidade_teto_pmvg_compras_sus_pct"
+          data_type: "float64"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Percentual de adesão e conformidade das aquisições públicas locais abaixo do teto PMVG/CMED (%)"
+        - name: "reference_date"
+          data_type: "string"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Data de referência ISO-8601 da apuração CMED"
+        - name: "extracted_at"
+          data_type: "string"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Timestamp UTC ISO-8601 da extração"
+
+    cmed_regime_tributario_icms_piscofins:
+      description: "Estrutura tributária CMED por alíquota modal de ICMS estadual, listas PIS/COFINS e taxa de comercialização ativa"
+      grain: "id_municipio, ano_mes_competencia"
+      primary_keys: ["id_municipio", "ano_mes_competencia"]
+      min_expected_rows: 12
+      columns:
+        - name: "id_municipio"
+          data_type: "string"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Código IBGE de 7 dígitos do município"
+        - name: "nome_municipio"
+          data_type: "string"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Nome oficial do município"
+        - name: "sigla_uf"
+          data_type: "string"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Sigla de 2 letras da Unidade Federativa"
+        - name: "id_uf"
+          data_type: "string"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Código IBGE de 2 dígitos da Unidade Federativa"
+        - name: "ano_mes_competencia"
+          data_type: "string"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Competência mensal da tabela CMED no formato AAAAMM"
+        - name: "cnpj_14"
+          data_type: "string"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "CNPJ de 14 dígitos do laboratório ou polo farmacêutico de referência"
+        - name: "aliquota_icms_modal_uf_pct"
+          data_type: "float64"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Alíquota modal de ICMS estadual incidente sobre medicamentos na UF (%)"
+        - name: "apresentacoes_lista_positiva_piscofins"
+          data_type: "int64"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Quantidade de apresentações enquadradas na Lista Positiva de crédito presumido PIS/COFINS"
+        - name: "apresentacoes_lista_negativa_piscofins"
+          data_type: "int64"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Quantidade de apresentações sujeitas ao regime monofásico da Lista Negativa PIS/COFINS"
+        - name: "apresentacoes_lista_neutra_piscofins"
+          data_type: "int64"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Quantidade de apresentações tributadas em Lista Neutra de PIS/COFINS"
+        - name: "participacao_lista_positiva_piscofins_pct"
+          data_type: "float64"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Participação percentual da Lista Positiva (alíquota zero PIS/COFINS na ponta) no portfólio (%)"
+        - name: "apresentacoes_comercializacao_2024_ativa_pct"
+          data_type: "float64"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Percentual de apresentações CMED com comercialização efetiva reportada em 2024 (%)"
+        - name: "spread_medio_pmc_sobre_pf_pct"
+          data_type: "float64"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Margem regulatória percentual média entre o Preço Máximo ao Consumidor (PMC) e o PF (%)"
+        - name: "reference_date"
+          data_type: "string"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Data de referência ISO-8601 da apuração CMED"
+        - name: "extracted_at"
+          data_type: "string"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Timestamp UTC ISO-8601 da extração"
+
+    features_cmed_precos_medicamentos_municipios_brasil:
+      description: "Gold Feature Store municipal ANVISA CMED com competitividade de genéricos, eficiência regulatória PMVG/CAP e classificação do polo farmacêutico"
+      grain: "id_municipio"
+      primary_keys: ["id_municipio"]
+      min_expected_rows: 12
+      columns:
+        - name: "id_municipio"
+          data_type: "string"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Código IBGE de 7 dígitos identificador do município"
+        - name: "sigla_uf"
+          data_type: "string"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Sigla de 2 letras da Unidade Federativa"
+        - name: "nome_municipio"
+          data_type: "string"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Nome oficial do município"
+        - name: "ano_mes_competencia"
+          data_type: "string"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Competência mensal da tabela CMED no formato AAAAMM"
+        - name: "cnpj_14"
+          data_type: "string"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "CNPJ de 14 dígitos do laboratório ou polo farmacêutico de referência"
+        - name: "laboratorio_detentor_referencia"
+          data_type: "string"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Denominação do laboratório ou centro detentor de referência no município"
+        - name: "total_apresentacoes_ativas_cmed"
+          data_type: "int64"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Total de apresentações medicamentosas com registro de preço ativo na CMED"
+        - name: "participacao_genericos_similares_pct"
+          data_type: "float64"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Participação percentual combinada de genéricos e similares no portfólio CMED (%)"
+        - name: "apresentacoes_hospitalares_restritas_pct"
+          data_type: "float64"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Percentual de apresentações de uso restrito hospitalar (%)"
+        - name: "proporcao_apresentacoes_cap_pct"
+          data_type: "float64"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Percentual de apresentações sujeitas ao Coeficiente de Adequação de Preços CAP (%)"
+        - name: "preco_fabrica_medio_ponderado_brl"
+          data_type: "float64"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Preço Fábrica (PF) médio ponderado das apresentações em reais (BRL)"
+        - name: "pmc_medio_ponderado_aliquota_uf_brl"
+          data_type: "float64"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Preço Máximo ao Consumidor (PMC) médio ponderado na UF em reais (BRL)"
+        - name: "pmvg_medio_ponderado_brl"
+          data_type: "float64"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Preço Máximo de Venda ao Governo (PMVG) médio ponderado com CAP em reais (BRL)"
+        - name: "economia_potencial_pmvg_sobre_pmc_pct"
+          data_type: "float64"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Economia percentual máxima do PMVG frente ao teto PMC (%)"
+        - name: "conformidade_teto_pmvg_compras_sus_pct"
+          data_type: "float64"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Índice de conformidade das aquisições públicas locais ao teto PMVG/CMED (%)"
+        - name: "aliquota_icms_modal_uf_pct"
+          data_type: "float64"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Alíquota modal estadual de ICMS aplicada à precificação farmacêutica (%)"
+        - name: "participacao_lista_positiva_piscofins_pct"
+          data_type: "float64"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Participação percentual da Lista Positiva PIS/COFINS no portfólio regulado (%)"
+        - name: "apresentacoes_comercializacao_2024_ativa_pct"
+          data_type: "float64"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Percentual de apresentações CMED com comercialização efetiva em 2024 (%)"
+        - name: "score_competitividade_genericos_cmed"
+          data_type: "float64"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Score normalizado (0-100) de competitividade de genéricos, Lista Positiva PIS/COFINS e comercialização ativa"
+        - name: "score_eficiencia_regulatoria_pmvg_cap"
+          data_type: "float64"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Score normalizado (0-100) de eficiência regulatória PMVG/CAP nas aquisições públicas de medicamentos"
+        - name: "classificacao_polo_farmaceutico_cmed"
+          data_type: "string"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Classificação hierárquica de conformidade e maturidade regulatória CMED do polo farmacêutico"
+        - name: "reference_date"
+          data_type: "string"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Data de referência ISO-8601 da série"
+        - name: "extracted_at"
+          data_type: "string"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Timestamp UTC ISO-8601 da extração"

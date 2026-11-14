@@ -938,7 +938,7 @@ sources:
   - P04
   rice_score: 450
   roadmap_wave: 5
-  status: CATALOGED
+  status: HOMOLOGATED
 - source_id: inep_ideb
   name: 'INEP: Índice de Desenvolvimento da Educação Básica (IDEB)'
   agency: Instituto Nacional de Estudos e Pesquisas Educacionais Anísio Teixeira (INEP)

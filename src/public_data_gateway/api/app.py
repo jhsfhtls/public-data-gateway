@@ -1573,6 +1573,71 @@ def create_app(settings: GatewaySettings | None = None) -> FastAPI:
         conn = DataSUSSinascConnector(settings=app_settings)
         return conn.get_live_births_summary(id_municipio)
 
+    @app.get("/api/v1/health-public/cmed/top-hubs")
+    async def get_top_cmed_hubs(
+        limit: int = Query(10, ge=1, le=50, description="Max pharmaceutical hubs to list"),
+        uf: str | None = Query(None, description="Filter by 2-letter state abbreviation"),
+    ) -> list[dict[str, Any]]:
+        from public_data_gateway.connectors.saude.anvisa_cmed.connector import (
+            ANVISACmedConnector,
+        )
+
+        conn = ANVISACmedConnector(settings=app_settings)
+        return conn.list_top_cmed_regulatory_efficiency_hubs(limit=limit, sigla_uf=uf)
+
+    @app.get("/api/v1/health-public/cmed/features/{id_municipio}")
+    async def get_cmed_features(id_municipio: str) -> dict[str, Any]:
+        from public_data_gateway.connectors.saude.anvisa_cmed.connector import (
+            ANVISACmedConnector,
+        )
+
+        conn = ANVISACmedConnector(settings=app_settings)
+        return conn.get_cmed_drug_pricing_features(id_municipio)
+
+    @app.get("/api/v1/health-public/cmed/classes/{id_municipio}")
+    async def get_cmed_classes(
+        id_municipio: str,
+        classe: str | None = Query(
+            None, description="Optional ATC therapeutic class filter (e.g. Antineoplasicos)"
+        ),
+    ) -> list[dict[str, Any]]:
+        from public_data_gateway.connectors.saude.anvisa_cmed.connector import (
+            ANVISACmedConnector,
+        )
+
+        conn = ANVISACmedConnector(settings=app_settings)
+        return conn.list_therapeutic_class_prices(
+            id_municipio, classe_terapeutica_atc=classe
+        )
+
+    @app.get("/api/v1/health-public/cmed/pmvg/{id_municipio}")
+    async def get_cmed_pmvg(id_municipio: str) -> dict[str, Any]:
+        from public_data_gateway.connectors.saude.anvisa_cmed.connector import (
+            ANVISACmedConnector,
+        )
+
+        conn = ANVISACmedConnector(settings=app_settings)
+        return conn.get_public_procurement_pmvg(id_municipio)
+
+    @app.get("/api/v1/health-public/cmed/taxes/{id_municipio}")
+    async def get_cmed_taxes(id_municipio: str) -> dict[str, Any]:
+        from public_data_gateway.connectors.saude.anvisa_cmed.connector import (
+            ANVISACmedConnector,
+        )
+
+        conn = ANVISACmedConnector(settings=app_settings)
+        return conn.get_tax_regime_piscofins(id_municipio)
+
+    @app.get("/api/v1/health-public/cmed/presentations/{id_municipio}")
+    @app.get("/api/v1/cmed/{id_municipio}")
+    async def get_cmed_presentations(id_municipio: str) -> dict[str, Any]:
+        from public_data_gateway.connectors.saude.anvisa_cmed.connector import (
+            ANVISACmedConnector,
+        )
+
+        conn = ANVISACmedConnector(settings=app_settings)
+        return conn.get_presentations_summary(id_municipio)
+
     @app.get("/api/v1/education/censo-escolar/top-municipalities")
     async def get_top_censo_escolar_municipalities(
         limit: int = Query(10, ge=1, le=50, description="Max municipalities to list"),

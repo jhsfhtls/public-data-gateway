@@ -843,7 +843,7 @@ class LaborFacade:
 
 
 class HealthFacade:
-    """Unified developer facade for public health infrastructure, CNES networks, SIH hospitalizations, SIM mortality, and SINASC live births analytics."""
+    """Unified developer facade for public health infrastructure, CNES networks, SIH hospitalizations, SIM mortality, SINASC live births, and ANVISA CMED drug price analytics."""
 
     def __init__(self, sdk: "BrazilData") -> None:
         self._sdk = sdk
@@ -851,6 +851,7 @@ class HealthFacade:
         self._sih_connector: Any = None
         self._sim_connector: Any = None
         self._sinasc_connector: Any = None
+        self._cmed_connector: Any = None
 
     @property
     def cnes_connector(self) -> Any:
@@ -891,6 +892,16 @@ class HealthFacade:
 
             self._sinasc_connector = DataSUSSinascConnector(settings=self._sdk.settings)
         return self._sinasc_connector
+
+    @property
+    def cmed_connector(self) -> Any:
+        if self._cmed_connector is None:
+            from public_data_gateway.connectors.saude.anvisa_cmed.connector import (
+                ANVISACmedConnector,
+            )
+
+            self._cmed_connector = ANVISACmedConnector(settings=self._sdk.settings)
+        return self._cmed_connector
 
     def get_cnes_establishments(self, id_municipio: str) -> dict[str, Any]:
         """Get municipal summary of active health establishments and SUS network share (DataSUS CNES)."""
@@ -1015,6 +1026,38 @@ class HealthFacade:
     ) -> list[dict[str, Any]]:
         """List top Brazilian municipalities ranked by composite DataSUS SINASC prenatal quality score."""
         return self.sinasc_connector.list_top_sinasc_prenatal_municipalities(
+            limit=limit, sigla_uf=sigla_uf
+        )
+
+    def get_cmed_presentations_summary(self, id_municipio: str) -> dict[str, Any]:
+        """Get municipal ANVISA CMED registered drug presentations inventory and generics share."""
+        return self.cmed_connector.get_presentations_summary(id_municipio)
+
+    def list_cmed_therapeutic_class_prices(
+        self, id_municipio: str, classe_terapeutica_atc: str | None = None
+    ) -> list[dict[str, Any]]:
+        """List municipal ANVISA CMED regulated PF, PMC and PMVG prices by ATC therapeutic class."""
+        return self.cmed_connector.list_therapeutic_class_prices(
+            id_municipio, classe_terapeutica_atc=classe_terapeutica_atc
+        )
+
+    def get_cmed_public_procurement_pmvg(self, id_municipio: str) -> dict[str, Any]:
+        """Get municipal CAP coefficient coverage, PMVG price ceilings, and SUS procurement compliance."""
+        return self.cmed_connector.get_public_procurement_pmvg(id_municipio)
+
+    def get_cmed_tax_regime_piscofins(self, id_municipio: str) -> dict[str, Any]:
+        """Get state modal ICMS rate, PIS/COFINS positive/negative lists, and active commercialization rate."""
+        return self.cmed_connector.get_tax_regime_piscofins(id_municipio)
+
+    def get_cmed_drug_pricing_features(self, id_municipio: str) -> dict[str, Any]:
+        """Get normalized Gold ANVISA CMED generics competitiveness and PMVG/CAP regulatory efficiency features."""
+        return self.cmed_connector.get_cmed_drug_pricing_features(id_municipio)
+
+    def list_top_cmed_regulatory_efficiency_hubs(
+        self, limit: int = 10, sigla_uf: str | None = None
+    ) -> list[dict[str, Any]]:
+        """List top pharmaceutical hub municipalities ranked by ANVISA CMED PMVG/CAP regulatory efficiency score."""
+        return self.cmed_connector.list_top_cmed_regulatory_efficiency_hubs(
             limit=limit, sigla_uf=sigla_uf
         )
 
@@ -1663,6 +1706,38 @@ class BrazilData:
     ) -> list[dict[str, Any]]:
         """Listar municípios líderes em qualidade da assistência pré-natal e saúde perinatal no Brasil (DataSUS SINASC)."""
         return self.health.list_top_sinasc_prenatal_municipalities(
+            limit=limit, sigla_uf=sigla_uf
+        )
+
+    def get_cmed_presentations_summary(self, id_municipio: str) -> dict[str, Any]:
+        """Consultar inventário de apresentações ativas e participação de genéricos/similares na CMED (ANVISA)."""
+        return self.health.get_cmed_presentations_summary(id_municipio)
+
+    def list_cmed_therapeutic_class_prices(
+        self, id_municipio: str, classe_terapeutica_atc: str | None = None
+    ) -> list[dict[str, Any]]:
+        """Listar preços regulados médios PF, PMC e PMVG por grande classe terapêutica ATC (ANVISA CMED)."""
+        return self.health.list_cmed_therapeutic_class_prices(
+            id_municipio, classe_terapeutica_atc=classe_terapeutica_atc
+        )
+
+    def get_cmed_public_procurement_pmvg(self, id_municipio: str) -> dict[str, Any]:
+        """Consultar cobertura CAP, teto PMVG e conformidade em compras públicas SUS (ANVISA CMED)."""
+        return self.health.get_cmed_public_procurement_pmvg(id_municipio)
+
+    def get_cmed_tax_regime_piscofins(self, id_municipio: str) -> dict[str, Any]:
+        """Consultar alíquota modal ICMS, listas PIS/COFINS e spread PMC/PF (ANVISA CMED)."""
+        return self.health.get_cmed_tax_regime_piscofins(id_municipio)
+
+    def get_cmed_drug_pricing_features(self, id_municipio: str) -> dict[str, Any]:
+        """Consultar features Gold de competitividade de genéricos e eficiência regulatória PMVG/CAP (ANVISA CMED)."""
+        return self.health.get_cmed_drug_pricing_features(id_municipio)
+
+    def list_top_cmed_regulatory_efficiency_hubs(
+        self, limit: int = 10, sigla_uf: str | None = None
+    ) -> list[dict[str, Any]]:
+        """Listar polos farmacêuticos líderes em eficiência regulatória PMVG/CAP no Brasil (ANVISA CMED)."""
+        return self.health.list_top_cmed_regulatory_efficiency_hubs(
             limit=limit, sigla_uf=sigla_uf
         )
 

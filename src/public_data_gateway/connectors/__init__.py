@@ -33,6 +33,7 @@ import public_data_gateway.connectors.macrofinanceiro.bcb_sgs  # noqa: F401
 import public_data_gateway.connectors.macrofinanceiro.cvm_dfp_itr  # noqa: F401
 import public_data_gateway.connectors.macrofinanceiro.cvm_fundos  # noqa: F401
 import public_data_gateway.connectors.macrofinanceiro.stn_tesouro_transparente  # noqa: F401
+import public_data_gateway.connectors.saude.anvisa_cmed  # noqa: F401
 import public_data_gateway.connectors.saude.datasus_cnes  # noqa: F401
 import public_data_gateway.connectors.saude.datasus_sih  # noqa: F401
 import public_data_gateway.connectors.saude.datasus_sim  # noqa: F401

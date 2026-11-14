@@ -781,6 +781,36 @@ def build_parser() -> argparse.ArgumentParser:
     sn_rk_p.add_argument("--uf", type=str, help="Optional 2-letter state filter")
     sn_rk_p.add_argument("--json", action="store_true", help="Output in JSON format")
 
+    # ANVISA CMED (Câmara de Regulação do Mercado de Medicamentos) command group
+    cm_p = subparsers.add_parser("cmed", help="Query ANVISA CMED regulated drug prices (PF, PMC, PMVG), CAP, ICMS/PIS-COFINS, and efficiency hubs.")
+    cm_sub = cm_p.add_subparsers(dest="cmed_action", required=True)
+
+    cm_pres_p = cm_sub.add_parser("presentations", help="Get municipal ANVISA CMED active drug presentations inventory.")
+    cm_pres_p.add_argument("id_municipio", help="7-digit IBGE municipality code, CNPJ-14, or municipality name")
+    cm_pres_p.add_argument("--json", action="store_true", help="Output in JSON format")
+
+    cm_cls_p = cm_sub.add_parser("classes", help="List regulated PF, PMC and PMVG prices stratified by ATC therapeutic class.")
+    cm_cls_p.add_argument("id_municipio", help="7-digit IBGE municipality code, CNPJ-14, or municipality name")
+    cm_cls_p.add_argument("--classe", type=str, help="Optional ATC therapeutic class substring filter (e.g. Antineoplasicos)")
+    cm_cls_p.add_argument("--json", action="store_true", help="Output in JSON format")
+
+    cm_pmvg_p = cm_sub.add_parser("pmvg", help="Get CAP coverage, PMVG ceiling, and public SUS procurement compliance.")
+    cm_pmvg_p.add_argument("id_municipio", help="7-digit IBGE municipality code, CNPJ-14, or municipality name")
+    cm_pmvg_p.add_argument("--json", action="store_true", help="Output in JSON format")
+
+    cm_tax_p = cm_sub.add_parser("taxes", help="Get state modal ICMS rate, PIS/COFINS lists, and active commercialization ratio.")
+    cm_tax_p.add_argument("id_municipio", help="7-digit IBGE municipality code, CNPJ-14, or municipality name")
+    cm_tax_p.add_argument("--json", action="store_true", help="Output in JSON format")
+
+    cm_ft_p = cm_sub.add_parser("features", help="Get Gold ANVISA CMED generics competitiveness and PMVG/CAP regulatory efficiency features.")
+    cm_ft_p.add_argument("id_municipio", help="7-digit IBGE municipality code, CNPJ-14, or municipality name")
+    cm_ft_p.add_argument("--json", action="store_true", help="Output in JSON format")
+
+    cm_rk_p = cm_sub.add_parser("ranking", help="List top pharmaceutical hubs ranked by ANVISA CMED regulatory efficiency score.")
+    cm_rk_p.add_argument("--limit", type=int, default=10, help="Max municipalities to list")
+    cm_rk_p.add_argument("--uf", type=str, help="Optional 2-letter state filter")
+    cm_rk_p.add_argument("--json", action="store_true", help="Output in JSON format")
+
     # INEP Censo Escolar (Educação Básica) command group
     ce_p = subparsers.add_parser("censo-escolar", help="Query INEP Censo Escolar schools, enrollments, teachers, flow, and education scores.")
     ce_sub = ce_p.add_subparsers(dest="censo_escolar_action", required=True)
@@ -2735,6 +2765,82 @@ def main(argv: Sequence[str] | None = None) -> int:
                     for idx, r in enumerate(ranks, 1):
                         print(f"  {idx}. {r.get('nome_municipio')} ({r.get('sigla_uf')}): Pré-Natal {r.get('score_qualidade_assistencia_prenatal_sinasc')} | Vitalidade: {r.get('score_vitalidade_protecao_perinatal')} | {r.get('classificacao_rede_materno_perinatal')}")
                 return 0
+
+        elif args.command == "cmed":
+            from public_data_gateway.connectors.saude.anvisa_cmed.connector import (
+                ANVISACmedConnector,
+            )
+
+            cm_conn = ANVISACmedConnector()
+            cm_action = getattr(args, "cmed_action", None)
+            try:
+                if cm_action == "presentations":
+                    res = cm_conn.get_presentations_summary(args.id_municipio)
+                    if getattr(args, "json", False):
+                        print(json.dumps(res, indent=2, ensure_ascii=False, default=str))
+                    else:
+                        print(f"ANVISA CMED Apresentações ({res.get('nome_municipio')} - {res.get('id_municipio')}):")
+                        print(f"  Laboratório Âncora: {res.get('laboratorio_detentor_referencia')} ({res.get('cnpj_14')})")
+                        print(f"  Ativas / Gen+Sim:   {res.get('total_apresentacoes_ativas_cmed')} ({res.get('participacao_genericos_similares_pct')}% genéricos+similares)")
+                    return 0
+
+                if cm_action == "classes":
+                    rows = cm_conn.list_therapeutic_class_prices(
+                        args.id_municipio, classe_terapeutica_atc=getattr(args, "classe", None)
+                    )
+                    if getattr(args, "json", False):
+                        print(json.dumps(rows, indent=2, ensure_ascii=False, default=str))
+                    else:
+                        print(f"ANVISA CMED Preços por Classe Terapêutica ({args.id_municipio}):")
+                        for r in rows:
+                            print(f"  - {r.get('classe_terapeutica_atc')}: PF R$ {r.get('preco_fabrica_pf_medio_brl')} | PMC R$ {r.get('preco_maximo_consumidor_pmc_medio_brl')} | PMVG R$ {r.get('preco_maximo_venda_governo_pmvg_medio_brl')}")
+                    return 0
+
+                if cm_action == "pmvg":
+                    res = cm_conn.get_public_procurement_pmvg(args.id_municipio)
+                    if getattr(args, "json", False):
+                        print(json.dumps(res, indent=2, ensure_ascii=False, default=str))
+                    else:
+                        print(f"ANVISA CMED Compras Públicas CAP & PMVG ({res.get('nome_municipio')} - {res.get('id_municipio')}):")
+                        print(f"  PF / PMC / PMVG:    R$ {res.get('preco_fabrica_medio_ponderado_brl')} / R$ {res.get('pmc_medio_ponderado_aliquota_uf_brl')} / R$ {res.get('pmvg_medio_ponderado_brl')}")
+                        print(f"  CAP / Conform. SUS: {res.get('proporcao_apresentacoes_cap_pct')}% CAP | {res.get('conformidade_teto_pmvg_compras_sus_pct')}% conformidade PMVG")
+                    return 0
+
+                if cm_action == "taxes":
+                    res = cm_conn.get_tax_regime_piscofins(args.id_municipio)
+                    if getattr(args, "json", False):
+                        print(json.dumps(res, indent=2, ensure_ascii=False, default=str))
+                    else:
+                        print(f"ANVISA CMED Regime Tributário ICMS & PIS/COFINS ({res.get('nome_municipio')} - {res.get('id_municipio')}):")
+                        print(f"  ICMS Modal / Lista+: {res.get('aliquota_icms_modal_uf_pct')}% ICMS | {res.get('participacao_lista_positiva_piscofins_pct')}% Lista Positiva")
+                        print(f"  Comerc. 2024 / Spr:  {res.get('apresentacoes_comercializacao_2024_ativa_pct')}% ativa | {res.get('spread_medio_pmc_sobre_pf_pct')}% spread PMC/PF")
+                    return 0
+
+                if cm_action == "features":
+                    feat = cm_conn.get_cmed_drug_pricing_features(args.id_municipio)
+                    if getattr(args, "json", False):
+                        print(json.dumps(feat, indent=2, ensure_ascii=False, default=str))
+                    else:
+                        print(f"ANVISA CMED Features Regulatórias: {feat.get('nome_municipio')} ({feat.get('sigla_uf')} - {feat.get('id_municipio')}):")
+                        print(f"  Score Competitividade: {feat.get('score_competitividade_genericos_cmed')}/100.0")
+                        print(f"  Score Eficiência PMVG: {feat.get('score_eficiencia_regulatoria_pmvg_cap')}/100.0")
+                        print(f"  Classificação Polo:    {feat.get('classificacao_polo_farmaceutico_cmed')}")
+                    return 0
+
+                if cm_action == "ranking":
+                    ranks = cm_conn.list_top_cmed_regulatory_efficiency_hubs(
+                        limit=getattr(args, "limit", 10), sigla_uf=getattr(args, "uf", None)
+                    )
+                    if getattr(args, "json", False):
+                        print(json.dumps(ranks, indent=2, ensure_ascii=False, default=str))
+                    else:
+                        print(f"Top {len(ranks)} Polos Farmacêuticos CMED (ANVISA):")
+                        for idx, r in enumerate(ranks, 1):
+                            print(f"  {idx}. {r.get('nome_municipio')} ({r.get('sigla_uf')}): Eficiência {r.get('score_eficiencia_regulatoria_pmvg_cap')} | Competitividade: {r.get('score_competitividade_genericos_cmed')} | {r.get('classificacao_polo_farmaceutico_cmed')}")
+                    return 0
+            except ValueError as exc:
+                print(f"Erro ANVISA CMED: {exc}", file=sys.stderr)
+                return 1
 
         elif args.command == "censo-escolar":
             from public_data_gateway.connectors.educacao.inep_censo_escolar.connector import (
