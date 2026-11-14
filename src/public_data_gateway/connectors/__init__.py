@@ -16,6 +16,7 @@ import public_data_gateway.connectors.demografico.ibge_localidades  # noqa: F401
 import public_data_gateway.connectors.demografico.ibge_pib_municipal  # noqa: F401
 import public_data_gateway.connectors.demografico.ibge_sidra  # noqa: F401
 import public_data_gateway.connectors.educacao.inep_censo_escolar  # noqa: F401
+import public_data_gateway.connectors.educacao.inep_censo_superior  # noqa: F401
 import public_data_gateway.connectors.empresarial.rfb_cnpj_lakehouse  # noqa: F401
 import public_data_gateway.connectors.empresarial.rfb_simples_mei  # noqa: F401
 import public_data_gateway.connectors.empresarial.suframa_pim_zfm  # noqa: F401

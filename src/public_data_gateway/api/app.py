@@ -1505,4 +1505,67 @@ def create_app(settings: GatewaySettings | None = None) -> FastAPI:
         conn = INEPCensoEscolarConnector(settings=app_settings)
         return conn.get_school_infrastructure(id_municipio)
 
+    @app.get("/api/v1/education/censo-superior/top-hubs")
+    async def get_top_censo_superior_hubs(
+        limit: int = Query(10, ge=1, le=50, description="Max municipalities to list"),
+        uf: str | None = Query(None, description="Filter by 2-letter state abbreviation"),
+    ) -> list[dict[str, Any]]:
+        from public_data_gateway.connectors.educacao.inep_censo_superior.connector import (
+            INEPCensoSuperiorConnector,
+        )
+
+        conn = INEPCensoSuperiorConnector(settings=app_settings)
+        return conn.list_top_censo_superior_hubs(limit=limit, sigla_uf=uf)
+
+    @app.get("/api/v1/education/censo-superior/features/{id_municipio}")
+    async def get_censo_superior_features(id_municipio: str) -> dict[str, Any]:
+        from public_data_gateway.connectors.educacao.inep_censo_superior.connector import (
+            INEPCensoSuperiorConnector,
+        )
+
+        conn = INEPCensoSuperiorConnector(settings=app_settings)
+        return conn.get_censo_superior_features(id_municipio)
+
+    @app.get("/api/v1/education/censo-superior/courses/{id_municipio}")
+    async def get_censo_superior_courses(
+        id_municipio: str,
+        area: str | None = Query(
+            None, description="Optional CINE macroarea filter (e.g. STEM)"
+        ),
+    ) -> list[dict[str, Any]]:
+        from public_data_gateway.connectors.educacao.inep_censo_superior.connector import (
+            INEPCensoSuperiorConnector,
+        )
+
+        conn = INEPCensoSuperiorConnector(settings=app_settings)
+        return conn.list_cine_area_courses(id_municipio, area_cine_rotulo=area)
+
+    @app.get("/api/v1/education/censo-superior/enrollments/{id_municipio}")
+    async def get_censo_superior_enrollments(id_municipio: str) -> dict[str, Any]:
+        from public_data_gateway.connectors.educacao.inep_censo_superior.connector import (
+            INEPCensoSuperiorConnector,
+        )
+
+        conn = INEPCensoSuperiorConnector(settings=app_settings)
+        return conn.get_enrollments_and_graduates(id_municipio)
+
+    @app.get("/api/v1/education/censo-superior/faculty/{id_municipio}")
+    async def get_censo_superior_faculty(id_municipio: str) -> dict[str, Any]:
+        from public_data_gateway.connectors.educacao.inep_censo_superior.connector import (
+            INEPCensoSuperiorConnector,
+        )
+
+        conn = INEPCensoSuperiorConnector(settings=app_settings)
+        return conn.get_faculty_profile(id_municipio)
+
+    @app.get("/api/v1/education/censo-superior/institutions/{id_municipio}")
+    @app.get("/api/v1/censo-superior/{id_municipio}")
+    async def get_censo_superior_institutions(id_municipio: str) -> dict[str, Any]:
+        from public_data_gateway.connectors.educacao.inep_censo_superior.connector import (
+            INEPCensoSuperiorConnector,
+        )
+
+        conn = INEPCensoSuperiorConnector(settings=app_settings)
+        return conn.get_institutions_summary(id_municipio)
+
     return app
