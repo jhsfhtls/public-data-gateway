@@ -2091,6 +2091,89 @@ def create_app(settings: GatewaySettings | None = None) -> FastAPI:
         except ValueError as exc:
             raise HTTPException(status_code=400, detail=str(exc)) from exc
 
+    @app.get("/api/v1/environment/terrabrasilis/top-municipalities")
+    async def get_top_terrabrasilis_municipalities(
+        limit: int = Query(10, ge=1, le=50, description="Max municipalities to list"),
+        uf: str | None = Query(None, description="Filter by 2-letter state abbreviation"),
+    ) -> list[dict[str, Any]]:
+        from public_data_gateway.connectors.ambiental.inpe_terrabrasilis.connector import (
+            InpeTerrabrasilisConnector,
+        )
+
+        conn = InpeTerrabrasilisConnector(settings=app_settings)
+        try:
+            return conn.list_top_terrabrasilis_municipalities(limit=limit, sigla_uf=uf)
+        except ValueError as exc:
+            raise HTTPException(status_code=400, detail=str(exc)) from exc
+
+    @app.get("/api/v1/environment/terrabrasilis/features/{id_municipio}")
+    async def get_terrabrasilis_features(id_municipio: str) -> dict[str, Any]:
+        from public_data_gateway.connectors.ambiental.inpe_terrabrasilis.connector import (
+            InpeTerrabrasilisConnector,
+        )
+
+        conn = InpeTerrabrasilisConnector(settings=app_settings)
+        try:
+            return conn.get_terrabrasilis_environmental_features(id_municipio)
+        except ValueError as exc:
+            raise HTTPException(status_code=400, detail=str(exc)) from exc
+
+    @app.get("/api/v1/environment/terrabrasilis/deter/{id_municipio}")
+    async def get_terrabrasilis_deter(
+        id_municipio: str,
+        classe: str | None = Query(
+            None, description="Optional DETER alert class filter (e.g. Corte_Raso)"
+        ),
+    ) -> list[dict[str, Any]]:
+        from public_data_gateway.connectors.ambiental.inpe_terrabrasilis.connector import (
+            InpeTerrabrasilisConnector,
+        )
+
+        conn = InpeTerrabrasilisConnector(settings=app_settings)
+        try:
+            return conn.list_terrabrasilis_deter_alerts(
+                id_municipio, classe_alerta_deter=classe
+            )
+        except ValueError as exc:
+            raise HTTPException(status_code=400, detail=str(exc)) from exc
+
+    @app.get("/api/v1/environment/terrabrasilis/land-cover/{id_municipio}")
+    async def get_terrabrasilis_land_cover(id_municipio: str) -> dict[str, Any]:
+        from public_data_gateway.connectors.ambiental.inpe_terrabrasilis.connector import (
+            InpeTerrabrasilisConnector,
+        )
+
+        conn = InpeTerrabrasilisConnector(settings=app_settings)
+        try:
+            return conn.get_terrabrasilis_land_cover(id_municipio)
+        except ValueError as exc:
+            raise HTTPException(status_code=400, detail=str(exc)) from exc
+
+    @app.get("/api/v1/environment/terrabrasilis/governance/{id_municipio}")
+    async def get_terrabrasilis_governance(id_municipio: str) -> dict[str, Any]:
+        from public_data_gateway.connectors.ambiental.inpe_terrabrasilis.connector import (
+            InpeTerrabrasilisConnector,
+        )
+
+        conn = InpeTerrabrasilisConnector(settings=app_settings)
+        try:
+            return conn.get_terrabrasilis_esg_governance(id_municipio)
+        except ValueError as exc:
+            raise HTTPException(status_code=400, detail=str(exc)) from exc
+
+    @app.get("/api/v1/environment/terrabrasilis/prodes/{id_municipio}")
+    @app.get("/api/v1/terrabrasilis/{id_municipio}")
+    async def get_terrabrasilis_prodes(id_municipio: str) -> dict[str, Any]:
+        from public_data_gateway.connectors.ambiental.inpe_terrabrasilis.connector import (
+            InpeTerrabrasilisConnector,
+        )
+
+        conn = InpeTerrabrasilisConnector(settings=app_settings)
+        try:
+            return conn.get_terrabrasilis_prodes_deforestation(id_municipio)
+        except ValueError as exc:
+            raise HTTPException(status_code=400, detail=str(exc)) from exc
+
     @app.get("/api/v1/real-estate/onr/top-municipalities")
     async def get_top_onr_municipalities(
         limit: int = Query(10, ge=1, le=50, description="Max municipalities to list"),

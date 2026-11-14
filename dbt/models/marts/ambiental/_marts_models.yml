@@ -1,0 +1,75 @@
+version: 2
+
+models:
+  - name: mart_desmatamento_terrabrasilis_brasil
+    description: "Mart analítico ambiental de monitoramento PRODES/DETER do INPE TerraBrasilis, conformidade ao Código Florestal e risco EUDR/ESG por município brasileiro."
+    columns:
+      - name: id_municipio
+        description: "Código IBGE de 7 dígitos do município."
+        tests: [not_null, unique]
+      - name: nome_municipio
+        description: "Nome oficial do município."
+        tests: [not_null]
+      - name: sigla_uf
+        description: "Sigla da Unidade Federativa."
+        tests: [not_null]
+      - name: id_uf
+        description: "Código IBGE da UF."
+        tests: [not_null]
+      - name: regiao
+        description: "Grande região geográfica brasileira."
+        tests: [not_null]
+      - name: bioma_predominante
+        description: "Bioma predominante no município."
+        tests: [not_null]
+      - name: ano_prodes
+        description: "Ano-calendário PRODES de referência."
+        tests: [not_null]
+      - name: area_desmatada_prodes_km2
+        description: "Incremento anual de desmatamento PRODES (km²)."
+        tests: [not_null]
+      - name: cobertura_florestal_remanescente_pct
+        description: "Cobertura florestal remanescente (%)."
+        tests: [not_null]
+      - name: variacao_anual_prodes_pct
+        description: "Variação anual do desmatamento PRODES (%)."
+        tests: [not_null]
+      - name: total_alertas_deter_ano
+        description: "Total agregado de alertas DETER emitidos no município."
+        tests: [not_null]
+      - name: area_total_alertas_deter_km2
+        description: "Área total agregada de alertas DETER no município (km²)."
+        tests: [not_null]
+      - name: conformidade_codigo_florestal_pct
+        description: "Conformidade estimada ao Código Florestal (%)."
+        tests: [not_null]
+      - name: embargos_ibama_ativos_ano
+        description: "Embargos ambientais ativos no município."
+        tests: [not_null]
+      - name: elegibilidade_credito_rural_esg_pct
+        description: "Elegibilidade a crédito rural ESG (%)."
+        tests: [not_null]
+      - name: risco_desconformidade_eudr_pct
+        description: "Exposição a desconformidade EUDR (%)."
+        tests: [not_null]
+      - name: indice_prontidao_fiscalizacao
+        description: "Índice de prontidão de fiscalização ambiental (0-100)."
+        tests: [not_null]
+      - name: score_preservacao_conformidade_florestal
+        description: "Score normalizado (0-100) de preservação e conformidade florestal."
+        tests: [not_null]
+      - name: score_pressao_desmatamento_deter
+        description: "Score normalizado (0-100) de pressão de desmatamento PRODES/DETER e risco EUDR."
+        tests: [not_null]
+      - name: score_composto_risco_esg_territorial
+        description: "Score composto (0-100) de sustentabilidade territorial e conformidade ESG/EUDR."
+        tests: [not_null]
+      - name: perfil_risco_ambiental_terrabrasilis
+        description: "Classificação estratégica do perfil de risco ambiental e conformidade EUDR (4 tiers)."
+        tests: [not_null]
+      - name: reference_date
+        description: "Data de referência do ciclo anual TerraBrasilis."
+        tests: [not_null]
+      - name: extracted_at
+        description: "Timestamp UTC ISO-8601 da extração."
+        tests: [not_null]

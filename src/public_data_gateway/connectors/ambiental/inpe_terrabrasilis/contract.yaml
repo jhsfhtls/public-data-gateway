@@ -1,0 +1,569 @@
+schema_version: "3.1.0"
+contract_id: "ODCS-BR-INPE-TERRABRASILIS-001"
+source_id: "inpe_terrabrasilis"
+version: "1.0.0"
+name: "INPE: Plataforma TerraBrasilis (DETER & PRODES)"
+agency: "Instituto Nacional de Pesquisas Espaciais (INPE)"
+official_url: "http://terrabrasilis.dpi.inpe.br/"
+
+legal_framework:
+  statutes:
+    - name: "Lei nº 12.651/2012 (Código Florestal)"
+      description: "Dispõe sobre a proteção da vegetação nativa, Áreas de Preservação Permanente (APP), Reserva Legal e Cadastro Ambiental Rural (CAR)"
+    - name: "Decreto nº 7.830/2012 & Decreto nº 8.235/2014"
+      description: "Regulam o Sistema de Cadastro Ambiental Rural (SICAR) e os Programas de Regularização Ambiental (PRA)"
+    - name: "Lei Complementar nº 140/2011"
+      description: "Fixa normas de cooperação federativa para fiscalização ambiental, combate ao desmatamento e licenciamento"
+    - name: "Resolução BCB nº 140/2021 & Regulação EUDR (EU 2023/1115)"
+      description: "Define critérios socioambientais para crédito rural sustentável e rastreabilidade livre de desmatamento"
+    - name: "Lei nº 12.527/2011 (LAI) & Decreto nº 8.777/2016"
+      description: "Regem a transparência ativa e os dados abertos geoespaciais dos sistemas PRODES e DETER do INPE"
+
+data_governance:
+  grain: "municipio_monitoramento_terrabrasilis"
+  primary_keys:
+    - "id_municipio"
+    - "sigla_uf"
+  reference_date_column: "reference_date"
+  min_expected_rows: 10
+  max_volume_drop_pct: 15.0
+  freshness_sla_hours: 24
+  lgpd_tier: "PUBLIC_NON_PERSONAL"
+  ml_feature_domains:
+    - "deforestation_alerts"
+    - "environmental_compliance"
+
+schema:
+  tables:
+    terrabrasilis_prodes_desmatamento_anual:
+      description: "Monitoramento anual consolidado de corte raso e cobertura florestal remanescente via PRODES/INPE por município."
+      grain: "id_municipio, ano_prodes"
+      primary_keys: ["id_municipio", "ano_prodes"]
+      min_expected_rows: 12
+      columns:
+        - name: "id_municipio"
+          data_type: "string"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Código IBGE de 7 dígitos identificador único do município."
+        - name: "nome_municipio"
+          data_type: "string"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Nome oficial do município."
+        - name: "sigla_uf"
+          data_type: "string"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Sigla de 2 letras da Unidade Federativa."
+        - name: "id_uf"
+          data_type: "string"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Código IBGE de 2 dígitos da Unidade Federativa."
+        - name: "regiao"
+          data_type: "string"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Grande região geográfica brasileira segundo o IBGE."
+        - name: "bioma_predominante"
+          data_type: "string"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Bioma predominante no território municipal (Amazonia, Cerrado, Mata_Atlantica)."
+        - name: "ano_prodes"
+          data_type: "int64"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Ano-calendário PRODES de apuração do incremento anual de desmatamento."
+        - name: "area_desmatada_prodes_km2"
+          data_type: "float64"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Incremento anual de supressão vegetal apurado pelo PRODES (km²)."
+        - name: "desmatamento_acumulado_km2"
+          data_type: "float64"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Área acumulada histórica de desmatamento no município (km²)."
+        - name: "cobertura_florestal_remanescente_pct"
+          data_type: "float64"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Percentual de cobertura florestal e vegetação nativa remanescente (%)."
+        - name: "variacao_anual_prodes_pct"
+          data_type: "float64"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Variação percentual do incremento anual PRODES frente ao ciclo anterior (%)."
+        - name: "taxa_desmatamento_relativa_area_pct"
+          data_type: "float64"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Taxa anual de desmatamento sobre a área florestal municipal (%)."
+        - name: "focos_calor_associados_ano"
+          data_type: "int64"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Focos ativos de calor associados a polígonos de supressão no ano."
+        - name: "reference_date"
+          data_type: "string"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Data de referência da consolidação PRODES (YYYY-MM-DD)."
+        - name: "extracted_at"
+          data_type: "string"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Timestamp UTC ISO-8601 da materialização."
+
+    terrabrasilis_deter_alertas_classe:
+      description: "Alertas quase-reais DETER-B do INPE desagregados por classe de alerta (corte raso, degradação, queimada e mineração)."
+      grain: "id_municipio, ano_prodes, classe_alerta_deter"
+      primary_keys: ["id_municipio", "ano_prodes", "classe_alerta_deter"]
+      min_expected_rows: 48
+      columns:
+        - name: "id_municipio"
+          data_type: "string"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Código IBGE de 7 dígitos identificador único do município."
+        - name: "nome_municipio"
+          data_type: "string"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Nome oficial do município."
+        - name: "sigla_uf"
+          data_type: "string"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Sigla de 2 letras da Unidade Federativa."
+        - name: "id_uf"
+          data_type: "string"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Código IBGE de 2 dígitos da Unidade Federativa."
+        - name: "regiao"
+          data_type: "string"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Grande região geográfica brasileira segundo o IBGE."
+        - name: "ano_prodes"
+          data_type: "int64"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Ano de referência dos alertas DETER."
+        - name: "classe_alerta_deter"
+          data_type: "string"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Classe de alerta DETER (Desmatamento_Corte_Raso, Degradacao_Florestal, Cicatrice_Queimada, Mineracao_Ilegal)."
+        - name: "num_alertas_deter_ano"
+          data_type: "int64"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Quantidade de polígonos de alerta DETER emitidos na classe."
+        - name: "area_alertas_deter_km2"
+          data_type: "float64"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Área total dos alertas DETER emitidos na classe (km²)."
+        - name: "area_media_poligono_ha"
+          data_type: "float64"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Área média por polígono de alerta DETER na classe (hectares)."
+        - name: "alertas_em_uc_ti_pct"
+          data_type: "float64"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Percentual de alertas incidentes em Unidades de Conservação ou Terras Indígenas (%)."
+        - name: "dias_medios_emissao_alerta"
+          data_type: "float64"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Latência média em dias entre detecção orbital e emissão do alerta."
+        - name: "proporcao_classe_sobre_total_pct"
+          data_type: "float64"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Participação percentual da classe sobre a área total de alertas do município (%)."
+        - name: "reference_date"
+          data_type: "string"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Data de referência da consolidação DETER (YYYY-MM-DD)."
+        - name: "extracted_at"
+          data_type: "string"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Timestamp UTC ISO-8601 da materialização."
+
+    terrabrasilis_cobertura_uso_terra_bioma:
+      description: "Balanço municipal de vegetação nativa, uso agropecuário, regeneração secundária e conformidade ao Código Florestal."
+      grain: "id_municipio, ano_prodes"
+      primary_keys: ["id_municipio", "ano_prodes"]
+      min_expected_rows: 12
+      columns:
+        - name: "id_municipio"
+          data_type: "string"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Código IBGE de 7 dígitos identificador único do município."
+        - name: "nome_municipio"
+          data_type: "string"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Nome oficial do município."
+        - name: "sigla_uf"
+          data_type: "string"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Sigla de 2 letras da Unidade Federativa."
+        - name: "id_uf"
+          data_type: "string"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Código IBGE de 2 dígitos da Unidade Federativa."
+        - name: "regiao"
+          data_type: "string"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Grande região geográfica brasileira segundo o IBGE."
+        - name: "bioma_predominante"
+          data_type: "string"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Bioma predominante no território municipal."
+        - name: "ano_prodes"
+          data_type: "int64"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Ano de referência do balanço de uso da terra."
+        - name: "area_vegetacao_nativa_km2"
+          data_type: "float64"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Área de vegetação nativa conservada no município (km²)."
+        - name: "area_uso_agropecuario_km2"
+          data_type: "float64"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Área de pastagem, lavoura e uso agropecuário consolidado (km²)."
+        - name: "area_regeneracao_secundaria_km2"
+          data_type: "float64"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Área em processo de regeneração florestal secundária (km²)."
+        - name: "area_hidrografia_km2"
+          data_type: "float64"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Superfície de corpos hídricos mapeados (km²)."
+        - name: "indice_pressao_antropica_pct"
+          data_type: "float64"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Índice percentual de pressão antrópica sobre áreas nativas (%)."
+        - name: "conformidade_codigo_florestal_pct"
+          data_type: "float64"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Estimativa de conformidade de Reserva Legal e APP ao Código Florestal (%)."
+        - name: "reference_date"
+          data_type: "string"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Data de referência do balanço territorial (YYYY-MM-DD)."
+        - name: "extracted_at"
+          data_type: "string"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Timestamp UTC ISO-8601 da materialização."
+
+    terrabrasilis_governanca_fiscalizacao_esg:
+      description: "Embargos ambientais, autos de infração, regularização CAR, cobertura SAR/óptica e elegibilidade EUDR/crédito rural ESG."
+      grain: "id_municipio, ano_prodes"
+      primary_keys: ["id_municipio", "ano_prodes"]
+      min_expected_rows: 12
+      columns:
+        - name: "id_municipio"
+          data_type: "string"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Código IBGE de 7 dígitos identificador único do município."
+        - name: "nome_municipio"
+          data_type: "string"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Nome oficial do município."
+        - name: "sigla_uf"
+          data_type: "string"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Sigla de 2 letras da Unidade Federativa."
+        - name: "id_uf"
+          data_type: "string"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Código IBGE de 2 dígitos da Unidade Federativa."
+        - name: "regiao"
+          data_type: "string"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Grande região geográfica brasileira segundo o IBGE."
+        - name: "ano_prodes"
+          data_type: "int64"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Ano de referência da governança e fiscalização ambiental."
+        - name: "embargos_ibama_ativos_ano"
+          data_type: "int64"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Quantidade de áreas embargadas ativas associadas a alertas no município."
+        - name: "autos_infracao_ambiental_ano"
+          data_type: "int64"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Autos de infração ambiental lavrados no ano-base."
+        - name: "propriedades_car_regularizadas_pct"
+          data_type: "float64"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Percentual de imóveis rurais com CAR analisado e regularizado (%)."
+        - name: "cobertura_monitoramento_sar_optico_pct"
+          data_type: "float64"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Percentual do território sob monitoramento orbital óptico/SAR contínuo (%)."
+        - name: "elegibilidade_credito_rural_esg_pct"
+          data_type: "float64"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Proporção de área produtiva elegível a crédito rural verde (Resolução BCB nº 140/2021) (%)."
+        - name: "risco_desconformidade_eudr_pct"
+          data_type: "float64"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Exposição percentual estimada a desconformidade EUDR (EU 2023/1115) (%)."
+        - name: "indice_prontidao_fiscalizacao"
+          data_type: "float64"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Índice composto (0-100) de prontidão de fiscalização e rastreabilidade ambiental."
+        - name: "reference_date"
+          data_type: "string"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Data de referência da governança ESG (YYYY-MM-DD)."
+        - name: "extracted_at"
+          data_type: "string"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Timestamp UTC ISO-8601 da materialização."
+
+    features_inpe_terrabrasilis_desmatamento:
+      description: "Feature store Gold municipal de monitoramento de desmatamento PRODES/DETER, conformidade florestal e risco ESG/EUDR."
+      grain: "id_municipio"
+      primary_keys: ["id_municipio"]
+      min_expected_rows: 12
+      columns:
+        - name: "id_municipio"
+          data_type: "string"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Código IBGE de 7 dígitos identificador único do município."
+        - name: "nome_municipio"
+          data_type: "string"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Nome oficial do município."
+        - name: "sigla_uf"
+          data_type: "string"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Sigla de 2 letras da Unidade Federativa."
+        - name: "id_uf"
+          data_type: "string"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Código IBGE de 2 dígitos da Unidade Federativa."
+        - name: "regiao"
+          data_type: "string"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Grande região geográfica brasileira segundo o IBGE."
+        - name: "bioma_predominante"
+          data_type: "string"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Bioma predominante no município."
+        - name: "ano_prodes"
+          data_type: "int64"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Ano-calendário PRODES de referência."
+        - name: "area_desmatada_prodes_km2"
+          data_type: "float64"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Incremento anual de desmatamento PRODES (km²)."
+        - name: "cobertura_florestal_remanescente_pct"
+          data_type: "float64"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Cobertura florestal remanescente (%)."
+        - name: "variacao_anual_prodes_pct"
+          data_type: "float64"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Variação anual do desmatamento PRODES (%)."
+        - name: "total_alertas_deter_ano"
+          data_type: "int64"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Total agregado de alertas DETER emitidos no município."
+        - name: "area_total_alertas_deter_km2"
+          data_type: "float64"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Área total agregada de alertas DETER no município (km²)."
+        - name: "conformidade_codigo_florestal_pct"
+          data_type: "float64"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Conformidade estimada ao Código Florestal (%)."
+        - name: "embargos_ibama_ativos_ano"
+          data_type: "int64"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Embargos ambientais ativos no município."
+        - name: "elegibilidade_credito_rural_esg_pct"
+          data_type: "float64"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Elegibilidade a crédito rural ESG (%)."
+        - name: "risco_desconformidade_eudr_pct"
+          data_type: "float64"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Exposição a desconformidade EUDR (%)."
+        - name: "indice_prontidao_fiscalizacao"
+          data_type: "float64"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Índice de prontidão de fiscalização ambiental (0-100)."
+        - name: "score_preservacao_conformidade_florestal"
+          data_type: "float64"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Score normalizado (0-100) de preservação e conformidade florestal."
+        - name: "score_pressao_desmatamento_deter"
+          data_type: "float64"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Score normalizado (0-100) de pressão de desmatamento PRODES/DETER e risco EUDR."
+        - name: "score_composto_risco_esg_territorial"
+          data_type: "float64"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Score composto (0-100) de sustentabilidade territorial e conformidade ESG/EUDR."
+        - name: "perfil_risco_ambiental_terrabrasilis"
+          data_type: "string"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Classificação estratégica do perfil de risco ambiental e conformidade EUDR (4 tiers)."
+        - name: "reference_date"
+          data_type: "string"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Data de referência do ciclo anual TerraBrasilis (YYYY-MM-DD)."
+        - name: "extracted_at"
+          data_type: "string"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Timestamp UTC ISO-8601 da materialização."

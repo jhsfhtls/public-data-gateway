@@ -1460,6 +1460,69 @@ class RealEstateFacade:
         )
 
 
+class EnvironmentFacade:
+    """Environmental monitoring, deforestation alerts, land cover & ESG/EUDR compliance (INPE TerraBrasilis)."""
+
+    def __init__(self, sdk: "BrazilData") -> None:
+        self._sdk = sdk
+        self._terrabrasilis_connector: Any = None
+
+    @property
+    def terrabrasilis_connector(self) -> Any:
+        if self._terrabrasilis_connector is None:
+            from public_data_gateway.connectors.ambiental.inpe_terrabrasilis.connector import (
+                InpeTerrabrasilisConnector,
+            )
+
+            self._terrabrasilis_connector = InpeTerrabrasilisConnector(
+                settings=self._sdk.settings
+            )
+        return self._terrabrasilis_connector
+
+    def get_terrabrasilis_prodes_deforestation(
+        self, id_municipio: str
+    ) -> dict[str, Any]:
+        """Get municipal annual PRODES deforestation increment and remaining forest cover (INPE)."""
+        return self.terrabrasilis_connector.get_terrabrasilis_prodes_deforestation(
+            id_municipio
+        )
+
+    def list_terrabrasilis_deter_alerts(
+        self, id_municipio: str, classe_alerta_deter: str | None = None
+    ) -> list[dict[str, Any]]:
+        """List municipal INPE DETER-B alerts broken down by alert class."""
+        return self.terrabrasilis_connector.list_terrabrasilis_deter_alerts(
+            id_municipio=id_municipio,
+            classe_alerta_deter=classe_alerta_deter,
+        )
+
+    def get_terrabrasilis_land_cover(self, id_municipio: str) -> dict[str, Any]:
+        """Get municipal native vegetation, agricultural land use, and Forest Code compliance."""
+        return self.terrabrasilis_connector.get_terrabrasilis_land_cover(id_municipio)
+
+    def get_terrabrasilis_esg_governance(self, id_municipio: str) -> dict[str, Any]:
+        """Get municipal IBAMA embargoes, CAR regularization, and EUDR/ESG rural credit eligibility."""
+        return self.terrabrasilis_connector.get_terrabrasilis_esg_governance(
+            id_municipio
+        )
+
+    def get_terrabrasilis_environmental_features(
+        self, id_municipio: str
+    ) -> dict[str, Any]:
+        """Get normalized Gold INPE TerraBrasilis deforestation pressure and ESG/EUDR risk features."""
+        return self.terrabrasilis_connector.get_terrabrasilis_environmental_features(
+            id_municipio
+        )
+
+    def list_top_terrabrasilis_municipalities(
+        self, limit: int = 10, sigla_uf: str | None = None
+    ) -> list[dict[str, Any]]:
+        """List top Brazilian municipalities ranked by composite INPE TerraBrasilis ESG compliance score."""
+        return self.terrabrasilis_connector.list_top_terrabrasilis_municipalities(
+            limit=limit, sigla_uf=sigla_uf
+        )
+
+
 class BrazilData:
     """Unified developer SDK facade for querying, normalizing, and enriching Brazilian public datasets."""
 
@@ -1489,6 +1552,7 @@ class BrazilData:
         self.health = HealthFacade(self)
         self.education = EducationFacade(self)
         self.real_estate = RealEstateFacade(self)
+        self.environment = EnvironmentFacade(self)
 
     def list_sources(
         self,
@@ -2307,6 +2371,43 @@ class BrazilData:
     ) -> list[dict[str, Any]]:
         """Listar capitais ranqueadas por dinamismo imobiliário ITBI e governança cadastral CTM."""
         return self.real_estate.list_top_iptu_itbi_capitals(
+            limit=limit, sigla_uf=sigla_uf
+        )
+
+    def get_terrabrasilis_prodes_deforestation(
+        self, id_municipio: str
+    ) -> dict[str, Any]:
+        """Consultar incremento anual de desmatamento PRODES e cobertura florestal (INPE TerraBrasilis)."""
+        return self.environment.get_terrabrasilis_prodes_deforestation(id_municipio)
+
+    def list_terrabrasilis_deter_alerts(
+        self, id_municipio: str, classe_alerta_deter: str | None = None
+    ) -> list[dict[str, Any]]:
+        """Listar alertas DETER-B por classe de desmatamento e degradação (INPE TerraBrasilis)."""
+        return self.environment.list_terrabrasilis_deter_alerts(
+            id_municipio=id_municipio,
+            classe_alerta_deter=classe_alerta_deter,
+        )
+
+    def get_terrabrasilis_land_cover(self, id_municipio: str) -> dict[str, Any]:
+        """Consultar balanço de vegetação nativa, uso agropecuário e Código Florestal (INPE TerraBrasilis)."""
+        return self.environment.get_terrabrasilis_land_cover(id_municipio)
+
+    def get_terrabrasilis_esg_governance(self, id_municipio: str) -> dict[str, Any]:
+        """Consultar embargos IBAMA, regularização CAR e elegibilidade EUDR/ESG (INPE TerraBrasilis)."""
+        return self.environment.get_terrabrasilis_esg_governance(id_municipio)
+
+    def get_terrabrasilis_environmental_features(
+        self, id_municipio: str
+    ) -> dict[str, Any]:
+        """Consultar features Gold de pressão de desmatamento e risco ESG/EUDR (INPE TerraBrasilis)."""
+        return self.environment.get_terrabrasilis_environmental_features(id_municipio)
+
+    def list_top_terrabrasilis_municipalities(
+        self, limit: int = 10, sigla_uf: str | None = None
+    ) -> list[dict[str, Any]]:
+        """Listar municípios líderes em conformidade verde e baixo risco ESG (INPE TerraBrasilis)."""
+        return self.environment.list_top_terrabrasilis_municipalities(
             limit=limit, sigla_uf=sigla_uf
         )
 
