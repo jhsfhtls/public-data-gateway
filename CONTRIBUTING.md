@@ -28,7 +28,7 @@ This repository validates branch names and commit messages in CI (`pr-lint.yml`)
 ## Quality & Architecture Standards
 
 1. **Encoding:** All source files, SQL models, YAML contracts, and Markdown documents must use **UTF-8 without BOM** and **LF (`\n`)** line endings.
-2. **ODCS v3.1 & Data Observability:** New connectors require a `contract.yaml`, isolated `data/<connector>/{bronze,silver,gold,quarantine}/` materialization, and fail-hard live probe checks.
+2. **ODCS v3.1 & 11-Gate Medallion Parity ([ADR-004](docs/adr/ADR-004-connector-medallion-parity-policy.md)):** Every API/connector integrated into the gateway must follow the exact same 11-Gate standard: catalog registration (`CATALOG.md`), `BaseConnector` + `contract.yaml`, isolated `data/<connector>/{bronze,silver,gold,quarantine}/` materialization, complete dbt layers (`staging` -> `intradominio` -> `cross_domain`), offline + fail-hard live tests, and 4-interface parity (SDK, FastAPI, CLI, MCP).
 3. **dbt Documentation Coverage:** Every dbt model and 100% of its columns must have descriptions in `_models.yml`.
 4. **Error Handling:** Never swallow exceptions silently (`except: pass`). Always log explicit context and use context managers for file I/O.
 5. **Security & Privacy:** Respect `Client Path Shield` isolation (never persist external user datasets inside the gateway's `data/` lakehouse directory), preserve LGPD masking, and apply CSV formula neutralization.

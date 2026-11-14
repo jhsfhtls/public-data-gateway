@@ -346,19 +346,56 @@ def render_markdown(data: dict[str, Any]) -> str:
     for tier, base, rule, examples in LGPD_TIERS_INFO:
         lines.append(f"| `{tier}` | {base} | {rule} | {examples} |")
 
+    public_apis_path = REPO_ROOT / "catalog" / "public_apis_registry.yaml"
+    if public_apis_path.is_file():
+        pub_data = yaml.safe_load(public_apis_path.read_text(encoding="utf-8")) or {}
+        pub_blocks = pub_data.get("blocks", [])
+        pub_apis = pub_data.get("apis", [])
+        pub_refs = pub_data.get("discovery_references", [])
+        lines.extend([
+            "",
+            "---",
+            "",
+            "## 7. Catálogo Unificado — APIs Públicas & Globais (Analytics, KYC/KYB, Espacial & ML)",
+            "",
+            f"Complemento integrado ao catálogo mestre com **{len(pub_apis)} APIs públicas e globais curadas** "
+            f"(fonte: `catalog/public_apis_registry.yaml`), auditadas contra:",
+            "",
+        ])
+        for ref in pub_refs:
+            lines.append(f"- **{ref['name']}** ({ref['url']}): {ref['purpose']}")
+        for block in pub_blocks:
+            block_apis = [a for a in pub_apis if a.get("block") == block["block_id"]]
+            lines.extend([
+                "",
+                f"### {block['name']} (`{block['block_id']}`)",
+                "",
+                block["description"],
+                "",
+                "| API ID | Nome | Auth | RPM | FinOps | Packs | Método Gateway | Status |",
+                "| :--- | :--- | :--- | ---: | :--- | :--- | :--- | :--- |",
+            ])
+            for api in block_apis:
+                packs_str = ", ".join(api.get("target_packs", []))
+                lines.append(
+                    f"| `{api['api_id']}` | {api['name']} | `{api['auth_type']}` | "
+                    f"{api['rate_limit_rpm']} | `{api['finops_tier']}` | {packs_str} | "
+                    f"`{api['gateway_method']}` | `{api['status']}` |"
+                )
+
     lines.extend([
         "",
         "---",
         "",
-        "## 7. Instruções de Manutenção & Verificação de Integridade",
+        "## 8. Instruções de Manutenção & Verificação de Integridade",
         "",
-        "O arquivo `CATALOG.md` é gerado de forma **100% determinística** a partir de `catalog/sources_registry.yaml`.",
+        "O arquivo `CATALOG.md` é gerado de forma **100% determinística** a partir de `catalog/sources_registry.yaml` e `catalog/public_apis_registry.yaml`.",
         "",
         "```powershell",
-        "# 1. Verificar se CATALOG.md está em sincronia com o sources_registry.yaml (exit 0/1)",
+        "# 1. Verificar se CATALOG.md está em sincronia com os registries (exit 0/1)",
         "python scripts/render_catalog.py --check",
         "",
-        "# 2. Regenerar CATALOG.md após adicionar ou atualizar fontes no sources_registry.yaml",
+        "# 2. Regenerar CATALOG.md após adicionar ou atualizar fontes",
         "python scripts/render_catalog.py",
         "```",
         "",
