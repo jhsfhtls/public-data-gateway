@@ -1145,6 +1145,7 @@ class EducationFacade:
         self._censo_superior_connector: Any = None
         self._ideb_connector: Any = None
         self._enem_connector: Any = None
+        self._sucupira_connector: Any = None
 
     @property
     def censo_escolar_connector(self) -> Any:
@@ -1189,6 +1190,18 @@ class EducationFacade:
 
             self._enem_connector = INEPEnemConnector(settings=self._sdk.settings)
         return self._enem_connector
+
+    @property
+    def sucupira_connector(self) -> Any:
+        if self._sucupira_connector is None:
+            from public_data_gateway.connectors.educacao.capes_sucupira.connector import (
+                CapesSucupiraConnector,
+            )
+
+            self._sucupira_connector = CapesSucupiraConnector(
+                settings=self._sdk.settings
+            )
+        return self._sucupira_connector
 
     def get_censo_escolar_infrastructure(self, id_municipio: str) -> dict[str, Any]:
         """Get municipal active schools inventory, broadband internet, labs, and PcD accessibility (INEP)."""
@@ -1317,6 +1330,39 @@ class EducationFacade:
     ) -> list[dict[str, Any]]:
         """List top Brazilian municipalities ranked by composite INEP ENEM performance and equity score."""
         return self.enem_connector.list_top_enem_municipalities(
+            limit=limit, sigla_uf=sigla_uf
+        )
+
+    def get_sucupira_program_evaluation(self, id_municipio: str) -> dict[str, Any]:
+        """Get municipal CAPES Sucupira stricto sensu programs count, excellence 6-7 share, and mean grade."""
+        return self.sucupira_connector.get_sucupira_program_evaluation(id_municipio)
+
+    def list_sucupira_students_by_area(
+        self, id_municipio: str, grande_area_conhecimento: str | None = None
+    ) -> list[dict[str, Any]]:
+        """List municipal CAPES Sucupira master's/doctoral students, graduates, and scholarships by field."""
+        return self.sucupira_connector.list_sucupira_students_by_area(
+            id_municipio=id_municipio,
+            grande_area_conhecimento=grande_area_conhecimento,
+        )
+
+    def get_sucupira_faculty_research(self, id_municipio: str) -> dict[str, Any]:
+        """Get municipal CAPES Sucupira permanent faculty, CNPq PQ fellows, and active research lines."""
+        return self.sucupira_connector.get_sucupira_faculty_research(id_municipio)
+
+    def get_sucupira_scientific_production(self, id_municipio: str) -> dict[str, Any]:
+        """Get municipal CAPES Sucupira Qualis A1/A2 papers, theses, patents/software, and estimated grants."""
+        return self.sucupira_connector.get_sucupira_scientific_production(id_municipio)
+
+    def get_sucupira_postgrad_features(self, id_municipio: str) -> dict[str, Any]:
+        """Get normalized Gold CAPES Sucupira postgraduate density, scientific production, and tier features."""
+        return self.sucupira_connector.get_sucupira_postgrad_features(id_municipio)
+
+    def list_top_sucupira_municipalities(
+        self, limit: int = 10, sigla_uf: str | None = None
+    ) -> list[dict[str, Any]]:
+        """List top Brazilian municipalities ranked by composite CAPES Sucupira postgraduate ecosystem score."""
+        return self.sucupira_connector.list_top_sucupira_municipalities(
             limit=limit, sigla_uf=sigla_uf
         )
 
@@ -2164,6 +2210,39 @@ class BrazilData:
     ) -> list[dict[str, Any]]:
         """Listar municípios líderes em desempenho cognitivo e equidade no ENEM no Brasil (INEP)."""
         return self.education.list_top_enem_municipalities(
+            limit=limit, sigla_uf=sigla_uf
+        )
+
+    def get_sucupira_program_evaluation(self, id_municipio: str) -> dict[str, Any]:
+        """Consultar avaliação quadrienal CAPES Sucupira dos programas stricto sensu no município."""
+        return self.education.get_sucupira_program_evaluation(id_municipio)
+
+    def list_sucupira_students_by_area(
+        self, id_municipio: str, grande_area_conhecimento: str | None = None
+    ) -> list[dict[str, Any]]:
+        """Listar discentes matriculados, titulados e bolsistas CAPES por grande área de conhecimento."""
+        return self.education.list_sucupira_students_by_area(
+            id_municipio=id_municipio,
+            grande_area_conhecimento=grande_area_conhecimento,
+        )
+
+    def get_sucupira_faculty_research(self, id_municipio: str) -> dict[str, Any]:
+        """Consultar corpo docente permanente, bolsistas PQ CNPq e linhas de pesquisa (CAPES Sucupira)."""
+        return self.education.get_sucupira_faculty_research(id_municipio)
+
+    def get_sucupira_scientific_production(self, id_municipio: str) -> dict[str, Any]:
+        """Consultar produção científica Qualis A1/A2, teses, patentes/software e fomento (CAPES Sucupira)."""
+        return self.education.get_sucupira_scientific_production(id_municipio)
+
+    def get_sucupira_postgrad_features(self, id_municipio: str) -> dict[str, Any]:
+        """Consultar features Gold de pós-graduação stricto sensu e produção científica (CAPES Sucupira)."""
+        return self.education.get_sucupira_postgrad_features(id_municipio)
+
+    def list_top_sucupira_municipalities(
+        self, limit: int = 10, sigla_uf: str | None = None
+    ) -> list[dict[str, Any]]:
+        """Listar municípios líderes no ecossistema de pós-graduação stricto sensu no Brasil (CAPES Sucupira)."""
+        return self.education.list_top_sucupira_municipalities(
             limit=limit, sigla_uf=sigla_uf
         )
 

@@ -1,0 +1,16 @@
+version: 2
+
+sources:
+  - name: capes_sucupira_silver
+    description: "Tabelas Silver da Plataforma Sucupira (CAPES) com dados de programas de pós-graduação stricto sensu, discentes/titulados por grande área, corpo docente e produção científica."
+    meta:
+      external_location: "data/capes_sucupira/silver/{name}.parquet"
+    tables:
+      - name: sucupira_programas_avaliacao
+        description: "Programas de pós-graduação stricto sensu avaliados pela CAPES por município."
+      - name: sucupira_discentes_titulados_area
+        description: "Discentes matriculados, titulados e bolsistas CAPES por grande área de conhecimento."
+      - name: sucupira_docentes_pesquisa
+        description: "Corpo docente permanente, bolsas PQ CNPq e linhas/projetos de pesquisa."
+      - name: sucupira_producao_cientifica_teses
+        description: "Produção científica Qualis A1/A2, teses defendidas, patentes/software e fomento estimado."

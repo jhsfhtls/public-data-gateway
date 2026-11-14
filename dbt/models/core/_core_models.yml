@@ -7066,3 +7066,157 @@ models:
         description: "Timestamp ISO-8601 UTC da extração."
         tests:
           - not_null
+  - name: fct_sucupira_pos_graduacao_pesquisa_municipio
+    description: "Fato Core consolidando programas stricto sensu CAPES Sucupira, discentes/titulados agregados, corpo docente permanente e produção científica por município."
+    columns:
+      - name: id_municipio
+        description: "Código IBGE de 7 dígitos do município."
+        tests: [not_null, unique]
+      - name: nome_municipio
+        description: "Nome oficial do município."
+        tests: [not_null]
+      - name: sigla_uf
+        description: "Sigla da Unidade Federativa."
+        tests: [not_null]
+      - name: id_uf
+        description: "Código IBGE da UF."
+        tests: [not_null]
+      - name: regiao
+        description: "Grande região geográfica brasileira."
+        tests: [not_null]
+      - name: ano_base_sucupira
+        description: "Ano-base da coleta CAPES Sucupira."
+        tests: [not_null]
+      - name: total_programas_stricto_sensu_ano
+        description: "Total de programas stricto sensu no município."
+        tests: [not_null]
+      - name: programas_nota_6_7_excelencia_ano
+        description: "Quantidade de programas com conceito CAPES 6 ou 7."
+        tests: [not_null]
+      - name: programas_doutorado_ativo_ano
+        description: "Quantidade de programas com doutorado ativo."
+        tests: [not_null]
+      - name: ies_ofertantes_pos_graduacao_ano
+        description: "Total de IES ofertantes de pós-graduação stricto sensu."
+        tests: [not_null]
+      - name: nota_media_capes_programas
+        description: "Conceito médio CAPES dos programas avaliados."
+        tests: [not_null]
+      - name: prop_programas_excelencia_6_7_pct
+        description: "Proporção percentual de programas com conceito 6 ou 7 (%)."
+        tests: [not_null]
+      - name: prop_programas_profissionais_pct
+        description: "Proporção percentual de programas profissionais (%)."
+        tests: [not_null]
+      - name: total_matriculados_pos_graduacao_ano
+        description: "Total agregado de discentes matriculados em mestrado e doutorado."
+        tests: [not_null]
+      - name: total_titulados_mestres_doutores_ano
+        description: "Total agregado de mestres e doutores titulados no ano-base."
+        tests: [not_null]
+      - name: total_bolsistas_capes_ano
+        description: "Total de discentes com bolsas CAPES no município."
+        tests: [not_null]
+      - name: total_docentes_permanentes_ano
+        description: "Total de docentes permanentes vinculados aos programas."
+        tests: [not_null]
+      - name: docentes_bolsistas_pq_cnpq_ano
+        description: "Docentes com bolsa de produtividade PQ CNPq."
+        tests: [not_null]
+      - name: razao_discentes_por_docente
+        description: "Razão de discentes matriculados por docente permanente."
+        tests: [not_null]
+      - name: taxa_docentes_dedicacao_exclusiva_pct
+        description: "Percentual de docentes em dedicação exclusiva (%)."
+        tests: [not_null]
+      - name: taxa_doutores_internacionalizacao_pct
+        description: "Percentual de docentes com formação ou pós-doutorado no exterior (%)."
+        tests: [not_null]
+      - name: linhas_pesquisa_ativas_ano
+        description: "Linhas de pesquisa ativas registradas."
+        tests: [not_null]
+      - name: projetos_financiamento_externo_ano
+        description: "Projetos de pesquisa com financiamento externo."
+        tests: [not_null]
+      - name: artigos_qualis_a1_a2_ano
+        description: "Artigos publicados em periódicos Qualis A1 ou A2."
+        tests: [not_null]
+      - name: teses_dissertacoes_defendidas_ano
+        description: "Teses e dissertações defendidas no ano."
+        tests: [not_null]
+      - name: producao_tecnica_patentes_software_ano
+        description: "Produções técnicas (patentes e registros de software)."
+        tests: [not_null]
+      - name: indice_impacto_producao_por_docente
+        description: "Razão de produção Qualis A1/A2 e técnica por docente."
+        tests: [not_null]
+      - name: taxa_acesso_aberto_repositorio_pct
+        description: "Percentual de trabalhos em acesso aberto (%)."
+        tests: [not_null]
+      - name: colaboracoes_internacionais_coautoria_pct
+        description: "Percentual de publicações com coautoria internacional (%)."
+        tests: [not_null]
+      - name: fomento_bolsas_estimado_milhoes_brl
+        description: "Fomento anual estimado em bolsas (R$ milhões)."
+        tests: [not_null]
+      - name: reference_date
+        description: "Data de referência ISO-8601 (YYYY-MM-DD)."
+        tests: [not_null]
+      - name: extracted_at
+        description: "Timestamp ISO-8601 UTC da extração."
+        tests: [not_null]
+
+  - name: fct_sucupira_discentes_area_municipio
+    description: "Fato Core de discentes matriculados, titulados e bolsistas CAPES desagregados por grande área de conhecimento e município."
+    columns:
+      - name: id_municipio
+        description: "Código IBGE de 7 dígitos do município."
+        tests: [not_null]
+      - name: nome_municipio
+        description: "Nome oficial do município."
+        tests: [not_null]
+      - name: sigla_uf
+        description: "Sigla da Unidade Federativa."
+        tests: [not_null]
+      - name: id_uf
+        description: "Código IBGE da UF."
+        tests: [not_null]
+      - name: regiao
+        description: "Grande região geográfica brasileira."
+        tests: [not_null]
+      - name: ano_base_sucupira
+        description: "Ano-base da coleta CAPES Sucupira."
+        tests: [not_null]
+      - name: grande_area_conhecimento
+        description: "Grande área do conhecimento CAPES."
+        tests: [not_null]
+      - name: matriculados_mestrado_area
+        description: "Discentes matriculados em mestrado na grande área."
+        tests: [not_null]
+      - name: matriculados_doutorado_area
+        description: "Discentes matriculados em doutorado na grande área."
+        tests: [not_null]
+      - name: total_matriculados_area
+        description: "Soma de matriculados em mestrado e doutorado na grande área."
+        tests: [not_null]
+      - name: titulados_mestres_ano
+        description: "Mestres titulados no ano-base na grande área."
+        tests: [not_null]
+      - name: titulados_doutores_ano
+        description: "Doutores titulados no ano-base na grande área."
+        tests: [not_null]
+      - name: total_titulados_area
+        description: "Soma de mestres e doutores titulados na grande área."
+        tests: [not_null]
+      - name: bolsistas_capes_area
+        description: "Bolsistas CAPES na grande área."
+        tests: [not_null]
+      - name: taxa_titulacao_doutorado_pct
+        description: "Participação percentual de doutores sobre titulados na grande área (%)."
+        tests: [not_null]
+      - name: reference_date
+        description: "Data de referência ISO-8601 (YYYY-MM-DD)."
+        tests: [not_null]
+      - name: extracted_at
+        description: "Timestamp ISO-8601 UTC da extração."
+        tests: [not_null]

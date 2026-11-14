@@ -1,6 +1,6 @@
 {
   "schema_version": "1.0.0",
-  "last_updated": "2026-11-14T07:08:00.000000",
+  "last_updated": "2026-11-14T08:56:00.000000",
   "project_name": "public-data-gateway",
   "ecosystem": "C.O.R.E. (core, operations, career, studies)",
   "governing_pops": [
@@ -12,10 +12,10 @@
     "POP_T_074",
     "POP_T_148"
   ],
-  "current_macro_phase_id": "07",
-  "current_macro_phase": "Fase 07 - Ingestão Wave 5 (Saúde, Educação & Setor Notarial — 41/49 fontes homologadas [83.7%] com capitais_iptu_itbi homologado; Próximo: capes_sucupira)",
+  "current_macro_phase_id": "08",
+  "current_macro_phase": "Fase 08 - Ingestão Wave 6 (Meio Ambiente, Agro & Metaportais — 42/49 fontes homologadas [85.7%]; Wave 5 100% concluída com capes_sucupira; Próximo: inpe_terrabrasilis)",
   "overall_status": "ON_TRACK",
-  "active_connector": "capes_sucupira",
+  "active_connector": "inpe_terrabrasilis",
   "next_connector": "ana_hidroweb",
   "structural_phases": [
     {
@@ -128,8 +128,8 @@
     {
       "phase_id": "07",
       "name": "Ingestão Wave 5 — Saúde, Educação & Setor Notarial",
-      "status": "IN_PROGRESS",
-      "completion_date": null,
+      "status": "COMPLETED",
+      "completion_date": "2026-11-14",
       "deliverables": [
         "Conector datasus_cnes (Estabelecimentos, Leitos/UTI, Equipamentos Diagnósticos e Força de Trabalho) - CONCLUÍDO",
         "Conector datasus_sih (Produção Hospitalar AIH, Custos SUS/UTI, Morbidade CID-10 e Desfechos/ICSAP) - CONCLUÍDO",
@@ -143,14 +143,14 @@
         "Conector onr_registro_imoveis (Acervo CNM, Transações por Natureza, Garantias Alienação Fiduciária/CGI e Interoperabilidade SERP/SAEC) - CONCLUÍDO",
         "Conector opendatasus_vigilancia (e-SUS Notifica SG, SIVEP-Gripe SRAG, SINAN Agravos Compulsórios, SI-PNI Cobertura Vacinal e Prontidão CIEVS/GAL-LACEN) - CONCLUÍDO",
         "Conector inep_enem (Desempenho TRI LC/CH/CN/MT, Redes Federal/Estadual/Privada/EJA, Redação Competências I/III/V e Equidade QSE/SiSU-ProUni) - CONCLUÍDO",
-        "Conector CAPES restante (capes_sucupira)",
-        "Conector capitais_iptu_itbi (Cadastro Imobiliário IPTU, Transações ITBI por Segmento, Dinâmica de Preços/PGV e Governança CTM/SINTER) - CONCLUÍDO"
+        "Conector capitais_iptu_itbi (Cadastro Imobiliário IPTU, Transações ITBI por Segmento, Dinâmica de Preços/PGV e Governança CTM/SINTER) - CONCLUÍDO",
+        "Conector capes_sucupira (Programas Stricto Sensu CAPES 6-7, Discentes/Titulados por Grande Área, Docentes PQ CNPq e Produção Qualis A1/A2) - CONCLUÍDO"
       ]
     },
     {
       "phase_id": "08",
       "name": "Ingestão Wave 6 — Meio Ambiente, Agro & Metaportais",
-      "status": "PENDING",
+      "status": "IN_PROGRESS",
       "completion_date": null,
       "deliverables": [
         "Conectores Ambientais (ana_hidroweb, inpe_terrabrasilis, mapbiomas, sfb_sicar, mapa_zarc)",
@@ -421,6 +421,12 @@
     }
   ],
   "recent_milestones": [
+    {
+      "date": "2026-11-14",
+      "phase_id": "07",
+      "milestone": "Conclusão da Wave 5 & Homologação do Conector capes_sucupira (42/49 Fontes — 85.7%)",
+      "summary": "Implementação e homologação completa do conector capes_sucupira (CAPES: Plataforma Sucupira — Pós-Graduação Stricto Sensu, Lei nº 8.405/1992, Decreto nº 11.238/2022, Portaria CAPES nº 182/2018) concluindo 100% da Wave 5 e alcançando 42/49 fontes homologadas (85.7%): 5 tabelas Medallion (sucupira_programas_avaliacao, sucupira_discentes_titulados_area, sucupira_docentes_pesquisa, sucupira_producao_cientifica_teses e features_capes_sucupira_pos_graduacao) materializadas em data/capes_sucupira/{silver,gold}/; 7 novos modelos dbt (4 staging views, fct_sucupira_pos_graduacao_pesquisa_municipio, fct_sucupira_discentes_area_municipio e mart_pos_graduacao_capes_sucupira_brasil) totalizando 355 modelos e 5.217 colunas 100% documentadas no linter (194 sources); paridade SQL–Python estrita confirmada (12 capitais, 4 tiers x 3 capitais, zero divergências); paridade multi-interface completa em SDK (EducationFacade.sucupira_connector), CLI (bdg sucupira), FastAPI (/api/v1/education/sucupira/* e /api/v1/sucupira/*) e MCP (bdg_*_sucupira* com wrap_untrusted_gov_data); 9 testes pytest (8 offline + 1 live CAPES CKAN/Portal) aprovados."
+    },
     {
       "date": "2026-11-14",
       "phase_id": "07",

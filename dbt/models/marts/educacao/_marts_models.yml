@@ -608,3 +608,75 @@ models:
         description: "Timestamp ISO-8601 UTC da extração."
         tests:
           - not_null
+  - name: mart_pos_graduacao_capes_sucupira_brasil
+    description: "Mart analítico de pós-graduação stricto sensu CAPES Sucupira por município brasileiro, consolidando excelência quadrienal, produção científica Qualis A1/A2 e classificação em 4 tiers."
+    columns:
+      - name: id_municipio
+        description: "Código IBGE de 7 dígitos do município."
+        tests: [not_null, unique]
+      - name: nome_municipio
+        description: "Nome oficial do município."
+        tests: [not_null]
+      - name: sigla_uf
+        description: "Sigla da Unidade Federativa."
+        tests: [not_null]
+      - name: id_uf
+        description: "Código IBGE da UF."
+        tests: [not_null]
+      - name: regiao
+        description: "Grande região geográfica brasileira."
+        tests: [not_null]
+      - name: ano_base_sucupira
+        description: "Ano-base da coleta CAPES Sucupira."
+        tests: [not_null]
+      - name: total_programas_stricto_sensu_ano
+        description: "Total de programas stricto sensu no município."
+        tests: [not_null]
+      - name: programas_nota_6_7_excelencia_ano
+        description: "Total de programas nota 6 ou 7 CAPES no município."
+        tests: [not_null]
+      - name: nota_media_capes_programas
+        description: "Conceito médio dos programas avaliados pela CAPES."
+        tests: [not_null]
+      - name: prop_programas_excelencia_6_7_pct
+        description: "Proporção de programas com conceito 6 ou 7 (%)."
+        tests: [not_null]
+      - name: total_matriculados_pos_graduacao_ano
+        description: "Total agregado de discentes matriculados em mestrado e doutorado."
+        tests: [not_null]
+      - name: total_titulados_mestres_doutores_ano
+        description: "Total agregado de mestres e doutores titulados no ano-base."
+        tests: [not_null]
+      - name: total_docentes_permanentes_ano
+        description: "Total de docentes permanentes no município."
+        tests: [not_null]
+      - name: razao_discentes_por_docente
+        description: "Razão de discentes matriculados por docente permanente."
+        tests: [not_null]
+      - name: artigos_qualis_a1_a2_ano
+        description: "Artigos Qualis A1/A2 publicados no ano-base."
+        tests: [not_null]
+      - name: indice_impacto_producao_por_docente
+        description: "Índice de produção científica e técnica por docente."
+        tests: [not_null]
+      - name: fomento_bolsas_estimado_milhoes_brl
+        description: "Fomento anual estimado em bolsas de pós-graduação (R$ milhões)."
+        tests: [not_null]
+      - name: score_densidade_excelencia_stricto_sensu
+        description: "Score normalizado (0-100) de densidade e excelência da pós-graduação stricto sensu."
+        tests: [not_null]
+      - name: score_producao_cientifica_inovacao
+        description: "Score normalizado (0-100) de produção científica Qualis A1/A2, inovação técnica e internacionalização."
+        tests: [not_null]
+      - name: score_composto_ecossistema_pos_graduacao
+        description: "Score composto (0-100) do ecossistema municipal de pós-graduação e pesquisa."
+        tests: [not_null]
+      - name: perfil_pos_graduacao_sucupira
+        description: "Classificação estratégica do ecossistema municipal de pós-graduação stricto sensu."
+        tests: [not_null]
+      - name: reference_date
+        description: "Data de referência do ciclo anual CAPES Sucupira."
+        tests: [not_null]
+      - name: extracted_at
+        description: "Timestamp UTC ISO-8601 da extração."
+        tests: [not_null]

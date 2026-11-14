@@ -961,6 +961,36 @@ def build_parser() -> argparse.ArgumentParser:
     enem_rk_p.add_argument("--uf", type=str, help="Optional 2-letter state filter")
     enem_rk_p.add_argument("--json", action="store_true", help="Output in JSON format")
 
+    # CAPES Sucupira (Pós-Graduação Stricto Sensu) command group
+    suc_p = subparsers.add_parser("sucupira", help="Query CAPES Sucupira postgraduate programs, students by field, faculty, production, and rankings.")
+    suc_sub = suc_p.add_subparsers(dest="sucupira_action", required=True)
+
+    suc_pr_p = suc_sub.add_parser("programs", help="Get municipal CAPES Sucupira stricto sensu programs count, excellence 6-7 share, and mean grade.")
+    suc_pr_p.add_argument("id_municipio", help="7-digit IBGE municipality code, 6-digit prefix, or 8-digit CEP")
+    suc_pr_p.add_argument("--json", action="store_true", help="Output in JSON format")
+
+    suc_st_p = suc_sub.add_parser("students", help="List municipal CAPES Sucupira master's/doctoral students, graduates, and scholarships by field.")
+    suc_st_p.add_argument("id_municipio", help="7-digit IBGE municipality code, 6-digit prefix, or 8-digit CEP")
+    suc_st_p.add_argument("--area", type=str, help="Optional CAPES knowledge field filter (e.g. Engenharias)")
+    suc_st_p.add_argument("--json", action="store_true", help="Output in JSON format")
+
+    suc_fa_p = suc_sub.add_parser("faculty", help="Get municipal CAPES Sucupira permanent faculty, CNPq PQ fellows, and research lines.")
+    suc_fa_p.add_argument("id_municipio", help="7-digit IBGE municipality code, 6-digit prefix, or 8-digit CEP")
+    suc_fa_p.add_argument("--json", action="store_true", help="Output in JSON format")
+
+    suc_pd_p = suc_sub.add_parser("production", help="Get municipal CAPES Sucupira Qualis A1/A2 papers, defended theses, patents, and grants.")
+    suc_pd_p.add_argument("id_municipio", help="7-digit IBGE municipality code, 6-digit prefix, or 8-digit CEP")
+    suc_pd_p.add_argument("--json", action="store_true", help="Output in JSON format")
+
+    suc_ft_p = suc_sub.add_parser("features", help="Get Gold CAPES Sucupira postgraduate density, production scores, and 4-tier classification.")
+    suc_ft_p.add_argument("id_municipio", help="7-digit IBGE municipality code, 6-digit prefix, or 8-digit CEP")
+    suc_ft_p.add_argument("--json", action="store_true", help="Output in JSON format")
+
+    suc_rk_p = suc_sub.add_parser("ranking", help="List top Brazilian municipalities ranked by composite CAPES Sucupira score.")
+    suc_rk_p.add_argument("--limit", type=int, default=10, help="Max municipalities to list")
+    suc_rk_p.add_argument("--uf", type=str, help="Optional 2-letter state filter")
+    suc_rk_p.add_argument("--json", action="store_true", help="Output in JSON format")
+
     # ONR Registro de Imóveis (SREI/SERP/CNM) command group
     onr_p = subparsers.add_parser("onr", help="Query ONR SREI real estate registries, transactions, credit guarantees, SERP, and rankings.")
     onr_sub = onr_p.add_subparsers(dest="onr_action", required=True)
@@ -3362,6 +3392,78 @@ def main(argv: Sequence[str] | None = None) -> int:
                     return 0
             except ValueError as exc:
                 print(f"Erro INEP ENEM: {exc}", file=sys.stderr)
+                return 1
+
+        elif args.command == "sucupira":
+            from public_data_gateway.connectors.educacao.capes_sucupira.connector import (
+                CapesSucupiraConnector,
+            )
+
+            suc_conn = CapesSucupiraConnector(settings=settings)
+            suc_action = getattr(args, "sucupira_action", None)
+            try:
+                if suc_action == "programs":
+                    res = suc_conn.get_sucupira_program_evaluation(args.id_municipio)
+                    if getattr(args, "json", False):
+                        print(json.dumps(res, indent=2, ensure_ascii=False, default=str))
+                    else:
+                        print(f"CAPES Sucupira Programas ({res.get('nome_municipio')} - {res.get('id_municipio')}):")
+                        print(f"  Programas / Nota 6-7: {res.get('total_programas_stricto_sensu_ano')} ({res.get('programas_nota_6_7_excelencia_ano')} excelência)")
+                        print(f"  Nota Média CAPES:     {res.get('nota_media_capes_programas')}")
+                    return 0
+
+                if suc_action == "students":
+                    rows = suc_conn.list_sucupira_students_by_area(
+                        args.id_municipio, grande_area_conhecimento=getattr(args, "area", None)
+                    )
+                    if getattr(args, "json", False):
+                        print(json.dumps(rows, indent=2, ensure_ascii=False, default=str))
+                    else:
+                        print(f"CAPES Sucupira Discentes ({args.id_municipio}) - {len(rows)} área(s):")
+                        for r in rows:
+                            print(f"  - {r.get('grande_area_conhecimento')}: Mestrado {r.get('matriculados_mestrado_area')} | Doutorado {r.get('matriculados_doutorado_area')} | Bolsas {r.get('bolsistas_capes_area')}")
+                    return 0
+
+                if suc_action == "faculty":
+                    res = suc_conn.get_sucupira_faculty_research(args.id_municipio)
+                    if getattr(args, "json", False):
+                        print(json.dumps(res, indent=2, ensure_ascii=False, default=str))
+                    else:
+                        print(f"CAPES Sucupira Docentes ({res.get('nome_municipio')} - {res.get('id_municipio')}):")
+                        print(f"  Docentes Permanentes: {res.get('total_docentes_permanentes_ano')} | PQ CNPq: {res.get('docentes_bolsistas_pq_cnpq_ano')}")
+                    return 0
+
+                if suc_action == "production":
+                    res = suc_conn.get_sucupira_scientific_production(args.id_municipio)
+                    if getattr(args, "json", False):
+                        print(json.dumps(res, indent=2, ensure_ascii=False, default=str))
+                    else:
+                        print(f"CAPES Sucupira Produção Científica ({res.get('nome_municipio')} - {res.get('id_municipio')}):")
+                        print(f"  Qualis A1/A2: {res.get('artigos_qualis_a1_a2_ano')} | Teses/Diss.: {res.get('teses_dissertacoes_defendidas_ano')} | Fomento: R$ {res.get('fomento_bolsas_estimado_milhoes_brl')}M")
+                    return 0
+
+                if suc_action == "features":
+                    res = suc_conn.get_sucupira_postgrad_features(args.id_municipio)
+                    if getattr(args, "json", False):
+                        print(json.dumps(res, indent=2, ensure_ascii=False, default=str))
+                    else:
+                        print(f"CAPES Sucupira Gold ({res.get('nome_municipio')} - {res.get('id_municipio')}):")
+                        print(f"  Score Composto: {res.get('score_composto_ecossistema_pos_graduacao')} | Perfil: {res.get('perfil_pos_graduacao_sucupira')}")
+                    return 0
+
+                if suc_action == "ranking":
+                    ranks = suc_conn.list_top_sucupira_municipalities(
+                        limit=getattr(args, "limit", 10), sigla_uf=getattr(args, "uf", None)
+                    )
+                    if getattr(args, "json", False):
+                        print(json.dumps(ranks, indent=2, ensure_ascii=False, default=str))
+                    else:
+                        print(f"Top {len(ranks)} Municípios CAPES Sucupira:")
+                        for idx, r in enumerate(ranks, 1):
+                            print(f"  {idx}. {r.get('nome_municipio')} ({r.get('sigla_uf')}): {r.get('score_composto_ecossistema_pos_graduacao')} | {r.get('perfil_pos_graduacao_sucupira')}")
+                    return 0
+            except ValueError as exc:
+                print(f"Erro CAPES Sucupira: {exc}", file=sys.stderr)
                 return 1
 
         elif args.command == "onr":
