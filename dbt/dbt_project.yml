@@ -42,6 +42,7 @@ model-paths:
   - "../src/public_data_gateway/connectors/educacao/inep_censo_superior/dbt"
   - "../src/public_data_gateway/connectors/educacao/inep_ideb/dbt"
   - "../src/public_data_gateway/connectors/judicial/cnj_justica_aberta/dbt"
+  - "../src/public_data_gateway/connectors/imobiliario/onr_registro_imoveis/dbt"
   - "models"
 
 analysis-paths: ["analyses"]

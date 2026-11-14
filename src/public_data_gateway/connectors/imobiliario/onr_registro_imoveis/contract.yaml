@@ -1,0 +1,569 @@
+schema_version: "3.1.0"
+contract_id: "ODCS-BR-ONR-REGISTRO-IMOVEIS-001"
+source_id: "onr_registro_imoveis"
+version: "1.0.0"
+name: "ONR: Sistema de Registro Eletrônico de Imóveis (SREI)"
+agency: "Operador Nacional do Registro de Imóveis Eletrônico (ONR)"
+official_url: "https://onr.org.br/"
+
+legal_framework:
+  statutes:
+    - name: "Lei nº 13.465/2017 (Art. 76 - SREI/ONR)"
+      description: "Institui o Sistema de Registro Eletrônico de Imóveis (SREI) e determina sua implementação e operação pelo Operador Nacional do Registro de Imóveis Eletrônico (ONR)"
+    - name: "Lei nº 6.015/1973 (Lei de Registros Públicos)"
+      description: "Dispõe sobre os Registros Públicos no Brasil, disciplinando matrícula, registro e averbação imobiliária"
+    - name: "Lei nº 14.382/2022 (SERP)"
+      description: "Institui o Sistema Eletrônico dos Registros Públicos (SERP), a interoperabilidade de bases registrais e os extratos eletrônicos nato-digitais"
+    - name: "Provimento CNJ nº 89/2019 e Provimento CNJ nº 149/2023 (CNM/SAEC/ONR)"
+      description: "Regulamentam o Código Nacional de Matrícula (CNM), o SAEC (Serviço de Atendimento Eletrônico Compartilhado) e o Mapa Estatístico do Registro de Imóveis"
+    - name: "Decreto nº 8.777/2016"
+      description: "Institui a Política de Dados Abertos e diretrizes de transparência ativa institucional"
+
+data_governance:
+  grain: "municipio_registro_imoveis_anual"
+  primary_keys:
+    - "id_municipio"
+    - "sigla_uf"
+  reference_date_column: "reference_date"
+  min_expected_rows: 10
+  max_volume_drop_pct: 10.0
+  freshness_sla_hours: 720
+  lgpd_tier: "PUBLIC_NON_PERSONAL"
+  ml_feature_domains:
+    - "real_estate_transactions"
+    - "property_registries"
+
+schema:
+  tables:
+    onr_matriculas_acervo_municipio:
+      description: "Acervo de matrículas imobiliárias ativas, conversão digital ao Código Nacional de Matrícula (CNM), abertura de novas matrículas e emissões digitais via SREI/ONR"
+      grain: "id_municipio, competencia_referencia"
+      primary_keys: ["id_municipio", "competencia_referencia"]
+      min_expected_rows: 10
+      columns:
+        - name: "id_municipio"
+          data_type: "string"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Código IBGE de 7 dígitos identificador único do município"
+        - name: "nome_municipio"
+          data_type: "string"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Nome oficial do município"
+        - name: "sigla_uf"
+          data_type: "string"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Sigla de 2 letras da Unidade Federativa"
+        - name: "id_uf"
+          data_type: "string"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Código IBGE de 2 dígitos da Unidade Federativa"
+        - name: "cep_8"
+          data_type: "string"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "CEP canônico de 8 dígitos da circunscrição registral de referência no município"
+        - name: "competencia_referencia"
+          data_type: "string"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Competência consolidada de referência estatística ONR/SREI (ex.: 2025-12)"
+        - name: "serventias_ri_integradas_srei"
+          data_type: "int64"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Quantidade de Ofícios de Registro de Imóveis integrados ao SREI/ONR no município"
+        - name: "total_matriculas_ativas_cnm"
+          data_type: "int64"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Estoque total de matrículas imobiliárias ativas registradas sob Código Nacional de Matrícula (CNM)"
+        - name: "matriculas_urbanas_ativas"
+          data_type: "int64"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Quantidade de matrículas imobiliárias urbanas ativas no município"
+        - name: "matriculas_rurais_georreferenciadas"
+          data_type: "int64"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Quantidade de matrículas rurais georreferenciadas integradas ao SIGEF/CNM"
+        - name: "taxa_conversao_cnm_digital_pct"
+          data_type: "float64"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Percentual do acervo de matrículas convertido ao padrão estruturado digital CNM/ONR (%)"
+        - name: "novas_matriculas_abertas_ano"
+          data_type: "int64"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Quantidade de novas matrículas imobiliárias abertas no exercício anual"
+        - name: "certidoes_digitais_srei_ano"
+          data_type: "int64"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Quantidade de certidões imobiliárias digitais emitidas via SAEC/SREI no ano"
+        - name: "visualizacoes_matricula_online_ano"
+          data_type: "int64"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Quantidade de visualizações de matrículas eletrônicas realizadas via plataforma ONR no ano"
+        - name: "reference_date"
+          data_type: "string"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Data de referência ISO-8601 da consolidação anual ONR/SREI"
+        - name: "extracted_at"
+          data_type: "string"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Timestamp ISO-8601 UTC da extração e normalização Medallion"
+
+    onr_transacoes_atos_natureza:
+      description: "Volume físico, financeiro declarado, ticket médio e protocolização eletrônica de transações e atos registrais imobiliários desagregados por natureza"
+      grain: "id_municipio, competencia_referencia, natureza_ato_registral"
+      primary_keys: ["id_municipio", "competencia_referencia", "natureza_ato_registral"]
+      min_expected_rows: 40
+      columns:
+        - name: "id_municipio"
+          data_type: "string"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Código IBGE de 7 dígitos identificador único do município"
+        - name: "nome_municipio"
+          data_type: "string"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Nome oficial do município"
+        - name: "sigla_uf"
+          data_type: "string"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Sigla de 2 letras da Unidade Federativa"
+        - name: "id_uf"
+          data_type: "string"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Código IBGE de 2 dígitos da Unidade Federativa"
+        - name: "cep_8"
+          data_type: "string"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "CEP canônico de 8 dígitos da circunscrição registral de referência no município"
+        - name: "competencia_referencia"
+          data_type: "string"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Competência consolidada de referência estatística ONR/SREI"
+        - name: "natureza_ato_registral"
+          data_type: "string"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Natureza do ato registral imobiliário (Compra_Venda_Transmissao, Alienacao_Fiduciaria_Garantia, Incorporacao_Loteamento_Especificacao, Averbacao_Construcao_Cancelamento_Onus)"
+        - name: "categoria_operacao"
+          data_type: "string"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Categoria funcional da operação no mercado imobiliário e registral"
+        - name: "quantidade_atos_registrados_ano"
+          data_type: "int64"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Quantidade total de atos protocolados e registrados na natureza informada no ano"
+        - name: "volume_financeiro_declarado_milhoes_brl"
+          data_type: "float64"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Volume financeiro total declarado nos títulos da natureza registral em milhões de reais (BRL)"
+        - name: "ticket_medio_ato_brl"
+          data_type: "float64"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Valor médio declarado por ato registrado na natureza informada em reais (BRL)"
+        - name: "proporcao_protocolo_eletronico_srei_pct"
+          data_type: "float64"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Percentual dos títulos da natureza protocolados eletronicamente via e-Protocolo SREI/SAEC (%)"
+        - name: "reference_date"
+          data_type: "string"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Data de referência ISO-8601 da consolidação anual ONR/SREI"
+        - name: "extracted_at"
+          data_type: "string"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Timestamp ISO-8601 UTC da extração e normalização Medallion"
+
+    onr_garantias_credito_imobiliario:
+      description: "Contratos de alienação fiduciária, volume de crédito imobiliário garantido, home equity (CGI), intimações de mora e consolidações de propriedade"
+      grain: "id_municipio, competencia_referencia"
+      primary_keys: ["id_municipio", "competencia_referencia"]
+      min_expected_rows: 10
+      columns:
+        - name: "id_municipio"
+          data_type: "string"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Código IBGE de 7 dígitos identificador único do município"
+        - name: "nome_municipio"
+          data_type: "string"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Nome oficial do município"
+        - name: "sigla_uf"
+          data_type: "string"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Sigla de 2 letras da Unidade Federativa"
+        - name: "id_uf"
+          data_type: "string"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Código IBGE de 2 dígitos da Unidade Federativa"
+        - name: "cep_8"
+          data_type: "string"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "CEP canônico de 8 dígitos da circunscrição registral de referência no município"
+        - name: "competencia_referencia"
+          data_type: "string"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Competência consolidada de referência estatística ONR/SREI"
+        - name: "contratos_alienacao_fiduciaria_ano"
+          data_type: "int64"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Quantidade de contratos de garantia real por alienação fiduciária registrados no ano (Lei 9.514/1997)"
+        - name: "volume_credito_imobiliario_garantido_milhoes_brl"
+          data_type: "float64"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Volume financeiro de crédito imobiliário lastreado em garantias registrais em milhões de reais (BRL)"
+        - name: "participacao_sfi_sbpe_pmcmv_pct"
+          data_type: "float64"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Percentual das transmissões onerosas financiadas por SFI/SBPE/PMCMV registradas no ano (%)"
+        - name: "contratos_home_equity_cgi_ano"
+          data_type: "int64"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Quantidade de operações de Crédito com Garantia de Imóvel (Home Equity / CGI) registradas no ano"
+        - name: "intimacoes_purgacao_mora_fiduciaria_ano"
+          data_type: "int64"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Quantidade de intimações extrajudiciais para purgação da mora em alienação fiduciária processadas no ano"
+        - name: "consolidacoes_propriedade_inadimplencia_ano"
+          data_type: "int64"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Quantidade de consolidações de propriedade em favor do credor fiduciário por inadimplência no ano"
+        - name: "taxa_execucao_garantia_fiduciaria_pct"
+          data_type: "float64"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Razão percentual entre consolidações de propriedade e contratos de alienação fiduciária registrados (%)"
+        - name: "reference_date"
+          data_type: "string"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Data de referência ISO-8601 da consolidação anual ONR/SREI"
+        - name: "extracted_at"
+          data_type: "string"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Timestamp ISO-8601 UTC da extração e normalização Medallion"
+
+    onr_interoperabilidade_serp_eficiencia:
+      description: "Indicadores de interoperabilidade eletrônica no SERP/SAEC, títulos nato-digitais por extrato, SLA registral e ordens CNIB/Penhora Online"
+      grain: "id_municipio, competencia_referencia"
+      primary_keys: ["id_municipio", "competencia_referencia"]
+      min_expected_rows: 10
+      columns:
+        - name: "id_municipio"
+          data_type: "string"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Código IBGE de 7 dígitos identificador único do município"
+        - name: "nome_municipio"
+          data_type: "string"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Nome oficial do município"
+        - name: "sigla_uf"
+          data_type: "string"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Sigla de 2 letras da Unidade Federativa"
+        - name: "id_uf"
+          data_type: "string"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Código IBGE de 2 dígitos da Unidade Federativa"
+        - name: "cep_8"
+          data_type: "string"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "CEP canônico de 8 dígitos da circunscrição registral de referência no município"
+        - name: "competencia_referencia"
+          data_type: "string"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Competência consolidada de referência estatística ONR/SREI"
+        - name: "indice_integracao_serp_saec_pct"
+          data_type: "float64"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Índice percentual de interoperabilidade eletrônica plena com SERP, SAEC e SREI (%)"
+        - name: "proporcao_titulos_nato_digitais_extrato_pct"
+          data_type: "float64"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Percentual de títulos ingressados via extrato eletrônico estruturado XML/JSON nato-digital (%)"
+        - name: "prazo_medio_qualificacao_registral_dias"
+          data_type: "float64"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Prazo médio em dias úteis para qualificação e prática do ato registral imobiliário"
+        - name: "prazo_medio_certidao_eletronica_horas"
+          data_type: "float64"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Prazo médio em horas para expedição de certidão eletrônica de matrícula via SAEC/ONR"
+        - name: "ordens_indisponibilidade_cnib_processadas_ano"
+          data_type: "int64"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Quantidade de ordens de indisponibilidade de bens via CNIB processadas eletronicamente no ano"
+        - name: "penhoras_online_arisp_srei_ano"
+          data_type: "int64"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Quantidade de averbações de penhora judicial recebidas via Penhora Online SREI no ano"
+        - name: "taxa_nota_devolutiva_exigencia_pct"
+          data_type: "float64"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Percentual de títulos prenotados que geraram nota devolutiva de exigência registral (%)"
+        - name: "reference_date"
+          data_type: "string"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Data de referência ISO-8601 da consolidação anual ONR/SREI"
+        - name: "extracted_at"
+          data_type: "string"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Timestamp ISO-8601 UTC da extração e normalização Medallion"
+
+    features_onr_registro_imoveis_municipios_brasil:
+      description: "Feature Store Gold municipal ONR/SREI consolidando maturidade digital SERP, dinamismo de transações imobiliárias e segurança de garantias"
+      grain: "id_municipio"
+      primary_keys: ["id_municipio"]
+      min_expected_rows: 10
+      columns:
+        - name: "id_municipio"
+          data_type: "string"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Código IBGE de 7 dígitos identificador único do município"
+        - name: "nome_municipio"
+          data_type: "string"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Nome oficial do município"
+        - name: "sigla_uf"
+          data_type: "string"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Sigla de 2 letras da Unidade Federativa"
+        - name: "id_uf"
+          data_type: "string"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Código IBGE de 2 dígitos da Unidade Federativa"
+        - name: "cep_8"
+          data_type: "string"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "CEP canônico de 8 dígitos da circunscrição registral de referência no município"
+        - name: "competencia_referencia"
+          data_type: "string"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Competência consolidada de referência estatística ONR/SREI"
+        - name: "serventias_ri_integradas_srei"
+          data_type: "int64"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Quantidade de Ofícios de Registro de Imóveis integrados ao SREI/ONR no município"
+        - name: "total_matriculas_ativas_cnm"
+          data_type: "int64"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Estoque total de matrículas imobiliárias ativas sob Código Nacional de Matrícula (CNM)"
+        - name: "taxa_conversao_cnm_digital_pct"
+          data_type: "float64"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Percentual do acervo convertido ao padrão digital CNM (%)"
+        - name: "novas_matriculas_abertas_ano"
+          data_type: "int64"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Quantidade de novas matrículas imobiliárias abertas no exercício anual"
+        - name: "total_atos_registrais_imobiliarios_ano"
+          data_type: "int64"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Total consolidado de atos registrais imobiliários praticados nas 4 naturezas no ano"
+        - name: "volume_total_transacionado_milhoes_brl"
+          data_type: "float64"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Volume financeiro consolidado declarado em todas as naturezas de atos no ano (milhões BRL)"
+        - name: "contratos_alienacao_fiduciaria_ano"
+          data_type: "int64"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Contratos de alienação fiduciária em garantia imobiliária registrados no ano"
+        - name: "volume_credito_imobiliario_garantido_milhoes_brl"
+          data_type: "float64"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Volume de crédito imobiliário garantido por alienação fiduciária/hipoteca em milhões de reais (BRL)"
+        - name: "taxa_execucao_garantia_fiduciaria_pct"
+          data_type: "float64"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Taxa percentual de execução/consolidação fiduciária sobre contratos registrados (%)"
+        - name: "indice_integracao_serp_saec_pct"
+          data_type: "float64"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Índice percentual de interoperabilidade eletrônica no SERP/SAEC/SREI (%)"
+        - name: "proporcao_titulos_nato_digitais_extrato_pct"
+          data_type: "float64"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Proporção de títulos ingressados via extrato eletrônico nato-digital (%)"
+        - name: "prazo_medio_qualificacao_registral_dias"
+          data_type: "float64"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Prazo médio em dias úteis para qualificação e prática do registro imobiliário"
+        - name: "score_maturidade_digital_srei_serp"
+          data_type: "float64"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Score normalizado (0 a 100) de maturidade digital registral SREI/SERP, CNM, extrato eletrônico e SLA"
+        - name: "score_liquidez_seguranca_imobiliaria"
+          data_type: "float64"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Score normalizado (0 a 100) de liquidez imobiliária, penetração de crédito SFI/SBPE e adimplência das garantias"
+        - name: "classificacao_mercado_registral_imobiliario"
+          data_type: "string"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Classificação analítica em 4 tiers de maturidade digital e liquidez do mercado registral imobiliário"
+        - name: "reference_date"
+          data_type: "string"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Data de referência ISO-8601 da consolidação anual ONR/SREI"
+        - name: "extracted_at"
+          data_type: "string"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Timestamp ISO-8601 UTC da extração e normalização Medallion"
