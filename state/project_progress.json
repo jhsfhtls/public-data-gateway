@@ -1,6 +1,6 @@
 {
   "schema_version": "1.0.0",
-  "last_updated": "2026-11-14T13:55:00.000000",
+  "last_updated": "2026-11-14T14:07:00.000000",
   "project_name": "public-data-gateway",
   "ecosystem": "C.O.R.E. (core, operations, career, studies)",
   "governing_pops": [
@@ -13,10 +13,10 @@
     "POP_T_148"
   ],
   "current_macro_phase_id": "08",
-  "current_macro_phase": "Fase 08 - Ingestão Wave 6 (Meio Ambiente, Agro & Metaportais — 46/49 fontes homologadas [93.9%] com sfb_sicar homologado; Próximo: mapa_zarc)",
+  "current_macro_phase": "Fase 08 - Ingestão Wave 6 (Meio Ambiente, Agro & Metaportais — 47/49 fontes homologadas [95.9%] com mapa_zarc homologado; Próximo: basedosdados_bq)",
   "overall_status": "ON_TRACK",
-  "active_connector": "mapa_zarc",
-  "next_connector": "basedosdados_bq",
+  "active_connector": "basedosdados_bq",
+  "next_connector": "dadosgov_ckan",
   "structural_phases": [
     {
       "phase_id": "00",
@@ -157,7 +157,7 @@
         "Conector ana_hidroweb_telemetria (Estações Telemétricas, Cotas/Vazões por Segmento, Pluviometria e Segurança Hídrica) - CONCLUÍDO",
         "Conector mapbiomas_cobertura (Cobertura Anual, Transições por Classe, Pastagens/Irrigação e Alertas Validados) - CONCLUÍDO",
         "Conector sfb_sicar (Imóveis Rurais CAR, Reserva Legal/APP por Categoria, PRA/Embargos IBAMA e Geometria SIGEF) - CONCLUÍDO",
-        "Conectores Ambientais (mapa_zarc)",
+        "Conector mapa_zarc (Aptidão Climática, Janelas Decendiais por Cultura, PROAGRO/PSR e Solo AD1-AD6) - CONCLUÍDO",
         "Conectores Metaportais (basedosdados_bq, dadosgov_ckan)"
       ]
     },
@@ -425,6 +425,12 @@
     }
   ],
   "recent_milestones": [
+    {
+      "date": "2026-11-14",
+      "phase_id": "08",
+      "milestone": "Homologação do Conector mapa_zarc (47/49 Fontes — 95.9%)",
+      "summary": "Implementação e homologação completa do conector mapa_zarc (MAPA: Zoneamento Agrícola de Risco Climático — ZARC, Decreto nº 9.841/2019, Lei nº 10.823/2003) alcançando 47/49 fontes homologadas (95.9%): 5 tabelas Medallion (zarc_aptidao_climatica_municipio, zarc_janelas_plantio_cultura, zarc_proagro_seguro_rural_municipio, zarc_risco_solo_ad_biomassa e features_mapa_zarc_agroclimatico) materializadas em data/mapa_zarc/silver/; 7 novos modelos dbt (4 staging views, fct_zarc_risco_agroclimatico_municipio, fct_zarc_janelas_plantio_cultura_municipio e mart_aptidao_agroclimatica_zarc_brasil) totalizando 390 modelos e 5.788 colunas 100% documentadas no linter (214 sources); paridade SQL–Python estrita confirmada (12 municípios, 4 tiers x 3 municípios, zero divergências); paridade multi-interface completa em SDK (EnvironmentFacade.mapa_zarc_connector), CLI (bdg zarc), FastAPI (/api/v1/environment/zarc/* e /api/v1/zarc/*) e MCP (bdg_*_zarc* com wrap_untrusted_gov_data); 9 testes pytest (8 offline + 1 live MAPA ZARC/Dados Abertos) aprovados."
+    },
     {
       "date": "2026-11-14",
       "phase_id": "08",

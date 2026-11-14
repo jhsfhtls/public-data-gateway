@@ -1671,6 +1671,65 @@ class MCPDispatcher:
                                 },
                             },
                             {
+                                "name": "bdg_get_zarc_climate_aptitude",
+                                "description": "Get official MAPA ZARC municipal agro-climatic aptitude, zoned crops count, and suitable planting decendios.",
+                                "inputSchema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "id_municipio": {
+                                            "type": "string",
+                                            "description": "7-digit IBGE municipality code, 6-digit prefix, or 8-digit CEP",
+                                        }
+                                    },
+                                    "required": ["id_municipio"],
+                                },
+                            },
+                            {
+                                "name": "bdg_get_zarc_proagro_coverage",
+                                "description": "Get municipal MAPA ZARC PROAGRO, Rural Insurance (PSR) coverage, and climatic loss rate.",
+                                "inputSchema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "id_municipio": {
+                                            "type": "string",
+                                            "description": "7-digit IBGE municipality code, 6-digit prefix, or 8-digit CEP",
+                                        }
+                                    },
+                                    "required": ["id_municipio"],
+                                },
+                            },
+                            {
+                                "name": "bdg_get_zarc_features",
+                                "description": "Get normalized Gold MAPA ZARC agro-climatic risk score and 4-tier classification.",
+                                "inputSchema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "id_municipio": {
+                                            "type": "string",
+                                            "description": "7-digit IBGE municipality code, 6-digit prefix, or 8-digit CEP",
+                                        }
+                                    },
+                                    "required": ["id_municipio"],
+                                },
+                            },
+                            {
+                                "name": "bdg_list_top_zarc_municipalities",
+                                "description": "List top Brazilian municipalities ranked by composite MAPA ZARC agro-climatic aptitude score.",
+                                "inputSchema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "limit": {
+                                            "type": "integer",
+                                            "description": "Maximum rows (default: 10)",
+                                        },
+                                        "sigla_uf": {
+                                            "type": "string",
+                                            "description": "Optional 2-letter state filter (e.g. PR)",
+                                        },
+                                    },
+                                },
+                            },
+                            {
                                 "name": "bdg_get_onr_property_registry",
                                 "description": "Get official ONR SREI municipal active property registry CNM stock, digital conversion rate, and online certificate emissions.",
                                 "inputSchema": {
@@ -3707,6 +3766,68 @@ class MCPDispatcher:
                     },
                 }
             wrapped = wrap_untrusted_gov_data(result, source_id="sfb_sicar")
+            return {
+                "jsonrpc": "2.0",
+                "id": req_id,
+                "result": {"content": [{"type": "text", "text": wrapped}], "isError": False},
+            }
+
+        if tool_name in {
+            "bdg_get_zarc_climate_aptitude",
+            "bdg_get_zarc_proagro_coverage",
+            "bdg_get_zarc_features",
+            "bdg_list_top_zarc_municipalities",
+        }:
+            from public_data_gateway.connectors.ambiental.mapa_zarc.connector import (
+                MapaZarcConnector,
+            )
+
+            connector = MapaZarcConnector(settings=self.settings)
+            try:
+                if tool_name == "bdg_get_zarc_climate_aptitude":
+                    result: Any = connector.get_zarc_climate_aptitude(
+                        str(args.get("id_municipio", ""))
+                    )
+                elif tool_name == "bdg_get_zarc_proagro_coverage":
+                    result = connector.get_zarc_proagro_coverage(
+                        str(args.get("id_municipio", ""))
+                    )
+                elif tool_name == "bdg_get_zarc_features":
+                    result = connector.get_zarc_features(
+                        str(args.get("id_municipio", ""))
+                    )
+                else:
+                    result = connector.list_top_zarc_municipalities(
+                        limit=int(args.get("limit", 10)),
+                        sigla_uf=args.get("sigla_uf"),
+                    )
+            except (ValueError, KeyError) as exc:
+                return {
+                    "jsonrpc": "2.0",
+                    "id": req_id,
+                    "result": {
+                        "content": [
+                            {"type": "text", "text": f"MAPA ZARC parameter error: {exc}"}
+                        ],
+                        "isError": True,
+                    },
+                }
+
+            if not result:
+                return {
+                    "jsonrpc": "2.0",
+                    "id": req_id,
+                    "result": {
+                        "content": [
+                            {
+                                "type": "text",
+                                "text": "No MAPA ZARC data found for the query.",
+                            }
+                        ],
+                        "isError": True,
+                    },
+                }
+            wrapped = wrap_untrusted_gov_data(result, source_id="mapa_zarc")
             return {
                 "jsonrpc": "2.0",
                 "id": req_id,

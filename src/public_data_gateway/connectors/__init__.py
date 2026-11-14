@@ -8,6 +8,7 @@ energia, saude, transito, etc.
 import public_data_gateway.connectors.agregadores.brasilapi_core  # noqa: F401
 import public_data_gateway.connectors.ambiental.ana_hidroweb_telemetria  # noqa: F401
 import public_data_gateway.connectors.ambiental.inpe_terrabrasilis  # noqa: F401
+import public_data_gateway.connectors.ambiental.mapa_zarc  # noqa: F401
 import public_data_gateway.connectors.ambiental.mapbiomas_cobertura  # noqa: F401
 import public_data_gateway.connectors.ambiental.sfb_sicar  # noqa: F401
 import public_data_gateway.connectors.comercio_exterior.mdic_comexstat  # noqa: F401

@@ -1,0 +1,24 @@
+version: 2
+
+sources:
+  - name: mapa_zarc
+    description: "MAPA / Embrapa: Zoneamento Agrícola de Risco Climático (ZARC)."
+    meta:
+      external_root: "data/mapa_zarc/silver"
+    tables:
+      - name: zarc_aptidao_climatica_municipio
+        description: "Aptidão climática, segurança hídrica e decêndios aptos no ZARC por município."
+        meta:
+          external_location: "read_parquet('data/mapa_zarc/silver/zarc_aptidao_climatica_municipio.parquet')"
+      - name: zarc_janelas_plantio_cultura
+        description: "Janelas decendiais de plantio ZARC por cultura e grupo de solo AD."
+        meta:
+          external_location: "read_parquet('data/mapa_zarc/silver/zarc_janelas_plantio_cultura.parquet')"
+      - name: zarc_proagro_seguro_rural_municipio
+        description: "Cobertura PROAGRO, Seguro Rural (PSR), adesão ao crédito e sinistralidade climática."
+        meta:
+          external_location: "read_parquet('data/mapa_zarc/silver/zarc_proagro_seguro_rural_municipio.parquet')"
+      - name: zarc_risco_solo_ad_biomassa
+        description: "Capacidade de retenção de água do solo (AD1-AD6), plantio direto e estabilidade pluviométrica."
+        meta:
+          external_location: "read_parquet('data/mapa_zarc/silver/zarc_risco_solo_ad_biomassa.parquet')"

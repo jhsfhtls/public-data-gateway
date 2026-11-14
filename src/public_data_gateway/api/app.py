@@ -2420,6 +2420,86 @@ def create_app(settings: GatewaySettings | None = None) -> FastAPI:
         except (ValueError, KeyError) as exc:
             raise HTTPException(status_code=400, detail=str(exc)) from exc
 
+    @app.get("/api/v1/environment/zarc/top-municipalities")
+    async def get_top_zarc_municipalities(
+        limit: int = Query(10, ge=1, le=50, description="Max municipalities to list"),
+        uf: str | None = Query(None, description="Optional 2-letter state filter"),
+    ) -> list[dict[str, Any]]:
+        from public_data_gateway.connectors.ambiental.mapa_zarc.connector import (
+            MapaZarcConnector,
+        )
+
+        conn = MapaZarcConnector(settings=app_settings)
+        return conn.list_top_zarc_municipalities(limit=limit, sigla_uf=uf)
+
+    @app.get("/api/v1/environment/zarc/features/{id_municipio}")
+    async def get_zarc_features(id_municipio: str) -> dict[str, Any]:
+        from public_data_gateway.connectors.ambiental.mapa_zarc.connector import (
+            MapaZarcConnector,
+        )
+
+        conn = MapaZarcConnector(settings=app_settings)
+        try:
+            return conn.get_zarc_features(id_municipio)
+        except (ValueError, KeyError) as exc:
+            raise HTTPException(status_code=400, detail=str(exc)) from exc
+
+    @app.get("/api/v1/environment/zarc/windows/{id_municipio}")
+    async def get_zarc_windows(
+        id_municipio: str,
+        cultura: str | None = Query(
+            None, description="Optional ZARC crop filter"
+        ),
+    ) -> list[dict[str, Any]]:
+        from public_data_gateway.connectors.ambiental.mapa_zarc.connector import (
+            MapaZarcConnector,
+        )
+
+        conn = MapaZarcConnector(settings=app_settings)
+        try:
+            return conn.list_zarc_planting_windows(
+                id_municipio, cultura_zarc=cultura
+            )
+        except (ValueError, KeyError) as exc:
+            raise HTTPException(status_code=400, detail=str(exc)) from exc
+
+    @app.get("/api/v1/environment/zarc/proagro/{id_municipio}")
+    async def get_zarc_proagro(id_municipio: str) -> dict[str, Any]:
+        from public_data_gateway.connectors.ambiental.mapa_zarc.connector import (
+            MapaZarcConnector,
+        )
+
+        conn = MapaZarcConnector(settings=app_settings)
+        try:
+            return conn.get_zarc_proagro_coverage(id_municipio)
+        except (ValueError, KeyError) as exc:
+            raise HTTPException(status_code=400, detail=str(exc)) from exc
+
+    @app.get("/api/v1/environment/zarc/soil/{id_municipio}")
+    async def get_zarc_soil(id_municipio: str) -> dict[str, Any]:
+        from public_data_gateway.connectors.ambiental.mapa_zarc.connector import (
+            MapaZarcConnector,
+        )
+
+        conn = MapaZarcConnector(settings=app_settings)
+        try:
+            return conn.get_zarc_soil_risk(id_municipio)
+        except (ValueError, KeyError) as exc:
+            raise HTTPException(status_code=400, detail=str(exc)) from exc
+
+    @app.get("/api/v1/environment/zarc/climate/{id_municipio}")
+    @app.get("/api/v1/zarc/{id_municipio}")
+    async def get_zarc_climate(id_municipio: str) -> dict[str, Any]:
+        from public_data_gateway.connectors.ambiental.mapa_zarc.connector import (
+            MapaZarcConnector,
+        )
+
+        conn = MapaZarcConnector(settings=app_settings)
+        try:
+            return conn.get_zarc_climate_aptitude(id_municipio)
+        except (ValueError, KeyError) as exc:
+            raise HTTPException(status_code=400, detail=str(exc)) from exc
+
     @app.get("/api/v1/real-estate/onr/top-municipalities")
     async def get_top_onr_municipalities(
         limit: int = Query(10, ge=1, le=50, description="Max municipalities to list"),
