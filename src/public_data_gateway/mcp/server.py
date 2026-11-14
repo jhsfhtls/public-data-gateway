@@ -1022,6 +1022,65 @@ class MCPDispatcher:
                                 },
                             },
                             {
+                                "name": "bdg_get_cmed_presentations_summary",
+                                "description": "Get municipal ANVISA CMED registered drug presentations inventory, reference lab CNPJ, and generics/similares share.",
+                                "inputSchema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "id_municipio": {
+                                            "type": "string",
+                                            "description": "7-digit IBGE municipality code, CNPJ-14, or municipality name",
+                                        },
+                                    },
+                                    "required": ["id_municipio"],
+                                },
+                            },
+                            {
+                                "name": "bdg_get_cmed_public_procurement_pmvg",
+                                "description": "Get municipal ANVISA CMED CAP mandatory scope, PF/PMC/PMVG ceilings, potential savings, and SUS compliance share.",
+                                "inputSchema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "id_municipio": {
+                                            "type": "string",
+                                            "description": "7-digit IBGE municipality code, CNPJ-14, or municipality name",
+                                        },
+                                    },
+                                    "required": ["id_municipio"],
+                                },
+                            },
+                            {
+                                "name": "bdg_get_cmed_drug_pricing_features",
+                                "description": "Get Gold ANVISA CMED generics competitiveness score, PMVG/CAP regulatory efficiency score, and pharmaceutical hub classification.",
+                                "inputSchema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "id_municipio": {
+                                            "type": "string",
+                                            "description": "7-digit IBGE municipality code, CNPJ-14, or municipality name",
+                                        },
+                                    },
+                                    "required": ["id_municipio"],
+                                },
+                            },
+                            {
+                                "name": "bdg_list_top_cmed_regulatory_efficiency_hubs",
+                                "description": "List top Brazilian pharmaceutical hub municipalities ranked by composite ANVISA CMED PMVG/CAP regulatory efficiency score.",
+                                "inputSchema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "limit": {
+                                            "type": "integer",
+                                            "description": "Maximum rows (default: 10)",
+                                        },
+                                        "sigla_uf": {
+                                            "type": "string",
+                                            "description": "Optional 2-letter state filter (e.g. SP)",
+                                        },
+                                    },
+                                },
+                            },
+                            {
                                 "name": "bdg_get_censo_escolar_schools",
                                 "description": "Get municipal active schools inventory, broadband internet, science labs, libraries, and PcD accessibility (INEP Censo Escolar).",
                                 "inputSchema": {
@@ -2392,6 +2451,69 @@ class MCPDispatcher:
                     },
                 }
             wrapped = wrap_untrusted_gov_data(result, source_id="datasus_sinasc")
+            return {
+                "jsonrpc": "2.0",
+                "id": req_id,
+                "result": {"content": [{"type": "text", "text": wrapped}], "isError": False},
+            }
+
+        if tool_name in {
+            "bdg_get_cmed_presentations_summary",
+            "bdg_get_cmed_public_procurement_pmvg",
+            "bdg_get_cmed_drug_pricing_features",
+            "bdg_list_top_cmed_regulatory_efficiency_hubs",
+        }:
+            from public_data_gateway.connectors.saude.anvisa_cmed.connector import (
+                ANVISACmedConnector,
+            )
+
+            connector = ANVISACmedConnector(settings=self.settings)
+            try:
+                if tool_name == "bdg_get_cmed_presentations_summary":
+                    result = connector.get_presentations_summary(
+                        str(args.get("id_municipio", "")).strip()
+                    )
+                elif tool_name == "bdg_get_cmed_public_procurement_pmvg":
+                    result = connector.get_public_procurement_pmvg(
+                        str(args.get("id_municipio", "")).strip()
+                    )
+                elif tool_name == "bdg_get_cmed_drug_pricing_features":
+                    result = connector.get_cmed_drug_pricing_features(
+                        str(args.get("id_municipio", "")).strip()
+                    )
+                else:
+                    raw_uf = args.get("sigla_uf")
+                    result = connector.list_top_cmed_regulatory_efficiency_hubs(
+                        limit=int(args.get("limit", 10)),
+                        sigla_uf=str(raw_uf).strip() if raw_uf else None,
+                    )
+            except ValueError as exc:
+                return {
+                    "jsonrpc": "2.0",
+                    "id": req_id,
+                    "result": {
+                        "content": [
+                            {"type": "text", "text": f"ANVISA CMED parameter error: {exc}"}
+                        ],
+                        "isError": True,
+                    },
+                }
+
+            if not result:
+                return {
+                    "jsonrpc": "2.0",
+                    "id": req_id,
+                    "result": {
+                        "content": [
+                            {
+                                "type": "text",
+                                "text": "No ANVISA CMED data found for the query.",
+                            }
+                        ],
+                        "isError": True,
+                    },
+                }
+            wrapped = wrap_untrusted_gov_data(result, source_id="anvisa_cmed")
             return {
                 "jsonrpc": "2.0",
                 "id": req_id,

@@ -616,3 +616,168 @@ models:
         description: "Timestamp ISO-8601 UTC da geração."
         tests:
           - not_null
+
+  - name: mart_precos_medicamentos_regulados_cmed_brasil
+    description: "Data Mart Gold executivo de preços máximos regulados de medicamentos (PF, PMC, PMVG), conformidade CAP/SUS, competitividade de genéricos e tributação estadual (ANVISA CMED)."
+    columns:
+      - name: id_municipio
+        description: "Código IBGE de 7 dígitos do município."
+        tests:
+          - unique
+          - not_null
+      - name: nome_municipio
+        description: "Nome oficial do município."
+        tests:
+          - not_null
+      - name: sigla_uf
+        description: "Sigla de 2 letras da Unidade Federativa."
+        tests:
+          - not_null
+      - name: id_uf
+        description: "Código IBGE de 2 dígitos da Unidade Federativa."
+        tests:
+          - not_null
+      - name: nome_uf
+        description: "Nome por extenso da Unidade Federativa."
+        tests:
+          - not_null
+      - name: regiao
+        description: "Grande região geográfica brasileira segundo o IBGE."
+        tests:
+          - not_null
+      - name: ano_mes_competencia
+        description: "Competência mensal da tabela CMED no formato AAAAMM."
+        tests:
+          - not_null
+      - name: cnpj_14
+        description: "CNPJ de 14 dígitos do laboratório ou polo farmacêutico de referência."
+        tests:
+          - not_null
+      - name: laboratorio_detentor_referencia
+        description: "Razão social resumida do laboratório ou centro detentor de referência na CMED."
+        tests:
+          - not_null
+      - name: total_apresentacoes_ativas_cmed
+        description: "Total de apresentações medicamentosas ativas na lista CMED."
+        tests:
+          - not_null
+      - name: apresentacoes_genericos
+        description: "Quantidade de apresentações de medicamentos genéricos."
+        tests:
+          - not_null
+      - name: apresentacoes_similares
+        description: "Quantidade de apresentações de medicamentos similares."
+        tests:
+          - not_null
+      - name: apresentacoes_referencia_novos_biologicos
+        description: "Quantidade de apresentações de referência, novos e biológicos."
+        tests:
+          - not_null
+      - name: participacao_genericos_similares_pct
+        description: "Participação percentual combinada de genéricos e similares no portfólio (%)."
+        tests:
+          - not_null
+      - name: apresentacoes_tarja_vermelha_preta_pct
+        description: "Percentual de apresentações tarja vermelha ou preta sob prescrição (%)."
+        tests:
+          - not_null
+      - name: apresentacoes_hospitalares_restritas_pct
+        description: "Percentual de apresentações hospitalares restritas com PMC zerado (%)."
+        tests:
+          - not_null
+      - name: apresentacoes_sujeitas_cap_obrigatorio
+        description: "Quantidade de apresentações sujeitas à aplicação obrigatória do CAP."
+        tests:
+          - not_null
+      - name: proporcao_apresentacoes_cap_pct
+        description: "Percentual de apresentações CMED enquadradas no Coeficiente CAP (%)."
+        tests:
+          - not_null
+      - name: coeficiente_cap_vigente_pct
+        description: "Percentual vigente do Coeficiente de Adequação de Preços CAP (%)."
+        tests:
+          - not_null
+      - name: preco_fabrica_medio_ponderado_brl
+        description: "Preço Fábrica (PF) médio ponderado das apresentações em reais (BRL)."
+        tests:
+          - not_null
+      - name: pmc_medio_ponderado_aliquota_uf_brl
+        description: "Preço Máximo ao Consumidor (PMC) médio ponderado na UF em reais (BRL)."
+        tests:
+          - not_null
+      - name: pmvg_medio_ponderado_brl
+        description: "Preço Máximo de Venda ao Governo (PMVG) médio ponderado com CAP em reais (BRL)."
+        tests:
+          - not_null
+      - name: economia_potencial_pmvg_sobre_pmc_pct
+        description: "Economia percentual máxima alcançável do PMVG frente ao teto PMC (%)."
+        tests:
+          - not_null
+      - name: conformidade_teto_pmvg_compras_sus_pct
+        description: "Índice de conformidade das aquisições públicas locais ao teto PMVG/CMED (%)."
+        tests:
+          - not_null
+      - name: aliquota_icms_modal_uf_pct
+        description: "Alíquota modal estadual de ICMS incidente sobre medicamentos (%)."
+        tests:
+          - not_null
+      - name: apresentacoes_lista_positiva_piscofins
+        description: "Quantidade de apresentações enquadradas na Lista Positiva PIS/COFINS."
+        tests:
+          - not_null
+      - name: apresentacoes_lista_negativa_piscofins
+        description: "Quantidade de apresentações enquadradas na Lista Negativa PIS/COFINS."
+        tests:
+          - not_null
+      - name: apresentacoes_lista_neutra_piscofins
+        description: "Quantidade de apresentações enquadradas na Lista Neutra PIS/COFINS."
+        tests:
+          - not_null
+      - name: participacao_lista_positiva_piscofins_pct
+        description: "Participação percentual da Lista Positiva PIS/COFINS no portfólio CMED (%)."
+        tests:
+          - not_null
+      - name: apresentacoes_comercializacao_2024_ativa_pct
+        description: "Percentual de apresentações CMED com comercialização efetiva reportada em 2024 (%)."
+        tests:
+          - not_null
+      - name: spread_medio_pmc_sobre_pf_pct
+        description: "Margem regulatória média percentual entre PMC e PF (%)."
+        tests:
+          - not_null
+      - name: apresentacoes_onco_imuno_classe_l
+        description: "Quantidade de apresentações na classe Antineoplásicos e Imunomoduladores (ATC L)."
+        tests:
+          - not_null
+      - name: pf_medio_antineoplasicos_brl
+        description: "Preço Fábrica médio na classe de Antineoplásicos e Imunomoduladores (ATC L) em reais (BRL)."
+        tests:
+          - not_null
+      - name: apresentacoes_cardio_metabolico_classe_ca
+        description: "Quantidade de apresentações na classe Sistema Cardiovascular e Metabólico (ATC C/A)."
+        tests:
+          - not_null
+      - name: pf_medio_cardiovascular_brl
+        description: "Preço Fábrica médio na classe Sistema Cardiovascular e Metabólico (ATC C/A) em reais (BRL)."
+        tests:
+          - not_null
+      - name: score_competitividade_genericos_cmed
+        description: "Score normalizado (0 a 100) de competitividade de genéricos, Lista Positiva PIS/COFINS e comercialização ativa."
+        tests:
+          - not_null
+      - name: score_eficiencia_regulatoria_pmvg_cap
+        description: "Score normalizado (0 a 100) de eficiência regulatória PMVG/CAP nas compras públicas de medicamentos."
+        tests:
+          - not_null
+      - name: classificacao_polo_farmaceutico_cmed
+        description: "Classificação hierárquica da maturidade e conformidade regulatória CMED do polo farmacêutico."
+        tests:
+          - not_null
+      - name: reference_date
+        description: "Data de referência ISO-8601 da série."
+        tests:
+          - not_null
+      - name: extracted_at
+        description: "Timestamp ISO-8601 UTC da geração."
+        tests:
+          - not_null

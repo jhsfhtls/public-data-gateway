@@ -1,6 +1,6 @@
 {
   "schema_version": "1.0.0",
-  "last_updated": "2026-11-13T22:49:00.000000",
+  "last_updated": "2026-11-13T23:18:00.000000",
   "project_name": "public-data-gateway",
   "ecosystem": "C.O.R.E. (core, operations, career, studies)",
   "governing_pops": [
@@ -13,10 +13,10 @@
     "POP_T_148"
   ],
   "current_macro_phase_id": "07",
-  "current_macro_phase": "Fase 07 - Ingestão Wave 5 (Saúde, Educação & Setor Notarial — 35/49 fontes homologadas [71.4%] com datasus_sinasc homologado; Próximo: anvisa_cmed)",
+  "current_macro_phase": "Fase 07 - Ingestão Wave 5 (Saúde, Educação & Setor Notarial — 36/49 fontes homologadas [73.5%] com anvisa_cmed homologado; Próximo: inep_ideb)",
   "overall_status": "ON_TRACK",
-  "active_connector": "anvisa_cmed",
-  "next_connector": "inep_ideb",
+  "active_connector": "inep_ideb",
+  "next_connector": "onr_registro_imoveis",
   "structural_phases": [
     {
       "phase_id": "00",
@@ -138,7 +138,8 @@
         "Conector inep_censo_superior (Instituições IES/IGC, Cursos CINE/ENADE, Matrículas/TCG/TDA e Corpo Docente) - CONCLUÍDO",
         "Conector cnj_justica_aberta (Serventias Extrajudiciais, Produtividade por Atribuição, Emolumentos e Digitalização SREI/ONR/CRC) - CONCLUÍDO",
         "Conector datasus_sinasc (Nascidos Vivos, Assistência Pré-Natal e Parto, Perfil Materno Demográfico e Vitalidade Recém-Nascido) - CONCLUÍDO",
-        "Conector DataSUS restante (OpenDataSUS) & anvisa_cmed",
+        "Conector anvisa_cmed (Apresentações Ativas CMED, Preços PF/PMC/PMVG por Classe Terapêutica ATC, CAP/SUS e Regime ICMS/PIS-COFINS) - CONCLUÍDO",
+        "Conector DataSUS restante (opendatasus_vigilancia)",
         "Conectores INEP restantes (IDEB, ENEM) & capes_sucupira",
         "Conectores Notariais restantes (onr_registro_imoveis, capitais_iptu_itbi)"
       ]
@@ -417,6 +418,12 @@
     }
   ],
   "recent_milestones": [
+    {
+      "date": "2026-11-13",
+      "phase_id": "07",
+      "milestone": "Homologação do Conector anvisa_cmed (4 Tabelas, dbt, Mart Preços Regulados CMED & Live Fail-Hard)",
+      "summary": "Implementação e homologação completa do conector anvisa_cmed (ANVISA: Câmara de Regulação do Mercado de Medicamentos — Apresentações Ativas, Preços Máximos PF/PMC/PMVG por Classe Terapêutica ATC, Compras Públicas CAP/PMVG e Regime Tributário ICMS/PIS-COFINS, Leis nº 10.742/2003, 9.782/1999, Resoluções CMED nº 2/2004 e 3/2011) consolidando o oitavo conector da Wave 5 e 36º conector total da plataforma (73.5% do catálogo homologado): 4 tabelas Silver e Gold Feature Store (features_cmed_precos_medicamentos_municipios_brasil.parquet) materializadas em data/anvisa_cmed/{silver,gold}/; 7 novos modelos dbt (4 staging views, fct_cmed_apresentacoes_precos_regulados_municipio, fct_cmed_precos_classe_terapeutica_municipio, mart_precos_medicamentos_regulados_cmed_brasil) totalizando 313 modelos dbt e 4.371 colunas 100% documentadas com 194 checks do build aprovados; paridade rigorosa SQL-Python validada; 8 testes offline e 1 teste live fail-hard aprovados; exposição completa via SDK, CLI, REST API e MCP com wrap_untrusted_gov_data."
+    },
     {
       "date": "2026-11-13",
       "phase_id": "07",

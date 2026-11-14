@@ -1,0 +1,16 @@
+version: 2
+
+sources:
+  - name: anvisa_cmed_silver
+    description: "Bases oficiais da Câmara de Regulação do Mercado de Medicamentos (ANVISA CMED) normalizadas na camada Silver."
+    meta:
+      external_location: "data/anvisa_cmed/silver/{name}.parquet"
+    tables:
+      - name: cmed_apresentacoes_registradas_municipio
+        description: "Inventário municipal de apresentações medicamentosas ativas na lista CMED por laboratório ou polo de referência."
+      - name: cmed_precos_regulados_classe_terapeutica
+        description: "Estratificação municipal de preços médios regulados PF, PMC e PMVG por grande classe terapêutica ATC."
+      - name: cmed_compras_publicas_cap_pmvg
+        description: "Indicadores de abrangência do Coeficiente de Adequação de Preços (CAP), tetos PMVG e conformidade nas compras públicas SUS."
+      - name: cmed_regime_tributario_icms_piscofins
+        description: "Estrutura tributária estadual CMED por alíquota modal de ICMS, listas PIS/COFINS e taxa de comercialização ativa."

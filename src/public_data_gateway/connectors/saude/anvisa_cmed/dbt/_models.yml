@@ -1,0 +1,269 @@
+version: 2
+
+models:
+  - name: stg_cmed_apresentacoes_registradas_municipio
+    description: "Visão padronizada de apresentações medicamentosas ativas, genéricos, similares e produtos biológicos/referência CMED por município."
+    columns:
+      - name: id_municipio
+        description: "Código IBGE de 7 dígitos identificador do município."
+        tests:
+          - not_null
+          - unique
+      - name: nome_municipio
+        description: "Nome oficial do município."
+        tests:
+          - not_null
+      - name: sigla_uf
+        description: "Sigla de 2 letras da Unidade Federativa."
+        tests:
+          - not_null
+      - name: id_uf
+        description: "Código IBGE de 2 dígitos da Unidade Federativa."
+        tests:
+          - not_null
+      - name: ano_mes_competencia
+        description: "Competência mensal da tabela CMED no formato AAAAMM."
+        tests:
+          - not_null
+      - name: cnpj_14
+        description: "CNPJ de 14 dígitos do laboratório ou polo detentor de referência."
+        tests:
+          - not_null
+      - name: laboratorio_detentor_referencia
+        description: "Razão social resumida do laboratório ou centro detentor de referência na lista CMED."
+        tests:
+          - not_null
+      - name: total_apresentacoes_ativas_cmed
+        description: "Total de apresentações medicamentosas com registro ativo na CMED."
+        tests:
+          - not_null
+      - name: apresentacoes_genericos
+        description: "Quantidade de apresentações classificadas como medicamentos genéricos."
+        tests:
+          - not_null
+      - name: apresentacoes_similares
+        description: "Quantidade de apresentações classificadas como medicamentos similares."
+        tests:
+          - not_null
+      - name: apresentacoes_referencia_novos_biologicos
+        description: "Quantidade de apresentações de referência, medicamentos novos e produtos biológicos."
+        tests:
+          - not_null
+      - name: participacao_genericos_similares_pct
+        description: "Participação percentual combinada de genéricos e similares no portfólio (%)."
+        tests:
+          - not_null
+      - name: apresentacoes_tarja_vermelha_preta_pct
+        description: "Percentual de apresentações sob prescrição obrigatória (tarja vermelha ou preta) (%)."
+        tests:
+          - not_null
+      - name: apresentacoes_hospitalares_restritas_pct
+        description: "Percentual de apresentações de uso restrito hospitalar com PF vedado ao varejo PMC (%)."
+        tests:
+          - not_null
+      - name: reference_date
+        description: "Data de referência ISO-8601 da apuração CMED."
+        tests:
+          - not_null
+      - name: extracted_at
+        description: "Timestamp UTC ISO-8601 da extração."
+        tests:
+          - not_null
+
+  - name: stg_cmed_precos_regulados_classe_terapeutica
+    description: "Visão padronizada dos preços médios regulados PF, PMC e PMVG estratificados por grande classe terapêutica ATC e município."
+    columns:
+      - name: id_municipio
+        description: "Código IBGE de 7 dígitos identificador do município."
+        tests:
+          - not_null
+      - name: nome_municipio
+        description: "Nome oficial do município."
+        tests:
+          - not_null
+      - name: sigla_uf
+        description: "Sigla de 2 letras da Unidade Federativa."
+        tests:
+          - not_null
+      - name: id_uf
+        description: "Código IBGE de 2 dígitos da Unidade Federativa."
+        tests:
+          - not_null
+      - name: ano_mes_competencia
+        description: "Competência mensal da tabela CMED no formato AAAAMM."
+        tests:
+          - not_null
+      - name: cnpj_14
+        description: "CNPJ de 14 dígitos do polo ou distribuidor farmacêutico de referência."
+        tests:
+          - not_null
+      - name: classe_terapeutica_atc
+        description: "Grande classe terapêutica padronizada segundo classificação anatômico-terapêutica ATC."
+        tests:
+          - not_null
+      - name: apresentacoes_classe
+        description: "Quantidade de apresentações medicamentosas na classe terapêutica."
+        tests:
+          - not_null
+      - name: participacao_classe_pct
+        description: "Participação percentual da classe terapêutica sobre o total de apresentações (%)."
+        tests:
+          - not_null
+      - name: preco_fabrica_pf_medio_brl
+        description: "Preço Fábrica (PF) médio regulado na classe terapêutica em reais (BRL)."
+        tests:
+          - not_null
+      - name: preco_maximo_consumidor_pmc_medio_brl
+        description: "Preço Máximo ao Consumidor (PMC) médio regulado na classe em reais (BRL)."
+        tests:
+          - not_null
+      - name: preco_maximo_venda_governo_pmvg_medio_brl
+        description: "Preço Máximo de Venda ao Governo (PMVG) médio com CAP aplicado na classe em reais (BRL)."
+        tests:
+          - not_null
+      - name: desconto_medio_pmvg_sobre_pf_pct
+        description: "Desconto percentual médio do PMVG sobre o Preço Fábrica PF na classe (%)."
+        tests:
+          - not_null
+      - name: reference_date
+        description: "Data de referência ISO-8601 da apuração CMED."
+        tests:
+          - not_null
+      - name: extracted_at
+        description: "Timestamp UTC ISO-8601 da extração."
+        tests:
+          - not_null
+
+  - name: stg_cmed_compras_publicas_cap_pmvg
+    description: "Visão padronizada da abrangência do Coeficiente de Adequação de Preços (CAP), tetos PMVG e economia potencial nas compras públicas."
+    columns:
+      - name: id_municipio
+        description: "Código IBGE de 7 dígitos identificador do município."
+        tests:
+          - not_null
+          - unique
+      - name: nome_municipio
+        description: "Nome oficial do município."
+        tests:
+          - not_null
+      - name: sigla_uf
+        description: "Sigla de 2 letras da Unidade Federativa."
+        tests:
+          - not_null
+      - name: id_uf
+        description: "Código IBGE de 2 dígitos da Unidade Federativa."
+        tests:
+          - not_null
+      - name: ano_mes_competencia
+        description: "Competência mensal da tabela CMED no formato AAAAMM."
+        tests:
+          - not_null
+      - name: cnpj_14
+        description: "CNPJ de 14 dígitos do detentor ou fundo municipal de assistência farmacêutica."
+        tests:
+          - not_null
+      - name: apresentacoes_sujeitas_cap_obrigatorio
+        description: "Quantidade de apresentações sujeitas à aplicação obrigatória do CAP."
+        tests:
+          - not_null
+      - name: proporcao_apresentacoes_cap_pct
+        description: "Percentual de apresentações CMED enquadradas no Coeficiente de Adequação de Preços CAP (%)."
+        tests:
+          - not_null
+      - name: coeficiente_cap_vigente_pct
+        description: "Percentual vigente do Coeficiente de Adequação de Preços (CAP) fixado pela CMED (%)."
+        tests:
+          - not_null
+      - name: preco_fabrica_medio_ponderado_brl
+        description: "Preço Fábrica (PF) médio ponderado das apresentações em reais (BRL)."
+        tests:
+          - not_null
+      - name: pmc_medio_ponderado_aliquota_uf_brl
+        description: "Preço Máximo ao Consumidor (PMC) médio ponderado pela alíquota estadual de ICMS em reais (BRL)."
+        tests:
+          - not_null
+      - name: pmvg_medio_ponderado_brl
+        description: "Preço Máximo de Venda ao Governo (PMVG) médio ponderado em reais (BRL)."
+        tests:
+          - not_null
+      - name: economia_potencial_pmvg_sobre_pmc_pct
+        description: "Redução percentual máxima alcançável do PMVG frente ao teto PMC de varejo (%)."
+        tests:
+          - not_null
+      - name: conformidade_teto_pmvg_compras_sus_pct
+        description: "Percentual de conformidade das aquisições públicas locais abaixo do teto PMVG/CMED (%)."
+        tests:
+          - not_null
+      - name: reference_date
+        description: "Data de referência ISO-8601 da apuração CMED."
+        tests:
+          - not_null
+      - name: extracted_at
+        description: "Timestamp UTC ISO-8601 da extração."
+        tests:
+          - not_null
+
+  - name: stg_cmed_regime_tributario_icms_piscofins
+    description: "Visão padronizada do regime tributário estadual CMED: alíquota de ICMS, listas PIS/COFINS, comercialização ativa e spread PMC/PF."
+    columns:
+      - name: id_municipio
+        description: "Código IBGE de 7 dígitos identificador do município."
+        tests:
+          - not_null
+          - unique
+      - name: nome_municipio
+        description: "Nome oficial do município."
+        tests:
+          - not_null
+      - name: sigla_uf
+        description: "Sigla de 2 letras da Unidade Federativa."
+        tests:
+          - not_null
+      - name: id_uf
+        description: "Código IBGE de 2 dígitos da Unidade Federativa."
+        tests:
+          - not_null
+      - name: ano_mes_competencia
+        description: "Competência mensal da tabela CMED no formato AAAAMM."
+        tests:
+          - not_null
+      - name: cnpj_14
+        description: "CNPJ de 14 dígitos do laboratório ou polo farmacêutico de referência."
+        tests:
+          - not_null
+      - name: aliquota_icms_modal_uf_pct
+        description: "Alíquota modal de ICMS estadual incidente sobre medicamentos na UF (%)."
+        tests:
+          - not_null
+      - name: apresentacoes_lista_positiva_piscofins
+        description: "Quantidade de apresentações enquadradas na Lista Positiva PIS/COFINS."
+        tests:
+          - not_null
+      - name: apresentacoes_lista_negativa_piscofins
+        description: "Quantidade de apresentações sujeitas ao regime monofásico da Lista Negativa PIS/COFINS."
+        tests:
+          - not_null
+      - name: apresentacoes_lista_neutra_piscofins
+        description: "Quantidade de apresentações tributadas em Lista Neutra de PIS/COFINS."
+        tests:
+          - not_null
+      - name: participacao_lista_positiva_piscofins_pct
+        description: "Participação percentual da Lista Positiva PIS/COFINS no portfólio regulado (%)."
+        tests:
+          - not_null
+      - name: apresentacoes_comercializacao_2024_ativa_pct
+        description: "Percentual de apresentações CMED com comercialização efetiva reportada em 2024 (%)."
+        tests:
+          - not_null
+      - name: spread_medio_pmc_sobre_pf_pct
+        description: "Margem percentual média entre o Preço Máximo ao Consumidor (PMC) e o PF (%)."
+        tests:
+          - not_null
+      - name: reference_date
+        description: "Data de referência ISO-8601 da apuração CMED."
+        tests:
+          - not_null
+      - name: extracted_at
+        description: "Timestamp UTC ISO-8601 da extração."
+        tests:
+          - not_null
