@@ -50,6 +50,7 @@ model-paths:
   - "../src/public_data_gateway/connectors/ambiental/ana_hidroweb_telemetria/dbt"
   - "../src/public_data_gateway/connectors/ambiental/inpe_terrabrasilis/dbt"
   - "../src/public_data_gateway/connectors/ambiental/mapbiomas_cobertura/dbt"
+  - "../src/public_data_gateway/connectors/ambiental/mapa_zarc/dbt"
   - "../src/public_data_gateway/connectors/ambiental/sfb_sicar/dbt"
   - "models"
 

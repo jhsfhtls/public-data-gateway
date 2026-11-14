@@ -1469,6 +1469,7 @@ class EnvironmentFacade:
         self._hidroweb_connector: Any = None
         self._mapbiomas_connector: Any = None
         self._sfb_sicar_connector: Any = None
+        self._mapa_zarc_connector: Any = None
 
     @property
     def terrabrasilis_connector(self) -> Any:
@@ -1663,6 +1664,53 @@ class EnvironmentFacade:
     ) -> list[dict[str, Any]]:
         """List top Brazilian municipalities ranked by composite SFB/SICAR compliance score."""
         return self.sfb_sicar_connector.list_top_sicar_municipalities(
+            limit=limit, sigla_uf=sigla_uf
+        )
+
+    @property
+    def mapa_zarc_connector(self) -> Any:
+        if self._mapa_zarc_connector is None:
+            from public_data_gateway.connectors.ambiental.mapa_zarc.connector import (
+                MapaZarcConnector,
+            )
+
+            self._mapa_zarc_connector = MapaZarcConnector(
+                settings=self._sdk.settings
+            )
+        return self._mapa_zarc_connector
+
+    def get_zarc_climate_aptitude(self, id_municipio: str) -> dict[str, Any]:
+        """Get municipal MAPA ZARC agro-climatic aptitude and suitable planting decendios."""
+        return self.mapa_zarc_connector.get_zarc_climate_aptitude(id_municipio)
+
+    def list_zarc_planting_windows(
+        self,
+        id_municipio: str,
+        cultura_zarc: str | None = None,
+    ) -> list[dict[str, Any]]:
+        """List municipal MAPA ZARC decendial planting windows by crop and AD soil group."""
+        return self.mapa_zarc_connector.list_zarc_planting_windows(
+            id_municipio,
+            cultura_zarc=cultura_zarc,
+        )
+
+    def get_zarc_proagro_coverage(self, id_municipio: str) -> dict[str, Any]:
+        """Get municipal MAPA ZARC PROAGRO and Rural Insurance (PSR) coverage metrics."""
+        return self.mapa_zarc_connector.get_zarc_proagro_coverage(id_municipio)
+
+    def get_zarc_soil_risk(self, id_municipio: str) -> dict[str, Any]:
+        """Get municipal MAPA ZARC soil water retention (AD1-AD6) and no-till resilience."""
+        return self.mapa_zarc_connector.get_zarc_soil_risk(id_municipio)
+
+    def get_zarc_features(self, id_municipio: str) -> dict[str, Any]:
+        """Get normalized Gold MAPA ZARC agro-climatic risk score and 4-tier classification."""
+        return self.mapa_zarc_connector.get_zarc_features(id_municipio)
+
+    def list_top_zarc_municipalities(
+        self, limit: int = 10, sigla_uf: str | None = None
+    ) -> list[dict[str, Any]]:
+        """List top Brazilian municipalities ranked by composite MAPA ZARC aptitude score."""
+        return self.mapa_zarc_connector.list_top_zarc_municipalities(
             limit=limit, sigla_uf=sigla_uf
         )
 
@@ -2657,6 +2705,41 @@ class BrazilData:
     ) -> list[dict[str, Any]]:
         """Listar municípios líderes em conformidade ambiental rural CAR/SICAR (SFB)."""
         return self.environment.list_top_sicar_municipalities(
+            limit=limit, sigla_uf=sigla_uf
+        )
+
+    def get_zarc_climate_aptitude(self, id_municipio: str) -> dict[str, Any]:
+        """Consultar aptidão climática e decêndios aptos no ZARC (MAPA/Embrapa)."""
+        return self.environment.get_zarc_climate_aptitude(id_municipio)
+
+    def list_zarc_planting_windows(
+        self,
+        id_municipio: str,
+        cultura_zarc: str | None = None,
+    ) -> list[dict[str, Any]]:
+        """Listar janelas decendiais de plantio ZARC por cultura e solo AD (MAPA)."""
+        return self.environment.list_zarc_planting_windows(
+            id_municipio,
+            cultura_zarc=cultura_zarc,
+        )
+
+    def get_zarc_proagro_coverage(self, id_municipio: str) -> dict[str, Any]:
+        """Consultar cobertura PROAGRO, Seguro Rural (PSR) e sinistralidade (MAPA ZARC)."""
+        return self.environment.get_zarc_proagro_coverage(id_municipio)
+
+    def get_zarc_soil_risk(self, id_municipio: str) -> dict[str, Any]:
+        """Consultar retenção hídrica do solo (AD1-AD6) e plantio direto (MAPA ZARC)."""
+        return self.environment.get_zarc_soil_risk(id_municipio)
+
+    def get_zarc_features(self, id_municipio: str) -> dict[str, Any]:
+        """Consultar features Gold de risco agroclimático ZARC/PROAGRO (MAPA)."""
+        return self.environment.get_zarc_features(id_municipio)
+
+    def list_top_zarc_municipalities(
+        self, limit: int = 10, sigla_uf: str | None = None
+    ) -> list[dict[str, Any]]:
+        """Listar municípios líderes em aptidão agroclimática ZARC (MAPA)."""
+        return self.environment.list_top_zarc_municipalities(
             limit=limit, sigla_uf=sigla_uf
         )
 

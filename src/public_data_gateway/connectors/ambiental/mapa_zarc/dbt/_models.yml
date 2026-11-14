@@ -1,0 +1,168 @@
+version: 2
+
+models:
+  - name: stg_mapa_zarc_aptidao_climatica
+    description: "Staging view de aptidão climática e decêndios aptos no ZARC/MAPA por município."
+    columns:
+      - name: id_municipio
+        description: "Código IBGE de 7 dígitos do município (STRING)."
+        tests: [not_null, unique]
+      - name: nome_municipio
+        description: "Nome oficial do município."
+        tests: [not_null]
+      - name: sigla_uf
+        description: "Sigla da Unidade da Federação (UF)."
+        tests: [not_null]
+      - name: id_uf
+        description: "Código IBGE da UF (STRING)."
+        tests: [not_null]
+      - name: regiao
+        description: "Macrorregião geográfica brasileira."
+        tests: [not_null]
+      - name: bioma_predominante
+        description: "Bioma predominante no território municipal."
+        tests: [not_null]
+      - name: ano_safra
+        description: "Safra agrícola de referência do zoneamento ZARC."
+        tests: [not_null]
+      - name: qtd_culturas_zoneadas
+        description: "Quantidade de culturas agrícolas zoneadas no município."
+        tests: [not_null]
+      - name: decendios_aptos_media
+        description: "Média de decêndios aptos para plantio na janela principal."
+        tests: [not_null]
+      - name: indice_seguranca_hidrica_safra
+        description: "Índice de segurança hídrica da safra no ZARC (0-100)."
+        tests: [not_null]
+      - name: risco_geada_granizo_pct
+        description: "Probabilidade histórica de ocorrência de geada ou granizo (%)."
+        tests: [not_null]
+      - name: indice_aptidao_climatica_zarc
+        description: "Subíndice sintético de aptidão climática ZARC (0-100)."
+        tests: [not_null]
+      - name: reference_date
+        description: "Data de referência ISO-8601 (YYYY-MM-DD)."
+        tests: [not_null]
+
+  - name: stg_mapa_zarc_janelas_plantio
+    description: "Staging view de janelas decendiais de plantio por cultura e grupo de solo AD."
+    columns:
+      - name: id_municipio
+        description: "Código IBGE de 7 dígitos do município (STRING)."
+        tests: [not_null]
+      - name: nome_municipio
+        description: "Nome oficial do município."
+        tests: [not_null]
+      - name: sigla_uf
+        description: "Sigla da Unidade da Federação (UF)."
+        tests: [not_null]
+      - name: id_uf
+        description: "Código IBGE da UF (STRING)."
+        tests: [not_null]
+      - name: regiao
+        description: "Macrorregião geográfica brasileira."
+        tests: [not_null]
+      - name: bioma_predominante
+        description: "Bioma predominante no território municipal."
+        tests: [not_null]
+      - name: cultura_zarc
+        description: "Cultura agrícola zoneada no ZARC (Soja_Grao, Milho_1a_Safra, Milho_2a_Safra, Feijao_Caupi)."
+        tests: [not_null]
+      - name: grupo_solo_ad
+        description: "Classe de Água Disponível no Solo (AD1-AD6)."
+        tests: [not_null]
+      - name: risco_climatico_nivel_pct
+        description: "Nível de risco climático de enquadramento ZARC (20%, 30% ou 40%)."
+        tests: [not_null]
+      - name: decendios_aptos_plantio
+        description: "Quantidade de decêndios aptos para semeadura da cultura."
+        tests: [not_null]
+      - name: janela_plantio_inicio_mes
+        description: "Mês de abertura da janela recomendada de plantio (1-12)."
+        tests: [not_null]
+      - name: janela_plantio_fim_mes
+        description: "Mês de encerramento da janela recomendada de plantio (1-12)."
+        tests: [not_null]
+      - name: elegivel_proagro_psr_pct
+        description: "Percentual de operações elegíveis ao PROAGRO/PSR nesta cultura (%)."
+        tests: [not_null]
+      - name: reference_date
+        description: "Data de referência ISO-8601 (YYYY-MM-DD)."
+        tests: [not_null]
+
+  - name: stg_mapa_zarc_proagro_seguro
+    description: "Staging view de cobertura PROAGRO, Seguro Rural (PSR) e sinistralidade climática."
+    columns:
+      - name: id_municipio
+        description: "Código IBGE de 7 dígitos do município (STRING)."
+        tests: [not_null, unique]
+      - name: nome_municipio
+        description: "Nome oficial do município."
+        tests: [not_null]
+      - name: sigla_uf
+        description: "Sigla da Unidade da Federação (UF)."
+        tests: [not_null]
+      - name: id_uf
+        description: "Código IBGE da UF (STRING)."
+        tests: [not_null]
+      - name: regiao
+        description: "Macrorregião geográfica brasileira."
+        tests: [not_null]
+      - name: bioma_predominante
+        description: "Bioma predominante no território municipal."
+        tests: [not_null]
+      - name: qtd_operacoes_proagro_safra
+        description: "Quantidade de operações de custeio enquadradas no PROAGRO na safra."
+        tests: [not_null]
+      - name: cobertura_seguro_rural_psr_pct
+        description: "Cobertura de seguro rural subvencionado pelo PSR (%)."
+        tests: [not_null]
+      - name: adesao_zarc_credito_custeio_pct
+        description: "Percentual de contratos de crédito rural aderentes ao calendário ZARC (%)."
+        tests: [not_null]
+      - name: taxa_sinistralidade_climatica_pct
+        description: "Taxa histórica de sinistralidade climática em custeio agrícola (%)."
+        tests: [not_null]
+      - name: indice_protecao_proagro_psr
+        description: "Subíndice sintético de proteção PROAGRO e Seguro Rural (0-100)."
+        tests: [not_null]
+      - name: reference_date
+        description: "Data de referência ISO-8601 (YYYY-MM-DD)."
+        tests: [not_null]
+
+  - name: stg_mapa_zarc_risco_solo
+    description: "Staging view de retenção hídrica do solo (AD), plantio direto e estabilidade pluviométrica."
+    columns:
+      - name: id_municipio
+        description: "Código IBGE de 7 dígitos do município (STRING)."
+        tests: [not_null, unique]
+      - name: nome_municipio
+        description: "Nome oficial do município."
+        tests: [not_null]
+      - name: sigla_uf
+        description: "Sigla da Unidade da Federação (UF)."
+        tests: [not_null]
+      - name: id_uf
+        description: "Código IBGE da UF (STRING)."
+        tests: [not_null]
+      - name: regiao
+        description: "Macrorregião geográfica brasileira."
+        tests: [not_null]
+      - name: bioma_predominante
+        description: "Bioma predominante no território municipal."
+        tests: [not_null]
+      - name: capacidade_retencao_agua_solo_pct
+        description: "Capacidade média de retenção de água disponível no solo (%)."
+        tests: [not_null]
+      - name: adocao_plantio_direto_zarc_pct
+        description: "Taxa de adoção do Sistema Plantio Direto (ZARC-PD) (%)."
+        tests: [not_null]
+      - name: estabilidade_pluviometrica_safra_pct
+        description: "Estabilidade pluviométrica observada na janela da safra (%)."
+        tests: [not_null]
+      - name: indice_resiliencia_solo_ad
+        description: "Subíndice sintético de resiliência hídrica do solo AD (0-100)."
+        tests: [not_null]
+      - name: reference_date
+        description: "Data de referência ISO-8601 (YYYY-MM-DD)."
+        tests: [not_null]

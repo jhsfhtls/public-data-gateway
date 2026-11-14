@@ -1,0 +1,253 @@
+apiVersion: v3.1.0
+kind: DataContract
+id: ODCS-BR-MAPA-ZARC-001
+name: MAPA Zoneamento Agrícola de Risco Climático (ZARC)
+version: 1.0.0
+status: active
+domain: ambiental
+owner: public-data-gateway
+description: >
+  Contrato oficial ODCS v3.1 para consolidação de dados municipais do Zoneamento
+  Agrícola de Risco Climático (ZARC / MAPA / Embrapa): aptidão climática por
+  safra, janelas decendiais de plantio por cultura, cobertura PROAGRO/PSR para
+  crédito rural, capacidade de retenção de água disponível no solo (AD1–AD6) e
+  features Gold de risco agroclimático.
+source:
+  source_id: mapa_zarc
+  agency: Ministério da Agricultura e Pecuária (MAPA) / Embrapa
+  official_url: https://indicadores.agricultura.gov.br/zarc/
+  datasets_url: https://dados.agricultura.gov.br/
+  protocol: REST_JSON
+  auth_type: NONE
+  lgpd_tier: PUBLIC_NON_PERSONAL
+  update_frequency: Safra / Anual
+  legal_basis:
+    - Decreto nº 9.841/2019 (Zoneamento Agrícola de Risco Climático - ZARC)
+    - Resolução CMN/BACEN (Elegibilidade PROAGRO e Crédito Rural de Custeio)
+    - Lei nº 10.823/2003 (Programa de Subvenção ao Prêmio do Seguro Rural - PSR)
+sla:
+  freshness: "2025-03-31"
+  completeness_threshold_pct: 100.0
+  key_integrity: STRING_7_DIGITS_IBGE
+tables:
+  - name: zarc_aptidao_climatica_municipio
+    description: Indicadores municipais de aptidão climática e decêndios aptos no ZARC.
+    primary_key: [id_municipio]
+    columns:
+      - name: id_municipio
+        type: string
+        nullable: false
+      - name: nome_municipio
+        type: string
+        nullable: false
+      - name: sigla_uf
+        type: string
+        nullable: false
+      - name: id_uf
+        type: string
+        nullable: false
+      - name: regiao
+        type: string
+        nullable: false
+      - name: bioma_predominante
+        type: string
+        nullable: false
+      - name: ano_safra
+        type: string
+        nullable: false
+      - name: qtd_culturas_zoneadas
+        type: integer
+        nullable: false
+      - name: decendios_aptos_media
+        type: integer
+        nullable: false
+      - name: indice_seguranca_hidrica_safra
+        type: double
+        nullable: false
+      - name: risco_geada_granizo_pct
+        type: double
+        nullable: false
+      - name: indice_aptidao_climatica_zarc
+        type: double
+        nullable: false
+      - name: reference_date
+        type: string
+        nullable: false
+  - name: zarc_janelas_plantio_cultura
+    description: Janelas decendiais de plantio por cultura e grupo de solo no ZARC.
+    primary_key: [id_municipio, cultura_zarc]
+    columns:
+      - name: id_municipio
+        type: string
+        nullable: false
+      - name: nome_municipio
+        type: string
+        nullable: false
+      - name: sigla_uf
+        type: string
+        nullable: false
+      - name: id_uf
+        type: string
+        nullable: false
+      - name: regiao
+        type: string
+        nullable: false
+      - name: bioma_predominante
+        type: string
+        nullable: false
+      - name: cultura_zarc
+        type: string
+        nullable: false
+      - name: grupo_solo_ad
+        type: string
+        nullable: false
+      - name: risco_climatico_nivel_pct
+        type: integer
+        nullable: false
+      - name: decendios_aptos_plantio
+        type: integer
+        nullable: false
+      - name: janela_plantio_inicio_mes
+        type: integer
+        nullable: false
+      - name: janela_plantio_fim_mes
+        type: integer
+        nullable: false
+      - name: elegivel_proagro_psr_pct
+        type: double
+        nullable: false
+      - name: reference_date
+        type: string
+        nullable: false
+  - name: zarc_proagro_seguro_rural_municipio
+    description: Cobertura PROAGRO, Seguro Rural (PSR), adesão ao crédito e sinistralidade climática.
+    primary_key: [id_municipio]
+    columns:
+      - name: id_municipio
+        type: string
+        nullable: false
+      - name: nome_municipio
+        type: string
+        nullable: false
+      - name: sigla_uf
+        type: string
+        nullable: false
+      - name: id_uf
+        type: string
+        nullable: false
+      - name: regiao
+        type: string
+        nullable: false
+      - name: bioma_predominante
+        type: string
+        nullable: false
+      - name: qtd_operacoes_proagro_safra
+        type: integer
+        nullable: false
+      - name: cobertura_seguro_rural_psr_pct
+        type: double
+        nullable: false
+      - name: adesao_zarc_credito_custeio_pct
+        type: double
+        nullable: false
+      - name: taxa_sinistralidade_climatica_pct
+        type: double
+        nullable: false
+      - name: indice_protecao_proagro_psr
+        type: double
+        nullable: false
+      - name: reference_date
+        type: string
+        nullable: false
+  - name: zarc_risco_solo_ad_biomassa
+    description: Retenção hídrica de solo (classes AD1–AD6), plantio direto e estabilidade pluviométrica.
+    primary_key: [id_municipio]
+    columns:
+      - name: id_municipio
+        type: string
+        nullable: false
+      - name: nome_municipio
+        type: string
+        nullable: false
+      - name: sigla_uf
+        type: string
+        nullable: false
+      - name: id_uf
+        type: string
+        nullable: false
+      - name: regiao
+        type: string
+        nullable: false
+      - name: bioma_predominante
+        type: string
+        nullable: false
+      - name: capacidade_retencao_agua_solo_pct
+        type: double
+        nullable: false
+      - name: adocao_plantio_direto_zarc_pct
+        type: double
+        nullable: false
+      - name: estabilidade_pluviometrica_safra_pct
+        type: double
+        nullable: false
+      - name: indice_resiliencia_solo_ad
+        type: double
+        nullable: false
+      - name: reference_date
+        type: string
+        nullable: false
+  - name: features_mapa_zarc_agroclimatico
+    description: Feature store Gold de aptidão e risco agroclimático ZARC/MAPA com 4 tiers.
+    primary_key: [id_municipio]
+    columns:
+      - name: id_municipio
+        type: string
+        nullable: false
+      - name: nome_municipio
+        type: string
+        nullable: false
+      - name: sigla_uf
+        type: string
+        nullable: false
+      - name: id_uf
+        type: string
+        nullable: false
+      - name: regiao
+        type: string
+        nullable: false
+      - name: bioma_predominante
+        type: string
+        nullable: false
+      - name: ano_safra
+        type: string
+        nullable: false
+      - name: qtd_culturas_zoneadas
+        type: integer
+        nullable: false
+      - name: decendios_aptos_media
+        type: integer
+        nullable: false
+      - name: adesao_zarc_credito_custeio_pct
+        type: double
+        nullable: false
+      - name: taxa_sinistralidade_climatica_pct
+        type: double
+        nullable: false
+      - name: indice_aptidao_climatica_zarc
+        type: double
+        nullable: false
+      - name: indice_protecao_proagro_psr
+        type: double
+        nullable: false
+      - name: indice_resiliencia_solo_ad
+        type: double
+        nullable: false
+      - name: score_aptidao_zarc
+        type: double
+        nullable: false
+      - name: tier_risco_zarc
+        type: string
+        nullable: false
+      - name: reference_date
+        type: string
+        nullable: false

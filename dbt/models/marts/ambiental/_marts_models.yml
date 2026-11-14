@@ -247,3 +247,58 @@ models:
       - name: reference_date
         description: "Data de referência ISO-8601 (YYYY-MM-DD)."
         tests: [not_null]
+
+  - name: mart_aptidao_agroclimatica_zarc_brasil
+    description: "Data Mart Gold de aptidão agroclimática, risco de safra e elegibilidade PROAGRO/PSR no ZARC/MAPA por município."
+    columns:
+      - name: id_municipio
+        description: "Código IBGE de 7 dígitos do município (STRING)."
+        tests: [not_null, unique]
+      - name: nome_municipio
+        description: "Nome oficial do município."
+        tests: [not_null]
+      - name: sigla_uf
+        description: "Sigla da Unidade da Federação (UF)."
+        tests: [not_null]
+      - name: id_uf
+        description: "Código IBGE da UF (STRING)."
+        tests: [not_null]
+      - name: regiao
+        description: "Macrorregião geográfica brasileira."
+        tests: [not_null]
+      - name: bioma_predominante
+        description: "Bioma predominante no território municipal."
+        tests: [not_null]
+      - name: ano_safra
+        description: "Safra agrícola de referência do zoneamento ZARC."
+        tests: [not_null]
+      - name: qtd_culturas_zoneadas
+        description: "Quantidade de culturas agrícolas zoneadas no município."
+        tests: [not_null]
+      - name: decendios_aptos_media
+        description: "Média de decêndios aptos para plantio na janela principal."
+        tests: [not_null]
+      - name: adesao_zarc_credito_custeio_pct
+        description: "Percentual de contratos de crédito rural aderentes ao calendário ZARC (%)."
+        tests: [not_null]
+      - name: taxa_sinistralidade_climatica_pct
+        description: "Taxa histórica de sinistralidade climática em custeio agrícola (%)."
+        tests: [not_null]
+      - name: indice_aptidao_climatica_zarc
+        description: "Subíndice sintético de aptidão climática ZARC (0-100)."
+        tests: [not_null]
+      - name: indice_protecao_proagro_psr
+        description: "Subíndice sintético de proteção PROAGRO e Seguro Rural (0-100)."
+        tests: [not_null]
+      - name: indice_resiliencia_solo_ad
+        description: "Subíndice sintético de resiliência hídrica do solo AD (0-100)."
+        tests: [not_null]
+      - name: score_aptidao_zarc
+        description: "Score composto de aptidão agroclimática e proteção ZARC (0-100)."
+        tests: [not_null]
+      - name: tier_risco_zarc
+        description: "Classificação municipal em 4 tiers de risco agroclimático ZARC."
+        tests: [not_null]
+      - name: reference_date
+        description: "Data de referência ISO-8601 (YYYY-MM-DD)."
+        tests: [not_null]
