@@ -1,6 +1,6 @@
 {
   "schema_version": "1.0.0",
-  "last_updated": "2026-11-14T14:34:00.000000",
+  "last_updated": "2026-11-14T16:56:00.000000",
   "project_name": "public-data-gateway",
   "architecture": "Hexagonal Medallion Lakehouse (Bronze -> Silver -> Gold / Feature Store)",
   "governance_standards": [
@@ -11,8 +11,8 @@
     "ASOF Point-in-Time Joins",
     "LGPD Privacy Masking"
   ],
-  "current_macro_phase_id": "09.5",
-  "current_macro_phase": "Fase 09.5 - Marts Comerciais & Relatórios de Ciclo de Vida (S01..S09 x Solution Packs P01..P10) + Integração Multi-Interface Concluída!",
+  "current_macro_phase_id": "10",
+  "current_macro_phase": "Fase 10 - Centralização de APIs Públicas (Analytics, KYC/KYB, Espacial & ML) + Catálogo Bipartido Concluída!",
   "overall_status": "ON_TRACK",
   "active_connector": null,
   "next_connector": null,
@@ -187,8 +187,8 @@
     {
       "phase_id": "10",
       "name": "Expansão de Fronteira: Centralização de APIs Públicas para Analytics, KYC/KYB, Inteligência Regulatória & ML",
-      "status": "PENDING",
-      "completion_date": null,
+      "status": "COMPLETED",
+      "completion_date": "2026-11-14",
       "deliverables": [
         "Auditoria e varredura do Conecta GOV.BR (https://www.gov.br/conecta/catalogo/) e do catálogo public-apis para mapear, selecionar e homologar novas APIs públicas úteis para Analytics, Engenharia de Dados e Machine Learning",
         "Bloco 1 — Enriquecimento Cadastral, Geolocalização, KYC/KYB & Antifraude (validado que BrasilAPI, cgu_ceis_cnep e cgu_pep já estão homologados): integração de Minha Receita e CNPJa Open API (fallback em cascata/load balancing para QSA/Simples), RDAP Registro.br, GLEIF API (holdings globais), IP-API / BGPView (ASN/proxy), ViaCEP, OpenCEP, Nominatim (OSM), Mapbox, Google Maps, CompanyEnrich, Apollo, BigDataCorp e ReceitaWS",
@@ -615,6 +615,12 @@
       "phase_id": "09.5",
       "milestone": "Conclusão da Fase 09.5 — Marts Comerciais & Relatórios de Ciclo de Vida (S01..S09 x P01..P10)",
       "summary": "Implementação dos 9 Gold Marts de Ciclo de Vida Comercial e Entrega em dbt/models/marts/gtm_lifecycle/ (mart_lifecycle_s01_gtm_icp_ranking até mart_lifecycle_s09_cs_upsell_matrix), 100% documentados em _marts_gtm_lifecycle_models.yml; serviço LifecycleReportsService com gerador de Dossiê Executivo; exposição completa via SDK (BrazilData.lifecycle), REST API (/api/v1/lifecycle/*), CLI (bdg lifecycle) e MCP (bdg_get_lifecycle_stage_report, bdg_generate_solution_dossier)."
+    },
+    {
+      "date": "2026-11-14",
+      "phase_id": "10",
+      "milestone": "Conclusão da Fase 10 — Centralização de APIs Públicas (Analytics, KYC/KYB, Espacial & ML) & Catálogo Bipartido",
+      "summary": "Implementação completa da Fase 10: catálogo bipartido (CATALOG.md para 49 fontes Gov BR + catalog/public_apis_registry.yaml & CATALOG_PUBLIC_APIS.md com 29 APIs curadas e auditadas via Conecta GOV.BR e public-apis); hub resiliente PublicApisHubService (src/public_data_gateway/connectors/public_apis_hub/) com fallback em cascata para CNPJ (Minha Receita -> CNPJa -> BrasilAPI -> ReceitaWS) e CEP (ViaCEP -> OpenCEP -> BrasilAPI), Nominatim, RDAP Registro.br, GLEIF LEI, BGPView IP, brapi, AwesomeAPI, IPEA OData v4, ANEEL/ANP CKAN, Câmara, World Bank, WHO GHO, Overpass POIs, OSRM, Open-Meteo, NASA POWER, Open-Elevation, Hugging Face, Alpha Vantage, NASA APOD, Upgini, REST Countries, OpenAlex e GDELT; Gold mart mart_public_apis_ml_readiness; exposição multi-interface via SDK (BrazilData.public_apis), FastAPI (/api/v1/public-apis/*), CLI (bdg public-apis) e MCP (bdg_list_public_apis_catalog, bdg_enrich_cnpj_cascade, bdg_count_osm_pois_radius)."
     }
   ]
 }

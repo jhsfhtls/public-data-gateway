@@ -335,3 +335,46 @@ models:
       - name: reference_period
         description: "Competência macroeconômica de referência dos insights (YYYY-MM)."
         tests: [not_null]
+
+  - name: mart_public_apis_ml_readiness
+    description: "Matriz Gold da Fase 10 consolidando a prontidão dos 4 blocos de APIs Públicas & Globais (KYC/Geo, Mercado/Regulatório, Espacial/Clima/ML e Global/Pesquisa) por UF."
+    columns:
+      - name: block_id
+        description: "Identificador do bloco funcional do Hub de APIs Públicas (BLOCO_1..BLOCO_4)."
+        tests: [not_null]
+      - name: block_name
+        description: "Nome descritivo do bloco funcional da Fase 10."
+        tests: [not_null]
+      - name: total_curated_apis
+        description: "Quantidade total de APIs curadas no catálogo bipartido para o bloco."
+        tests: [not_null]
+      - name: homologated_apis
+        description: "Quantidade de APIs já homologadas no PublicApisHubService."
+        tests: [not_null]
+      - name: pct_homologated
+        description: "Percentual de homologação operacional do bloco (%)."
+        tests: [not_null]
+      - name: target_packs
+        description: "Solution Packs Modulares (P01..P10) diretamente atendidos pelo bloco."
+        tests: [not_null]
+      - name: finops_profile
+        description: "Perfil de custo FinOps predominante do bloco (camadas gratuitas vs. chaves opcionais)."
+        tests: [not_null]
+      - name: sigla_uf
+        description: "Sigla da Unidade da Federação (UF)."
+        tests: [not_null]
+      - name: regiao
+        description: "Macrorregião geográfica brasileira."
+        tests: [not_null]
+      - name: avg_propensao_b2b_uf
+        description: "Média estadual do score composto de propensão B2B (0-100)."
+        tests: [not_null]
+      - name: avg_risco_compliance_uf
+        description: "Média estadual do score de risco de compliance fiscal (0-100)."
+        tests: [not_null]
+      - name: avg_conectividade_5g_uf
+        description: "Média estadual do score de conectividade 5G e infraestrutura digital (0-100)."
+        tests: [not_null]
+      - name: score_prontidao_ml_uf
+        description: "Score de prontidão e aderência para feature engineering ML do bloco na UF (0-100)."
+        tests: [not_null]
