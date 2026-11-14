@@ -1034,7 +1034,7 @@ sources:
   - P02
   rice_score: 440
   roadmap_wave: 5
-  status: CATALOGED
+  status: HOMOLOGATED
 - source_id: capitais_iptu_itbi
   name: 'Capitais: Cadastros Imobiliários Municipais (IPTU / ITBI)'
   agency: Prefeituras Municipais das Capitais

@@ -931,6 +931,36 @@ def build_parser() -> argparse.ArgumentParser:
     ideb_rk_p.add_argument("--uf", type=str, help="Optional 2-letter state filter")
     ideb_rk_p.add_argument("--json", action="store_true", help="Output in JSON format")
 
+    # INEP ENEM (Microdados do Exame Nacional do Ensino Médio) command group
+    enem_p = subparsers.add_parser("enem", help="Query INEP ENEM area scores, school networks, essay competencies, equity QSE, and rankings.")
+    enem_sub = enem_p.add_subparsers(dest="enem_action", required=True)
+
+    enem_sc_p = enem_sub.add_parser("scores", help="Get municipal INEP ENEM mean TRI scores across all four objective areas.")
+    enem_sc_p.add_argument("id_municipio", help="7-digit IBGE municipality code, 6-digit prefix, 8-digit CEP, or municipality name")
+    enem_sc_p.add_argument("--json", action="store_true", help="Output in JSON format")
+
+    enem_nw_p = enem_sub.add_parser("networks", help="List municipal INEP ENEM scores disaggregated by school network dependency.")
+    enem_nw_p.add_argument("id_municipio", help="7-digit IBGE municipality code, 6-digit prefix, 8-digit CEP, or municipality name")
+    enem_nw_p.add_argument("--rede", type=str, help="Optional school network filter (e.g. Privada)")
+    enem_nw_p.add_argument("--json", action="store_true", help="Output in JSON format")
+
+    enem_es_p = enem_sub.add_parser("essay", help="Get municipal INEP ENEM Essay score, Competencies I/III/V, and 900+ excellence share.")
+    enem_es_p.add_argument("id_municipio", help="7-digit IBGE municipality code, 6-digit prefix, 8-digit CEP, or municipality name")
+    enem_es_p.add_argument("--json", action="store_true", help="Output in JSON format")
+
+    enem_eq_p = enem_sub.add_parser("equity", help="Get municipal INEP ENEM QSE socioeconomic equity, Q025 internet, and SiSU/ProUni eligibility.")
+    enem_eq_p.add_argument("id_municipio", help="7-digit IBGE municipality code, 6-digit prefix, 8-digit CEP, or municipality name")
+    enem_eq_p.add_argument("--json", action="store_true", help="Output in JSON format")
+
+    enem_ft_p = enem_sub.add_parser("features", help="Get Gold INEP ENEM cognitive performance and higher-education equity features.")
+    enem_ft_p.add_argument("id_municipio", help="7-digit IBGE municipality code, 6-digit prefix, 8-digit CEP, or municipality name")
+    enem_ft_p.add_argument("--json", action="store_true", help="Output in JSON format")
+
+    enem_rk_p = enem_sub.add_parser("ranking", help="List top Brazilian municipalities ranked by composite INEP ENEM score.")
+    enem_rk_p.add_argument("--limit", type=int, default=10, help="Max municipalities to list")
+    enem_rk_p.add_argument("--uf", type=str, help="Optional 2-letter state filter")
+    enem_rk_p.add_argument("--json", action="store_true", help="Output in JSON format")
+
     # ONR Registro de Imóveis (SREI/SERP/CNM) command group
     onr_p = subparsers.add_parser("onr", help="Query ONR SREI real estate registries, transactions, credit guarantees, SERP, and rankings.")
     onr_sub = onr_p.add_subparsers(dest="onr_action", required=True)
@@ -3226,6 +3256,83 @@ def main(argv: Sequence[str] | None = None) -> int:
                     for idx, r in enumerate(ranks, 1):
                         print(f"  {idx}. {r.get('nome_municipio')} ({r.get('sigla_uf')}): IDEB Score {r.get('score_desempenho_ideb_municipal')} | SAEB/INSE: {r.get('score_proficiencia_equidade_saeb')} | {r.get('classificacao_qualidade_ideb_municipio')}")
                 return 0
+
+        elif args.command == "enem":
+            from public_data_gateway.connectors.educacao.inep_enem.connector import (
+                INEPEnemConnector,
+            )
+
+            enem_conn = INEPEnemConnector(settings=settings)
+            enem_action = getattr(args, "enem_action", None)
+            try:
+                if enem_action == "scores":
+                    res = enem_conn.get_enem_municipal_area_scores(args.id_municipio)
+                    if getattr(args, "json", False):
+                        print(json.dumps(res, indent=2, ensure_ascii=False, default=str))
+                    else:
+                        print(f"INEP ENEM Notas TRI ({res.get('nome_municipio')} - {res.get('id_municipio')}):")
+                        print(f"  LC / CH:           {res.get('nota_media_linguagens_codigos_lc')} / {res.get('nota_media_ciencias_humanas_ch')}")
+                        print(f"  CN / MT / Geral:   {res.get('nota_media_ciencias_natureza_cn')} / {res.get('nota_media_matematica_mt')} / {res.get('nota_media_objetivas_tri_geral')}")
+                        print(f"  Presentes 2 dias:  {res.get('participantes_presentes_2dias_ano'):,}/{res.get('inscritos_confirmados_enem_ano'):,} ({res.get('taxa_presenca_efetiva_2dias_pct')}%)")
+                    return 0
+
+                if enem_action == "networks":
+                    rows = enem_conn.list_enem_scores_by_school_network(
+                        args.id_municipio, dependencia_rede=getattr(args, "rede", None)
+                    )
+                    if getattr(args, "json", False):
+                        print(json.dumps(rows, indent=2, ensure_ascii=False, default=str))
+                    else:
+                        print(f"INEP ENEM Redes de Ensino ({args.id_municipio}) - {len(rows)} rede(s):")
+                        for r in rows:
+                            print(f"  - {r.get('dependencia_administrativa_escola')}: Objetivas {r.get('nota_media_objetivas_rede')} | MT {r.get('nota_media_matematica_rede')} | Redação {r.get('nota_media_redacao_rede')}")
+                    return 0
+
+                if enem_action == "essay":
+                    res = enem_conn.get_enem_essay_competencies(args.id_municipio)
+                    if getattr(args, "json", False):
+                        print(json.dumps(res, indent=2, ensure_ascii=False, default=str))
+                    else:
+                        print(f"INEP ENEM Redação & Competências ({res.get('nome_municipio')} - {res.get('id_municipio')}):")
+                        print(f"  Redação Média:     {res.get('nota_media_redacao_enem')} pts (Comp1 {res.get('nota_media_comp1_norma_padrao')} | Comp3 {res.get('nota_media_comp3_argumentacao')} | Comp5 {res.get('nota_media_comp5_proposta_intervencao')})")
+                        print(f"  Notas 900+ / Zero: {res.get('redacoes_nota_900_mais_ano'):,} ({res.get('proporcao_redacao_900_mais_pct')}%) | Zero: {res.get('taxa_redacao_zero_ou_anulada_pct')}%")
+                    return 0
+
+                if enem_action == "equity":
+                    res = enem_conn.get_enem_socioeconomic_equity(args.id_municipio)
+                    if getattr(args, "json", False):
+                        print(json.dumps(res, indent=2, ensure_ascii=False, default=str))
+                    else:
+                        print(f"INEP ENEM Equidade QSE & Acesso ({res.get('nome_municipio')} - {res.get('id_municipio')}):")
+                        print(f"  Isenção / Pública: {res.get('proporcao_isencao_taxa_inscricao_pct')}% isenção | {res.get('proporcao_concluintes_escola_publica_pct')}% pública | {res.get('acesso_internet_domiciliar_q025_pct')}% internet")
+                        print(f"  Equidade / SiSU:   {res.get('razao_equidade_publica_privada_enem')} razão púb/priv | {res.get('aptos_sisu_prouni_fies_nota_450_pct')}% aptos SiSU/ProUni")
+                    return 0
+
+                if enem_action == "features":
+                    feat = enem_conn.get_enem_performance_equity_features(args.id_municipio)
+                    if getattr(args, "json", False):
+                        print(json.dumps(feat, indent=2, ensure_ascii=False, default=str))
+                    else:
+                        print(f"INEP ENEM Features: {feat.get('nome_municipio')} ({feat.get('sigla_uf')} - {feat.get('id_municipio')}):")
+                        print(f"  Score Cognitivo:   {feat.get('score_desempenho_cognitivo_enem')}/100.0")
+                        print(f"  Score Equidade:    {feat.get('score_equidade_acesso_ensino_superior_enem')}/100.0")
+                        print(f"  Classificação:     {feat.get('classificacao_desempenho_enem_municipal')}")
+                    return 0
+
+                if enem_action == "ranking":
+                    ranks = enem_conn.list_top_enem_municipalities(
+                        limit=getattr(args, "limit", 10), sigla_uf=getattr(args, "uf", None)
+                    )
+                    if getattr(args, "json", False):
+                        print(json.dumps(ranks, indent=2, ensure_ascii=False, default=str))
+                    else:
+                        print(f"Top {len(ranks)} Municípios no Desempenho & Equidade ENEM (INEP):")
+                        for idx, r in enumerate(ranks, 1):
+                            print(f"  {idx}. {r.get('nome_municipio')} ({r.get('sigla_uf')}): Cognitivo {r.get('score_desempenho_cognitivo_enem')} | Equidade: {r.get('score_equidade_acesso_ensino_superior_enem')} | {r.get('classificacao_desempenho_enem_municipal')}")
+                    return 0
+            except ValueError as exc:
+                print(f"Erro INEP ENEM: {exc}", file=sys.stderr)
+                return 1
 
         elif args.command == "onr":
             from public_data_gateway.connectors.imobiliario.onr_registro_imoveis.connector import (

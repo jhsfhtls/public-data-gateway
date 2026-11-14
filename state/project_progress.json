@@ -1,6 +1,6 @@
 {
   "schema_version": "1.0.0",
-  "last_updated": "2026-11-14T00:46:00.000000",
+  "last_updated": "2026-11-14T05:15:00.000000",
   "project_name": "public-data-gateway",
   "ecosystem": "C.O.R.E. (core, operations, career, studies)",
   "governing_pops": [
@@ -13,10 +13,10 @@
     "POP_T_148"
   ],
   "current_macro_phase_id": "07",
-  "current_macro_phase": "Fase 07 - Ingestão Wave 5 (Saúde, Educação & Setor Notarial — 39/49 fontes homologadas [79.6%] com opendatasus_vigilancia homologado; Próximo: inep_enem)",
+  "current_macro_phase": "Fase 07 - Ingestão Wave 5 (Saúde, Educação & Setor Notarial — 40/49 fontes homologadas [81.6%] com inep_enem homologado; Próximo: capitais_iptu_itbi)",
   "overall_status": "ON_TRACK",
-  "active_connector": "inep_enem",
-  "next_connector": "capitais_iptu_itbi",
+  "active_connector": "capitais_iptu_itbi",
+  "next_connector": "capes_sucupira",
   "structural_phases": [
     {
       "phase_id": "00",
@@ -142,7 +142,8 @@
         "Conector inep_ideb (IDEB Bienal por Etapa e Rede, Fluxo Escolar P, Proficiências SAEB LP/MAT, Metas INEP e Equidade INSE) - CONCLUÍDO",
         "Conector onr_registro_imoveis (Acervo CNM, Transações por Natureza, Garantias Alienação Fiduciária/CGI e Interoperabilidade SERP/SAEC) - CONCLUÍDO",
         "Conector opendatasus_vigilancia (e-SUS Notifica SG, SIVEP-Gripe SRAG, SINAN Agravos Compulsórios, SI-PNI Cobertura Vacinal e Prontidão CIEVS/GAL-LACEN) - CONCLUÍDO",
-        "Conectores INEP/CAPES restantes (inep_enem, capes_sucupira)",
+        "Conector inep_enem (Desempenho TRI LC/CH/CN/MT, Redes Federal/Estadual/Privada/EJA, Redação Competências I/III/V e Equidade QSE/SiSU-ProUni) - CONCLUÍDO",
+        "Conector CAPES restante (capes_sucupira)",
         "Conector Notarial restante (capitais_iptu_itbi)"
       ]
     },
@@ -420,6 +421,12 @@
     }
   ],
   "recent_milestones": [
+    {
+      "date": "2026-11-14",
+      "phase_id": "07",
+      "milestone": "Homologação do Conector inep_enem (4 Tabelas Silver + Gold Feature Store, 7 modelos dbt, 341 modelos dbt / 4.943 colunas, 40/49 [81.6%])",
+      "impact": "Conector inep_enem (ODCS-BR-INEP-ENEM-001) homologado com probe live fail-hard em https://www.gov.br/inep/pt-br/acesso-a-informacao/dados-abertos/microdados/enem e https://www.gov.br/inep/pt-br/areas-de-atuacao/avaliacao-e-exames-educacionais/enem, paridade SQL-Python (23 colunas compartilhadas com zero divergências), EducationFacade/BrazilData, CLI bdg enem, 6+1 rotas REST API, 4 tools MCP e 9 testes dedicados (8 offline + 1 live). Próximo conector Wave 5: capitais_iptu_itbi."
+    },
     {
       "date": "2026-11-14",
       "phase_id": "07",

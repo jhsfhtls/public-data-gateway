@@ -467,3 +467,144 @@ models:
         description: "Timestamp ISO-8601 UTC da extração."
         tests:
           - not_null
+
+  - name: mart_desempenho_equidade_enem_municipios_brasil
+    description: "Data Mart Gold executivo de desempenho cognitivo TRI no ENEM, competências e notas 900+ em Redação, equidade pública-privada QSE, elegibilidade SiSU/ProUni/FIES e classificação em 4 tiers (INEP ENEM)."
+    columns:
+      - name: id_municipio
+        description: "Código IBGE de 7 dígitos do município."
+        tests:
+          - unique
+          - not_null
+      - name: nome_municipio
+        description: "Nome oficial do município."
+        tests:
+          - not_null
+      - name: sigla_uf
+        description: "Sigla de 2 letras da Unidade Federativa."
+        tests:
+          - not_null
+      - name: id_uf
+        description: "Código IBGE de 2 dígitos da Unidade Federativa."
+        tests:
+          - not_null
+      - name: nome_uf
+        description: "Nome completo da Unidade Federativa."
+        tests:
+          - not_null
+      - name: regiao
+        description: "Grande região geográfica brasileira."
+        tests:
+          - not_null
+      - name: ano_edicao_enem
+        description: "Ano de aplicação da edição oficial do ENEM."
+        tests:
+          - not_null
+      - name: inscritos_confirmados_enem_ano
+        description: "Total municipal de participantes com inscrição confirmada na edição do ENEM."
+        tests:
+          - not_null
+      - name: participantes_presentes_2dias_ano
+        description: "Participantes que compareceram às provas nos dois dias de aplicação do exame."
+        tests:
+          - not_null
+      - name: taxa_presenca_efetiva_2dias_pct
+        description: "Taxa percentual de presença efetiva nos dois dias de prova em relação aos inscritos (%)."
+        tests:
+          - not_null
+      - name: nota_media_linguagens_codigos_lc
+        description: "Nota média municipal TRI em Linguagens, Códigos e suas Tecnologias (LC)."
+        tests:
+          - not_null
+      - name: nota_media_ciencias_humanas_ch
+        description: "Nota média municipal TRI em Ciências Humanas e suas Tecnologias (CH)."
+        tests:
+          - not_null
+      - name: nota_media_ciencias_natureza_cn
+        description: "Nota média municipal TRI em Ciências da Natureza e suas Tecnologias (CN)."
+        tests:
+          - not_null
+      - name: nota_media_matematica_mt
+        description: "Nota média municipal TRI em Matemática e suas Tecnologias (MT)."
+        tests:
+          - not_null
+      - name: nota_media_objetivas_tri_geral
+        description: "Média aritmética municipal das quatro áreas objetivas avaliadas pela TRI."
+        tests:
+          - not_null
+      - name: nota_media_redacao_enem
+        description: "Nota média municipal obtida na prova de Redação (escala de 0 a 1000)."
+        tests:
+          - not_null
+      - name: nota_media_comp1_norma_padrao
+        description: "Nota média municipal na Competência I (norma padrão da Língua Portuguesa)."
+        tests:
+          - not_null
+      - name: nota_media_comp3_argumentacao
+        description: "Nota média municipal na Competência III (argumentação e projeto de texto)."
+        tests:
+          - not_null
+      - name: nota_media_comp5_proposta_intervencao
+        description: "Nota média municipal na Competência V (proposta de intervenção)."
+        tests:
+          - not_null
+      - name: redacoes_nota_900_mais_ano
+        description: "Quantidade absoluta de redações no município com nota >= 900 pontos."
+        tests:
+          - not_null
+      - name: proporcao_redacao_900_mais_pct
+        description: "Percentual de participantes presentes com nota >= 900 na Redação (%)."
+        tests:
+          - not_null
+      - name: taxa_redacao_zero_ou_anulada_pct
+        description: "Percentual de provas de Redação zeradas ou anuladas (%)."
+        tests:
+          - not_null
+      - name: proporcao_isencao_taxa_inscricao_pct
+        description: "Percentual de inscritos beneficiados com isenção da taxa de inscrição (%)."
+        tests:
+          - not_null
+      - name: proporcao_concluintes_escola_publica_pct
+        description: "Participação percentual de egressos ou concluintes da rede pública no exame (%)."
+        tests:
+          - not_null
+      - name: acesso_internet_domiciliar_q025_pct
+        description: "Percentual de participantes com acesso domiciliar à internet declarado no QSE Q025 (%)."
+        tests:
+          - not_null
+      - name: gap_nota_objetiva_privada_vs_publica_pts
+        description: "Diferença em pontos TRI nas provas objetivas entre rede privada e rede estadual pública."
+        tests:
+          - not_null
+      - name: razao_equidade_publica_privada_enem
+        description: "Razão entre a média objetiva da rede estadual pública e da rede privada (0 a 1)."
+        tests:
+          - not_null
+      - name: aptos_sisu_prouni_fies_nota_450_pct
+        description: "Percentual de presentes elegíveis a SiSU/ProUni/FIES (média >= 450 e redação > 0) (%)."
+        tests:
+          - not_null
+      - name: indice_paridade_socioeconomica_qse
+        description: "Índice sintético de paridade socioeconômica QSE entre estratos de renda (0 a 1)."
+        tests:
+          - not_null
+      - name: score_desempenho_cognitivo_enem
+        description: "Score normalizado (0 a 100) composto pela média objetiva TRI (45%), Redação (35%) e proporção 900+ (20%)."
+        tests:
+          - not_null
+      - name: score_equidade_acesso_ensino_superior_enem
+        description: "Score normalizado (0 a 100) de presença efetiva (30%), elegibilidade SiSU/ProUni/FIES (35%) e equidade pública-privada (35%)."
+        tests:
+          - not_null
+      - name: classificacao_desempenho_enem_municipal
+        description: "Classificação analítica da qualidade cognitiva e equidade no acesso ao ensino superior pelo ENEM em 4 tiers."
+        tests:
+          - not_null
+      - name: reference_date
+        description: "Data de referência ISO-8601 da consolidação ENEM."
+        tests:
+          - not_null
+      - name: extracted_at
+        description: "Timestamp ISO-8601 UTC da extração."
+        tests:
+          - not_null
