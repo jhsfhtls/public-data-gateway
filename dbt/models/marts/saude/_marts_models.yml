@@ -1,0 +1,183 @@
+version: 2
+
+models:
+  - name: mart_capacidade_assistencial_saude_brasil
+    description: "Data Mart Gold executivo de capacidade hospitalar, leitos de UTI, parque diagnóstico, força de trabalho e classificação da rede assistencial municipal (DataSUS CNES)."
+    columns:
+      - name: id_municipio
+        description: "Código IBGE de 7 dígitos do município."
+        tests:
+          - unique
+          - not_null
+      - name: nome_municipio
+        description: "Nome oficial do município."
+        tests:
+          - not_null
+      - name: sigla_uf
+        description: "Sigla de 2 letras da Unidade Federativa."
+        tests:
+          - not_null
+      - name: id_uf
+        description: "Código IBGE de 2 dígitos da Unidade Federativa."
+        tests:
+          - not_null
+      - name: nome_uf
+        description: "Nome completo da Unidade Federativa."
+        tests:
+          - not_null
+      - name: regiao
+        description: "Grande região geográfica brasileira."
+        tests:
+          - not_null
+      - name: ano_mes_competencia
+        description: "Competência mensal de referência CNES no formato AAAAMM."
+        tests:
+          - not_null
+      - name: codigo_cnes_referencia
+        description: "Código CNES de 7 dígitos do hospital de referência no município."
+        tests:
+          - not_null
+      - name: cnpj_14
+        description: "CNPJ de 14 dígitos da entidade mantenedora de referência."
+        tests:
+          - not_null
+      - name: cep_8
+        description: "CEP de 8 dígitos da unidade hospitalar de referência."
+        tests:
+          - not_null
+      - name: estabelecimento_referencia_nome
+        description: "Denominação oficial da principal unidade de referência assistencial."
+        tests:
+          - not_null
+      - name: total_estabelecimentos_ativos
+        description: "Total de estabelecimentos de saúde ativos cadastrados no CNES."
+        tests:
+          - not_null
+      - name: hospitais_gerais_especializados
+        description: "Total de hospitais gerais e especializados no município."
+        tests:
+          - not_null
+      - name: unidades_basicas_saude_ubs
+        description: "Total de Unidades Básicas de Saúde (UBS) em operação."
+        tests:
+          - not_null
+      - name: unidades_pronto_atendimento_upa
+        description: "Total de Unidades de Pronto Atendimento (UPAs) 24h."
+        tests:
+          - not_null
+      - name: estabelecimentos_atendimento_sus
+        description: "Quantidade de estabelecimentos com atendimento ao SUS."
+        tests:
+          - not_null
+      - name: proporcao_rede_sus_pct
+        description: "Percentual de estabelecimentos ativos integrados à rede SUS."
+        tests:
+          - not_null
+      - name: total_leitos_hospitalares
+        description: "Total de leitos hospitalares instalados no município."
+        tests:
+          - not_null
+      - name: leitos_sus
+        description: "Quantidade de leitos hospitalares disponíveis ao SUS."
+        tests:
+          - not_null
+      - name: leitos_nao_sus
+        description: "Quantidade de leitos destinados à rede suplementar e particular."
+        tests:
+          - not_null
+      - name: proporcao_leitos_sus_pct
+        description: "Percentual dos leitos hospitalares destinados ao SUS."
+        tests:
+          - not_null
+      - name: total_leitos_uti
+        description: "Total de leitos de UTI habilitados (adulto, pediátrico e neonatal)."
+        tests:
+          - not_null
+      - name: leitos_uti_adulto
+        description: "Quantidade de leitos de UTI adulto."
+        tests:
+          - not_null
+      - name: leitos_uti_pediatrico_neonatal
+        description: "Quantidade de leitos de UTI pediátrica e neonatal."
+        tests:
+          - not_null
+      - name: leitos_uti_sus
+        description: "Quantidade de leitos de UTI vinculados ao atendimento SUS."
+        tests:
+          - not_null
+      - name: leitos_por_1000_hab
+        description: "Taxa de leitos hospitalares gerais por 1.000 habitantes."
+        tests:
+          - not_null
+      - name: leitos_uti_por_10k_hab
+        description: "Taxa de leitos de UTI por 10.000 habitantes."
+        tests:
+          - not_null
+      - name: tomografos_computadorizados
+        description: "Quantidade de tomógrafos computadorizados em uso."
+        tests:
+          - not_null
+      - name: ressonancia_magnetica
+        description: "Quantidade de aparelhos de ressonância magnética em uso."
+        tests:
+          - not_null
+      - name: mamografos_em_uso
+        description: "Quantidade de mamógrafos em operação."
+        tests:
+          - not_null
+      - name: aparelhos_hemodialise
+        description: "Quantidade de máquinas de hemodiálise em uso."
+        tests:
+          - not_null
+      - name: aparelhos_raio_x
+        description: "Quantidade de aparelhos de diagnóstico por raio-X."
+        tests:
+          - not_null
+      - name: proporcao_equipamentos_sus_pct
+        description: "Percentual de equipamentos diagnósticos disponíveis ao SUS."
+        tests:
+          - not_null
+      - name: indice_disponibilidade_diagnostica
+        description: "Índice composto (0 a 100) de densidade de equipamentos diagnósticos críticos."
+        tests:
+          - not_null
+      - name: medicos_ativos
+        description: "Total de vínculos médicos ativos registrados no CNES no município."
+        tests:
+          - not_null
+      - name: medicos_por_10k_hab
+        description: "Densidade de médicos ativos por 10.000 habitantes."
+        tests:
+          - not_null
+      - name: enfermeiros_ativos
+        description: "Total de vínculos ativos de enfermeiros registrados no CNES."
+        tests:
+          - not_null
+      - name: enfermeiros_por_10k_hab
+        description: "Densidade de enfermeiros ativos por 10.000 habitantes."
+        tests:
+          - not_null
+      - name: equipes_esf_ativas
+        description: "Quantidade de Equipes de Saúde da Família (eSF) ativas."
+        tests:
+          - not_null
+      - name: score_alta_complexidade_uti
+        description: "Score normalizado (0 a 100) de densidade de UTI, parque diagnóstico e rede hospitalar."
+        tests:
+          - not_null
+      - name: score_capacidade_hospitalar
+        description: "Score composto (0 a 100) de capacidade instalada hospitalar e cobertura assistencial."
+        tests:
+          - not_null
+      - name: classificacao_rede_assistencial
+        description: "Classificação hierárquica da rede assistencial do município."
+        tests:
+          - not_null
+      - name: reference_date
+        description: "Data de referência ISO-8601."
+        tests:
+          - not_null
+      - name: extracted_at
+        description: "Timestamp ISO-8601 UTC da geração."
+        tests:
+          - not_null

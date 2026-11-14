@@ -1,0 +1,257 @@
+version: 2
+
+models:
+  - name: stg_cnes_estabelecimentos_saude
+    description: "Visão padronizada de estabelecimentos de saúde cadastrados no CNES (hospitais, UBS, UPAs, vínculo SUS e unidade de referência) por município."
+    columns:
+      - name: id_municipio
+        description: "Código IBGE de 7 dígitos do município."
+        tests:
+          - not_null
+          - unique
+      - name: nome_municipio
+        description: "Nome oficial do município."
+        tests:
+          - not_null
+      - name: sigla_uf
+        description: "Sigla de 2 letras da Unidade Federativa."
+        tests:
+          - not_null
+      - name: id_uf
+        description: "Código IBGE de 2 dígitos da Unidade Federativa."
+        tests:
+          - not_null
+      - name: ano_mes_competencia
+        description: "Competência mensal do cadastro CNES no formato AAAAMM."
+        tests:
+          - not_null
+      - name: codigo_cnes_referencia
+        description: "Código CNES de 7 dígitos da principal unidade hospitalar de referência."
+        tests:
+          - not_null
+      - name: cnpj_14
+        description: "CNPJ de 14 dígitos da entidade mantenedora ou fundo municipal de referência."
+        tests:
+          - not_null
+      - name: cep_8
+        description: "CEP de 8 dígitos da unidade assistencial de referência."
+        tests:
+          - not_null
+      - name: estabelecimento_referencia_nome
+        description: "Denominação oficial da unidade de referência cadastrada no CNES."
+        tests:
+          - not_null
+      - name: total_estabelecimentos_ativos
+        description: "Total de estabelecimentos de saúde ativos cadastrados no CNES."
+        tests:
+          - not_null
+      - name: hospitais_gerais_especializados
+        description: "Quantidade de hospitais gerais e especializados ativos no município."
+        tests:
+          - not_null
+      - name: unidades_basicas_saude_ubs
+        description: "Quantidade de Unidades Básicas de Saúde e Centros de Saúde ativos."
+        tests:
+          - not_null
+      - name: unidades_pronto_atendimento_upa
+        description: "Quantidade de Unidades de Pronto Atendimento (UPAs) e prontos-socorros 24h."
+        tests:
+          - not_null
+      - name: estabelecimentos_atendimento_sus
+        description: "Quantidade de estabelecimentos com atendimento ao Sistema Único de Saúde."
+        tests:
+          - not_null
+      - name: proporcao_rede_sus_pct
+        description: "Percentual de estabelecimentos ativos integrados à rede assistencial SUS."
+        tests:
+          - not_null
+      - name: source_url
+        description: "URL oficial do portal DataSUS CNES consultado."
+        tests:
+          - not_null
+      - name: reference_date
+        description: "Data de referência ISO-8601."
+        tests:
+          - not_null
+      - name: extracted_at
+        description: "Timestamp ISO-8601 UTC da extração."
+        tests:
+          - not_null
+
+  - name: stg_cnes_leitos_hospitalares_uti
+    description: "Visão padronizada da capacidade instalada de leitos hospitalares totais, SUS, UTI adulto e pediátrico/neonatal por município."
+    columns:
+      - name: id_municipio
+        description: "Código IBGE de 7 dígitos do município."
+        tests:
+          - not_null
+          - unique
+      - name: nome_municipio
+        description: "Nome oficial do município."
+        tests:
+          - not_null
+      - name: sigla_uf
+        description: "Sigla de 2 letras da Unidade Federativa."
+        tests:
+          - not_null
+      - name: ano_mes_competencia
+        description: "Competência mensal de referência no formato AAAAMM."
+        tests:
+          - not_null
+      - name: total_leitos_hospitalares
+        description: "Total de leitos hospitalares de internação e complementares instalados."
+        tests:
+          - not_null
+      - name: leitos_sus
+        description: "Quantidade de leitos hospitalares disponíveis ao SUS."
+        tests:
+          - not_null
+      - name: leitos_nao_sus
+        description: "Quantidade de leitos destinados à saúde suplementar e atendimento particular."
+        tests:
+          - not_null
+      - name: total_leitos_uti
+        description: "Total de leitos de Unidade de Terapia Intensiva (UTI) habilitados."
+        tests:
+          - not_null
+      - name: leitos_uti_adulto
+        description: "Quantidade de leitos de UTI adulto."
+        tests:
+          - not_null
+      - name: leitos_uti_pediatrico_neonatal
+        description: "Quantidade de leitos de UTI pediátrica e neonatal."
+        tests:
+          - not_null
+      - name: leitos_uti_sus
+        description: "Quantidade de leitos de UTI vinculados ao SUS."
+        tests:
+          - not_null
+      - name: leitos_por_1000_hab
+        description: "Taxa de leitos hospitalares gerais por 1.000 habitantes."
+        tests:
+          - not_null
+      - name: leitos_uti_por_10k_hab
+        description: "Taxa de leitos de UTI por 10.000 habitantes."
+        tests:
+          - not_null
+      - name: source_url
+        description: "URL oficial do portal DataSUS CNES consultado."
+        tests:
+          - not_null
+      - name: reference_date
+        description: "Data de referência ISO-8601."
+        tests:
+          - not_null
+      - name: extracted_at
+        description: "Timestamp ISO-8601 UTC da extração."
+        tests:
+          - not_null
+
+  - name: stg_cnes_equipamentos_diagnostico
+    description: "Visão padronizada do parque de equipamentos médicos de alta e média complexidade em uso no CNES por município."
+    columns:
+      - name: id_municipio
+        description: "Código IBGE de 7 dígitos do município."
+        tests:
+          - not_null
+          - unique
+      - name: nome_municipio
+        description: "Nome oficial do município."
+        tests:
+          - not_null
+      - name: sigla_uf
+        description: "Sigla de 2 letras da Unidade Federativa."
+        tests:
+          - not_null
+      - name: ano_mes_competencia
+        description: "Competência mensal de referência no formato AAAAMM."
+        tests:
+          - not_null
+      - name: tomografos_computadorizados
+        description: "Quantidade de tomógrafos computadorizados em uso."
+        tests:
+          - not_null
+      - name: ressonancia_magnetica
+        description: "Quantidade de equipamentos de ressonância magnética em operação."
+        tests:
+          - not_null
+      - name: mamografos_em_uso
+        description: "Quantidade de mamógrafos em uso."
+        tests:
+          - not_null
+      - name: aparelhos_hemodialise
+        description: "Quantidade de aparelhos de hemodiálise em operação."
+        tests:
+          - not_null
+      - name: aparelhos_raio_x
+        description: "Quantidade total de aparelhos de diagnóstico por raio-X."
+        tests:
+          - not_null
+      - name: proporcao_equipamentos_sus_pct
+        description: "Percentual de equipamentos diagnósticos disponíveis ao SUS."
+        tests:
+          - not_null
+      - name: indice_disponibilidade_diagnostica
+        description: "Índice composto (0 a 100) de densidade de equipamentos diagnósticos."
+        tests:
+          - not_null
+      - name: source_url
+        description: "URL oficial do portal DataSUS CNES consultado."
+        tests:
+          - not_null
+      - name: reference_date
+        description: "Data de referência ISO-8601."
+        tests:
+          - not_null
+      - name: extracted_at
+        description: "Timestamp ISO-8601 UTC da extração."
+        tests:
+          - not_null
+
+  - name: stg_cnes_profissionais_equipes_saude
+    description: "Visão padronizada de vínculos profissionais ativos e equipes de Atenção Primária (Médicos, Enfermeiros e eSF) por município."
+    columns:
+      - name: id_municipio
+        description: "Código IBGE de 7 dígitos do município."
+        tests:
+          - not_null
+      - name: nome_municipio
+        description: "Nome oficial do município."
+        tests:
+          - not_null
+      - name: sigla_uf
+        description: "Sigla de 2 letras da Unidade Federativa."
+        tests:
+          - not_null
+      - name: categoria_profissional
+        description: "Categoria assistencial analisada (Medicos, Enfermeiros ou Equipes_Saude_Familia_eSF)."
+        tests:
+          - not_null
+      - name: total_vinculos_ativos
+        description: "Total de vínculos profissionais ou equipes ativas cadastradas no CNES."
+        tests:
+          - not_null
+      - name: vinculos_atendimento_sus
+        description: "Quantidade de vínculos ou equipes com atuação no SUS."
+        tests:
+          - not_null
+      - name: carga_horaria_semanal_media
+        description: "Carga horária semanal média da categoria profissional."
+        tests:
+          - not_null
+      - name: densidade_por_10k_hab
+        description: "Densidade de profissionais ou equipes por 10.000 habitantes."
+        tests:
+          - not_null
+      - name: source_url
+        description: "URL oficial do portal DataSUS CNES consultado."
+        tests:
+          - not_null
+      - name: reference_date
+        description: "Data de referência ISO-8601."
+        tests:
+          - not_null
+      - name: extracted_at
+        description: "Timestamp ISO-8601 UTC da extração."
+        tests:
+          - not_null

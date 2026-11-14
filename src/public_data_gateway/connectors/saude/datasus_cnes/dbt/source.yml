@@ -1,0 +1,16 @@
+version: 2
+
+sources:
+  - name: datasus_cnes_silver
+    description: "Bases oficiais do DataSUS Cadastro Nacional de Estabelecimentos de Saúde (CNES) normalizadas na camada Silver."
+    meta:
+      external_location: "data/datasus_cnes/silver/{name}.parquet"
+    tables:
+      - name: cnes_estabelecimentos_saude
+        description: "Consolidação municipal de estabelecimentos de saúde ativos (hospitais, UBS, UPAs e atendimento SUS) por município."
+      - name: cnes_leitos_hospitalares_uti
+        description: "Capacidade instalada de leitos hospitalares gerais, leitos SUS e leitos de UTI adulto e pediátrico/neonatal por município."
+      - name: cnes_equipamentos_diagnostico
+        description: "Parque de equipamentos médicos críticos em uso (tomógrafos, ressonância magnética, mamógrafos, hemodiálise e raio-X) por município."
+      - name: cnes_profissionais_equipes_saude
+        description: "Vínculos ativos de médicos, enfermeiros e equipes de Saúde da Família (eSF) por município."

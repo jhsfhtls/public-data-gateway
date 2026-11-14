@@ -33,6 +33,7 @@ model-paths:
   - "../src/public_data_gateway/connectors/geografico/ibge_malhas/dbt"
   - "../src/public_data_gateway/connectors/geografico/anatel_mosaico/dbt"
   - "../src/public_data_gateway/connectors/geografico/antt_malha_transporte/dbt"
+  - "../src/public_data_gateway/connectors/saude/datasus_cnes/dbt"
   - "models"
 
 analysis-paths: ["analyses"]

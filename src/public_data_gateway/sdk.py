@@ -795,6 +795,54 @@ class LaborFacade:
         return self.pnad_connector.list_highest_earnings_states(limit=limit)
 
 
+class HealthFacade:
+    """Unified developer facade for public health infrastructure and CNES network analytics."""
+
+    def __init__(self, sdk: "BrazilData") -> None:
+        self._sdk = sdk
+        self._cnes_connector: Any = None
+
+    @property
+    def cnes_connector(self) -> Any:
+        if self._cnes_connector is None:
+            from public_data_gateway.connectors.saude.datasus_cnes.connector import (
+                DataSUSCnesConnector,
+            )
+
+            self._cnes_connector = DataSUSCnesConnector(settings=self._sdk.settings)
+        return self._cnes_connector
+
+    def get_cnes_establishments(self, id_municipio: str) -> dict[str, Any]:
+        """Get municipal summary of active health establishments and SUS network share (DataSUS CNES)."""
+        return self.cnes_connector.get_establishments_summary(id_municipio)
+
+    def get_cnes_beds_icu(self, id_municipio: str) -> dict[str, Any]:
+        """Get hospital bed capacity and ICU beds (Adulto/Pediatrico/Neonatal) per municipality (DataSUS CNES)."""
+        return self.cnes_connector.get_hospital_beds_icu(id_municipio)
+
+    def get_cnes_equipment(self, id_municipio: str) -> dict[str, Any]:
+        """Get high-complexity diagnostic imaging and dialysis equipment availability (DataSUS CNES)."""
+        return self.cnes_connector.get_diagnostic_equipment(id_municipio)
+
+    def list_cnes_workforce(
+        self, id_municipio: str, categoria_profissional: str | None = None
+    ) -> list[dict[str, Any]]:
+        """List health professionals and Primary Care eSF teams per municipality (DataSUS CNES)."""
+        return self.cnes_connector.list_health_workforce(
+            id_municipio, categoria_profissional=categoria_profissional
+        )
+
+    def get_cnes_health_features(self, id_municipio: str) -> dict[str, Any]:
+        """Get normalized Gold health capacity and ICU complexity features per municipality (DataSUS CNES)."""
+        return self.cnes_connector.get_health_capacity_features(id_municipio)
+
+    def list_top_health_hubs(
+        self, limit: int = 10, sigla_uf: str | None = None
+    ) -> list[dict[str, Any]]:
+        """List top Brazilian municipalities ranked by composite CNES hospital capacity score."""
+        return self.cnes_connector.list_top_health_hubs(limit=limit, sigla_uf=sigla_uf)
+
+
 class BrazilData:
     """Unified developer SDK facade for querying, normalizing, and enriching Brazilian public datasets."""
 
@@ -821,6 +869,7 @@ class BrazilData:
         self.treasury = TreasuryFacade(self)
         self.socioeconomic = SocioeconomicFacade(self)
         self.labor = LaborFacade(self)
+        self.health = HealthFacade(self)
 
     def list_sources(
         self,
@@ -1184,6 +1233,36 @@ class BrazilData:
     def list_top_municipal_gdp(self, limit: int = 10) -> list[dict[str, Any]]:
         """Listar municípios líderes em PIB municipal no Brasil (IBGE Contas Regionais)."""
         return self.socioeconomic.top_municipalities_pib(limit=limit)
+
+    def get_cnes_establishments(self, id_municipio: str) -> dict[str, Any]:
+        """Consultar resumo de estabelecimentos de saúde ativos e cobertura SUS por município (DataSUS CNES)."""
+        return self.health.get_cnes_establishments(id_municipio)
+
+    def get_cnes_beds_icu(self, id_municipio: str) -> dict[str, Any]:
+        """Consultar capacidade de leitos hospitalares e leitos de UTI por município (DataSUS CNES)."""
+        return self.health.get_cnes_beds_icu(id_municipio)
+
+    def get_cnes_equipment(self, id_municipio: str) -> dict[str, Any]:
+        """Consultar disponibilidade de equipamentos de diagnóstico por imagem e hemodiálise (DataSUS CNES)."""
+        return self.health.get_cnes_equipment(id_municipio)
+
+    def list_cnes_workforce(
+        self, id_municipio: str, categoria_profissional: str | None = None
+    ) -> list[dict[str, Any]]:
+        """Listar profissionais de saúde e equipes eSF por município e categoria (DataSUS CNES)."""
+        return self.health.list_cnes_workforce(
+            id_municipio, categoria_profissional=categoria_profissional
+        )
+
+    def get_cnes_health_features(self, id_municipio: str) -> dict[str, Any]:
+        """Consultar features Gold de capacidade assistencial hospitalar e alta complexidade UTI (DataSUS CNES)."""
+        return self.health.get_cnes_health_features(id_municipio)
+
+    def list_top_health_hubs(
+        self, limit: int = 10, sigla_uf: str | None = None
+    ) -> list[dict[str, Any]]:
+        """Listar polos hospitalares líderes em capacidade assistencial de saúde no Brasil (DataSUS CNES)."""
+        return self.health.list_top_health_hubs(limit=limit, sigla_uf=sigla_uf)
 
     def resolve_municipality(
         self, code_or_name: str | int, uf: str | None = None
