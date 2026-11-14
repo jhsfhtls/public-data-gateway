@@ -1,0 +1,249 @@
+version: 2
+
+models:
+  - name: stg_censo_superior_instituicoes_ies
+    description: "Staging view das Instituições de Educação Superior (IES) ativas e IGC contínuo por município (INEP)."
+    columns:
+      - name: id_municipio
+        description: "Código IBGE de 7 dígitos do município."
+        tests:
+          - not_null
+          - unique
+      - name: nome_municipio
+        description: "Nome oficial do município."
+        tests:
+          - not_null
+      - name: sigla_uf
+        description: "Sigla de 2 letras da Unidade Federativa."
+        tests:
+          - not_null
+      - name: id_uf
+        description: "Código IBGE de 2 dígitos da UF."
+        tests:
+          - not_null
+      - name: cnpj_14
+        description: "CNPJ canônico de 14 dígitos da mantenedora de IES de referência."
+        tests:
+          - not_null
+      - name: ano_censo
+        description: "Ano de referência do Censo da Educação Superior INEP."
+        tests:
+          - not_null
+      - name: total_ies_ativas
+        description: "Quantidade total de IES ativas no município."
+        tests:
+          - not_null
+      - name: universidades_e_centros_universitarios
+        description: "Quantidade de Universidades, Centros Universitários ou IFs/CEFETs."
+        tests:
+          - not_null
+      - name: ies_rede_publica
+        description: "Quantidade de IES públicas (federais, estaduais e municipais)."
+        tests:
+          - not_null
+      - name: ies_rede_privada
+        description: "Quantidade de IES privadas."
+        tests:
+          - not_null
+      - name: proporcao_ies_publicas_pct
+        description: "Percentual de IES pertencentes à rede pública (%)."
+        tests:
+          - not_null
+      - name: igc_medio_continuo_municipio
+        description: "Média municipal do Índice Geral de Cursos (IGC contínuo 1,0 a 5,0)."
+        tests:
+          - not_null
+      - name: reference_date
+        description: "Data de referência ISO-8601 da coleta censitária."
+        tests:
+          - not_null
+      - name: extracted_at
+        description: "Timestamp ISO-8601 UTC da extração."
+        tests:
+          - not_null
+
+  - name: stg_censo_superior_cursos_areas_cine
+    description: "Staging view de cursos de graduação, matrículas, concluintes, EaD e Conceito ENADE por área CINE/OCDE."
+    columns:
+      - name: id_municipio
+        description: "Código IBGE de 7 dígitos do município."
+        tests:
+          - not_null
+      - name: nome_municipio
+        description: "Nome oficial do município."
+        tests:
+          - not_null
+      - name: sigla_uf
+        description: "Sigla de 2 letras da UF."
+        tests:
+          - not_null
+      - name: id_uf
+        description: "Código IBGE de 2 dígitos da UF."
+        tests:
+          - not_null
+      - name: ano_censo
+        description: "Ano censitário de referência."
+        tests:
+          - not_null
+      - name: area_cine_rotulo
+        description: "Agrupamento macro da classificação CINE Brasil / OCDE."
+        tests:
+          - not_null
+      - name: cursos_graduacao_ativos
+        description: "Quantidade de cursos de graduação ativos na área CINE."
+        tests:
+          - not_null
+      - name: matriculas_ativas_area
+        description: "Total de matrículas ativas em graduação na área CINE."
+        tests:
+          - not_null
+      - name: concluintes_anuais_area
+        description: "Quantidade anual de concluintes na área CINE."
+        tests:
+          - not_null
+      - name: participacao_matriculas_area_pct
+        description: "Participação percentual da área nas matrículas totais de graduação (%)."
+        tests:
+          - not_null
+      - name: proporcao_modalidade_ead_area_pct
+        description: "Percentual de matrículas na modalidade EaD na área (%)."
+        tests:
+          - not_null
+      - name: conceito_enade_medio_area
+        description: "Conceito ENADE contínuo médio na área CINE (1,0 a 5,0)."
+        tests:
+          - not_null
+      - name: reference_date
+        description: "Data de referência ISO-8601 da coleta censitária."
+        tests:
+          - not_null
+      - name: extracted_at
+        description: "Timestamp ISO-8601 UTC da extração."
+        tests:
+          - not_null
+
+  - name: stg_censo_superior_matriculas_ingressantes_concluintes
+    description: "Staging view da dinâmica de matrículas presenciais vs. EaD, ingressantes, concluintes e taxas TCG/TDA (INEP)."
+    columns:
+      - name: id_municipio
+        description: "Código IBGE de 7 dígitos do município."
+        tests:
+          - not_null
+          - unique
+      - name: nome_municipio
+        description: "Nome oficial do município."
+        tests:
+          - not_null
+      - name: sigla_uf
+        description: "Sigla de 2 letras da UF."
+        tests:
+          - not_null
+      - name: id_uf
+        description: "Código IBGE de 2 dígitos da UF."
+        tests:
+          - not_null
+      - name: ano_censo
+        description: "Ano censitário de referência."
+        tests:
+          - not_null
+      - name: total_matriculas_graduacao
+        description: "Total de matrículas ativas em cursos de graduação."
+        tests:
+          - not_null
+      - name: matriculas_presenciais
+        description: "Matrículas em cursos presenciais no município."
+        tests:
+          - not_null
+      - name: matriculas_ead_polo
+        description: "Matrículas em educação a distância (polos EaD) no município."
+        tests:
+          - not_null
+      - name: proporcao_matriculas_ead_pct
+        description: "Participação percentual do ensino a distância nas matrículas (%)."
+        tests:
+          - not_null
+      - name: ingressantes_anuais_total
+        description: "Total anual de estudantes ingressantes na graduação."
+        tests:
+          - not_null
+      - name: concluintes_anuais_total
+        description: "Total anual de formandos concluintes na graduação."
+        tests:
+          - not_null
+      - name: taxa_conclusao_acumulada_tcg_pct
+        description: "Taxa de Conclusão Acumulada de Graduação TCG INEP (%)."
+        tests:
+          - not_null
+      - name: taxa_desistencia_anual_tda_pct
+        description: "Taxa de Desistência Anual TDA INEP (%)."
+        tests:
+          - not_null
+      - name: reference_date
+        description: "Data de referência ISO-8601 da coleta censitária."
+        tests:
+          - not_null
+      - name: extracted_at
+        description: "Timestamp ISO-8601 UTC da extração."
+        tests:
+          - not_null
+
+  - name: stg_censo_superior_docentes_titulacao_regime
+    description: "Staging view de titulação stricto sensu (doutores/mestres) e regime de trabalho do corpo docente das IES."
+    columns:
+      - name: id_municipio
+        description: "Código IBGE de 7 dígitos do município."
+        tests:
+          - not_null
+          - unique
+      - name: nome_municipio
+        description: "Nome oficial do município."
+        tests:
+          - not_null
+      - name: sigla_uf
+        description: "Sigla de 2 letras da UF."
+        tests:
+          - not_null
+      - name: id_uf
+        description: "Código IBGE de 2 dígitos da UF."
+        tests:
+          - not_null
+      - name: ano_censo
+        description: "Ano censitário de referência."
+        tests:
+          - not_null
+      - name: total_docentes_exercicio_ies
+        description: "Total de docentes em exercício nas IES do município."
+        tests:
+          - not_null
+      - name: docentes_doutores
+        description: "Quantidade de docentes com doutorado."
+        tests:
+          - not_null
+      - name: docentes_mestres
+        description: "Quantidade de docentes com mestrado."
+        tests:
+          - not_null
+      - name: proporcao_doutores_pct
+        description: "Percentual de docentes doutores em exercício (%)."
+        tests:
+          - not_null
+      - name: proporcao_mestres_doutores_stricto_sensu_pct
+        description: "Percentual combinado de mestres e doutores stricto sensu (%)."
+        tests:
+          - not_null
+      - name: proporcao_regime_tempo_integral_de_pct
+        description: "Percentual de docentes em regime de tempo integral ou dedicação exclusiva (%)."
+        tests:
+          - not_null
+      - name: razao_alunos_por_docente_equivalente
+        description: "Razão entre matrículas presenciais e docentes em exercício na IES."
+        tests:
+          - not_null
+      - name: reference_date
+        description: "Data de referência ISO-8601 da coleta censitária."
+        tests:
+          - not_null
+      - name: extracted_at
+        description: "Timestamp ISO-8601 UTC da extração."
+        tests:
+          - not_null

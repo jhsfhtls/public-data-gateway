@@ -963,6 +963,65 @@ class MCPDispatcher:
                                 },
                             },
                             {
+                                "name": "bdg_get_censo_superior_institutions",
+                                "description": "Get municipal Higher Education Institutions (IES) inventory, public/private split, and IGC continuous score (INEP Censo da Educação Superior).",
+                                "inputSchema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "id_municipio": {
+                                            "type": "string",
+                                            "description": "7-digit IBGE municipality code (e.g. 3550308)",
+                                        },
+                                    },
+                                    "required": ["id_municipio"],
+                                },
+                            },
+                            {
+                                "name": "bdg_get_censo_superior_faculty",
+                                "description": "Get municipal IES faculty qualifications (PhD, Masters stricto sensu) and full-time DE regime share (INEP Censo Superior).",
+                                "inputSchema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "id_municipio": {
+                                            "type": "string",
+                                            "description": "7-digit IBGE municipality code (e.g. 3550308)",
+                                        },
+                                    },
+                                    "required": ["id_municipio"],
+                                },
+                            },
+                            {
+                                "name": "bdg_get_censo_superior_features",
+                                "description": "Get Gold INEP Censo Superior academic excellence score, higher human capital score, and university hub tier classification.",
+                                "inputSchema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "id_municipio": {
+                                            "type": "string",
+                                            "description": "7-digit IBGE municipality code (e.g. 3550308)",
+                                        },
+                                    },
+                                    "required": ["id_municipio"],
+                                },
+                            },
+                            {
+                                "name": "bdg_list_top_censo_superior_hubs",
+                                "description": "List top Brazilian municipalities ranked by composite INEP Censo Superior academic and research excellence score.",
+                                "inputSchema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "limit": {
+                                            "type": "integer",
+                                            "description": "Maximum rows (default: 10)",
+                                        },
+                                        "sigla_uf": {
+                                            "type": "string",
+                                            "description": "Optional 2-letter state filter (e.g. SP)",
+                                        },
+                                    },
+                                },
+                            },
+                            {
                                 "name": "bdg_get_labor_force_indicators",
                                 "description": "Query official quarterly labor force, population, and unemployment rate by Brazilian UF from IBGE PNAD Contínua (Tier 1).",
                                 "inputSchema": {
@@ -2165,6 +2224,56 @@ class MCPDispatcher:
                     },
                 }
             wrapped = wrap_untrusted_gov_data(result, source_id="inep_censo_escolar")
+            return {
+                "jsonrpc": "2.0",
+                "id": req_id,
+                "result": {"content": [{"type": "text", "text": wrapped}], "isError": False},
+            }
+
+        if tool_name in {
+            "bdg_get_censo_superior_institutions",
+            "bdg_get_censo_superior_faculty",
+            "bdg_get_censo_superior_features",
+            "bdg_list_top_censo_superior_hubs",
+        }:
+            from public_data_gateway.connectors.educacao.inep_censo_superior.connector import (
+                INEPCensoSuperiorConnector,
+            )
+
+            connector = INEPCensoSuperiorConnector(settings=self.settings)
+            if tool_name == "bdg_get_censo_superior_institutions":
+                result = connector.get_institutions_summary(
+                    str(args.get("id_municipio", "")).strip()
+                )
+            elif tool_name == "bdg_get_censo_superior_faculty":
+                result = connector.get_faculty_profile(
+                    str(args.get("id_municipio", "")).strip()
+                )
+            elif tool_name == "bdg_get_censo_superior_features":
+                result = connector.get_censo_superior_features(
+                    str(args.get("id_municipio", "")).strip()
+                )
+            else:
+                raw_uf = args.get("sigla_uf")
+                result = connector.list_top_censo_superior_hubs(
+                    limit=int(args.get("limit", 10)),
+                    sigla_uf=str(raw_uf).strip() if raw_uf else None,
+                )
+            if not result:
+                return {
+                    "jsonrpc": "2.0",
+                    "id": req_id,
+                    "result": {
+                        "content": [
+                            {
+                                "type": "text",
+                                "text": "No INEP Censo da Educação Superior data found for the query.",
+                            }
+                        ],
+                        "isError": True,
+                    },
+                }
+            wrapped = wrap_untrusted_gov_data(result, source_id="inep_censo_superior")
             return {
                 "jsonrpc": "2.0",
                 "id": req_id,

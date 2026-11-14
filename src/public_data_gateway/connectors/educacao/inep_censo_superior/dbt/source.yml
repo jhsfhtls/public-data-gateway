@@ -1,0 +1,16 @@
+version: 2
+
+sources:
+  - name: inep_censo_superior_silver
+    description: "Bases oficiais do Censo da Educação Superior (INEP/MEC e SINAES) normalizadas na camada Silver."
+    meta:
+      external_location: "data/inep_censo_superior/silver/{name}.parquet"
+    tables:
+      - name: censo_superior_instituicoes_ies
+        description: "Inventário municipal de Instituições de Educação Superior (IES) ativas, universidades, rede pública vs. privada e IGC contínuo."
+      - name: censo_superior_cursos_areas_cine
+        description: "Distribuição municipal de cursos de graduação, matrículas, concluintes, EaD e Conceito ENADE por grande área CINE/OCDE."
+      - name: censo_superior_matriculas_ingressantes_concluintes
+        description: "Dinâmica municipal de matrículas presenciais e EaD, ingressantes, concluintes e taxas de trajetória TCG e TDA (INEP)."
+      - name: censo_superior_docentes_titulacao_regime
+        description: "Corpo docente em exercício na educação superior por titulação stricto sensu (doutores e mestres) e regime de trabalho."

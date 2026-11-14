@@ -1,6 +1,6 @@
 {
   "schema_version": "1.0.0",
-  "last_updated": "2026-11-13T21:40:00.000000",
+  "last_updated": "2026-11-13T22:05:00.000000",
   "project_name": "public-data-gateway",
   "ecosystem": "C.O.R.E. (core, operations, career, studies)",
   "governing_pops": [
@@ -13,10 +13,10 @@
     "POP_T_148"
   ],
   "current_macro_phase_id": "07",
-  "current_macro_phase": "Fase 07 - Ingestão Wave 5 (Saúde, Educação & Setor Notarial — 32/49 fontes homologadas [65.3%] com datasus_sim homologado; Próximo: inep_censo_superior)",
+  "current_macro_phase": "Fase 07 - Ingestão Wave 5 (Saúde, Educação & Setor Notarial — 33/49 fontes homologadas [67.3%] com inep_censo_superior homologado; Próximo: cnj_justica_aberta)",
   "overall_status": "ON_TRACK",
-  "active_connector": "inep_censo_superior",
-  "next_connector": "cnj_justica_aberta",
+  "active_connector": "cnj_justica_aberta",
+  "next_connector": "datasus_sinasc",
   "structural_phases": [
     {
       "phase_id": "00",
@@ -135,6 +135,7 @@
         "Conector datasus_sih (Produção Hospitalar AIH, Custos SUS/UTI, Morbidade CID-10 e Desfechos/ICSAP) - CONCLUÍDO",
         "Conector inep_censo_escolar (Escolas/Infraestrutura, Matrículas por Etapa, Docentes/AFD e Rendimento/Fluxo) - CONCLUÍDO",
         "Conector datasus_sim (Óbitos Gerais/DO, Causas Capítulos CID-10, Mortalidade Materno-Infantil e Prematura DCNT/Causas Externas) - CONCLUÍDO",
+        "Conector inep_censo_superior (Instituições IES/IGC, Cursos CINE/ENADE, Matrículas/TCG/TDA e Corpo Docente) - CONCLUÍDO",
         "Conectores DataSUS restantes (SINASC, OpenDataSUS) & anvisa_cmed",
         "Conectores INEP restantes (Superior, IDEB, ENEM) & capes_sucupira",
         "Conectores Notariais (cnj_justica_aberta, onr_registro_imoveis, capitais_iptu_itbi)"
@@ -414,6 +415,11 @@
     }
   ],
   "recent_milestones": [
+    {
+      "date": "2026-11-13",
+      "milestone": "Homologação do conector INEP Censo da Educação Superior (ODCS v3.1 + Medallion 5 tabelas + dbt + SDK/CLI/API/MCP + Pytest/Live) — 33/49 fontes homologadas (67.3%)",
+      "impact": "Conclusão do quinto conector da Wave 5 (Educação Superior: IES/IGC, Cursos CINE/ENADE, Matrículas/TCG/TDA, Corpo Docente e Hub Score), elevando a maturidade do catálogo para 67.3%."
+    },
     {
       "date": "2026-11-13",
       "phase_id": "07",

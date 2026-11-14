@@ -161,3 +161,164 @@ models:
         description: "Timestamp ISO-8601 UTC da extração."
         tests:
           - not_null
+
+  - name: mart_ecossistema_educacao_superior_brasil
+    description: "Data Mart Gold executivo de ecossistema universitário municipal, produção STEM/TI, titulação stricto sensu docente, trajetórias de conclusão TCG/TDA, IGC e classificação em 4 tiers (INEP Censo da Educação Superior)."
+    columns:
+      - name: id_municipio
+        description: "Código IBGE de 7 dígitos do município."
+        tests:
+          - unique
+          - not_null
+      - name: nome_municipio
+        description: "Nome oficial do município."
+        tests:
+          - not_null
+      - name: sigla_uf
+        description: "Sigla de 2 letras da Unidade Federativa."
+        tests:
+          - not_null
+      - name: id_uf
+        description: "Código IBGE de 2 dígitos da Unidade Federativa."
+        tests:
+          - not_null
+      - name: nome_uf
+        description: "Nome completo da Unidade Federativa."
+        tests:
+          - not_null
+      - name: regiao
+        description: "Grande região geográfica brasileira."
+        tests:
+          - not_null
+      - name: cnpj_14
+        description: "CNPJ canônico de 14 dígitos da mantenedora de IES de referência."
+        tests:
+          - not_null
+      - name: ano_censo
+        description: "Ano de referência do Censo da Educação Superior INEP."
+        tests:
+          - not_null
+      - name: total_ies_ativas
+        description: "Total de IES ativas no município."
+        tests:
+          - not_null
+      - name: universidades_e_centros_universitarios
+        description: "Quantidade de Universidades, Centros Universitários ou IFs/CEFETs."
+        tests:
+          - not_null
+      - name: ies_rede_publica
+        description: "Quantidade de IES públicas no município."
+        tests:
+          - not_null
+      - name: ies_rede_privada
+        description: "Quantidade de IES privadas no município."
+        tests:
+          - not_null
+      - name: proporcao_ies_publicas_pct
+        description: "Percentual de IES pertencentes à rede pública (%)."
+        tests:
+          - not_null
+      - name: total_cursos_graduacao
+        description: "Total de cursos de graduação ativos nas grandes áreas CINE."
+        tests:
+          - not_null
+      - name: total_matriculas_graduacao
+        description: "Total de matrículas ativas em cursos de graduação."
+        tests:
+          - not_null
+      - name: matriculas_presenciais
+        description: "Total de matrículas na modalidade presencial."
+        tests:
+          - not_null
+      - name: matriculas_ead_polo
+        description: "Total de matrículas na modalidade EaD."
+        tests:
+          - not_null
+      - name: proporcao_matriculas_ead_pct
+        description: "Participação percentual da modalidade EaD nas matrículas (%)."
+        tests:
+          - not_null
+      - name: ingressantes_anuais_total
+        description: "Total anual de ingressantes na graduação."
+        tests:
+          - not_null
+      - name: concluintes_anuais_total
+        description: "Total anual de egressos concluintes na graduação."
+        tests:
+          - not_null
+      - name: proporcao_matriculas_stem_ti_pct
+        description: "Percentual de matrículas em cursos STEM, Engenharia e Computação/TI (%)."
+        tests:
+          - not_null
+      - name: matriculas_stem_ti
+        description: "Matrículas consolidadas na área CINE STEM, Engenharia e Computação/TI."
+        tests:
+          - not_null
+      - name: matriculas_saude_bem_estar
+        description: "Matrículas consolidadas na área CINE Saúde e Bem-Estar."
+        tests:
+          - not_null
+      - name: total_docentes_exercicio_ies
+        description: "Total de docentes em exercício nas IES."
+        tests:
+          - not_null
+      - name: docentes_doutores
+        description: "Quantidade de docentes com título de doutorado."
+        tests:
+          - not_null
+      - name: docentes_mestres
+        description: "Quantidade de docentes com título de mestrado."
+        tests:
+          - not_null
+      - name: proporcao_doutores_pct
+        description: "Percentual de docentes doutores em exercício (%)."
+        tests:
+          - not_null
+      - name: proporcao_mestres_doutores_stricto_sensu_pct
+        description: "Percentual combinado de mestres e doutores stricto sensu (%)."
+        tests:
+          - not_null
+      - name: proporcao_regime_tempo_integral_de_pct
+        description: "Percentual de docentes em tempo integral ou dedicação exclusiva (%)."
+        tests:
+          - not_null
+      - name: razao_alunos_por_docente_equivalente
+        description: "Razão entre matrículas presenciais e docentes em exercício."
+        tests:
+          - not_null
+      - name: taxa_conclusao_acumulada_tcg_pct
+        description: "Taxa de Conclusão Acumulada de Graduação TCG INEP (%)."
+        tests:
+          - not_null
+      - name: taxa_desistencia_anual_tda_pct
+        description: "Taxa de Desistência Anual na graduação TDA INEP (%)."
+        tests:
+          - not_null
+      - name: igc_medio_continuo_municipio
+        description: "Média municipal do Índice Geral de Cursos (IGC contínuo 1,0 a 5,0)."
+        tests:
+          - not_null
+      - name: conceito_enade_medio_municipio
+        description: "Média do Conceito ENADE contínuo nas grandes áreas CINE."
+        tests:
+          - not_null
+      - name: score_excelencia_academica_pesquisa_ies
+        description: "Score normalizado (0 a 100) de excelência acadêmica, pesquisa, doutores e IGC das IES."
+        tests:
+          - not_null
+      - name: score_formacao_capital_humano_superior
+        description: "Score normalizado (0 a 100) de formação de capital humano superior, retenção TCG e concentração STEM/TI."
+        tests:
+          - not_null
+      - name: classificacao_polo_educacao_superior
+        description: "Classificação analítica do polo de Educação Superior em 4 tiers."
+        tests:
+          - not_null
+      - name: reference_date
+        description: "Data de referência ISO-8601 da coleta censitária."
+        tests:
+          - not_null
+      - name: extracted_at
+        description: "Timestamp ISO-8601 UTC da extração."
+        tests:
+          - not_null

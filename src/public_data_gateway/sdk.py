@@ -935,6 +935,7 @@ class EducationFacade:
     def __init__(self, sdk: "BrazilData") -> None:
         self._sdk = sdk
         self._censo_escolar_connector: Any = None
+        self._censo_superior_connector: Any = None
 
     @property
     def censo_escolar_connector(self) -> Any:
@@ -947,6 +948,18 @@ class EducationFacade:
                 settings=self._sdk.settings
             )
         return self._censo_escolar_connector
+
+    @property
+    def censo_superior_connector(self) -> Any:
+        if self._censo_superior_connector is None:
+            from public_data_gateway.connectors.educacao.inep_censo_superior.connector import (
+                INEPCensoSuperiorConnector,
+            )
+
+            self._censo_superior_connector = INEPCensoSuperiorConnector(
+                settings=self._sdk.settings
+            )
+        return self._censo_superior_connector
 
     def get_censo_escolar_infrastructure(self, id_municipio: str) -> dict[str, Any]:
         """Get municipal active schools inventory, broadband internet, labs, and PcD accessibility (INEP)."""
@@ -977,6 +990,38 @@ class EducationFacade:
     ) -> list[dict[str, Any]]:
         """List top Brazilian municipalities ranked by composite INEP school infrastructure score."""
         return self.censo_escolar_connector.list_top_censo_escolar_municipalities(
+            limit=limit, sigla_uf=sigla_uf
+        )
+
+    def get_censo_superior_institutions(self, id_municipio: str) -> dict[str, Any]:
+        """Get municipal higher education institutions (IES) profile from INEP Censo da Educação Superior."""
+        return self.censo_superior_connector.get_institutions_summary(id_municipio)
+
+    def list_censo_superior_cine_courses(
+        self, id_municipio: str, area_cine_rotulo: str | None = None
+    ) -> list[dict[str, Any]]:
+        """List degree courses and CINE areas by municipality from INEP Censo da Educação Superior."""
+        return self.censo_superior_connector.list_cine_area_courses(
+            id_municipio=id_municipio, area_cine_rotulo=area_cine_rotulo
+        )
+
+    def get_censo_superior_enrollments_graduates(self, id_municipio: str) -> dict[str, Any]:
+        """Get higher education enrollments, entrants, graduates, and dropout/retention metrics."""
+        return self.censo_superior_connector.get_enrollments_and_graduates(id_municipio)
+
+    def get_censo_superior_faculty_profile(self, id_municipio: str) -> dict[str, Any]:
+        """Get municipal higher education faculty qualifications (PhD/Master/DE) profile."""
+        return self.censo_superior_connector.get_faculty_profile(id_municipio)
+
+    def get_censo_superior_features(self, id_municipio: str) -> dict[str, Any]:
+        """Get normalized Gold INEP Censo da Educação Superior university hub and academic features."""
+        return self.censo_superior_connector.get_censo_superior_features(id_municipio)
+
+    def list_top_censo_superior_hubs(
+        self, limit: int = 10, sigla_uf: str | None = None
+    ) -> list[dict[str, Any]]:
+        """List top Brazilian municipalities ranked by composite INEP higher education excellence score."""
+        return self.censo_superior_connector.list_top_censo_superior_hubs(
             limit=limit, sigla_uf=sigla_uf
         )
 
@@ -1496,6 +1541,38 @@ class BrazilData:
     ) -> list[dict[str, Any]]:
         """Listar municípios líderes em infraestrutura escolar e qualidade educacional básica no Brasil (INEP)."""
         return self.education.list_top_censo_escolar_municipalities(
+            limit=limit, sigla_uf=sigla_uf
+        )
+
+    def get_censo_superior_institutions(self, id_municipio: str) -> dict[str, Any]:
+        """Consultar perfil de instituições de ensino superior (IES) no município (INEP)."""
+        return self.education.get_censo_superior_institutions(id_municipio)
+
+    def list_censo_superior_cine_courses(
+        self, id_municipio: str, area_cine_rotulo: str | None = None
+    ) -> list[dict[str, Any]]:
+        """Listar cursos presenciais/EaD e áreas CINE por município (INEP Censo Superior)."""
+        return self.education.list_censo_superior_cine_courses(
+            id_municipio=id_municipio, area_cine_rotulo=area_cine_rotulo
+        )
+
+    def get_censo_superior_enrollments_graduates(self, id_municipio: str) -> dict[str, Any]:
+        """Consultar matrículas, ingressantes, concluintes e fluxo acadêmico superior (INEP)."""
+        return self.education.get_censo_superior_enrollments_graduates(id_municipio)
+
+    def get_censo_superior_faculty_profile(self, id_municipio: str) -> dict[str, Any]:
+        """Consultar perfil docente (doutores, mestres e dedicação exclusiva) no ensino superior."""
+        return self.education.get_censo_superior_faculty_profile(id_municipio)
+
+    def get_censo_superior_features(self, id_municipio: str) -> dict[str, Any]:
+        """Consultar features Gold de polos universitários e capital humano superior (INEP)."""
+        return self.education.get_censo_superior_features(id_municipio)
+
+    def list_top_censo_superior_hubs(
+        self, limit: int = 10, sigla_uf: str | None = None
+    ) -> list[dict[str, Any]]:
+        """Listar municípios líderes em excelência e pesquisa na educação superior (INEP)."""
+        return self.education.list_top_censo_superior_hubs(
             limit=limit, sigla_uf=sigla_uf
         )
 

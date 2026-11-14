@@ -751,6 +751,36 @@ def build_parser() -> argparse.ArgumentParser:
     ce_rk_p.add_argument("--uf", type=str, help="Optional 2-letter state filter")
     ce_rk_p.add_argument("--json", action="store_true", help="Output in JSON format")
 
+    # INEP Censo da Educação Superior command group
+    cs_p = subparsers.add_parser("censo-superior", help="Query INEP Censo da Educação Superior IES, CINE courses, enrollments, faculty, and hubs.")
+    cs_sub = cs_p.add_subparsers(dest="censo_superior_action", required=True)
+
+    cs_ins_p = cs_sub.add_parser("institutions", help="Get municipal higher education institutions (IES) inventory and IGC (INEP).")
+    cs_ins_p.add_argument("id_municipio", help="7-digit IBGE municipality code (e.g. 3550308)")
+    cs_ins_p.add_argument("--json", action="store_true", help="Output in JSON format")
+
+    cs_crs_p = cs_sub.add_parser("courses", help="List higher education courses, enrollments, and ENADE by CINE area (INEP).")
+    cs_crs_p.add_argument("id_municipio", help="7-digit IBGE municipality code")
+    cs_crs_p.add_argument("--area", type=str, help="Optional CINE macroarea filter (e.g. STEM)")
+    cs_crs_p.add_argument("--json", action="store_true", help="Output in JSON format")
+
+    cs_enr_p = cs_sub.add_parser("enrollments", help="Get municipal undergraduate enrollments, freshmen, graduates, TCG and TDA rates.")
+    cs_enr_p.add_argument("id_municipio", help="7-digit IBGE municipality code")
+    cs_enr_p.add_argument("--json", action="store_true", help="Output in JSON format")
+
+    cs_fac_p = cs_sub.add_parser("faculty", help="Get municipal IES faculty PhD/Masters share and full-time DE regime profile.")
+    cs_fac_p.add_argument("id_municipio", help="7-digit IBGE municipality code")
+    cs_fac_p.add_argument("--json", action="store_true", help="Output in JSON format")
+
+    cs_ft_p = cs_sub.add_parser("features", help="Get Gold INEP Censo Superior academic excellence and human capital features.")
+    cs_ft_p.add_argument("id_municipio", help="7-digit IBGE municipality code")
+    cs_ft_p.add_argument("--json", action="store_true", help="Output in JSON format")
+
+    cs_rk_p = cs_sub.add_parser("ranking", help="List top Brazilian municipalities ranked by INEP Censo Superior excellence score.")
+    cs_rk_p.add_argument("--limit", type=int, default=10, help="Max municipalities to list")
+    cs_rk_p.add_argument("--uf", type=str, help="Optional 2-letter state filter")
+    cs_rk_p.add_argument("--json", action="store_true", help="Output in JSON format")
+
     # Direct shortcut: pnad-uf
     pnad_s_p = subparsers.add_parser("pnad-uf", help="Shortcut to query PNAD Contínua labor market profile.")
     pnad_s_p.add_argument("uf", type=str, help="IBGE 2-digit UF code or 2-letter state abbreviation (e.g. SP, 35)")
@@ -2572,6 +2602,78 @@ def main(argv: Sequence[str] | None = None) -> int:
                     print(f"Top {len(ranks)} Redes Municipais de Educação Básica (INEP Censo Escolar):")
                     for idx, r in enumerate(ranks, 1):
                         print(f"  {idx}. {r.get('nome_municipio')} ({r.get('sigla_uf')}): Infra {r.get('score_infraestrutura_escolar_inep')} | Fluxo: {r.get('score_qualidade_fluxo_educacional')} | {r.get('classificacao_rede_educacional_basica')}")
+                return 0
+
+        elif args.command == "censo-superior":
+            from public_data_gateway.connectors.educacao.inep_censo_superior.connector import (
+                INEPCensoSuperiorConnector,
+            )
+
+            cs_conn = INEPCensoSuperiorConnector()
+            cs_action = getattr(args, "censo_superior_action", None)
+            if cs_action == "institutions":
+                res = cs_conn.get_institutions_summary(args.id_municipio)
+                if getattr(args, "json", False):
+                    print(json.dumps(res, indent=2, ensure_ascii=False, default=str))
+                else:
+                    print(f"INEP Censo Superior Instituições IES ({res.get('nome_municipio')} - {res.get('id_municipio')}):")
+                    print(f"  IES Ativas / Univ:  {res.get('total_ies_ativas')} IES ({res.get('universidades_e_centros_universitarios')} Univ/Centros | {res.get('proporcao_ies_publicas_pct')}% públicas)")
+                    print(f"  IGC Contínuo Médio: {res.get('igc_medio_continuo_municipio')}")
+                return 0
+
+            if cs_action == "courses":
+                rows = cs_conn.list_cine_area_courses(
+                    args.id_municipio, area_cine_rotulo=getattr(args, "area", None)
+                )
+                if getattr(args, "json", False):
+                    print(json.dumps(rows, indent=2, ensure_ascii=False, default=str))
+                else:
+                    print(f"INEP Censo Superior Cursos por Área CINE ({args.id_municipio}):")
+                    for r in rows:
+                        print(f"  - {r.get('area_cine_rotulo')}: {r.get('cursos_graduacao_ativos')} cursos | {r.get('matriculas_ativas_area')} matrículas ({r.get('participacao_matriculas_area_pct')}%) | ENADE: {r.get('conceito_enade_medio_area')}")
+                return 0
+
+            if cs_action == "enrollments":
+                res = cs_conn.get_enrollments_and_graduates(args.id_municipio)
+                if getattr(args, "json", False):
+                    print(json.dumps(res, indent=2, ensure_ascii=False, default=str))
+                else:
+                    print(f"INEP Censo Superior Matrículas & Fluxo ({res.get('nome_municipio')} - {res.get('id_municipio')}):")
+                    print(f"  Matrículas / EaD:   {res.get('total_matriculas_graduacao')} ({res.get('proporcao_matriculas_ead_pct')}% EaD)")
+                    print(f"  Conclusão / Desist: {res.get('taxa_conclusao_acumulada_tcg_pct')}% TCG | {res.get('taxa_desistencia_anual_tda_pct')}% TDA")
+                return 0
+
+            if cs_action == "faculty":
+                res = cs_conn.get_faculty_profile(args.id_municipio)
+                if getattr(args, "json", False):
+                    print(json.dumps(res, indent=2, ensure_ascii=False, default=str))
+                else:
+                    print(f"INEP Censo Superior Corpo Docente ({res.get('nome_municipio')} - {res.get('id_municipio')}):")
+                    print(f"  Docentes / Doutores:{res.get('total_docentes_exercicio_ies')} ({res.get('proporcao_doutores_pct')}% doutores)")
+                    print(f"  Regime DE / Razão:  {res.get('proporcao_regime_tempo_integral_de_pct')}% DE | {res.get('razao_alunos_por_docente_equivalente')} alunos/docente")
+                return 0
+
+            if cs_action == "features":
+                feat = cs_conn.get_censo_superior_features(args.id_municipio)
+                if getattr(args, "json", False):
+                    print(json.dumps(feat, indent=2, ensure_ascii=False, default=str))
+                else:
+                    print(f"INEP Censo Superior Features Polos Universitários: {feat.get('nome_municipio')} ({feat.get('sigla_uf')} - {feat.get('id_municipio')}):")
+                    print(f"  Score Excelência IES:{feat.get('score_excelencia_academica_pesquisa_ies')}/100.0")
+                    print(f"  Score Cap. Humano:   {feat.get('score_formacao_capital_humano_superior')}/100.0")
+                    print(f"  Classificação Polo:  {feat.get('classificacao_polo_educacao_superior')}")
+                return 0
+
+            if cs_action == "ranking":
+                ranks = cs_conn.list_top_censo_superior_hubs(
+                    limit=getattr(args, "limit", 10), sigla_uf=getattr(args, "uf", None)
+                )
+                if getattr(args, "json", False):
+                    print(json.dumps(ranks, indent=2, ensure_ascii=False, default=str))
+                else:
+                    print(f"Top {len(ranks)} Polos Universitários & Educação Superior (INEP Censo Superior):")
+                    for idx, r in enumerate(ranks, 1):
+                        print(f"  {idx}. {r.get('nome_municipio')} ({r.get('sigla_uf')}): Excelência {r.get('score_excelencia_academica_pesquisa_ies')} | Cap. Humano: {r.get('score_formacao_capital_humano_superior')} | {r.get('classificacao_polo_educacao_superior')}")
                 return 0
 
         elif args.command == "pib-municipal":
