@@ -1,0 +1,527 @@
+schema_version: "3.1.0"
+contract_id: "ODCS-BR-DATASUS-CNES-001"
+source_id: "datasus_cnes"
+version: "1.0.0"
+name: "DataSUS: Cadastro Nacional de Estabelecimentos de Saúde (CNES)"
+agency: "Ministério da Saúde / DataSUS"
+official_url: "https://cnes.datasus.gov.br/"
+
+legal_framework:
+  statutes:
+    - name: "Lei nº 8.080/1990"
+      description: "Dispõe sobre as condições para a promoção, proteção e recuperação da saúde e regula o Sistema Único de Saúde (SUS)"
+    - name: "Portaria de Consolidação GM/MS nº 1/2017"
+      description: "Consolidação das normas sobre os direitos e deveres dos usuários da saúde, organização e funcionamento do SUS e do CNES"
+    - name: "Portaria SAS/MS nº 1.646/2015"
+      description: "Institui o Cadastro Nacional de Estabelecimentos de Saúde (CNES) como registro oficial obrigatório em todo o território nacional"
+    - name: "Decreto nº 8.777/2016"
+      description: "Institui a Política de Dados Abertos do Poder Executivo Federal"
+
+data_governance:
+  grain: "municipio_rede_assistencial"
+  primary_keys:
+    - "id_municipio"
+    - "sigla_uf"
+    - "cnpj_14"
+    - "cep_8"
+  reference_date_column: "reference_date"
+  min_expected_rows: 5
+  max_volume_drop_pct: 15.0
+  freshness_sla_hours: 720
+  lgpd_tier: "PUBLIC_NON_PERSONAL"
+  ml_feature_domains:
+    - "health_facilities"
+    - "icu_beds_capacity"
+
+schema:
+  tables:
+    cnes_estabelecimentos_saude:
+      description: "Consolidação municipal de estabelecimentos de saúde cadastrados no CNES (hospitais, UBS, UPAs, vínculo SUS e unidade âncora de referência)"
+      grain: "id_municipio, ano_mes_competencia"
+      primary_keys: ["id_municipio", "ano_mes_competencia"]
+      min_expected_rows: 5
+      columns:
+        - name: "id_municipio"
+          data_type: "string"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Código IBGE de 7 dígitos identificador único do município"
+        - name: "nome_municipio"
+          data_type: "string"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Nome oficial do município"
+        - name: "sigla_uf"
+          data_type: "string"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Sigla de 2 letras da Unidade Federativa"
+        - name: "id_uf"
+          data_type: "string"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Código IBGE de 2 dígitos da Unidade Federativa"
+        - name: "ano_mes_competencia"
+          data_type: "string"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Competência mensal do cadastro CNES no formato AAAAMM"
+        - name: "codigo_cnes_referencia"
+          data_type: "string"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Código CNES de 7 dígitos da principal unidade hospitalar de referência no município"
+        - name: "cnpj_14"
+          data_type: "string"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "CNPJ de 14 dígitos da entidade mantenedora ou fundo municipal de saúde de referência"
+        - name: "cep_8"
+          data_type: "string"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "CEP de 8 dígitos da unidade assistencial de referência"
+        - name: "estabelecimento_referencia_nome"
+          data_type: "string"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Nome fantasia ou denominação oficial do estabelecimento de referência CNES"
+        - name: "total_estabelecimentos_ativos"
+          data_type: "integer"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Total de estabelecimentos de saúde ativos cadastrados no CNES no município"
+        - name: "hospitais_gerais_especializados"
+          data_type: "integer"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Quantidade de hospitais gerais e especializados em operação"
+        - name: "unidades_basicas_saude_ubs"
+          data_type: "integer"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Quantidade de Unidades Básicas de Saúde e Centros de Saúde ativos"
+        - name: "unidades_pronto_atendimento_upa"
+          data_type: "integer"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Quantidade de Unidades de Pronto Atendimento e prontos-socorros 24h"
+        - name: "estabelecimentos_atendimento_sus"
+          data_type: "integer"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Quantidade de estabelecimentos com convênio ou atendimento ao SUS"
+        - name: "proporcao_rede_sus_pct"
+          data_type: "double"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Percentual de estabelecimentos ativos integrados à rede assistencial SUS"
+        - name: "source_url"
+          data_type: "string"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "URL oficial do portal DataSUS CNES consultado"
+        - name: "reference_date"
+          data_type: "string"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Data de referência ISO-8601 da competência"
+        - name: "extracted_at"
+          data_type: "string"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Timestamp ISO-8601 UTC da extração"
+
+    cnes_leitos_hospitalares_uti:
+      description: "Capacidade instalada de leitos hospitalares totais, leitos SUS, leitos de UTI adulto, pediátrico/neonatal e taxas per capita por município"
+      grain: "id_municipio, ano_mes_competencia"
+      primary_keys: ["id_municipio", "ano_mes_competencia"]
+      min_expected_rows: 5
+      columns:
+        - name: "id_municipio"
+          data_type: "string"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Código IBGE de 7 dígitos do município"
+        - name: "nome_municipio"
+          data_type: "string"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Nome oficial do município"
+        - name: "sigla_uf"
+          data_type: "string"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Sigla de 2 letras da Unidade Federativa"
+        - name: "ano_mes_competencia"
+          data_type: "string"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Competência mensal de referência no formato AAAAMM"
+        - name: "total_leitos_hospitalares"
+          data_type: "integer"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Total de leitos hospitalares de internação e complementares instalados"
+        - name: "leitos_sus"
+          data_type: "integer"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Quantidade de leitos hospitalares disponíveis ao Sistema Único de Saúde"
+        - name: "leitos_nao_sus"
+          data_type: "integer"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Quantidade de leitos hospitalares destinados à saúde suplementar e particular"
+        - name: "total_leitos_uti"
+          data_type: "integer"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Total de leitos de Unidade de Terapia Intensiva (UTI) habilitados"
+        - name: "leitos_uti_adulto"
+          data_type: "integer"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Quantidade de leitos de UTI adulto (tipos I, II e III)"
+        - name: "leitos_uti_pediatrico_neonatal"
+          data_type: "integer"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Quantidade de leitos de UTI pediátrica e neonatal"
+        - name: "leitos_uti_sus"
+          data_type: "integer"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Quantidade de leitos de UTI vinculados ao atendimento SUS"
+        - name: "leitos_por_1000_hab"
+          data_type: "double"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Taxa de leitos hospitalares gerais por 1.000 habitantes"
+        - name: "leitos_uti_por_10k_hab"
+          data_type: "double"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Taxa de leitos de UTI por 10.000 habitantes"
+        - name: "source_url"
+          data_type: "string"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "URL oficial do portal DataSUS CNES consultado"
+        - name: "reference_date"
+          data_type: "string"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Data de referência ISO-8601"
+        - name: "extracted_at"
+          data_type: "string"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Timestamp ISO-8601 UTC da extração"
+
+    cnes_equipamentos_diagnostico:
+      description: "Parque de equipamentos médicos de alta e média complexidade em uso (tomógrafos, ressonância magnética, mamógrafos, hemodiálise e raio-X) por município"
+      grain: "id_municipio, ano_mes_competencia"
+      primary_keys: ["id_municipio", "ano_mes_competencia"]
+      min_expected_rows: 5
+      columns:
+        - name: "id_municipio"
+          data_type: "string"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Código IBGE de 7 dígitos do município"
+        - name: "nome_municipio"
+          data_type: "string"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Nome oficial do município"
+        - name: "sigla_uf"
+          data_type: "string"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Sigla de 2 letras da Unidade Federativa"
+        - name: "ano_mes_competencia"
+          data_type: "string"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Competência mensal de referência no formato AAAAMM"
+        - name: "tomografos_computadorizados"
+          data_type: "integer"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Quantidade de tomógrafos computadorizados em uso"
+        - name: "ressonancia_magnetica"
+          data_type: "integer"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Quantidade de equipamentos de ressonância magnética em operação"
+        - name: "mamografos_em_uso"
+          data_type: "integer"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Quantidade de mamógrafos (simples e com estereotaxia) em uso"
+        - name: "aparelhos_hemodialise"
+          data_type: "integer"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Quantidade de máquinas de hemodiálise ativas para terapia renal substitutiva"
+        - name: "aparelhos_raio_x"
+          data_type: "integer"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Quantidade total de aparelhos de diagnóstico por raio-X em uso"
+        - name: "proporcao_equipamentos_sus_pct"
+          data_type: "double"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Percentual dos equipamentos de imagem e diagnóstico disponíveis ao SUS"
+        - name: "indice_disponibilidade_diagnostica"
+          data_type: "double"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Índice normalizado (0 a 100) de densidade de equipamentos diagnósticos críticos"
+        - name: "source_url"
+          data_type: "string"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "URL oficial do portal DataSUS CNES consultado"
+        - name: "reference_date"
+          data_type: "string"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Data de referência ISO-8601"
+        - name: "extracted_at"
+          data_type: "string"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Timestamp ISO-8601 UTC da extração"
+
+    cnes_profissionais_equipes_saude:
+      description: "Vínculos ativos de profissionais de saúde e equipes de Atenção Primária (Médicos, Enfermeiros e Equipes de Saúde da Família) por município"
+      grain: "id_municipio, categoria_profissional"
+      primary_keys: ["id_municipio", "categoria_profissional"]
+      min_expected_rows: 15
+      columns:
+        - name: "id_municipio"
+          data_type: "string"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Código IBGE de 7 dígitos do município"
+        - name: "nome_municipio"
+          data_type: "string"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Nome oficial do município"
+        - name: "sigla_uf"
+          data_type: "string"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Sigla de 2 letras da Unidade Federativa"
+        - name: "categoria_profissional"
+          data_type: "string"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Categoria assistencial analisada (Medicos, Enfermeiros ou Equipes_Saude_Familia_eSF)"
+        - name: "total_vinculos_ativos"
+          data_type: "integer"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Quantidade total de vínculos profissionais ou equipes ativas no CNES"
+        - name: "vinculos_atendimento_sus"
+          data_type: "integer"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Quantidade de vínculos ou equipes atuantes no atendimento pelo SUS"
+        - name: "carga_horaria_semanal_media"
+          data_type: "double"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Carga horária semanal média praticada pela categoria no município"
+        - name: "densidade_por_10k_hab"
+          data_type: "double"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Densidade de profissionais ou equipes por 10.000 habitantes"
+        - name: "source_url"
+          data_type: "string"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "URL oficial do portal DataSUS CNES consultado"
+        - name: "reference_date"
+          data_type: "string"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Data de referência ISO-8601"
+        - name: "extracted_at"
+          data_type: "string"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Timestamp ISO-8601 UTC da extração"
+
+    features_cnes_capacidade_assistencial_municipios_brasil:
+      description: "Feature Store Gold municipal de capacidade hospitalar, densidade de leitos de UTI e classificação hierárquica da rede assistencial de saúde"
+      grain: "id_municipio"
+      primary_keys: ["id_municipio"]
+      min_expected_rows: 5
+      columns:
+        - name: "id_municipio"
+          data_type: "string"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Código IBGE de 7 dígitos do município"
+        - name: "sigla_uf"
+          data_type: "string"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Sigla de 2 letras da Unidade Federativa"
+        - name: "nome_municipio"
+          data_type: "string"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Nome oficial do município"
+        - name: "cnpj_14"
+          data_type: "string"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "CNPJ de 14 dígitos da entidade de referência municipal no CNES"
+        - name: "cep_8"
+          data_type: "string"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "CEP de 8 dígitos da unidade hospitalar de referência"
+        - name: "total_estabelecimentos_ativos"
+          data_type: "integer"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Total de estabelecimentos de saúde ativos no município"
+        - name: "hospitais_gerais_especializados"
+          data_type: "integer"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Total de hospitais gerais e especializados cadastrados"
+        - name: "unidades_basicas_saude_ubs"
+          data_type: "integer"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Total de Unidades Básicas de Saúde (UBS) em operação"
+        - name: "total_leitos_hospitalares"
+          data_type: "integer"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Total de leitos hospitalares instalados"
+        - name: "total_leitos_uti"
+          data_type: "integer"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Total de leitos de UTI habilitados"
+        - name: "leitos_por_1000_hab"
+          data_type: "double"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Taxa de leitos hospitalares por 1.000 habitantes"
+        - name: "leitos_uti_por_10k_hab"
+          data_type: "double"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Taxa de leitos de UTI por 10.000 habitantes"
+        - name: "score_capacidade_hospitalar"
+          data_type: "double"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Score composto (0 a 100) de capacidade instalada hospitalar e disponibilidade assistencial"
+        - name: "score_alta_complexidade_uti"
+          data_type: "double"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Score normalizado (0 a 100) de densidade de UTI, parque diagnóstico e rede hospitalar"
+        - name: "classificacao_rede_assistencial"
+          data_type: "string"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Classificação hierárquica da rede de saúde (POLO_MACRORREGIONAL_ALTA_COMPLEXIDADE, CENTRO_REFERENCIA_HOSPITALAR_REGIONAL, REDE_ASSISTENCIAL_SECUNDARIA, ATENCAO_BASICA_PREDOMINANTE)"
+        - name: "reference_date"
+          data_type: "string"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Data de referência ISO-8601 da apuração"
+        - name: "extracted_at"
+          data_type: "string"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Timestamp ISO-8601 UTC da geração da Feature Store"

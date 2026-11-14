@@ -727,6 +727,65 @@ class MCPDispatcher:
                                 },
                             },
                             {
+                                "name": "bdg_get_cnes_establishments",
+                                "description": "Get municipal DataSUS CNES summary of active health establishments, hospitals, UBS, UPA, and SUS coverage share.",
+                                "inputSchema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "id_municipio": {
+                                            "type": "string",
+                                            "description": "7-digit IBGE municipality code (e.g. 3550308)",
+                                        },
+                                    },
+                                    "required": ["id_municipio"],
+                                },
+                            },
+                            {
+                                "name": "bdg_get_cnes_beds_icu",
+                                "description": "Get municipal DataSUS CNES hospital bed capacity, SUS beds, and Adult/Pediatric/Neonatal ICU bed counts.",
+                                "inputSchema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "id_municipio": {
+                                            "type": "string",
+                                            "description": "7-digit IBGE municipality code (e.g. 3550308)",
+                                        },
+                                    },
+                                    "required": ["id_municipio"],
+                                },
+                            },
+                            {
+                                "name": "bdg_get_cnes_health_features",
+                                "description": "Get Gold health capacity score, ICU complexity score, and assistive network classification for a municipality (DataSUS CNES).",
+                                "inputSchema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "id_municipio": {
+                                            "type": "string",
+                                            "description": "7-digit IBGE municipality code (e.g. 3550308)",
+                                        },
+                                    },
+                                    "required": ["id_municipio"],
+                                },
+                            },
+                            {
+                                "name": "bdg_list_top_health_hubs",
+                                "description": "List top Brazilian municipalities ranked by composite DataSUS CNES hospital capacity and ICU complexity score.",
+                                "inputSchema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "limit": {
+                                            "type": "integer",
+                                            "description": "Maximum rows (default: 10)",
+                                        },
+                                        "sigla_uf": {
+                                            "type": "string",
+                                            "description": "Optional 2-letter state filter (e.g. SP)",
+                                        },
+                                    },
+                                },
+                            },
+                            {
                                 "name": "bdg_get_labor_force_indicators",
                                 "description": "Query official quarterly labor force, population, and unemployment rate by Brazilian UF from IBGE PNAD Contínua (Tier 1).",
                                 "inputSchema": {
@@ -1735,6 +1794,53 @@ class MCPDispatcher:
                     },
                 }
             wrapped = wrap_untrusted_gov_data(result, source_id="antt_malha_transporte")
+            return {
+                "jsonrpc": "2.0",
+                "id": req_id,
+                "result": {"content": [{"type": "text", "text": wrapped}], "isError": False},
+            }
+
+        if tool_name in {
+            "bdg_get_cnes_establishments",
+            "bdg_get_cnes_beds_icu",
+            "bdg_get_cnes_health_features",
+            "bdg_list_top_health_hubs",
+        }:
+            from public_data_gateway.connectors.saude.datasus_cnes.connector import (
+                DataSUSCnesConnector,
+            )
+
+            connector = DataSUSCnesConnector(settings=self.settings)
+            if tool_name == "bdg_get_cnes_establishments":
+                result: Any = connector.get_establishments_summary(
+                    str(args.get("id_municipio", "")).strip()
+                )
+            elif tool_name == "bdg_get_cnes_beds_icu":
+                result = connector.get_hospital_beds_icu(
+                    str(args.get("id_municipio", "")).strip()
+                )
+            elif tool_name == "bdg_get_cnes_health_features":
+                result = connector.get_health_capacity_features(
+                    str(args.get("id_municipio", "")).strip()
+                )
+            else:
+                raw_uf = args.get("sigla_uf")
+                result = connector.list_top_health_hubs(
+                    limit=int(args.get("limit", 10)),
+                    sigla_uf=str(raw_uf).strip() if raw_uf else None,
+                )
+            if not result:
+                return {
+                    "jsonrpc": "2.0",
+                    "id": req_id,
+                    "result": {
+                        "content": [
+                            {"type": "text", "text": "No DataSUS CNES data found for the query."}
+                        ],
+                        "isError": True,
+                    },
+                }
+            wrapped = wrap_untrusted_gov_data(result, source_id="datasus_cnes")
             return {
                 "jsonrpc": "2.0",
                 "id": req_id,

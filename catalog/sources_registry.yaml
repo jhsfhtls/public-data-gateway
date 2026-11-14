@@ -769,7 +769,7 @@ sources:
   - P02
   rice_score: 480
   roadmap_wave: 5
-  status: CATALOGED
+  status: HOMOLOGATED
 - source_id: datasus_sih
   name: 'DataSUS: Sistema de Informações Hospitalares (SIH/SUS)'
   agency: Ministério da Saúde / DataSUS

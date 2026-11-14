@@ -1251,4 +1251,69 @@ def create_app(settings: GatewaySettings | None = None) -> FastAPI:
         conn = AnttMalhaTransporteConnector(settings=app_settings)
         return conn.get_highway_corridors(id_municipio)
 
+    @app.get("/api/v1/health-public/cnes/top-hubs")
+    async def get_top_health_hubs(
+        limit: int = Query(10, ge=1, le=50, description="Max municipalities to list"),
+        uf: str | None = Query(None, description="Filter by 2-letter state abbreviation"),
+    ) -> list[dict[str, Any]]:
+        from public_data_gateway.connectors.saude.datasus_cnes.connector import (
+            DataSUSCnesConnector,
+        )
+
+        conn = DataSUSCnesConnector(settings=app_settings)
+        return conn.list_top_health_hubs(limit=limit, sigla_uf=uf)
+
+    @app.get("/api/v1/health-public/cnes/features/{id_municipio}")
+    async def get_cnes_health_features(id_municipio: str) -> dict[str, Any]:
+        from public_data_gateway.connectors.saude.datasus_cnes.connector import (
+            DataSUSCnesConnector,
+        )
+
+        conn = DataSUSCnesConnector(settings=app_settings)
+        return conn.get_health_capacity_features(id_municipio)
+
+    @app.get("/api/v1/health-public/cnes/beds/{id_municipio}")
+    async def get_cnes_beds_icu(id_municipio: str) -> dict[str, Any]:
+        from public_data_gateway.connectors.saude.datasus_cnes.connector import (
+            DataSUSCnesConnector,
+        )
+
+        conn = DataSUSCnesConnector(settings=app_settings)
+        return conn.get_hospital_beds_icu(id_municipio)
+
+    @app.get("/api/v1/health-public/cnes/equipment/{id_municipio}")
+    async def get_cnes_equipment(id_municipio: str) -> dict[str, Any]:
+        from public_data_gateway.connectors.saude.datasus_cnes.connector import (
+            DataSUSCnesConnector,
+        )
+
+        conn = DataSUSCnesConnector(settings=app_settings)
+        return conn.get_diagnostic_equipment(id_municipio)
+
+    @app.get("/api/v1/health-public/cnes/workforce/{id_municipio}")
+    async def get_cnes_workforce(
+        id_municipio: str,
+        categoria: str | None = Query(
+            None, description="Optional workforce category filter (e.g. Medicos)"
+        ),
+    ) -> list[dict[str, Any]]:
+        from public_data_gateway.connectors.saude.datasus_cnes.connector import (
+            DataSUSCnesConnector,
+        )
+
+        conn = DataSUSCnesConnector(settings=app_settings)
+        return conn.list_health_workforce(
+            id_municipio, categoria_profissional=categoria
+        )
+
+    @app.get("/api/v1/health-public/cnes/establishments/{id_municipio}")
+    @app.get("/api/v1/cnes/{id_municipio}")
+    async def get_cnes_establishments(id_municipio: str) -> dict[str, Any]:
+        from public_data_gateway.connectors.saude.datasus_cnes.connector import (
+            DataSUSCnesConnector,
+        )
+
+        conn = DataSUSCnesConnector(settings=app_settings)
+        return conn.get_establishments_summary(id_municipio)
+
     return app

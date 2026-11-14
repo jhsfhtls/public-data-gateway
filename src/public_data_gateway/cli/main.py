@@ -631,6 +631,36 @@ def build_parser() -> argparse.ArgumentParser:
     antt_rk_p.add_argument("--uf", type=str, help="Optional 2-letter state filter")
     antt_rk_p.add_argument("--json", action="store_true", help="Output in JSON format")
 
+    # DataSUS CNES (Cadastro Nacional de Estabelecimentos de Saúde) command group
+    cnes_p = subparsers.add_parser("cnes", help="Query DataSUS CNES health establishments, beds/ICU, equipment, and workforce analytics.")
+    cnes_sub = cnes_p.add_subparsers(dest="cnes_action", required=True)
+
+    cnes_est_p = cnes_sub.add_parser("establishments", help="Get municipal CNES health establishments summary.")
+    cnes_est_p.add_argument("id_municipio", help="7-digit IBGE municipality code (e.g. 3550308)")
+    cnes_est_p.add_argument("--json", action="store_true", help="Output in JSON format")
+
+    cnes_bed_p = cnes_sub.add_parser("beds", help="Get municipal CNES hospital and ICU bed capacity.")
+    cnes_bed_p.add_argument("id_municipio", help="7-digit IBGE municipality code")
+    cnes_bed_p.add_argument("--json", action="store_true", help="Output in JSON format")
+
+    cnes_eq_p = cnes_sub.add_parser("equipment", help="Get municipal CNES diagnostic imaging and dialysis equipment.")
+    cnes_eq_p.add_argument("id_municipio", help="7-digit IBGE municipality code")
+    cnes_eq_p.add_argument("--json", action="store_true", help="Output in JSON format")
+
+    cnes_wf_p = cnes_sub.add_parser("workforce", help="List municipal CNES health workforce and eSF teams.")
+    cnes_wf_p.add_argument("id_municipio", help="7-digit IBGE municipality code")
+    cnes_wf_p.add_argument("--categoria", type=str, help="Optional category filter (e.g. Medicos)")
+    cnes_wf_p.add_argument("--json", action="store_true", help="Output in JSON format")
+
+    cnes_ft_p = cnes_sub.add_parser("features", help="Get Gold health capacity and ICU complexity features.")
+    cnes_ft_p.add_argument("id_municipio", help="7-digit IBGE municipality code")
+    cnes_ft_p.add_argument("--json", action="store_true", help="Output in JSON format")
+
+    cnes_rk_p = cnes_sub.add_parser("ranking", help="List top municipalities ranked by composite CNES health capacity score.")
+    cnes_rk_p.add_argument("--limit", type=int, default=10, help="Max municipalities to list")
+    cnes_rk_p.add_argument("--uf", type=str, help="Optional 2-letter state filter")
+    cnes_rk_p.add_argument("--json", action="store_true", help="Output in JSON format")
+
     # Direct shortcut: pnad-uf
     pnad_s_p = subparsers.add_parser("pnad-uf", help="Shortcut to query PNAD Contínua labor market profile.")
     pnad_s_p.add_argument("uf", type=str, help="IBGE 2-digit UF code or 2-letter state abbreviation (e.g. SP, 35)")
@@ -2164,6 +2194,78 @@ def main(argv: Sequence[str] | None = None) -> int:
                     print(f"Top {len(ranks)} Municípios por Infraestrutura Logística (ANTT):")
                     for idx, r in enumerate(ranks, 1):
                         print(f"  {idx}. {r.get('nome_municipio')} ({r.get('sigla_uf')}): Score {r.get('score_infraestrutura_logistica')} | Intermodal: {r.get('score_intermodalidade_cargas')} | {r.get('classificacao_nodo_logistico')}")
+                return 0
+
+        elif args.command == "cnes":
+            from public_data_gateway.connectors.saude.datasus_cnes.connector import (
+                DataSUSCnesConnector,
+            )
+
+            cnes_conn = DataSUSCnesConnector()
+            cnes_action = getattr(args, "cnes_action", None)
+            if cnes_action == "establishments":
+                res = cnes_conn.get_establishments_summary(args.id_municipio)
+                if getattr(args, "json", False):
+                    print(json.dumps(res, indent=2, ensure_ascii=False, default=str))
+                else:
+                    print(f"DataSUS CNES Estabelecimentos ({res.get('nome_municipio')} - {res.get('id_municipio')}):")
+                    print(f"  Ativos / SUS:        {res.get('total_estabelecimentos_ativos')} ({res.get('proporcao_rede_sus_pct')}% SUS)")
+                    print(f"  Hospitais / UBS / UPA: {res.get('hospitais_gerais_especializados')} / {res.get('unidades_basicas_saude_ubs')} / {res.get('unidades_pronto_atendimento_upa')}")
+                return 0
+
+            if cnes_action == "beds":
+                res = cnes_conn.get_hospital_beds_icu(args.id_municipio)
+                if getattr(args, "json", False):
+                    print(json.dumps(res, indent=2, ensure_ascii=False, default=str))
+                else:
+                    print(f"DataSUS CNES Leitos & UTI ({res.get('nome_municipio')} - {res.get('id_municipio')}):")
+                    print(f"  Leitos Totais / SUS: {res.get('total_leitos_hospitalares')} / {res.get('leitos_sus')} ({res.get('leitos_por_1000_hab')} por 1.000 hab)")
+                    print(f"  UTI Total (Ad/Ped):  {res.get('total_leitos_uti')} ({res.get('leitos_uti_adulto')}/{res.get('leitos_uti_pediatrico_neonatal')}) | {res.get('leitos_uti_por_10k_hab')} por 10k hab")
+                return 0
+
+            if cnes_action == "equipment":
+                res = cnes_conn.get_diagnostic_equipment(args.id_municipio)
+                if getattr(args, "json", False):
+                    print(json.dumps(res, indent=2, ensure_ascii=False, default=str))
+                else:
+                    print(f"DataSUS CNES Equipamentos Diagnósticos ({res.get('nome_municipio')} - {res.get('id_municipio')}):")
+                    print(f"  TC / RM / Mamógrafos:{res.get('tomografos_computadorizados')} / {res.get('ressonancia_magnetica')} / {res.get('mamografos_em_uso')}")
+                    print(f"  Hemodiálise / Índice:{res.get('aparelhos_hemodialise')} | Score Diag {res.get('indice_disponibilidade_diagnostica')}/100.0 ({res.get('proporcao_equipamentos_sus_pct')}% SUS)")
+                return 0
+
+            if cnes_action == "workforce":
+                rows = cnes_conn.list_health_workforce(
+                    args.id_municipio, categoria_profissional=getattr(args, "categoria", None)
+                )
+                if getattr(args, "json", False):
+                    print(json.dumps(rows, indent=2, ensure_ascii=False, default=str))
+                else:
+                    print(f"DataSUS CNES Força de Trabalho ({args.id_municipio}):")
+                    for r in rows:
+                        print(f"  - {r.get('categoria_profissional')}: {r.get('total_vinculos_ativos')} vínculos ({r.get('vinculos_atendimento_sus')} SUS) | {r.get('densidade_por_10k_hab')}/10k hab | {r.get('carga_horaria_semanal_media')}h/sem")
+                return 0
+
+            if cnes_action == "features":
+                feat = cnes_conn.get_health_capacity_features(args.id_municipio)
+                if getattr(args, "json", False):
+                    print(json.dumps(feat, indent=2, ensure_ascii=False, default=str))
+                else:
+                    print(f"DataSUS CNES Features Assistenciais: {feat.get('nome_municipio')} ({feat.get('sigla_uf')} - {feat.get('id_municipio')}):")
+                    print(f"  Score Capacidade Hosp: {feat.get('score_capacidade_hospitalar')}/100.0")
+                    print(f"  Score Complexidade UTI:{feat.get('score_alta_complexidade_uti')}/100.0")
+                    print(f"  Classificação Rede:    {feat.get('classificacao_rede_assistencial')}")
+                return 0
+
+            if cnes_action == "ranking":
+                ranks = cnes_conn.list_top_health_hubs(
+                    limit=getattr(args, "limit", 10), sigla_uf=getattr(args, "uf", None)
+                )
+                if getattr(args, "json", False):
+                    print(json.dumps(ranks, indent=2, ensure_ascii=False, default=str))
+                else:
+                    print(f"Top {len(ranks)} Polos de Capacidade Assistencial (DataSUS CNES):")
+                    for idx, r in enumerate(ranks, 1):
+                        print(f"  {idx}. {r.get('nome_municipio')} ({r.get('sigla_uf')}): Hosp {r.get('score_capacidade_hospitalar')} | UTI: {r.get('score_alta_complexidade_uti')} | {r.get('classificacao_rede_assistencial')}")
                 return 0
 
         elif args.command == "pib-municipal":

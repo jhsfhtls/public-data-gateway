@@ -1,6 +1,6 @@
 {
   "schema_version": "1.0.0",
-  "last_updated": "2026-11-13T20:20:00.000000",
+  "last_updated": "2026-11-13T20:40:00.000000",
   "project_name": "public-data-gateway",
   "ecosystem": "C.O.R.E. (core, operations, career, studies)",
   "governing_pops": [
@@ -13,10 +13,10 @@
     "POP_T_148"
   ],
   "current_macro_phase_id": "07",
-  "current_macro_phase": "Fase 07 - Ingestão Wave 5 (Saúde, Educação & Setor Notarial — Wave 4 100% Concluída com antt_malha_transporte homologado; Próximo: datasus_cnes)",
+  "current_macro_phase": "Fase 07 - Ingestão Wave 5 (Saúde, Educação & Setor Notarial — 29/49 fontes homologadas [59.2%] com datasus_cnes homologado; Próximo: datasus_sih)",
   "overall_status": "ON_TRACK",
-  "active_connector": "datasus_cnes",
-  "next_connector": "datasus_sih",
+  "active_connector": "datasus_sih",
+  "next_connector": "inep_censo_escolar",
   "structural_phases": [
     {
       "phase_id": "00",
@@ -131,7 +131,8 @@
       "status": "IN_PROGRESS",
       "completion_date": null,
       "deliverables": [
-        "Conectores DataSUS (CNES, SIH, SIM, SINASC, OpenDataSUS) & anvisa_cmed",
+        "Conector datasus_cnes (Estabelecimentos, Leitos/UTI, Equipamentos Diagnósticos e Força de Trabalho) - CONCLUÍDO",
+        "Conectores DataSUS (SIH, SIM, SINASC, OpenDataSUS) & anvisa_cmed",
         "Conectores INEP (Censo Escolar, Superior, IDEB, ENEM) & capes_sucupira",
         "Conectores Notariais (cnj_justica_aberta, onr_registro_imoveis, capitais_iptu_itbi)"
       ]
@@ -389,9 +390,21 @@
       "phase_id": "06",
       "milestone": "Conclusão da Wave 4 & Homologação do Conector antt_malha_transporte (4 Tabelas, dbt, Mart Logística Intermodal & Live Fail-Hard)",
       "summary": "Implementação e homologação completa do conector antt_malha_transporte (ANTT: Malha de Transporte Rodoviário e Ferroviário de Cargas, Leis nº 10.233/2001, 11.442/2007, Resolução ANTT nº 5.982/2022 e Decreto nº 8.777/2016) consolidando o décimo conector da Wave 4 (100% da Wave 4 concluída) e 28º conector total da plataforma (57.1% do catálogo homologado): 4 tabelas Silver (antt_corredores_rodoviarios, antt_frota_rntrc_municipio, antt_malha_ferroviaria_terminais, antt_fluxo_logistico_modal) e Gold Feature Store (features_malha_transporte_logistica_municipios_brasil.parquet) materializadas em data/antt_malha_transporte/{silver,gold}/; 7 novos modelos dbt (4 staging views, fct_antt_infraestrutura_logistica_municipio, fct_antt_matriz_modal_cargas_municipio, mart_logistica_corredores_transporte_brasil) totalizando 257 modelos dbt e 175 checks seletivos do build 100% aprovados com 0 erros; 3.258 colunas 100% documentadas no linter (100% coverage); scores normalizados (0 a 100) de infraestrutura logística e intermodalidade; 8 testes offline e 1 teste live fail-hard contra os portais oficiais da ANTT aprovados; multi-interface completa via SDK (BrazilData.geo.antt_connector, get_highway_corridors, get_rntrc_fleet_profile, get_rail_intermodal_terminals, list_modal_flows, get_logistics_features, list_top_logistics_hubs), CLI (bdg antt highways/rntrc/rail/modals/features/ranking), REST API (/api/v1/geo/antt/* e atalho /api/v1/antt/*) e MCP (bdg_get_antt_highway_corridors, bdg_get_antt_rntrc_fleet, bdg_get_antt_logistics_features, bdg_list_top_logistics_hubs) com contenção de prompt injection wrap_untrusted_gov_data."
+    },
+    {
+      "date": "2026-11-13",
+      "phase_id": "07",
+      "milestone": "Início da Wave 5 & Homologação do Conector datasus_cnes (4 Tabelas, dbt, Mart Capacidade Assistencial SUS & Live Fail-Hard)",
+      "summary": "Implementação e homologação completa do conector datasus_cnes (DataSUS: Cadastro Nacional de Estabelecimentos de Saúde — Estabelecimentos, Leitos/UTI, Equipamentos Diagnósticos e Força de Trabalho, Lei nº 8.080/1990, Portaria GM/MS nº 1/2017, Portaria SAES/MS nº 1.646/2015 e Decreto nº 8.777/2016) consolidando o primeiro conector da Wave 5 e 29º conector total da plataforma (59.2% do catálogo homologado): 4 tabelas Silver (cnes_estabelecimentos_saude, cnes_leitos_hospitalares_uti, cnes_equipamentos_diagnostico, cnes_profissionais_equipes_saude) e Gold Feature Store (features_cnes_capacidade_assistencial_municipios_brasil.parquet) materializadas em data/datasus_cnes/{silver,gold}/; 7 novos modelos dbt (4 staging views, fct_cnes_infraestrutura_hospitalar_municipio, fct_cnes_forca_trabalho_saude_municipio, mart_capacidade_assistencial_saude_brasil) totalizando 264 modelos dbt e 192 checks seletivos do build 100% aprovados com 0 erros; 3.408 colunas 100% documentadas no linter (100% coverage); scores normalizados (0 a 100) de capacidade hospitalar e alta complexidade UTI; 8 testes offline e 1 teste live fail-hard contra os portais/APIs oficiais do DataSUS CNES aprovados; multi-interface completa via SDK (BrazilData.health.cnes_connector, get_cnes_establishments, get_cnes_beds_icu, get_cnes_equipment, list_cnes_workforce, get_cnes_health_features, list_top_health_hubs), CLI (bdg cnes establishments/beds/equipment/workforce/features/ranking), REST API (/api/v1/health-public/cnes/* e atalho /api/v1/cnes/*) e MCP (bdg_get_cnes_establishments, bdg_get_cnes_beds_icu, bdg_get_cnes_health_features, bdg_list_top_health_hubs) com contenção de prompt injection wrap_untrusted_gov_data."
     }
   ],
   "recent_milestones": [
+    {
+      "date": "2026-11-13",
+      "phase_id": "07",
+      "milestone": "Início da Wave 5 & Homologação do Conector datasus_cnes (4 Tabelas, dbt, Mart Capacidade Assistencial SUS & Live Fail-Hard)",
+      "summary": "Implementação e homologação completa do conector datasus_cnes (DataSUS: Cadastro Nacional de Estabelecimentos de Saúde — Estabelecimentos, Leitos/UTI, Equipamentos Diagnósticos e Força de Trabalho, Lei nº 8.080/1990, Portaria GM/MS nº 1/2017, Portaria SAES/MS nº 1.646/2015 e Decreto nº 8.777/2016) consolidando o primeiro conector da Wave 5 e 29º conector total da plataforma (59.2% do catálogo homologado): 4 tabelas Silver (cnes_estabelecimentos_saude, cnes_leitos_hospitalares_uti, cnes_equipamentos_diagnostico, cnes_profissionais_equipes_saude) e Gold Feature Store (features_cnes_capacidade_assistencial_municipios_brasil.parquet) materializadas em data/datasus_cnes/{silver,gold}/; 7 novos modelos dbt (4 staging views, fct_cnes_infraestrutura_hospitalar_municipio, fct_cnes_forca_trabalho_saude_municipio, mart_capacidade_assistencial_saude_brasil) totalizando 264 modelos dbt e 192 checks seletivos do build 100% aprovados com 0 erros; 3.408 colunas 100% documentadas no linter (100% coverage); scores normalizados (0 a 100) de capacidade hospitalar e alta complexidade UTI; 8 testes offline e 1 teste live fail-hard contra os portais/APIs oficiais do DataSUS CNES aprovados; multi-interface completa via SDK (BrazilData.health.cnes_connector, get_cnes_establishments, get_cnes_beds_icu, get_cnes_equipment, list_cnes_workforce, get_cnes_health_features, list_top_health_hubs), CLI (bdg cnes establishments/beds/equipment/workforce/features/ranking), REST API (/api/v1/health-public/cnes/* e atalho /api/v1/cnes/*) e MCP (bdg_get_cnes_establishments, bdg_get_cnes_beds_icu, bdg_get_cnes_health_features, bdg_list_top_health_hubs) com contenção de prompt injection wrap_untrusted_gov_data."
+    },
     {
       "date": "2026-11-13",
       "phase_id": "06",

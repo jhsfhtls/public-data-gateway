@@ -4567,3 +4567,200 @@ models:
         description: "Timestamp ISO-8601 UTC da extração."
         tests:
           - not_null
+
+  - name: fct_cnes_infraestrutura_hospitalar_municipio
+    description: "Fato consolidado da rede assistencial CNES (estabelecimentos, leitos gerais e de UTI e parque diagnóstico) por município."
+    columns:
+      - name: id_municipio
+        description: "Código IBGE de 7 dígitos do município."
+        tests:
+          - unique
+          - not_null
+      - name: nome_municipio
+        description: "Nome oficial do município."
+        tests:
+          - not_null
+      - name: sigla_uf
+        description: "Sigla de 2 letras da Unidade Federativa."
+        tests:
+          - not_null
+      - name: id_uf
+        description: "Código IBGE de 2 dígitos da Unidade Federativa."
+        tests:
+          - not_null
+      - name: nome_uf
+        description: "Nome completo da Unidade Federativa."
+        tests:
+          - not_null
+      - name: regiao
+        description: "Grande região geográfica brasileira."
+        tests:
+          - not_null
+      - name: ano_mes_competencia
+        description: "Competência mensal de referência CNES no formato AAAAMM."
+        tests:
+          - not_null
+      - name: codigo_cnes_referencia
+        description: "Código CNES de 7 dígitos da principal unidade hospitalar de referência."
+        tests:
+          - not_null
+      - name: cnpj_14
+        description: "CNPJ de 14 dígitos da entidade mantenedora de referência."
+        tests:
+          - not_null
+      - name: cep_8
+        description: "CEP de 8 dígitos da unidade assistencial de referência."
+        tests:
+          - not_null
+      - name: estabelecimento_referencia_nome
+        description: "Denominação oficial da unidade de referência CNES."
+        tests:
+          - not_null
+      - name: total_estabelecimentos_ativos
+        description: "Total de estabelecimentos de saúde ativos cadastrados no CNES."
+        tests:
+          - not_null
+      - name: hospitais_gerais_especializados
+        description: "Total de hospitais gerais e especializados ativos no município."
+        tests:
+          - not_null
+      - name: unidades_basicas_saude_ubs
+        description: "Quantidade de Unidades Básicas de Saúde (UBS) em operação."
+        tests:
+          - not_null
+      - name: unidades_pronto_atendimento_upa
+        description: "Quantidade de Unidades de Pronto Atendimento (UPAs) 24h."
+        tests:
+          - not_null
+      - name: estabelecimentos_atendimento_sus
+        description: "Total de estabelecimentos integrados ao atendimento SUS."
+        tests:
+          - not_null
+      - name: proporcao_rede_sus_pct
+        description: "Percentual de estabelecimentos ativos vinculados ao SUS."
+        tests:
+          - not_null
+      - name: total_leitos_hospitalares
+        description: "Total de leitos hospitalares de internação e complementares."
+        tests:
+          - not_null
+      - name: leitos_sus
+        description: "Quantidade de leitos hospitalares disponíveis ao SUS."
+        tests:
+          - not_null
+      - name: leitos_nao_sus
+        description: "Quantidade de leitos hospitalares destinados à rede privada/suplementar."
+        tests:
+          - not_null
+      - name: proporcao_leitos_sus_pct
+        description: "Percentual dos leitos hospitalares disponíveis ao SUS."
+        tests:
+          - not_null
+      - name: total_leitos_uti
+        description: "Total de leitos de Unidade de Terapia Intensiva (UTI) habilitados."
+        tests:
+          - not_null
+      - name: leitos_uti_adulto
+        description: "Quantidade de leitos de UTI adulto."
+        tests:
+          - not_null
+      - name: leitos_uti_pediatrico_neonatal
+        description: "Quantidade de leitos de UTI pediátrica e neonatal."
+        tests:
+          - not_null
+      - name: leitos_uti_sus
+        description: "Quantidade de leitos de UTI disponíveis ao SUS."
+        tests:
+          - not_null
+      - name: leitos_por_1000_hab
+        description: "Taxa de leitos hospitalares gerais por 1.000 habitantes."
+        tests:
+          - not_null
+      - name: leitos_uti_por_10k_hab
+        description: "Taxa de leitos de UTI por 10.000 habitantes."
+        tests:
+          - not_null
+      - name: tomografos_computadorizados
+        description: "Quantidade de tomógrafos computadorizados em uso."
+        tests:
+          - not_null
+      - name: ressonancia_magnetica
+        description: "Quantidade de equipamentos de ressonância magnética em operação."
+        tests:
+          - not_null
+      - name: mamografos_em_uso
+        description: "Quantidade de mamógrafos em uso no município."
+        tests:
+          - not_null
+      - name: aparelhos_hemodialise
+        description: "Quantidade de máquinas de hemodiálise em uso."
+        tests:
+          - not_null
+      - name: aparelhos_raio_x
+        description: "Quantidade total de aparelhos de raio-X diagnósticos."
+        tests:
+          - not_null
+      - name: proporcao_equipamentos_sus_pct
+        description: "Percentual de equipamentos diagnósticos vinculados ao SUS."
+        tests:
+          - not_null
+      - name: indice_disponibilidade_diagnostica
+        description: "Índice composto (0 a 100) de densidade de equipamentos diagnósticos."
+        tests:
+          - not_null
+      - name: reference_date
+        description: "Data de referência ISO-8601."
+        tests:
+          - not_null
+      - name: extracted_at
+        description: "Timestamp ISO-8601 UTC da extração."
+        tests:
+          - not_null
+
+  - name: fct_cnes_forca_trabalho_saude_municipio
+    description: "Fato analítico da força de trabalho assistencial e equipes de Saúde da Família (CNES) por categoria profissional e município."
+    columns:
+      - name: id_municipio
+        description: "Código IBGE de 7 dígitos do município."
+        tests:
+          - not_null
+      - name: nome_municipio
+        description: "Nome oficial do município."
+        tests:
+          - not_null
+      - name: sigla_uf
+        description: "Sigla de 2 letras da Unidade Federativa."
+        tests:
+          - not_null
+      - name: categoria_profissional
+        description: "Categoria assistencial analisada (Medicos, Enfermeiros ou Equipes_Saude_Familia_eSF)."
+        tests:
+          - not_null
+      - name: total_vinculos_ativos
+        description: "Total de vínculos ativos ou equipes cadastradas na categoria."
+        tests:
+          - not_null
+      - name: vinculos_atendimento_sus
+        description: "Quantidade de vínculos ou equipes com atendimento pelo SUS."
+        tests:
+          - not_null
+      - name: proporcao_vinculos_sus_pct
+        description: "Percentual dos vínculos da categoria dedicados ao SUS."
+        tests:
+          - not_null
+      - name: carga_horaria_semanal_media
+        description: "Carga horária semanal média praticada pela categoria."
+        tests:
+          - not_null
+      - name: densidade_por_10k_hab
+        description: "Densidade de profissionais ou equipes por 10.000 habitantes."
+        tests:
+          - not_null
+      - name: reference_date
+        description: "Data de referência ISO-8601."
+        tests:
+          - not_null
+      - name: extracted_at
+        description: "Timestamp ISO-8601 UTC da extração."
+        tests:
+          - not_null
