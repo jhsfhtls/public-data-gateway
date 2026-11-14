@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import json
 from pathlib import Path
+from unittest.mock import patch
 
 import pyarrow.parquet as pq
 import pytest
@@ -19,6 +20,18 @@ from public_data_gateway.connectors.geografico.ibge_malhas.connector import (
 )
 from public_data_gateway.mcp.server import MCPDispatcher
 from public_data_gateway.sdk import BrazilData
+
+
+@pytest.fixture(scope="module", autouse=True)
+def ensure_malhas_baseline() -> None:
+    """Garante que os Parquets de baseline existam em ambiente CI sem rede externa."""
+    conn = IBGEMalhasConnector()
+    if not (conn.silver_dir / "malhas_municipios.parquet").exists():
+        with patch(
+            "public_data_gateway.connectors.geografico.ibge_malhas.connector.requests.get",
+            side_effect=RuntimeError("Offline CI baseline synthesis"),
+        ):
+            conn.extract_all()
 
 
 def test_contract_validity() -> None:

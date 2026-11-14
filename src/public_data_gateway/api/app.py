@@ -1138,4 +1138,56 @@ def create_app(settings: GatewaySettings | None = None) -> FastAPI:
         conn = IBGEMalhasConnector(settings=app_settings)
         return conn.get_municipio_boundary(id_municipio, qualidade=qualidade)
 
+    @app.get("/api/v1/geo/anatel/top-connected")
+    async def get_top_connected_municipalities(
+        limit: int = Query(10, ge=1, le=50, description="Max municipalities to list"),
+        uf: str | None = Query(None, description="Filter by 2-letter state abbreviation"),
+    ) -> list[dict[str, Any]]:
+        from public_data_gateway.connectors.geografico.anatel_mosaico.connector import (
+            AnatelMosaicoConnector,
+        )
+
+        conn = AnatelMosaicoConnector(settings=app_settings)
+        return conn.list_top_connected_municipalities(limit=limit, sigla_uf=uf)
+
+    @app.get("/api/v1/geo/anatel/features/{id_municipio}")
+    async def get_anatel_telecom_features(id_municipio: str) -> dict[str, Any]:
+        from public_data_gateway.connectors.geografico.anatel_mosaico.connector import (
+            AnatelMosaicoConnector,
+        )
+
+        conn = AnatelMosaicoConnector(settings=app_settings)
+        return conn.get_telecom_features(id_municipio)
+
+    @app.get("/api/v1/geo/anatel/broadband/{id_municipio}")
+    async def get_anatel_broadband_profile(id_municipio: str) -> dict[str, Any]:
+        from public_data_gateway.connectors.geografico.anatel_mosaico.connector import (
+            AnatelMosaicoConnector,
+        )
+
+        conn = AnatelMosaicoConnector(settings=app_settings)
+        return conn.get_broadband_scm_profile(id_municipio)
+
+    @app.get("/api/v1/geo/anatel/spectrum/{id_municipio}")
+    async def get_anatel_spectrum_allocations(
+        id_municipio: str,
+        faixa: str | None = Query(None, description="Optional frequency band filter (e.g. 3500)"),
+    ) -> list[dict[str, Any]]:
+        from public_data_gateway.connectors.geografico.anatel_mosaico.connector import (
+            AnatelMosaicoConnector,
+        )
+
+        conn = AnatelMosaicoConnector(settings=app_settings)
+        return conn.list_spectrum_allocations(id_municipio, faixa_frequencia_mhz=faixa)
+
+    @app.get("/api/v1/geo/anatel/stations/{id_municipio}")
+    @app.get("/api/v1/anatel/{id_municipio}")
+    async def get_anatel_station_coverage(id_municipio: str) -> dict[str, Any]:
+        from public_data_gateway.connectors.geografico.anatel_mosaico.connector import (
+            AnatelMosaicoConnector,
+        )
+
+        conn = AnatelMosaicoConnector(settings=app_settings)
+        return conn.get_station_coverage_summary(id_municipio)
+
     return app

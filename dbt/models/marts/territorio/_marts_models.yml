@@ -809,3 +809,144 @@ models:
         description: "Extensão latitudinal municipal em graus decimais."
         tests:
           - not_null
+
+  - name: mart_conectividade_digital_telecom_brasil
+    description: "Data Mart estratégico de conectividade digital, densidade 5G, fibra óptica e classificação de infraestrutura telecom dos municípios brasileiros."
+    columns:
+      - name: id_municipio
+        description: "Código IBGE de 7 dígitos do município."
+        tests:
+          - not_null
+          - unique
+      - name: nome_municipio
+        description: "Nome oficial do município."
+        tests:
+          - not_null
+      - name: sigla_uf
+        description: "Sigla de 2 letras da Unidade Federativa."
+        tests:
+          - not_null
+      - name: id_uf
+        description: "Código IBGE de 2 dígitos da Unidade Federativa."
+        tests:
+          - not_null
+      - name: nome_uf
+        description: "Nome completo da Unidade Federativa."
+        tests:
+          - not_null
+      - name: regiao
+        description: "Grande região geográfica do município."
+        tests:
+          - not_null
+      - name: ano_mes_referencia
+        description: "Competência mensal de referência no formato AAAA-MM."
+        tests:
+          - not_null
+      - name: total_erbs_licenciadas
+        description: "Total de Estações Rádio Base licenciadas no município."
+        tests:
+          - not_null
+      - name: erbs_5g_nr
+        description: "Total de estações licenciadas com tecnologia 5G NR."
+        tests:
+          - not_null
+      - name: proporcao_erbs_5g_pct
+        description: "Proporção percentual de estações 5G NR sobre o total municipal."
+        tests:
+          - not_null
+      - name: densidade_erbs_por_10k_hab
+        description: "Densidade de ERBs por 10 mil habitantes."
+        tests:
+          - not_null
+      - name: densidade_erbs_por_100km2
+        description: "Densidade espacial de ERBs por 100 km²."
+        tests:
+          - not_null
+      - name: operadoras_ativas_smp
+        description: "Número de operadoras SMP ativas no município."
+        tests:
+          - not_null
+      - name: operadora_lider_erbs
+        description: "Operadora líder em volume de ERBs licenciadas."
+        tests:
+          - not_null
+      - name: possui_backhaul_fibra
+        description: "Indicador booleano de presença de backhaul em fibra óptica."
+        tests:
+          - not_null
+      - name: total_acessos_scm
+        description: "Total de acessos ativos em banda larga fixa (SCM)."
+        tests:
+          - not_null
+      - name: acessos_fibra_ftth
+        description: "Total de acessos em banda larga via fibra óptica FTTH."
+        tests:
+          - not_null
+      - name: participacao_fibra_ftth_pct
+        description: "Participação percentual de acessos FTTH na banda larga fixa."
+        tests:
+          - not_null
+      - name: velocidade_mediana_mbps
+        description: "Velocidade mediana contratada em Mbps."
+        tests:
+          - not_null
+      - name: prestadoras_scm_ativas
+        description: "Número de prestadoras de banda larga fixa ativas."
+        tests:
+          - not_null
+      - name: indice_hhi_concentracao_scm
+        description: "Índice HHI de concentração competitiva no mercado SCM."
+        tests:
+          - not_null
+      - name: populacao_coberta_4g_pct
+        description: "Percentual da população municipal coberta por sinal 4G."
+        tests:
+          - not_null
+      - name: populacao_coberta_5g_pct
+        description: "Percentual da população municipal coberta por sinal 5G."
+        tests:
+          - not_null
+      - name: area_geografica_coberta_movel_pct
+        description: "Percentual da área geográfica com cobertura móvel."
+        tests:
+          - not_null
+      - name: cobertura_rodovias_federais_pct
+        description: "Percentual de cobertura em rodovias federais."
+        tests:
+          - not_null
+      - name: localidades_rurais_conectadas_pct
+        description: "Percentual de localidades rurais conectadas."
+        tests:
+          - not_null
+      - name: escolas_publicas_conectadas_pct
+        description: "Percentual de escolas públicas conectadas."
+        tests:
+          - not_null
+      - name: largura_banda_total_mhz
+        description: "Largura de banda espectral total agregada no município em MHz."
+        tests:
+          - not_null
+      - name: estacoes_3500mhz_5g_sa
+        description: "Quantidade de estações licenciadas na faixa de 3500 MHz (5G Standalone)."
+        tests:
+          - not_null
+      - name: score_maturidade_5g
+        description: "Score normalizado (0 a 100) de maturidade e adensamento 5G."
+        tests:
+          - not_null
+      - name: score_conectividade_digital
+        description: "Score composto de conectividade digital municipal (0 a 100)."
+        tests:
+          - not_null
+      - name: classificacao_infraestrutura_telecom
+        description: "Classificação estratégica do estágio de conectividade municipal."
+        tests:
+          - not_null
+      - name: reference_date
+        description: "Data de referência ISO-8601."
+        tests:
+          - not_null
+      - name: extracted_at
+        description: "Timestamp ISO-8601 UTC da geração."
+        tests:
+          - not_null

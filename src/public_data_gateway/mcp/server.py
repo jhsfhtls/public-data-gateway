@@ -609,6 +609,65 @@ class MCPDispatcher:
                                 },
                             },
                             {
+                                "name": "bdg_get_anatel_stations",
+                                "description": "Query licensed ANATEL Mosaico mobile base stations (ERBs 5G/4G/3G/2G) and urban coverage for a municipality (Tier 1).",
+                                "inputSchema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "id_municipio": {
+                                            "type": "string",
+                                            "description": "IBGE 7-digit municipality code (e.g. 3550308 for São Paulo)",
+                                        },
+                                    },
+                                    "required": ["id_municipio"],
+                                },
+                            },
+                            {
+                                "name": "bdg_get_anatel_broadband",
+                                "description": "Query ANATEL fixed broadband (SCM), backhaul fiber availability, FTTH share and median speed for a municipality (Tier 1).",
+                                "inputSchema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "id_municipio": {
+                                            "type": "string",
+                                            "description": "IBGE 7-digit municipality code",
+                                        },
+                                    },
+                                    "required": ["id_municipio"],
+                                },
+                            },
+                            {
+                                "name": "bdg_get_anatel_telecom_features",
+                                "description": "Query Gold Feature Store digital connectivity score, 5G maturity score and infrastructure tier for a municipality (Tier 1).",
+                                "inputSchema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "id_municipio": {
+                                            "type": "string",
+                                            "description": "IBGE 7-digit municipality code",
+                                        },
+                                    },
+                                    "required": ["id_municipio"],
+                                },
+                            },
+                            {
+                                "name": "bdg_list_top_connected_municipalities",
+                                "description": "List top Brazilian municipalities ranked by composite ANATEL digital connectivity score (Tier 1).",
+                                "inputSchema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "limit": {
+                                            "type": "integer",
+                                            "description": "Maximum rows (default: 10)",
+                                        },
+                                        "sigla_uf": {
+                                            "type": "string",
+                                            "description": "Optional 2-letter state filter (e.g. SP)",
+                                        },
+                                    },
+                                },
+                            },
+                            {
                                 "name": "bdg_get_labor_force_indicators",
                                 "description": "Query official quarterly labor force, population, and unemployment rate by Brazilian UF from IBGE PNAD Contínua (Tier 1).",
                                 "inputSchema": {
@@ -1523,6 +1582,53 @@ class MCPDispatcher:
                     },
                 }
             wrapped = wrap_untrusted_gov_data(result, source_id="ibge_malhas")
+            return {
+                "jsonrpc": "2.0",
+                "id": req_id,
+                "result": {"content": [{"type": "text", "text": wrapped}], "isError": False},
+            }
+
+        if tool_name in {
+            "bdg_get_anatel_stations",
+            "bdg_get_anatel_broadband",
+            "bdg_get_anatel_telecom_features",
+            "bdg_list_top_connected_municipalities",
+        }:
+            from public_data_gateway.connectors.geografico.anatel_mosaico.connector import (
+                AnatelMosaicoConnector,
+            )
+
+            connector = AnatelMosaicoConnector(settings=self.settings)
+            if tool_name == "bdg_get_anatel_stations":
+                result = connector.get_station_coverage_summary(
+                    str(args.get("id_municipio", "")).strip()
+                )
+            elif tool_name == "bdg_get_anatel_broadband":
+                result = connector.get_broadband_scm_profile(
+                    str(args.get("id_municipio", "")).strip()
+                )
+            elif tool_name == "bdg_get_anatel_telecom_features":
+                result = connector.get_telecom_features(
+                    str(args.get("id_municipio", "")).strip()
+                )
+            else:
+                raw_uf = args.get("sigla_uf")
+                result = connector.list_top_connected_municipalities(
+                    limit=int(args.get("limit", 10)),
+                    sigla_uf=str(raw_uf).strip() if raw_uf else None,
+                )
+            if not result:
+                return {
+                    "jsonrpc": "2.0",
+                    "id": req_id,
+                    "result": {
+                        "content": [
+                            {"type": "text", "text": "No ANATEL Mosaico telecom data found for the query."}
+                        ],
+                        "isError": True,
+                    },
+                }
+            wrapped = wrap_untrusted_gov_data(result, source_id="anatel_mosaico")
             return {
                 "jsonrpc": "2.0",
                 "id": req_id,

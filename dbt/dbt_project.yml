@@ -31,6 +31,7 @@ model-paths:
   - "../src/public_data_gateway/connectors/trabalho/mte_rais/dbt"
   - "../src/public_data_gateway/connectors/geografico/ibge_cnefe/dbt"
   - "../src/public_data_gateway/connectors/geografico/ibge_malhas/dbt"
+  - "../src/public_data_gateway/connectors/geografico/anatel_mosaico/dbt"
   - "models"
 
 analysis-paths: ["analyses"]

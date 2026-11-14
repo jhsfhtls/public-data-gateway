@@ -116,6 +116,44 @@ class GeoFacade:
         """List top municipalities ranked by territorial compactness score."""
         return self.malhas_connector.list_top_compact_municipalities(limit=limit, sigla_uf=sigla_uf)
 
+    @property
+    def anatel_connector(self) -> Any:
+        if not hasattr(self, "_anatel_conn") or self._anatel_conn is None:
+            from public_data_gateway.connectors.geografico.anatel_mosaico import (
+                AnatelMosaicoConnector,
+            )
+
+            self._anatel_conn = AnatelMosaicoConnector(settings=self._sdk.settings)
+        return self._anatel_conn
+
+    def get_telecom_stations(self, id_municipio: str) -> dict[str, Any]:
+        """Get licensed SMP telecom towers and 4G/5G coverage summary (ANATEL Mosaico)."""
+        return self.anatel_connector.get_station_coverage_summary(id_municipio)
+
+    def get_broadband_profile(self, id_municipio: str) -> dict[str, Any]:
+        """Get fixed broadband (SCM) and fiber optic (FTTH/backhaul) profile (ANATEL Mosaico)."""
+        return self.anatel_connector.get_broadband_scm_profile(id_municipio)
+
+    def list_spectrum_allocations(
+        self, id_municipio: str, faixa_frequencia_mhz: str | None = None
+    ) -> list[dict[str, Any]]:
+        """List radiofrequency spectrum allocations by band for a municipality."""
+        return self.anatel_connector.list_spectrum_allocations(
+            id_municipio, faixa_frequencia_mhz=faixa_frequencia_mhz
+        )
+
+    def get_telecom_features(self, id_municipio: str) -> dict[str, Any]:
+        """Get digital connectivity and 5G maturity features from the Gold Feature Store."""
+        return self.anatel_connector.get_telecom_features(id_municipio)
+
+    def list_top_connected_municipalities(
+        self, limit: int = 10, sigla_uf: str | None = None
+    ) -> list[dict[str, Any]]:
+        """List top municipalities ranked by composite digital connectivity score."""
+        return self.anatel_connector.list_top_connected_municipalities(
+            limit=limit, sigla_uf=sigla_uf
+        )
+
 
 class ProcurementFacade:
     """Public procurement query interface powered by PNCP (Lei nº 14.133/2021)."""
@@ -1036,6 +1074,32 @@ class BrazilData:
     ) -> list[dict[str, Any]]:
         """Listar municípios com maior compacidade territorial (Polsby-Popper score) no Brasil (IBGE Malhas)."""
         return self.geo.list_top_compact_municipalities(limit=limit, sigla_uf=sigla_uf)
+
+    def get_telecom_stations(self, id_municipio: str) -> dict[str, Any]:
+        """Consultar estações rádio base (ERBs SMP) licenciadas e cobertura 4G/5G municipal (ANATEL Mosaico)."""
+        return self.geo.get_telecom_stations(id_municipio)
+
+    def get_broadband_profile(self, id_municipio: str) -> dict[str, Any]:
+        """Consultar perfil de banda larga fixa (SCM), fibra FTTH e backhaul municipal (ANATEL Mosaico)."""
+        return self.geo.get_broadband_profile(id_municipio)
+
+    def list_spectrum_allocations(
+        self, id_municipio: str, faixa_frequencia_mhz: str | None = None
+    ) -> list[dict[str, Any]]:
+        """Listar alocações de espectro de radiofrequência por faixa no município (ANATEL Mosaico)."""
+        return self.geo.list_spectrum_allocations(
+            id_municipio, faixa_frequencia_mhz=faixa_frequencia_mhz
+        )
+
+    def get_telecom_features(self, id_municipio: str) -> dict[str, Any]:
+        """Consultar features Gold de conectividade digital e maturidade 5G municipal (ANATEL Mosaico)."""
+        return self.geo.get_telecom_features(id_municipio)
+
+    def list_top_connected_municipalities(
+        self, limit: int = 10, sigla_uf: str | None = None
+    ) -> list[dict[str, Any]]:
+        """Listar municípios com maior score de conectividade digital no Brasil (ANATEL Mosaico)."""
+        return self.geo.list_top_connected_municipalities(limit=limit, sigla_uf=sigla_uf)
 
     def get_municipal_gdp_detail(self, id_municipio: str, year: int = 2023) -> dict[str, Any] | None:
         """Consultar contas econômicas municipais detalhadas (PIB, VAB setorial, impostos e participações) do IBGE."""

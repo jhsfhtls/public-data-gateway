@@ -18,7 +18,9 @@ import public_data_gateway.connectors.demografico.ibge_sidra  # noqa: F401
 import public_data_gateway.connectors.empresarial.rfb_cnpj_lakehouse  # noqa: F401
 import public_data_gateway.connectors.empresarial.rfb_simples_mei  # noqa: F401
 import public_data_gateway.connectors.empresarial.suframa_pim_zfm  # noqa: F401
+import public_data_gateway.connectors.geografico.anatel_mosaico  # noqa: F401
 import public_data_gateway.connectors.geografico.ibge_cnefe  # noqa: F401
+import public_data_gateway.connectors.geografico.ibge_malhas  # noqa: F401
 import public_data_gateway.connectors.judicial.cnj_datajud  # noqa: F401
 import public_data_gateway.connectors.judicial.tst_cndt  # noqa: F401
 import public_data_gateway.connectors.macrofinanceiro.bcb_ifdata  # noqa: F401
@@ -29,3 +31,4 @@ import public_data_gateway.connectors.macrofinanceiro.cvm_fundos  # noqa: F401
 import public_data_gateway.connectors.macrofinanceiro.stn_tesouro_transparente  # noqa: F401
 import public_data_gateway.connectors.trabalho.ibge_pnad_continua  # noqa: F401
 import public_data_gateway.connectors.trabalho.mte_novo_caged  # noqa: F401
+import public_data_gateway.connectors.trabalho.mte_rais  # noqa: F401

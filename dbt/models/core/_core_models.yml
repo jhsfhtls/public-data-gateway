@@ -4185,3 +4185,208 @@ models:
         description: "Área territorial aproximada da UF em km²."
         tests:
           - not_null
+
+  - name: fct_anatel_infraestrutura_telecom_municipio
+    description: "Fato municipal consolidado de infraestrutura de telecomunicações ANATEL (ERBs SMP, banda larga fixa SCM/FTTH e cobertura setorial 4G/5G)."
+    columns:
+      - name: id_municipio
+        description: "Código IBGE de 7 dígitos do município."
+        tests:
+          - not_null
+          - unique
+      - name: nome_municipio
+        description: "Nome oficial do município."
+        tests:
+          - not_null
+      - name: sigla_uf
+        description: "Sigla de 2 letras da Unidade Federativa."
+        tests:
+          - not_null
+      - name: id_uf
+        description: "Código IBGE de 2 dígitos da Unidade Federativa."
+        tests:
+          - not_null
+      - name: nome_uf
+        description: "Nome completo da Unidade Federativa."
+        tests:
+          - not_null
+      - name: regiao
+        description: "Grande região geográfica brasileira do município."
+        tests:
+          - not_null
+      - name: ano_mes_referencia
+        description: "Competência mensal de referência no formato AAAA-MM."
+        tests:
+          - not_null
+      - name: total_erbs_licenciadas
+        description: "Total de Estações Rádio Base (ERBs) licenciadas."
+        tests:
+          - not_null
+      - name: erbs_5g_nr
+        description: "Quantidade de estações licenciadas 5G NR."
+        tests:
+          - not_null
+      - name: erbs_4g_lte
+        description: "Quantidade de estações licenciadas 4G LTE."
+        tests:
+          - not_null
+      - name: erbs_3g_wcdma
+        description: "Quantidade de estações licenciadas 3G WCDMA."
+        tests:
+          - not_null
+      - name: erbs_2g_gsm
+        description: "Quantidade de estações licenciadas 2G GSM."
+        tests:
+          - not_null
+      - name: proporcao_erbs_5g_pct
+        description: "Proporção percentual de estações 5G NR sobre o total de ERBs."
+        tests:
+          - not_null
+      - name: operadoras_ativas_smp
+        description: "Número de operadoras SMP com estações ativas no município."
+        tests:
+          - not_null
+      - name: operadora_lider_erbs
+        description: "Nome da operadora líder em volume de ERBs licenciadas."
+        tests:
+          - not_null
+      - name: densidade_erbs_por_10k_hab
+        description: "Densidade de ERBs por 10 mil habitantes."
+        tests:
+          - not_null
+      - name: densidade_erbs_por_100km2
+        description: "Densidade espacial de ERBs por 100 km²."
+        tests:
+          - not_null
+      - name: cobertura_urbana_5g_pct
+        description: "Percentual de cobertura urbana estimada 5G."
+        tests:
+          - not_null
+      - name: cobertura_urbana_4g_pct
+        description: "Percentual de cobertura urbana estimada 4G."
+        tests:
+          - not_null
+      - name: possui_backhaul_fibra
+        description: "Indicador booleano de disponibilidade de backhaul em fibra óptica."
+        tests:
+          - not_null
+      - name: total_acessos_scm
+        description: "Total de acessos ativos em banda larga fixa (SCM)."
+        tests:
+          - not_null
+      - name: acessos_fibra_ftth
+        description: "Total de acessos fixos via fibra óptica FTTH/FTTB."
+        tests:
+          - not_null
+      - name: acessos_cabo_coaxial
+        description: "Total de acessos fixos via cabo coaxial ou xDSL."
+        tests:
+          - not_null
+      - name: acessos_radio_satelite
+        description: "Total de acessos fixos via rádio terrestre ou satélite."
+        tests:
+          - not_null
+      - name: participacao_fibra_ftth_pct
+        description: "Percentual de acessos banda larga fixa via fibra FTTH."
+        tests:
+          - not_null
+      - name: velocidade_mediana_mbps
+        description: "Velocidade mediana contratada de download em Mbps."
+        tests:
+          - not_null
+      - name: prestadoras_scm_ativas
+        description: "Número de prestadoras SCM com base ativa no município."
+        tests:
+          - not_null
+      - name: indice_hhi_concentracao_scm
+        description: "Índice Herfindahl-Hirschman (HHI) de concentração de mercado SCM."
+        tests:
+          - not_null
+      - name: populacao_coberta_4g_pct
+        description: "Percentual da população municipal coberta por sinal 4G."
+        tests:
+          - not_null
+      - name: populacao_coberta_5g_pct
+        description: "Percentual da população municipal coberta por sinal 5G."
+        tests:
+          - not_null
+      - name: area_geografica_coberta_movel_pct
+        description: "Percentual da área geográfica municipal com cobertura móvel."
+        tests:
+          - not_null
+      - name: cobertura_rodovias_federais_pct
+        description: "Percentual de cobertura móvel em rodovias federais no município."
+        tests:
+          - not_null
+      - name: localidades_rurais_conectadas_pct
+        description: "Percentual de localidades rurais conectadas."
+        tests:
+          - not_null
+      - name: escolas_publicas_conectadas_pct
+        description: "Percentual de escolas públicas conectadas à internet."
+        tests:
+          - not_null
+      - name: reference_date
+        description: "Data de referência ISO-8601."
+        tests:
+          - not_null
+      - name: extracted_at
+        description: "Timestamp ISO-8601 UTC da extração."
+        tests:
+          - not_null
+
+  - name: fct_anatel_alocacao_espectro_municipio
+    description: "Fato de alocação de faixas de radiofrequência e largura de banda por faixa e município."
+    columns:
+      - name: id_municipio
+        description: "Código IBGE de 7 dígitos do município."
+        tests:
+          - not_null
+      - name: nome_municipio
+        description: "Nome oficial do município."
+        tests:
+          - not_null
+      - name: sigla_uf
+        description: "Sigla de 2 letras da Unidade Federativa."
+        tests:
+          - not_null
+      - name: faixa_frequencia_mhz
+        description: "Faixa de espectro licenciada em MHz."
+        tests:
+          - not_null
+      - name: geracao_tecnologica
+        description: "Geração tecnológica principal associada à faixa."
+        tests:
+          - not_null
+      - name: largura_banda_agregada_mhz
+        description: "Largura de banda total agregada alocada na faixa em MHz."
+        tests:
+          - not_null
+      - name: estacoes_licenciadas_faixa
+        description: "Quantidade de estações operando nesta faixa."
+        tests:
+          - not_null
+      - name: participacao_estacoes_faixa_pct
+        description: "Participação percentual das estações desta faixa no total municipal."
+        tests:
+          - not_null
+      - name: total_largura_banda_municipio_mhz
+        description: "Largura de banda total agregada somada entre todas as faixas no município."
+        tests:
+          - not_null
+      - name: potencia_media_eirp_dbm
+        description: "Potência média efetiva isotropicamente radiada (EIRP) em dBm."
+        tests:
+          - not_null
+      - name: status_limpeza_faixa
+        description: "Status regulatório de desocupação da faixa."
+        tests:
+          - not_null
+      - name: reference_date
+        description: "Data de referência ISO-8601."
+        tests:
+          - not_null
+      - name: extracted_at
+        description: "Timestamp ISO-8601 UTC da extração."
+        tests:
+          - not_null
