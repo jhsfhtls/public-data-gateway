@@ -2205,6 +2205,37 @@ class PublicApisHubFacade:
             return conn.extract_table().to_pylist()[0]
         return conn.fetch_b2b_profile(domain=domain)
 
+    def lookup_country(self, code: str = "BRA", *, persist: bool = False) -> dict[str, Any]:
+        """Lookup ISO-3166 country metadata via REST Countries Medallion connector."""
+        from public_data_gateway.connectors.demografico.rest_countries import RestCountriesConnector
+
+        conn = RestCountriesConnector(settings=self._sdk.settings)
+        if persist:
+            return conn.extract_table().to_pylist()[0]
+        return conn.fetch_country(code=code)
+
+    def search_openalex_works(
+        self, query: str, *, per_page: int = 5, persist: bool = False
+    ) -> list[dict[str, Any]]:
+        """Search scientific works & citations via OpenAlex Medallion connector."""
+        from public_data_gateway.connectors.educacao.openalex_api import OpenAlexApiConnector
+
+        conn = OpenAlexApiConnector(settings=self._sdk.settings)
+        if persist:
+            return conn.extract_table().to_pylist()
+        return conn.normalize_records(conn.fetch_works(query=query, per_page=per_page))
+
+    def query_gdelt_doc(
+        self, query: str, *, maxrecords: int = 5, persist: bool = False
+    ) -> list[dict[str, Any]]:
+        """Query global news articles via GDELT Project Doc 2.0 Medallion connector."""
+        from public_data_gateway.connectors.agregadores.gdelt_doc_api import GdeltDocApiConnector
+
+        conn = GdeltDocApiConnector(settings=self._sdk.settings)
+        if persist:
+            return conn.extract_table().to_pylist()
+        return conn.normalize_records(conn.fetch_articles(query=query, maxrecords=maxrecords))
+
 
 class BrazilData:
     """Unified developer SDK facade for querying, normalizing, and enriching Brazilian public datasets."""

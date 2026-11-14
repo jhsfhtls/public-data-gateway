@@ -1,0 +1,10 @@
+version: 2
+
+sources:
+  - name: gdelt_doc_api
+    description: "GDELT Project Doc 2.0 news stream dataset."
+    meta:
+      external_location: "data/gdelt_doc_api/silver/{name}.parquet"
+    tables:
+      - name: gdelt_doc_articles
+        description: "Normalized news articles from GDELT Project."

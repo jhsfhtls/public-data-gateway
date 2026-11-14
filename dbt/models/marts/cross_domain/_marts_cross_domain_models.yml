@@ -514,3 +514,34 @@ models:
       - name: total_perfis_b2b
         description: "Total de perfis corporativos B2B indexados."
         tests: [not_null]
+
+  - name: mart_cross_domain_global_pesquisa_brasil
+    description: "Visao cross-domain estadual integrando Feature Store B2B com os 3 conectores Medallion Globais e Pesquisa do Bloco 4: REST Countries ISO-3166, OpenAlex e GDELT Doc 2.0 (Wave 10.5D)."
+    columns:
+      - name: sigla_uf
+        description: "Sigla da Unidade Federativa."
+        tests: [not_null, unique]
+      - name: regiao
+        description: "Macrorregiao brasileira."
+        tests: [not_null]
+      - name: total_municipios_uf
+        description: "Total de municipios na UF."
+        tests: [not_null]
+      - name: avg_propensao_b2b_uf
+        description: "Media estadual do score composto de propensao B2B."
+        tests: [not_null]
+      - name: total_paises_iso
+        description: "Total de paises ISO-3166 indexados via REST Countries."
+        tests: [not_null]
+      - name: max_populacao_iso
+        description: "Maior populacao nacional registrada na dimensao ISO-3166."
+        tests: [not_null]
+      - name: total_obras_openalex
+        description: "Total de obras cientificas indexadas via OpenAlex."
+        tests: [not_null]
+      - name: total_citacoes_openalex
+        description: "Total de citacoes acumuladas nas obras OpenAlex indexadas."
+        tests: [not_null]
+      - name: total_artigos_gdelt
+        description: "Total de artigos e sinais de sentimento monitorados via GDELT Doc 2.0."
+        tests: [not_null]

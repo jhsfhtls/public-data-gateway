@@ -1,0 +1,42 @@
+version: 2
+
+models:
+  - name: stg_gdelt_doc_articles
+    description: "Staging view for GDELT Project articles."
+    columns:
+      - name: article_url
+        description: "Canonical article URL."
+        tests: [not_null]
+      - name: title
+        description: "Article headline."
+        tests: [not_null]
+      - name: domain
+        description: "Publisher domain."
+      - name: language
+        description: "Article language."
+      - name: source_country
+        description: "Source country."
+      - name: seendate
+        description: "GDELT observation timestamp."
+      - name: extracted_at
+        description: "UTC ISO-8601 extraction timestamp."
+
+  - name: fct_gdelt_noticias_sentimento
+    description: "Intradomain fact table for global news & sentiment streams."
+    columns:
+      - name: article_url
+        description: "Canonical article URL."
+        tests: [not_null, unique]
+      - name: title
+        description: "Article headline."
+        tests: [not_null]
+      - name: domain
+        description: "Publisher domain."
+      - name: language
+        description: "Article language."
+      - name: source_country
+        description: "Source country."
+      - name: seendate
+        description: "GDELT observation timestamp."
+      - name: extracted_at
+        description: "UTC ISO-8601 extraction timestamp."

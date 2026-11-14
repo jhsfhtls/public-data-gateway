@@ -1,0 +1,37 @@
+contract_id: gdelt-doc-api-v1
+source_id: gdelt_doc_api
+version: "1.0.0"
+grain: "article_url"
+primary_keys:
+  - article_url
+reference_date_column: extracted_at
+lgpd_legal_basis: "Monitoramento global aberto de noticias e sentimento (GDELT Project)"
+min_expected_rows: 1
+max_volume_drop_pct: 50.0
+sentinel_values:
+  - "-1"
+  - "-999"
+  - "999999"
+  - "N/A"
+columns:
+  - name: article_url
+    data_type: STRING
+    nullable: false
+  - name: title
+    data_type: STRING
+    nullable: false
+  - name: domain
+    data_type: STRING
+    nullable: false
+  - name: language
+    data_type: STRING
+    nullable: false
+  - name: source_country
+    data_type: STRING
+    nullable: false
+  - name: seendate
+    data_type: STRING
+    nullable: false
+  - name: extracted_at
+    data_type: STRING
+    nullable: false

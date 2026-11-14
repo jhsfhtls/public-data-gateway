@@ -1,0 +1,42 @@
+version: 2
+
+models:
+  - name: stg_openalex_works
+    description: "Staging view for OpenAlex scientific works."
+    columns:
+      - name: work_id
+        description: "Canonical OpenAlex work URI."
+        tests: [not_null]
+      - name: title
+        description: "Publication title."
+        tests: [not_null]
+      - name: publication_year
+        description: "Year of publication."
+        tests: [not_null]
+      - name: cited_by_count
+        description: "Citation count."
+        tests: [not_null]
+      - name: doi
+        description: "Digital Object Identifier."
+      - name: extracted_at
+        description: "UTC ISO-8601 extraction timestamp."
+
+  - name: fct_openalex_pesquisa_cientifica
+    description: "Intradomain fact table for scientific research output."
+    columns:
+      - name: work_id
+        description: "Canonical OpenAlex work URI."
+        tests: [not_null, unique]
+      - name: title
+        description: "Publication title."
+        tests: [not_null]
+      - name: publication_year
+        description: "Year of publication."
+        tests: [not_null]
+      - name: cited_by_count
+        description: "Citation count."
+        tests: [not_null]
+      - name: doi
+        description: "Digital Object Identifier."
+      - name: extracted_at
+        description: "UTC ISO-8601 extraction timestamp."

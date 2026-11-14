@@ -201,8 +201,8 @@
     {
       "phase_id": "10.5",
       "name": "Padronização Medallion 11-Gates das APIs da Fase 10 (Staging, Intradomínio, Cross-Domain, Testes Live & Catálogo)",
-      "status": "IN_PROGRESS",
-      "completion_date": null,
+      "status": "COMPLETED",
+      "completion_date": "2026-11-14",
       "deliverables": [
         "Diretiva obrigatória formalizada em .agents/rules/connector_standard_policy.md e docs/adr/ADR-004-connector-medallion-parity-policy.md exigindo que TODA API siga o padrão 11-Gates (BaseConnector, contract.yaml ODCS v3.1, data/<api>/{bronze,silver,gold,quarantine}/, dbt staging -> intradomínio -> cross_domain, testes offline + live fail-hard, catálogo e paridade SDK/FastAPI/CLI/MCP)",
         "Wave 10.5A — Conectores Medallion de Séries & Dados Abertos (Bloco 2): elevar ipeadata_odata, brapi_b3, awesomeapi_fx, aneel_anp_ckan, camara_senado_dados_abertos, world_bank_v2 e who_gho_odata para BaseConnector + contract.yaml + Parquet Silver/Gold + stg_* + fct_*/dim_*/mart_* intradomínio + cross_domain + testes live 1-linha",
@@ -653,6 +653,12 @@
       "phase_id": "10.5",
       "milestone": "Conclusão da Wave 10.5C — Padronização Medallion 11-Gates das 10 APIs KYC/KYB, Antifraude & Endereçamento do Bloco 1",
       "summary": "Elevação completa dos 10 conectores do Bloco 1 (minha_receita, cnpja_open, receitaws, viacep, opencep, nominatim_osm, rdap_registro_br, gleif_lei, bgpview_ip_intel e company_enrich_apollo_bdc) ao padrão 11-Gates: contratos ODCS v3.1, persistência isolada Bronze/Silver/Gold/Quarantine com Parquet ZSTD + SHA-256, 10 staging views (stg_*) + 10 modelos intradomínio (fct_*/dim_*) + cross-domain mart_cross_domain_kyc_antifraude_brasil, paridade nas 4 interfaces (SDK, FastAPI, CLI e MCP), testes offline determinísticos e testes live 1-linha."
+    },
+    {
+      "date": "2026-11-14",
+      "phase_id": "10.5",
+      "milestone": "Conclusão da Wave 10.5D e da Fase 10.5 — Padronização Medallion 11-Gates das 3 APIs Globais & Pesquisa do Bloco 4 + Paridade Total",
+      "summary": "Elevação completa dos 3 conectores finais do Bloco 4 (rest_countries, openalex_api e gdelt_doc_api) ao padrão 11-Gates: contratos ODCS v3.1, persistência isolada Bronze/Silver/Gold/Quarantine, 3 staging views (stg_*) + 3 modelos intradomínio (dim_paises_iso_3166, fct_openalex_pesquisa_cientifica e fct_gdelt_noticias_sentimento) + cross-domain mart_cross_domain_global_pesquisa_brasil, paridade 100% nas 4 interfaces (SDK, FastAPI, CLI e MCP com wrap_untrusted_gov_data), catálogo unificado sincronizado (29/29 APIs em medallion_parity: true), testes offline e testes live 1-linha."
     }
   ]
 }

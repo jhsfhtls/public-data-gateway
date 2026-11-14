@@ -1316,6 +1316,17 @@ def build_parser() -> argparse.ArgumentParser:
     pa_b2b_p = pa_sub.add_parser("b2b-domain", help="Lookup optional freemium B2B domain profile")
     pa_b2b_p.add_argument("domain", help="Corporate domain name")
 
+    pa_ctry_p = pa_sub.add_parser("country", help="Lookup ISO-3166 country metadata via REST Countries")
+    pa_ctry_p.add_argument("code", help="ISO-3166 alpha-2 or alpha-3 code (e.g. BRA)")
+
+    pa_oa_p = pa_sub.add_parser("openalex", help="Search scientific works via OpenAlex API")
+    pa_oa_p.add_argument("query", help="Search query")
+    pa_oa_p.add_argument("--per-page", type=int, default=5)
+
+    pa_gd_p = pa_sub.add_parser("gdelt", help="Query global news stream via GDELT Doc 2.0 API")
+    pa_gd_p.add_argument("query", help="Search query")
+    pa_gd_p.add_argument("--maxrecords", type=int, default=5)
+
     # Dados.gov.br (CKAN) command group
     dg_p = subparsers.add_parser("dadosgov", help="Query Dados.gov.br (CKAN) publishing organizations, resource formats, LAI governance, API reuse, and rankings.")
     dg_sub = dg_p.add_subparsers(dest="dadosgov_action", required=True)
@@ -4708,6 +4719,15 @@ def main(argv: Sequence[str] | None = None) -> int:
                 return 0
             if args.public_apis_action == "b2b-domain":
                 print(json.dumps(sdk.public_apis.lookup_b2b_domain_profile(args.domain), ensure_ascii=False, indent=2, default=str))
+                return 0
+            if args.public_apis_action == "country":
+                print(json.dumps(sdk.public_apis.lookup_country(args.code), ensure_ascii=False, indent=2, default=str))
+                return 0
+            if args.public_apis_action == "openalex":
+                print(json.dumps(sdk.public_apis.search_openalex_works(args.query, per_page=args.per_page), ensure_ascii=False, indent=2, default=str))
+                return 0
+            if args.public_apis_action == "gdelt":
+                print(json.dumps(sdk.public_apis.query_gdelt_doc(args.query, maxrecords=args.maxrecords), ensure_ascii=False, indent=2, default=str))
                 return 0
 
     except Exception as exc:
