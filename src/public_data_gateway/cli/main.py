@@ -1274,6 +1274,31 @@ def build_parser() -> argparse.ArgumentParser:
     pa_who_p.add_argument("--indicator", default="WHOSIS_000001", help="WHO GHO indicator code")
     pa_who_p.add_argument("--top", type=int, default=10, help="Max records")
 
+    pa_osrm_p = pa_sub.add_parser("osrm-route", help="Compute OSRM road distance and duration")
+    pa_osrm_p.add_argument("--lat1", type=float, required=True)
+    pa_osrm_p.add_argument("--lon1", type=float, required=True)
+    pa_osrm_p.add_argument("--lat2", type=float, required=True)
+    pa_osrm_p.add_argument("--lon2", type=float, required=True)
+
+    pa_meteo_p = pa_sub.add_parser("open-meteo", help="Fetch Open-Meteo daily weather forecast")
+    pa_meteo_p.add_argument("--lat", type=float, default=-23.5505)
+    pa_meteo_p.add_argument("--lon", type=float, default=-46.6333)
+
+    pa_nasa_p = pa_sub.add_parser("nasa-power", help="Fetch NASA POWER agro-climate data")
+    pa_nasa_p.add_argument("--lat", type=float, default=-23.5505)
+    pa_nasa_p.add_argument("--lon", type=float, default=-46.6333)
+    pa_nasa_p.add_argument("--start", default="20261101")
+    pa_nasa_p.add_argument("--end", default="20261105")
+
+    pa_elev_p = pa_sub.add_parser("elevation", help="Fetch SRTM terrain elevation")
+    pa_elev_p.add_argument("--lat", type=float, default=-23.5505)
+    pa_elev_p.add_argument("--lon", type=float, default=-46.6333)
+
+    pa_apod_p = pa_sub.add_parser("nasa-apod", help="Fetch NASA APOD Open ML asset")
+    pa_apod_p.add_argument("--date", default=None)
+
+    pa_sub.add_parser("upgini-features", help="Describe Upgini public ML feature groups")
+
     # Dados.gov.br (CKAN) command group
     dg_p = subparsers.add_parser("dadosgov", help="Query Dados.gov.br (CKAN) publishing organizations, resource formats, LAI governance, API reuse, and rankings.")
     dg_sub = dg_p.add_subparsers(dest="dadosgov_action", required=True)
@@ -4633,6 +4658,24 @@ def main(argv: Sequence[str] | None = None) -> int:
                 return 0
             if args.public_apis_action == "who-gho":
                 print(json.dumps(sdk.public_apis.fetch_who_gho_indicator(indicator=args.indicator, top=args.top), ensure_ascii=False, indent=2, default=str))
+                return 0
+            if args.public_apis_action == "osrm-route":
+                print(json.dumps(sdk.public_apis.compute_osrm_route(args.lat1, args.lon1, args.lat2, args.lon2), ensure_ascii=False, indent=2, default=str))
+                return 0
+            if args.public_apis_action == "open-meteo":
+                print(json.dumps(sdk.public_apis.fetch_open_meteo_forecast(lat=args.lat, lon=args.lon), ensure_ascii=False, indent=2, default=str))
+                return 0
+            if args.public_apis_action == "nasa-power":
+                print(json.dumps(sdk.public_apis.fetch_nasa_power_daily(lat=args.lat, lon=args.lon, start=args.start, end=args.end), ensure_ascii=False, indent=2, default=str))
+                return 0
+            if args.public_apis_action == "elevation":
+                print(json.dumps(sdk.public_apis.fetch_elevation(lat=args.lat, lon=args.lon), ensure_ascii=False, indent=2, default=str))
+                return 0
+            if args.public_apis_action == "nasa-apod":
+                print(json.dumps(sdk.public_apis.fetch_nasa_apod(date=args.date), ensure_ascii=False, indent=2, default=str))
+                return 0
+            if args.public_apis_action == "upgini-features":
+                print(json.dumps(sdk.public_apis.describe_upgini_features(), ensure_ascii=False, indent=2, default=str))
                 return 0
 
     except Exception as exc:

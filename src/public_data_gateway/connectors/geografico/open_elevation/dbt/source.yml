@@ -1,0 +1,10 @@
+version: 2
+
+sources:
+  - name: open_elevation
+    description: "Open-Elevation SRTM terrain altitude dataset."
+    meta:
+      external_location: "data/open_elevation/silver/{name}.parquet"
+    tables:
+      - name: open_elevation_points
+        description: "Normalized municipal centroid SRTM elevation in meters."

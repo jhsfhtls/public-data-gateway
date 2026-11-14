@@ -1,0 +1,38 @@
+contract_id: open-meteo-v1
+source_id: open_meteo
+version: "1.0.0"
+grain: "id_municipio x forecast_date"
+primary_keys:
+  - id_municipio
+  - forecast_date
+reference_date_column: forecast_date
+lgpd_legal_basis: "Dados meteorologicos abertos (Open-Meteo CC BY 4.0)"
+min_expected_rows: 1
+max_volume_drop_pct: 50.0
+sentinel_values:
+  - "-1"
+  - "-999"
+  - "999999"
+  - "N/A"
+columns:
+  - name: id_municipio
+    data_type: STRING
+    nullable: false
+  - name: sigla_uf
+    data_type: STRING
+    nullable: false
+  - name: forecast_date
+    data_type: STRING
+    nullable: false
+  - name: temp_max_c
+    data_type: DOUBLE
+    nullable: false
+  - name: temp_min_c
+    data_type: DOUBLE
+    nullable: false
+  - name: precipitation_mm
+    data_type: DOUBLE
+    nullable: true
+  - name: extracted_at
+    data_type: STRING
+    nullable: false

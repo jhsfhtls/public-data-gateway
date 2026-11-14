@@ -1,0 +1,10 @@
+version: 2
+
+sources:
+  - name: nasa_power
+    description: "NASA POWER agro-climatology and solar irradiance API."
+    meta:
+      external_location: "data/nasa_power/silver/{name}.parquet"
+    tables:
+      - name: nasa_power_daily
+        description: "Normalized NASA POWER daily agro-climate records."

@@ -1,0 +1,34 @@
+version: 2
+
+models:
+  - name: stg_nasa_youtube_open_ml_apod
+    description: "Staging view for NASA Open APIs APOD vision assets."
+    columns:
+      - name: apod_date
+        description: "ISO-8601 APOD publication date."
+        tests: [not_null]
+      - name: title
+        description: "Asset title."
+        tests: [not_null]
+      - name: media_type
+        description: "Media type (image or video)."
+      - name: url
+        description: "Public asset URL."
+      - name: extracted_at
+        description: "UTC ISO-8601 extraction timestamp."
+
+  - name: dim_nasa_open_ml_assets
+    description: "Intradomain dimension table of NASA Open ML vision and multimodal assets."
+    columns:
+      - name: apod_date
+        description: "ISO-8601 APOD publication date."
+        tests: [not_null, unique]
+      - name: title
+        description: "Asset title."
+        tests: [not_null]
+      - name: media_type
+        description: "Media type (image or video)."
+      - name: url
+        description: "Public asset URL."
+      - name: extracted_at
+        description: "UTC ISO-8601 extraction timestamp."

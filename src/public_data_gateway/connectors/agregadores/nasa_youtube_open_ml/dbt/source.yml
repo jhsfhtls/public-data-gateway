@@ -1,0 +1,10 @@
+version: 2
+
+sources:
+  - name: nasa_youtube_open_ml
+    description: "NASA Open APIs and Open ML vision/NLP assets."
+    meta:
+      external_location: "data/nasa_youtube_open_ml/silver/{name}.parquet"
+    tables:
+      - name: nasa_apod_catalog
+        description: "Normalized NASA APOD vision asset metadata."

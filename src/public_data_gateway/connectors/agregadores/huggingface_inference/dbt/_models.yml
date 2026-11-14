@@ -1,0 +1,42 @@
+version: 2
+
+models:
+  - name: stg_huggingface_inference_runs
+    description: "Staging view for Hugging Face Inference API runs."
+    columns:
+      - name: model_id
+        description: "Hugging Face Hub model identifier."
+        tests: [not_null]
+      - name: input_hash
+        description: "SHA-256 prefix of the evaluated input text."
+        tests: [not_null]
+      - name: task_type
+        description: "NLP inference task type."
+      - name: top_label
+        description: "Highest-scoring predicted label."
+        tests: [not_null]
+      - name: top_score
+        description: "Confidence score for top_label."
+        tests: [not_null]
+      - name: extracted_at
+        description: "UTC ISO-8601 extraction timestamp."
+
+  - name: fct_huggingface_nlp_signals
+    description: "Intradomain fact table of Hugging Face NLP inference signals."
+    columns:
+      - name: model_id
+        description: "Hugging Face Hub model identifier."
+        tests: [not_null]
+      - name: input_hash
+        description: "SHA-256 prefix of evaluated input text."
+        tests: [not_null]
+      - name: task_type
+        description: "NLP inference task type."
+      - name: top_label
+        description: "Highest-scoring predicted label."
+        tests: [not_null]
+      - name: top_score
+        description: "Confidence score for top_label."
+        tests: [not_null]
+      - name: extracted_at
+        description: "UTC ISO-8601 extraction timestamp."

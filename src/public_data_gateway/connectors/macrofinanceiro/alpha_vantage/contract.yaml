@@ -1,0 +1,41 @@
+contract_id: alpha-vantage-v1
+source_id: alpha_vantage
+version: "1.0.0"
+grain: "symbol x trade_date"
+primary_keys:
+  - symbol
+  - trade_date
+reference_date_column: trade_date
+lgpd_legal_basis: "Dados publicos de mercado financeiro global (Alpha Vantage)"
+min_expected_rows: 1
+max_volume_drop_pct: 50.0
+sentinel_values:
+  - "-1"
+  - "-999"
+  - "999999"
+  - "N/A"
+columns:
+  - name: symbol
+    data_type: STRING
+    nullable: false
+  - name: trade_date
+    data_type: STRING
+    nullable: false
+  - name: open_price
+    data_type: DOUBLE
+    nullable: false
+  - name: high_price
+    data_type: DOUBLE
+    nullable: false
+  - name: low_price
+    data_type: DOUBLE
+    nullable: false
+  - name: close_price
+    data_type: DOUBLE
+    nullable: false
+  - name: volume
+    data_type: DOUBLE
+    nullable: true
+  - name: extracted_at
+    data_type: STRING
+    nullable: false

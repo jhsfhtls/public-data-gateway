@@ -1,0 +1,47 @@
+contract_id: overpass-osm-v1
+source_id: overpass_osm
+version: "1.0.0"
+grain: "id_municipio x amenity"
+primary_keys:
+  - id_municipio
+  - amenity
+reference_date_column: extracted_at
+lgpd_legal_basis: "Dados geoespaciais abertos de infraestrutura urbana (OpenStreetMap ODbL)"
+min_expected_rows: 1
+max_volume_drop_pct: 50.0
+sentinel_values:
+  - "-1"
+  - "-999"
+  - "999999"
+  - "N/A"
+columns:
+  - name: id_municipio
+    data_type: STRING
+    nullable: false
+  - name: sigla_uf
+    data_type: STRING
+    nullable: false
+  - name: lat
+    data_type: DOUBLE
+    nullable: false
+  - name: lon
+    data_type: DOUBLE
+    nullable: false
+  - name: amenity
+    data_type: STRING
+    nullable: false
+  - name: radius_m
+    data_type: INTEGER
+    nullable: false
+  - name: total_pois
+    data_type: DOUBLE
+    nullable: false
+  - name: nodes
+    data_type: INTEGER
+    nullable: true
+  - name: ways
+    data_type: INTEGER
+    nullable: true
+  - name: extracted_at
+    data_type: STRING
+    nullable: false

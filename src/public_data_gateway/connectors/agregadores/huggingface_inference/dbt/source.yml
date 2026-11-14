@@ -1,0 +1,10 @@
+version: 2
+
+sources:
+  - name: huggingface_inference
+    description: "Hugging Face Inference API NLP and classification signals."
+    meta:
+      external_location: "data/huggingface_inference/silver/{name}.parquet"
+    tables:
+      - name: hf_inference_runs
+        description: "Normalized Hugging Face NLP inference output records."

@@ -110,6 +110,26 @@ class PublicApiMedallionConnector(BaseConnector):
         resp.raise_for_status()
         return resp.json()
 
+    def _post_json(
+        self,
+        url: str,
+        *,
+        data: dict[str, Any] | None = None,
+        json_body: dict[str, Any] | None = None,
+        headers: dict[str, str] | None = None,
+    ) -> Any:
+        merged_headers = {"User-Agent": _DEFAULT_USER_AGENT, "Accept": "application/json"}
+        if headers:
+            merged_headers.update(headers)
+        resp = self.http_client.post(
+            url,
+            data=data,
+            json=json_body,
+            headers=merged_headers,
+        )
+        resp.raise_for_status()
+        return resp.json()
+
     def _sanitize_and_partition(
         self,
         records: list[dict[str, Any]],

@@ -420,3 +420,51 @@ models:
         description: "Taxa de crescimento do PIB brasileiro segundo World Bank v2 (%)."
       - name: who_life_expectancy_years
         description: "Expectativa de vida no Brasil segundo WHO GHO OData (anos)."
+
+  - name: mart_cross_domain_espacial_clima_ml_brasil
+    description: "Cross-domain mart integrating Wave 10.5B Medallion Block 3 connectors (Overpass OSM, OSRM, Open-Meteo, NASA POWER, Open-Elevation, Hugging Face, Alpha Vantage, NASA Open ML, Upgini) with municipal feature store by UF."
+    columns:
+      - name: sigla_uf
+        description: "Sigla da Unidade da Federacao (UF)."
+        tests: [not_null, unique]
+      - name: regiao
+        description: "Macrorregiao geografica brasileira."
+        tests: [not_null]
+      - name: total_municipios_uf
+        description: "Quantidade de municipios da UF consolidados na feature store."
+        tests: [not_null]
+      - name: avg_propensao_b2b_uf
+        description: "Media estadual do score de propensao B2B (0-100)."
+        tests: [not_null]
+      - name: avg_esg_agro_uf
+        description: "Media estadual do score ESG e agro resiliencia (0-100)."
+        tests: [not_null]
+      - name: total_osm_pois_uf
+        description: "Total de POIs urbanos mapeados via Overpass OSM na UF."
+        tests: [not_null]
+      - name: avg_osrm_distance_km
+        description: "Distancia viaria media OSRM em km a partir da UF."
+      - name: avg_temp_max_c
+        description: "Temperatura maxima media diaria Open-Meteo na UF (C)."
+      - name: avg_meteo_precip_mm
+        description: "Precipitacao media diaria Open-Meteo na UF (mm)."
+      - name: avg_solar_radiation_kwh_m2
+        description: "Irradiancia solar media NASA POWER na UF (kWh/m2/dia)."
+      - name: avg_elevation_m
+        description: "Altitude media SRTM Open-Elevation na UF (m)."
+      - name: total_hf_signals
+        description: "Total de sinais NLP avaliados via Hugging Face Inference."
+        tests: [not_null]
+      - name: avg_hf_confidence
+        description: "Score medio de confianca das inferencias Hugging Face."
+      - name: alpha_vantage_tickers
+        description: "Quantidade de ativos monitorados via Alpha Vantage."
+        tests: [not_null]
+      - name: avg_alpha_vantage_close
+        description: "Preco medio de fechamento dos ativos Alpha Vantage."
+      - name: total_nasa_ml_assets
+        description: "Quantidade de ativos NASA Open ML catalogados."
+        tests: [not_null]
+      - name: total_upgini_feature_groups
+        description: "Quantidade de grupos de features Upgini catalogados."
+        tests: [not_null]

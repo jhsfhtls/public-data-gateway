@@ -1,0 +1,48 @@
+version: 2
+
+models:
+  - name: stg_nasa_power_daily
+    description: "Staging view for NASA POWER daily solar and agro-climate observations."
+    columns:
+      - name: id_municipio
+        description: "7-digit IBGE municipality code."
+        tests: [not_null]
+      - name: sigla_uf
+        description: "Federative Unit abbreviation."
+        tests: [not_null]
+      - name: obs_date
+        description: "Observation date (YYYYMMDD)."
+        tests: [not_null]
+      - name: solar_radiation_kwh_m2
+        description: "All-sky surface shortwave downward irradiance (kWh/m2/day)."
+        tests: [not_null]
+      - name: precipitation_mm
+        description: "Bias-corrected precipitation (mm/day)."
+      - name: temp_2m_c
+        description: "2-meter air temperature in Celsius."
+        tests: [not_null]
+      - name: extracted_at
+        description: "UTC ISO-8601 extraction timestamp."
+
+  - name: fct_nasa_power_agro_clima
+    description: "Intradomain fact table of NASA POWER solar irradiance and agro-climate indicators."
+    columns:
+      - name: id_municipio
+        description: "7-digit IBGE municipality code."
+        tests: [not_null]
+      - name: sigla_uf
+        description: "Federative Unit abbreviation."
+        tests: [not_null]
+      - name: obs_date
+        description: "Observation date (YYYYMMDD)."
+        tests: [not_null]
+      - name: solar_radiation_kwh_m2
+        description: "All-sky surface shortwave downward irradiance."
+        tests: [not_null]
+      - name: precipitation_mm
+        description: "Bias-corrected precipitation (mm/day)."
+      - name: temp_2m_c
+        description: "2-meter air temperature in Celsius."
+        tests: [not_null]
+      - name: extracted_at
+        description: "UTC ISO-8601 extraction timestamp."

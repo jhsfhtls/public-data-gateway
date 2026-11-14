@@ -1,0 +1,52 @@
+version: 2
+
+models:
+  - name: stg_osrm_routing_routes
+    description: "Staging view for OSRM road routing metrics."
+    columns:
+      - name: origin_municipio
+        description: "Origin IBGE municipality code."
+        tests: [not_null]
+      - name: dest_municipio
+        description: "Destination IBGE municipality code."
+        tests: [not_null]
+      - name: sigla_uf
+        description: "Origin Federative Unit abbreviation."
+        tests: [not_null]
+      - name: profile
+        description: "OSRM routing profile (driving, cycling, walking)."
+        tests: [not_null]
+      - name: distance_km
+        description: "Road distance in kilometers."
+        tests: [not_null]
+      - name: duration_min
+        description: "Estimated travel duration in minutes."
+        tests: [not_null]
+      - name: extracted_at
+        description: "UTC ISO-8601 extraction timestamp."
+
+  - name: fct_osrm_rotas_logisticas
+    description: "Intradomain fact table of OSRM inter-municipal logistics routes and average speeds."
+    columns:
+      - name: origin_municipio
+        description: "Origin IBGE municipality code."
+        tests: [not_null]
+      - name: dest_municipio
+        description: "Destination IBGE municipality code."
+        tests: [not_null]
+      - name: sigla_uf
+        description: "Origin Federative Unit abbreviation."
+        tests: [not_null]
+      - name: profile
+        description: "OSRM routing profile."
+        tests: [not_null]
+      - name: distance_km
+        description: "Road distance in kilometers."
+        tests: [not_null]
+      - name: duration_min
+        description: "Estimated travel duration in minutes."
+        tests: [not_null]
+      - name: avg_speed_kmh
+        description: "Calculated average route speed in km/h."
+      - name: extracted_at
+        description: "UTC ISO-8601 extraction timestamp."
