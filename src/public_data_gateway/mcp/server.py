@@ -1081,6 +1081,65 @@ class MCPDispatcher:
                                 },
                             },
                             {
+                                "name": "bdg_get_vigilancia_srag_respiratory_surveillance",
+                                "description": "Get official OpenDataSUS municipal Flu Syndrome (e-SUS) and SARI/SRAG (SIVEP-Gripe) hospitalizations, ICU share, lethality, and RT-PCR confirmation.",
+                                "inputSchema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "id_municipio": {
+                                            "type": "string",
+                                            "description": "7-digit IBGE municipality code, 6-digit DataSUS prefix, CEP-8, or municipality name",
+                                        },
+                                    },
+                                    "required": ["id_municipio"],
+                                },
+                            },
+                            {
+                                "name": "bdg_get_vigilancia_sipni_vaccination_coverage",
+                                "description": "Get official OpenDataSUS municipal SI-PNI/RNDS vaccination coverage (Pentavalent, VIP, MMR/Tríplice Viral), homogeneity, and dropout rates.",
+                                "inputSchema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "id_municipio": {
+                                            "type": "string",
+                                            "description": "7-digit IBGE municipality code, 6-digit DataSUS prefix, CEP-8, or municipality name",
+                                        },
+                                    },
+                                    "required": ["id_municipio"],
+                                },
+                            },
+                            {
+                                "name": "bdg_get_vigilancia_epidemiological_features",
+                                "description": "Get normalized Gold OpenDataSUS epidemiological surveillance readiness score, PNI collective immunization protection score, and 4-tier municipal classification.",
+                                "inputSchema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "id_municipio": {
+                                            "type": "string",
+                                            "description": "7-digit IBGE municipality code, 6-digit DataSUS prefix, CEP-8, or municipality name",
+                                        },
+                                    },
+                                    "required": ["id_municipio"],
+                                },
+                            },
+                            {
+                                "name": "bdg_list_top_vigilancia_surveillance_municipalities",
+                                "description": "List top Brazilian municipalities ranked by composite OpenDataSUS epidemiological readiness and PNI immunization protection scores.",
+                                "inputSchema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "limit": {
+                                            "type": "integer",
+                                            "description": "Maximum rows (default: 10)",
+                                        },
+                                        "sigla_uf": {
+                                            "type": "string",
+                                            "description": "Optional 2-letter state filter (e.g. PR)",
+                                        },
+                                    },
+                                },
+                            },
+                            {
                                 "name": "bdg_get_censo_escolar_schools",
                                 "description": "Get municipal active schools inventory, broadband internet, science labs, libraries, and PcD accessibility (INEP Censo Escolar).",
                                 "inputSchema": {
@@ -2632,6 +2691,69 @@ class MCPDispatcher:
                     },
                 }
             wrapped = wrap_untrusted_gov_data(result, source_id="anvisa_cmed")
+            return {
+                "jsonrpc": "2.0",
+                "id": req_id,
+                "result": {"content": [{"type": "text", "text": wrapped}], "isError": False},
+            }
+
+        if tool_name in {
+            "bdg_get_vigilancia_srag_respiratory_surveillance",
+            "bdg_get_vigilancia_sipni_vaccination_coverage",
+            "bdg_get_vigilancia_epidemiological_features",
+            "bdg_list_top_vigilancia_surveillance_municipalities",
+        }:
+            from public_data_gateway.connectors.saude.opendatasus_vigilancia.connector import (
+                OpenDataSUSVigilanciaConnector,
+            )
+
+            connector = OpenDataSUSVigilanciaConnector(settings=self.settings)
+            try:
+                if tool_name == "bdg_get_vigilancia_srag_respiratory_surveillance":
+                    result = connector.get_vigilancia_srag_respiratory_surveillance(
+                        str(args.get("id_municipio", "")).strip()
+                    )
+                elif tool_name == "bdg_get_vigilancia_sipni_vaccination_coverage":
+                    result = connector.get_vigilancia_sipni_vaccination_coverage(
+                        str(args.get("id_municipio", "")).strip()
+                    )
+                elif tool_name == "bdg_get_vigilancia_epidemiological_features":
+                    result = connector.get_vigilancia_epidemiological_features(
+                        str(args.get("id_municipio", "")).strip()
+                    )
+                else:
+                    raw_uf = args.get("sigla_uf")
+                    result = connector.list_top_vigilancia_surveillance_municipalities(
+                        limit=int(args.get("limit", 10)),
+                        sigla_uf=str(raw_uf).strip() if raw_uf else None,
+                    )
+            except ValueError as exc:
+                return {
+                    "jsonrpc": "2.0",
+                    "id": req_id,
+                    "result": {
+                        "content": [
+                            {"type": "text", "text": f"OpenDataSUS Vigilância parameter error: {exc}"}
+                        ],
+                        "isError": True,
+                    },
+                }
+
+            if not result:
+                return {
+                    "jsonrpc": "2.0",
+                    "id": req_id,
+                    "result": {
+                        "content": [
+                            {
+                                "type": "text",
+                                "text": "No OpenDataSUS Vigilância data found for the query.",
+                            }
+                        ],
+                        "isError": True,
+                    },
+                }
+            wrapped = wrap_untrusted_gov_data(result, source_id="opendatasus_vigilancia")
             return {
                 "jsonrpc": "2.0",
                 "id": req_id,

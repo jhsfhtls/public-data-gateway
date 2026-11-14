@@ -856,7 +856,7 @@ class LaborFacade:
 
 
 class HealthFacade:
-    """Unified developer facade for public health infrastructure, CNES networks, SIH hospitalizations, SIM mortality, SINASC live births, and ANVISA CMED drug price analytics."""
+    """Unified developer facade for public health infrastructure, CNES networks, SIH hospitalizations, SIM mortality, SINASC live births, ANVISA CMED prices, and OpenDataSUS epidemiological surveillance analytics."""
 
     def __init__(self, sdk: "BrazilData") -> None:
         self._sdk = sdk
@@ -865,6 +865,7 @@ class HealthFacade:
         self._sim_connector: Any = None
         self._sinasc_connector: Any = None
         self._cmed_connector: Any = None
+        self._vigilancia_connector: Any = None
 
     @property
     def cnes_connector(self) -> Any:
@@ -915,6 +916,18 @@ class HealthFacade:
 
             self._cmed_connector = ANVISACmedConnector(settings=self._sdk.settings)
         return self._cmed_connector
+
+    @property
+    def vigilancia_connector(self) -> Any:
+        if self._vigilancia_connector is None:
+            from public_data_gateway.connectors.saude.opendatasus_vigilancia.connector import (
+                OpenDataSUSVigilanciaConnector,
+            )
+
+            self._vigilancia_connector = OpenDataSUSVigilanciaConnector(
+                settings=self._sdk.settings
+            )
+        return self._vigilancia_connector
 
     def get_cnes_establishments(self, id_municipio: str) -> dict[str, Any]:
         """Get municipal summary of active health establishments and SUS network share (DataSUS CNES)."""
@@ -1071,6 +1084,54 @@ class HealthFacade:
     ) -> list[dict[str, Any]]:
         """List top pharmaceutical hub municipalities ranked by ANVISA CMED PMVG/CAP regulatory efficiency score."""
         return self.cmed_connector.list_top_cmed_regulatory_efficiency_hubs(
+            limit=limit, sigla_uf=sigla_uf
+        )
+
+    def get_vigilancia_srag_respiratory_surveillance(
+        self, id_municipio: str
+    ) -> dict[str, Any]:
+        """Get OpenDataSUS SRAG severe acute respiratory syndrome surveillance summary for a municipality."""
+        return self.vigilancia_connector.get_vigilancia_srag_respiratory_surveillance(
+            id_municipio
+        )
+
+    def list_vigilancia_sinan_notifiable_diseases(
+        self, id_municipio: str, grupo_agravo: str | None = None
+    ) -> list[dict[str, Any]]:
+        """List SINAN notifiable diseases and arboviruses records for a municipality."""
+        return self.vigilancia_connector.list_vigilancia_sinan_notifiable_diseases(
+            id_municipio, grupo_agravo=grupo_agravo
+        )
+
+    def get_vigilancia_sipni_vaccination_coverage(
+        self, id_municipio: str
+    ) -> dict[str, Any]:
+        """Get SI-PNI / RNDS immunization coverage metrics for a municipality."""
+        return self.vigilancia_connector.get_vigilancia_sipni_vaccination_coverage(
+            id_municipio
+        )
+
+    def get_vigilancia_cievs_response_capacity(
+        self, id_municipio: str
+    ) -> dict[str, Any]:
+        """Get CIEVS and LACEN epidemiological laboratory surveillance capacity metrics for a municipality."""
+        return self.vigilancia_connector.get_vigilancia_cievs_response_capacity(
+            id_municipio
+        )
+
+    def get_vigilancia_epidemiological_features(
+        self, id_municipio: str
+    ) -> dict[str, Any]:
+        """Get consolidated OpenDataSUS epidemiological and immunization ML features for a municipality."""
+        return self.vigilancia_connector.get_vigilancia_epidemiological_features(
+            id_municipio
+        )
+
+    def list_top_vigilancia_surveillance_municipalities(
+        self, limit: int = 10, sigla_uf: str | None = None
+    ) -> list[dict[str, Any]]:
+        """List top municipalities ranked by OpenDataSUS epidemiological surveillance and immunization resilience score."""
+        return self.vigilancia_connector.list_top_vigilancia_surveillance_municipalities(
             limit=limit, sigla_uf=sigla_uf
         )
 
@@ -1845,6 +1906,46 @@ class BrazilData:
     ) -> list[dict[str, Any]]:
         """Listar polos farmacêuticos líderes em eficiência regulatória PMVG/CAP no Brasil (ANVISA CMED)."""
         return self.health.list_top_cmed_regulatory_efficiency_hubs(
+            limit=limit, sigla_uf=sigla_uf
+        )
+
+    def get_vigilancia_srag_respiratory_surveillance(
+        self, id_municipio: str
+    ) -> dict[str, Any]:
+        """Consultar resumo de vigilância de SRAG (OpenDataSUS / SIVEP-Gripe) para um município."""
+        return self.health.get_vigilancia_srag_respiratory_surveillance(id_municipio)
+
+    def list_vigilancia_sinan_notifiable_diseases(
+        self, id_municipio: str, grupo_agravo: str | None = None
+    ) -> list[dict[str, Any]]:
+        """Listar notificações de agravos SINAN (arboviroses e endemias) para um município."""
+        return self.health.list_vigilancia_sinan_notifiable_diseases(
+            id_municipio, grupo_agravo=grupo_agravo
+        )
+
+    def get_vigilancia_sipni_vaccination_coverage(
+        self, id_municipio: str
+    ) -> dict[str, Any]:
+        """Consultar cobertura vacinal SI-PNI / RNDS para um município."""
+        return self.health.get_vigilancia_sipni_vaccination_coverage(id_municipio)
+
+    def get_vigilancia_cievs_response_capacity(
+        self, id_municipio: str
+    ) -> dict[str, Any]:
+        """Consultar capacidade de resposta laboratorial e epidemiológica CIEVS/LACEN para um município."""
+        return self.health.get_vigilancia_cievs_response_capacity(id_municipio)
+
+    def get_vigilancia_epidemiological_features(
+        self, id_municipio: str
+    ) -> dict[str, Any]:
+        """Consultar features epidemiológicas e de imunização consolidadas OpenDataSUS para um município."""
+        return self.health.get_vigilancia_epidemiological_features(id_municipio)
+
+    def list_top_vigilancia_surveillance_municipalities(
+        self, limit: int = 10, sigla_uf: str | None = None
+    ) -> list[dict[str, Any]]:
+        """Listar municípios líderes em score de vigilância epidemiológica e imunização OpenDataSUS."""
+        return self.health.list_top_vigilancia_surveillance_municipalities(
             limit=limit, sigla_uf=sigla_uf
         )
 

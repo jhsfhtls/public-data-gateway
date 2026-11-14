@@ -811,6 +811,36 @@ def build_parser() -> argparse.ArgumentParser:
     cm_rk_p.add_argument("--uf", type=str, help="Optional 2-letter state filter")
     cm_rk_p.add_argument("--json", action="store_true", help="Output in JSON format")
 
+    # OpenDataSUS Vigilância Epidemiológica & Imunização command group
+    vig_p = subparsers.add_parser("vigilancia", help="Query OpenDataSUS SRAG, SINAN notifiable diseases, SI-PNI vaccination coverage, CIEVS/LACEN, and surveillance rankings.")
+    vig_sub = vig_p.add_subparsers(dest="vigilancia_action", required=True)
+
+    vig_srag_p = vig_sub.add_parser("srag", help="Get municipal Flu Syndrome (e-SUS) and SARI/SRAG (SIVEP-Gripe) surveillance indicators.")
+    vig_srag_p.add_argument("id_municipio", help="7-digit IBGE municipality code, 6-digit DataSUS prefix, CEP-8, or municipality name")
+    vig_srag_p.add_argument("--json", action="store_true", help="Output in JSON format")
+
+    vig_sinan_p = vig_sub.add_parser("sinan", help="List municipal SINAN compulsory notification diseases by epidemiological group.")
+    vig_sinan_p.add_argument("id_municipio", help="7-digit IBGE municipality code, 6-digit DataSUS prefix, CEP-8, or municipality name")
+    vig_sinan_p.add_argument("--grupo", type=str, help="Optional disease group filter (e.g. Arboviroses)")
+    vig_sinan_p.add_argument("--json", action="store_true", help="Output in JSON format")
+
+    vig_vac_p = vig_sub.add_parser("vacinacao", help="Get municipal SI-PNI/RNDS vaccination coverage, doses, homogeneity, and dropout indicators.")
+    vig_vac_p.add_argument("id_municipio", help="7-digit IBGE municipality code, 6-digit DataSUS prefix, CEP-8, or municipality name")
+    vig_vac_p.add_argument("--json", action="store_true", help="Output in JSON format")
+
+    vig_cievs_p = vig_sub.add_parser("cievs", help="Get municipal CIEVS 24h/48h response readiness, GAL/LACEN turnaround, and RNDS integration indicators.")
+    vig_cievs_p.add_argument("id_municipio", help="7-digit IBGE municipality code, 6-digit DataSUS prefix, CEP-8, or municipality name")
+    vig_cievs_p.add_argument("--json", action="store_true", help="Output in JSON format")
+
+    vig_ft_p = vig_sub.add_parser("features", help="Get Gold OpenDataSUS epidemiological readiness and PNI immunization protection features.")
+    vig_ft_p.add_argument("id_municipio", help="7-digit IBGE municipality code, 6-digit DataSUS prefix, CEP-8, or municipality name")
+    vig_ft_p.add_argument("--json", action="store_true", help="Output in JSON format")
+
+    vig_rk_p = vig_sub.add_parser("ranking", help="List top Brazilian municipalities ranked by OpenDataSUS epidemiological surveillance readiness score.")
+    vig_rk_p.add_argument("--limit", type=int, default=10, help="Max municipalities to list")
+    vig_rk_p.add_argument("--uf", type=str, help="Optional 2-letter state filter")
+    vig_rk_p.add_argument("--json", action="store_true", help="Output in JSON format")
+
     # INEP Censo Escolar (Educação Básica) command group
     ce_p = subparsers.add_parser("censo-escolar", help="Query INEP Censo Escolar schools, enrollments, teachers, flow, and education scores.")
     ce_sub = ce_p.add_subparsers(dest="censo_escolar_action", required=True)
@@ -2900,6 +2930,83 @@ def main(argv: Sequence[str] | None = None) -> int:
                     return 0
             except ValueError as exc:
                 print(f"Erro ANVISA CMED: {exc}", file=sys.stderr)
+                return 1
+
+        elif args.command == "vigilancia":
+            from public_data_gateway.connectors.saude.opendatasus_vigilancia.connector import (
+                OpenDataSUSVigilanciaConnector,
+            )
+
+            vig_conn = OpenDataSUSVigilanciaConnector(settings=settings)
+            vig_action = getattr(args, "vigilancia_action", None)
+            try:
+                if vig_action == "srag":
+                    res = vig_conn.get_vigilancia_srag_respiratory_surveillance(args.id_municipio)
+                    if getattr(args, "json", False):
+                        print(json.dumps(res, indent=2, ensure_ascii=False, default=str))
+                    else:
+                        print(f"OpenDataSUS Vigilância SG & SRAG ({res.get('nome_municipio')} - {res.get('id_municipio')}):")
+                        print(f"  SG / SRAG ({res.get('ano_epidemiologico')}): {res.get('notificacoes_sindrome_gripal_esus_ano'):,} SG e-SUS | {res.get('internacoes_srag_sivep_ano'):,} internações SRAG ({res.get('taxa_incidencia_srag_100k_hab')}/100k)")
+                        print(f"  UTI / Letalidade:  {res.get('proporcao_srag_uti_pct')}% UTI | {res.get('letalidade_hospitalar_srag_pct')}% letalidade | {res.get('confirmacao_laboratorial_rt_pcr_srag_pct')}% RT-PCR")
+                    return 0
+
+                if vig_action == "sinan":
+                    rows = vig_conn.list_vigilancia_sinan_notifiable_diseases(
+                        args.id_municipio, grupo_agravo=getattr(args, "grupo", None)
+                    )
+                    if getattr(args, "json", False):
+                        print(json.dumps(rows, indent=2, ensure_ascii=False, default=str))
+                    else:
+                        print(f"OpenDataSUS SINAN Agravos Compulsórios ({args.id_municipio}) - {len(rows)} grupo(s):")
+                        for r in rows:
+                            print(f"  - {r.get('grupo_agravo_sinan')} ({r.get('categoria_transmissao')}): {r.get('casos_confirmados_ano'):,}/{r.get('casos_notificados_ano'):,} conf. | Inc.: {r.get('taxa_incidencia_confirmada_100k_hab')}/100k | Enc.: {r.get('proporcao_encerramento_oportuno_sinan_pct')}%")
+                    return 0
+
+                if vig_action == "vacinacao":
+                    res = vig_conn.get_vigilancia_sipni_vaccination_coverage(args.id_municipio)
+                    if getattr(args, "json", False):
+                        print(json.dumps(res, indent=2, ensure_ascii=False, default=str))
+                    else:
+                        print(f"OpenDataSUS SI-PNI Cobertura Vacinal ({res.get('nome_municipio')} - {res.get('id_municipio')}):")
+                        print(f"  Doses / Salas:    {res.get('doses_aplicadas_calendario_pni_ano'):,} doses | {res.get('salas_vacina_ativas_cnes')} salas ativas")
+                        print(f"  Penta / VIP / TV: {res.get('cobertura_pentavalente_d3_pct')}% Penta | {res.get('cobertura_poliomielite_vip_pct')}% VIP | {res.get('cobertura_triplice_viral_d1_pct')}% Tríplice Viral")
+                        print(f"  Homog. / Aband.:  {res.get('homogeneidade_cobertura_vacinal_pni_pct')}% homogeneidade | {res.get('taxa_abandono_esquema_multidose_pct')}% abandono")
+                    return 0
+
+                if vig_action == "cievs":
+                    res = vig_conn.get_vigilancia_cievs_response_capacity(args.id_municipio)
+                    if getattr(args, "json", False):
+                        print(json.dumps(res, indent=2, ensure_ascii=False, default=str))
+                    else:
+                        print(f"OpenDataSUS CIEVS/GAL-LACEN Prontidão ({res.get('nome_municipio')} - {res.get('id_municipio')}):")
+                        print(f"  24h / 48h / GAL:  {res.get('notificacoes_imediatas_24h_cievs_pct')}% 24h | {res.get('investigacoes_epidemiologicas_48h_pct')}% 48h | {res.get('tempo_medio_liberacao_gal_lacen_horas')}h LACEN")
+                        print(f"  Bloq. / RNDS:     {res.get('indice_bloqueio_vetorial_arboviroses_pct')}% bloqueio | {res.get('integracao_rnds_esus_sinan_pct')}% integração RNDS")
+                    return 0
+
+                if vig_action == "features":
+                    feat = vig_conn.get_vigilancia_epidemiological_features(args.id_municipio)
+                    if getattr(args, "json", False):
+                        print(json.dumps(feat, indent=2, ensure_ascii=False, default=str))
+                    else:
+                        print(f"OpenDataSUS Vigilância Features: {feat.get('nome_municipio')} ({feat.get('sigla_uf')} - {feat.get('id_municipio')}):")
+                        print(f"  Score Prontidão:   {feat.get('score_prontidao_vigilancia_epidemiologica')}/100.0")
+                        print(f"  Score Imunização:  {feat.get('score_protecao_imunizacao_coletiva_pni')}/100.0")
+                        print(f"  Classificação:     {feat.get('classificacao_vigilancia_epidemiologica_municipal')}")
+                    return 0
+
+                if vig_action == "ranking":
+                    ranks = vig_conn.list_top_vigilancia_surveillance_municipalities(
+                        limit=getattr(args, "limit", 10), sigla_uf=getattr(args, "uf", None)
+                    )
+                    if getattr(args, "json", False):
+                        print(json.dumps(ranks, indent=2, ensure_ascii=False, default=str))
+                    else:
+                        print(f"Top {len(ranks)} Municípios em Prontidão Epidemiológica & Imunização (OpenDataSUS):")
+                        for idx, r in enumerate(ranks, 1):
+                            print(f"  {idx}. {r.get('nome_municipio')} ({r.get('sigla_uf')}): Prontidão {r.get('score_prontidao_vigilancia_epidemiologica')} | Imunização: {r.get('score_protecao_imunizacao_coletiva_pni')} | {r.get('classificacao_vigilancia_epidemiologica_municipal')}")
+                    return 0
+            except ValueError as exc:
+                print(f"Erro OpenDataSUS Vigilância: {exc}", file=sys.stderr)
                 return 1
 
         elif args.command == "censo-escolar":

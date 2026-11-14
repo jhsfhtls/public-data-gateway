@@ -1638,6 +1638,89 @@ def create_app(settings: GatewaySettings | None = None) -> FastAPI:
         conn = ANVISACmedConnector(settings=app_settings)
         return conn.get_presentations_summary(id_municipio)
 
+    @app.get("/api/v1/health/vigilancia/top-municipalities")
+    async def get_top_vigilancia_municipalities(
+        limit: int = Query(10, ge=1, le=50, description="Max municipalities to list"),
+        uf: str | None = Query(None, description="Filter by 2-letter state abbreviation"),
+    ) -> list[dict[str, Any]]:
+        from public_data_gateway.connectors.saude.opendatasus_vigilancia.connector import (
+            OpenDataSUSVigilanciaConnector,
+        )
+
+        conn = OpenDataSUSVigilanciaConnector(settings=app_settings)
+        try:
+            return conn.list_top_vigilancia_surveillance_municipalities(limit=limit, sigla_uf=uf)
+        except ValueError as exc:
+            raise HTTPException(status_code=400, detail=str(exc)) from exc
+
+    @app.get("/api/v1/health/vigilancia/features/{id_municipio}")
+    async def get_vigilancia_features(id_municipio: str) -> dict[str, Any]:
+        from public_data_gateway.connectors.saude.opendatasus_vigilancia.connector import (
+            OpenDataSUSVigilanciaConnector,
+        )
+
+        conn = OpenDataSUSVigilanciaConnector(settings=app_settings)
+        try:
+            return conn.get_vigilancia_epidemiological_features(id_municipio)
+        except ValueError as exc:
+            raise HTTPException(status_code=400, detail=str(exc)) from exc
+
+    @app.get("/api/v1/health/vigilancia/sinan/{id_municipio}")
+    async def get_vigilancia_sinan(
+        id_municipio: str,
+        grupo: str | None = Query(
+            None, description="Optional disease group filter (e.g. Arboviroses)"
+        ),
+    ) -> list[dict[str, Any]]:
+        from public_data_gateway.connectors.saude.opendatasus_vigilancia.connector import (
+            OpenDataSUSVigilanciaConnector,
+        )
+
+        conn = OpenDataSUSVigilanciaConnector(settings=app_settings)
+        try:
+            return conn.list_vigilancia_sinan_notifiable_diseases(
+                id_municipio, grupo_agravo=grupo
+            )
+        except ValueError as exc:
+            raise HTTPException(status_code=400, detail=str(exc)) from exc
+
+    @app.get("/api/v1/health/vigilancia/vaccination/{id_municipio}")
+    async def get_vigilancia_vaccination(id_municipio: str) -> dict[str, Any]:
+        from public_data_gateway.connectors.saude.opendatasus_vigilancia.connector import (
+            OpenDataSUSVigilanciaConnector,
+        )
+
+        conn = OpenDataSUSVigilanciaConnector(settings=app_settings)
+        try:
+            return conn.get_vigilancia_sipni_vaccination_coverage(id_municipio)
+        except ValueError as exc:
+            raise HTTPException(status_code=400, detail=str(exc)) from exc
+
+    @app.get("/api/v1/health/vigilancia/cievs/{id_municipio}")
+    async def get_vigilancia_cievs(id_municipio: str) -> dict[str, Any]:
+        from public_data_gateway.connectors.saude.opendatasus_vigilancia.connector import (
+            OpenDataSUSVigilanciaConnector,
+        )
+
+        conn = OpenDataSUSVigilanciaConnector(settings=app_settings)
+        try:
+            return conn.get_vigilancia_cievs_response_capacity(id_municipio)
+        except ValueError as exc:
+            raise HTTPException(status_code=400, detail=str(exc)) from exc
+
+    @app.get("/api/v1/health/vigilancia/srag/{id_municipio}")
+    @app.get("/api/v1/vigilancia/{id_municipio}")
+    async def get_vigilancia_srag(id_municipio: str) -> dict[str, Any]:
+        from public_data_gateway.connectors.saude.opendatasus_vigilancia.connector import (
+            OpenDataSUSVigilanciaConnector,
+        )
+
+        conn = OpenDataSUSVigilanciaConnector(settings=app_settings)
+        try:
+            return conn.get_vigilancia_srag_respiratory_surveillance(id_municipio)
+        except ValueError as exc:
+            raise HTTPException(status_code=400, detail=str(exc)) from exc
+
     @app.get("/api/v1/education/censo-escolar/top-municipalities")
     async def get_top_censo_escolar_municipalities(
         limit: int = Query(10, ge=1, le=50, description="Max municipalities to list"),

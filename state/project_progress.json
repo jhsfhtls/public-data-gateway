@@ -1,6 +1,6 @@
 {
   "schema_version": "1.0.0",
-  "last_updated": "2026-11-14T00:21:00.000000",
+  "last_updated": "2026-11-14T00:46:00.000000",
   "project_name": "public-data-gateway",
   "ecosystem": "C.O.R.E. (core, operations, career, studies)",
   "governing_pops": [
@@ -13,10 +13,10 @@
     "POP_T_148"
   ],
   "current_macro_phase_id": "07",
-  "current_macro_phase": "Fase 07 - Ingestão Wave 5 (Saúde, Educação & Setor Notarial — 38/49 fontes homologadas [77.6%] com onr_registro_imoveis homologado; Próximo: opendatasus_vigilancia)",
+  "current_macro_phase": "Fase 07 - Ingestão Wave 5 (Saúde, Educação & Setor Notarial — 39/49 fontes homologadas [79.6%] com opendatasus_vigilancia homologado; Próximo: inep_enem)",
   "overall_status": "ON_TRACK",
-  "active_connector": "opendatasus_vigilancia",
-  "next_connector": "inep_enem",
+  "active_connector": "inep_enem",
+  "next_connector": "capitais_iptu_itbi",
   "structural_phases": [
     {
       "phase_id": "00",
@@ -141,8 +141,8 @@
         "Conector anvisa_cmed (Apresentações Ativas CMED, Preços PF/PMC/PMVG por Classe Terapêutica ATC, CAP/SUS e Regime ICMS/PIS-COFINS) - CONCLUÍDO",
         "Conector inep_ideb (IDEB Bienal por Etapa e Rede, Fluxo Escolar P, Proficiências SAEB LP/MAT, Metas INEP e Equidade INSE) - CONCLUÍDO",
         "Conector onr_registro_imoveis (Acervo CNM, Transações por Natureza, Garantias Alienação Fiduciária/CGI e Interoperabilidade SERP/SAEC) - CONCLUÍDO",
-        "Conector DataSUS restante (opendatasus_vigilancia)",
-        "Conectores INEP restantes (inep_enem) & capes_sucupira",
+        "Conector opendatasus_vigilancia (e-SUS Notifica SG, SIVEP-Gripe SRAG, SINAN Agravos Compulsórios, SI-PNI Cobertura Vacinal e Prontidão CIEVS/GAL-LACEN) - CONCLUÍDO",
+        "Conectores INEP/CAPES restantes (inep_enem, capes_sucupira)",
         "Conector Notarial restante (capitais_iptu_itbi)"
       ]
     },
@@ -420,6 +420,12 @@
     }
   ],
   "recent_milestones": [
+    {
+      "date": "2026-11-14",
+      "phase_id": "07",
+      "milestone": "Homologação do Conector opendatasus_vigilancia (4 Tabelas Silver + Gold Feature Store, 7 modelos dbt, 334 modelos dbt / 4.803 colunas, 39/49 [79.6%])",
+      "impact": "Conector opendatasus_vigilancia (ODCS-BR-OPENDATASUS-VIGILANCIA-001) homologado com probe live fail-hard em https://opendatasus.saude.gov.br/ e https://www.gov.br/saude/pt-br/composicao/svsa, paridade SQL-Python (23 colunas compartilhadas com zero divergências), HealthFacade/BrazilData, CLI bdg vigilancia, 6+1 rotas REST API, 4 tools MCP e 9 testes dedicados (8 offline + 1 live). Próximo conector Wave 5: inep_enem."
+    },
     {
       "date": "2026-11-14",
       "phase_id": "07",
