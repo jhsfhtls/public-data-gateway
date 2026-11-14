@@ -1721,6 +1721,7 @@ class MetaportalsFacade:
     def __init__(self, sdk: "BrazilData") -> None:
         self._sdk = sdk
         self._basedosdados_connector: Any = None
+        self._dadosgov_connector: Any = None
 
     @property
     def basedosdados_connector(self) -> Any:
@@ -1766,6 +1767,51 @@ class MetaportalsFacade:
     ) -> list[dict[str, Any]]:
         """List top Brazilian municipalities ranked by composite Base dos Dados maturity score."""
         return self.basedosdados_connector.list_top_bd_municipalities(
+            limit=limit, sigla_uf=sigla_uf
+        )
+
+    @property
+    def dadosgov_connector(self) -> Any:
+        if self._dadosgov_connector is None:
+            from public_data_gateway.connectors.agregadores.dadosgov_ckan.connector import (
+                DadosGovCkanConnector,
+            )
+
+            self._dadosgov_connector = DadosGovCkanConnector(settings=self._sdk.settings)
+        return self._dadosgov_connector
+
+    def get_ckan_organizations(self, id_municipio: str) -> dict[str, Any]:
+        """Get municipal Dados.gov.br CKAN publishing organizations and open dataset supply."""
+        return self.dadosgov_connector.get_ckan_organizations(id_municipio)
+
+    def list_ckan_formats(
+        self,
+        id_municipio: str,
+        formato_recurso_ckan: str | None = None,
+    ) -> list[dict[str, Any]]:
+        """List municipal Dados.gov.br CKAN resource formats and machine-readability metrics."""
+        return self.dadosgov_connector.list_ckan_formats(
+            id_municipio,
+            formato_recurso_ckan=formato_recurso_ckan,
+        )
+
+    def get_ckan_governance(self, id_municipio: str) -> dict[str, Any]:
+        """Get municipal Dados.gov.br CKAN open license, metadata dictionary, and LAI governance."""
+        return self.dadosgov_connector.get_ckan_governance(id_municipio)
+
+    def get_ckan_engagement(self, id_municipio: str) -> dict[str, Any]:
+        """Get municipal Dados.gov.br CKAN resource downloads, API calls, and civic reuse."""
+        return self.dadosgov_connector.get_ckan_engagement(id_municipio)
+
+    def get_ckan_features(self, id_municipio: str) -> dict[str, Any]:
+        """Get normalized Gold Dados.gov.br CKAN transparency score and 4-tier classification."""
+        return self.dadosgov_connector.get_ckan_features(id_municipio)
+
+    def list_top_ckan_municipalities(
+        self, limit: int = 10, sigla_uf: str | None = None
+    ) -> list[dict[str, Any]]:
+        """List top Brazilian municipalities ranked by composite Dados.gov.br CKAN transparency score."""
+        return self.dadosgov_connector.list_top_ckan_municipalities(
             limit=limit, sigla_uf=sigla_uf
         )
 
@@ -2831,6 +2877,41 @@ class BrazilData:
     ) -> list[dict[str, Any]]:
         """Listar municípios líderes em maturidade no datalake Base dos Dados (BigQuery)."""
         return self.metaportals.list_top_bd_municipalities(
+            limit=limit, sigla_uf=sigla_uf
+        )
+
+    def get_ckan_organizations(self, id_municipio: str) -> dict[str, Any]:
+        """Consultar organizações publicadoras, conjuntos abertos e PDA (Dados.gov.br CKAN)."""
+        return self.metaportals.get_ckan_organizations(id_municipio)
+
+    def list_ckan_formats(
+        self,
+        id_municipio: str,
+        formato_recurso_ckan: str | None = None,
+    ) -> list[dict[str, Any]]:
+        """Listar formatos de recursos CKAN e legibilidade por máquina (Dados.gov.br)."""
+        return self.metaportals.list_ckan_formats(
+            id_municipio,
+            formato_recurso_ckan=formato_recurso_ckan,
+        )
+
+    def get_ckan_governance(self, id_municipio: str) -> dict[str, Any]:
+        """Consultar governança de licenças abertas, metadados e LAI (Dados.gov.br CKAN)."""
+        return self.metaportals.get_ckan_governance(id_municipio)
+
+    def get_ckan_engagement(self, id_municipio: str) -> dict[str, Any]:
+        """Consultar downloads mensais, chamadas de API e reuso cívico (Dados.gov.br CKAN)."""
+        return self.metaportals.get_ckan_engagement(id_municipio)
+
+    def get_ckan_features(self, id_municipio: str) -> dict[str, Any]:
+        """Consultar features Gold de transparência e abertura de dados (Dados.gov.br CKAN)."""
+        return self.metaportals.get_ckan_features(id_municipio)
+
+    def list_top_ckan_municipalities(
+        self, limit: int = 10, sigla_uf: str | None = None
+    ) -> list[dict[str, Any]]:
+        """Listar municípios líderes em transparência de dados abertos no Dados.gov.br (CKAN)."""
+        return self.metaportals.list_top_ckan_municipalities(
             limit=limit, sigla_uf=sigla_uf
         )
 

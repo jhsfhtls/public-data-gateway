@@ -75,3 +75,49 @@ models:
       - name: reference_date
         description: "Data de referência ISO-8601 (YYYY-MM-DD)."
         tests: [not_null]
+
+  - name: mart_transparencia_dados_abertos_ckan_brasil
+    description: "Mart analítico de transparência, oferta e governança LAI de dados abertos no Dados.gov.br CKAN por município."
+    columns:
+      - name: id_municipio
+        description: "Código IBGE de 7 dígitos do município."
+        tests: [not_null, unique]
+      - name: nome_municipio
+        description: "Nome oficial do município."
+        tests: [not_null]
+      - name: sigla_uf
+        description: "Sigla da Unidade da Federação."
+        tests: [not_null]
+      - name: id_uf
+        description: "Código IBGE de 2 dígitos da UF."
+        tests: [not_null]
+      - name: regiao
+        description: "Macrorregião geográfica brasileira."
+        tests: [not_null]
+      - name: qtd_orgaos_publicadores_ckan
+        description: "Quantidade de órgãos públicos publicadores ativos no catálogo CKAN."
+        tests: [not_null]
+      - name: qtd_conjuntos_dados_abertos
+        description: "Quantidade de conjuntos de dados abertos publicados."
+        tests: [not_null]
+      - name: taxa_pda_vigente_pct
+        description: "Percentual de órgãos com Plano de Dados Abertos (PDA) vigente."
+        tests: [not_null]
+      - name: indice_oferta_dados_abertos
+        description: "Subíndice sintético de oferta de dados abertos CKAN (0-100)."
+        tests: [not_null]
+      - name: indice_governanca_lai_ckan
+        description: "Subíndice sintético de governança LAI e metadados CKAN (0-100)."
+        tests: [not_null]
+      - name: indice_reuso_dados_abertos
+        description: "Subíndice sintético de reuso e engajamento de dados abertos (0-100)."
+        tests: [not_null]
+      - name: score_transparencia_ckan
+        description: "Score composto de transparência e abertura de dados CKAN (0-100)."
+        tests: [not_null]
+      - name: tier_transparencia_ckan
+        description: "Classificação municipal em 4 tiers de transparência CKAN."
+        tests: [not_null]
+      - name: reference_date
+        description: "Data de referência ISO-8601 (YYYY-MM-DD)."
+        tests: [not_null]

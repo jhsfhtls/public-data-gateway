@@ -10,6 +10,7 @@ model-paths:
   - "../src/public_data_gateway/connectors/macrofinanceiro/bcb_olinda_ptax/dbt"
   - "../src/public_data_gateway/connectors/agregadores/basedosdados_bq/dbt"
   - "../src/public_data_gateway/connectors/agregadores/brasilapi_core/dbt"
+  - "../src/public_data_gateway/connectors/agregadores/dadosgov_ckan/dbt"
   - "../src/public_data_gateway/connectors/empresarial/rfb_cnpj_lakehouse/dbt"
   - "../src/public_data_gateway/connectors/empresarial/rfb_simples_mei/dbt"
   - "../src/public_data_gateway/connectors/compras_publicas/pncp_contratacoes/dbt"
