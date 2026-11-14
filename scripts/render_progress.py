@@ -1,8 +1,8 @@
 """Script to validate state/project_progress.json and render JORNADA_IMPLEMENTACAO.md.
 
 Cross-references state/project_progress.json and catalog/sources_registry.yaml
-to compute live statistics, product enablement matrices, and anti-bus-factor runbooks.
-Enforces POP_T_148 executive headers and deterministic --check validation.
+to compute live statistics, capability matrix, and operational runbooks.
+Enforces executive headers and deterministic --check validation.
 """
 
 from __future__ import annotations
@@ -23,54 +23,54 @@ OUTPUT_MD_PATH = REPO_ROOT / "JORNADA_IMPLEMENTACAO.md"
 
 MODULAR_PRODUCTS_DEF = {
     "P01": {
-        "name": "Modern Data Platform & Analytics (Lakehouse as a Service)",
-        "readiness": "🟢 Fundação Operacional (SQLite WAL, DuckDB Medallion & Quarentena)",
+        "name": "Modern Data Platform & Analytics (Lakehouse)",
+        "readiness": "🟢 100% Operacional (49/49 Fontes Homologadas)",
         "description": "Arquitetura Medallion unificada com ingestão Bronze/Silver/Gold e atomic swap.",
     },
     "P02": {
-        "name": "IA Agêntica & Automação Cognitiva (Enterprise AI)",
-        "readiness": "🟢 Fundação Operacional (Servidor MCP bdg-mcp & Prompt Shield)",
-        "description": "Ferramentas MCP para agentes autônomos com envelopamento untrusted_gov_data.",
+        "name": "IA Agêntica & Automação LLM (MCP & REST)",
+        "readiness": "🟢 100% Operacional (49/49 Fontes Homologadas)",
+        "description": "Ferramentas MCP (pdg-mcp / bdg-mcp) com envelopamento untrusted_gov_data.",
     },
     "P03": {
-        "name": "Software FullStack & Mobile Offline-First (Clean Arch/PostGIS)",
-        "readiness": "🟢 Base Territorial Pronta (5.571 Municípios Sanitizados)",
-        "description": "Normalização canônica de municípios 7D, UFs e CEPs para interfaces de usuário.",
+        "name": "Engenharia FullStack & Geolocalização Offline-First",
+        "readiness": "🟢 100% Operacional (49/49 Fontes Homologadas)",
+        "description": "Normalização canônica de municípios 7D, UFs, CEPs e malhas vetoriais para APIs e apps.",
     },
     "P04": {
-        "name": "Automação Inteligente de Processos (DPA & Power Platform)",
-        "readiness": "🟡 Aguardando Ingestão Wave 1/2 (BrasilAPI & PNCP)",
-        "description": "Pipelines de enriquecimento automatizado e extração de licitações públicas.",
+        "name": "Automação Inteligente de Onboarding & Compliance KYB",
+        "readiness": "🟢 100% Operacional (49/49 Fontes Homologadas)",
+        "description": "Pipelines de enriquecimento cadastral, Simples Nacional e licitações públicas.",
     },
     "P05": {
-        "name": "FinOps & Otimização de Custos em Nuvem (Gain-Sharing)",
-        "readiness": "🟡 Aguardando Ingestão Wave 1/3 (BCB SGS, PTAX & CVM)",
-        "description": "Séries de deflacionamento monetário (IPCA/IGP-M) e análise de balanços públicos.",
+        "name": "FinOps & Séries Macroeconômicas / Deflacionamento",
+        "readiness": "🟢 100% Operacional (49/49 Fontes Homologadas)",
+        "description": "Séries de deflacionamento monetário (IPCA/IGP-M/PTAX) e demonstrativos públicos.",
     },
     "P06": {
-        "name": "Data Clean Rooms & Parcerias Seguras (Privacidade Diferencial)",
-        "readiness": "🟡 Aguardando Ingestão Wave 2 (RFB CNPJ & Quarentena)",
-        "description": "Ambiente controlado de cruzamento com proteção de máscaras e isolamento cross-repo.",
+        "name": "Data Clean Rooms & Benchmarks Anonimizados",
+        "readiness": "🟢 100% Operacional (49/49 Fontes Homologadas)",
+        "description": "Cruzamentos controlados em Parquet ZSTD com preservação de máscaras e conformidade LGPD.",
     },
     "P07": {
-        "name": "Cibersegurança Corporativa & Homologação Enterprise (SOC 2/BACEN)",
-        "readiness": "🟡 Aguardando Ingestão Wave 2 (CGU PEP/CEIS & CNJ DataJud)",
-        "description": "Dossiês de conformidade, sanções administrativas e antecedentes de partes.",
+        "name": "Due Diligence Corporativa, Sanções & Contencioso (TPRM)",
+        "readiness": "🟢 100% Operacional (49/49 Fontes Homologadas)",
+        "description": "Trilhas de auditoria cadastral, sanções administrativas (CEIS/CNEP) e passivos judiciais.",
     },
     "P08": {
-        "name": "AI Red Teaming & Auditoria Ética de Algoritmos (OWASP/SHAP)",
-        "readiness": "🟢 Ativo (Proteção CWE-1236, Magic Bytes & Anti-Prompt Injection)",
-        "description": "Auditoria de dados governamentais contra viés discriminatório e injeções.",
+        "name": "Segurança de Pipelines & Auditoria de Viés/Qualidade",
+        "readiness": "🟢 100% Operacional (49/49 Fontes Homologadas)",
+        "description": "Validação de integridade, defesa CWE-1236, Magic Bytes e contenção de Prompt Injection.",
     },
     "P09": {
-        "name": "Convergência Industrial OT/IT & IoT Analytics (OEE ISO 22400)",
-        "readiness": "🟡 Aguardando Ingestão Wave 2/6 (SUFRAMA PIM & ANA Telemetria)",
-        "description": "Telemetria hídrica e monitoramento produtivo de indústrias incentivadas.",
+        "name": "Inteligência Industrial, Energia, Agro & Meio Ambiente",
+        "readiness": "🟢 100% Operacional (49/49 Fontes Homologadas)",
+        "description": "Telemetria hídrica, zoneamento agrícola, uso da terra e comércio exterior.",
     },
     "P10": {
-        "name": "Retainer de Sustentação Contínua & SRE as a Service (ARR 99.9%)",
-        "readiness": "🟢 Ativo (5 Pilares de Observabilidade & Health Check API)",
-        "description": "Contratos ODCS v3.1, circuit breakers e monitoramento contínuo de pipelines.",
+        "name": "Observabilidade de Dados, Contratos ODCS & Confiabilidade SRE",
+        "readiness": "🟢 100% Operacional (49/49 Fontes Homologadas)",
+        "description": "Contratos ODCS v3.1, circuit breakers e validação contínua dos 5 Pilares de Observabilidade.",
     },
 }
 
@@ -130,10 +130,10 @@ def render_markdown(progress: dict[str, Any], registry: dict[str, Any]) -> str:
 
     total_sources = len(sources)
 
-    # Compute sources enabling each product
+    # Compute sources enabling each solution pack
     product_sources_map: dict[str, list[str]] = {p: [] for p in MODULAR_PRODUCTS_DEF}
     for s in sources:
-        for p in s.get("core_products_enabled", []):
+        for p in s.get("solution_packs", []):
             if p in product_sources_map:
                 product_sources_map[p].append(s["source_id"])
 
@@ -143,6 +143,7 @@ def render_markdown(progress: dict[str, Any], registry: dict[str, Any]) -> str:
         w_sources = [s for s in sources if s.get("roadmap_wave") == w]
         wave_stats[w] = {
             "total": len(w_sources),
+            "homologated": sum(1 for s in w_sources if s.get("status") == "HOMOLOGATED"),
             "sources": w_sources,
             "rice_avg": round(sum(s["rice_score"] for s in w_sources) / len(w_sources)) if w_sources else 0,
         }
@@ -154,16 +155,16 @@ def render_markdown(progress: dict[str, Any], registry: dict[str, Any]) -> str:
 
     lines: list[str] = [
         '<div align="center">',
-        "  <h2>Jornada de Implementação — Brazil Data Gateway</h2>",
-        "  <p><i>Painel Vivo de Evolução Arquitetural, Ciclo de Vida de Conectores & Habilitação de Produtos C.O.R.E.</i></p>",
-        f"  <p><b>Versão:</b> 1.0.0 &nbsp;|&nbsp; <b>Última Atualização:</b> {last_updated} &nbsp;|&nbsp; <b>Governança:</b> POP_T_177 • POP_T_176 • POP_T_175 • POP_T_070 • POP_T_074 • POP_T_148</p>",
+        "  <h2>Jornada de Implementação — Public Data Gateway</h2>",
+        "  <p><i>Painel Vivo de Evolução Arquitetural, Ciclo de Vida de Conectores & Solution Packs Analíticos</i></p>",
+        f"  <p><b>Versão:</b> 1.0.0 &nbsp;|&nbsp; <b>Última Atualização:</b> {last_updated} &nbsp;|&nbsp; <b>Padrões:</b> ADR-001 • ADR-002 • ADR-003 • ODCS v3.1 • LGPD</p>",
         "  <hr/>",
         "</div>",
         "<br/>",
         "",
         "# Jornada de Implementação & Painel Vivo de Governança",
         "",
-        "Este artefato constitui a **Fonte Única da Verdade Operacional (SSOT)** do status de desenvolvimento do `public-data-gateway`. Ele rastreia o avanço das macrofases arquiteturais, o ciclo de vida dos 9 Gates de qualidade por conector, o desbloqueio comercial dos 10 Produtos Modulares do ecossistema C.O.R.E. e o **Runbook Anti-Bus-Factor** para continuidade operacional autônoma.",
+        "Este artefato constitui a **Fonte Única da Verdade Operacional (SSOT)** do status de desenvolvimento do `public-data-gateway`. Ele rastreia o avanço das macrofases arquiteturais, o ciclo de vida dos 9 Gates de qualidade por conector, a matriz de capacidade dos **10 Perfis de Capacidade Analítica (Solution Packs `P01` a `P10`)** e o **Runbook Operacional** para continuidade e reprodutibilidade em ambientes locais e de CI/CD.",
         "",
         "---",
         "",
@@ -171,22 +172,21 @@ def render_markdown(progress: dict[str, Any], registry: dict[str, Any]) -> str:
         "",
         f"- **Macrofase Ativa:** `{progress.get('current_macro_phase')}`",
         f"- **Status Geral de Governança:** `🟢 {progress.get('overall_status')}`",
-        f"- **Conector Ativo em Desenvolvimento:** `{progress.get('active_connector') or 'Nenhum (Transição de Fase / Fundação Concluída)'}`",
-        f"- **Próximo Conector na Fila de Execução:** `{progress.get('next_connector', 'ibge_localidades')}` (Wave 1 — Prioridade RICE 950)",
+        f"- **Conector Ativo em Desenvolvimento:** `{progress.get('active_connector') or 'Nenhum (Transição de Fase / Waves 1..6 Concluídas)'}`",
+        f"- **Próxima Etapa Planejada:** `{progress.get('next_connector') or 'Fase 09 (Marts Cross-Domain & Insights)'}`",
         f"- **Progresso Estrutural das Macrofases:** **{completed_phases} de {total_phases} Concluídas ({progress_pct}%)**",
         f"- **Universo de Fontes Homologadas no Catálogo:** **{total_sources} fontes públicas** nos 13 macrosegmentos",
         "",
         "```mermaid",
         "flowchart LR",
-        '    F00["Fase 00: ADRs & Governança<br/>✅ CONCLUÍDO"] --> F01["Fase 01: Setup & DevSecOps<br/>✅ CONCLUÍDO"]',
-        '    F01 --> F02["Fase 02: Catálogo & Interfaces<br/>✅ CONCLUÍDO"]',
-        '    F02 --> F03["Fase 03: Wave 1 Borda & Macro<br/>⏳ PRÓXIMO"]',
-        '    F03 --> F04["Fases 04..08: Waves 2 a 6<br/>⚪ PENDENTE"]',
+        '    F00["Fases 00..02: Fundacao & Catalogo<br/>✅ CONCLUÍDO"] --> F03["Fases 03..08: Waves 1 a 6 (49/49)<br/>✅ 100% CONCLUÍDO"]',
+        '    F03 --> F09["Fase 09: Marts Cross-Domain & Live<br/>⏳ PRÓXIMO"]',
+        '    F09 --> F10["Fase 10: Catalogo Global & Geo<br/>⚪ PLANEJADO"]',
         "```",
         "",
         "---",
         "",
-        "## 2. Acompanhamento das Macrofases Estruturais (Fases 00 a 08)",
+        "## 2. Acompanhamento das Macrofases Estruturais (Fases 00 a 10)",
         "",
         "| ID | Macrofase de Desenvolvimento | Status | Conclusão | Entregáveis Principais & Evidências |",
         "| :---: | :--- | :---: | :---: | :--- |",
@@ -214,7 +214,7 @@ def render_markdown(progress: dict[str, Any], registry: dict[str, Any]) -> str:
         "",
         f"Todo conector integrado ao `public-data-gateway` deve percorrer rigorosamente os **9 Gates de Qualidade** antes de ser promovido a `HOMOLOGATED`. O alvo atual do ciclo de vida é o conector `{active_gates_info.get('target_connector', 'ibge_localidades')}` (Wave {active_gates_info.get('target_wave', 1)}):",
         "",
-        "| Gate | Nome do Gate de Homologação | Critério Operacional de Aceite (`POP_T_070` / `POP_T_074` / `POP_T_177`) | Status |",
+        "| Gate | Nome do Gate de Homologação | Critério Operacional de Aceite (ODCS v3.1 / ADR-001 / ADR-002) | Status |",
         "| :---: | :--- | :--- | :---: |",
     ])
 
@@ -259,18 +259,23 @@ def render_markdown(progress: dict[str, Any], registry: dict[str, Any]) -> str:
         crit = ", ".join(f"`{s['source_id']}`" for s in w_sources[:3])
         if len(w_sources) > 3:
             crit += f" (+{len(w_sources) - 3})"
-        wbadge = "🟡 Em Preparação" if w == 1 else "⚪ Planejado"
+        if st["homologated"] == st["total"] and st["total"] > 0:
+            wbadge = "🟢 100% Homologada"
+        elif st["homologated"] > 0:
+            wbadge = "🟡 Em Progresso"
+        else:
+            wbadge = "⚪ Planejado"
         lines.append(f"| **Wave {w}** | {wave_focuses[w]} | {st['total']} | {st['rice_avg']} | `{modes}` | {crit} | {wbadge} |")
 
     lines.extend([
         "",
         "---",
         "",
-        "## 5. Matriz de Habilitação dos 10 Produtos Modulares C.O.R.E.",
+        "## 5. Matriz de Habilitação dos 10 Perfis de Capacidade Analítica (Solution Packs)",
         "",
-        "O `public-data-gateway` atua como barramento alimentador de dados para os **10 Produtos Modulares** do ecossistema corporativo (definidos em `biz-feasibility-evaluator` e no Catálogo de Ofertas GTM):",
+        "O `public-data-gateway` organiza suas fontes e marts de dados em **10 Perfis de Capacidade Analítica (Solution Packs `P01` a `P10`)** componíveis via SDK (`list_sources(pack_id=...)`), CLI e servidor MCP:",
         "",
-        "| Produto | Nome Comercial do Módulo | Status de Prontidão no Gateway | Fontes Mapeadas que Viabilizam o Módulo |",
+        "| Pack ID | Nome do Perfil Analítico | Status de Prontidão no Gateway | Fontes Mapeadas que Habilitam o Perfil |",
         "| :---: | :--- | :--- | :--- |",
     ])
 
@@ -309,7 +314,8 @@ def render_markdown(progress: dict[str, Any], registry: dict[str, Any]) -> str:
         "",
         "```powershell",
         "# 1. Clonar repositório e navegar para a raiz",
-        "cd c:\\Users\\jhose\\GitOps\\public-data-gateway",
+        "git clone https://github.com/jhsfhtls/public-data-gateway.git",
+        "cd public-data-gateway",
         "",
         "# 2. Criar e ativar o ambiente virtual isolado (.venv)",
         "py -3.12 -m venv .venv",
@@ -337,12 +343,12 @@ def render_markdown(progress: dict[str, Any], registry: dict[str, Any]) -> str:
         "ruff check scripts/",
         "```",
         "",
-        "### 7.3. Como Iniciar a Ingestão do Próximo Conector (`ibge_localidades`)",
+        "### 7.3. Checklist de Expansão para Novos Conectores (Pós-Wave 6)",
         "",
-        "1. **Atualizar o Estado:** Edite `state/project_progress.json` alterando `active_connector: 'ibge_localidades'` e defina a fase como `03`.",
-        "2. **Criar o Contrato:** Crie `src/brazil_data_gateway/connectors/ibge/contract.yaml` (perfil ODCS v3.1) definindo primary keys `id_municipio` e `sigla_uf`.",
-        "3. **Executar os 9 Gates:** Implemente o conector herdando de `BaseConnector`, conecte o cache SQLite WAL, valide os 5 pilares e gere Parquet ZSTD.",
-        "4. **Regenerar os Painéis:** Execute `python scripts/render_progress.py` para sincronizar `JORNADA_IMPLEMENTACAO.md`.",
+        "1. **Atualizar o Catálogo:** Registre a nova fonte em `catalog/sources_registry.yaml` e atualize `state/project_progress.json`.",
+        "2. **Criar o Contrato ODCS v3.1:** Defina `src/public_data_gateway/connectors/<segmento>/<source_id>/contract.yaml` especificando chaves canônicas, sentinelas e regras de observabilidade.",
+        "3. **Executar os Gates:** Implemente o conector herdando de `BaseConnector`, adicione modelos dbt em `_models.yml`, exponha nas 4 interfaces (SDK, CLI, REST, MCP) e valide com `pytest`.",
+        "4. **Regenerar os Painéis:** Execute `python scripts/render_catalog.py` e `python scripts/render_progress.py` para manter os painéis sincronizados.",
         "",
     ])
 

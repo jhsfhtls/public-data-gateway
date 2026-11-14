@@ -1,7 +1,7 @@
 ## Summary
 - **Connector / Component**: ``
 - **Macrosegment / Wave**: ``
-- **Governing POPs**: `POP_T_176` / `POP_T_177` / `POP_T_162` / `POP_T_163`
+- **Architecture / ADRs**: `ADR-001` / `ADR-002` / `ADR-003` / `ODCS v3.1`
 
 ## Technical Changes
 - 

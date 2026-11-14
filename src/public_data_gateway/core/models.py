@@ -3,7 +3,7 @@
 from datetime import UTC, datetime
 from typing import Any
 
-from pydantic import BaseModel, ConfigDict, Field
+from pydantic import AliasChoices, BaseModel, ConfigDict, Field
 
 
 class SourceEntry(BaseModel):
@@ -25,7 +25,10 @@ class SourceEntry(BaseModel):
     estimated_volume: str = ""
     lgpd_tier: str = "public"
     ml_feature_domains: list[str] = Field(default_factory=list)
-    core_products_enabled: list[str] = Field(default_factory=list)
+    solution_packs: list[str] = Field(
+        default_factory=list,
+        validation_alias=AliasChoices("solution_packs", "product_packs"),
+    )
     rice_score: float = 0.0
     roadmap_wave: int = 1
     status: str = "planned"

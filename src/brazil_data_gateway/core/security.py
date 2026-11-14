@@ -1,4 +1,4 @@
-"""Security controls for untrusted external government payloads (POP_T_175, CWE-1236, MCP wrapping)."""
+"""Security controls for untrusted external government payloads (CWE-1236, Zip-Bomb guard, MCP wrapping)."""
 
 import json
 import re

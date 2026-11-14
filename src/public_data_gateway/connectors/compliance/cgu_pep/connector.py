@@ -1,6 +1,6 @@
 """CGU PEP Connector — Cadastro de Pessoas Expostas Politicamente (Controladoria-Geral da União).
 
-Part of the public-data-gateway Medallion platform (C.O.R.E. Ecosystem).
+Part of the public-data-gateway Medallion platform.
 Implements the 11-Gate Protocol:
 1. Multi-table ingestion (5 tabelas: cgu_pep, cgu_pep_orgaos, cgu_pep_funcoes, cgu_pep_historico_carencia, cgu_pep_relacionados)
 2. Isolated storage in data/cgu_pep/{bronze, silver, gold, quarantine}/

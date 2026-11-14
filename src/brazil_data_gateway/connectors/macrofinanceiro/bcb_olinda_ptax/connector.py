@@ -1,6 +1,6 @@
 """BCB Olinda PTAX Connector — Banco Central do Brasil Cotações Diárias PTAX (OData v4).
 
-Part of the brazil-data-gateway Medallion platform (C.O.R.E. Ecosystem).
+Part of the public-data-gateway Medallion platform (compatibility alias: brazil-data-gateway).
 Implements the 11-Gate Protocol:
 1. Multi-table ingestion (Moedas, Cotação Dólar, Cotação Moedas Estrangeiras, Boletins Intradiários)
 2. Isolated storage in data/bcb_olinda_ptax/{bronze, silver, gold, quarantine}/

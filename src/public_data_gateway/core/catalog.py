@@ -57,6 +57,7 @@ class CatalogRegistry:
         segment_id: str | None = None,
         status: str | None = None,
         product_id: str | None = None,
+        pack_id: str | None = None,
     ) -> list[SourceEntry]:
         """Query sources with filtering, ordered by roadmap_wave (asc) and rice_score (desc)."""
         filtered = list(self._sources.values())
@@ -67,8 +68,9 @@ class CatalogRegistry:
             filtered = [s for s in filtered if s.segment_id.lower() == segment_id.lower()]
         if status is not None:
             filtered = [s for s in filtered if s.status.lower() == status.lower()]
-        if product_id is not None:
-            filtered = [s for s in filtered if product_id in s.core_products_enabled]
+        target_pack = pack_id or product_id
+        if target_pack is not None:
+            filtered = [s for s in filtered if target_pack in s.solution_packs]
 
         # Sort: roadmap_wave ascending, rice_score descending
         filtered.sort(key=lambda s: (s.roadmap_wave, -s.rice_score))

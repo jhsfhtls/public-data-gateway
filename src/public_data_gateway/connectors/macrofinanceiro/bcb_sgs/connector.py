@@ -1,6 +1,6 @@
 """BCB SGS Connector — Banco Central do Brasil Sistema Gerenciador de Séries Temporais.
 
-Part of the public-data-gateway Medallion platform (C.O.R.E. Ecosystem).
+Part of the public-data-gateway Medallion platform.
 Implements the 11-Gate Protocol:
 1. Multi-table ingestion (Catalogo, IPCA, IGP-M, Selic, CDI, IBC-Br)
 2. Isolated storage in data/bcb_sgs/{bronze, silver, gold, quarantine}/

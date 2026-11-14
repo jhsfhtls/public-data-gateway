@@ -68,7 +68,7 @@ class ComprasGovCatmatConnector:
 
     def _get_headers(self) -> dict[str, str]:
         return {
-            "User-Agent": "PublicDataGateway/0.1.0 (+https://github.com/jhosefer/public-data-gateway)",
+            "User-Agent": "PublicDataGateway/0.1.0 (+https://github.com/jhsfhtls/public-data-gateway)",
             "Accept": "application/json",
         }
 

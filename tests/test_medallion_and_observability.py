@@ -1,4 +1,4 @@
-"""Tests for Hybrid Medallion Lakehouse, 5-Pillar Observability, and ASOF Join (POP_T_074, POP_T_128)."""
+"""Tests for Hybrid Medallion Lakehouse, 5-Pillar Observability, and ASOF Join."""
 
 
 import pyarrow as pa
@@ -155,7 +155,7 @@ def test_five_pillars_failure_quarantine_routing(
 
 
 def test_asof_point_in_time_join_zero_data_leakage(tmp_settings: GatewaySettings) -> None:
-    """Test DuckDB ASOF join preventing future data leakage in ML features (POP_T_128)."""
+    """Test DuckDB ASOF join preventing future data leakage in ML features."""
     storage = HybridStorageEngine(tmp_settings)
 
     # Left table: transactions / events

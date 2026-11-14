@@ -1,6 +1,6 @@
 """BrasilAPI Core Connector — Borda Síncrona, Bancos, PIX, CVM, Feriados, DDDs & CEPs.
 
-Part of the brazil-data-gateway Medallion platform (C.O.R.E. Ecosystem).
+Part of the public-data-gateway Medallion platform (compatibility alias: brazil-data-gateway).
 Implements the 11-Gate Protocol:
 1. Multi-table ingestion (Bancos, PIX Participantes, Corretoras CVM, Feriados Nacionais, DDDs e CEPs)
 2. Isolated storage in data/brasilapi_core/{bronze, silver, gold, quarantine}/

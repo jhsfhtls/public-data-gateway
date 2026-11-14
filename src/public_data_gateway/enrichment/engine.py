@@ -1,4 +1,4 @@
-"""Enrichment engine implementing Client Path Shield (POP_T_154) and canonical joins."""
+"""Enrichment engine implementing Client Path Shield and canonical joins."""
 
 import csv
 import hashlib
@@ -39,8 +39,8 @@ class EnrichmentEngine:
         as_of_column: str | None = None,
         output_path: Path | str | None = None,
     ) -> tuple[pa.Table, EnrichmentReport]:
-        """Executes dataset enrichment, enforcing POP_T_154 Client Path Shield and CWE-1236 CSV sanitization."""
-        # 1. Enforce Client Path Shield (POP_T_154)
+        """Executes dataset enrichment, enforcing Client Path Shield and CWE-1236 CSV sanitization."""
+        # 1. Enforce Client Path Shield
         out_resolved: Path | None = None
         if output_path is not None:
             out_resolved = Path(output_path).resolve()
@@ -53,7 +53,7 @@ class EnrichmentEngine:
 
             if is_inside_data or out_resolved == data_resolved:
                 raise ValueError(
-                    f"Client Path Shield (POP_T_154): Output path '{out_resolved}' cannot be written inside the gateway's internal lakehouse directory ('{data_resolved}')."
+                    f"Client Path Shield: Output path '{out_resolved}' cannot be written inside the gateway's internal lakehouse directory ('{data_resolved}')."
                 )
 
         # 2. Ingest input table or file

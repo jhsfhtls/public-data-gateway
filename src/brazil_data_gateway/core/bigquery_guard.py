@@ -1,4 +1,4 @@
-"""BigQuery FinOps Guard & Base dos Dados Metadata Bridge (POP_T_176)."""
+"""BigQuery FinOps Guard & Base dos Dados Metadata Bridge."""
 
 import re
 from typing import Any

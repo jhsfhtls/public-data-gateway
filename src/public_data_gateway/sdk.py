@@ -1,4 +1,4 @@
-"""High-level Python SDK facade for Brazil Data Gateway (C.O.R.E. Ecosystem)."""
+"""High-level Python SDK facade for Public Data Gateway."""
 
 from pathlib import Path
 from typing import Any, Literal
@@ -1854,10 +1854,15 @@ class BrazilData:
         segment_id: str | None = None,
         status: str | None = None,
         product_id: str | None = None,
+        pack_id: str | None = None,
     ) -> list[SourceEntry]:
-        """List catalog sources filtered by wave, segment, status, or product."""
+        """List catalog sources filtered by wave, segment, status, or solution pack."""
         return self.catalog.list_sources(
-            wave=wave, segment_id=segment_id, status=status, product_id=product_id
+            wave=wave,
+            segment_id=segment_id,
+            status=status,
+            product_id=product_id,
+            pack_id=pack_id,
         )
 
     def get_source(self, source_id: str) -> SourceEntry | None:
@@ -2930,7 +2935,7 @@ class BrazilData:
         uf_column: str | None = None,
         output_path: Path | str | None = None,
     ) -> tuple[pa.Table, EnrichmentReport]:
-        """Enrich a dataset with official identifiers, enforcing POP_T_154 shield."""
+        """Enrich a dataset with official identifiers, enforcing Client Path Shield."""
         return self.enricher.enrich(
             entity_type=entity_type,
             key_column=key_column,

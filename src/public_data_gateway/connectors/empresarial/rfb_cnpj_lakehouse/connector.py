@@ -1,6 +1,6 @@
 """RFB CNPJ Lakehouse Connector — Receita Federal do Brasil (CNPJ, QSA, Simples & Domínios).
 
-Part of the public-data-gateway Medallion platform (C.O.R.E. Ecosystem).
+Part of the public-data-gateway Medallion platform.
 Implements the 11-Gate Protocol:
 1. Multi-table ingestion (10 tabelas: Empresas, Estabelecimentos, Sócios QSA, Simples/MEI, CNAEs, Motivos, Municípios, Naturezas, Países, Qualificações)
 2. Isolated storage in data/rfb_cnpj_lakehouse/{bronze, silver, gold, quarantine}/

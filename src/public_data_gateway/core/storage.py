@@ -1,4 +1,4 @@
-"""Hybrid Medallion Lakehouse & SQLite Caching Engine (POP_T_070, POP_T_074, POP_T_128)."""
+"""Hybrid Medallion Lakehouse & SQLite Caching Engine (ODCS v3.1 & Point-in-Time ASOF)."""
 
 import hashlib
 import logging
@@ -283,7 +283,7 @@ class HybridStorageEngine:
         left_time_col: str,
         right_time_col: str = "reference_date",
     ) -> pa.Table:
-        """Point-in-Time ASOF LEFT JOIN via DuckDB preventing future data leakage (POP_T_128)."""
+        """Point-in-Time ASOF LEFT JOIN via DuckDB preventing future data leakage."""
         con = duckdb.connect()
         try:
             con.register("_left_table", left_table)

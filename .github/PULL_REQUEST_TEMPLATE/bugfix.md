@@ -7,8 +7,8 @@
 
 ## Verification Checklist
 - [ ] Regression test added in `tests/` reproducing the edge case offline
-- [ ] Zero silent exception swallowing (`error_handling_resilience.md`)
-- [ ] UTF-8 LF without BOM verified (`windows_encoding_safety.md`)
+- [ ] Zero silent exception swallowing (explicit error handling and logging)
+- [ ] UTF-8 LF without BOM verified
 - [ ] `ruff check .` and `pytest -m "not live"` passing
 - [ ] `JORNADA_IMPLEMENTACAO.md` updated if connector state changed
 
