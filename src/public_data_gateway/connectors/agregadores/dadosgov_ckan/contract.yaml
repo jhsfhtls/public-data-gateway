@@ -1,0 +1,221 @@
+apiVersion: v3.1.0
+kind: DataContract
+id: ODCS-BR-DADOSGOV-CKAN-001
+name: Dados.gov.br Portal Brasileiro de Dados Abertos (Catálogo CKAN)
+version: 1.0.0
+status: active
+domain: agregadores
+owner: public-data-gateway
+description: >
+  Contrato oficial ODCS v3.1 para consolidação de indicadores do Portal
+  Brasileiro de Dados Abertos (Dados.gov.br / Catálogo CKAN): organizações
+  publicadoras e conjuntos de dados abertos, distribuição de recursos por
+  formato (CSV, JSON, Parquet/GeoJSON, PDF), governança de licenças abertas e
+  Planos de Dados Abertos (PDA/LAI), engajamento/reuso via API e features Gold
+  de maturidade em transparência ativa.
+source:
+  source_id: dadosgov_ckan
+  agency: Governo Federal (Dados.gov.br)
+  official_url: https://dados.gov.br/dados/conjuntos-dados
+  portal_url: https://dados.gov.br/
+  protocol: REST_JSON
+  auth_type: NONE
+  lgpd_tier: PUBLIC_NON_PERSONAL
+  update_frequency: Contínua
+  legal_basis:
+    - Lei nº 12.527/2011 (Lei de Acesso à Informação - LAI)
+    - Decreto nº 8.777/2016 (Política de Dados Abertos do Poder Executivo Federal)
+    - Lei nº 14.129/2021 (Lei do Governo Digital)
+sla:
+  freshness: "2025-03-31"
+  completeness_threshold_pct: 100.0
+  key_integrity: STRING_7_DIGITS_IBGE
+tables:
+  - name: ckan_organizacoes_publicas_municipio
+    description: Organizações publicadoras, conjuntos de dados e adesão ao PDA por município.
+    primary_key: [id_municipio]
+    columns:
+      - name: id_municipio
+        type: string
+        nullable: false
+      - name: nome_municipio
+        type: string
+        nullable: false
+      - name: sigla_uf
+        type: string
+        nullable: false
+      - name: id_uf
+        type: string
+        nullable: false
+      - name: regiao
+        type: string
+        nullable: false
+      - name: qtd_orgaos_publicadores_ckan
+        type: integer
+        nullable: false
+      - name: qtd_conjuntos_dados_abertos
+        type: integer
+        nullable: false
+      - name: qtd_recursos_estruturados
+        type: integer
+        nullable: false
+      - name: taxa_pda_vigente_pct
+        type: double
+        nullable: false
+      - name: indice_oferta_dados_abertos
+        type: double
+        nullable: false
+      - name: reference_date
+        type: string
+        nullable: false
+  - name: ckan_formatos_recursos_tema
+    description: Distribuição de recursos abertos por formato (CSV, JSON, Parquet/GeoJSON, PDF).
+    primary_key: [id_municipio, formato_recurso_ckan]
+    columns:
+      - name: id_municipio
+        type: string
+        nullable: false
+      - name: nome_municipio
+        type: string
+        nullable: false
+      - name: sigla_uf
+        type: string
+        nullable: false
+      - name: id_uf
+        type: string
+        nullable: false
+      - name: regiao
+        type: string
+        nullable: false
+      - name: formato_recurso_ckan
+        type: string
+        nullable: false
+      - name: qtd_recursos_formato
+        type: integer
+        nullable: false
+      - name: acessibilidade_maquina_pct
+        type: double
+        nullable: false
+      - name: conformidade_padrao_dados_pct
+        type: double
+        nullable: false
+      - name: taxa_disponibilidade_url_pct
+        type: double
+        nullable: false
+      - name: reference_date
+        type: string
+        nullable: false
+  - name: ckan_licencas_governanca_lai
+    description: Governança de licenças abertas, metadados CKAN e atualização tempestiva de PDA/LAI.
+    primary_key: [id_municipio]
+    columns:
+      - name: id_municipio
+        type: string
+        nullable: false
+      - name: nome_municipio
+        type: string
+        nullable: false
+      - name: sigla_uf
+        type: string
+        nullable: false
+      - name: id_uf
+        type: string
+        nullable: false
+      - name: regiao
+        type: string
+        nullable: false
+      - name: licenca_aberta_padrao_pct
+        type: double
+        nullable: false
+      - name: dicionario_metadados_ckan_pct
+        type: double
+        nullable: false
+      - name: atualizacao_tempestiva_pda_pct
+        type: double
+        nullable: false
+      - name: indice_governanca_lai_ckan
+        type: double
+        nullable: false
+      - name: reference_date
+        type: string
+        nullable: false
+  - name: ckan_engajamento_reuso_api
+    description: Downloads de recursos, chamadas à API do catálogo e reuso cívico.
+    primary_key: [id_municipio]
+    columns:
+      - name: id_municipio
+        type: string
+        nullable: false
+      - name: nome_municipio
+        type: string
+        nullable: false
+      - name: sigla_uf
+        type: string
+        nullable: false
+      - name: id_uf
+        type: string
+        nullable: false
+      - name: regiao
+        type: string
+        nullable: false
+      - name: downloads_mensais_recursos
+        type: integer
+        nullable: false
+      - name: chamadas_api_catalogo_mensais
+        type: integer
+        nullable: false
+      - name: reuso_aplicacoes_civicas_pct
+        type: double
+        nullable: false
+      - name: indice_reuso_dados_abertos
+        type: double
+        nullable: false
+      - name: reference_date
+        type: string
+        nullable: false
+  - name: features_dadosgov_ckan_transparencia
+    description: Feature store Gold de transparência ativa e maturidade CKAN Dados.gov.br (4 tiers).
+    primary_key: [id_municipio]
+    columns:
+      - name: id_municipio
+        type: string
+        nullable: false
+      - name: nome_municipio
+        type: string
+        nullable: false
+      - name: sigla_uf
+        type: string
+        nullable: false
+      - name: id_uf
+        type: string
+        nullable: false
+      - name: regiao
+        type: string
+        nullable: false
+      - name: qtd_orgaos_publicadores_ckan
+        type: integer
+        nullable: false
+      - name: qtd_conjuntos_dados_abertos
+        type: integer
+        nullable: false
+      - name: taxa_pda_vigente_pct
+        type: double
+        nullable: false
+      - name: indice_oferta_dados_abertos
+        type: double
+        nullable: false
+      - name: indice_governanca_lai_ckan
+        type: double
+        nullable: false
+      - name: indice_reuso_dados_abertos
+        type: double
+        nullable: false
+      - name: score_transparencia_ckan
+        type: double
+        nullable: false
+      - name: tier_transparencia_ckan
+        type: string
+        nullable: false
+      - name: reference_date
+        type: string
+        nullable: false

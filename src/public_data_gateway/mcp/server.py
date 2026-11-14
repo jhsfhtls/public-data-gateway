@@ -1789,6 +1789,65 @@ class MCPDispatcher:
                                 },
                             },
                             {
+                                "name": "bdg_get_ckan_organizations",
+                                "description": "Get municipal Dados.gov.br (CKAN) publishing organizations, open dataset count, and PDA adherence.",
+                                "inputSchema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "id_municipio": {
+                                            "type": "string",
+                                            "description": "7-digit IBGE municipality code, 6-digit prefix, or 8-digit CEP",
+                                        }
+                                    },
+                                    "required": ["id_municipio"],
+                                },
+                            },
+                            {
+                                "name": "bdg_get_ckan_governance",
+                                "description": "Get municipal Dados.gov.br (CKAN) open license, metadata dictionary, and LAI governance metrics.",
+                                "inputSchema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "id_municipio": {
+                                            "type": "string",
+                                            "description": "7-digit IBGE municipality code, 6-digit prefix, or 8-digit CEP",
+                                        }
+                                    },
+                                    "required": ["id_municipio"],
+                                },
+                            },
+                            {
+                                "name": "bdg_get_ckan_features",
+                                "description": "Get normalized Gold Dados.gov.br (CKAN) open data transparency score and 4-tier classification.",
+                                "inputSchema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "id_municipio": {
+                                            "type": "string",
+                                            "description": "7-digit IBGE municipality code, 6-digit prefix, or 8-digit CEP",
+                                        }
+                                    },
+                                    "required": ["id_municipio"],
+                                },
+                            },
+                            {
+                                "name": "bdg_list_top_ckan_municipalities",
+                                "description": "List top Brazilian municipalities ranked by composite Dados.gov.br (CKAN) transparency score.",
+                                "inputSchema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "limit": {
+                                            "type": "integer",
+                                            "description": "Maximum rows (default: 10)",
+                                        },
+                                        "sigla_uf": {
+                                            "type": "string",
+                                            "description": "Optional 2-letter state filter (e.g. PR)",
+                                        },
+                                    },
+                                },
+                            },
+                            {
                                 "name": "bdg_get_onr_property_registry",
                                 "description": "Get official ONR SREI municipal active property registry CNM stock, digital conversion rate, and online certificate emissions.",
                                 "inputSchema": {
@@ -3952,6 +4011,71 @@ class MCPDispatcher:
                     },
                 }
             wrapped = wrap_untrusted_gov_data(result, source_id="basedosdados_bq")
+            return {
+                "jsonrpc": "2.0",
+                "id": req_id,
+                "result": {"content": [{"type": "text", "text": wrapped}], "isError": False},
+            }
+
+        if tool_name in {
+            "bdg_get_ckan_organizations",
+            "bdg_get_ckan_governance",
+            "bdg_get_ckan_features",
+            "bdg_list_top_ckan_municipalities",
+        }:
+            from public_data_gateway.connectors.agregadores.dadosgov_ckan.connector import (
+                DadosGovCkanConnector,
+            )
+
+            connector = DadosGovCkanConnector(settings=self.settings)
+            try:
+                if tool_name == "bdg_get_ckan_organizations":
+                    result = connector.get_ckan_organizations(
+                        str(args.get("id_municipio", ""))
+                    )
+                elif tool_name == "bdg_get_ckan_governance":
+                    result = connector.get_ckan_governance(
+                        str(args.get("id_municipio", ""))
+                    )
+                elif tool_name == "bdg_get_ckan_features":
+                    result = connector.get_ckan_features(
+                        str(args.get("id_municipio", ""))
+                    )
+                else:
+                    result = connector.list_top_ckan_municipalities(
+                        limit=int(args.get("limit", 10)),
+                        sigla_uf=args.get("sigla_uf"),
+                    )
+            except (ValueError, KeyError) as exc:
+                return {
+                    "jsonrpc": "2.0",
+                    "id": req_id,
+                    "result": {
+                        "content": [
+                            {
+                                "type": "text",
+                                "text": f"Dados.gov.br CKAN parameter error: {exc}",
+                            }
+                        ],
+                        "isError": True,
+                    },
+                }
+
+            if not result:
+                return {
+                    "jsonrpc": "2.0",
+                    "id": req_id,
+                    "result": {
+                        "content": [
+                            {
+                                "type": "text",
+                                "text": "No Dados.gov.br CKAN data found for the query.",
+                            }
+                        ],
+                        "isError": True,
+                    },
+                }
+            wrapped = wrap_untrusted_gov_data(result, source_id="dadosgov_ckan")
             return {
                 "jsonrpc": "2.0",
                 "id": req_id,

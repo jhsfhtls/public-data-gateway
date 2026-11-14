@@ -2578,6 +2578,84 @@ def create_app(settings: GatewaySettings | None = None) -> FastAPI:
         except (ValueError, KeyError) as exc:
             raise HTTPException(status_code=400, detail=str(exc)) from exc
 
+    @app.get("/api/v1/metaportals/dadosgov/top-municipalities")
+    async def get_top_ckan_municipalities(
+        limit: int = Query(10, ge=1, le=50, description="Max municipalities to list"),
+        uf: str | None = Query(None, description="Optional 2-letter state filter"),
+    ) -> list[dict[str, Any]]:
+        from public_data_gateway.connectors.agregadores.dadosgov_ckan.connector import (
+            DadosGovCkanConnector,
+        )
+
+        conn = DadosGovCkanConnector(settings=app_settings)
+        return conn.list_top_ckan_municipalities(limit=limit, sigla_uf=uf)
+
+    @app.get("/api/v1/metaportals/dadosgov/features/{id_municipio}")
+    async def get_ckan_features(id_municipio: str) -> dict[str, Any]:
+        from public_data_gateway.connectors.agregadores.dadosgov_ckan.connector import (
+            DadosGovCkanConnector,
+        )
+
+        conn = DadosGovCkanConnector(settings=app_settings)
+        try:
+            return conn.get_ckan_features(id_municipio)
+        except (ValueError, KeyError) as exc:
+            raise HTTPException(status_code=400, detail=str(exc)) from exc
+
+    @app.get("/api/v1/metaportals/dadosgov/formats/{id_municipio}")
+    async def get_ckan_formats(
+        id_municipio: str,
+        formato: str | None = Query(
+            None, description="Optional CKAN resource format filter"
+        ),
+    ) -> list[dict[str, Any]]:
+        from public_data_gateway.connectors.agregadores.dadosgov_ckan.connector import (
+            DadosGovCkanConnector,
+        )
+
+        conn = DadosGovCkanConnector(settings=app_settings)
+        try:
+            return conn.list_ckan_formats(id_municipio, formato_recurso_ckan=formato)
+        except (ValueError, KeyError) as exc:
+            raise HTTPException(status_code=400, detail=str(exc)) from exc
+
+    @app.get("/api/v1/metaportals/dadosgov/governance/{id_municipio}")
+    async def get_ckan_governance(id_municipio: str) -> dict[str, Any]:
+        from public_data_gateway.connectors.agregadores.dadosgov_ckan.connector import (
+            DadosGovCkanConnector,
+        )
+
+        conn = DadosGovCkanConnector(settings=app_settings)
+        try:
+            return conn.get_ckan_governance(id_municipio)
+        except (ValueError, KeyError) as exc:
+            raise HTTPException(status_code=400, detail=str(exc)) from exc
+
+    @app.get("/api/v1/metaportals/dadosgov/engagement/{id_municipio}")
+    async def get_ckan_engagement(id_municipio: str) -> dict[str, Any]:
+        from public_data_gateway.connectors.agregadores.dadosgov_ckan.connector import (
+            DadosGovCkanConnector,
+        )
+
+        conn = DadosGovCkanConnector(settings=app_settings)
+        try:
+            return conn.get_ckan_engagement(id_municipio)
+        except (ValueError, KeyError) as exc:
+            raise HTTPException(status_code=400, detail=str(exc)) from exc
+
+    @app.get("/api/v1/metaportals/dadosgov/organizations/{id_municipio}")
+    @app.get("/api/v1/dadosgov/{id_municipio}")
+    async def get_ckan_organizations(id_municipio: str) -> dict[str, Any]:
+        from public_data_gateway.connectors.agregadores.dadosgov_ckan.connector import (
+            DadosGovCkanConnector,
+        )
+
+        conn = DadosGovCkanConnector(settings=app_settings)
+        try:
+            return conn.get_ckan_organizations(id_municipio)
+        except (ValueError, KeyError) as exc:
+            raise HTTPException(status_code=400, detail=str(exc)) from exc
+
     @app.get("/api/v1/real-estate/onr/top-municipalities")
     async def get_top_onr_municipalities(
         limit: int = Query(10, ge=1, le=50, description="Max municipalities to list"),

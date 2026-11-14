@@ -1,0 +1,24 @@
+version: 2
+
+sources:
+  - name: dadosgov_ckan
+    description: "Dados.gov.br: Portal Brasileiro de Dados Abertos (Catálogo CKAN)."
+    meta:
+      external_root: "data/dadosgov_ckan/silver"
+    tables:
+      - name: ckan_organizacoes_publicas_municipio
+        description: "Organizações publicadoras, conjuntos de dados abertos e Planos de Dados Abertos (PDA) por município."
+        meta:
+          external_location: "read_parquet('data/dadosgov_ckan/silver/ckan_organizacoes_publicas_municipio.parquet')"
+      - name: ckan_formatos_recursos_tema
+        description: "Detalhamento de formatos de recursos CKAN (CSV, JSON, Parquet/GeoJSON, PDF) e legibilidade por máquina."
+        meta:
+          external_location: "read_parquet('data/dadosgov_ckan/silver/ckan_formatos_recursos_tema.parquet')"
+      - name: ckan_licencas_governanca_lai
+        description: "Governança de licenças abertas, dicionários de metadados CKAN e tempestividade de atualização PDA."
+        meta:
+          external_location: "read_parquet('data/dadosgov_ckan/silver/ckan_licencas_governanca_lai.parquet')"
+      - name: ckan_engajamento_reuso_api
+        description: "Downloads mensais de recursos, chamadas à API do catálogo e índice de reuso cívico."
+        meta:
+          external_location: "read_parquet('data/dadosgov_ckan/silver/ckan_engajamento_reuso_api.parquet')"

@@ -1,0 +1,121 @@
+version: 2
+
+models:
+  - name: stg_ckan_organizacoes_publicas
+    description: "Staging de organizações publicadoras e oferta de conjuntos de dados abertos no Dados.gov.br CKAN."
+    columns:
+      - name: id_municipio
+        description: "Código IBGE de 7 dígitos do município."
+        tests:
+          - not_null
+          - unique
+      - name: nome_municipio
+        description: "Nome oficial do município."
+      - name: sigla_uf
+        description: "Sigla da Unidade da Federação."
+      - name: id_uf
+        description: "Código IBGE de 2 dígitos da UF."
+      - name: regiao
+        description: "Macrorregião geográfica brasileira."
+      - name: qtd_orgaos_publicadores_ckan
+        description: "Quantidade de órgãos públicos publicadores ativos no catálogo CKAN."
+      - name: qtd_conjuntos_dados_abertos
+        description: "Quantidade de conjuntos de dados abertos publicados."
+      - name: qtd_recursos_estruturados
+        description: "Quantidade de recursos estruturados disponibilizados."
+      - name: taxa_pda_vigente_pct
+        description: "Percentual de órgãos com Plano de Dados Abertos (PDA) vigente."
+      - name: indice_oferta_dados_abertos
+        description: "Índice composto de oferta de dados abertos CKAN (0 a 100)."
+        tests:
+          - not_null
+      - name: reference_date
+        description: "Data de referência da extração Silver (YYYY-MM-DD)."
+
+  - name: stg_ckan_formatos_recursos
+    description: "Staging de formatos de recursos publicados no Dados.gov.br CKAN por município."
+    columns:
+      - name: id_municipio
+        description: "Código IBGE de 7 dígitos do município."
+        tests:
+          - not_null
+      - name: nome_municipio
+        description: "Nome oficial do município."
+      - name: sigla_uf
+        description: "Sigla da Unidade da Federação."
+      - name: id_uf
+        description: "Código IBGE de 2 dígitos da UF."
+      - name: regiao
+        description: "Macrorregião geográfica brasileira."
+      - name: formato_recurso_ckan
+        description: "Tipo de formato de recurso CKAN (CSV_Estruturado, JSON_REST_API, Parquet_GeoJSON, PDF_Relatorio_Semi)."
+        tests:
+          - not_null
+      - name: qtd_recursos_formato
+        description: "Quantidade de recursos disponíveis no formato."
+      - name: acessibilidade_maquina_pct
+        description: "Percentual de recursos legíveis por máquina."
+      - name: conformidade_padrao_dados_pct
+        description: "Percentual de conformidade com padrões abertos de dados."
+      - name: taxa_disponibilidade_url_pct
+        description: "Taxa de disponibilidade HTTP (uptime) das URLs dos recursos."
+      - name: reference_date
+        description: "Data de referência da extração Silver (YYYY-MM-DD)."
+
+  - name: stg_ckan_licencas_governanca
+    description: "Staging de governança de licenças abertas, metadados CKAN e aderência à LAI."
+    columns:
+      - name: id_municipio
+        description: "Código IBGE de 7 dígitos do município."
+        tests:
+          - not_null
+          - unique
+      - name: nome_municipio
+        description: "Nome oficial do município."
+      - name: sigla_uf
+        description: "Sigla da Unidade da Federação."
+      - name: id_uf
+        description: "Código IBGE de 2 dígitos da UF."
+      - name: regiao
+        description: "Macrorregião geográfica brasileira."
+      - name: licenca_aberta_padrao_pct
+        description: "Percentual de datasets com licença aberta padronizada (CC-BY / ODbL)."
+      - name: dicionario_metadados_ckan_pct
+        description: "Percentual de datasets com dicionário de metadados documentado no CKAN."
+      - name: atualizacao_tempestiva_pda_pct
+        description: "Percentual de atualizações tempestivas conforme cronograma do PDA."
+      - name: indice_governanca_lai_ckan
+        description: "Índice composto de governança LAI e metadados CKAN (0 a 100)."
+        tests:
+          - not_null
+      - name: reference_date
+        description: "Data de referência da extração Silver (YYYY-MM-DD)."
+
+  - name: stg_ckan_engajamento_reuso
+    description: "Staging de engajamento, downloads mensais e chamadas de API do Dados.gov.br CKAN."
+    columns:
+      - name: id_municipio
+        description: "Código IBGE de 7 dígitos do município."
+        tests:
+          - not_null
+          - unique
+      - name: nome_municipio
+        description: "Nome oficial do município."
+      - name: sigla_uf
+        description: "Sigla da Unidade da Federação."
+      - name: id_uf
+        description: "Código IBGE de 2 dígitos da UF."
+      - name: regiao
+        description: "Macrorregião geográfica brasileira."
+      - name: downloads_mensais_recursos
+        description: "Volume mensal estimado de downloads de recursos abertos."
+      - name: chamadas_api_catalogo_mensais
+        description: "Volume mensal de chamadas à API do catálogo CKAN."
+      - name: reuso_aplicacoes_civicas_pct
+        description: "Percentual de datasets reutilizados em aplicações cívicas e controle social."
+      - name: indice_reuso_dados_abertos
+        description: "Índice composto de reuso e engajamento de dados abertos (0 a 100)."
+        tests:
+          - not_null
+      - name: reference_date
+        description: "Data de referência da extração Silver (YYYY-MM-DD)."

@@ -7984,3 +7984,101 @@ models:
       - name: reference_date
         description: "Data de referência ISO-8601 (YYYY-MM-DD)."
         tests: [not_null]
+
+  - name: fct_dadosgov_ckan_transparencia_municipio
+    description: "Fato consolidado de oferta de dados abertos, governança LAI e reuso no portal Dados.gov.br (CKAN) por município."
+    columns:
+      - name: id_municipio
+        description: "Código IBGE de 7 dígitos do município (STRING)."
+        tests: [not_null, unique]
+      - name: nome_municipio
+        description: "Nome oficial do município."
+        tests: [not_null]
+      - name: sigla_uf
+        description: "Sigla da Unidade da Federação (UF)."
+        tests: [not_null]
+      - name: id_uf
+        description: "Código IBGE da UF (STRING)."
+        tests: [not_null]
+      - name: regiao
+        description: "Macrorregião geográfica brasileira."
+        tests: [not_null]
+      - name: qtd_orgaos_publicadores_ckan
+        description: "Quantidade de órgãos públicos publicadores ativos no catálogo CKAN."
+        tests: [not_null]
+      - name: qtd_conjuntos_dados_abertos
+        description: "Quantidade de conjuntos de dados abertos publicados."
+        tests: [not_null]
+      - name: qtd_recursos_estruturados
+        description: "Quantidade de recursos estruturados disponibilizados."
+        tests: [not_null]
+      - name: taxa_pda_vigente_pct
+        description: "Percentual de órgãos com Plano de Dados Abertos (PDA) vigente (%)."
+        tests: [not_null]
+      - name: indice_oferta_dados_abertos
+        description: "Índice composto de oferta de dados abertos CKAN (0-100)."
+        tests: [not_null]
+      - name: licenca_aberta_padrao_pct
+        description: "Percentual de datasets com licença aberta padronizada (%)."
+        tests: [not_null]
+      - name: dicionario_metadados_ckan_pct
+        description: "Percentual de datasets com dicionário de metadados documentado no CKAN (%)."
+        tests: [not_null]
+      - name: atualizacao_tempestiva_pda_pct
+        description: "Percentual de atualizações tempestivas conforme cronograma do PDA (%)."
+        tests: [not_null]
+      - name: indice_governanca_lai_ckan
+        description: "Índice composto de governança LAI e metadados CKAN (0-100)."
+        tests: [not_null]
+      - name: downloads_mensais_recursos
+        description: "Volume mensal estimado de downloads de recursos abertos."
+        tests: [not_null]
+      - name: chamadas_api_catalogo_mensais
+        description: "Volume mensal de chamadas à API do catálogo CKAN."
+        tests: [not_null]
+      - name: reuso_aplicacoes_civicas_pct
+        description: "Percentual de datasets reutilizados em aplicações cívicas (%)."
+        tests: [not_null]
+      - name: indice_reuso_dados_abertos
+        description: "Índice composto de reuso e engajamento de dados abertos (0-100)."
+        tests: [not_null]
+      - name: reference_date
+        description: "Data de referência ISO-8601 (YYYY-MM-DD)."
+        tests: [not_null]
+
+  - name: fct_dadosgov_ckan_formatos_recursos_municipio
+    description: "Fato municipal por formato de recurso publicado no portal Dados.gov.br (CKAN)."
+    columns:
+      - name: id_municipio
+        description: "Código IBGE de 7 dígitos do município (STRING)."
+        tests: [not_null]
+      - name: nome_municipio
+        description: "Nome oficial do município."
+        tests: [not_null]
+      - name: sigla_uf
+        description: "Sigla da Unidade da Federação (UF)."
+        tests: [not_null]
+      - name: id_uf
+        description: "Código IBGE da UF (STRING)."
+        tests: [not_null]
+      - name: regiao
+        description: "Macrorregião geográfica brasileira."
+        tests: [not_null]
+      - name: formato_recurso_ckan
+        description: "Tipo de formato de recurso CKAN."
+        tests: [not_null]
+      - name: qtd_recursos_formato
+        description: "Quantidade de recursos disponíveis no formato."
+        tests: [not_null]
+      - name: acessibilidade_maquina_pct
+        description: "Percentual de recursos legíveis por máquina (%)."
+        tests: [not_null]
+      - name: conformidade_padrao_dados_pct
+        description: "Percentual de conformidade com padrões abertos de dados (%)."
+        tests: [not_null]
+      - name: taxa_disponibilidade_url_pct
+        description: "Taxa de disponibilidade HTTP das URLs dos recursos (%)."
+        tests: [not_null]
+      - name: reference_date
+        description: "Data de referência ISO-8601 (YYYY-MM-DD)."
+        tests: [not_null]

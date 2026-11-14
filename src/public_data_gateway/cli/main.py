@@ -1171,6 +1171,36 @@ def build_parser() -> argparse.ArgumentParser:
     bd_rk_p.add_argument("--uf", type=str, help="Optional 2-letter state filter")
     bd_rk_p.add_argument("--json", action="store_true", help="Output in JSON format")
 
+    # Dados.gov.br (CKAN) command group
+    dg_p = subparsers.add_parser("dadosgov", help="Query Dados.gov.br (CKAN) publishing organizations, resource formats, LAI governance, API reuse, and rankings.")
+    dg_sub = dg_p.add_subparsers(dest="dadosgov_action", required=True)
+
+    dg_org_p = dg_sub.add_parser("organizations", help="Get municipal Dados.gov.br CKAN publishing organizations and open dataset supply.")
+    dg_org_p.add_argument("id_municipio", help="7-digit IBGE municipality code, 6-digit prefix, or 8-digit CEP")
+    dg_org_p.add_argument("--json", action="store_true", help="Output in JSON format")
+
+    dg_fmt_p = dg_sub.add_parser("formats", help="List municipal Dados.gov.br CKAN resource formats and machine-readability metrics.")
+    dg_fmt_p.add_argument("id_municipio", help="7-digit IBGE municipality code, 6-digit prefix, or 8-digit CEP")
+    dg_fmt_p.add_argument("--formato", type=str, help="Optional format filter (e.g. CSV_Estruturado)")
+    dg_fmt_p.add_argument("--json", action="store_true", help="Output in JSON format")
+
+    dg_gov_p = dg_sub.add_parser("governance", help="Get municipal Dados.gov.br CKAN open license, metadata dictionary, and LAI governance.")
+    dg_gov_p.add_argument("id_municipio", help="7-digit IBGE municipality code, 6-digit prefix, or 8-digit CEP")
+    dg_gov_p.add_argument("--json", action="store_true", help="Output in JSON format")
+
+    dg_eng_p = dg_sub.add_parser("engagement", help="Get municipal Dados.gov.br CKAN resource downloads, API calls, and civic reuse.")
+    dg_eng_p.add_argument("id_municipio", help="7-digit IBGE municipality code, 6-digit prefix, or 8-digit CEP")
+    dg_eng_p.add_argument("--json", action="store_true", help="Output in JSON format")
+
+    dg_ft_p = dg_sub.add_parser("features", help="Get Gold Dados.gov.br CKAN transparency score and 4-tier classification.")
+    dg_ft_p.add_argument("id_municipio", help="7-digit IBGE municipality code, 6-digit prefix, or 8-digit CEP")
+    dg_ft_p.add_argument("--json", action="store_true", help="Output in JSON format")
+
+    dg_rk_p = dg_sub.add_parser("ranking", help="List top Brazilian municipalities ranked by Dados.gov.br CKAN transparency score.")
+    dg_rk_p.add_argument("--limit", type=int, default=10, help="Max municipalities to list")
+    dg_rk_p.add_argument("--uf", type=str, help="Optional 2-letter state filter")
+    dg_rk_p.add_argument("--json", action="store_true", help="Output in JSON format")
+
     # ONR Registro de Imóveis (SREI/SERP/CNM) command group
     onr_p = subparsers.add_parser("onr", help="Query ONR SREI real estate registries, transactions, credit guarantees, SERP, and rankings.")
     onr_sub = onr_p.add_subparsers(dest="onr_action", required=True)
@@ -4076,6 +4106,78 @@ def main(argv: Sequence[str] | None = None) -> int:
                     return 0
             except (ValueError, KeyError) as exc:
                 print(f"Erro Base dos Dados: {exc}", file=sys.stderr)
+                return 1
+
+        elif args.command == "dadosgov":
+            from public_data_gateway.connectors.agregadores.dadosgov_ckan.connector import (
+                DadosGovCkanConnector,
+            )
+
+            dg_conn = DadosGovCkanConnector()
+            dg_action = getattr(args, "dadosgov_action", "")
+            try:
+                if dg_action == "organizations":
+                    res = dg_conn.get_ckan_organizations(args.id_municipio)
+                    if getattr(args, "json", False):
+                        print(json.dumps(res, indent=2, ensure_ascii=False, default=str))
+                    else:
+                        print(f"Dados.gov.br CKAN Organizações ({res.get('nome_municipio')} - {res.get('id_municipio')}):")
+                        print(f"  Órgãos: {res.get('qtd_orgaos_publicadores_ckan')} | Conjuntos: {res.get('qtd_conjuntos_dados_abertos')} | PDA Vigente: {res.get('taxa_pda_vigente_pct')}%")
+                    return 0
+
+                if dg_action == "formats":
+                    rows = dg_conn.list_ckan_formats(
+                        args.id_municipio,
+                        formato_recurso_ckan=getattr(args, "formato", None),
+                    )
+                    if getattr(args, "json", False):
+                        print(json.dumps(rows, indent=2, ensure_ascii=False, default=str))
+                    else:
+                        print(f"Dados.gov.br CKAN Formatos ({len(rows)} tipos):")
+                        for r in rows:
+                            print(f"  {r.get('formato_recurso_ckan')}: {r.get('qtd_recursos_formato')} recs | Máquina={r.get('acessibilidade_maquina_pct')}%")
+                    return 0
+
+                if dg_action == "governance":
+                    res = dg_conn.get_ckan_governance(args.id_municipio)
+                    if getattr(args, "json", False):
+                        print(json.dumps(res, indent=2, ensure_ascii=False, default=str))
+                    else:
+                        print(f"Dados.gov.br CKAN Governança ({res.get('nome_municipio')} - {res.get('id_municipio')}):")
+                        print(f"  Licença Aberta: {res.get('licenca_aberta_padrao_pct')}% | Metadados: {res.get('dicionario_metadados_ckan_pct')}%")
+                    return 0
+
+                if dg_action == "engagement":
+                    res = dg_conn.get_ckan_engagement(args.id_municipio)
+                    if getattr(args, "json", False):
+                        print(json.dumps(res, indent=2, ensure_ascii=False, default=str))
+                    else:
+                        print(f"Dados.gov.br CKAN Engajamento ({res.get('nome_municipio')} - {res.get('id_municipio')}):")
+                        print(f"  Downloads/mês: {res.get('downloads_mensais_recursos')} | API/mês: {res.get('chamadas_api_catalogo_mensais')}")
+                    return 0
+
+                if dg_action == "features":
+                    res = dg_conn.get_ckan_features(args.id_municipio)
+                    if getattr(args, "json", False):
+                        print(json.dumps(res, indent=2, ensure_ascii=False, default=str))
+                    else:
+                        print(f"Dados.gov.br CKAN Gold ({res.get('nome_municipio')} - {res.get('id_municipio')}):")
+                        print(f"  Score: {res.get('score_transparencia_ckan')} | Tier: {res.get('tier_transparencia_ckan')}")
+                    return 0
+
+                if dg_action == "ranking":
+                    ranks = dg_conn.list_top_ckan_municipalities(
+                        limit=getattr(args, "limit", 10), sigla_uf=getattr(args, "uf", None)
+                    )
+                    if getattr(args, "json", False):
+                        print(json.dumps(ranks, indent=2, ensure_ascii=False, default=str))
+                    else:
+                        print(f"Top {len(ranks)} Municípios Dados.gov.br CKAN:")
+                        for idx, r in enumerate(ranks, 1):
+                            print(f"  {idx}. {r.get('nome_municipio')} ({r.get('sigla_uf')}): {r.get('score_transparencia_ckan')} | {r.get('tier_transparencia_ckan')}")
+                    return 0
+            except (ValueError, KeyError) as exc:
+                print(f"Erro Dados.gov.br CKAN: {exc}", file=sys.stderr)
                 return 1
 
         elif args.command == "onr":

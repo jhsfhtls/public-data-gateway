@@ -1,6 +1,6 @@
 {
   "schema_version": "1.0.0",
-  "last_updated": "2026-11-14T14:21:00.000000",
+  "last_updated": "2026-11-14T14:34:00.000000",
   "project_name": "public-data-gateway",
   "ecosystem": "C.O.R.E. (core, operations, career, studies)",
   "governing_pops": [
@@ -13,9 +13,9 @@
     "POP_T_148"
   ],
   "current_macro_phase_id": "08",
-  "current_macro_phase": "Fase 08 - Ingestão Wave 6 (Meio Ambiente, Agro & Metaportais — 48/49 fontes homologadas [98.0%] com basedosdados_bq homologado; Próximo: dadosgov_ckan)",
+  "current_macro_phase": "Fase 08 - Ingestão Wave 6 (Meio Ambiente, Agro & Metaportais — 49/49 fontes homologadas [100.0%] com dadosgov_ckan homologado; Wave 6 e Catálogo 100% concluídos!)",
   "overall_status": "ON_TRACK",
-  "active_connector": "dadosgov_ckan",
+  "active_connector": null,
   "next_connector": null,
   "structural_phases": [
     {
@@ -150,8 +150,8 @@
     {
       "phase_id": "08",
       "name": "Ingestão Wave 6 — Meio Ambiente, Agro & Metaportais",
-      "status": "IN_PROGRESS",
-      "completion_date": null,
+      "status": "COMPLETED",
+      "completion_date": "2026-11-14",
       "deliverables": [
         "Conector inpe_terrabrasilis (PRODES Anual, Alertas DETER-B por Classe, Uso da Terra e Governança ESG/EUDR) - CONCLUÍDO",
         "Conector ana_hidroweb_telemetria (Estações Telemétricas, Cotas/Vazões por Segmento, Pluviometria e Segurança Hídrica) - CONCLUÍDO",
@@ -159,7 +159,7 @@
         "Conector sfb_sicar (Imóveis Rurais CAR, Reserva Legal/APP por Categoria, PRA/Embargos IBAMA e Geometria SIGEF) - CONCLUÍDO",
         "Conector mapa_zarc (Aptidão Climática, Janelas Decendiais por Cultura, PROAGRO/PSR e Solo AD1-AD6) - CONCLUÍDO",
         "Conector basedosdados_bq (Datalake BigQuery, Datasets Temáticos, Governança ODCS e Consumo SQL) - CONCLUÍDO",
-        "Conectores Metaportais (dadosgov_ckan)"
+        "Conector dadosgov_ckan (Organizações Publicadoras, Formatos CKAN, Governança LAI e Engajamento/API) - CONCLUÍDO"
       ]
     },
     {
@@ -586,6 +586,12 @@
       "phase_id": "06",
       "milestone": "Homologação do Conector ibge_censo2022 (5 Tabelas, dbt, Mart de Transição Demográfica & Live Fail-Hard)",
       "summary": "Implementação e homologação completa do conector ibge_censo2022 (IBGE Censo Demográfico 2022 — Microdados, Domicílios Ocupados, Estrutura Etária, Alfabetização e Diversidade Étnico-Racial, Leis nº 5.534/1968, 5.878/1973 e Portaria IBGE nº 123/2021) consolidando o segundo conector da Wave 4: 5 tabelas (censo_populacao_domicilios, censo_estrutura_etaria, censo_educacao_alfabetizacao, censo_urbanizacao_situacao, censo_diversidade_quilombola_indigena) materializadas em data/ibge_censo2022/{bronze,silver,gold}/; 8 novos modelos dbt (5 staging views, fct_censo_demografico_municipios, fct_censo_diversidade_etnico_racial, mart_censo_transicao_demografica_brasil) totalizando 201 modelos dbt (96 tabelas, 105 views) e 1967 testes dbt 100% aprovados com 0 erros; 2374 colunas 100% documentadas no linter (100% coverage); feature store features_censo2022_municipios_brasil.parquet gerada com indicadores demográficos (idade mediana, índice de envelhecimento, razão de sexo, taxa de alfabetização/analfabetismo, urbanização, população indígena/quilombola), score de maturidade social (0 a 100) e score de vulnerabilidade demográfica; testes reais com fail-hard estrito contra as APIs oficiais do IBGE SIDRA Censo 2022 (Tabelas 4712, 9515 e 9543) com 9 testes pytest aprovados (175 testes offline totais no repositório); multi-interface completa via SDK (PublicData.socioeconomic.*, census_summary, demographic_profile, literacy_indicators, highest_aging_municipalities), CLI (pdg censo summary/profile/literacy/aging e atalho direto pdg censo2022), REST API (/api/v1/census/* e atalho /api/v1/censo/*) e MCP (bdg_get_census_summary, bdg_get_demographic_profile, bdg_list_highest_aging_municipalities) com contenção de prompt injection."
+    },
+    {
+      "date": "2026-11-14",
+      "phase_id": "08",
+      "milestone": "Conclusão da Wave 6 & Homologação do Conector dadosgov_ckan (49/49 Fontes = 100.0% do Catálogo)",
+      "summary": "Implementação e homologação completa do conector dadosgov_ckan (Dados.gov.br: Portal Brasileiro de Dados Abertos — Catálogo CKAN) atingindo 49/49 fontes homologadas (100.0% do catálogo mestre) e concluindo a Fase 08 (Wave 6): 5 tabelas Silver/Gold materializadas em data/dadosgov_ckan/silver/; 7 novos modelos dbt (4 staging views, fct_dadosgov_ckan_transparencia_municipio, fct_dadosgov_ckan_formatos_recursos_municipio, mart_transparencia_dados_abertos_ckan_brasil) totalizando 404 modelos, 5.962 colunas e 222 sources 100% documentados e aprovados no lint_dbt_docs.py; paridade 0.0000 entre Python e DuckDB SQL; 9 testes pytest (8 offline + 1 live) aprovados; multi-interface completa via SDK (MetaportalsFacade/BrazilData), CLI (bdg dadosgov), REST API (/api/v1/metaportals/dadosgov/* e /api/v1/dadosgov/{id_municipio}) e MCP (bdg_get_ckan_*, bdg_list_top_ckan_municipalities)."
     }
   ]
 }
