@@ -818,7 +818,7 @@ sources:
   - P02
   rice_score: 470
   roadmap_wave: 5
-  status: CATALOGED
+  status: HOMOLOGATED
 - source_id: datasus_sim
   name: 'DataSUS: Sistema de Informações sobre Mortalidade (SIM)'
   agency: Ministério da Saúde / DataSUS

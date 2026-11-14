@@ -845,6 +845,65 @@ class MCPDispatcher:
                                 },
                             },
                             {
+                                "name": "bdg_get_censo_escolar_schools",
+                                "description": "Get municipal active schools inventory, broadband internet, science labs, libraries, and PcD accessibility (INEP Censo Escolar).",
+                                "inputSchema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "id_municipio": {
+                                            "type": "string",
+                                            "description": "7-digit IBGE municipality code (e.g. 3550308)",
+                                        },
+                                    },
+                                    "required": ["id_municipio"],
+                                },
+                            },
+                            {
+                                "name": "bdg_get_censo_escolar_teachers",
+                                "description": "Get municipal teaching workforce qualification, higher-ed share, postgraduate share, and INEP AFD indicator.",
+                                "inputSchema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "id_municipio": {
+                                            "type": "string",
+                                            "description": "7-digit IBGE municipality code (e.g. 3550308)",
+                                        },
+                                    },
+                                    "required": ["id_municipio"],
+                                },
+                            },
+                            {
+                                "name": "bdg_get_censo_escolar_features",
+                                "description": "Get Gold INEP Censo Escolar school infrastructure score, educational flow quality score, and basic education tier.",
+                                "inputSchema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "id_municipio": {
+                                            "type": "string",
+                                            "description": "7-digit IBGE municipality code (e.g. 3550308)",
+                                        },
+                                    },
+                                    "required": ["id_municipio"],
+                                },
+                            },
+                            {
+                                "name": "bdg_list_top_censo_escolar_municipalities",
+                                "description": "List top Brazilian municipalities ranked by composite INEP Censo Escolar infrastructure score.",
+                                "inputSchema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "limit": {
+                                            "type": "integer",
+                                            "description": "Maximum rows (default: 10)",
+                                        },
+                                        "sigla_uf": {
+                                            "type": "string",
+                                            "description": "Optional 2-letter state filter (e.g. SP)",
+                                        },
+                                    },
+                                },
+                            },
+                            {
                                 "name": "bdg_get_labor_force_indicators",
                                 "description": "Query official quarterly labor force, population, and unemployment rate by Brazilian UF from IBGE PNAD Contínua (Tier 1).",
                                 "inputSchema": {
@@ -1947,6 +2006,56 @@ class MCPDispatcher:
                     },
                 }
             wrapped = wrap_untrusted_gov_data(result, source_id="datasus_sih")
+            return {
+                "jsonrpc": "2.0",
+                "id": req_id,
+                "result": {"content": [{"type": "text", "text": wrapped}], "isError": False},
+            }
+
+        if tool_name in {
+            "bdg_get_censo_escolar_schools",
+            "bdg_get_censo_escolar_teachers",
+            "bdg_get_censo_escolar_features",
+            "bdg_list_top_censo_escolar_municipalities",
+        }:
+            from public_data_gateway.connectors.educacao.inep_censo_escolar.connector import (
+                INEPCensoEscolarConnector,
+            )
+
+            connector = INEPCensoEscolarConnector(settings=self.settings)
+            if tool_name == "bdg_get_censo_escolar_schools":
+                result = connector.get_school_infrastructure(
+                    str(args.get("id_municipio", "")).strip()
+                )
+            elif tool_name == "bdg_get_censo_escolar_teachers":
+                result = connector.get_teacher_qualifications(
+                    str(args.get("id_municipio", "")).strip()
+                )
+            elif tool_name == "bdg_get_censo_escolar_features":
+                result = connector.get_censo_escolar_features(
+                    str(args.get("id_municipio", "")).strip()
+                )
+            else:
+                raw_uf = args.get("sigla_uf")
+                result = connector.list_top_censo_escolar_municipalities(
+                    limit=int(args.get("limit", 10)),
+                    sigla_uf=str(raw_uf).strip() if raw_uf else None,
+                )
+            if not result:
+                return {
+                    "jsonrpc": "2.0",
+                    "id": req_id,
+                    "result": {
+                        "content": [
+                            {
+                                "type": "text",
+                                "text": "No INEP Censo Escolar data found for the query.",
+                            }
+                        ],
+                        "isError": True,
+                    },
+                }
+            wrapped = wrap_untrusted_gov_data(result, source_id="inep_censo_escolar")
             return {
                 "jsonrpc": "2.0",
                 "id": req_id,

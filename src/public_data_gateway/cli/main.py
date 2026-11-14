@@ -691,6 +691,36 @@ def build_parser() -> argparse.ArgumentParser:
     sih_rk_p.add_argument("--uf", type=str, help="Optional 2-letter state filter")
     sih_rk_p.add_argument("--json", action="store_true", help="Output in JSON format")
 
+    # INEP Censo Escolar (Educação Básica) command group
+    ce_p = subparsers.add_parser("censo-escolar", help="Query INEP Censo Escolar schools, enrollments, teachers, flow, and education scores.")
+    ce_sub = ce_p.add_subparsers(dest="censo_escolar_action", required=True)
+
+    ce_sch_p = ce_sub.add_parser("schools", help="Get municipal active schools and infrastructure indicators (INEP).")
+    ce_sch_p.add_argument("id_municipio", help="7-digit IBGE municipality code (e.g. 3550308)")
+    ce_sch_p.add_argument("--json", action="store_true", help="Output in JSON format")
+
+    ce_enr_p = ce_sub.add_parser("enrollments", help="List municipal basic education enrollments by teaching stage (INEP).")
+    ce_enr_p.add_argument("id_municipio", help="7-digit IBGE municipality code")
+    ce_enr_p.add_argument("--etapa", type=str, help="Optional educational stage filter (e.g. Ensino_Medio)")
+    ce_enr_p.add_argument("--json", action="store_true", help="Output in JSON format")
+
+    ce_tch_p = ce_sub.add_parser("teachers", help="Get municipal teaching workforce qualification and INEP AFD indicator.")
+    ce_tch_p.add_argument("id_municipio", help="7-digit IBGE municipality code")
+    ce_tch_p.add_argument("--json", action="store_true", help="Output in JSON format")
+
+    ce_flw_p = ce_sub.add_parser("flow", help="Get municipal school approval, abandonment, full-time share, and distortion rates.")
+    ce_flw_p.add_argument("id_municipio", help="7-digit IBGE municipality code")
+    ce_flw_p.add_argument("--json", action="store_true", help="Output in JSON format")
+
+    ce_ft_p = ce_sub.add_parser("features", help="Get Gold INEP Censo Escolar infrastructure and flow quality features.")
+    ce_ft_p.add_argument("id_municipio", help="7-digit IBGE municipality code")
+    ce_ft_p.add_argument("--json", action="store_true", help="Output in JSON format")
+
+    ce_rk_p = ce_sub.add_parser("ranking", help="List top municipalities ranked by INEP Censo Escolar infrastructure score.")
+    ce_rk_p.add_argument("--limit", type=int, default=10, help="Max municipalities to list")
+    ce_rk_p.add_argument("--uf", type=str, help="Optional 2-letter state filter")
+    ce_rk_p.add_argument("--json", action="store_true", help="Output in JSON format")
+
     # Direct shortcut: pnad-uf
     pnad_s_p = subparsers.add_parser("pnad-uf", help="Shortcut to query PNAD Contínua labor market profile.")
     pnad_s_p.add_argument("uf", type=str, help="IBGE 2-digit UF code or 2-letter state abbreviation (e.g. SP, 35)")
@@ -2368,6 +2398,78 @@ def main(argv: Sequence[str] | None = None) -> int:
                     print(f"Top {len(ranks)} Polos de Complexidade Hospitalar (DataSUS SIH/SUS):")
                     for idx, r in enumerate(ranks, 1):
                         print(f"  {idx}. {r.get('nome_municipio')} ({r.get('sigla_uf')}): Complexidade {r.get('score_complexidade_assistencial_sih')} | Pressão: {r.get('score_pressao_morbidade_hospitalar')} | {r.get('perfil_epidemiologico_hospitalar')}")
+                return 0
+
+        elif args.command == "censo-escolar":
+            from public_data_gateway.connectors.educacao.inep_censo_escolar.connector import (
+                INEPCensoEscolarConnector,
+            )
+
+            ce_conn = INEPCensoEscolarConnector()
+            ce_action = getattr(args, "censo_escolar_action", None)
+            if ce_action == "schools":
+                res = ce_conn.get_school_infrastructure(args.id_municipio)
+                if getattr(args, "json", False):
+                    print(json.dumps(res, indent=2, ensure_ascii=False, default=str))
+                else:
+                    print(f"INEP Censo Escolar Escolas & Infraestrutura ({res.get('nome_municipio')} - {res.get('id_municipio')}):")
+                    print(f"  Escolas Ativas:     {res.get('total_escolas_ativas')} ({res.get('proporcao_rede_publica_pct')}% pública)")
+                    print(f"  Banda Larga / Lab:  {res.get('escolas_com_internet_banda_larga_pct')}% internet | {res.get('escolas_com_laboratorio_ciencias_pct')}% lab ciências")
+                return 0
+
+            if ce_action == "enrollments":
+                rows = ce_conn.list_enrollments_by_stage(
+                    args.id_municipio, etapa_ensino=getattr(args, "etapa", None)
+                )
+                if getattr(args, "json", False):
+                    print(json.dumps(rows, indent=2, ensure_ascii=False, default=str))
+                else:
+                    print(f"INEP Censo Escolar Matrículas por Etapa ({args.id_municipio}):")
+                    for r in rows:
+                        print(f"  - {r.get('etapa_ensino')}: {r.get('matriculas_totais_etapa')} ({r.get('proporcao_tempo_integral_pct')}% integral | {r.get('participacao_etapa_total_pct')}%)")
+                return 0
+
+            if ce_action == "teachers":
+                res = ce_conn.get_teacher_qualifications(args.id_municipio)
+                if getattr(args, "json", False):
+                    print(json.dumps(res, indent=2, ensure_ascii=False, default=str))
+                else:
+                    print(f"INEP Censo Escolar Docentes & AFD ({res.get('nome_municipio')} - {res.get('id_municipio')}):")
+                    print(f"  Docentes Exercício: {res.get('total_docentes_exercicio')} ({res.get('proporcao_docentes_superior_pct')}% superior)")
+                    print(f"  Indicador AFD:      {res.get('indicador_adequacao_formacao_docente_afd_pct')}% | Alunos/Docente: {res.get('razao_alunos_por_docente')}")
+                return 0
+
+            if ce_action == "flow":
+                res = ce_conn.get_yield_flow_indicators(args.id_municipio)
+                if getattr(args, "json", False):
+                    print(json.dumps(res, indent=2, ensure_ascii=False, default=str))
+                else:
+                    print(f"INEP Censo Escolar Rendimento & Fluxo ({res.get('nome_municipio')} - {res.get('id_municipio')}):")
+                    print(f"  Matrículas / Integ: {res.get('total_matriculas_educacao_basica')} ({res.get('proporcao_tempo_integral_total_pct')}% integral)")
+                    print(f"  Aprovação / Aband:  {res.get('taxa_aprovacao_media_pct')}% aprovação | {res.get('taxa_abandono_escolar_pct')}% abandono")
+                return 0
+
+            if ce_action == "features":
+                feat = ce_conn.get_censo_escolar_features(args.id_municipio)
+                if getattr(args, "json", False):
+                    print(json.dumps(feat, indent=2, ensure_ascii=False, default=str))
+                else:
+                    print(f"INEP Censo Escolar Features Educação Básica: {feat.get('nome_municipio')} ({feat.get('sigla_uf')} - {feat.get('id_municipio')}):")
+                    print(f"  Score Infraestrutura: {feat.get('score_infraestrutura_escolar_inep')}/100.0")
+                    print(f"  Score Qualidade Fluxo:{feat.get('score_qualidade_fluxo_educacional')}/100.0")
+                    print(f"  Classificação Rede:   {feat.get('classificacao_rede_educacional_basica')}")
+                return 0
+
+            if ce_action == "ranking":
+                ranks = ce_conn.list_top_censo_escolar_municipalities(
+                    limit=getattr(args, "limit", 10), sigla_uf=getattr(args, "uf", None)
+                )
+                if getattr(args, "json", False):
+                    print(json.dumps(ranks, indent=2, ensure_ascii=False, default=str))
+                else:
+                    print(f"Top {len(ranks)} Redes Municipais de Educação Básica (INEP Censo Escolar):")
+                    for idx, r in enumerate(ranks, 1):
+                        print(f"  {idx}. {r.get('nome_municipio')} ({r.get('sigla_uf')}): Infra {r.get('score_infraestrutura_escolar_inep')} | Fluxo: {r.get('score_qualidade_fluxo_educacional')} | {r.get('classificacao_rede_educacional_basica')}")
                 return 0
 
         elif args.command == "pib-municipal":

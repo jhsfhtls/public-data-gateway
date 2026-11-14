@@ -1,0 +1,16 @@
+version: 2
+
+sources:
+  - name: inep_censo_escolar_silver
+    description: "Bases oficiais do Censo Escolar da Educação Básica (INEP/MEC) normalizadas na camada Silver."
+    meta:
+      external_location: "data/inep_censo_escolar/silver/{name}.parquet"
+    tables:
+      - name: censo_escolar_escolas_infraestrutura
+        description: "Inventário municipal de escolas ativas, dependência administrativa, internet banda larga, laboratórios, biblioteca e acessibilidade PcD."
+      - name: censo_escolar_matriculas_etapas
+        description: "Distribuição das matrículas da educação básica por etapa/modalidade, jornada em tempo integral e distorção idade-série."
+      - name: censo_escolar_docentes_qualificacao
+        description: "Corpo docente em exercício, titulação superior, pós-graduação e indicador de Adequação da Formação Docente (AFD)."
+      - name: censo_escolar_rendimento_fluxo
+        description: "Taxas municipais consolidadas de aprovação, reprovação, abandono escolar, distorção idade-série e tempo integral."

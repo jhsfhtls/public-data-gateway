@@ -35,6 +35,7 @@ model-paths:
   - "../src/public_data_gateway/connectors/geografico/antt_malha_transporte/dbt"
   - "../src/public_data_gateway/connectors/saude/datasus_cnes/dbt"
   - "../src/public_data_gateway/connectors/saude/datasus_sih/dbt"
+  - "../src/public_data_gateway/connectors/educacao/inep_censo_escolar/dbt"
   - "models"
 
 analysis-paths: ["analyses"]
