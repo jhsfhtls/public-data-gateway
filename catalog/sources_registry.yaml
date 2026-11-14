@@ -1108,7 +1108,7 @@ sources:
   - P09
   rice_score: 390
   roadmap_wave: 6
-  status: CATALOGED
+  status: HOMOLOGATED
 - source_id: basedosdados_bq
   name: 'Base dos Dados: Datalake Público Federado (BigQuery)'
   agency: Base dos Dados

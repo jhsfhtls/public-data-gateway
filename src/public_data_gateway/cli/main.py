@@ -991,6 +991,36 @@ def build_parser() -> argparse.ArgumentParser:
     suc_rk_p.add_argument("--uf", type=str, help="Optional 2-letter state filter")
     suc_rk_p.add_argument("--json", action="store_true", help="Output in JSON format")
 
+    # INPE TerraBrasilis (DETER & PRODES) command group
+    tb_p = subparsers.add_parser("terrabrasilis", help="Query INPE TerraBrasilis PRODES deforestation, DETER alerts, land cover, ESG governance, and rankings.")
+    tb_sub = tb_p.add_subparsers(dest="terrabrasilis_action", required=True)
+
+    tb_pr_p = tb_sub.add_parser("prodes", help="Get municipal annual PRODES deforestation increment and remaining forest cover.")
+    tb_pr_p.add_argument("id_municipio", help="7-digit IBGE municipality code, 6-digit prefix, or 8-digit CEP")
+    tb_pr_p.add_argument("--json", action="store_true", help="Output in JSON format")
+
+    tb_dt_p = tb_sub.add_parser("deter", help="List municipal INPE DETER-B alerts by alert class.")
+    tb_dt_p.add_argument("id_municipio", help="7-digit IBGE municipality code, 6-digit prefix, or 8-digit CEP")
+    tb_dt_p.add_argument("--classe", type=str, help="Optional DETER alert class filter (e.g. Corte_Raso)")
+    tb_dt_p.add_argument("--json", action="store_true", help="Output in JSON format")
+
+    tb_lc_p = tb_sub.add_parser("land-cover", help="Get municipal native vegetation, agricultural use, and Forest Code compliance.")
+    tb_lc_p.add_argument("id_municipio", help="7-digit IBGE municipality code, 6-digit prefix, or 8-digit CEP")
+    tb_lc_p.add_argument("--json", action="store_true", help="Output in JSON format")
+
+    tb_gv_p = tb_sub.add_parser("governance", help="Get municipal IBAMA embargoes, CAR regularization, and EUDR/ESG eligibility.")
+    tb_gv_p.add_argument("id_municipio", help="7-digit IBGE municipality code, 6-digit prefix, or 8-digit CEP")
+    tb_gv_p.add_argument("--json", action="store_true", help="Output in JSON format")
+
+    tb_ft_p = tb_sub.add_parser("features", help="Get Gold INPE TerraBrasilis deforestation pressure, ESG risk scores, and 4-tier classification.")
+    tb_ft_p.add_argument("id_municipio", help="7-digit IBGE municipality code, 6-digit prefix, or 8-digit CEP")
+    tb_ft_p.add_argument("--json", action="store_true", help="Output in JSON format")
+
+    tb_rk_p = tb_sub.add_parser("ranking", help="List top Brazilian municipalities ranked by composite INPE TerraBrasilis ESG score.")
+    tb_rk_p.add_argument("--limit", type=int, default=10, help="Max municipalities to list")
+    tb_rk_p.add_argument("--uf", type=str, help="Optional 2-letter state filter")
+    tb_rk_p.add_argument("--json", action="store_true", help="Output in JSON format")
+
     # ONR Registro de Imóveis (SREI/SERP/CNM) command group
     onr_p = subparsers.add_parser("onr", help="Query ONR SREI real estate registries, transactions, credit guarantees, SERP, and rankings.")
     onr_sub = onr_p.add_subparsers(dest="onr_action", required=True)
@@ -3464,6 +3494,78 @@ def main(argv: Sequence[str] | None = None) -> int:
                     return 0
             except ValueError as exc:
                 print(f"Erro CAPES Sucupira: {exc}", file=sys.stderr)
+                return 1
+
+        elif args.command == "terrabrasilis":
+            from public_data_gateway.connectors.ambiental.inpe_terrabrasilis.connector import (
+                InpeTerrabrasilisConnector,
+            )
+
+            tb_conn = InpeTerrabrasilisConnector(settings=settings)
+            tb_action = getattr(args, "terrabrasilis_action", None)
+            try:
+                if tb_action == "prodes":
+                    res = tb_conn.get_terrabrasilis_prodes_deforestation(args.id_municipio)
+                    if getattr(args, "json", False):
+                        print(json.dumps(res, indent=2, ensure_ascii=False, default=str))
+                    else:
+                        print(f"INPE TerraBrasilis PRODES ({res.get('nome_municipio')} - {res.get('id_municipio')}):")
+                        print(f"  Desmatamento Anual:   {res.get('area_desmatada_prodes_km2')} km² ({res.get('variacao_anual_prodes_pct')}%)")
+                        print(f"  Cobertura Florestal:  {res.get('cobertura_florestal_remanescente_pct')}%")
+                    return 0
+
+                if tb_action == "deter":
+                    rows = tb_conn.list_terrabrasilis_deter_alerts(
+                        args.id_municipio, classe_alerta_deter=getattr(args, "classe", None)
+                    )
+                    if getattr(args, "json", False):
+                        print(json.dumps(rows, indent=2, ensure_ascii=False, default=str))
+                    else:
+                        print(f"INPE TerraBrasilis DETER ({args.id_municipio}) - {len(rows)} classe(s):")
+                        for r in rows:
+                            print(f"  - {r.get('classe_alerta_deter')}: {r.get('num_alertas_deter_ano')} alertas | {r.get('area_alertas_deter_km2')} km²")
+                    return 0
+
+                if tb_action == "land-cover":
+                    res = tb_conn.get_terrabrasilis_land_cover(args.id_municipio)
+                    if getattr(args, "json", False):
+                        print(json.dumps(res, indent=2, ensure_ascii=False, default=str))
+                    else:
+                        print(f"INPE TerraBrasilis Uso da Terra ({res.get('nome_municipio')} - {res.get('id_municipio')}):")
+                        print(f"  Vegetação Nativa: {res.get('area_vegetacao_nativa_km2')} km² | Código Florestal: {res.get('conformidade_codigo_florestal_pct')}%")
+                    return 0
+
+                if tb_action == "governance":
+                    res = tb_conn.get_terrabrasilis_esg_governance(args.id_municipio)
+                    if getattr(args, "json", False):
+                        print(json.dumps(res, indent=2, ensure_ascii=False, default=str))
+                    else:
+                        print(f"INPE TerraBrasilis Governança ESG ({res.get('nome_municipio')} - {res.get('id_municipio')}):")
+                        print(f"  Embargos IBAMA: {res.get('embargos_ibama_ativos_ano')} | Elegibilidade ESG: {res.get('elegibilidade_credito_rural_esg_pct')}% | Risco EUDR: {res.get('risco_desconformidade_eudr_pct')}%")
+                    return 0
+
+                if tb_action == "features":
+                    res = tb_conn.get_terrabrasilis_environmental_features(args.id_municipio)
+                    if getattr(args, "json", False):
+                        print(json.dumps(res, indent=2, ensure_ascii=False, default=str))
+                    else:
+                        print(f"INPE TerraBrasilis Gold ({res.get('nome_municipio')} - {res.get('id_municipio')}):")
+                        print(f"  Score ESG: {res.get('score_composto_risco_esg_territorial')} | Perfil: {res.get('perfil_risco_ambiental_terrabrasilis')}")
+                    return 0
+
+                if tb_action == "ranking":
+                    ranks = tb_conn.list_top_terrabrasilis_municipalities(
+                        limit=getattr(args, "limit", 10), sigla_uf=getattr(args, "uf", None)
+                    )
+                    if getattr(args, "json", False):
+                        print(json.dumps(ranks, indent=2, ensure_ascii=False, default=str))
+                    else:
+                        print(f"Top {len(ranks)} Municípios INPE TerraBrasilis ESG:")
+                        for idx, r in enumerate(ranks, 1):
+                            print(f"  {idx}. {r.get('nome_municipio')} ({r.get('sigla_uf')}): {r.get('score_composto_risco_esg_territorial')} | {r.get('perfil_risco_ambiental_terrabrasilis')}")
+                    return 0
+            except ValueError as exc:
+                print(f"Erro INPE TerraBrasilis: {exc}", file=sys.stderr)
                 return 1
 
         elif args.command == "onr":

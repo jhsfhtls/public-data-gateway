@@ -7220,3 +7220,145 @@ models:
       - name: extracted_at
         description: "Timestamp ISO-8601 UTC da extração."
         tests: [not_null]
+  - name: fct_terrabrasilis_desmatamento_governanca_municipio
+    description: "Fato Core consolidando monitoramento PRODES, alertas DETER agregados, uso da terra e governança ESG/EUDR por município."
+    columns:
+      - name: id_municipio
+        description: "Código IBGE de 7 dígitos do município."
+        tests: [not_null, unique]
+      - name: nome_municipio
+        description: "Nome oficial do município."
+        tests: [not_null]
+      - name: sigla_uf
+        description: "Sigla da Unidade Federativa."
+        tests: [not_null]
+      - name: id_uf
+        description: "Código IBGE da UF."
+        tests: [not_null]
+      - name: regiao
+        description: "Grande região geográfica brasileira."
+        tests: [not_null]
+      - name: bioma_predominante
+        description: "Bioma predominante no município."
+        tests: [not_null]
+      - name: ano_prodes
+        description: "Ano-calendário PRODES de referência."
+        tests: [not_null]
+      - name: area_desmatada_prodes_km2
+        description: "Incremento anual de desmatamento PRODES (km²)."
+        tests: [not_null]
+      - name: desmatamento_acumulado_km2
+        description: "Desmatamento acumulado histórico no município (km²)."
+        tests: [not_null]
+      - name: cobertura_florestal_remanescente_pct
+        description: "Percentual de cobertura florestal remanescente (%)."
+        tests: [not_null]
+      - name: variacao_anual_prodes_pct
+        description: "Variação anual do desmatamento PRODES (%)."
+        tests: [not_null]
+      - name: taxa_desmatamento_relativa_area_pct
+        description: "Taxa relativa de desmatamento anual (%)."
+        tests: [not_null]
+      - name: focos_calor_associados_ano
+        description: "Focos de calor associados a alertas no ano."
+        tests: [not_null]
+      - name: total_alertas_deter_ano
+        description: "Total agregado de alertas DETER emitidos no município."
+        tests: [not_null]
+      - name: area_total_alertas_deter_km2
+        description: "Área total agregada de alertas DETER no município (km²)."
+        tests: [not_null]
+      - name: area_vegetacao_nativa_km2
+        description: "Área de vegetação nativa conservada (km²)."
+        tests: [not_null]
+      - name: area_uso_agropecuario_km2
+        description: "Área de uso agropecuário consolidado (km²)."
+        tests: [not_null]
+      - name: area_regeneracao_secundaria_km2
+        description: "Área em regeneração florestal secundária (km²)."
+        tests: [not_null]
+      - name: area_hidrografia_km2
+        description: "Área de corpos hídricos (km²)."
+        tests: [not_null]
+      - name: indice_pressao_antropica_pct
+        description: "Índice percentual de pressão antrópica (%)."
+        tests: [not_null]
+      - name: conformidade_codigo_florestal_pct
+        description: "Conformidade estimada ao Código Florestal (%)."
+        tests: [not_null]
+      - name: embargos_ibama_ativos_ano
+        description: "Embargos ambientais ativos no município."
+        tests: [not_null]
+      - name: autos_infracao_ambiental_ano
+        description: "Autos de infração ambiental lavrados no ano."
+        tests: [not_null]
+      - name: propriedades_car_regularizadas_pct
+        description: "Percentual de propriedades com CAR regularizado (%)."
+        tests: [not_null]
+      - name: cobertura_monitoramento_sar_optico_pct
+        description: "Cobertura de monitoramento orbital SAR/óptico (%)."
+        tests: [not_null]
+      - name: elegibilidade_credito_rural_esg_pct
+        description: "Elegibilidade percentual a crédito rural ESG (%)."
+        tests: [not_null]
+      - name: risco_desconformidade_eudr_pct
+        description: "Risco percentual de desconformidade EUDR (%)."
+        tests: [not_null]
+      - name: indice_prontidao_fiscalizacao
+        description: "Índice de prontidão de fiscalização ambiental (0-100)."
+        tests: [not_null]
+      - name: reference_date
+        description: "Data de referência ISO-8601 (YYYY-MM-DD)."
+        tests: [not_null]
+      - name: extracted_at
+        description: "Timestamp ISO-8601 UTC da extração."
+        tests: [not_null]
+
+  - name: fct_terrabrasilis_deter_alertas_classe_municipio
+    description: "Fato Core de alertas DETER-B do INPE desagregados por classe de alerta e município."
+    columns:
+      - name: id_municipio
+        description: "Código IBGE de 7 dígitos do município."
+        tests: [not_null]
+      - name: nome_municipio
+        description: "Nome oficial do município."
+        tests: [not_null]
+      - name: sigla_uf
+        description: "Sigla da Unidade Federativa."
+        tests: [not_null]
+      - name: id_uf
+        description: "Código IBGE da UF."
+        tests: [not_null]
+      - name: regiao
+        description: "Grande região geográfica brasileira."
+        tests: [not_null]
+      - name: ano_prodes
+        description: "Ano de referência dos alertas DETER."
+        tests: [not_null]
+      - name: classe_alerta_deter
+        description: "Classe de alerta DETER-B."
+        tests: [not_null]
+      - name: num_alertas_deter_ano
+        description: "Quantidade de alertas DETER na classe."
+        tests: [not_null]
+      - name: area_alertas_deter_km2
+        description: "Área total dos alertas DETER na classe (km²)."
+        tests: [not_null]
+      - name: area_media_poligono_ha
+        description: "Área média por polígono de alerta (hectares)."
+        tests: [not_null]
+      - name: alertas_em_uc_ti_pct
+        description: "Percentual de alertas em UC/TI (%)."
+        tests: [not_null]
+      - name: dias_medios_emissao_alerta
+        description: "Latência média em dias para emissão do alerta."
+        tests: [not_null]
+      - name: proporcao_classe_sobre_total_pct
+        description: "Participação percentual da classe sobre a área total (%)."
+        tests: [not_null]
+      - name: reference_date
+        description: "Data de referência ISO-8601 (YYYY-MM-DD)."
+        tests: [not_null]
+      - name: extracted_at
+        description: "Timestamp ISO-8601 UTC da extração."
+        tests: [not_null]

@@ -1435,6 +1435,65 @@ class MCPDispatcher:
                                 },
                             },
                             {
+                                "name": "bdg_get_terrabrasilis_prodes_deforestation",
+                                "description": "Get official municipal INPE TerraBrasilis PRODES annual deforestation increment, accumulated deforestation, and remaining forest cover.",
+                                "inputSchema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "id_municipio": {
+                                            "type": "string",
+                                            "description": "7-digit IBGE municipality code, 6-digit prefix, or 8-digit CEP (e.g. 1302603)",
+                                        },
+                                    },
+                                    "required": ["id_municipio"],
+                                },
+                            },
+                            {
+                                "name": "bdg_get_terrabrasilis_esg_governance",
+                                "description": "Get municipal INPE TerraBrasilis IBAMA embargoes, CAR regularization, ESG rural credit eligibility, and EUDR non-compliance risk.",
+                                "inputSchema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "id_municipio": {
+                                            "type": "string",
+                                            "description": "7-digit IBGE municipality code, 6-digit prefix, or 8-digit CEP",
+                                        },
+                                    },
+                                    "required": ["id_municipio"],
+                                },
+                            },
+                            {
+                                "name": "bdg_get_terrabrasilis_environmental_features",
+                                "description": "Get normalized Gold INPE TerraBrasilis forest preservation, DETER pressure, composite ESG score, and 4-tier EUDR classification.",
+                                "inputSchema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "id_municipio": {
+                                            "type": "string",
+                                            "description": "7-digit IBGE municipality code, 6-digit prefix, or 8-digit CEP",
+                                        },
+                                    },
+                                    "required": ["id_municipio"],
+                                },
+                            },
+                            {
+                                "name": "bdg_list_top_terrabrasilis_municipalities",
+                                "description": "List top Brazilian municipalities ranked by composite INPE TerraBrasilis ESG compliance and low deforestation risk score.",
+                                "inputSchema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "limit": {
+                                            "type": "integer",
+                                            "description": "Maximum rows (default: 10)",
+                                        },
+                                        "sigla_uf": {
+                                            "type": "string",
+                                            "description": "Optional 2-letter state filter (e.g. PR)",
+                                        },
+                                    },
+                                },
+                            },
+                            {
                                 "name": "bdg_get_onr_property_registry",
                                 "description": "Get official ONR SREI municipal active property registry CNM stock, digital conversion rate, and online certificate emissions.",
                                 "inputSchema": {
@@ -3220,6 +3279,69 @@ class MCPDispatcher:
                     },
                 }
             wrapped = wrap_untrusted_gov_data(result, source_id="capes_sucupira")
+            return {
+                "jsonrpc": "2.0",
+                "id": req_id,
+                "result": {"content": [{"type": "text", "text": wrapped}], "isError": False},
+            }
+
+        if tool_name in {
+            "bdg_get_terrabrasilis_prodes_deforestation",
+            "bdg_get_terrabrasilis_esg_governance",
+            "bdg_get_terrabrasilis_environmental_features",
+            "bdg_list_top_terrabrasilis_municipalities",
+        }:
+            from public_data_gateway.connectors.ambiental.inpe_terrabrasilis.connector import (
+                InpeTerrabrasilisConnector,
+            )
+
+            connector = InpeTerrabrasilisConnector(settings=self.settings)
+            try:
+                if tool_name == "bdg_get_terrabrasilis_prodes_deforestation":
+                    result = connector.get_terrabrasilis_prodes_deforestation(
+                        str(args.get("id_municipio", "")).strip()
+                    )
+                elif tool_name == "bdg_get_terrabrasilis_esg_governance":
+                    result = connector.get_terrabrasilis_esg_governance(
+                        str(args.get("id_municipio", "")).strip()
+                    )
+                elif tool_name == "bdg_get_terrabrasilis_environmental_features":
+                    result = connector.get_terrabrasilis_environmental_features(
+                        str(args.get("id_municipio", "")).strip()
+                    )
+                else:
+                    raw_uf = args.get("sigla_uf")
+                    result = connector.list_top_terrabrasilis_municipalities(
+                        limit=int(args.get("limit", 10)),
+                        sigla_uf=str(raw_uf).strip() if raw_uf else None,
+                    )
+            except ValueError as exc:
+                return {
+                    "jsonrpc": "2.0",
+                    "id": req_id,
+                    "result": {
+                        "content": [
+                            {"type": "text", "text": f"INPE TerraBrasilis parameter error: {exc}"}
+                        ],
+                        "isError": True,
+                    },
+                }
+
+            if not result:
+                return {
+                    "jsonrpc": "2.0",
+                    "id": req_id,
+                    "result": {
+                        "content": [
+                            {
+                                "type": "text",
+                                "text": "No INPE TerraBrasilis data found for the query.",
+                            }
+                        ],
+                        "isError": True,
+                    },
+                }
+            wrapped = wrap_untrusted_gov_data(result, source_id="inpe_terrabrasilis")
             return {
                 "jsonrpc": "2.0",
                 "id": req_id,

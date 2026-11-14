@@ -1,0 +1,16 @@
+version: 2
+
+sources:
+  - name: inpe_terrabrasilis_silver
+    description: "Tabelas Silver da Plataforma TerraBrasilis (INPE) com monitoramento PRODES, alertas DETER-B por classe, cobertura da terra e governança ESG/EUDR."
+    meta:
+      external_location: "data/inpe_terrabrasilis/silver/{name}.parquet"
+    tables:
+      - name: terrabrasilis_prodes_desmatamento_anual
+        description: "Incremento anual PRODES e cobertura florestal remanescente por município."
+      - name: terrabrasilis_deter_alertas_classe
+        description: "Alertas quase-reais DETER-B por classe de alerta e município."
+      - name: terrabrasilis_cobertura_uso_terra_bioma
+        description: "Balanço de vegetação nativa, uso agropecuário e Código Florestal."
+      - name: terrabrasilis_governanca_fiscalizacao_esg
+        description: "Embargos IBAMA, regularização CAR e elegibilidade EUDR/crédito rural ESG."
