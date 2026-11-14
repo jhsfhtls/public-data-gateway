@@ -1190,4 +1190,65 @@ def create_app(settings: GatewaySettings | None = None) -> FastAPI:
         conn = AnatelMosaicoConnector(settings=app_settings)
         return conn.get_station_coverage_summary(id_municipio)
 
+    @app.get("/api/v1/geo/antt/top-hubs")
+    async def get_top_logistics_hubs(
+        limit: int = Query(10, ge=1, le=50, description="Max municipalities to list"),
+        uf: str | None = Query(None, description="Filter by 2-letter state abbreviation"),
+    ) -> list[dict[str, Any]]:
+        from public_data_gateway.connectors.geografico.antt_malha_transporte.connector import (
+            AnttMalhaTransporteConnector,
+        )
+
+        conn = AnttMalhaTransporteConnector(settings=app_settings)
+        return conn.list_top_logistics_hubs(limit=limit, sigla_uf=uf)
+
+    @app.get("/api/v1/geo/antt/features/{id_municipio}")
+    async def get_antt_logistics_features(id_municipio: str) -> dict[str, Any]:
+        from public_data_gateway.connectors.geografico.antt_malha_transporte.connector import (
+            AnttMalhaTransporteConnector,
+        )
+
+        conn = AnttMalhaTransporteConnector(settings=app_settings)
+        return conn.get_logistics_features(id_municipio)
+
+    @app.get("/api/v1/geo/antt/rntrc/{id_municipio}")
+    async def get_antt_rntrc_profile(id_municipio: str) -> dict[str, Any]:
+        from public_data_gateway.connectors.geografico.antt_malha_transporte.connector import (
+            AnttMalhaTransporteConnector,
+        )
+
+        conn = AnttMalhaTransporteConnector(settings=app_settings)
+        return conn.get_rntrc_fleet_profile(id_municipio)
+
+    @app.get("/api/v1/geo/antt/rail/{id_municipio}")
+    async def get_antt_rail_profile(id_municipio: str) -> dict[str, Any]:
+        from public_data_gateway.connectors.geografico.antt_malha_transporte.connector import (
+            AnttMalhaTransporteConnector,
+        )
+
+        conn = AnttMalhaTransporteConnector(settings=app_settings)
+        return conn.get_rail_intermodal_terminals(id_municipio)
+
+    @app.get("/api/v1/geo/antt/modals/{id_municipio}")
+    async def get_antt_modal_flows(
+        id_municipio: str,
+        modal: str | None = Query(None, description="Optional transport modal filter (e.g. Ferroviario)"),
+    ) -> list[dict[str, Any]]:
+        from public_data_gateway.connectors.geografico.antt_malha_transporte.connector import (
+            AnttMalhaTransporteConnector,
+        )
+
+        conn = AnttMalhaTransporteConnector(settings=app_settings)
+        return conn.list_modal_flows(id_municipio, modal_transporte=modal)
+
+    @app.get("/api/v1/geo/antt/highways/{id_municipio}")
+    @app.get("/api/v1/antt/{id_municipio}")
+    async def get_antt_highway_corridors(id_municipio: str) -> dict[str, Any]:
+        from public_data_gateway.connectors.geografico.antt_malha_transporte.connector import (
+            AnttMalhaTransporteConnector,
+        )
+
+        conn = AnttMalhaTransporteConnector(settings=app_settings)
+        return conn.get_highway_corridors(id_municipio)
+
     return app

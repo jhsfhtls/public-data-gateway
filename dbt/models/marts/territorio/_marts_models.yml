@@ -950,3 +950,160 @@ models:
         description: "Timestamp ISO-8601 UTC da geração."
         tests:
           - not_null
+
+  - name: mart_logistica_corredores_transporte_brasil
+    description: "Data Mart Gold executivo de inteligência logística municipal (corredores rodoviários ANTT, frota RNTRC, ferrovias, matriz modal e classificação intermodal)."
+    columns:
+      - name: id_municipio
+        description: "Código IBGE de 7 dígitos do município."
+        tests:
+          - unique
+          - not_null
+      - name: nome_municipio
+        description: "Nome oficial do município."
+        tests:
+          - not_null
+      - name: sigla_uf
+        description: "Sigla de 2 letras da Unidade Federativa."
+        tests:
+          - not_null
+      - name: id_uf
+        description: "Código IBGE de 2 dígitos da Unidade Federativa."
+        tests:
+          - not_null
+      - name: nome_uf
+        description: "Nome oficial da Unidade Federativa."
+        tests:
+          - not_null
+      - name: regiao
+        description: "Grande região geográfica brasileira."
+        tests:
+          - not_null
+      - name: ano_referencia
+        description: "Ano de referência da consolidação logística."
+        tests:
+          - not_null
+      - name: rodovias_federais_principais
+        description: "Principais rodovias federais (BRs) de influência no município."
+        tests:
+          - not_null
+      - name: extensao_malha_federal_km
+        description: "Extensão da malha rodoviária federal de influência em km."
+        tests:
+          - not_null
+      - name: trechos_concedidos_antt_km
+        description: "Extensão rodoviária concedida regulada pela ANTT em km."
+        tests:
+          - not_null
+      - name: proporcao_malha_concedida_pct
+        description: "Percentual da malha federal operada via concessão ANTT."
+        tests:
+          - not_null
+      - name: pracas_pedagio_ativas
+        description: "Quantidade de praças de pedágio ativas."
+        tests:
+          - not_null
+      - name: volume_medio_diario_vmd_pesados
+        description: "Volume Médio Diário (VMD) de veículos comerciais pesados."
+        tests:
+          - not_null
+      - name: fluxo_anual_cargas_estimado_ton
+        description: "Fluxo anual estimado de cargas rodoviárias em toneladas."
+        tests:
+          - not_null
+      - name: total_transportadores_rntrc
+        description: "Quantidade total de transportadores registrados no RNTRC."
+        tests:
+          - not_null
+      - name: transportadores_etc_empresas
+        description: "Quantidade de empresas transportadoras (ETC)."
+        tests:
+          - not_null
+      - name: transportadores_tac_autonomos
+        description: "Quantidade de transportadores autônomos (TAC)."
+        tests:
+          - not_null
+      - name: transportadores_ctc_cooperativas
+        description: "Quantidade de cooperativas de transporte (CTC)."
+        tests:
+          - not_null
+      - name: proporcao_etc_empresas_pct
+        description: "Percentual de empresas (ETC) sobre o total de transportadores."
+        tests:
+          - not_null
+      - name: frota_veiculos_habilitados
+        description: "Frota total de veículos de carga habilitados no RNTRC."
+        tests:
+          - not_null
+      - name: capacidade_estatica_total_ton
+        description: "Capacidade estática total da frota habilitada em toneladas."
+        tests:
+          - not_null
+      - name: capacidade_media_veiculo_ton
+        description: "Capacidade média por veículo habilitado em toneladas."
+        tests:
+          - not_null
+      - name: idade_media_frota_anos
+        description: "Idade média da frota rodoviária habilitada em anos."
+        tests:
+          - not_null
+      - name: possui_conexao_ferroviaria
+        description: "Indicador booleano de conexão ferroviária de cargas ativa."
+        tests:
+          - not_null
+      - name: concessionarias_ferroviarias
+        description: "Concessionárias ferroviárias operantes ou 'NENHUMA'."
+        tests:
+          - not_null
+      - name: extensao_ferroviaria_km
+        description: "Extensão da malha ferroviária no município em km."
+        tests:
+          - not_null
+      - name: terminais_carga_intermodal
+        description: "Quantidade de terminais intermodais e plataformas logísticas."
+        tests:
+          - not_null
+      - name: movimentacao_ferroviaria_anual_tu
+        description: "Movimentação ferroviária anual estimada em milhares de toneladas úteis."
+        tests:
+          - not_null
+      - name: principais_mercadorias_ferrovia
+        description: "Principais mercadorias transportadas por ferrovia."
+        tests:
+          - not_null
+      - name: participacao_rodoviaria_pct
+        description: "Participação percentual do modal rodoviário na matriz de cargas."
+        tests:
+          - not_null
+      - name: participacao_ferroviaria_pct
+        description: "Participação percentual do modal ferroviário na matriz de cargas."
+        tests:
+          - not_null
+      - name: participacao_hidroviaria_pct
+        description: "Participação percentual do modal hidroviário/cabotagem na matriz de cargas."
+        tests:
+          - not_null
+      - name: custo_medio_ponderado_tku_brl
+        description: "Custo médio ponderado por tonelada-quilômetro (R$/TKU) considerando a matriz modal."
+        tests:
+          - not_null
+      - name: score_intermodalidade_cargas
+        description: "Score normalizado (0 a 100) de diversificação modal e infraestrutura intermodal."
+        tests:
+          - not_null
+      - name: score_infraestrutura_logistica
+        description: "Score composto (0 a 100) de densidade rodoviária, frota RNTRC e intermodalidade."
+        tests:
+          - not_null
+      - name: classificacao_nodo_logistico
+        description: "Classificação estratégica do nó logístico municipal."
+        tests:
+          - not_null
+      - name: reference_date
+        description: "Data de referência ISO-8601."
+        tests:
+          - not_null
+      - name: extracted_at
+        description: "Timestamp ISO-8601 UTC da geração."
+        tests:
+          - not_null

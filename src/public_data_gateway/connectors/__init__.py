@@ -19,6 +19,7 @@ import public_data_gateway.connectors.empresarial.rfb_cnpj_lakehouse  # noqa: F4
 import public_data_gateway.connectors.empresarial.rfb_simples_mei  # noqa: F401
 import public_data_gateway.connectors.empresarial.suframa_pim_zfm  # noqa: F401
 import public_data_gateway.connectors.geografico.anatel_mosaico  # noqa: F401
+import public_data_gateway.connectors.geografico.antt_malha_transporte  # noqa: F401
 import public_data_gateway.connectors.geografico.ibge_cnefe  # noqa: F401
 import public_data_gateway.connectors.geografico.ibge_malhas  # noqa: F401
 import public_data_gateway.connectors.judicial.cnj_datajud  # noqa: F401

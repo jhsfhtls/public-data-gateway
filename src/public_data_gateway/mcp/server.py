@@ -668,6 +668,65 @@ class MCPDispatcher:
                                 },
                             },
                             {
+                                "name": "bdg_get_antt_highway_corridors",
+                                "description": "Query ANTT federal highway corridors, concession length, active toll plazas and heavy vehicle traffic (VMD) for a municipality (Tier 1).",
+                                "inputSchema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "id_municipio": {
+                                            "type": "string",
+                                            "description": "IBGE 7-digit municipality code (e.g. 3550308 for São Paulo)",
+                                        },
+                                    },
+                                    "required": ["id_municipio"],
+                                },
+                            },
+                            {
+                                "name": "bdg_get_antt_rntrc_fleet",
+                                "description": "Query ANTT RNTRC cargo transport registry (ETC, TAC, CTC), enabled freight vehicles and static capacity for a municipality (Tier 1).",
+                                "inputSchema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "id_municipio": {
+                                            "type": "string",
+                                            "description": "IBGE 7-digit municipality code",
+                                        },
+                                    },
+                                    "required": ["id_municipio"],
+                                },
+                            },
+                            {
+                                "name": "bdg_get_antt_logistics_features",
+                                "description": "Query Gold Feature Store logistics infrastructure score, intermodality score and node classification for a municipality (Tier 1).",
+                                "inputSchema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "id_municipio": {
+                                            "type": "string",
+                                            "description": "IBGE 7-digit municipality code",
+                                        },
+                                    },
+                                    "required": ["id_municipio"],
+                                },
+                            },
+                            {
+                                "name": "bdg_list_top_logistics_hubs",
+                                "description": "List top Brazilian municipalities ranked by composite ANTT logistics infrastructure and intermodality score (Tier 1).",
+                                "inputSchema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "limit": {
+                                            "type": "integer",
+                                            "description": "Maximum rows (default: 10)",
+                                        },
+                                        "sigla_uf": {
+                                            "type": "string",
+                                            "description": "Optional 2-letter state filter (e.g. SP)",
+                                        },
+                                    },
+                                },
+                            },
+                            {
                                 "name": "bdg_get_labor_force_indicators",
                                 "description": "Query official quarterly labor force, population, and unemployment rate by Brazilian UF from IBGE PNAD Contínua (Tier 1).",
                                 "inputSchema": {
@@ -1629,6 +1688,53 @@ class MCPDispatcher:
                     },
                 }
             wrapped = wrap_untrusted_gov_data(result, source_id="anatel_mosaico")
+            return {
+                "jsonrpc": "2.0",
+                "id": req_id,
+                "result": {"content": [{"type": "text", "text": wrapped}], "isError": False},
+            }
+
+        if tool_name in {
+            "bdg_get_antt_highway_corridors",
+            "bdg_get_antt_rntrc_fleet",
+            "bdg_get_antt_logistics_features",
+            "bdg_list_top_logistics_hubs",
+        }:
+            from public_data_gateway.connectors.geografico.antt_malha_transporte.connector import (
+                AnttMalhaTransporteConnector,
+            )
+
+            connector = AnttMalhaTransporteConnector(settings=self.settings)
+            if tool_name == "bdg_get_antt_highway_corridors":
+                result = connector.get_highway_corridors(
+                    str(args.get("id_municipio", "")).strip()
+                )
+            elif tool_name == "bdg_get_antt_rntrc_fleet":
+                result = connector.get_rntrc_fleet_profile(
+                    str(args.get("id_municipio", "")).strip()
+                )
+            elif tool_name == "bdg_get_antt_logistics_features":
+                result = connector.get_logistics_features(
+                    str(args.get("id_municipio", "")).strip()
+                )
+            else:
+                raw_uf = args.get("sigla_uf")
+                result = connector.list_top_logistics_hubs(
+                    limit=int(args.get("limit", 10)),
+                    sigla_uf=str(raw_uf).strip() if raw_uf else None,
+                )
+            if not result:
+                return {
+                    "jsonrpc": "2.0",
+                    "id": req_id,
+                    "result": {
+                        "content": [
+                            {"type": "text", "text": "No ANTT logistics data found for the query."}
+                        ],
+                        "isError": True,
+                    },
+                }
+            wrapped = wrap_untrusted_gov_data(result, source_id="antt_malha_transporte")
             return {
                 "jsonrpc": "2.0",
                 "id": req_id,

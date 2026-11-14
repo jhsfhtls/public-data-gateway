@@ -1,0 +1,233 @@
+version: 2
+
+models:
+  - name: stg_antt_corredores_rodoviarios
+    description: "Visão padronizada de corredores rodoviários federais, trechos concedidos ANTT, praças de pedágio e VMD de pesados por município."
+    columns:
+      - name: id_municipio
+        description: "Código IBGE de 7 dígitos do município."
+        tests:
+          - not_null
+          - unique
+      - name: nome_municipio
+        description: "Nome oficial do município."
+        tests:
+          - not_null
+      - name: sigla_uf
+        description: "Sigla de 2 letras da Unidade Federativa."
+        tests:
+          - not_null
+      - name: id_uf
+        description: "Código IBGE de 2 dígitos da Unidade Federativa."
+        tests:
+          - not_null
+      - name: ano_referencia
+        description: "Ano de referência da malha rodoviária consolidada."
+        tests:
+          - not_null
+      - name: rodovias_federais_principais
+        description: "Relação das principais rodovias federais (BRs) que cruzam o município."
+        tests:
+          - not_null
+      - name: extensao_malha_federal_km
+        description: "Extensão da malha rodoviária federal de influência municipal em quilômetros."
+        tests:
+          - not_null
+      - name: trechos_concedidos_antt_km
+        description: "Extensão rodoviária operada sob concessão regulada pela ANTT em quilômetros."
+        tests:
+          - not_null
+      - name: proporcao_malha_concedida_pct
+        description: "Percentual da malha federal concedido à iniciativa privada."
+        tests:
+          - not_null
+      - name: pracas_pedagio_ativas
+        description: "Quantidade de praças de pedágio ativas no corredor de influência."
+        tests:
+          - not_null
+      - name: volume_medio_diario_vmd_pesados
+        description: "Volume Médio Diário (VMD) estimado de veículos comerciais pesados."
+        tests:
+          - not_null
+      - name: fluxo_anual_cargas_estimado_ton
+        description: "Fluxo anual estimado de cargas rodoviárias em toneladas."
+        tests:
+          - not_null
+      - name: source_url
+        description: "URL da fonte oficial ANTT consultada."
+        tests:
+          - not_null
+      - name: reference_date
+        description: "Data de referência ISO-8601."
+        tests:
+          - not_null
+      - name: extracted_at
+        description: "Timestamp ISO-8601 UTC da extração."
+        tests:
+          - not_null
+
+  - name: stg_antt_frota_rntrc_municipio
+    description: "Visão padronizada de transportadores registrados no RNTRC (ETC, TAC, CTC), frota habilitada e capacidade estática por município."
+    columns:
+      - name: id_municipio
+        description: "Código IBGE de 7 dígitos do município."
+        tests:
+          - not_null
+          - unique
+      - name: nome_municipio
+        description: "Nome oficial do município."
+        tests:
+          - not_null
+      - name: sigla_uf
+        description: "Sigla de 2 letras da Unidade Federativa."
+        tests:
+          - not_null
+      - name: ano_referencia
+        description: "Ano de referência do registro RNTRC."
+        tests:
+          - not_null
+      - name: total_transportadores_rntrc
+        description: "Quantidade total de transportadores com registro ativo no RNTRC."
+        tests:
+          - not_null
+      - name: transportadores_etc_empresas
+        description: "Quantidade de Empresas de Transporte Rodoviário de Cargas (ETC)."
+        tests:
+          - not_null
+      - name: transportadores_tac_autonomos
+        description: "Quantidade de Transportadores Autônomos de Cargas (TAC)."
+        tests:
+          - not_null
+      - name: transportadores_ctc_cooperativas
+        description: "Quantidade de Cooperativas de Transporte Rodoviário de Cargas (CTC)."
+        tests:
+          - not_null
+      - name: frota_veiculos_habilitados
+        description: "Quantidade total de veículos rodoviários de carga habilitados no RNTRC."
+        tests:
+          - not_null
+      - name: capacidade_estatica_total_ton
+        description: "Capacidade estática agregada da frota habilitada em toneladas."
+        tests:
+          - not_null
+      - name: idade_media_frota_anos
+        description: "Idade média estimada da frota comercial em anos."
+        tests:
+          - not_null
+      - name: source_url
+        description: "URL da fonte oficial ANTT consultada."
+        tests:
+          - not_null
+      - name: reference_date
+        description: "Data de referência ISO-8601."
+        tests:
+          - not_null
+      - name: extracted_at
+        description: "Timestamp ISO-8601 UTC da extração."
+        tests:
+          - not_null
+
+  - name: stg_antt_malha_ferroviaria_terminais
+    description: "Visão padronizada da conectividade ferroviária, concessionárias, extensão em km, terminais intermodais e movimentação anual por município."
+    columns:
+      - name: id_municipio
+        description: "Código IBGE de 7 dígitos do município."
+        tests:
+          - not_null
+          - unique
+      - name: nome_municipio
+        description: "Nome oficial do município."
+        tests:
+          - not_null
+      - name: sigla_uf
+        description: "Sigla de 2 letras da Unidade Federativa."
+        tests:
+          - not_null
+      - name: ano_referencia
+        description: "Ano de referência da malha ferroviária SAFF/ANTT."
+        tests:
+          - not_null
+      - name: possui_conexao_ferroviaria
+        description: "Indicador booleano de conexão ferroviária de cargas ativa no município."
+        tests:
+          - not_null
+      - name: concessionarias_ferroviarias
+        description: "Concessionárias ferroviárias operantes ou 'NENHUMA' quando inexistente."
+        tests:
+          - not_null
+      - name: extensao_ferroviaria_km
+        description: "Extensão da malha ferroviária no município em quilômetros."
+        tests:
+          - not_null
+      - name: terminais_carga_intermodal
+        description: "Quantidade de terminais intermodais e plataformas logísticas de carga."
+        tests:
+          - not_null
+      - name: movimentacao_ferroviaria_anual_tu
+        description: "Movimentação ferroviária anual estimada em milhares de toneladas úteis (TU)."
+        tests:
+          - not_null
+      - name: principais_mercadorias_ferrovia
+        description: "Principais grupos de mercadorias movimentadas ou 'NENHUMA'."
+        tests:
+          - not_null
+      - name: source_url
+        description: "URL da fonte oficial ANTT consultada."
+        tests:
+          - not_null
+      - name: reference_date
+        description: "Data de referência ISO-8601."
+        tests:
+          - not_null
+      - name: extracted_at
+        description: "Timestamp ISO-8601 UTC da extração."
+        tests:
+          - not_null
+
+  - name: stg_antt_fluxo_logistico_modal
+    description: "Visão padronizada da repartição modal de cargas, custo por tonelada-km, velocidade comercial e confiabilidade por modal e município."
+    columns:
+      - name: id_municipio
+        description: "Código IBGE de 7 dígitos do município."
+        tests:
+          - not_null
+      - name: nome_municipio
+        description: "Nome oficial do município."
+        tests:
+          - not_null
+      - name: sigla_uf
+        description: "Sigla de 2 letras da Unidade Federativa."
+        tests:
+          - not_null
+      - name: modal_transporte
+        description: "Modal de transporte analisado (Rodoviario, Ferroviario ou Hidroviario/Cabotagem)."
+        tests:
+          - not_null
+      - name: participacao_modal_cargas_pct
+        description: "Participação percentual do modal no escoamento total de cargas do município."
+        tests:
+          - not_null
+      - name: custo_tonelada_km_brl
+        description: "Custo logístico médio estimado em reais por tonelada-quilômetro (R$/TKU)."
+        tests:
+          - not_null
+      - name: velocidade_media_comercial_kmh
+        description: "Velocidade média comercial do corredor para o modal em km/h."
+        tests:
+          - not_null
+      - name: indice_confiabilidade_corredor
+        description: "Índice composto de confiabilidade operacional e previsibilidade do corredor (0-100)."
+        tests:
+          - not_null
+      - name: source_url
+        description: "URL da fonte oficial ANTT consultada."
+        tests:
+          - not_null
+      - name: reference_date
+        description: "Data de referência ISO-8601."
+        tests:
+          - not_null
+      - name: extracted_at
+        description: "Timestamp ISO-8601 UTC da extração."
+        tests:
+          - not_null
