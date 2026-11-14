@@ -647,6 +647,12 @@
       "phase_id": "10.5",
       "milestone": "Conclusão da Wave 10.5B — Padronização Medallion 11-Gates das 9 APIs Espaciais, Clima & ML do Bloco 3",
       "summary": "Elevação completa dos 9 conectores do Bloco 3 (overpass_osm, osrm_routing, open_meteo, nasa_power, open_elevation, huggingface_inference, alpha_vantage, nasa_youtube_open_ml e upgini_adapter) ao padrão 11-Gates: contratos ODCS v3.1, persistência isolada Bronze/Silver/Gold/Quarantine com Parquet ZSTD + SHA-256, 9 staging views (stg_*) + 9 modelos intradomínio (fct_*/dim_*) + cross-domain mart_cross_domain_espacial_clima_ml_brasil, paridade nas 4 interfaces (SDK, FastAPI, CLI e MCP), testes offline determinísticos e testes live 1-linha."
+    },
+    {
+      "date": "2026-11-14",
+      "phase_id": "10.5",
+      "milestone": "Conclusão da Wave 10.5C — Padronização Medallion 11-Gates das 10 APIs KYC/KYB, Antifraude & Endereçamento do Bloco 1",
+      "summary": "Elevação completa dos 10 conectores do Bloco 1 (minha_receita, cnpja_open, receitaws, viacep, opencep, nominatim_osm, rdap_registro_br, gleif_lei, bgpview_ip_intel e company_enrich_apollo_bdc) ao padrão 11-Gates: contratos ODCS v3.1, persistência isolada Bronze/Silver/Gold/Quarantine com Parquet ZSTD + SHA-256, 10 staging views (stg_*) + 10 modelos intradomínio (fct_*/dim_*) + cross-domain mart_cross_domain_kyc_antifraude_brasil, paridade nas 4 interfaces (SDK, FastAPI, CLI e MCP), testes offline determinísticos e testes live 1-linha."
     }
   ]
 }

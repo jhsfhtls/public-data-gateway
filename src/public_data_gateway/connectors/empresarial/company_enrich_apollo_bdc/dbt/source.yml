@@ -1,0 +1,10 @@
+version: 2
+
+sources:
+  - name: company_enrich_apollo_bdc
+    description: "CompanyEnrich / Apollo freemium B2B profile dataset."
+    meta:
+      external_location: "data/company_enrich_apollo_bdc/silver/{name}.parquet"
+    tables:
+      - name: company_enrich_profiles
+        description: "Normalized corporate domain profiles."

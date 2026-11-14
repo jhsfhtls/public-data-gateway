@@ -1,0 +1,10 @@
+version: 2
+
+sources:
+  - name: minha_receita
+    description: "Minha Receita open CNPJ dataset."
+    meta:
+      external_location: "data/minha_receita/silver/{name}.parquet"
+    tables:
+      - name: minha_receita_cnpjs
+        description: "Normalized CNPJ records from Minha Receita."

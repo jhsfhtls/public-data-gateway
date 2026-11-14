@@ -1,0 +1,37 @@
+contract_id: company-enrich-apollo-bdc-v1
+source_id: company_enrich_apollo_bdc
+version: "1.0.0"
+grain: "domain"
+primary_keys:
+  - domain
+reference_date_column: extracted_at
+lgpd_legal_basis: "Enriquecimento B2B opcional por dominio corporativo (CompanyEnrich/Apollo)"
+min_expected_rows: 1
+max_volume_drop_pct: 50.0
+sentinel_values:
+  - "-1"
+  - "-999"
+  - "999999"
+  - "N/A"
+columns:
+  - name: domain
+    data_type: STRING
+    nullable: false
+  - name: company_name
+    data_type: STRING
+    nullable: false
+  - name: industry
+    data_type: STRING
+    nullable: false
+  - name: country_code
+    data_type: STRING
+    nullable: false
+  - name: employee_range
+    data_type: STRING
+    nullable: false
+  - name: provider
+    data_type: STRING
+    nullable: false
+  - name: extracted_at
+    data_type: STRING
+    nullable: false

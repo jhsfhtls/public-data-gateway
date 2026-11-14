@@ -1,0 +1,10 @@
+version: 2
+
+sources:
+  - name: nominatim_osm
+    description: "Nominatim OpenStreetMap geocoding dataset."
+    meta:
+      external_location: "data/nominatim_osm/silver/{name}.parquet"
+    tables:
+      - name: nominatim_osm_geocodes
+        description: "Normalized geocoding results from Nominatim."

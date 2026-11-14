@@ -1,0 +1,37 @@
+contract_id: bgpview-ip-intel-v1
+source_id: bgpview_ip_intel
+version: "1.0.0"
+grain: "ip"
+primary_keys:
+  - ip
+reference_date_column: extracted_at
+lgpd_legal_basis: "Telemetria publica de IP, ASN e geolocalizacao (BGPView / ipwho.is)"
+min_expected_rows: 1
+max_volume_drop_pct: 50.0
+sentinel_values:
+  - "-1"
+  - "-999"
+  - "999999"
+  - "N/A"
+columns:
+  - name: ip
+    data_type: STRING
+    nullable: false
+  - name: ptr_record
+    data_type: STRING
+    nullable: false
+  - name: asn
+    data_type: INT64
+    nullable: false
+  - name: asn_name
+    data_type: STRING
+    nullable: false
+  - name: country_code
+    data_type: STRING
+    nullable: false
+  - name: provider_used
+    data_type: STRING
+    nullable: false
+  - name: extracted_at
+    data_type: STRING
+    nullable: false

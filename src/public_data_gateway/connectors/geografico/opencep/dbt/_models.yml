@@ -1,0 +1,46 @@
+version: 2
+
+models:
+  - name: stg_opencep_ceps
+    description: "Staging view for OpenCEP address records."
+    columns:
+      - name: cep
+        description: "8-digit postal code."
+        tests: [not_null]
+      - name: logradouro
+        description: "Street name."
+      - name: bairro
+        description: "Neighborhood."
+      - name: localidade
+        description: "Municipality name."
+        tests: [not_null]
+      - name: sigla_uf
+        description: "Federative Unit abbreviation."
+        tests: [not_null]
+      - name: id_municipio
+        description: "7-digit IBGE municipality code."
+        tests: [not_null]
+      - name: extracted_at
+        description: "UTC ISO-8601 extraction timestamp."
+
+  - name: dim_opencep_enderecos
+    description: "Intradomain dimension table for OpenCEP postal addresses."
+    columns:
+      - name: cep
+        description: "8-digit postal code."
+        tests: [not_null, unique]
+      - name: logradouro
+        description: "Street name."
+      - name: bairro
+        description: "Neighborhood."
+      - name: localidade
+        description: "Municipality name."
+        tests: [not_null]
+      - name: sigla_uf
+        description: "Federative Unit abbreviation."
+        tests: [not_null]
+      - name: id_municipio
+        description: "7-digit IBGE municipality code."
+        tests: [not_null]
+      - name: extracted_at
+        description: "UTC ISO-8601 extraction timestamp."

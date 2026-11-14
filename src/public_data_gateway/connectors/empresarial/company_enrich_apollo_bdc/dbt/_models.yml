@@ -1,0 +1,46 @@
+version: 2
+
+models:
+  - name: stg_company_enrich_profiles
+    description: "Staging view for B2B domain enrichment profiles."
+    columns:
+      - name: domain
+        description: "Corporate domain name."
+        tests: [not_null]
+      - name: company_name
+        description: "Company name."
+        tests: [not_null]
+      - name: industry
+        description: "Company industry sector."
+      - name: country_code
+        description: "ISO country code."
+        tests: [not_null]
+      - name: employee_range
+        description: "Estimated employee headcount range."
+      - name: provider
+        description: "Enrichment provider used."
+        tests: [not_null]
+      - name: extracted_at
+        description: "UTC ISO-8601 extraction timestamp."
+
+  - name: dim_company_enrich_perfis_b2b
+    description: "Intradomain dimension table for B2B domain profiles."
+    columns:
+      - name: domain
+        description: "Corporate domain name."
+        tests: [not_null, unique]
+      - name: company_name
+        description: "Company name."
+        tests: [not_null]
+      - name: industry
+        description: "Company industry sector."
+      - name: country_code
+        description: "ISO country code."
+        tests: [not_null]
+      - name: employee_range
+        description: "Estimated employee headcount range."
+      - name: provider
+        description: "Enrichment provider used."
+        tests: [not_null]
+      - name: extracted_at
+        description: "UTC ISO-8601 extraction timestamp."

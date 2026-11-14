@@ -1299,6 +1299,23 @@ def build_parser() -> argparse.ArgumentParser:
 
     pa_sub.add_parser("upgini-features", help="Describe Upgini public ML feature groups")
 
+    pa_nom_p = pa_sub.add_parser("nominatim", help="Forward geocode an address via Nominatim OSM")
+    pa_nom_p.add_argument("query", help="Address or place query")
+    pa_nom_p.add_argument("--limit", type=int, default=3)
+
+    pa_rdap_p = pa_sub.add_parser("rdap", help="Lookup .br domain registration via RDAP Registro.br")
+    pa_rdap_p.add_argument("domain", help="Domain name (e.g. gov.br)")
+
+    pa_gleif_p = pa_sub.add_parser("gleif", help="Search global LEI entities via GLEIF API")
+    pa_gleif_p.add_argument("query", help="Legal entity name")
+    pa_gleif_p.add_argument("--limit", type=int, default=5)
+
+    pa_ip_p = pa_sub.add_parser("ip-intel", help="Lookup IP ASN and geolocation via BGPView / ipwho.is")
+    pa_ip_p.add_argument("ip", help="IPv4 or IPv6 address")
+
+    pa_b2b_p = pa_sub.add_parser("b2b-domain", help="Lookup optional freemium B2B domain profile")
+    pa_b2b_p.add_argument("domain", help="Corporate domain name")
+
     # Dados.gov.br (CKAN) command group
     dg_p = subparsers.add_parser("dadosgov", help="Query Dados.gov.br (CKAN) publishing organizations, resource formats, LAI governance, API reuse, and rankings.")
     dg_sub = dg_p.add_subparsers(dest="dadosgov_action", required=True)
@@ -4676,6 +4693,21 @@ def main(argv: Sequence[str] | None = None) -> int:
                 return 0
             if args.public_apis_action == "upgini-features":
                 print(json.dumps(sdk.public_apis.describe_upgini_features(), ensure_ascii=False, indent=2, default=str))
+                return 0
+            if args.public_apis_action == "nominatim":
+                print(json.dumps(sdk.public_apis.geocode_nominatim(args.query, limit=args.limit), ensure_ascii=False, indent=2, default=str))
+                return 0
+            if args.public_apis_action == "rdap":
+                print(json.dumps(sdk.public_apis.lookup_rdap_registro_br(args.domain), ensure_ascii=False, indent=2, default=str))
+                return 0
+            if args.public_apis_action == "gleif":
+                print(json.dumps(sdk.public_apis.lookup_gleif_lei(args.query, limit=args.limit), ensure_ascii=False, indent=2, default=str))
+                return 0
+            if args.public_apis_action == "ip-intel":
+                print(json.dumps(sdk.public_apis.lookup_ip_intel(args.ip), ensure_ascii=False, indent=2, default=str))
+                return 0
+            if args.public_apis_action == "b2b-domain":
+                print(json.dumps(sdk.public_apis.lookup_b2b_domain_profile(args.domain), ensure_ascii=False, indent=2, default=str))
                 return 0
 
     except Exception as exc:

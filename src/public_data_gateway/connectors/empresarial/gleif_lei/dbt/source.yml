@@ -1,0 +1,10 @@
+version: 2
+
+sources:
+  - name: gleif_lei
+    description: "GLEIF Global LEI entity dataset."
+    meta:
+      external_location: "data/gleif_lei/silver/{name}.parquet"
+    tables:
+      - name: gleif_lei_records
+        description: "Normalized LEI entity records from GLEIF API."

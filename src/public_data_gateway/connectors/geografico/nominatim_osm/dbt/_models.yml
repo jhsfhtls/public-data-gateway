@@ -1,0 +1,48 @@
+version: 2
+
+models:
+  - name: stg_nominatim_osm_geocodes
+    description: "Staging view for Nominatim OSM geocodes."
+    columns:
+      - name: query_key
+        description: "Input address query."
+        tests: [not_null]
+      - name: display_name
+        description: "Formatted OpenStreetMap display name."
+        tests: [not_null]
+      - name: lat
+        description: "Latitude."
+        tests: [not_null]
+      - name: lon
+        description: "Longitude."
+        tests: [not_null]
+      - name: place_type
+        description: "OSM place type."
+      - name: sigla_uf
+        description: "Federative Unit abbreviation."
+        tests: [not_null]
+      - name: extracted_at
+        description: "UTC ISO-8601 extraction timestamp."
+
+  - name: dim_nominatim_geocodes
+    description: "Intradomain dimension table for geocoded locations."
+    columns:
+      - name: query_key
+        description: "Input address query."
+        tests: [not_null, unique]
+      - name: display_name
+        description: "Formatted OpenStreetMap display name."
+        tests: [not_null]
+      - name: lat
+        description: "Latitude."
+        tests: [not_null]
+      - name: lon
+        description: "Longitude."
+        tests: [not_null]
+      - name: place_type
+        description: "OSM place type."
+      - name: sigla_uf
+        description: "Federative Unit abbreviation."
+        tests: [not_null]
+      - name: extracted_at
+        description: "UTC ISO-8601 extraction timestamp."

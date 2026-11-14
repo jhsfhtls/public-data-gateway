@@ -1,0 +1,10 @@
+version: 2
+
+sources:
+  - name: rdap_registro_br
+    description: "RDAP Registro.br domain intelligence dataset."
+    meta:
+      external_location: "data/rdap_registro_br/silver/{name}.parquet"
+    tables:
+      - name: rdap_registro_br_domains
+        description: "Normalized .br domain registration metadata."

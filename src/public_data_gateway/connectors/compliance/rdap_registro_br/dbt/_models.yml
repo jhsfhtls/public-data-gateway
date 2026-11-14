@@ -1,0 +1,40 @@
+version: 2
+
+models:
+  - name: stg_rdap_registro_br_domains
+    description: "Staging view for RDAP Registro.br domains."
+    columns:
+      - name: domain
+        description: "Domain name (.br)."
+        tests: [not_null]
+      - name: status_list
+        description: "Comma-separated EPP/RDAP statuses."
+        tests: [not_null]
+      - name: registered_at
+        description: "Initial registration timestamp."
+      - name: last_changed_at
+        description: "Last modification timestamp."
+      - name: nameserver_count
+        description: "Configured DNS nameserver count."
+        tests: [not_null]
+      - name: extracted_at
+        description: "UTC ISO-8601 extraction timestamp."
+
+  - name: fct_rdap_dominios_br
+    description: "Intradomain fact table for .br domain age and antifraud intelligence."
+    columns:
+      - name: domain
+        description: "Domain name (.br)."
+        tests: [not_null, unique]
+      - name: status_list
+        description: "Comma-separated EPP/RDAP statuses."
+        tests: [not_null]
+      - name: registered_at
+        description: "Initial registration timestamp."
+      - name: last_changed_at
+        description: "Last modification timestamp."
+      - name: nameserver_count
+        description: "Configured DNS nameserver count."
+        tests: [not_null]
+      - name: extracted_at
+        description: "UTC ISO-8601 extraction timestamp."

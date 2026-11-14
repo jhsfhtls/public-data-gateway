@@ -1,0 +1,10 @@
+version: 2
+
+sources:
+  - name: cnpja_open
+    description: "CNPJa Open office dataset."
+    meta:
+      external_location: "data/cnpja_open/silver/{name}.parquet"
+    tables:
+      - name: cnpja_open_offices
+        description: "Normalized office records from CNPJa Open API."

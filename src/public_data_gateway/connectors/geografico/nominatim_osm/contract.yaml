@@ -1,0 +1,37 @@
+contract_id: nominatim-osm-v1
+source_id: nominatim_osm
+version: "1.0.0"
+grain: "query_key"
+primary_keys:
+  - query_key
+reference_date_column: extracted_at
+lgpd_legal_basis: "Geocodificacao aberta OpenStreetMap Nominatim (ODbL)"
+min_expected_rows: 1
+max_volume_drop_pct: 50.0
+sentinel_values:
+  - "-1"
+  - "-999"
+  - "999999"
+  - "N/A"
+columns:
+  - name: query_key
+    data_type: STRING
+    nullable: false
+  - name: display_name
+    data_type: STRING
+    nullable: false
+  - name: lat
+    data_type: DOUBLE
+    nullable: false
+  - name: lon
+    data_type: DOUBLE
+    nullable: false
+  - name: place_type
+    data_type: STRING
+    nullable: false
+  - name: sigla_uf
+    data_type: STRING
+    nullable: false
+  - name: extracted_at
+    data_type: STRING
+    nullable: false

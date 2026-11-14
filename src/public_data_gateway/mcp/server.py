@@ -2129,6 +2129,57 @@ class MCPDispatcher:
                                 "inputSchema": {"type": "object", "properties": {}},
                             },
                             {
+                                "name": "bdg_geocode_nominatim",
+                                "description": "Forward geocode an address using OpenStreetMap Nominatim.",
+                                "inputSchema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "query": {"type": "string"},
+                                        "limit": {"type": "integer"},
+                                    },
+                                    "required": ["query"],
+                                },
+                            },
+                            {
+                                "name": "bdg_lookup_rdap_registro_br",
+                                "description": "Lookup .br domain registration and age metadata via RDAP Registro.br.",
+                                "inputSchema": {
+                                    "type": "object",
+                                    "properties": {"domain": {"type": "string"}},
+                                    "required": ["domain"],
+                                },
+                            },
+                            {
+                                "name": "bdg_lookup_gleif_lei",
+                                "description": "Search global Legal Entity Identifiers (LEI) in GLEIF API.",
+                                "inputSchema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "query": {"type": "string"},
+                                        "limit": {"type": "integer"},
+                                    },
+                                    "required": ["query"],
+                                },
+                            },
+                            {
+                                "name": "bdg_lookup_ip_intel",
+                                "description": "Lookup IP ASN, reverse DNS, and geolocation via BGPView / ipwho.is.",
+                                "inputSchema": {
+                                    "type": "object",
+                                    "properties": {"ip": {"type": "string"}},
+                                    "required": ["ip"],
+                                },
+                            },
+                            {
+                                "name": "bdg_lookup_b2b_domain_profile",
+                                "description": "Lookup optional freemium B2B corporate domain profile.",
+                                "inputSchema": {
+                                    "type": "object",
+                                    "properties": {"domain": {"type": "string"}},
+                                    "required": ["domain"],
+                                },
+                            },
+                            {
                                 "name": "bdg_get_onr_property_registry",
                                 "description": "Get official ONR SREI municipal active property registry CNM stock, digital conversion rate, and online certificate emissions.",
                                 "inputSchema": {
@@ -5011,6 +5062,30 @@ class MCPDispatcher:
             "bdg_describe_upgini_features": (
                 "upgini_adapter",
                 lambda sdk: sdk.public_apis.describe_upgini_features(),
+            ),
+            "bdg_geocode_nominatim": (
+                "nominatim_osm",
+                lambda sdk: sdk.public_apis.geocode_nominatim(
+                    str(args["query"]), limit=int(args.get("limit", 3))
+                ),
+            ),
+            "bdg_lookup_rdap_registro_br": (
+                "rdap_registro_br",
+                lambda sdk: sdk.public_apis.lookup_rdap_registro_br(str(args["domain"])),
+            ),
+            "bdg_lookup_gleif_lei": (
+                "gleif_lei",
+                lambda sdk: sdk.public_apis.lookup_gleif_lei(
+                    str(args["query"]), limit=int(args.get("limit", 5))
+                ),
+            ),
+            "bdg_lookup_ip_intel": (
+                "bgpview_ip_intel",
+                lambda sdk: sdk.public_apis.lookup_ip_intel(str(args["ip"])),
+            ),
+            "bdg_lookup_b2b_domain_profile": (
+                "company_enrich_apollo_bdc",
+                lambda sdk: sdk.public_apis.lookup_b2b_domain_profile(str(args["domain"])),
             ),
         }
         if tool_name in wave10_5a_handlers:

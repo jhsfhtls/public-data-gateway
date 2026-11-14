@@ -3134,4 +3134,65 @@ def create_app(settings: GatewaySettings | None = None) -> FastAPI:
 
         return UpginiAdapterConnector(settings=app_settings).describe_features()
 
+    @app.get("/api/v1/public-apis/geo/nominatim")
+    async def geocode_nominatim_public(
+        q: str = Query(..., description="Address or place query"),
+        limit: int = Query(3, ge=1, le=10),
+    ) -> dict[str, Any]:
+        from public_data_gateway.connectors.geografico.nominatim_osm import NominatimOsmConnector
+
+        conn = NominatimOsmConnector(settings=app_settings)
+        try:
+            rows = conn.normalize_records(conn.fetch_geocode(query=q, limit=limit))
+            return {"source_id": "nominatim_osm", "count": len(rows), "records": rows}
+        except ValueError as exc:
+            raise HTTPException(status_code=400, detail=str(exc)) from exc
+
+    @app.get("/api/v1/public-apis/compliance/rdap/{domain}")
+    async def get_rdap_domain(domain: str) -> dict[str, Any]:
+        from public_data_gateway.connectors.compliance.rdap_registro_br import (
+            RdapRegistroBrConnector,
+        )
+
+        try:
+            return RdapRegistroBrConnector(settings=app_settings).fetch_domain(domain=domain)
+        except ValueError as exc:
+            raise HTTPException(status_code=400, detail=str(exc)) from exc
+
+    @app.get("/api/v1/public-apis/kyc/gleif")
+    async def get_gleif_lei(
+        q: str = Query(..., description="Legal entity name query"),
+        limit: int = Query(5, ge=1, le=20),
+    ) -> dict[str, Any]:
+        from public_data_gateway.connectors.empresarial.gleif_lei import GleifLeiConnector
+
+        conn = GleifLeiConnector(settings=app_settings)
+        try:
+            rows = conn.normalize_records(conn.fetch_lei_records(query=q, limit=limit))
+            return {"source_id": "gleif_lei", "count": len(rows), "records": rows}
+        except ValueError as exc:
+            raise HTTPException(status_code=400, detail=str(exc)) from exc
+
+    @app.get("/api/v1/public-apis/compliance/ip/{ip}")
+    async def get_ip_intel(ip: str) -> dict[str, Any]:
+        from public_data_gateway.connectors.compliance.bgpview_ip_intel import (
+            BgpviewIpIntelConnector,
+        )
+
+        try:
+            return BgpviewIpIntelConnector(settings=app_settings).fetch_ip(ip=ip)
+        except ValueError as exc:
+            raise HTTPException(status_code=400, detail=str(exc)) from exc
+
+    @app.get("/api/v1/public-apis/kyc/b2b-domain/{domain}")
+    async def get_b2b_domain_profile(domain: str) -> dict[str, Any]:
+        from public_data_gateway.connectors.empresarial.company_enrich_apollo_bdc import (
+            CompanyEnrichConnector,
+        )
+
+        try:
+            return CompanyEnrichConnector(settings=app_settings).fetch_b2b_profile(domain=domain)
+        except ValueError as exc:
+            raise HTTPException(status_code=400, detail=str(exc)) from exc
+
     return app
