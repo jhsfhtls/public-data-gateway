@@ -1,0 +1,54 @@
+version: 2
+
+models:
+  - name: stg_aneel_anp_ckan_records
+    description: "Staging view for ANEEL and ANP CKAN DataStore records."
+    columns:
+      - name: portal
+        description: "Regulatory CKAN portal identifier (aneel or anp)."
+        tests:
+          - not_null
+      - name: resource_id
+        description: "CKAN resource UUID."
+        tests:
+          - not_null
+      - name: record_id
+        description: "Record identifier within the CKAN resource."
+        tests:
+          - not_null
+      - name: reference_date
+        description: "ISO-8601 reference date."
+      - name: metric_name
+        description: "Regulatory metric or agent label."
+      - name: metric_value
+        description: "Numeric regulatory value (tariff or price)."
+      - name: uf
+        description: "Brazilian Federative Unit abbreviation."
+      - name: extracted_at
+        description: "UTC ISO-8601 extraction timestamp."
+
+  - name: fct_energia_regulatoria_ckan
+    description: "Intradomain fact table of ANEEL and ANP energy and fuel regulatory metrics."
+    columns:
+      - name: portal
+        description: "Regulatory CKAN portal identifier."
+        tests:
+          - not_null
+      - name: resource_id
+        description: "CKAN resource UUID."
+        tests:
+          - not_null
+      - name: record_id
+        description: "Record identifier within the CKAN resource."
+        tests:
+          - not_null
+      - name: reference_date
+        description: "ISO-8601 reference date."
+      - name: metric_name
+        description: "Regulatory metric or agent label."
+      - name: metric_value
+        description: "Numeric regulatory value."
+      - name: uf
+        description: "Brazilian Federative Unit abbreviation."
+      - name: extracted_at
+        description: "UTC ISO-8601 extraction timestamp."

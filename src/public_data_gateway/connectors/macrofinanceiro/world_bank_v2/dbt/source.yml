@@ -1,0 +1,10 @@
+version: 2
+
+sources:
+  - name: world_bank_v2
+    description: "World Bank Open Data API v2 macroeconomic and development indicators."
+    meta:
+      external_location: "data/world_bank_v2/silver/{name}.parquet"
+    tables:
+      - name: world_bank_indicators
+        description: "Normalized World Bank v2 indicator observations."

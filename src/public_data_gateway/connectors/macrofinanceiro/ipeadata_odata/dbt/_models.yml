@@ -1,0 +1,50 @@
+version: 2
+
+models:
+  - name: stg_ipeadata_odata_series
+    description: "Staging view for IPEA Data OData v4 macroeconomic time series."
+    columns:
+      - name: sercodigo
+        description: "IPEA Data series identifier code."
+        tests:
+          - not_null
+      - name: data_referencia
+        description: "Reference ISO-8601 date of the observation."
+        tests:
+          - not_null
+      - name: valor
+        description: "Observed numeric value of the series."
+        tests:
+          - not_null
+      - name: tercodigo
+        description: "Geographic territory code (e.g., BR or IBGE code)."
+      - name: nivnome
+        description: "Geographic aggregation level name."
+      - name: extracted_at
+        description: "UTC ISO-8601 extraction timestamp."
+
+  - name: fct_ipeadata_macro_series
+    description: "Intradomain fact table of IPEA Data macroeconomic and regional indicators."
+    columns:
+      - name: sercodigo
+        description: "IPEA Data series identifier code."
+        tests:
+          - not_null
+      - name: data_referencia
+        description: "Reference ISO-8601 date of the observation."
+        tests:
+          - not_null
+      - name: ano_mes
+        description: "Year-month partition key (YYYY-MM)."
+        tests:
+          - not_null
+      - name: valor
+        description: "Observed numeric value of the series."
+        tests:
+          - not_null
+      - name: tercodigo
+        description: "Geographic territory code."
+      - name: nivnome
+        description: "Geographic aggregation level name."
+      - name: extracted_at
+        description: "UTC ISO-8601 extraction timestamp."

@@ -1,0 +1,50 @@
+version: 2
+
+models:
+  - name: stg_brapi_b3_quotes
+    description: "Staging view for B3 equities and FII quotes from brapi.dev."
+    columns:
+      - name: symbol
+        description: "B3 ticker symbol (e.g., PETR4, VALE3)."
+        tests:
+          - not_null
+      - name: trade_date
+        description: "ISO-8601 trading session date."
+        tests:
+          - not_null
+      - name: short_name
+        description: "Short issuer name."
+      - name: price
+        description: "Regular market price in BRL."
+        tests:
+          - not_null
+      - name: change_pct
+        description: "Daily percentage price variation."
+      - name: market_cap
+        description: "Total market capitalization in BRL."
+      - name: extracted_at
+        description: "UTC ISO-8601 extraction timestamp."
+
+  - name: fct_b3_market_quotes
+    description: "Intradomain fact table of B3 market quotes and market capitalization."
+    columns:
+      - name: symbol
+        description: "B3 ticker symbol."
+        tests:
+          - not_null
+      - name: trade_date
+        description: "ISO-8601 trading session date."
+        tests:
+          - not_null
+      - name: short_name
+        description: "Short issuer name."
+      - name: price
+        description: "Regular market price in BRL."
+        tests:
+          - not_null
+      - name: change_pct
+        description: "Daily percentage price variation."
+      - name: market_cap
+        description: "Total market capitalization in BRL."
+      - name: extracted_at
+        description: "UTC ISO-8601 extraction timestamp."

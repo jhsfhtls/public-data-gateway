@@ -1,0 +1,10 @@
+version: 2
+
+sources:
+  - name: camara_senado_dados_abertos
+    description: "Camara dos Deputados and Senado Federal Open Data API."
+    meta:
+      external_location: "data/camara_senado_dados_abertos/silver/{name}.parquet"
+    tables:
+      - name: camara_deputados
+        description: "Active federal deputies directory from Camara dos Deputados API v2."

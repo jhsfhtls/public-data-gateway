@@ -1,0 +1,38 @@
+contract_id: brapi-b3-v1
+source_id: brapi_b3
+version: "1.0.0"
+grain: "ticker_b3 x trade_date"
+primary_keys:
+  - symbol
+  - trade_date
+reference_date_column: trade_date
+lgpd_legal_basis: "Dados publicos de mercado mobiliario B3 (CVM/B3)"
+min_expected_rows: 1
+max_volume_drop_pct: 50.0
+sentinel_values:
+  - "-1"
+  - "-999"
+  - "999999"
+  - "N/A"
+columns:
+  - name: symbol
+    data_type: STRING
+    nullable: false
+  - name: trade_date
+    data_type: STRING
+    nullable: false
+  - name: short_name
+    data_type: STRING
+    nullable: true
+  - name: price
+    data_type: DOUBLE
+    nullable: false
+  - name: change_pct
+    data_type: DOUBLE
+    nullable: true
+  - name: market_cap
+    data_type: DOUBLE
+    nullable: true
+  - name: extracted_at
+    data_type: STRING
+    nullable: false

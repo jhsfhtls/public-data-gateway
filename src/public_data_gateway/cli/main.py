@@ -1246,6 +1246,34 @@ def build_parser() -> argparse.ArgumentParser:
     pa_pois_p.add_argument("--amenity", default="school", help="OSM amenity tag (default: school)")
     pa_pois_p.add_argument("--radius", type=int, default=1000, help="Radius in meters (default: 1000)")
 
+    pa_ipea_p = pa_sub.add_parser("ipeadata", help="Fetch IPEA Data OData v4 macroeconomic series")
+    pa_ipea_p.add_argument("sercodigo", help="IPEA series code (e.g. BM12_TJOVER12)")
+    pa_ipea_p.add_argument("--limit", type=int, default=24, help="Max records")
+
+    pa_brapi_p = pa_sub.add_parser("brapi", help="Fetch B3 stock/FII quotes via brapi.dev")
+    pa_brapi_p.add_argument("tickers", help="Comma-separated B3 tickers (e.g. PETR4,VALE3)")
+
+    pa_fx_p = pa_sub.add_parser("fx", help="Fetch real-time FX & crypto quotes via AwesomeAPI")
+    pa_fx_p.add_argument("--pairs", default="USD-BRL,EUR-BRL,BTC-BRL", help="Currency pairs")
+
+    pa_ckan_p = pa_sub.add_parser("ckan", help="Query ANEEL/ANP CKAN DataStore resources")
+    pa_ckan_p.add_argument("resource_id", help="CKAN resource UUID")
+    pa_ckan_p.add_argument("--portal", default="aneel", choices=["aneel", "anp"], help="CKAN portal")
+    pa_ckan_p.add_argument("--limit", type=int, default=20, help="Max records")
+
+    pa_cam_p = pa_sub.add_parser("camara-deputados", help="List active federal deputies (Camara Open Data)")
+    pa_cam_p.add_argument("--pagina", type=int, default=1, help="Page number")
+    pa_cam_p.add_argument("--itens", type=int, default=20, help="Items per page")
+
+    pa_wb_p = pa_sub.add_parser("world-bank", help="Fetch World Bank v2 indicator series")
+    pa_wb_p.add_argument("--country", default="BRA", help="ISO-3 country code")
+    pa_wb_p.add_argument("--indicator", default="NY.GDP.MKTP.KD.ZG", help="World Bank indicator ID")
+    pa_wb_p.add_argument("--per-page", type=int, default=10, help="Records per page")
+
+    pa_who_p = pa_sub.add_parser("who-gho", help="Fetch WHO GHO OData health indicator")
+    pa_who_p.add_argument("--indicator", default="WHOSIS_000001", help="WHO GHO indicator code")
+    pa_who_p.add_argument("--top", type=int, default=10, help="Max records")
+
     # Dados.gov.br (CKAN) command group
     dg_p = subparsers.add_parser("dadosgov", help="Query Dados.gov.br (CKAN) publishing organizations, resource formats, LAI governance, API reuse, and rankings.")
     dg_sub = dg_p.add_subparsers(dest="dadosgov_action", required=True)
@@ -4581,6 +4609,30 @@ def main(argv: Sequence[str] | None = None) -> int:
                     args.lat, args.lon, amenity=args.amenity, radius_m=args.radius
                 )
                 print(json.dumps(res, ensure_ascii=False, indent=2, default=str))
+                return 0
+            from public_data_gateway.sdk import BrazilData
+
+            sdk = BrazilData()
+            if args.public_apis_action == "ipeadata":
+                print(json.dumps(sdk.public_apis.fetch_ipeadata_series(args.sercodigo, limit=args.limit), ensure_ascii=False, indent=2, default=str))
+                return 0
+            if args.public_apis_action == "brapi":
+                print(json.dumps(sdk.public_apis.fetch_brapi_quote(args.tickers), ensure_ascii=False, indent=2, default=str))
+                return 0
+            if args.public_apis_action == "fx":
+                print(json.dumps(sdk.public_apis.fetch_awesomeapi_rates(args.pairs), ensure_ascii=False, indent=2, default=str))
+                return 0
+            if args.public_apis_action == "ckan":
+                print(json.dumps(sdk.public_apis.query_ckan_datastore(args.resource_id, portal=args.portal, limit=args.limit), ensure_ascii=False, indent=2, default=str))
+                return 0
+            if args.public_apis_action == "camara-deputados":
+                print(json.dumps(sdk.public_apis.fetch_camara_deputados(pagina=args.pagina, itens=args.itens), ensure_ascii=False, indent=2, default=str))
+                return 0
+            if args.public_apis_action == "world-bank":
+                print(json.dumps(sdk.public_apis.fetch_world_bank_indicator(country=args.country, indicator=args.indicator, per_page=args.per_page), ensure_ascii=False, indent=2, default=str))
+                return 0
+            if args.public_apis_action == "who-gho":
+                print(json.dumps(sdk.public_apis.fetch_who_gho_indicator(indicator=args.indicator, top=args.top), ensure_ascii=False, indent=2, default=str))
                 return 0
 
     except Exception as exc:

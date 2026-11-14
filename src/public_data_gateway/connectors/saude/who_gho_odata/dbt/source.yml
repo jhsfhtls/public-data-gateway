@@ -1,0 +1,10 @@
+version: 2
+
+sources:
+  - name: who_gho_odata
+    description: "WHO Global Health Observatory (GHO) OData API."
+    meta:
+      external_location: "data/who_gho_odata/silver/{name}.parquet"
+    tables:
+      - name: who_gho_indicators
+        description: "Normalized WHO GHO health indicator observations."

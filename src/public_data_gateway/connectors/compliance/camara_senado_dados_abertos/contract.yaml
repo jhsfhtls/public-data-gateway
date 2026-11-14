@@ -1,0 +1,41 @@
+contract_id: camara-senado-dados-abertos-v1
+source_id: camara_senado_dados_abertos
+version: "1.0.0"
+grain: "id_deputado x id_legislatura"
+primary_keys:
+  - id_deputado
+  - id_legislatura
+reference_date_column: extracted_at
+lgpd_legal_basis: "Dados abertos de agentes politicos eleitos (LAI - Lei 12.527/2011)"
+min_expected_rows: 1
+max_volume_drop_pct: 50.0
+sentinel_values:
+  - "-1"
+  - "-999"
+  - "999999"
+  - "N/A"
+columns:
+  - name: id_deputado
+    data_type: STRING
+    nullable: false
+  - name: id_legislatura
+    data_type: STRING
+    nullable: false
+  - name: nome
+    data_type: STRING
+    nullable: false
+  - name: sigla_partido
+    data_type: STRING
+    nullable: true
+  - name: sigla_uf
+    data_type: STRING
+    nullable: true
+  - name: email
+    data_type: STRING
+    nullable: true
+  - name: url_foto
+    data_type: STRING
+    nullable: true
+  - name: extracted_at
+    data_type: STRING
+    nullable: false

@@ -378,3 +378,45 @@ models:
       - name: score_prontidao_ml_uf
         description: "Score de prontidão e aderência para feature engineering ML do bloco na UF (0-100)."
         tests: [not_null]
+
+  - name: mart_cross_domain_global_macro_saude_brasil
+    description: "Cross-domain mart integrating Wave 10.5A Medallion Block 2 connectors (IPEA, B3, AwesomeAPI FX, ANEEL/ANP CKAN, Camara, World Bank v2, WHO GHO) with municipal feature store by UF."
+    columns:
+      - name: sigla_uf
+        description: "Sigla da Unidade da Federacao (UF)."
+        tests: [not_null, unique]
+      - name: regiao
+        description: "Macrorregiao geografica brasileira."
+        tests: [not_null]
+      - name: total_municipios_uf
+        description: "Quantidade de municipios da UF consolidados na feature store."
+        tests: [not_null]
+      - name: avg_propensao_b2b_uf
+        description: "Media estadual do score de propensao B2B (0-100)."
+        tests: [not_null]
+      - name: avg_risco_compliance_uf
+        description: "Media estadual do score de risco de compliance fiscal (0-100)."
+        tests: [not_null]
+      - name: total_registros_energia_ckan
+        description: "Quantidade de registros regulatorios ANEEL/ANP CKAN vinculados a UF."
+        tests: [not_null]
+      - name: avg_metric_energia_ckan
+        description: "Media das metricas regulatorias de energia/combustiveis na UF."
+      - name: total_deputados_ativos_uf
+        description: "Quantidade de deputados federais ativos na amostra da UF."
+        tests: [not_null]
+      - name: ipeadata_ref_valor
+        description: "Valor de referencia mais recente da serie macroeconomica IPEA Data."
+      - name: b3_tickers_monitorados
+        description: "Quantidade de tickers B3 monitorados via brapi.dev."
+        tests: [not_null]
+      - name: b3_preco_medio_brl
+        description: "Preco medio em BRL dos ativos B3 monitorados."
+      - name: usd_brl_bid
+        description: "Cotacao bid USD/BRL via AwesomeAPI."
+      - name: eur_brl_bid
+        description: "Cotacao bid EUR/BRL via AwesomeAPI."
+      - name: world_bank_gdp_growth_pct
+        description: "Taxa de crescimento do PIB brasileiro segundo World Bank v2 (%)."
+      - name: who_life_expectancy_years
+        description: "Expectativa de vida no Brasil segundo WHO GHO OData (anos)."

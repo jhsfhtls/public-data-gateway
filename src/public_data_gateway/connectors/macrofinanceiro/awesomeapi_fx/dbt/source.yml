@@ -1,0 +1,10 @@
+version: 2
+
+sources:
+  - name: awesomeapi_fx
+    description: "AwesomeAPI real-time FX and cryptocurrency rates."
+    meta:
+      external_location: "data/awesomeapi_fx/silver/{name}.parquet"
+    tables:
+      - name: awesomeapi_rates
+        description: "Normalized FX and crypto currency pair quotes."

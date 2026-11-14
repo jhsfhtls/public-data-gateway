@@ -182,6 +182,8 @@ apis:
   - P01
   gateway_method: fetch_brapi_quote
   status: HOMOLOGATED
+  medallion_parity: true
+  connector_id: brapi_b3
   notes: Cotacoes B3, dividendos, FIIs e indicadores fundamentalistas em JSON (BRAPI_TOKEN opcional).
 - api_id: awesomeapi_fx
   name: AwesomeAPI (Cambio & Cripto)
@@ -194,6 +196,8 @@ apis:
   - P05
   gateway_method: fetch_awesomeapi_rates
   status: HOMOLOGATED
+  medallion_parity: true
+  connector_id: awesomeapi_fx
   notes: Cotacoes em tempo real e fechamentos de moedas internacionais e criptomoedas.
 - api_id: ipeadata_odata
   name: IPEA Data (OData v4)
@@ -207,6 +211,8 @@ apis:
   - P05
   gateway_method: fetch_ipeadata_series
   status: HOMOLOGATED
+  medallion_parity: true
+  connector_id: ipeadata_odata
   notes: Milhares de series historicas macroeconomicas, sociais e de financas regionais em OData v4.
 - api_id: aneel_anp_ckan
   name: ANEEL & ANP (CKAN DataStore)
@@ -220,6 +226,8 @@ apis:
   - P01
   gateway_method: query_ckan_datastore
   status: HOMOLOGATED
+  medallion_parity: true
+  connector_id: aneel_anp_ckan
   notes: Consultas SQL/JSON em tarifas eletricas, geracao distribuida (ANEEL) e combustiveis (ANP).
 - api_id: camara_senado_dados_abertos
   name: Camara dos Deputados & Senado Federal
@@ -233,6 +241,8 @@ apis:
   - P06
   gateway_method: fetch_camara_deputados
   status: HOMOLOGATED
+  medallion_parity: true
+  connector_id: camara_senado_dados_abertos
   notes: Cota parlamentar (com CNPJ do fornecedor), proposicoes legislativas e votacoes.
 - api_id: world_bank_v2
   name: World Bank Indicators API v2
@@ -246,6 +256,8 @@ apis:
   - P05
   gateway_method: fetch_world_bank_indicator
   status: HOMOLOGATED
+  medallion_parity: true
+  connector_id: world_bank_v2
   notes: Cerca de 16 mil indicadores macroeconomicos, demograficos e sociais globais.
 - api_id: who_gho_odata
   name: Observatorio da OMS (WHO GHO)
@@ -259,6 +271,8 @@ apis:
   - P06
   gateway_method: fetch_who_gho_indicator
   status: HOMOLOGATED
+  medallion_parity: true
+  connector_id: who_gho_odata
   notes: Series temporais globais de indicadores sanitarios e epidemiologicos da OMS.
 - api_id: overpass_osm
   name: Overpass API (POIs OpenStreetMap)

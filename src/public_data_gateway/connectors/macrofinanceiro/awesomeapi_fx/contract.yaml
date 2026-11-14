@@ -1,0 +1,44 @@
+contract_id: awesomeapi-fx-v1
+source_id: awesomeapi_fx
+version: "1.0.0"
+grain: "pair_code x rate_date"
+primary_keys:
+  - pair_code
+  - rate_date
+reference_date_column: rate_date
+lgpd_legal_basis: "Dados publicos de mercado cambial e criptoativos"
+min_expected_rows: 1
+max_volume_drop_pct: 50.0
+sentinel_values:
+  - "-1"
+  - "-999"
+  - "999999"
+  - "N/A"
+columns:
+  - name: pair_code
+    data_type: STRING
+    nullable: false
+  - name: rate_date
+    data_type: STRING
+    nullable: false
+  - name: code
+    data_type: STRING
+    nullable: false
+  - name: codein
+    data_type: STRING
+    nullable: false
+  - name: name
+    data_type: STRING
+    nullable: true
+  - name: bid
+    data_type: DOUBLE
+    nullable: false
+  - name: ask
+    data_type: DOUBLE
+    nullable: false
+  - name: pct_change
+    data_type: DOUBLE
+    nullable: true
+  - name: extracted_at
+    data_type: STRING
+    nullable: false

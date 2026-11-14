@@ -1,0 +1,36 @@
+contract_id: who-gho-odata-v1
+source_id: who_gho_odata
+version: "1.0.0"
+grain: "indicator_code x spatial_dim x time_dim"
+primary_keys:
+  - indicator_code
+  - spatial_dim
+  - time_dim
+reference_date_column: time_dim
+lgpd_legal_basis: "Dados epidemiologicos e demograficos agregados internacionais (OMS/WHO)"
+min_expected_rows: 1
+max_volume_drop_pct: 50.0
+sentinel_values:
+  - "-1"
+  - "-999"
+  - "999999"
+  - "N/A"
+columns:
+  - name: indicator_code
+    data_type: STRING
+    nullable: false
+  - name: spatial_dim
+    data_type: STRING
+    nullable: false
+  - name: time_dim
+    data_type: STRING
+    nullable: false
+  - name: numeric_value
+    data_type: DOUBLE
+    nullable: false
+  - name: dim1
+    data_type: STRING
+    nullable: true
+  - name: extracted_at
+    data_type: STRING
+    nullable: false

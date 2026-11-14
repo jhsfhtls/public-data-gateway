@@ -2969,4 +2969,107 @@ def create_app(settings: GatewaySettings | None = None) -> FastAPI:
         except ValueError as exc:
             raise HTTPException(status_code=400, detail=str(exc)) from exc
 
+    @app.get("/api/v1/public-apis/ipeadata/{sercodigo}")
+    async def get_ipeadata_series(
+        sercodigo: str,
+        limit: int = Query(24, ge=1, le=500),
+    ) -> dict[str, Any]:
+        from public_data_gateway.connectors.macrofinanceiro.ipeadata_odata import (
+            IpeadataOdataConnector,
+        )
+
+        conn = IpeadataOdataConnector(settings=app_settings)
+        try:
+            rows = conn.normalize_records(conn.fetch_series(sercodigo=sercodigo, limit=limit), sercodigo=sercodigo)
+            return {"source_id": "ipeadata_odata", "sercodigo": sercodigo, "count": len(rows), "records": rows}
+        except ValueError as exc:
+            raise HTTPException(status_code=400, detail=str(exc)) from exc
+
+    @app.get("/api/v1/public-apis/brapi/quote/{tickers}")
+    async def get_brapi_quote(tickers: str) -> dict[str, Any]:
+        from public_data_gateway.connectors.macrofinanceiro.brapi_b3 import BrapiB3Connector
+
+        conn = BrapiB3Connector(settings=app_settings)
+        try:
+            rows = conn.normalize_records(conn.fetch_quotes(tickers=tickers))
+            return {"source_id": "brapi_b3", "tickers": tickers, "count": len(rows), "records": rows}
+        except ValueError as exc:
+            raise HTTPException(status_code=400, detail=str(exc)) from exc
+
+    @app.get("/api/v1/public-apis/fx/rates")
+    async def get_awesomeapi_rates(
+        pairs: str = Query("USD-BRL,EUR-BRL,BTC-BRL"),
+    ) -> dict[str, Any]:
+        from public_data_gateway.connectors.macrofinanceiro.awesomeapi_fx import (
+            AwesomeApiFxConnector,
+        )
+
+        conn = AwesomeApiFxConnector(settings=app_settings)
+        try:
+            rows = conn.normalize_records(conn.fetch_rates(pairs=pairs))
+            return {"source_id": "awesomeapi_fx", "pairs": pairs, "count": len(rows), "records": rows}
+        except ValueError as exc:
+            raise HTTPException(status_code=400, detail=str(exc)) from exc
+
+    @app.get("/api/v1/public-apis/ckan/{portal}/{resource_id}")
+    async def get_ckan_datastore(
+        portal: str,
+        resource_id: str,
+        limit: int = Query(20, ge=1, le=100),
+    ) -> dict[str, Any]:
+        from public_data_gateway.connectors.agregadores.aneel_anp_ckan import AneelAnpCkanConnector
+
+        conn = AneelAnpCkanConnector(settings=app_settings)
+        try:
+            rows = conn.normalize_records(
+                conn.fetch_datastore(resource_id=resource_id, portal=portal, limit=limit),
+                portal=portal,
+                resource_id=resource_id,
+            )
+            return {"source_id": "aneel_anp_ckan", "portal": portal, "count": len(rows), "records": rows}
+        except ValueError as exc:
+            raise HTTPException(status_code=400, detail=str(exc)) from exc
+
+    @app.get("/api/v1/public-apis/camara/deputados")
+    async def get_camara_deputados(
+        pagina: int = Query(1, ge=1),
+        itens: int = Query(20, ge=1, le=100),
+    ) -> dict[str, Any]:
+        from public_data_gateway.connectors.compliance.camara_senado_dados_abertos import (
+            CamaraSenadoDadosAbertosConnector,
+        )
+
+        conn = CamaraSenadoDadosAbertosConnector(settings=app_settings)
+        rows = conn.normalize_records(conn.fetch_deputados(pagina=pagina, itens=itens))
+        return {"source_id": "camara_senado_dados_abertos", "count": len(rows), "records": rows}
+
+    @app.get("/api/v1/public-apis/world-bank/{country}/{indicator}")
+    async def get_world_bank_indicator(
+        country: str,
+        indicator: str,
+        per_page: int = Query(10, ge=1, le=100),
+    ) -> dict[str, Any]:
+        from public_data_gateway.connectors.macrofinanceiro.world_bank_v2 import (
+            WorldBankV2Connector,
+        )
+
+        conn = WorldBankV2Connector(settings=app_settings)
+        rows = conn.normalize_records(
+            conn.fetch_indicator(country=country, indicator=indicator, per_page=per_page),
+            country=country,
+            indicator=indicator,
+        )
+        return {"source_id": "world_bank_v2", "country": country, "count": len(rows), "records": rows}
+
+    @app.get("/api/v1/public-apis/who-gho/{indicator}")
+    async def get_who_gho_indicator(
+        indicator: str,
+        top: int = Query(10, ge=1, le=100),
+    ) -> dict[str, Any]:
+        from public_data_gateway.connectors.saude.who_gho_odata import WhoGhoOdataConnector
+
+        conn = WhoGhoOdataConnector(settings=app_settings)
+        rows = conn.normalize_records(conn.fetch_indicator(indicator=indicator, top=top), indicator=indicator)
+        return {"source_id": "who_gho_odata", "indicator": indicator, "count": len(rows), "records": rows}
+
     return app

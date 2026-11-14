@@ -1995,6 +1995,86 @@ class MCPDispatcher:
                                 },
                             },
                             {
+                                "name": "bdg_fetch_ipeadata_series",
+                                "description": "Fetch historical macroeconomic/regional time series from IPEA Data OData v4.",
+                                "inputSchema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "sercodigo": {"type": "string", "description": "IPEA series code (e.g. BM12_TJOVER12)"},
+                                        "limit": {"type": "integer", "description": "Max records (default: 24)"},
+                                    },
+                                    "required": ["sercodigo"],
+                                },
+                            },
+                            {
+                                "name": "bdg_fetch_brapi_quote",
+                                "description": "Fetch B3 equities, ETFs, and FII quotes from brapi.dev.",
+                                "inputSchema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "tickers": {"type": "string", "description": "Comma-separated B3 tickers (e.g. PETR4)"},
+                                    },
+                                    "required": ["tickers"],
+                                },
+                            },
+                            {
+                                "name": "bdg_fetch_awesomeapi_rates",
+                                "description": "Fetch real-time FX and cryptocurrency quotes from AwesomeAPI.",
+                                "inputSchema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "pairs": {"type": "string", "description": "Currency pairs (default: USD-BRL,EUR-BRL,BTC-BRL)"},
+                                    },
+                                },
+                            },
+                            {
+                                "name": "bdg_query_ckan_datastore",
+                                "description": "Query ANEEL or ANP CKAN DataStore regulatory datasets.",
+                                "inputSchema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "resource_id": {"type": "string", "description": "CKAN resource UUID"},
+                                        "portal": {"type": "string", "description": "aneel or anp (default: aneel)"},
+                                        "limit": {"type": "integer", "description": "Max records (default: 20)"},
+                                    },
+                                    "required": ["resource_id"],
+                                },
+                            },
+                            {
+                                "name": "bdg_fetch_camara_deputados",
+                                "description": "Fetch active federal deputies from Camara dos Deputados Open Data API.",
+                                "inputSchema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "pagina": {"type": "integer", "description": "Page number (default: 1)"},
+                                        "itens": {"type": "integer", "description": "Items per page (default: 20)"},
+                                    },
+                                },
+                            },
+                            {
+                                "name": "bdg_fetch_world_bank_indicator",
+                                "description": "Fetch World Bank v2 macroeconomic indicator series.",
+                                "inputSchema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "country": {"type": "string", "description": "ISO-3 country code (default: BRA)"},
+                                        "indicator": {"type": "string", "description": "Indicator ID (default: NY.GDP.MKTP.KD.ZG)"},
+                                        "per_page": {"type": "integer", "description": "Max records (default: 10)"},
+                                    },
+                                },
+                            },
+                            {
+                                "name": "bdg_fetch_who_gho_indicator",
+                                "description": "Fetch WHO Global Health Observatory OData indicator records.",
+                                "inputSchema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "indicator": {"type": "string", "description": "WHO GHO indicator code (default: WHOSIS_000001)"},
+                                        "top": {"type": "integer", "description": "Max records (default: 10)"},
+                                    },
+                                },
+                            },
+                            {
                                 "name": "bdg_get_onr_property_registry",
                                 "description": "Get official ONR SREI municipal active property registry CNM stock, digital conversion rate, and online certificate emissions.",
                                 "inputSchema": {
@@ -4795,6 +4875,73 @@ class MCPDispatcher:
                         {
                             "type": "text",
                             "text": wrap_untrusted_gov_data(res, source_id="public_apis_hub"),
+                        }
+                    ],
+                    "isError": False,
+                },
+            }
+
+        wave10_5a_handlers = {
+            "bdg_fetch_ipeadata_series": (
+                "ipeadata_odata",
+                lambda sdk: sdk.public_apis.fetch_ipeadata_series(
+                    str(args.get("sercodigo", "")).strip(), limit=int(args.get("limit", 24))
+                ),
+            ),
+            "bdg_fetch_brapi_quote": (
+                "brapi_b3",
+                lambda sdk: sdk.public_apis.fetch_brapi_quote(str(args.get("tickers", "PETR4")).strip()),
+            ),
+            "bdg_fetch_awesomeapi_rates": (
+                "awesomeapi_fx",
+                lambda sdk: sdk.public_apis.fetch_awesomeapi_rates(
+                    str(args.get("pairs", "USD-BRL,EUR-BRL,BTC-BRL")).strip()
+                ),
+            ),
+            "bdg_query_ckan_datastore": (
+                "aneel_anp_ckan",
+                lambda sdk: sdk.public_apis.query_ckan_datastore(
+                    str(args.get("resource_id", "")).strip(),
+                    portal=str(args.get("portal", "aneel")).strip(),
+                    limit=int(args.get("limit", 20)),
+                ),
+            ),
+            "bdg_fetch_camara_deputados": (
+                "camara_senado_dados_abertos",
+                lambda sdk: sdk.public_apis.fetch_camara_deputados(
+                    pagina=int(args.get("pagina", 1)), itens=int(args.get("itens", 20))
+                ),
+            ),
+            "bdg_fetch_world_bank_indicator": (
+                "world_bank_v2",
+                lambda sdk: sdk.public_apis.fetch_world_bank_indicator(
+                    country=str(args.get("country", "BRA")).strip(),
+                    indicator=str(args.get("indicator", "NY.GDP.MKTP.KD.ZG")).strip(),
+                    per_page=int(args.get("per_page", 10)),
+                ),
+            ),
+            "bdg_fetch_who_gho_indicator": (
+                "who_gho_odata",
+                lambda sdk: sdk.public_apis.fetch_who_gho_indicator(
+                    indicator=str(args.get("indicator", "WHOSIS_000001")).strip(),
+                    top=int(args.get("top", 10)),
+                ),
+            ),
+        }
+        if tool_name in wave10_5a_handlers:
+            from public_data_gateway.sdk import BrazilData
+
+            source_id, fn = wave10_5a_handlers[tool_name]
+            sdk = BrazilData(settings=self.settings)
+            res = fn(sdk)
+            return {
+                "jsonrpc": "2.0",
+                "id": req_id,
+                "result": {
+                    "content": [
+                        {
+                            "type": "text",
+                            "text": wrap_untrusted_gov_data(res, source_id=source_id),
                         }
                     ],
                     "isError": False,

@@ -201,7 +201,7 @@
     {
       "phase_id": "10.5",
       "name": "Padronização Medallion 11-Gates das APIs da Fase 10 (Staging, Intradomínio, Cross-Domain, Testes Live & Catálogo)",
-      "status": "PENDING",
+      "status": "IN_PROGRESS",
       "completion_date": null,
       "deliverables": [
         "Diretiva obrigatória formalizada em .agents/rules/connector_standard_policy.md e docs/adr/ADR-004-connector-medallion-parity-policy.md exigindo que TODA API siga o padrão 11-Gates (BaseConnector, contract.yaml ODCS v3.1, data/<api>/{bronze,silver,gold,quarantine}/, dbt staging -> intradomínio -> cross_domain, testes offline + live fail-hard, catálogo e paridade SDK/FastAPI/CLI/MCP)",
@@ -635,6 +635,12 @@
       "phase_id": "10",
       "milestone": "Conclusão da Fase 10 — Centralização de APIs Públicas (Analytics, KYC/KYB, Espacial & ML) & Catálogo Bipartido",
       "summary": "Implementação completa da Fase 10: catálogo unificado (CATALOG.md integrando 49 fontes Gov BR + 29 APIs públicas/globais de catalog/public_apis_registry.yaml auditadas via Conecta GOV.BR e public-apis); hub resiliente PublicApisHubService (src/public_data_gateway/connectors/public_apis_hub/) com fallback em cascata para CNPJ (Minha Receita -> CNPJa -> BrasilAPI -> ReceitaWS) e CEP (ViaCEP -> OpenCEP -> BrasilAPI), Nominatim, RDAP Registro.br, GLEIF LEI, BGPView IP, brapi, AwesomeAPI, IPEA OData v4, ANEEL/ANP CKAN, Câmara, World Bank, WHO GHO, Overpass POIs, OSRM, Open-Meteo, NASA POWER, Open-Elevation, Hugging Face, Alpha Vantage, NASA APOD, Upgini, REST Countries, OpenAlex e GDELT; Gold mart mart_public_apis_ml_readiness; exposição multi-interface via SDK (BrazilData.public_apis), FastAPI (/api/v1/public-apis/*), CLI (bdg public-apis) e MCP (bdg_list_public_apis_catalog, bdg_enrich_cnpj_cascade, bdg_count_osm_pois_radius)."
+    },
+    {
+      "date": "2026-11-14",
+      "phase_id": "10.5",
+      "milestone": "Conclusão da Wave 10.5A — Padronização Medallion 11-Gates das 7 APIs do Bloco 2",
+      "summary": "Elevação completa dos 7 conectores do Bloco 2 (ipeadata_odata, brapi_b3, awesomeapi_fx, aneel_anp_ckan, camara_senado_dados_abertos, world_bank_v2 e who_gho_odata) ao padrão 11-Gates sobre a base compartilhada PublicApiMedallionConnector: contratos ODCS v3.1 (contract.yaml), persistência isolada Bronze/Silver/Gold/Quarantine com Parquet ZSTD + SHA-256, 7 staging views (stg_*) + 7 modelos intradomínio (fct_*/dim_*) + cross-domain mart_cross_domain_global_macro_saude_brasil, paridade nas 4 interfaces (SDK, FastAPI, CLI e MCP com wrap_untrusted_gov_data), testes offline determinísticos e testes live 1-linha."
     }
   ]
 }

@@ -1,0 +1,50 @@
+version: 2
+
+models:
+  - name: stg_who_gho_odata_indicators
+    description: "Staging view for WHO Global Health Observatory OData indicators."
+    columns:
+      - name: indicator_code
+        description: "WHO GHO indicator code (e.g., WHOSIS_000001)."
+        tests:
+          - not_null
+      - name: spatial_dim
+        description: "ISO-3 country or region code."
+        tests:
+          - not_null
+      - name: time_dim
+        description: "Reference year or time dimension."
+        tests:
+          - not_null
+      - name: numeric_value
+        description: "Numeric health indicator value."
+        tests:
+          - not_null
+      - name: dim1
+        description: "Disaggregation dimension (e.g., SEX_BTSX)."
+      - name: extracted_at
+        description: "UTC ISO-8601 extraction timestamp."
+
+  - name: fct_who_gho_saude_brasil
+    description: "Intradomain fact table of WHO GHO global and Brazilian health indicators."
+    columns:
+      - name: indicator_code
+        description: "WHO GHO indicator code."
+        tests:
+          - not_null
+      - name: spatial_dim
+        description: "ISO-3 country or region code."
+        tests:
+          - not_null
+      - name: time_dim
+        description: "Reference year or time dimension."
+        tests:
+          - not_null
+      - name: numeric_value
+        description: "Numeric health indicator value."
+        tests:
+          - not_null
+      - name: dim1
+        description: "Disaggregation dimension."
+      - name: extracted_at
+        description: "UTC ISO-8601 extraction timestamp."
