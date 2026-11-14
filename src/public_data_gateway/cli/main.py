@@ -1021,6 +1021,36 @@ def build_parser() -> argparse.ArgumentParser:
     tb_rk_p.add_argument("--uf", type=str, help="Optional 2-letter state filter")
     tb_rk_p.add_argument("--json", action="store_true", help="Output in JSON format")
 
+    # ANA HidroWeb (Telemetria & Segurança Hídrica) command group
+    hw_p = subparsers.add_parser("hidroweb", help="Query ANA HidroWeb telemetric stations, river flows, rainfall alerts, water security, and rankings.")
+    hw_sub = hw_p.add_subparsers(dest="hidroweb_action", required=True)
+
+    hw_st_p = hw_sub.add_parser("stations", help="Get municipal ANA HidroWeb telemetric network coverage and availability.")
+    hw_st_p.add_argument("id_municipio", help="7-digit IBGE municipality code, 6-digit prefix, or 8-digit CEP")
+    hw_st_p.add_argument("--json", action="store_true", help="Output in JSON format")
+
+    hw_fl_p = hw_sub.add_parser("flows", help="List municipal ANA HidroWeb river levels and flows by hydrological segment.")
+    hw_fl_p.add_argument("id_municipio", help="7-digit IBGE municipality code, 6-digit prefix, or 8-digit CEP")
+    hw_fl_p.add_argument("--segmento", type=str, help="Optional hydrological segment filter (e.g. Rio_Principal)")
+    hw_fl_p.add_argument("--json", action="store_true", help="Output in JSON format")
+
+    hw_rn_p = hw_sub.add_parser("rainfall", help="Get municipal rainfall accumulation, anomalies, and flood/drought alerts.")
+    hw_rn_p.add_argument("id_municipio", help="7-digit IBGE municipality code, 6-digit prefix, or 8-digit CEP")
+    hw_rn_p.add_argument("--json", action="store_true", help="Output in JSON format")
+
+    hw_sc_p = hw_sub.add_parser("security", help="Get municipal water quality (IQA), water security (ISH), and grant regularization.")
+    hw_sc_p.add_argument("id_municipio", help="7-digit IBGE municipality code, 6-digit prefix, or 8-digit CEP")
+    hw_sc_p.add_argument("--json", action="store_true", help="Output in JSON format")
+
+    hw_ft_p = hw_sub.add_parser("features", help="Get Gold ANA HidroWeb hydrology features, composite score, and 4-tier classification.")
+    hw_ft_p.add_argument("id_municipio", help="7-digit IBGE municipality code, 6-digit prefix, or 8-digit CEP")
+    hw_ft_p.add_argument("--json", action="store_true", help="Output in JSON format")
+
+    hw_rk_p = hw_sub.add_parser("ranking", help="List top Brazilian municipalities ranked by composite ANA HidroWeb water security score.")
+    hw_rk_p.add_argument("--limit", type=int, default=10, help="Max municipalities to list")
+    hw_rk_p.add_argument("--uf", type=str, help="Optional 2-letter state filter")
+    hw_rk_p.add_argument("--json", action="store_true", help="Output in JSON format")
+
     # ONR Registro de Imóveis (SREI/SERP/CNM) command group
     onr_p = subparsers.add_parser("onr", help="Query ONR SREI real estate registries, transactions, credit guarantees, SERP, and rankings.")
     onr_sub = onr_p.add_subparsers(dest="onr_action", required=True)
@@ -3566,6 +3596,78 @@ def main(argv: Sequence[str] | None = None) -> int:
                     return 0
             except ValueError as exc:
                 print(f"Erro INPE TerraBrasilis: {exc}", file=sys.stderr)
+                return 1
+
+        elif args.command == "hidroweb":
+            from public_data_gateway.connectors.ambiental.ana_hidroweb_telemetria.connector import (
+                AnaHidrowebConnector,
+            )
+
+            hw_conn = AnaHidrowebConnector(settings=settings)
+            hw_action = getattr(args, "hidroweb_action", None)
+            try:
+                if hw_action == "stations":
+                    res = hw_conn.get_hidroweb_stations(args.id_municipio)
+                    if getattr(args, "json", False):
+                        print(json.dumps(res, indent=2, ensure_ascii=False, default=str))
+                    else:
+                        print(f"ANA HidroWeb Estações ({res.get('nome_municipio')} - {res.get('id_municipio')}):")
+                        print(f"  Ativas: {res.get('qtd_estacoes_telemetricas_ativas')} | Disp: {res.get('disponibilidade_telemetria_pct')}%")
+                    return 0
+
+                if hw_action == "flows":
+                    rows = hw_conn.list_hidroweb_flows(
+                        args.id_municipio,
+                        tipo_monitoramento_hidrologico=getattr(args, "segmento", None),
+                    )
+                    if getattr(args, "json", False):
+                        print(json.dumps(rows, indent=2, ensure_ascii=False, default=str))
+                    else:
+                        print(f"ANA HidroWeb Cotas & Vazões ({args.id_municipio}): {len(rows)} segmentos")
+                        for r in rows:
+                            print(f"  - {r.get('tipo_monitoramento_hidrologico')}: {r.get('vazao_media_m3s')} m³/s | Cota {r.get('cota_media_cm')} cm")
+                    return 0
+
+                if hw_action == "rainfall":
+                    res = hw_conn.get_hidroweb_rainfall(args.id_municipio)
+                    if getattr(args, "json", False):
+                        print(json.dumps(res, indent=2, ensure_ascii=False, default=str))
+                    else:
+                        print(f"ANA HidroWeb Pluviometria ({res.get('nome_municipio')} - {res.get('id_municipio')}):")
+                        print(f"  Acumulado: {res.get('precipitacao_acumulada_anual_mm')} mm | Anomalia: {res.get('anomalia_precipitacao_pct')}%")
+                    return 0
+
+                if hw_action == "security":
+                    res = hw_conn.get_hidroweb_water_security(args.id_municipio)
+                    if getattr(args, "json", False):
+                        print(json.dumps(res, indent=2, ensure_ascii=False, default=str))
+                    else:
+                        print(f"ANA HidroWeb Segurança Hídrica ({res.get('nome_municipio')} - {res.get('id_municipio')}):")
+                        print(f"  IQA: {res.get('indice_qualidade_agua_iqa')} | ISH: {res.get('indice_seguranca_hidrica_ish')} | Comprometimento: {res.get('comprometimento_balanco_hidrico_pct')}%")
+                    return 0
+
+                if hw_action == "features":
+                    res = hw_conn.get_hidroweb_hydrology_features(args.id_municipio)
+                    if getattr(args, "json", False):
+                        print(json.dumps(res, indent=2, ensure_ascii=False, default=str))
+                    else:
+                        print(f"ANA HidroWeb Gold ({res.get('nome_municipio')} - {res.get('id_municipio')}):")
+                        print(f"  Score Segurança Hídrica: {res.get('score_seguranca_hidrica_hidroweb')} | Tier: {res.get('tier_seguranca_hidrica_hidroweb')}")
+                    return 0
+
+                if hw_action == "ranking":
+                    ranks = hw_conn.list_top_hidroweb_municipalities(
+                        limit=getattr(args, "limit", 10), sigla_uf=getattr(args, "uf", None)
+                    )
+                    if getattr(args, "json", False):
+                        print(json.dumps(ranks, indent=2, ensure_ascii=False, default=str))
+                    else:
+                        print(f"Top {len(ranks)} Municípios ANA HidroWeb:")
+                        for idx, r in enumerate(ranks, 1):
+                            print(f"  {idx}. {r.get('nome_municipio')} ({r.get('sigla_uf')}): {r.get('score_seguranca_hidrica_hidroweb')} | {r.get('tier_seguranca_hidrica_hidroweb')}")
+                    return 0
+            except (ValueError, KeyError) as exc:
+                print(f"Erro ANA HidroWeb: {exc}", file=sys.stderr)
                 return 1
 
         elif args.command == "onr":

@@ -1461,11 +1461,12 @@ class RealEstateFacade:
 
 
 class EnvironmentFacade:
-    """Environmental monitoring, deforestation alerts, land cover & ESG/EUDR compliance (INPE TerraBrasilis)."""
+    """Environmental monitoring, deforestation alerts, hydro telemetry & ESG/EUDR compliance (INPE TerraBrasilis & ANA HidroWeb)."""
 
     def __init__(self, sdk: "BrazilData") -> None:
         self._sdk = sdk
         self._terrabrasilis_connector: Any = None
+        self._hidroweb_connector: Any = None
 
     @property
     def terrabrasilis_connector(self) -> Any:
@@ -1478,6 +1479,18 @@ class EnvironmentFacade:
                 settings=self._sdk.settings
             )
         return self._terrabrasilis_connector
+
+    @property
+    def hidroweb_connector(self) -> Any:
+        if self._hidroweb_connector is None:
+            from public_data_gateway.connectors.ambiental.ana_hidroweb_telemetria.connector import (
+                AnaHidrowebConnector,
+            )
+
+            self._hidroweb_connector = AnaHidrowebConnector(
+                settings=self._sdk.settings
+            )
+        return self._hidroweb_connector
 
     def get_terrabrasilis_prodes_deforestation(
         self, id_municipio: str
@@ -1519,6 +1532,41 @@ class EnvironmentFacade:
     ) -> list[dict[str, Any]]:
         """List top Brazilian municipalities ranked by composite INPE TerraBrasilis ESG compliance score."""
         return self.terrabrasilis_connector.list_top_terrabrasilis_municipalities(
+            limit=limit, sigla_uf=sigla_uf
+        )
+
+    def get_hidroweb_stations(self, id_municipio: str) -> dict[str, Any]:
+        """Get municipal ANA HidroWeb telemetric station network coverage and availability."""
+        return self.hidroweb_connector.get_hidroweb_stations(id_municipio)
+
+    def list_hidroweb_flows(
+        self,
+        id_municipio: str,
+        tipo_monitoramento_hidrologico: str | None = None,
+    ) -> list[dict[str, Any]]:
+        """List municipal ANA HidroWeb river levels and flows by hydrological segment."""
+        return self.hidroweb_connector.list_hidroweb_flows(
+            id_municipio=id_municipio,
+            tipo_monitoramento_hidrologico=tipo_monitoramento_hidrologico,
+        )
+
+    def get_hidroweb_rainfall(self, id_municipio: str) -> dict[str, Any]:
+        """Get municipal ANA HidroWeb rainfall accumulation, anomalies, and flood/drought alerts."""
+        return self.hidroweb_connector.get_hidroweb_rainfall(id_municipio)
+
+    def get_hidroweb_water_security(self, id_municipio: str) -> dict[str, Any]:
+        """Get municipal ANA HidroWeb water quality (IQA), security (ISH), and grant regularization."""
+        return self.hidroweb_connector.get_hidroweb_water_security(id_municipio)
+
+    def get_hidroweb_hydrology_features(self, id_municipio: str) -> dict[str, Any]:
+        """Get normalized Gold ANA HidroWeb hydrology features and 4-tier water security classification."""
+        return self.hidroweb_connector.get_hidroweb_hydrology_features(id_municipio)
+
+    def list_top_hidroweb_municipalities(
+        self, limit: int = 10, sigla_uf: str | None = None
+    ) -> list[dict[str, Any]]:
+        """List top Brazilian municipalities ranked by composite ANA HidroWeb water security score."""
+        return self.hidroweb_connector.list_top_hidroweb_municipalities(
             limit=limit, sigla_uf=sigla_uf
         )
 
@@ -2408,6 +2456,41 @@ class BrazilData:
     ) -> list[dict[str, Any]]:
         """Listar municípios líderes em conformidade verde e baixo risco ESG (INPE TerraBrasilis)."""
         return self.environment.list_top_terrabrasilis_municipalities(
+            limit=limit, sigla_uf=sigla_uf
+        )
+
+    def get_hidroweb_stations(self, id_municipio: str) -> dict[str, Any]:
+        """Consultar cobertura e disponibilidade da rede telemétrica HidroWeb (ANA)."""
+        return self.environment.get_hidroweb_stations(id_municipio)
+
+    def list_hidroweb_flows(
+        self,
+        id_municipio: str,
+        tipo_monitoramento_hidrologico: str | None = None,
+    ) -> list[dict[str, Any]]:
+        """Listar séries de cotas fluviais e vazões por segmento hidrológico (ANA HidroWeb)."""
+        return self.environment.list_hidroweb_flows(
+            id_municipio=id_municipio,
+            tipo_monitoramento_hidrologico=tipo_monitoramento_hidrologico,
+        )
+
+    def get_hidroweb_rainfall(self, id_municipio: str) -> dict[str, Any]:
+        """Consultar pluviometria acumulada, anomalias e alertas de cheias/estiagens (ANA HidroWeb)."""
+        return self.environment.get_hidroweb_rainfall(id_municipio)
+
+    def get_hidroweb_water_security(self, id_municipio: str) -> dict[str, Any]:
+        """Consultar qualidade da água (IQA), segurança hídrica (ISH) e outorgas (ANA HidroWeb)."""
+        return self.environment.get_hidroweb_water_security(id_municipio)
+
+    def get_hidroweb_hydrology_features(self, id_municipio: str) -> dict[str, Any]:
+        """Consultar features Gold de telemetria e segurança hídrica municipal (ANA HidroWeb)."""
+        return self.environment.get_hidroweb_hydrology_features(id_municipio)
+
+    def list_top_hidroweb_municipalities(
+        self, limit: int = 10, sigla_uf: str | None = None
+    ) -> list[dict[str, Any]]:
+        """Listar municípios líderes em segurança hídrica e resiliência telemétrica (ANA HidroWeb)."""
+        return self.environment.list_top_hidroweb_municipalities(
             limit=limit, sigla_uf=sigla_uf
         )
 

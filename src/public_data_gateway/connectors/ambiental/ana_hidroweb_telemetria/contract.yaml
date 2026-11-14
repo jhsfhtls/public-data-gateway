@@ -1,0 +1,515 @@
+schema_version: "3.1.0"
+contract_id: "ODCS-BR-ANA-HIDROWEB-001"
+source_id: "ana_hidroweb_telemetria"
+version: "1.0.0"
+name: "ANA: Rede Hidrometeorológica Nacional (HidroWeb)"
+agency: "Agência Nacional de Águas e Saneamento Básico (ANA)"
+official_url: "https://www.snirh.gov.br/hidroweb/"
+
+legal_framework:
+  statutes:
+    - name: "Lei nº 9.433/1997 (Política Nacional de Recursos Hídricos)"
+      description: "Institui a Política Nacional de Recursos Hídricos e cria o Sistema Nacional de Informações sobre Recursos Hídricos (SNIRH)"
+    - name: "Lei nº 9.984/2000 & Lei nº 14.026/2020"
+      description: "Dispõe sobre a criação da ANA e atribui competência de monitoramento hidrológico e regulação de segurança hídrica"
+    - name: "Resolução ANA nº 1.041/2018 & Portaria Conjunta ANA/ANEEL nº 03/2010"
+      description: "Estabelecem diretrizes para operação de estações telemétricas, transmissão de cotas/vazões e qualidade de dados hidrometeorológicos"
+    - name: "Lei nº 12.608/2012 (PNPDEC)"
+      description: "Institui a Política Nacional de Proteção e Defesa Civil com uso de alertas hidrológicos de cheias e estiagens"
+    - name: "Lei nº 12.527/2011 (LAI) & Decreto nº 8.777/2016"
+      description: "Regem a transparência ativa e a publicação em dados abertos das séries históricas e telemetria do Portal HidroWeb"
+
+data_governance:
+  grain: "municipio_monitoramento_hidroweb"
+  primary_keys:
+    - "id_municipio"
+    - "sigla_uf"
+  reference_date_column: "reference_date"
+  min_expected_rows: 10
+  max_volume_drop_pct: 15.0
+  freshness_sla_hours: 24
+  lgpd_tier: "PUBLIC_NON_PERSONAL"
+  ml_feature_domains:
+    - "river_levels"
+    - "hydro_telemetry"
+
+schema:
+  tables:
+    hidroweb_estacoes_telemetricas_rede:
+      description: "Cobertura e disponibilidade operacional das estações fluviométricas e pluviométricas telemétricas da Rede Hidrometeorológica Nacional (ANA/HidroWeb) por município."
+      grain: "id_municipio, ano_referencia"
+      primary_keys: ["id_municipio", "ano_referencia"]
+      min_expected_rows: 12
+      columns:
+        - name: "id_municipio"
+          data_type: "string"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Código IBGE de 7 dígitos identificador único do município."
+        - name: "nome_municipio"
+          data_type: "string"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Nome oficial do município."
+        - name: "sigla_uf"
+          data_type: "string"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Sigla de 2 letras da Unidade Federativa."
+        - name: "id_uf"
+          data_type: "string"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Código IBGE de 2 dígitos da Unidade Federativa."
+        - name: "regiao"
+          data_type: "string"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Grande região geográfica brasileira segundo o IBGE."
+        - name: "regiao_hidrografica"
+          data_type: "string"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Região ou bacia hidrográfica predominante no município segundo o SNIRH/ANA."
+        - name: "ano_referencia"
+          data_type: "int64"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Ano-calendário de consolidação operacional da rede telemétrica."
+        - name: "qtd_estacoes_telemetricas_ativas"
+          data_type: "int64"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Quantidade total de estações telemétricas ativas no município e entorno imediato da sub-bacia."
+        - name: "qtd_estacoes_fluviometricas"
+          data_type: "int64"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Quantidade de estações com medição de cota e vazão fluvial."
+        - name: "qtd_estacoes_pluviometricas"
+          data_type: "int64"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Quantidade de estações com medição pluviométrica telemétrica."
+        - name: "disponibilidade_telemetria_pct"
+          data_type: "float64"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Percentual de disponibilidade de transmissão telemétrica em janela horária (0-100)."
+        - name: "densidade_rede_estacoes_1000km2"
+          data_type: "float64"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Densidade espacial da rede hidrometeorológica por 1.000 km2."
+        - name: "indice_cobertura_rede_hidroweb"
+          data_type: "float64"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Índice composto de cobertura e disponibilidade telemétrica HidroWeb (0-100)."
+        - name: "reference_date"
+          data_type: "string"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Data de referência da extração em formato ISO YYYY-MM-DD."
+
+    hidroweb_cotas_vazoes_bacia:
+      description: "Séries consolidadas de cotas fluviais, vazões médias, regularização e eventos críticos por tipo de ponto hidrológico monitorado no município."
+      grain: "id_municipio, tipo_monitoramento_hidrologico"
+      primary_keys: ["id_municipio", "tipo_monitoramento_hidrologico"]
+      min_expected_rows: 48
+      columns:
+        - name: "id_municipio"
+          data_type: "string"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Código IBGE de 7 dígitos identificador único do município."
+        - name: "nome_municipio"
+          data_type: "string"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Nome oficial do município."
+        - name: "sigla_uf"
+          data_type: "string"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Sigla de 2 letras da Unidade Federativa."
+        - name: "id_uf"
+          data_type: "string"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Código IBGE de 2 dígitos da Unidade Federativa."
+        - name: "regiao"
+          data_type: "string"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Grande região geográfica brasileira segundo o IBGE."
+        - name: "regiao_hidrografica"
+          data_type: "string"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Região ou bacia hidrográfica predominante no município."
+        - name: "tipo_monitoramento_hidrologico"
+          data_type: "string"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Segmento hidrológico monitorado (Rio_Principal, Tributario_Urbano, Reservatorio_Abastecimento, SubBacia_Rural)."
+        - name: "vazao_media_m3s"
+          data_type: "float64"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Vazão média observada no segmento hidrológico em m3/s."
+        - name: "cota_media_cm"
+          data_type: "float64"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Cota fluviométrica média registrada na régua/sensor em centímetros."
+        - name: "cota_maxima_anual_cm"
+          data_type: "float64"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Cota máxima anual observada no período de referência (cm)."
+        - name: "cota_minima_anual_cm"
+          data_type: "float64"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Cota mínima anual observada no período de referência (cm)."
+        - name: "taxa_eventos_criticos_pct"
+          data_type: "float64"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Percentual de dias em faixa crítica de atenção/alerta hidrológico (0-100)."
+        - name: "capacidade_regularizacao_pct"
+          data_type: "float64"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Capacidade de regularização e amortecimento hidrológico do segmento (0-100)."
+        - name: "reference_date"
+          data_type: "string"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Data de referência da extração em formato ISO YYYY-MM-DD."
+
+    hidroweb_pluviometria_estiagem_cheias:
+      description: "Indicadores pluviométricos municipais, anomalias de precipitação, períodos secos consecutivos e alertas de cheias/estiagens."
+      grain: "id_municipio"
+      primary_keys: ["id_municipio"]
+      min_expected_rows: 12
+      columns:
+        - name: "id_municipio"
+          data_type: "string"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Código IBGE de 7 dígitos identificador único do município."
+        - name: "nome_municipio"
+          data_type: "string"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Nome oficial do município."
+        - name: "sigla_uf"
+          data_type: "string"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Sigla de 2 letras da Unidade Federativa."
+        - name: "id_uf"
+          data_type: "string"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Código IBGE de 2 dígitos da Unidade Federativa."
+        - name: "regiao"
+          data_type: "string"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Grande região geográfica brasileira segundo o IBGE."
+        - name: "regiao_hidrografica"
+          data_type: "string"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Região ou bacia hidrográfica predominante no município."
+        - name: "precipitacao_acumulada_anual_mm"
+          data_type: "float64"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Precipitação acumulada anual em milímetros."
+        - name: "anomalia_precipitacao_pct"
+          data_type: "float64"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Desvio percentual da precipitação em relação à normal climatológica histórica."
+        - name: "dias_consecutivos_sem_chuva"
+          data_type: "int64"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Máximo de dias consecutivos sem precipitação relevante no ano de referência."
+        - name: "eventos_alerta_cheia"
+          data_type: "int64"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Quantidade de eventos de alerta de cheia registrados pela telemetria."
+        - name: "eventos_alerta_estiagem"
+          data_type: "int64"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Quantidade de eventos de alerta de estiagem registrados pela telemetria."
+        - name: "indice_equilibrio_pluviometrico"
+          data_type: "float64"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Índice normalizado de equilíbrio pluviométrico sem extremos severos (0-100)."
+        - name: "reference_date"
+          data_type: "string"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Data de referência da extração em formato ISO YYYY-MM-DD."
+
+    hidroweb_qualidade_seguranca_hidrica:
+      description: "Indicadores municipais de qualidade da água (IQA), segurança hídrica (ISH), comprometimento do balanço hídrico e regularização de outorgas."
+      grain: "id_municipio"
+      primary_keys: ["id_municipio"]
+      min_expected_rows: 12
+      columns:
+        - name: "id_municipio"
+          data_type: "string"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Código IBGE de 7 dígitos identificador único do município."
+        - name: "nome_municipio"
+          data_type: "string"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Nome oficial do município."
+        - name: "sigla_uf"
+          data_type: "string"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Sigla de 2 letras da Unidade Federativa."
+        - name: "id_uf"
+          data_type: "string"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Código IBGE de 2 dígitos da Unidade Federativa."
+        - name: "regiao"
+          data_type: "string"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Grande região geográfica brasileira segundo o IBGE."
+        - name: "regiao_hidrografica"
+          data_type: "string"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Região ou bacia hidrográfica predominante no município."
+        - name: "indice_qualidade_agua_iqa"
+          data_type: "float64"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Índice de Qualidade da Água consolidado pela rede monitorada (0-100)."
+        - name: "indice_seguranca_hidrica_ish"
+          data_type: "float64"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Índice de Segurança Hídrica municipal segundo metodologia SNIRH/ANA (0-100)."
+        - name: "comprometimento_balanco_hidrico_pct"
+          data_type: "float64"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Percentual de comprometimento da disponibilidade hídrica por demandas outorgadas (0-100)."
+        - name: "cobertura_outorga_regularizada_pct"
+          data_type: "float64"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Percentual de captações e lançamentos com outorga regularizada (0-100)."
+        - name: "confiabilidade_serie_historica_pct"
+          data_type: "float64"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Percentual de consistência e preenchimento da série histórica hidrológica (0-100)."
+        - name: "indice_resiliencia_hidrica"
+          data_type: "float64"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Índice composto de resiliência e qualidade hídrica municipal (0-100)."
+        - name: "reference_date"
+          data_type: "string"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Data de referência da extração em formato ISO YYYY-MM-DD."
+
+    features_ana_hidroweb_hidrologia:
+      description: "Tabela de features hidrológicas pronta para modelos de ML e scoring de risco hídrico municipal (P01 & P09)."
+      grain: "id_municipio"
+      primary_keys: ["id_municipio"]
+      min_expected_rows: 12
+      columns:
+        - name: "id_municipio"
+          data_type: "string"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Código IBGE de 7 dígitos identificador único do município."
+        - name: "nome_municipio"
+          data_type: "string"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Nome oficial do município."
+        - name: "sigla_uf"
+          data_type: "string"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Sigla de 2 letras da Unidade Federativa."
+        - name: "id_uf"
+          data_type: "string"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Código IBGE de 2 dígitos da Unidade Federativa."
+        - name: "regiao"
+          data_type: "string"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Grande região geográfica brasileira segundo o IBGE."
+        - name: "regiao_hidrografica"
+          data_type: "string"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Região ou bacia hidrográfica predominante no município."
+        - name: "ano_referencia"
+          data_type: "int64"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Ano de referência das features hidrológicas."
+        - name: "qtd_estacoes_telemetricas_ativas"
+          data_type: "int64"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Quantidade de estações telemétricas ativas."
+        - name: "disponibilidade_telemetria_pct"
+          data_type: "float64"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Disponibilidade percentual da telemetria em tempo real."
+        - name: "vazao_media_global_m3s"
+          data_type: "float64"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Vazão média agregada entre os segmentos monitorados (m3/s)."
+        - name: "cota_media_global_cm"
+          data_type: "float64"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Cota fluviométrica média agregada (cm)."
+        - name: "precipitacao_acumulada_anual_mm"
+          data_type: "float64"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Precipitação acumulada anual (mm)."
+        - name: "comprometimento_balanco_hidrico_pct"
+          data_type: "float64"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Percentual de comprometimento do balanço hídrico municipal."
+        - name: "indice_cobertura_rede_hidroweb"
+          data_type: "float64"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Subíndice de cobertura e disponibilidade da rede telemétrica (0-100)."
+        - name: "indice_equilibrio_pluviometrico"
+          data_type: "float64"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Subíndice de equilíbrio pluviométrico (0-100)."
+        - name: "indice_resiliencia_hidrica"
+          data_type: "float64"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Subíndice de resiliência e qualidade hídrica (0-100)."
+        - name: "taxa_eventos_criticos_media_pct"
+          data_type: "float64"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Taxa média percentual de eventos críticos hidrológicos entre segmentos."
+        - name: "score_seguranca_hidrica_hidroweb"
+          data_type: "float64"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Score composto de segurança hídrica e telemetria ANA HidroWeb (0-100)."
+        - name: "tier_seguranca_hidrica_hidroweb"
+          data_type: "string"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Classificação municipal em 4 tiers de segurança hídrica HidroWeb."
+        - name: "reference_date"
+          data_type: "string"
+          required: true
+          nullable: false
+          max_null_pct: 0.0
+          description: "Data de referência da extração em formato ISO YYYY-MM-DD."

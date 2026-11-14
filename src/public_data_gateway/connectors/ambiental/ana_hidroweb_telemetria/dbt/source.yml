@@ -1,0 +1,25 @@
+version: 2
+
+sources:
+  - name: ana_hidroweb_telemetria_silver
+    description: "Tabelas Silver do conector ANA: Rede Hidrometeorológica Nacional (HidroWeb)."
+    meta:
+      owner: "data-engineering@public-data-gateway"
+      source_id: "ana_hidroweb_telemetria"
+    tables:
+      - name: hidroweb_estacoes_telemetricas_rede
+        description: "Cobertura e disponibilidade operacional das estações telemétricas da rede HidroWeb por município."
+        meta:
+          external_location: "data/ana_hidroweb_telemetria/silver/hidroweb_estacoes_telemetricas_rede.parquet"
+      - name: hidroweb_cotas_vazoes_bacia
+        description: "Séries consolidadas de cotas fluviais, vazões e eventos críticos por segmento hidrológico."
+        meta:
+          external_location: "data/ana_hidroweb_telemetria/silver/hidroweb_cotas_vazoes_bacia.parquet"
+      - name: hidroweb_pluviometria_estiagem_cheias
+        description: "Indicadores pluviométricos municipais, anomalias de chuva e alertas de cheias e estiagens."
+        meta:
+          external_location: "data/ana_hidroweb_telemetria/silver/hidroweb_pluviometria_estiagem_cheias.parquet"
+      - name: hidroweb_qualidade_seguranca_hidrica
+        description: "Indicadores de qualidade da água (IQA), segurança hídrica (ISH) e regularização de outorgas."
+        meta:
+          external_location: "data/ana_hidroweb_telemetria/silver/hidroweb_qualidade_seguranca_hidrica.parquet"

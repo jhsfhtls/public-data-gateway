@@ -47,6 +47,7 @@ model-paths:
   - "../src/public_data_gateway/connectors/judicial/cnj_justica_aberta/dbt"
   - "../src/public_data_gateway/connectors/imobiliario/onr_registro_imoveis/dbt"
   - "../src/public_data_gateway/connectors/imobiliario/capitais_iptu_itbi/dbt"
+  - "../src/public_data_gateway/connectors/ambiental/ana_hidroweb_telemetria/dbt"
   - "../src/public_data_gateway/connectors/ambiental/inpe_terrabrasilis/dbt"
   - "models"
 

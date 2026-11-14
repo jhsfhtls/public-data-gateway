@@ -73,3 +73,67 @@ models:
       - name: extracted_at
         description: "Timestamp UTC ISO-8601 da extração."
         tests: [not_null]
+
+  - name: mart_seguranca_hidrica_hidroweb_brasil
+    description: "Data Mart Gold de segurança hídrica, telemetria e risco de cheias/estiagens ANA HidroWeb por município."
+    columns:
+      - name: id_municipio
+        description: "Código IBGE de 7 dígitos identificador único do município."
+        tests: [not_null, unique]
+      - name: nome_municipio
+        description: "Nome oficial do município."
+        tests: [not_null]
+      - name: sigla_uf
+        description: "Sigla de 2 letras da Unidade Federativa."
+        tests: [not_null]
+      - name: id_uf
+        description: "Código IBGE de 2 dígitos da UF."
+        tests: [not_null]
+      - name: regiao
+        description: "Grande região geográfica brasileira."
+        tests: [not_null]
+      - name: regiao_hidrografica
+        description: "Região ou bacia hidrográfica predominante."
+        tests: [not_null]
+      - name: ano_referencia
+        description: "Ano de referência da consolidação hidrológica."
+        tests: [not_null]
+      - name: qtd_estacoes_telemetricas_ativas
+        description: "Quantidade de estações telemétricas ativas."
+        tests: [not_null]
+      - name: disponibilidade_telemetria_pct
+        description: "Disponibilidade percentual da telemetria."
+        tests: [not_null]
+      - name: vazao_media_global_m3s
+        description: "Vazão média agregada entre segmentos monitorados (m3/s)."
+        tests: [not_null]
+      - name: cota_media_global_cm
+        description: "Cota fluviométrica média agregada (cm)."
+        tests: [not_null]
+      - name: precipitacao_acumulada_anual_mm
+        description: "Precipitação acumulada anual (mm)."
+        tests: [not_null]
+      - name: comprometimento_balanco_hidrico_pct
+        description: "Comprometimento percentual do balanço hídrico municipal."
+        tests: [not_null]
+      - name: indice_cobertura_rede_hidroweb
+        description: "Subíndice de cobertura e disponibilidade da rede telemétrica (0-100)."
+        tests: [not_null]
+      - name: indice_equilibrio_pluviometrico
+        description: "Subíndice de equilíbrio pluviométrico (0-100)."
+        tests: [not_null]
+      - name: indice_resiliencia_hidrica
+        description: "Subíndice de resiliência e qualidade hídrica (0-100)."
+        tests: [not_null]
+      - name: taxa_eventos_criticos_media_pct
+        description: "Taxa média percentual de eventos críticos hidrológicos."
+        tests: [not_null]
+      - name: score_seguranca_hidrica_hidroweb
+        description: "Score composto de segurança hídrica e telemetria ANA HidroWeb (0-100)."
+        tests: [not_null]
+      - name: tier_seguranca_hidrica_hidroweb
+        description: "Classificação municipal em 4 tiers de segurança hídrica HidroWeb."
+        tests: [not_null]
+      - name: reference_date
+        description: "Data de referência ISO-8601 (YYYY-MM-DD)."
+        tests: [not_null]

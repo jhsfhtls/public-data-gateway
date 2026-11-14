@@ -1,0 +1,180 @@
+version: 2
+
+models:
+  - name: stg_ana_hidroweb_estacoes_telemetricas
+    description: "Staging tipada da cobertura e disponibilidade das estações telemétricas HidroWeb/ANA por município."
+    columns:
+      - name: id_municipio
+        description: "Código IBGE de 7 dígitos do município."
+        tests: [not_null, unique]
+      - name: nome_municipio
+        description: "Nome oficial do município."
+        tests: [not_null]
+      - name: sigla_uf
+        description: "Sigla da Unidade Federativa."
+        tests: [not_null]
+      - name: id_uf
+        description: "Código IBGE de 2 dígitos da UF."
+        tests: [not_null]
+      - name: regiao
+        description: "Grande região geográfica brasileira."
+        tests: [not_null]
+      - name: regiao_hidrografica
+        description: "Região ou bacia hidrográfica predominante."
+        tests: [not_null]
+      - name: ano_referencia
+        description: "Ano de referência da rede telemétrica."
+        tests: [not_null]
+      - name: qtd_estacoes_telemetricas_ativas
+        description: "Total de estações telemétricas ativas."
+        tests: [not_null]
+      - name: qtd_estacoes_fluviometricas
+        description: "Quantidade de estações fluviométricas."
+        tests: [not_null]
+      - name: qtd_estacoes_pluviometricas
+        description: "Quantidade de estações pluviométricas."
+        tests: [not_null]
+      - name: disponibilidade_telemetria_pct
+        description: "Disponibilidade percentual da transmissão telemétrica."
+        tests: [not_null]
+      - name: densidade_rede_estacoes_1000km2
+        description: "Densidade da rede de estações por 1.000 km2."
+        tests: [not_null]
+      - name: indice_cobertura_rede_hidroweb
+        description: "Índice de cobertura e disponibilidade da rede HidroWeb (0-100)."
+        tests: [not_null]
+      - name: reference_date
+        description: "Data de referência ISO YYYY-MM-DD."
+        tests: [not_null]
+
+  - name: stg_ana_hidroweb_cotas_vazoes_bacia
+    description: "Staging tipada de cotas fluviais, vazões e eventos críticos por segmento hidrológico."
+    columns:
+      - name: id_municipio
+        description: "Código IBGE de 7 dígitos do município."
+        tests: [not_null]
+      - name: nome_municipio
+        description: "Nome oficial do município."
+        tests: [not_null]
+      - name: sigla_uf
+        description: "Sigla da Unidade Federativa."
+        tests: [not_null]
+      - name: id_uf
+        description: "Código IBGE de 2 dígitos da UF."
+        tests: [not_null]
+      - name: regiao
+        description: "Grande região geográfica brasileira."
+        tests: [not_null]
+      - name: regiao_hidrografica
+        description: "Região ou bacia hidrográfica predominante."
+        tests: [not_null]
+      - name: tipo_monitoramento_hidrologico
+        description: "Segmento hidrológico monitorado no município."
+        tests: [not_null]
+      - name: vazao_media_m3s
+        description: "Vazão média observada em m3/s."
+        tests: [not_null]
+      - name: cota_media_cm
+        description: "Cota fluviométrica média em cm."
+        tests: [not_null]
+      - name: cota_maxima_anual_cm
+        description: "Cota máxima anual em cm."
+        tests: [not_null]
+      - name: cota_minima_anual_cm
+        description: "Cota mínima anual em cm."
+        tests: [not_null]
+      - name: taxa_eventos_criticos_pct
+        description: "Percentual de dias em faixa crítica hidrológica."
+        tests: [not_null]
+      - name: capacidade_regularizacao_pct
+        description: "Capacidade percentual de regularização do segmento."
+        tests: [not_null]
+      - name: reference_date
+        description: "Data de referência ISO YYYY-MM-DD."
+        tests: [not_null]
+
+  - name: stg_ana_hidroweb_pluviometria_alertas
+    description: "Staging tipada de pluviometria acumulada, anomalias e alertas de cheias e estiagens."
+    columns:
+      - name: id_municipio
+        description: "Código IBGE de 7 dígitos do município."
+        tests: [not_null, unique]
+      - name: nome_municipio
+        description: "Nome oficial do município."
+        tests: [not_null]
+      - name: sigla_uf
+        description: "Sigla da Unidade Federativa."
+        tests: [not_null]
+      - name: id_uf
+        description: "Código IBGE de 2 dígitos da UF."
+        tests: [not_null]
+      - name: regiao
+        description: "Grande região geográfica brasileira."
+        tests: [not_null]
+      - name: regiao_hidrografica
+        description: "Região ou bacia hidrográfica predominante."
+        tests: [not_null]
+      - name: precipitacao_acumulada_anual_mm
+        description: "Precipitação acumulada anual em mm."
+        tests: [not_null]
+      - name: anomalia_precipitacao_pct
+        description: "Anomalia percentual de precipitação frente à normal climatológica."
+        tests: [not_null]
+      - name: dias_consecutivos_sem_chuva
+        description: "Máximo de dias consecutivos sem chuva."
+        tests: [not_null]
+      - name: eventos_alerta_cheia
+        description: "Quantidade de alertas de cheia."
+        tests: [not_null]
+      - name: eventos_alerta_estiagem
+        description: "Quantidade de alertas de estiagem."
+        tests: [not_null]
+      - name: indice_equilibrio_pluviometrico
+        description: "Índice de equilíbrio pluviométrico (0-100)."
+        tests: [not_null]
+      - name: reference_date
+        description: "Data de referência ISO YYYY-MM-DD."
+        tests: [not_null]
+
+  - name: stg_ana_hidroweb_qualidade_seguranca_hidrica
+    description: "Staging tipada de qualidade da água (IQA), segurança hídrica (ISH) e regularização de outorgas."
+    columns:
+      - name: id_municipio
+        description: "Código IBGE de 7 dígitos do município."
+        tests: [not_null, unique]
+      - name: nome_municipio
+        description: "Nome oficial do município."
+        tests: [not_null]
+      - name: sigla_uf
+        description: "Sigla da Unidade Federativa."
+        tests: [not_null]
+      - name: id_uf
+        description: "Código IBGE de 2 dígitos da UF."
+        tests: [not_null]
+      - name: regiao
+        description: "Grande região geográfica brasileira."
+        tests: [not_null]
+      - name: regiao_hidrografica
+        description: "Região ou bacia hidrográfica predominante."
+        tests: [not_null]
+      - name: indice_qualidade_agua_iqa
+        description: "Índice de Qualidade da Água (IQA, 0-100)."
+        tests: [not_null]
+      - name: indice_seguranca_hidrica_ish
+        description: "Índice de Segurança Hídrica (ISH, 0-100)."
+        tests: [not_null]
+      - name: comprometimento_balanco_hidrico_pct
+        description: "Comprometimento percentual do balanço hídrico municipal."
+        tests: [not_null]
+      - name: cobertura_outorga_regularizada_pct
+        description: "Percentual de captações/lançamentos com outorga regularizada."
+        tests: [not_null]
+      - name: confiabilidade_serie_historica_pct
+        description: "Consistência percentual da série histórica."
+        tests: [not_null]
+      - name: indice_resiliencia_hidrica
+        description: "Índice composto de resiliência hídrica (0-100)."
+        tests: [not_null]
+      - name: reference_date
+        description: "Data de referência ISO YYYY-MM-DD."
+        tests: [not_null]

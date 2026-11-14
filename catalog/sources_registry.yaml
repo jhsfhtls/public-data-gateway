@@ -1162,7 +1162,7 @@ sources:
   - P09
   rice_score: 380
   roadmap_wave: 6
-  status: CATALOGED
+  status: HOMOLOGATED
 - source_id: mapbiomas_cobertura
   name: 'MapBiomas: Cobertura e Uso da Terra no Brasil (1985-2024)'
   agency: Projeto MapBiomas
