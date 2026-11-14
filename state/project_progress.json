@@ -199,6 +199,19 @@
       ]
     },
     {
+      "phase_id": "10.5",
+      "name": "Padronização Medallion 11-Gates das APIs da Fase 10 (Staging, Intradomínio, Cross-Domain, Testes Live & Catálogo)",
+      "status": "PENDING",
+      "completion_date": null,
+      "deliverables": [
+        "Diretiva obrigatória formalizada em .agents/rules/connector_standard_policy.md e docs/adr/ADR-004-connector-medallion-parity-policy.md exigindo que TODA API siga o padrão 11-Gates (BaseConnector, contract.yaml ODCS v3.1, data/<api>/{bronze,silver,gold,quarantine}/, dbt staging -> intradomínio -> cross_domain, testes offline + live fail-hard, catálogo e paridade SDK/FastAPI/CLI/MCP)",
+        "Wave 10.5A — Conectores Medallion de Séries & Dados Abertos (Bloco 2): elevar ipeadata_odata, brapi_b3, awesomeapi_fx, aneel_anp_ckan, camara_senado_dados_abertos, world_bank_v2 e who_gho_odata para BaseConnector + contract.yaml + Parquet Silver/Gold + stg_* + fct_*/dim_*/mart_* intradomínio + cross_domain + testes live 1-linha",
+        "Wave 10.5B — Conectores Medallion Espaciais, Clima & ML (Bloco 3): elevar open_meteo, nasa_power, open_elevation, overpass_osm, osrm_routing, huggingface_inference, alpha_vantage, nasa_youtube_open_ml e upgini_adapter com lote canônico das 27 capitais/municípios-âncora para materialização Silver/Gold, stg_* + marts espaciais/climáticos + propagação para feature_store_cross_domain_municipio",
+        "Wave 10.5C — Conectores Medallion KYC/KYB, Antifraude & Endereçamento (Bloco 1): elevar minha_receita, cnpja_open, receitaws, viacep, opencep, nominatim_osm, rdap_registro_br, gleif_lei, bgpview_ip_intel e adaptador B2B freemium para BaseConnector + contract.yaml + entidades-semente em Silver/Gold + stg_* + marts de risco/antifraude + cross_domain + testes live",
+        "Wave 10.5D — Conectores Medallion Globais & Pesquisa (Bloco 4) + Paridade Total: elevar rest_countries, openalex_api e gdelt_doc_api ao padrão 11-Gates, garantir 100% de cobertura no lint_dbt_docs.py, expor todos os conectores nas 4 interfaces (SDK, FastAPI, CLI e MCP com wrap_untrusted_gov_data) e sincronizar ambos os catálogos (CATALOG.md e CATALOG_PUBLIC_APIS.md)"
+      ]
+    },
+    {
       "phase_id": "11",
       "name": "Cloud Lakehouse Mirror: Public Data Warehouse na Nuvem (S3 / Cloudflare R2 + DuckDB / MotherDuck / BigQuery)",
       "status": "PENDING",
