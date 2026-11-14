@@ -1612,6 +1612,65 @@ class MCPDispatcher:
                                 },
                             },
                             {
+                                "name": "bdg_get_sicar_properties",
+                                "description": "Get official SFB/SICAR municipal rural property registry, CAR coverage, and IBAMA embargo-free rate.",
+                                "inputSchema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "id_municipio": {
+                                            "type": "string",
+                                            "description": "7-digit IBGE municipality code, 6-digit prefix, or 8-digit CEP",
+                                        }
+                                    },
+                                    "required": ["id_municipio"],
+                                },
+                            },
+                            {
+                                "name": "bdg_get_sicar_pra_compliance",
+                                "description": "Get municipal SFB/SICAR Environmental Regularization Program (PRA) adherence and recovery progress.",
+                                "inputSchema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "id_municipio": {
+                                            "type": "string",
+                                            "description": "7-digit IBGE municipality code, 6-digit prefix, or 8-digit CEP",
+                                        }
+                                    },
+                                    "required": ["id_municipio"],
+                                },
+                            },
+                            {
+                                "name": "bdg_get_sicar_features",
+                                "description": "Get normalized Gold SFB/SICAR rural environmental compliance score and 4-tier EUDR/CAR classification.",
+                                "inputSchema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "id_municipio": {
+                                            "type": "string",
+                                            "description": "7-digit IBGE municipality code, 6-digit prefix, or 8-digit CEP",
+                                        }
+                                    },
+                                    "required": ["id_municipio"],
+                                },
+                            },
+                            {
+                                "name": "bdg_list_top_sicar_municipalities",
+                                "description": "List top Brazilian municipalities ranked by composite SFB/SICAR rural environmental compliance score.",
+                                "inputSchema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "limit": {
+                                            "type": "integer",
+                                            "description": "Maximum rows (default: 10)",
+                                        },
+                                        "sigla_uf": {
+                                            "type": "string",
+                                            "description": "Optional 2-letter state filter (e.g. PR)",
+                                        },
+                                    },
+                                },
+                            },
+                            {
                                 "name": "bdg_get_onr_property_registry",
                                 "description": "Get official ONR SREI municipal active property registry CNM stock, digital conversion rate, and online certificate emissions.",
                                 "inputSchema": {
@@ -3586,6 +3645,68 @@ class MCPDispatcher:
                     },
                 }
             wrapped = wrap_untrusted_gov_data(result, source_id="mapbiomas_cobertura")
+            return {
+                "jsonrpc": "2.0",
+                "id": req_id,
+                "result": {"content": [{"type": "text", "text": wrapped}], "isError": False},
+            }
+
+        if tool_name in {
+            "bdg_get_sicar_properties",
+            "bdg_get_sicar_pra_compliance",
+            "bdg_get_sicar_features",
+            "bdg_list_top_sicar_municipalities",
+        }:
+            from public_data_gateway.connectors.ambiental.sfb_sicar.connector import (
+                SfbSicarConnector,
+            )
+
+            connector = SfbSicarConnector(settings=self.settings)
+            try:
+                if tool_name == "bdg_get_sicar_properties":
+                    result: Any = connector.get_sicar_properties(
+                        str(args.get("id_municipio", ""))
+                    )
+                elif tool_name == "bdg_get_sicar_pra_compliance":
+                    result = connector.get_sicar_pra_compliance(
+                        str(args.get("id_municipio", ""))
+                    )
+                elif tool_name == "bdg_get_sicar_features":
+                    result = connector.get_sicar_features(
+                        str(args.get("id_municipio", ""))
+                    )
+                else:
+                    result = connector.list_top_sicar_municipalities(
+                        limit=int(args.get("limit", 10)),
+                        sigla_uf=args.get("sigla_uf"),
+                    )
+            except (ValueError, KeyError) as exc:
+                return {
+                    "jsonrpc": "2.0",
+                    "id": req_id,
+                    "result": {
+                        "content": [
+                            {"type": "text", "text": f"SFB/SICAR parameter error: {exc}"}
+                        ],
+                        "isError": True,
+                    },
+                }
+
+            if not result:
+                return {
+                    "jsonrpc": "2.0",
+                    "id": req_id,
+                    "result": {
+                        "content": [
+                            {
+                                "type": "text",
+                                "text": "No SFB/SICAR data found for the query.",
+                            }
+                        ],
+                        "isError": True,
+                    },
+                }
+            wrapped = wrap_untrusted_gov_data(result, source_id="sfb_sicar")
             return {
                 "jsonrpc": "2.0",
                 "id": req_id,

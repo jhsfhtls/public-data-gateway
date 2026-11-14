@@ -1,0 +1,171 @@
+version: 2
+
+models:
+  - name: stg_sfb_sicar_imoveis_rurais
+    description: "Staging tipada do estoque municipal de imóveis rurais inscritos no SICAR."
+    columns:
+      - name: id_municipio
+        description: "Código IBGE de 7 dígitos do município."
+        tests: [not_null, unique]
+      - name: nome_municipio
+        description: "Nome oficial do município."
+        tests: [not_null]
+      - name: sigla_uf
+        description: "Sigla da Unidade Federativa."
+        tests: [not_null]
+      - name: id_uf
+        description: "Código IBGE de 2 dígitos da UF."
+        tests: [not_null]
+      - name: regiao
+        description: "Grande região geográfica brasileira."
+        tests: [not_null]
+      - name: bioma_predominante
+        description: "Bioma predominante."
+        tests: [not_null]
+      - name: ano_referencia
+        description: "Ano de referência SICAR."
+        tests: [not_null]
+      - name: qtd_imoveis_car_ativos
+        description: "Quantidade de imóveis ativos no CAR."
+        tests: [not_null]
+      - name: area_cadastrada_car_ha
+        description: "Área total cadastrada no CAR (ha)."
+        tests: [not_null]
+      - name: area_media_imovel_ha
+        description: "Área média por imóvel rural (ha)."
+        tests: [not_null]
+      - name: imoveis_analise_concluida_pct
+        description: "Percentual de imóveis com análise concluída (%)."
+        tests: [not_null]
+      - name: indice_cobertura_cadastral_car
+        description: "Índice composto de cobertura cadastral CAR (0-100)."
+        tests: [not_null]
+      - name: reference_date
+        description: "Data de referência ISO YYYY-MM-DD."
+        tests: [not_null]
+
+  - name: stg_sfb_sicar_reserva_legal_app
+    description: "Staging tipada de Reserva Legal, APP e passivo ambiental por categoria fundiária no SICAR."
+    columns:
+      - name: id_municipio
+        description: "Código IBGE de 7 dígitos do município."
+        tests: [not_null]
+      - name: nome_municipio
+        description: "Nome oficial do município."
+        tests: [not_null]
+      - name: sigla_uf
+        description: "Sigla da UF."
+        tests: [not_null]
+      - name: id_uf
+        description: "Código IBGE de 2 dígitos da UF."
+        tests: [not_null]
+      - name: regiao
+        description: "Grande região geográfica."
+        tests: [not_null]
+      - name: bioma_predominante
+        description: "Bioma predominante."
+        tests: [not_null]
+      - name: categoria_imovel_car
+        description: "Categoria fundiária do imóvel rural."
+        tests: [not_null]
+      - name: qtd_imoveis_categoria
+        description: "Quantidade de imóveis na categoria."
+        tests: [not_null]
+      - name: area_reserva_legal_declarada_ha
+        description: "Área de Reserva Legal declarada (ha)."
+        tests: [not_null]
+      - name: area_app_preservada_ha
+        description: "Área de APP preservada (ha)."
+        tests: [not_null]
+      - name: taxa_passivo_ambiental_pct
+        description: "Taxa de passivo ambiental em RL/APP (%)."
+        tests: [not_null]
+      - name: conformidade_reserva_legal_pct
+        description: "Conformidade percentual de Reserva Legal (%)."
+        tests: [not_null]
+      - name: reference_date
+        description: "Data de referência ISO YYYY-MM-DD."
+        tests: [not_null]
+
+  - name: stg_sfb_sicar_regularizacao_pra
+    description: "Staging tipada de adesão ao PRA, ausência de sobreposição/embargos e elegibilidade para crédito rural."
+    columns:
+      - name: id_municipio
+        description: "Código IBGE de 7 dígitos do município."
+        tests: [not_null, unique]
+      - name: nome_municipio
+        description: "Nome oficial do município."
+        tests: [not_null]
+      - name: sigla_uf
+        description: "Sigla da UF."
+        tests: [not_null]
+      - name: id_uf
+        description: "Código IBGE de 2 dígitos da UF."
+        tests: [not_null]
+      - name: regiao
+        description: "Grande região geográfica."
+        tests: [not_null]
+      - name: bioma_predominante
+        description: "Bioma predominante."
+        tests: [not_null]
+      - name: qtd_imoveis_aderidos_pra
+        description: "Quantidade de imóveis aderidos ao PRA."
+        tests: [not_null]
+      - name: imoveis_sem_sobreposicao_ti_uc_pct
+        description: "Percentual de imóveis livres de sobreposição TI/UC."
+        tests: [not_null]
+      - name: imoveis_livres_embargo_ibama_pct
+        description: "Percentual de imóveis livres de embargo ambiental."
+        tests: [not_null]
+      - name: elegibilidade_credito_rural_car_pct
+        description: "Percentual de elegibilidade para crédito rural."
+        tests: [not_null]
+      - name: velocidade_homologacao_car_pct
+        description: "Taxa de avanço anual na homologação CAR (%)."
+        tests: [not_null]
+      - name: indice_governanca_pra
+        description: "Índice composto de governança PRA (0-100)."
+        tests: [not_null]
+      - name: reference_date
+        description: "Data de referência ISO YYYY-MM-DD."
+        tests: [not_null]
+
+  - name: stg_sfb_sicar_geometria_sigef
+    description: "Staging tipada da qualidade geoespacial dos polígonos SICAR e interoperabilidade SIGEF/INCRA."
+    columns:
+      - name: id_municipio
+        description: "Código IBGE de 7 dígitos do município."
+        tests: [not_null, unique]
+      - name: nome_municipio
+        description: "Nome oficial do município."
+        tests: [not_null]
+      - name: sigla_uf
+        description: "Sigla da UF."
+        tests: [not_null]
+      - name: id_uf
+        description: "Código IBGE de 2 dígitos da UF."
+        tests: [not_null]
+      - name: regiao
+        description: "Grande região geográfica."
+        tests: [not_null]
+      - name: bioma_predominante
+        description: "Bioma predominante."
+        tests: [not_null]
+      - name: poligonos_sem_sobreposicao_pct
+        description: "Percentual de polígonos sem sobreposição crítica."
+        tests: [not_null]
+      - name: integracao_car_sigef_incra_pct
+        description: "Percentual de integração geométrica CAR–SIGEF/INCRA."
+        tests: [not_null]
+      - name: precisao_georreferenciamento_pct
+        description: "Qualidade geométrica dos polígonos (%)."
+        tests: [not_null]
+      - name: atualizacao_retificacao_anual_pct
+        description: "Taxa de retificação cadastral anual (%)."
+        tests: [not_null]
+      - name: indice_qualidade_geoespacial_car
+        description: "Índice composto de qualidade geoespacial CAR (0-100)."
+        tests: [not_null]
+      - name: reference_date
+        description: "Data de referência ISO YYYY-MM-DD."
+        tests: [not_null]

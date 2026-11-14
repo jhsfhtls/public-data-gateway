@@ -1,6 +1,6 @@
 {
   "schema_version": "1.0.0",
-  "last_updated": "2026-11-14T09:24:00.000000",
+  "last_updated": "2026-11-14T13:55:00.000000",
   "project_name": "public-data-gateway",
   "ecosystem": "C.O.R.E. (core, operations, career, studies)",
   "governing_pops": [
@@ -13,10 +13,10 @@
     "POP_T_148"
   ],
   "current_macro_phase_id": "08",
-  "current_macro_phase": "Fase 08 - Ingestão Wave 6 (Meio Ambiente, Agro & Metaportais — 45/49 fontes homologadas [91.8%] com mapbiomas_cobertura homologado; Próximo: sfb_sicar)",
+  "current_macro_phase": "Fase 08 - Ingestão Wave 6 (Meio Ambiente, Agro & Metaportais — 46/49 fontes homologadas [93.9%] com sfb_sicar homologado; Próximo: mapa_zarc)",
   "overall_status": "ON_TRACK",
-  "active_connector": "sfb_sicar",
-  "next_connector": "mapa_zarc",
+  "active_connector": "mapa_zarc",
+  "next_connector": "basedosdados_bq",
   "structural_phases": [
     {
       "phase_id": "00",
@@ -156,7 +156,8 @@
         "Conector inpe_terrabrasilis (PRODES Anual, Alertas DETER-B por Classe, Uso da Terra e Governança ESG/EUDR) - CONCLUÍDO",
         "Conector ana_hidroweb_telemetria (Estações Telemétricas, Cotas/Vazões por Segmento, Pluviometria e Segurança Hídrica) - CONCLUÍDO",
         "Conector mapbiomas_cobertura (Cobertura Anual, Transições por Classe, Pastagens/Irrigação e Alertas Validados) - CONCLUÍDO",
-        "Conectores Ambientais (sfb_sicar, mapa_zarc)",
+        "Conector sfb_sicar (Imóveis Rurais CAR, Reserva Legal/APP por Categoria, PRA/Embargos IBAMA e Geometria SIGEF) - CONCLUÍDO",
+        "Conectores Ambientais (mapa_zarc)",
         "Conectores Metaportais (basedosdados_bq, dadosgov_ckan)"
       ]
     },
@@ -424,6 +425,12 @@
     }
   ],
   "recent_milestones": [
+    {
+      "date": "2026-11-14",
+      "phase_id": "08",
+      "milestone": "Homologação do Conector sfb_sicar (46/49 Fontes — 93.9%)",
+      "summary": "Implementação e homologação completa do conector sfb_sicar (SFB: Sistema Nacional de Cadastro Ambiental Rural — SICAR, Lei nº 12.651/2012, EUDR EU 2023/1115) alcançando 46/49 fontes homologadas (93.9%): 5 tabelas Medallion (sicar_imoveis_rurais_municipio, sicar_reserva_legal_app_situacao, sicar_regularizacao_pra_embargos, sicar_geometria_validacao_sigef e features_sfb_sicar_fundiario) materializadas em data/sfb_sicar/silver/; 7 novos modelos dbt (4 staging views, fct_sicar_regularizacao_fundiaria_municipio, fct_sicar_reserva_legal_categoria_municipio e mart_conformidade_car_sicar_brasil) totalizando 383 modelos e 5.685 colunas 100% documentadas no linter (210 sources); paridade SQL–Python estrita confirmada (12 municípios, 4 tiers x 3 municípios, zero divergências); paridade multi-interface completa em SDK (EnvironmentFacade.sfb_sicar_connector), CLI (bdg sicar), FastAPI (/api/v1/environment/sicar/* e /api/v1/sicar/*) e MCP (bdg_*_sicar* com wrap_untrusted_gov_data); 9 testes pytest (8 offline + 1 live SFB Portal) aprovados."
+    },
     {
       "date": "2026-11-14",
       "phase_id": "08",

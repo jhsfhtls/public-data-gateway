@@ -1468,6 +1468,7 @@ class EnvironmentFacade:
         self._terrabrasilis_connector: Any = None
         self._hidroweb_connector: Any = None
         self._mapbiomas_connector: Any = None
+        self._sfb_sicar_connector: Any = None
 
     @property
     def terrabrasilis_connector(self) -> Any:
@@ -1615,6 +1616,53 @@ class EnvironmentFacade:
     ) -> list[dict[str, Any]]:
         """List top Brazilian municipalities ranked by composite MapBiomas sustainability score."""
         return self.mapbiomas_connector.list_top_mapbiomas_municipalities(
+            limit=limit, sigla_uf=sigla_uf
+        )
+
+    @property
+    def sfb_sicar_connector(self) -> Any:
+        if self._sfb_sicar_connector is None:
+            from public_data_gateway.connectors.ambiental.sfb_sicar.connector import (
+                SfbSicarConnector,
+            )
+
+            self._sfb_sicar_connector = SfbSicarConnector(
+                settings=self._sdk.settings
+            )
+        return self._sfb_sicar_connector
+
+    def get_sicar_properties(self, id_municipio: str) -> dict[str, Any]:
+        """Get municipal SFB/SICAR rural property registry, area coverage, and IBAMA embargo metrics."""
+        return self.sfb_sicar_connector.get_sicar_properties(id_municipio)
+
+    def list_sicar_legal_reserve(
+        self,
+        id_municipio: str,
+        categoria_imovel_car: str | None = None,
+    ) -> list[dict[str, Any]]:
+        """List municipal SFB/SICAR Legal Reserve and APP compliance by property size category."""
+        return self.sfb_sicar_connector.list_sicar_legal_reserve(
+            id_municipio,
+            categoria_imovel_car=categoria_imovel_car,
+        )
+
+    def get_sicar_pra_compliance(self, id_municipio: str) -> dict[str, Any]:
+        """Get municipal SFB/SICAR Environmental Regularization Program (PRA) compliance metrics."""
+        return self.sfb_sicar_connector.get_sicar_pra_compliance(id_municipio)
+
+    def get_sicar_geometry(self, id_municipio: str) -> dict[str, Any]:
+        """Get municipal SFB/SICAR geospatial overlap, precision, and SIGEF integration metrics."""
+        return self.sfb_sicar_connector.get_sicar_geometry(id_municipio)
+
+    def get_sicar_features(self, id_municipio: str) -> dict[str, Any]:
+        """Get normalized Gold SFB/SICAR rural environmental compliance score and 4-tier classification."""
+        return self.sfb_sicar_connector.get_sicar_features(id_municipio)
+
+    def list_top_sicar_municipalities(
+        self, limit: int = 10, sigla_uf: str | None = None
+    ) -> list[dict[str, Any]]:
+        """List top Brazilian municipalities ranked by composite SFB/SICAR compliance score."""
+        return self.sfb_sicar_connector.list_top_sicar_municipalities(
             limit=limit, sigla_uf=sigla_uf
         )
 
@@ -2574,6 +2622,41 @@ class BrazilData:
     ) -> list[dict[str, Any]]:
         """Listar municípios líderes em sustentabilidade de cobertura do solo (MapBiomas)."""
         return self.environment.list_top_mapbiomas_municipalities(
+            limit=limit, sigla_uf=sigla_uf
+        )
+
+    def get_sicar_properties(self, id_municipio: str) -> dict[str, Any]:
+        """Consultar cadastro de imóveis rurais, cobertura e embargos IBAMA (SFB/SICAR)."""
+        return self.environment.get_sicar_properties(id_municipio)
+
+    def list_sicar_legal_reserve(
+        self,
+        id_municipio: str,
+        categoria_imovel_car: str | None = None,
+    ) -> list[dict[str, Any]]:
+        """Listar conformidade de Reserva Legal e APP por categoria fundiária (SFB/SICAR)."""
+        return self.environment.list_sicar_legal_reserve(
+            id_municipio,
+            categoria_imovel_car=categoria_imovel_car,
+        )
+
+    def get_sicar_pra_compliance(self, id_municipio: str) -> dict[str, Any]:
+        """Consultar regularização ambiental no Programa de Regularização Ambiental - PRA (SFB/SICAR)."""
+        return self.environment.get_sicar_pra_compliance(id_municipio)
+
+    def get_sicar_geometry(self, id_municipio: str) -> dict[str, Any]:
+        """Consultar precisão geoespacial, sobreposições e integração SIGEF/INCRA (SFB/SICAR)."""
+        return self.environment.get_sicar_geometry(id_municipio)
+
+    def get_sicar_features(self, id_municipio: str) -> dict[str, Any]:
+        """Consultar features Gold de conformidade ambiental rural CAR/EUDR (SFB/SICAR)."""
+        return self.environment.get_sicar_features(id_municipio)
+
+    def list_top_sicar_municipalities(
+        self, limit: int = 10, sigla_uf: str | None = None
+    ) -> list[dict[str, Any]]:
+        """Listar municípios líderes em conformidade ambiental rural CAR/SICAR (SFB)."""
+        return self.environment.list_top_sicar_municipalities(
             limit=limit, sigla_uf=sigla_uf
         )
 

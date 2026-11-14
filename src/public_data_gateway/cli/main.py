@@ -1081,6 +1081,36 @@ def build_parser() -> argparse.ArgumentParser:
     mb_rk_p.add_argument("--uf", type=str, help="Optional 2-letter state filter")
     mb_rk_p.add_argument("--json", action="store_true", help="Output in JSON format")
 
+    # SFB/SICAR Cadastro Ambiental Rural command group
+    sicar_p = subparsers.add_parser("sicar", help="Query SFB/SICAR rural environmental registry, legal reserve/APP, PRA, geometry, and rankings.")
+    sicar_sub = sicar_p.add_subparsers(dest="sicar_action", required=True)
+
+    sicar_pr_p = sicar_sub.add_parser("properties", help="Get municipal SFB/SICAR rural property registry, coverage, and IBAMA embargo metrics.")
+    sicar_pr_p.add_argument("id_municipio", help="7-digit IBGE municipality code, 6-digit prefix, or 8-digit CEP")
+    sicar_pr_p.add_argument("--json", action="store_true", help="Output in JSON format")
+
+    sicar_rl_p = sicar_sub.add_parser("legal-reserve", help="List municipal SFB/SICAR Legal Reserve and APP compliance by property size category.")
+    sicar_rl_p.add_argument("id_municipio", help="7-digit IBGE municipality code, 6-digit prefix, or 8-digit CEP")
+    sicar_rl_p.add_argument("--categoria", type=str, help="Optional property category filter (Pequena_Propriedade_Ate_4MF, Media_Propriedade_4a15MF, Grande_Propriedade_Acima_15MF, Assentamento_Territorio_Coletivo)")
+    sicar_rl_p.add_argument("--json", action="store_true", help="Output in JSON format")
+
+    sicar_pra_p = sicar_sub.add_parser("pra", help="Get municipal SFB/SICAR PRA environmental regularization compliance metrics.")
+    sicar_pra_p.add_argument("id_municipio", help="7-digit IBGE municipality code, 6-digit prefix, or 8-digit CEP")
+    sicar_pra_p.add_argument("--json", action="store_true", help="Output in JSON format")
+
+    sicar_geo_p = sicar_sub.add_parser("geometry", help="Get municipal SFB/SICAR geospatial overlap, precision, and SIGEF integration metrics.")
+    sicar_geo_p.add_argument("id_municipio", help="7-digit IBGE municipality code, 6-digit prefix, or 8-digit CEP")
+    sicar_geo_p.add_argument("--json", action="store_true", help="Output in JSON format")
+
+    sicar_ft_p = sicar_sub.add_parser("features", help="Get Gold SFB/SICAR rural environmental compliance score and 4-tier classification.")
+    sicar_ft_p.add_argument("id_municipio", help="7-digit IBGE municipality code, 6-digit prefix, or 8-digit CEP")
+    sicar_ft_p.add_argument("--json", action="store_true", help="Output in JSON format")
+
+    sicar_rk_p = sicar_sub.add_parser("ranking", help="List top Brazilian municipalities ranked by SFB/SICAR compliance score.")
+    sicar_rk_p.add_argument("--limit", type=int, default=10, help="Max municipalities to list")
+    sicar_rk_p.add_argument("--uf", type=str, help="Optional 2-letter state filter")
+    sicar_rk_p.add_argument("--json", action="store_true", help="Output in JSON format")
+
     # ONR Registro de Imóveis (SREI/SERP/CNM) command group
     onr_p = subparsers.add_parser("onr", help="Query ONR SREI real estate registries, transactions, credit guarantees, SERP, and rankings.")
     onr_sub = onr_p.add_subparsers(dest="onr_action", required=True)
@@ -3770,6 +3800,78 @@ def main(argv: Sequence[str] | None = None) -> int:
                     return 0
             except (ValueError, KeyError) as exc:
                 print(f"Erro MapBiomas: {exc}", file=sys.stderr)
+                return 1
+
+        elif args.command == "sicar":
+            from public_data_gateway.connectors.ambiental.sfb_sicar.connector import (
+                SfbSicarConnector,
+            )
+
+            sicar_conn = SfbSicarConnector()
+            sicar_action = getattr(args, "sicar_action", "")
+            try:
+                if sicar_action == "properties":
+                    res = sicar_conn.get_sicar_properties(args.id_municipio)
+                    if getattr(args, "json", False):
+                        print(json.dumps(res, indent=2, ensure_ascii=False, default=str))
+                    else:
+                        print(f"SFB/SICAR Imóveis ({res.get('nome_municipio')} - {res.get('id_municipio')}):")
+                        print(f"  Ativos: {res.get('qtd_imoveis_car_ativos')} | Análise Concluída: {res.get('imoveis_analise_concluida_pct')}% | Livre IBAMA: {res.get('imoveis_livres_embargo_ibama_pct')}%")
+                    return 0
+
+                if sicar_action == "legal-reserve":
+                    rows = sicar_conn.list_sicar_legal_reserve(
+                        args.id_municipio,
+                        categoria_imovel_car=getattr(args, "categoria", None),
+                    )
+                    if getattr(args, "json", False):
+                        print(json.dumps(rows, indent=2, ensure_ascii=False, default=str))
+                    else:
+                        print(f"SFB/SICAR Reserva Legal & APP ({len(rows)} categorias):")
+                        for r in rows:
+                            print(f"  {r.get('categoria_imovel_car')}: RL={r.get('area_reserva_legal_declarada_ha')}ha | Passivo={r.get('taxa_passivo_ambiental_pct')}%")
+                    return 0
+
+                if sicar_action == "pra":
+                    res = sicar_conn.get_sicar_pra_compliance(args.id_municipio)
+                    if getattr(args, "json", False):
+                        print(json.dumps(res, indent=2, ensure_ascii=False, default=str))
+                    else:
+                        print(f"SFB/SICAR PRA ({res.get('nome_municipio')} - {res.get('id_municipio')}):")
+                        print(f"  Elegibilidade Crédito: {res.get('elegibilidade_credito_rural_car_pct')}% | Índice Governança PRA: {res.get('indice_governanca_pra')}")
+                    return 0
+
+                if sicar_action == "geometry":
+                    res = sicar_conn.get_sicar_geometry(args.id_municipio)
+                    if getattr(args, "json", False):
+                        print(json.dumps(res, indent=2, ensure_ascii=False, default=str))
+                    else:
+                        print(f"SFB/SICAR Geometria ({res.get('nome_municipio')} - {res.get('id_municipio')}):")
+                        print(f"  Sem Sobreposição: {res.get('poligonos_sem_sobreposicao_pct')}% | SIGEF: {res.get('integracao_car_sigef_incra_pct')}%")
+                    return 0
+
+                if sicar_action == "features":
+                    res = sicar_conn.get_sicar_features(args.id_municipio)
+                    if getattr(args, "json", False):
+                        print(json.dumps(res, indent=2, ensure_ascii=False, default=str))
+                    else:
+                        print(f"SFB/SICAR Gold ({res.get('nome_municipio')} - {res.get('id_municipio')}):")
+                        print(f"  Score: {res.get('score_conformidade_sicar')} | Tier: {res.get('tier_conformidade_sicar')}")
+                    return 0
+
+                if sicar_action == "ranking":
+                    ranks = sicar_conn.list_top_sicar_municipalities(
+                        limit=getattr(args, "limit", 10), sigla_uf=getattr(args, "uf", None)
+                    )
+                    if getattr(args, "json", False):
+                        print(json.dumps(ranks, indent=2, ensure_ascii=False, default=str))
+                    else:
+                        print(f"Top {len(ranks)} Municípios SFB/SICAR:")
+                        for idx, r in enumerate(ranks, 1):
+                            print(f"  {idx}. {r.get('nome_municipio')} ({r.get('sigla_uf')}): {r.get('score_conformidade_sicar')} | {r.get('tier_conformidade_sicar')}")
+                    return 0
+            except (ValueError, KeyError) as exc:
+                print(f"Erro SFB/SICAR: {exc}", file=sys.stderr)
                 return 1
 
         elif args.command == "onr":
