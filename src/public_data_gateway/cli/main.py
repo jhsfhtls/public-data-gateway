@@ -661,6 +661,36 @@ def build_parser() -> argparse.ArgumentParser:
     cnes_rk_p.add_argument("--uf", type=str, help="Optional 2-letter state filter")
     cnes_rk_p.add_argument("--json", action="store_true", help="Output in JSON format")
 
+    # DataSUS SIH (Sistema de Informações Hospitalares - SIH/SUS) command group
+    sih_p = subparsers.add_parser("sih", help="Query DataSUS SIH/SUS hospital admissions (AIH), SUS costs, CID-10 morbidity, and outcomes.")
+    sih_sub = sih_p.add_subparsers(dest="sih_action", required=True)
+
+    sih_adm_p = sih_sub.add_parser("admissions", help="Get municipal SIH/SUS hospital admissions summary (AIH).")
+    sih_adm_p.add_argument("id_municipio", help="7-digit IBGE municipality code (e.g. 3550308)")
+    sih_adm_p.add_argument("--json", action="store_true", help="Output in JSON format")
+
+    sih_cost_p = sih_sub.add_parser("costs", help="Get municipal SIH/SUS approved hospital and ICU costs.")
+    sih_cost_p.add_argument("id_municipio", help="7-digit IBGE municipality code")
+    sih_cost_p.add_argument("--json", action="store_true", help="Output in JSON format")
+
+    sih_cid_p = sih_sub.add_parser("cid10", help="List municipal SIH/SUS hospitalizations broken down by CID-10 chapters.")
+    sih_cid_p.add_argument("id_municipio", help="7-digit IBGE municipality code")
+    sih_cid_p.add_argument("--capitulo", type=str, help="Optional CID-10 chapter filter (e.g. Circulatorio)")
+    sih_cid_p.add_argument("--json", action="store_true", help="Output in JSON format")
+
+    sih_out_p = sih_sub.add_parser("outcomes", help="Get municipal SIH/SUS clinical outcomes, mortality, ICU utilization, and ICSAP.")
+    sih_out_p.add_argument("id_municipio", help="7-digit IBGE municipality code")
+    sih_out_p.add_argument("--json", action="store_true", help="Output in JSON format")
+
+    sih_ft_p = sih_sub.add_parser("features", help="Get Gold SIH complexity and epidemiological pressure features.")
+    sih_ft_p.add_argument("id_municipio", help="7-digit IBGE municipality code")
+    sih_ft_p.add_argument("--json", action="store_true", help="Output in JSON format")
+
+    sih_rk_p = sih_sub.add_parser("ranking", help="List top municipalities ranked by composite SIH hospital complexity score.")
+    sih_rk_p.add_argument("--limit", type=int, default=10, help="Max municipalities to list")
+    sih_rk_p.add_argument("--uf", type=str, help="Optional 2-letter state filter")
+    sih_rk_p.add_argument("--json", action="store_true", help="Output in JSON format")
+
     # Direct shortcut: pnad-uf
     pnad_s_p = subparsers.add_parser("pnad-uf", help="Shortcut to query PNAD Contínua labor market profile.")
     pnad_s_p.add_argument("uf", type=str, help="IBGE 2-digit UF code or 2-letter state abbreviation (e.g. SP, 35)")
@@ -2266,6 +2296,78 @@ def main(argv: Sequence[str] | None = None) -> int:
                     print(f"Top {len(ranks)} Polos de Capacidade Assistencial (DataSUS CNES):")
                     for idx, r in enumerate(ranks, 1):
                         print(f"  {idx}. {r.get('nome_municipio')} ({r.get('sigla_uf')}): Hosp {r.get('score_capacidade_hospitalar')} | UTI: {r.get('score_alta_complexidade_uti')} | {r.get('classificacao_rede_assistencial')}")
+                return 0
+
+        elif args.command == "sih":
+            from public_data_gateway.connectors.saude.datasus_sih.connector import (
+                DataSUSSihConnector,
+            )
+
+            sih_conn = DataSUSSihConnector()
+            sih_action = getattr(args, "sih_action", None)
+            if sih_action == "admissions":
+                res = sih_conn.get_admissions_summary(args.id_municipio)
+                if getattr(args, "json", False):
+                    print(json.dumps(res, indent=2, ensure_ascii=False, default=str))
+                else:
+                    print(f"DataSUS SIH Internações AIH ({res.get('nome_municipio')} - {res.get('id_municipio')}):")
+                    print(f"  Total AIH / Urgência: {res.get('total_internacoes_aih')} ({res.get('proporcao_urgencia_pct')}% urgência)")
+                    print(f"  Diárias / Permanência:{res.get('diarias_hospitalares_totais')} diárias | {res.get('tempo_medio_permanencia_dias')} dias ({res.get('internacoes_por_1000_hab_ano')}/1k hab ano)")
+                return 0
+
+            if sih_action == "costs":
+                res = sih_conn.get_hospital_costs(args.id_municipio)
+                if getattr(args, "json", False):
+                    print(json.dumps(res, indent=2, ensure_ascii=False, default=str))
+                else:
+                    print(f"DataSUS SIH Custos Hospitalares SUS ({res.get('nome_municipio')} - {res.get('id_municipio')}):")
+                    print(f"  Valor Total AIH:      R$ {res.get('valor_total_aih_brl'):,.2f} (Ticket médio R$ {res.get('ticket_medio_aih_brl'):,.2f})")
+                    print(f"  UTI Alta Complexidade:R$ {res.get('valor_uti_alta_complexidade_brl'):,.2f} ({res.get('proporcao_custo_uti_pct')}% do total | Diária R$ {res.get('custo_medio_diaria_brl'):,.2f})")
+                return 0
+
+            if sih_action == "cid10":
+                rows = sih_conn.list_cid10_morbidity(
+                    args.id_municipio, capitulo_cid10=getattr(args, "capitulo", None)
+                )
+                if getattr(args, "json", False):
+                    print(json.dumps(rows, indent=2, ensure_ascii=False, default=str))
+                else:
+                    print(f"DataSUS SIH Morbidade CID-10 ({args.id_municipio}):")
+                    for r in rows:
+                        print(f"  - {r.get('capitulo_cid10')}: {r.get('internacoes_capitulo_aih')} AIHs ({r.get('participacao_capitulo_pct')}%) | R$ {r.get('valor_total_capitulo_brl'):,.2f} | Letalidade {r.get('taxa_letalidade_capitulo_pct')}%")
+                return 0
+
+            if sih_action == "outcomes":
+                res = sih_conn.get_mortality_outcomes(args.id_municipio)
+                if getattr(args, "json", False):
+                    print(json.dumps(res, indent=2, ensure_ascii=False, default=str))
+                else:
+                    print(f"DataSUS SIH Desfechos Hospitalares ({res.get('nome_municipio')} - {res.get('id_municipio')}):")
+                    print(f"  Altas / Óbitos:       {res.get('altas_hospitalares')} / {res.get('obitos_hospitalares')} (Mortalidade {res.get('taxa_mortalidade_hospitalar_pct')}%)")
+                    print(f"  Acionamento UTI/ICSAP:{res.get('internacoes_com_uti')} ({res.get('taxa_utilizacao_uti_pct')}% UTI) | {res.get('internacoes_icsap_evitaveis')} ICSAP ({res.get('proporcao_icsap_pct')}%)")
+                return 0
+
+            if sih_action == "features":
+                feat = sih_conn.get_sih_morbidity_features(args.id_municipio)
+                if getattr(args, "json", False):
+                    print(json.dumps(feat, indent=2, ensure_ascii=False, default=str))
+                else:
+                    print(f"DataSUS SIH Features Assistenciais: {feat.get('nome_municipio')} ({feat.get('sigla_uf')} - {feat.get('id_municipio')}):")
+                    print(f"  Score Complexidade SIH: {feat.get('score_complexidade_assistencial_sih')}/100.0")
+                    print(f"  Score Pressão Morbidade:{feat.get('score_pressao_morbidade_hospitalar')}/100.0")
+                    print(f"  Perfil Epidemiológico:  {feat.get('perfil_epidemiologico_hospitalar')}")
+                return 0
+
+            if sih_action == "ranking":
+                ranks = sih_conn.list_top_sih_complexity_hubs(
+                    limit=getattr(args, "limit", 10), sigla_uf=getattr(args, "uf", None)
+                )
+                if getattr(args, "json", False):
+                    print(json.dumps(ranks, indent=2, ensure_ascii=False, default=str))
+                else:
+                    print(f"Top {len(ranks)} Polos de Complexidade Hospitalar (DataSUS SIH/SUS):")
+                    for idx, r in enumerate(ranks, 1):
+                        print(f"  {idx}. {r.get('nome_municipio')} ({r.get('sigla_uf')}): Complexidade {r.get('score_complexidade_assistencial_sih')} | Pressão: {r.get('score_pressao_morbidade_hospitalar')} | {r.get('perfil_epidemiologico_hospitalar')}")
                 return 0
 
         elif args.command == "pib-municipal":

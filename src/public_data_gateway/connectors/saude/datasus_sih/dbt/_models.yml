@@ -1,0 +1,241 @@
+version: 2
+
+models:
+  - name: stg_sih_internacoes_aih_municipio
+    description: "Visão padronizada da produção mensal de internações hospitalares (AIH) aprovadas no SIH/SUS por município."
+    columns:
+      - name: id_municipio
+        description: "Código IBGE de 7 dígitos do município."
+        tests:
+          - not_null
+          - unique
+      - name: nome_municipio
+        description: "Nome oficial do município."
+        tests:
+          - not_null
+      - name: sigla_uf
+        description: "Sigla de 2 letras da Unidade Federativa."
+        tests:
+          - not_null
+      - name: id_uf
+        description: "Código IBGE de 2 dígitos da Unidade Federativa."
+        tests:
+          - not_null
+      - name: ano_mes_competencia
+        description: "Competência mensal de processamento SIH no formato AAAAMM."
+        tests:
+          - not_null
+      - name: total_internacoes_aih
+        description: "Quantidade total de AIHs aprovadas no município na competência."
+        tests:
+          - not_null
+      - name: internacoes_carater_urgencia
+        description: "Quantidade de internações hospitalares registradas em caráter de urgência."
+        tests:
+          - not_null
+      - name: internacoes_carater_eletivo
+        description: "Quantidade de internações hospitalares registradas em caráter eletivo."
+        tests:
+          - not_null
+      - name: proporcao_urgencia_pct
+        description: "Percentual de internações em caráter de urgência (%)."
+        tests:
+          - not_null
+      - name: diarias_hospitalares_totais
+        description: "Somatório de diárias hospitalares computadas nas AIHs."
+        tests:
+          - not_null
+      - name: tempo_medio_permanencia_dias
+        description: "Tempo médio de permanência hospitalar em dias por internação."
+        tests:
+          - not_null
+      - name: internacoes_por_1000_hab_ano
+        description: "Taxa anualizada de internações SUS por 1.000 habitantes."
+        tests:
+          - not_null
+      - name: source_url
+        description: "URL oficial DataSUS SIH/SUS."
+        tests:
+          - not_null
+      - name: reference_date
+        description: "Data de referência ISO-8601 da competência."
+        tests:
+          - not_null
+      - name: extracted_at
+        description: "Timestamp ISO-8601 UTC da extração."
+        tests:
+          - not_null
+
+  - name: stg_sih_custos_hospitalares_sus
+    description: "Visão padronizada dos valores aprovados e composição de custos hospitalares e de UTI das AIHs no SUS."
+    columns:
+      - name: id_municipio
+        description: "Código IBGE de 7 dígitos do município."
+        tests:
+          - not_null
+          - unique
+      - name: nome_municipio
+        description: "Nome oficial do município."
+        tests:
+          - not_null
+      - name: sigla_uf
+        description: "Sigla de 2 letras da Unidade Federativa."
+        tests:
+          - not_null
+      - name: ano_mes_competencia
+        description: "Competência mensal de faturamento no formato AAAAMM."
+        tests:
+          - not_null
+      - name: valor_total_aih_brl
+        description: "Valor total aprovado das AIHs pagas no município em reais (BRL)."
+        tests:
+          - not_null
+      - name: valor_servicos_hospitalares_brl
+        description: "Valor referente a serviços hospitalares aprovados em reais (BRL)."
+        tests:
+          - not_null
+      - name: valor_servicos_profissionais_brl
+        description: "Valor referente a serviços profissionais médicos em reais (BRL)."
+        tests:
+          - not_null
+      - name: valor_uti_alta_complexidade_brl
+        description: "Valor faturado em diárias de UTI e alta complexidade hospitalar (BRL)."
+        tests:
+          - not_null
+      - name: ticket_medio_aih_brl
+        description: "Valor médio aprovado por AIH no município em reais (BRL)."
+        tests:
+          - not_null
+      - name: custo_medio_diaria_brl
+        description: "Custo médio por dia de internação hospitalar no município (BRL)."
+        tests:
+          - not_null
+      - name: proporcao_custo_uti_pct
+        description: "Participação percentual dos custos de UTI sobre o valor total de AIHs."
+        tests:
+          - not_null
+      - name: source_url
+        description: "URL oficial DataSUS SIH/SUS."
+        tests:
+          - not_null
+      - name: reference_date
+        description: "Data de referência ISO-8601 da competência."
+        tests:
+          - not_null
+      - name: extracted_at
+        description: "Timestamp ISO-8601 UTC da extração."
+        tests:
+          - not_null
+
+  - name: stg_sih_morbidade_capitulos_cid10
+    description: "Visão padronizada da distribuição de internações hospitalares e letalidade por capítulos prioritários da CID-10."
+    columns:
+      - name: id_municipio
+        description: "Código IBGE de 7 dígitos do município."
+        tests:
+          - not_null
+      - name: nome_municipio
+        description: "Nome oficial do município."
+        tests:
+          - not_null
+      - name: sigla_uf
+        description: "Sigla de 2 letras da Unidade Federativa."
+        tests:
+          - not_null
+      - name: capitulo_cid10
+        description: "Capítulo CID-10 de morbidade hospitalar analisado."
+        tests:
+          - not_null
+      - name: internacoes_capitulo_aih
+        description: "Quantidade de internações AIH enquadradas no capítulo CID-10."
+        tests:
+          - not_null
+      - name: participacao_capitulo_pct
+        description: "Participação percentual do capítulo sobre o total de internações municipais."
+        tests:
+          - not_null
+      - name: valor_total_capitulo_brl
+        description: "Valor aprovado das AIHs do capítulo CID-10 em reais (BRL)."
+        tests:
+          - not_null
+      - name: tempo_medio_permanencia_dias
+        description: "Tempo médio de permanência em dias no capítulo CID-10."
+        tests:
+          - not_null
+      - name: taxa_letalidade_capitulo_pct
+        description: "Taxa de letalidade hospitalar intra-capítulo CID-10 (%)."
+        tests:
+          - not_null
+      - name: source_url
+        description: "URL oficial DataSUS SIH/SUS."
+        tests:
+          - not_null
+      - name: reference_date
+        description: "Data de referência ISO-8601 da competência."
+        tests:
+          - not_null
+      - name: extracted_at
+        description: "Timestamp ISO-8601 UTC da extração."
+        tests:
+          - not_null
+
+  - name: stg_sih_desfechos_mortalidade_hospitalar
+    description: "Visão padronizada dos desfechos hospitalares (altas, óbitos, utilização de UTI e internações evitáveis ICSAP) no SUS."
+    columns:
+      - name: id_municipio
+        description: "Código IBGE de 7 dígitos do município."
+        tests:
+          - not_null
+          - unique
+      - name: nome_municipio
+        description: "Nome oficial do município."
+        tests:
+          - not_null
+      - name: sigla_uf
+        description: "Sigla de 2 letras da Unidade Federativa."
+        tests:
+          - not_null
+      - name: ano_mes_competencia
+        description: "Competência mensal no formato AAAAMM."
+        tests:
+          - not_null
+      - name: altas_hospitalares
+        description: "Quantidade de internações encerradas por alta médica ou transferência."
+        tests:
+          - not_null
+      - name: obitos_hospitalares
+        description: "Quantidade de óbitos hospitalares registrados nas AIHs."
+        tests:
+          - not_null
+      - name: taxa_mortalidade_hospitalar_pct
+        description: "Taxa de mortalidade hospitalar geral (%)."
+        tests:
+          - not_null
+      - name: internacoes_com_uti
+        description: "Quantidade de internações hospitalares com utilização de UTI."
+        tests:
+          - not_null
+      - name: taxa_utilizacao_uti_pct
+        description: "Percentual de internações que utilizaram leito de UTI (%)."
+        tests:
+          - not_null
+      - name: internacoes_icsap_evitaveis
+        description: "Total de internações por Condições Sensíveis à Atenção Primária (ICSAP)."
+        tests:
+          - not_null
+      - name: proporcao_icsap_pct
+        description: "Percentual de internações evitáveis ICSAP no município (%)."
+        tests:
+          - not_null
+      - name: source_url
+        description: "URL oficial DataSUS SIH/SUS."
+        tests:
+          - not_null
+      - name: reference_date
+        description: "Data de referência ISO-8601 da competência."
+        tests:
+          - not_null
+      - name: extracted_at
+        description: "Timestamp ISO-8601 UTC da extração."
+        tests:
+          - not_null

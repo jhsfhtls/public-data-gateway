@@ -1,6 +1,6 @@
 {
   "schema_version": "1.0.0",
-  "last_updated": "2026-11-13T20:40:00.000000",
+  "last_updated": "2026-11-13T20:55:00.000000",
   "project_name": "public-data-gateway",
   "ecosystem": "C.O.R.E. (core, operations, career, studies)",
   "governing_pops": [
@@ -13,10 +13,10 @@
     "POP_T_148"
   ],
   "current_macro_phase_id": "07",
-  "current_macro_phase": "Fase 07 - Ingestão Wave 5 (Saúde, Educação & Setor Notarial — 29/49 fontes homologadas [59.2%] com datasus_cnes homologado; Próximo: datasus_sih)",
+  "current_macro_phase": "Fase 07 - Ingestão Wave 5 (Saúde, Educação & Setor Notarial — 30/49 fontes homologadas [61.2%] com datasus_sih homologado; Próximo: inep_censo_escolar)",
   "overall_status": "ON_TRACK",
-  "active_connector": "datasus_sih",
-  "next_connector": "inep_censo_escolar",
+  "active_connector": "inep_censo_escolar",
+  "next_connector": "datasus_sim",
   "structural_phases": [
     {
       "phase_id": "00",
@@ -132,7 +132,8 @@
       "completion_date": null,
       "deliverables": [
         "Conector datasus_cnes (Estabelecimentos, Leitos/UTI, Equipamentos Diagnósticos e Força de Trabalho) - CONCLUÍDO",
-        "Conectores DataSUS (SIH, SIM, SINASC, OpenDataSUS) & anvisa_cmed",
+        "Conector datasus_sih (Produção Hospitalar AIH, Custos SUS/UTI, Morbidade CID-10 e Desfechos/ICSAP) - CONCLUÍDO",
+        "Conectores DataSUS restantes (SIM, SINASC, OpenDataSUS) & anvisa_cmed",
         "Conectores INEP (Censo Escolar, Superior, IDEB, ENEM) & capes_sucupira",
         "Conectores Notariais (cnj_justica_aberta, onr_registro_imoveis, capitais_iptu_itbi)"
       ]
@@ -396,9 +397,21 @@
       "phase_id": "07",
       "milestone": "Início da Wave 5 & Homologação do Conector datasus_cnes (4 Tabelas, dbt, Mart Capacidade Assistencial SUS & Live Fail-Hard)",
       "summary": "Implementação e homologação completa do conector datasus_cnes (DataSUS: Cadastro Nacional de Estabelecimentos de Saúde — Estabelecimentos, Leitos/UTI, Equipamentos Diagnósticos e Força de Trabalho, Lei nº 8.080/1990, Portaria GM/MS nº 1/2017, Portaria SAES/MS nº 1.646/2015 e Decreto nº 8.777/2016) consolidando o primeiro conector da Wave 5 e 29º conector total da plataforma (59.2% do catálogo homologado): 4 tabelas Silver (cnes_estabelecimentos_saude, cnes_leitos_hospitalares_uti, cnes_equipamentos_diagnostico, cnes_profissionais_equipes_saude) e Gold Feature Store (features_cnes_capacidade_assistencial_municipios_brasil.parquet) materializadas em data/datasus_cnes/{silver,gold}/; 7 novos modelos dbt (4 staging views, fct_cnes_infraestrutura_hospitalar_municipio, fct_cnes_forca_trabalho_saude_municipio, mart_capacidade_assistencial_saude_brasil) totalizando 264 modelos dbt e 192 checks seletivos do build 100% aprovados com 0 erros; 3.408 colunas 100% documentadas no linter (100% coverage); scores normalizados (0 a 100) de capacidade hospitalar e alta complexidade UTI; 8 testes offline e 1 teste live fail-hard contra os portais/APIs oficiais do DataSUS CNES aprovados; multi-interface completa via SDK (BrazilData.health.cnes_connector, get_cnes_establishments, get_cnes_beds_icu, get_cnes_equipment, list_cnes_workforce, get_cnes_health_features, list_top_health_hubs), CLI (bdg cnes establishments/beds/equipment/workforce/features/ranking), REST API (/api/v1/health-public/cnes/* e atalho /api/v1/cnes/*) e MCP (bdg_get_cnes_establishments, bdg_get_cnes_beds_icu, bdg_get_cnes_health_features, bdg_list_top_health_hubs) com contenção de prompt injection wrap_untrusted_gov_data."
+    },
+    {
+      "date": "2026-11-13",
+      "phase_id": "07",
+      "milestone": "Homologação do Conector datasus_sih (4 Tabelas, dbt, Mart Morbidade Hospitalar SIH/SUS & Live Fail-Hard)",
+      "summary": "Implementação e homologação completa do conector datasus_sih (DataSUS: Sistema de Informações Hospitalares do SUS — Produção AIH, Custos Hospitalares/UTI, Morbidade CID-10 e Desfechos Clínicos/ICSAP, Lei nº 8.080/1990, Portaria GM/MS nº 221/2008, Portaria SAES/MS nº 1.324/2014 e Decreto nº 8.777/2016) consolidando o segundo conector da Wave 5 e 30º conector total da plataforma (61.2% do catálogo homologado): 4 tabelas Silver (sih_internacoes_aih_municipio, sih_custos_hospitalares_sus, sih_morbidade_capitulos_cid10, sih_desfechos_mortalidade_hospitalar) e Gold Feature Store (features_sih_morbidade_custos_hospitalares_municipios_brasil.parquet) materializadas em data/datasus_sih/{silver,gold}/; 7 novos modelos dbt (4 staging views, fct_sih_producao_custos_hospitalares_municipio, fct_sih_morbidade_cid10_municipio, mart_morbidade_custos_hospitalares_sus_brasil) totalizando 271 modelos dbt e 175 checks seletivos do build 100% aprovados com 0 erros; 3.541 colunas 100% documentadas no linter (100% coverage); scores normalizados (0 a 100) de complexidade assistencial SIH e pressão epidemiológica hospitalar; 8 testes offline e 1 teste live fail-hard contra os portais oficiais do DataSUS SIH aprovados; multi-interface completa via SDK (BrazilData.health.sih_connector, get_sih_admissions, get_sih_hospital_costs, list_sih_cid10_morbidity, get_sih_mortality_outcomes, get_sih_morbidity_features, list_top_sih_complexity_hubs), CLI (bdg sih admissions/costs/cid10/outcomes/features/ranking), REST API (/api/v1/health-public/sih/* e atalho /api/v1/sih/*) e MCP (bdg_get_sih_admissions, bdg_get_sih_hospital_costs, bdg_get_sih_morbidity_features, bdg_list_top_sih_complexity_hubs) com contenção de prompt injection wrap_untrusted_gov_data."
     }
   ],
   "recent_milestones": [
+    {
+      "date": "2026-11-13",
+      "phase_id": "07",
+      "milestone": "Homologação do Conector datasus_sih (4 Tabelas, dbt, Mart Morbidade Hospitalar SIH/SUS & Live Fail-Hard)",
+      "summary": "Implementação e homologação completa do conector datasus_sih (DataSUS: Sistema de Informações Hospitalares do SUS — Produção AIH, Custos Hospitalares/UTI, Morbidade CID-10 e Desfechos Clínicos/ICSAP, Lei nº 8.080/1990, Portaria GM/MS nº 221/2008, Portaria SAES/MS nº 1.324/2014 e Decreto nº 8.777/2016) consolidando o segundo conector da Wave 5 e 30º conector total da plataforma (61.2% do catálogo homologado): 4 tabelas Silver (sih_internacoes_aih_municipio, sih_custos_hospitalares_sus, sih_morbidade_capitulos_cid10, sih_desfechos_mortalidade_hospitalar) e Gold Feature Store (features_sih_morbidade_custos_hospitalares_municipios_brasil.parquet) materializadas em data/datasus_sih/{silver,gold}/; 7 novos modelos dbt (4 staging views, fct_sih_producao_custos_hospitalares_municipio, fct_sih_morbidade_cid10_municipio, mart_morbidade_custos_hospitalares_sus_brasil) totalizando 271 modelos dbt e 175 checks seletivos do build 100% aprovados com 0 erros; 3.541 colunas 100% documentadas no linter (100% coverage); scores normalizados (0 a 100) de complexidade assistencial SIH e pressão epidemiológica hospitalar; 8 testes offline e 1 teste live fail-hard contra os portais oficiais do DataSUS SIH aprovados; multi-interface completa via SDK (BrazilData.health.sih_connector, get_sih_admissions, get_sih_hospital_costs, list_sih_cid10_morbidity, get_sih_mortality_outcomes, get_sih_morbidity_features, list_top_sih_complexity_hubs), CLI (bdg sih admissions/costs/cid10/outcomes/features/ranking), REST API (/api/v1/health-public/sih/* e atalho /api/v1/sih/*) e MCP (bdg_get_sih_admissions, bdg_get_sih_hospital_costs, bdg_get_sih_morbidity_features, bdg_list_top_sih_complexity_hubs) com contenção de prompt injection wrap_untrusted_gov_data."
+    },
     {
       "date": "2026-11-13",
       "phase_id": "07",

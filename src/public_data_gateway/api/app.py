@@ -1316,4 +1316,67 @@ def create_app(settings: GatewaySettings | None = None) -> FastAPI:
         conn = DataSUSCnesConnector(settings=app_settings)
         return conn.get_establishments_summary(id_municipio)
 
+    @app.get("/api/v1/health-public/sih/top-hubs")
+    async def get_top_sih_complexity_hubs(
+        limit: int = Query(10, ge=1, le=50, description="Max municipalities to list"),
+        uf: str | None = Query(None, description="Filter by 2-letter state abbreviation"),
+    ) -> list[dict[str, Any]]:
+        from public_data_gateway.connectors.saude.datasus_sih.connector import (
+            DataSUSSihConnector,
+        )
+
+        conn = DataSUSSihConnector(settings=app_settings)
+        return conn.list_top_sih_complexity_hubs(limit=limit, sigla_uf=uf)
+
+    @app.get("/api/v1/health-public/sih/features/{id_municipio}")
+    async def get_sih_morbidity_features(id_municipio: str) -> dict[str, Any]:
+        from public_data_gateway.connectors.saude.datasus_sih.connector import (
+            DataSUSSihConnector,
+        )
+
+        conn = DataSUSSihConnector(settings=app_settings)
+        return conn.get_sih_morbidity_features(id_municipio)
+
+    @app.get("/api/v1/health-public/sih/costs/{id_municipio}")
+    async def get_sih_hospital_costs(id_municipio: str) -> dict[str, Any]:
+        from public_data_gateway.connectors.saude.datasus_sih.connector import (
+            DataSUSSihConnector,
+        )
+
+        conn = DataSUSSihConnector(settings=app_settings)
+        return conn.get_hospital_costs(id_municipio)
+
+    @app.get("/api/v1/health-public/sih/cid10/{id_municipio}")
+    async def get_sih_cid10_morbidity(
+        id_municipio: str,
+        capitulo: str | None = Query(
+            None, description="Optional CID-10 chapter filter (e.g. Circulatorio)"
+        ),
+    ) -> list[dict[str, Any]]:
+        from public_data_gateway.connectors.saude.datasus_sih.connector import (
+            DataSUSSihConnector,
+        )
+
+        conn = DataSUSSihConnector(settings=app_settings)
+        return conn.list_cid10_morbidity(id_municipio, capitulo_cid10=capitulo)
+
+    @app.get("/api/v1/health-public/sih/outcomes/{id_municipio}")
+    async def get_sih_mortality_outcomes(id_municipio: str) -> dict[str, Any]:
+        from public_data_gateway.connectors.saude.datasus_sih.connector import (
+            DataSUSSihConnector,
+        )
+
+        conn = DataSUSSihConnector(settings=app_settings)
+        return conn.get_mortality_outcomes(id_municipio)
+
+    @app.get("/api/v1/health-public/sih/admissions/{id_municipio}")
+    @app.get("/api/v1/sih/{id_municipio}")
+    async def get_sih_admissions(id_municipio: str) -> dict[str, Any]:
+        from public_data_gateway.connectors.saude.datasus_sih.connector import (
+            DataSUSSihConnector,
+        )
+
+        conn = DataSUSSihConnector(settings=app_settings)
+        return conn.get_admissions_summary(id_municipio)
+
     return app

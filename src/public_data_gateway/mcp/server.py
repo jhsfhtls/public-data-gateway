@@ -786,6 +786,65 @@ class MCPDispatcher:
                                 },
                             },
                             {
+                                "name": "bdg_get_sih_admissions",
+                                "description": "Get municipal DataSUS SIH/SUS hospital admissions summary (AIH), urgency share, and mean length of stay.",
+                                "inputSchema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "id_municipio": {
+                                            "type": "string",
+                                            "description": "7-digit IBGE municipality code (e.g. 3550308)",
+                                        },
+                                    },
+                                    "required": ["id_municipio"],
+                                },
+                            },
+                            {
+                                "name": "bdg_get_sih_hospital_costs",
+                                "description": "Get municipal DataSUS SIH/SUS approved AIH hospital billing, ICU cost share, and mean ticket per admission.",
+                                "inputSchema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "id_municipio": {
+                                            "type": "string",
+                                            "description": "7-digit IBGE municipality code (e.g. 3550308)",
+                                        },
+                                    },
+                                    "required": ["id_municipio"],
+                                },
+                            },
+                            {
+                                "name": "bdg_get_sih_morbidity_features",
+                                "description": "Get Gold SIH hospital complexity score, morbidity pressure score, and epidemiological profile for a municipality.",
+                                "inputSchema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "id_municipio": {
+                                            "type": "string",
+                                            "description": "7-digit IBGE municipality code (e.g. 3550308)",
+                                        },
+                                    },
+                                    "required": ["id_municipio"],
+                                },
+                            },
+                            {
+                                "name": "bdg_list_top_sih_complexity_hubs",
+                                "description": "List top Brazilian municipalities ranked by composite DataSUS SIH/SUS surgical and ICU hospital complexity score.",
+                                "inputSchema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "limit": {
+                                            "type": "integer",
+                                            "description": "Maximum rows (default: 10)",
+                                        },
+                                        "sigla_uf": {
+                                            "type": "string",
+                                            "description": "Optional 2-letter state filter (e.g. SP)",
+                                        },
+                                    },
+                                },
+                            },
+                            {
                                 "name": "bdg_get_labor_force_indicators",
                                 "description": "Query official quarterly labor force, population, and unemployment rate by Brazilian UF from IBGE PNAD Contínua (Tier 1).",
                                 "inputSchema": {
@@ -1841,6 +1900,53 @@ class MCPDispatcher:
                     },
                 }
             wrapped = wrap_untrusted_gov_data(result, source_id="datasus_cnes")
+            return {
+                "jsonrpc": "2.0",
+                "id": req_id,
+                "result": {"content": [{"type": "text", "text": wrapped}], "isError": False},
+            }
+
+        if tool_name in {
+            "bdg_get_sih_admissions",
+            "bdg_get_sih_hospital_costs",
+            "bdg_get_sih_morbidity_features",
+            "bdg_list_top_sih_complexity_hubs",
+        }:
+            from public_data_gateway.connectors.saude.datasus_sih.connector import (
+                DataSUSSihConnector,
+            )
+
+            connector = DataSUSSihConnector(settings=self.settings)
+            if tool_name == "bdg_get_sih_admissions":
+                result = connector.get_admissions_summary(
+                    str(args.get("id_municipio", "")).strip()
+                )
+            elif tool_name == "bdg_get_sih_hospital_costs":
+                result = connector.get_hospital_costs(
+                    str(args.get("id_municipio", "")).strip()
+                )
+            elif tool_name == "bdg_get_sih_morbidity_features":
+                result = connector.get_sih_morbidity_features(
+                    str(args.get("id_municipio", "")).strip()
+                )
+            else:
+                raw_uf = args.get("sigla_uf")
+                result = connector.list_top_sih_complexity_hubs(
+                    limit=int(args.get("limit", 10)),
+                    sigla_uf=str(raw_uf).strip() if raw_uf else None,
+                )
+            if not result:
+                return {
+                    "jsonrpc": "2.0",
+                    "id": req_id,
+                    "result": {
+                        "content": [
+                            {"type": "text", "text": "No DataSUS SIH data found for the query."}
+                        ],
+                        "isError": True,
+                    },
+                }
+            wrapped = wrap_untrusted_gov_data(result, source_id="datasus_sih")
             return {
                 "jsonrpc": "2.0",
                 "id": req_id,

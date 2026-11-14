@@ -4764,3 +4764,180 @@ models:
         description: "Timestamp ISO-8601 UTC da extração."
         tests:
           - not_null
+
+  - name: fct_sih_producao_custos_hospitalares_municipio
+    description: "Fato analítico consolidado da produção hospitalar (AIH), faturamento SUS, utilização de UTI, óbitos e internações evitáveis ICSAP (SIH/SUS) por município."
+    columns:
+      - name: id_municipio
+        description: "Código IBGE de 7 dígitos do município."
+        tests:
+          - not_null
+          - unique
+      - name: nome_municipio
+        description: "Nome oficial do município."
+        tests:
+          - not_null
+      - name: sigla_uf
+        description: "Sigla de 2 letras da Unidade Federativa."
+        tests:
+          - not_null
+      - name: id_uf
+        description: "Código IBGE de 2 dígitos da Unidade Federativa."
+        tests:
+          - not_null
+      - name: nome_uf
+        description: "Nome completo da Unidade Federativa."
+        tests:
+          - not_null
+      - name: regiao
+        description: "Grande região geográfica do Brasil segundo o IBGE."
+        tests:
+          - not_null
+      - name: ano_mes_competencia
+        description: "Competência mensal de processamento SIH no formato AAAAMM."
+        tests:
+          - not_null
+      - name: total_internacoes_aih
+        description: "Quantidade total de AIHs pagas e processadas na competência."
+        tests:
+          - not_null
+      - name: internacoes_carater_urgencia
+        description: "Quantidade de internações em caráter de urgência/emergência."
+        tests:
+          - not_null
+      - name: internacoes_carater_eletivo
+        description: "Quantidade de internações hospitalares programadas em caráter eletivo."
+        tests:
+          - not_null
+      - name: proporcao_urgencia_pct
+        description: "Percentual de internações em caráter de urgência (%)."
+        tests:
+          - not_null
+      - name: diarias_hospitalares_totais
+        description: "Somatório de diárias hospitalares computadas nas AIHs."
+        tests:
+          - not_null
+      - name: tempo_medio_permanencia_dias
+        description: "Tempo médio de permanência hospitalar em dias."
+        tests:
+          - not_null
+      - name: internacoes_por_1000_hab_ano
+        description: "Taxa anualizada de internações SUS por 1.000 habitantes."
+        tests:
+          - not_null
+      - name: valor_total_aih_brl
+        description: "Valor total aprovado das AIHs em reais (BRL)."
+        tests:
+          - not_null
+      - name: valor_servicos_hospitalares_brl
+        description: "Valor aprovado para serviços hospitalares em reais (BRL)."
+        tests:
+          - not_null
+      - name: valor_servicos_profissionais_brl
+        description: "Valor aprovado para honorários profissionais em reais (BRL)."
+        tests:
+          - not_null
+      - name: valor_uti_alta_complexidade_brl
+        description: "Valor faturado em diárias de UTI e alta complexidade (BRL)."
+        tests:
+          - not_null
+      - name: ticket_medio_aih_brl
+        description: "Valor médio aprovado por internação AIH em reais (BRL)."
+        tests:
+          - not_null
+      - name: custo_medio_diaria_brl
+        description: "Custo médio por dia de internação hospitalar no SUS (BRL)."
+        tests:
+          - not_null
+      - name: proporcao_custo_uti_pct
+        description: "Participação percentual dos custos de UTI sobre o valor total de AIHs."
+        tests:
+          - not_null
+      - name: altas_hospitalares
+        description: "Quantidade de AIHs encerradas com alta médica ou transferência."
+        tests:
+          - not_null
+      - name: obitos_hospitalares
+        description: "Total de óbitos hospitalares registrados nas AIHs."
+        tests:
+          - not_null
+      - name: taxa_mortalidade_hospitalar_pct
+        description: "Taxa de mortalidade hospitalar geral (%)."
+        tests:
+          - not_null
+      - name: internacoes_com_uti
+        description: "Total de internações hospitalares com acionamento de UTI."
+        tests:
+          - not_null
+      - name: taxa_utilizacao_uti_pct
+        description: "Percentual de internações com utilização de UTI (%)."
+        tests:
+          - not_null
+      - name: internacoes_icsap_evitaveis
+        description: "Total de internações por Condições Sensíveis à Atenção Primária (ICSAP)."
+        tests:
+          - not_null
+      - name: proporcao_icsap_pct
+        description: "Proporção de internações evitáveis ICSAP frente ao total (%)."
+        tests:
+          - not_null
+      - name: reference_date
+        description: "Data de referência ISO-8601 da competência."
+        tests:
+          - not_null
+      - name: extracted_at
+        description: "Timestamp ISO-8601 UTC da extração."
+        tests:
+          - not_null
+
+  - name: fct_sih_morbidade_cid10_municipio
+    description: "Fato analítico da distribuição de internações hospitalares, custos unitários e letalidade por capítulo CID-10 (SIH/SUS)."
+    columns:
+      - name: id_municipio
+        description: "Código IBGE de 7 dígitos do município."
+        tests:
+          - not_null
+      - name: nome_municipio
+        description: "Nome oficial do município."
+        tests:
+          - not_null
+      - name: sigla_uf
+        description: "Sigla de 2 letras da Unidade Federativa."
+        tests:
+          - not_null
+      - name: capitulo_cid10
+        description: "Capítulo prioritário da CID-10 analisado no município."
+        tests:
+          - not_null
+      - name: internacoes_capitulo_aih
+        description: "Quantidade de internações AIH enquadradas no capítulo CID-10."
+        tests:
+          - not_null
+      - name: participacao_capitulo_pct
+        description: "Participação percentual do capítulo sobre o total de internações."
+        tests:
+          - not_null
+      - name: valor_total_capitulo_brl
+        description: "Valor aprovado das AIHs do capítulo em reais (BRL)."
+        tests:
+          - not_null
+      - name: custo_medio_internacao_cid10_brl
+        description: "Valor médio calculado por internação no capítulo CID-10 (BRL)."
+        tests:
+          - not_null
+      - name: tempo_medio_permanencia_dias
+        description: "Permanência média em dias no capítulo CID-10."
+        tests:
+          - not_null
+      - name: taxa_letalidade_capitulo_pct
+        description: "Taxa de letalidade hospitalar no capítulo CID-10 (%)."
+        tests:
+          - not_null
+      - name: reference_date
+        description: "Data de referência ISO-8601 da competência."
+        tests:
+          - not_null
+      - name: extracted_at
+        description: "Timestamp ISO-8601 UTC da extração."
+        tests:
+          - not_null

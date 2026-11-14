@@ -1,0 +1,16 @@
+version: 2
+
+sources:
+  - name: datasus_sih_silver
+    description: "Bases oficiais do DataSUS Sistema de Informações Hospitalares (SIH/SUS - AIH) normalizadas na camada Silver."
+    meta:
+      external_location: "data/datasus_sih/silver/{name}.parquet"
+    tables:
+      - name: sih_internacoes_aih_municipio
+        description: "Produção mensal de internações hospitalares (AIH), caráter urgência/eletivo e diárias no SUS por município."
+      - name: sih_custos_hospitalares_sus
+        description: "Valores aprovados de AIH no SUS (hospitalares, profissionais e alta complexidade UTI) por município."
+      - name: sih_morbidade_capitulos_cid10
+        description: "Distribuição das internações e custos hospitalares por capítulos prioritários da CID-10 no município."
+      - name: sih_desfechos_mortalidade_hospitalar
+        description: "Desfechos clínicos hospitalares, mortalidade, utilização de UTI e internações evitáveis ICSAP por município."
