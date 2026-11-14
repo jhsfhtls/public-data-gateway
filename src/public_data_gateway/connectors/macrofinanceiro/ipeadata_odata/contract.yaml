@@ -1,0 +1,35 @@
+contract_id: ipeadata-odata-v1
+source_id: ipeadata_odata
+version: "1.0.0"
+grain: "serie_economica x data_referencia"
+primary_keys:
+  - sercodigo
+  - data_referencia
+reference_date_column: data_referencia
+lgpd_legal_basis: "Dados publicos agregados macroeconomicos e regionais (LAI - Lei 12.527/2011)"
+min_expected_rows: 1
+max_volume_drop_pct: 50.0
+sentinel_values:
+  - "-1"
+  - "-999"
+  - "999999"
+  - "N/A"
+columns:
+  - name: sercodigo
+    data_type: STRING
+    nullable: false
+  - name: data_referencia
+    data_type: STRING
+    nullable: false
+  - name: valor
+    data_type: DOUBLE
+    nullable: false
+  - name: tercodigo
+    data_type: STRING
+    nullable: true
+  - name: nivnome
+    data_type: STRING
+    nullable: true
+  - name: extracted_at
+    data_type: STRING
+    nullable: false

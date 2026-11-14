@@ -1,0 +1,54 @@
+version: 2
+
+models:
+  - name: stg_camara_senado_deputados
+    description: "Staging view for federal deputies from Camara dos Deputados Open Data API."
+    columns:
+      - name: id_deputado
+        description: "Official Camara dos Deputados identifier."
+        tests:
+          - not_null
+      - name: id_legislatura
+        description: "Legislative term number."
+        tests:
+          - not_null
+      - name: nome
+        description: "Parliamentary name."
+        tests:
+          - not_null
+      - name: sigla_partido
+        description: "Political party abbreviation."
+      - name: sigla_uf
+        description: "Represented Federative Unit abbreviation."
+      - name: email
+        description: "Official institutional e-mail address."
+      - name: url_foto
+        description: "Official portrait URL."
+      - name: extracted_at
+        description: "UTC ISO-8601 extraction timestamp."
+
+  - name: dim_parlamentares_federais
+    description: "Intradomain dimension table of Brazilian federal parliamentarians."
+    columns:
+      - name: id_deputado
+        description: "Official Camara dos Deputados identifier."
+        tests:
+          - not_null
+      - name: id_legislatura
+        description: "Legislative term number."
+        tests:
+          - not_null
+      - name: nome
+        description: "Parliamentary name."
+        tests:
+          - not_null
+      - name: sigla_partido
+        description: "Political party abbreviation."
+      - name: sigla_uf
+        description: "Represented Federative Unit abbreviation."
+      - name: email
+        description: "Official institutional e-mail address."
+      - name: url_foto
+        description: "Official portrait URL."
+      - name: extracted_at
+        description: "UTC ISO-8601 extraction timestamp."

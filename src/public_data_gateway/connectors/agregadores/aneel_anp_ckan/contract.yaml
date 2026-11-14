@@ -1,0 +1,42 @@
+contract_id: aneel-anp-ckan-v1
+source_id: aneel_anp_ckan
+version: "1.0.0"
+grain: "portal x resource_id x record_id"
+primary_keys:
+  - portal
+  - resource_id
+  - record_id
+reference_date_column: reference_date
+lgpd_legal_basis: "Dados abertos regulatorios de energia e combustiveis (LAI - Lei 12.527/2011)"
+min_expected_rows: 1
+max_volume_drop_pct: 50.0
+sentinel_values:
+  - "-1"
+  - "-999"
+  - "999999"
+  - "N/A"
+columns:
+  - name: portal
+    data_type: STRING
+    nullable: false
+  - name: resource_id
+    data_type: STRING
+    nullable: false
+  - name: record_id
+    data_type: STRING
+    nullable: false
+  - name: reference_date
+    data_type: STRING
+    nullable: false
+  - name: metric_name
+    data_type: STRING
+    nullable: false
+  - name: metric_value
+    data_type: DOUBLE
+    nullable: false
+  - name: uf
+    data_type: STRING
+    nullable: true
+  - name: extracted_at
+    data_type: STRING
+    nullable: false

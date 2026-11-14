@@ -1,0 +1,10 @@
+version: 2
+
+sources:
+  - name: brapi_b3
+    description: "B3 equities, ETFs, and FII quotes from brapi.dev."
+    meta:
+      external_location: "data/brapi_b3/silver/{name}.parquet"
+    tables:
+      - name: brapi_quotes
+        description: "Normalized B3 stock and FII daily quotes."

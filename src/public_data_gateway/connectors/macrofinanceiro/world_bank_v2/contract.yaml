@@ -1,0 +1,33 @@
+contract_id: world-bank-v2-v1
+source_id: world_bank_v2
+version: "1.0.0"
+grain: "country_iso3 x indicator_id x year"
+primary_keys:
+  - country_iso3
+  - indicator_id
+  - year
+reference_date_column: year
+lgpd_legal_basis: "Dados estatisticos internacionais agregados (World Bank Open Data - CC BY 4.0)"
+min_expected_rows: 1
+max_volume_drop_pct: 50.0
+sentinel_values:
+  - "-1"
+  - "-999"
+  - "999999"
+  - "N/A"
+columns:
+  - name: country_iso3
+    data_type: STRING
+    nullable: false
+  - name: indicator_id
+    data_type: STRING
+    nullable: false
+  - name: year
+    data_type: STRING
+    nullable: false
+  - name: value
+    data_type: DOUBLE
+    nullable: false
+  - name: extracted_at
+    data_type: STRING
+    nullable: false

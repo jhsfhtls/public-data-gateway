@@ -1,0 +1,64 @@
+version: 2
+
+models:
+  - name: stg_awesomeapi_fx_rates
+    description: "Staging view for AwesomeAPI real-time FX and crypto quotes."
+    columns:
+      - name: pair_code
+        description: "Concatenated currency pair key (e.g., USDBRL)."
+        tests:
+          - not_null
+      - name: rate_date
+        description: "ISO-8601 quote date."
+        tests:
+          - not_null
+      - name: code
+        description: "Base currency ISO code."
+      - name: codein
+        description: "Quote currency ISO code."
+      - name: name
+        description: "Human-readable currency pair label."
+      - name: bid
+        description: "Bid exchange rate."
+        tests:
+          - not_null
+      - name: ask
+        description: "Ask exchange rate."
+        tests:
+          - not_null
+      - name: pct_change
+        description: "Percentage change over previous close."
+      - name: extracted_at
+        description: "UTC ISO-8601 extraction timestamp."
+
+  - name: fct_fx_daily_rates
+    description: "Intradomain fact table of FX daily rates and bid-ask spreads."
+    columns:
+      - name: pair_code
+        description: "Concatenated currency pair key."
+        tests:
+          - not_null
+      - name: rate_date
+        description: "ISO-8601 quote date."
+        tests:
+          - not_null
+      - name: code
+        description: "Base currency ISO code."
+      - name: codein
+        description: "Quote currency ISO code."
+      - name: name
+        description: "Human-readable currency pair label."
+      - name: bid
+        description: "Bid exchange rate."
+        tests:
+          - not_null
+      - name: ask
+        description: "Ask exchange rate."
+        tests:
+          - not_null
+      - name: spread_bid_ask
+        description: "Calculated ask minus bid spread."
+      - name: pct_change
+        description: "Percentage change over previous close."
+      - name: extracted_at
+        description: "UTC ISO-8601 extraction timestamp."

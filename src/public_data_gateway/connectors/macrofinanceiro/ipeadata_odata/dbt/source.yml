@@ -1,0 +1,10 @@
+version: 2
+
+sources:
+  - name: ipeadata_odata
+    description: "IPEA Data OData v4 macroeconomic and regional time series."
+    meta:
+      external_location: "data/ipeadata_odata/silver/{name}.parquet"
+    tables:
+      - name: ipeadata_series
+        description: "Normalized IPEA Data OData series values."

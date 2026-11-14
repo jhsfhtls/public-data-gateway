@@ -1965,6 +1965,109 @@ class PublicApisHubFacade:
         """Compute real road distance (km) and duration (min) via OSRM."""
         return self.service.compute_osrm_route(lat1, lon1, lat2, lon2, profile=profile)
 
+    def fetch_ipeadata_series(self, sercodigo: str, limit: int = 24, *, persist: bool = False) -> list[dict[str, Any]]:
+        """Fetch IPEA Data OData v4 series via Medallion connector."""
+        from public_data_gateway.connectors.macrofinanceiro.ipeadata_odata import (
+            IpeadataOdataConnector,
+        )
+
+        conn = IpeadataOdataConnector(settings=self._sdk.settings)
+        if persist:
+            return conn.extract_table(sercodigo=sercodigo, limit=limit).to_pylist()
+        return conn.normalize_records(conn.fetch_series(sercodigo=sercodigo, limit=limit), sercodigo=sercodigo)
+
+    def fetch_brapi_quote(self, tickers: str = "PETR4", *, persist: bool = False) -> list[dict[str, Any]]:
+        """Fetch B3 stock/FII quotes via Medallion brapi.dev connector."""
+        from public_data_gateway.connectors.macrofinanceiro.brapi_b3 import BrapiB3Connector
+
+        conn = BrapiB3Connector(settings=self._sdk.settings)
+        if persist:
+            return conn.extract_table(tickers=tickers).to_pylist()
+        return conn.normalize_records(conn.fetch_quotes(tickers=tickers))
+
+    def fetch_awesomeapi_rates(
+        self, pairs: str = "USD-BRL,EUR-BRL,BTC-BRL", *, persist: bool = False
+    ) -> list[dict[str, Any]]:
+        """Fetch real-time FX & crypto quotes via Medallion AwesomeAPI connector."""
+        from public_data_gateway.connectors.macrofinanceiro.awesomeapi_fx import (
+            AwesomeApiFxConnector,
+        )
+
+        conn = AwesomeApiFxConnector(settings=self._sdk.settings)
+        if persist:
+            return conn.extract_table(pairs=pairs).to_pylist()
+        return conn.normalize_records(conn.fetch_rates(pairs=pairs))
+
+    def query_ckan_datastore(
+        self,
+        resource_id: str,
+        *,
+        portal: str = "aneel",
+        limit: int = 20,
+        persist: bool = False,
+    ) -> list[dict[str, Any]]:
+        """Query ANEEL/ANP CKAN DataStore via Medallion connector."""
+        from public_data_gateway.connectors.agregadores.aneel_anp_ckan import AneelAnpCkanConnector
+
+        conn = AneelAnpCkanConnector(settings=self._sdk.settings)
+        if persist:
+            return conn.extract_table(portal=portal, resource_id=resource_id, limit=limit).to_pylist()
+        return conn.normalize_records(
+            conn.fetch_datastore(resource_id=resource_id, portal=portal, limit=limit),
+            portal=portal,
+            resource_id=resource_id,
+        )
+
+    def fetch_camara_deputados(
+        self, pagina: int = 1, itens: int = 20, *, persist: bool = False
+    ) -> list[dict[str, Any]]:
+        """Fetch active federal deputies via Medallion Camara Dados Abertos connector."""
+        from public_data_gateway.connectors.compliance.camara_senado_dados_abertos import (
+            CamaraSenadoDadosAbertosConnector,
+        )
+
+        conn = CamaraSenadoDadosAbertosConnector(settings=self._sdk.settings)
+        if persist:
+            return conn.extract_table(pagina=pagina, itens=itens).to_pylist()
+        return conn.normalize_records(conn.fetch_deputados(pagina=pagina, itens=itens))
+
+    def fetch_world_bank_indicator(
+        self,
+        country: str = "BRA",
+        indicator: str = "NY.GDP.MKTP.KD.ZG",
+        per_page: int = 10,
+        *,
+        persist: bool = False,
+    ) -> list[dict[str, Any]]:
+        """Fetch World Bank v2 indicator series via Medallion connector."""
+        from public_data_gateway.connectors.macrofinanceiro.world_bank_v2 import (
+            WorldBankV2Connector,
+        )
+
+        conn = WorldBankV2Connector(settings=self._sdk.settings)
+        if persist:
+            return conn.extract_table(country=country, indicator=indicator, per_page=per_page).to_pylist()
+        return conn.normalize_records(
+            conn.fetch_indicator(country=country, indicator=indicator, per_page=per_page),
+            country=country,
+            indicator=indicator,
+        )
+
+    def fetch_who_gho_indicator(
+        self,
+        indicator: str = "WHOSIS_000001",
+        top: int = 10,
+        *,
+        persist: bool = False,
+    ) -> list[dict[str, Any]]:
+        """Fetch WHO GHO OData health indicator via Medallion connector."""
+        from public_data_gateway.connectors.saude.who_gho_odata import WhoGhoOdataConnector
+
+        conn = WhoGhoOdataConnector(settings=self._sdk.settings)
+        if persist:
+            return conn.extract_table(indicator=indicator, top=top).to_pylist()
+        return conn.normalize_records(conn.fetch_indicator(indicator=indicator, top=top), indicator=indicator)
+
 
 class BrazilData:
     """Unified developer SDK facade for querying, normalizing, and enriching Brazilian public datasets."""

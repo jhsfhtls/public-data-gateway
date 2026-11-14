@@ -1,0 +1,10 @@
+version: 2
+
+sources:
+  - name: aneel_anp_ckan
+    description: "ANEEL and ANP CKAN DataStore regulatory energy and fuel datasets."
+    meta:
+      external_location: "data/aneel_anp_ckan/silver/{name}.parquet"
+    tables:
+      - name: ckan_energy_records
+        description: "Normalized CKAN DataStore energy and fuel records."
