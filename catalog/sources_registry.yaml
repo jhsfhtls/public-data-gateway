@@ -83,6 +83,8 @@ sources:
   rice_score: 950
   roadmap_wave: 1
   status: HOMOLOGATED
+  freshness_sla_hours: 720
+  cron_schedule_expression: 0 3 1 * *
 - source_id: brasilapi_core
   name: 'BrasilAPI: CEPs, FIPE, Bancos, DDD & CNPJ de Borda'
   agency: Comunidade Open Source BrasilAPI
@@ -110,6 +112,8 @@ sources:
   rice_score: 880
   roadmap_wave: 1
   status: HOMOLOGATED
+  freshness_sla_hours: 1
+  cron_schedule_expression: 0 * * * *
 - source_id: bcb_sgs
   name: 'Banco Central: Sistema Gerenciador de Séries Temporais (SGS)'
   agency: Banco Central do Brasil (BACEN)
@@ -133,6 +137,8 @@ sources:
   rice_score: 860
   roadmap_wave: 1
   status: HOMOLOGATED
+  freshness_sla_hours: 24
+  cron_schedule_expression: 0 6 * * *
 - source_id: bcb_olinda_ptax
   name: 'Banco Central Olinda: Cotações PTAX Moedas Diárias'
   agency: Banco Central do Brasil (BACEN)
@@ -155,6 +161,8 @@ sources:
   rice_score: 820
   roadmap_wave: 1
   status: HOMOLOGATED
+  freshness_sla_hours: 24
+  cron_schedule_expression: 0 6 * * *
 - source_id: rfb_cnpj_lakehouse
   name: 'Receita Federal: Cadastro Nacional da Pessoa Jurídica (CNPJ & QSA)'
   agency: Receita Federal do Brasil
@@ -185,6 +193,8 @@ sources:
   rice_score: 840
   roadmap_wave: 2
   status: HOMOLOGATED
+  freshness_sla_hours: 720
+  cron_schedule_expression: 0 2 15 * *
 - source_id: pncp_contratacoes
   name: 'PNCP: Portal Nacional de Contratações Públicas (Lei 14.133)'
   agency: Governo Federal / PNCP
@@ -211,6 +221,8 @@ sources:
   rice_score: 790
   roadmap_wave: 2
   status: HOMOLOGATED
+  freshness_sla_hours: 1
+  cron_schedule_expression: 0 * * * *
 - source_id: cnj_datajud
   name: 'CNJ: Base Nacional do Poder Judiciário (DataJud)'
   agency: Conselho Nacional de Justiça (CNJ)
@@ -236,6 +248,8 @@ sources:
   rice_score: 780
   roadmap_wave: 2
   status: HOMOLOGATED
+  freshness_sla_hours: 24
+  cron_schedule_expression: 0 6 * * *
 - source_id: cgu_ceis_cnep
   name: 'CGU: Cadastros de Empresas Inidôneas, Suspensas e Punidas (CEIS/CNEP)'
   agency: Controladoria-Geral da União (CGU)
@@ -261,6 +275,8 @@ sources:
   rice_score: 760
   roadmap_wave: 2
   status: HOMOLOGATED
+  freshness_sla_hours: 24
+  cron_schedule_expression: 0 6 * * *
 - source_id: cgu_pep
   name: 'CGU: Cadastro de Pessoas Expostas Politicamente (PEP)'
   agency: Controladoria-Geral da União (CGU)
@@ -285,6 +301,8 @@ sources:
   rice_score: 750
   roadmap_wave: 2
   status: HOMOLOGATED
+  freshness_sla_hours: 24
+  cron_schedule_expression: 0 6 * * *
 - source_id: rfb_simples_mei
   name: 'Receita Federal: Opção pelo Simples Nacional & MEI'
   agency: Receita Federal do Brasil
@@ -308,6 +326,8 @@ sources:
   rice_score: 720
   roadmap_wave: 2
   status: HOMOLOGATED
+  freshness_sla_hours: 720
+  cron_schedule_expression: 0 2 15 * *
 - source_id: tst_cndt
   name: 'TST: Certidão Negativa de Débitos Trabalhistas (CNDT)'
   agency: Tribunal Superior do Trabalho (TST)
@@ -332,6 +352,8 @@ sources:
   rice_score: 700
   roadmap_wave: 2
   status: HOMOLOGATED
+  freshness_sla_hours: 24
+  cron_schedule_expression: 0 6 * * *
 - source_id: suframa_pim_zfm
   name: 'SUFRAMA: Cadastro de Empresas Incentivadas do PIM / ZFM'
   agency: Superintendência da Zona Franca de Manaus (SUFRAMA)
@@ -357,6 +379,8 @@ sources:
   rice_score: 610
   roadmap_wave: 2
   status: HOMOLOGATED
+  freshness_sla_hours: 720
+  cron_schedule_expression: 0 3 5 * *
 - source_id: cvm_dfp_itr
   name: 'CVM: Demonstrações Financeiras Padronizadas (DFP / ITR)'
   agency: Comissão de Valores Mobiliários (CVM)
@@ -380,6 +404,8 @@ sources:
   rice_score: 680
   roadmap_wave: 3
   status: HOMOLOGATED
+  freshness_sla_hours: 2160
+  cron_schedule_expression: 0 3 15 */3 *
 - source_id: mdic_comexstat
   name: 'MDIC: Comex Stat Exportações e Importações Detalhadas'
   agency: Ministério do Desenvolvimento, Indústria e Comércio Exterior (MDIC)
@@ -405,6 +431,8 @@ sources:
   rice_score: 660
   roadmap_wave: 3
   status: HOMOLOGATED
+  freshness_sla_hours: 720
+  cron_schedule_expression: 0 3 5 * *
 - source_id: cvm_fundos
   name: 'CVM: Informe Diário de Fundos de Investimento'
   agency: Comissão de Valores Mobiliários (CVM)
@@ -428,6 +456,8 @@ sources:
   rice_score: 650
   roadmap_wave: 3
   status: HOMOLOGATED
+  freshness_sla_hours: 24
+  cron_schedule_expression: 0 7 * * 1-5
 - source_id: bcb_ifdata
   name: 'Banco Central: Informações Financeiras das IFs (IF.data)'
   agency: Banco Central do Brasil (BACEN)
@@ -451,6 +481,8 @@ sources:
   rice_score: 640
   roadmap_wave: 3
   status: HOMOLOGATED
+  freshness_sla_hours: 2160
+  cron_schedule_expression: 0 2 1 */3 *
 - source_id: stn_tesouro_transparente
   name: 'Secretaria do Tesouro Nacional: SADIPEM & Dívida Pública'
   agency: Secretaria do Tesouro Nacional (STN)
@@ -475,6 +507,8 @@ sources:
   rice_score: 630
   roadmap_wave: 3
   status: HOMOLOGATED
+  freshness_sla_hours: 720
+  cron_schedule_expression: 0 3 5 * *
 - source_id: comprasgov_catmat
   name: 'Compras.gov.br: Catálogo Unificado de Materiais e Serviços (CATMAT/CATSER)'
   agency: Ministério da Gestão e Inovação em Serviços Públicos (MGI)
@@ -497,6 +531,8 @@ sources:
   rice_score: 610
   roadmap_wave: 3
   status: HOMOLOGATED
+  freshness_sla_hours: 168
+  cron_schedule_expression: 0 4 * * 1
 - source_id: ibge_sidra
   name: 'IBGE: Sistema IBGE de Recuperação Automática (SIDRA)'
   agency: Instituto Brasileiro de Geografia e Estatística (IBGE)
@@ -521,6 +557,8 @@ sources:
   rice_score: 590
   roadmap_wave: 4
   status: HOMOLOGATED
+  freshness_sla_hours: 720
+  cron_schedule_expression: 0 3 5 * *
 - source_id: ibge_pib_municipal
   name: 'IBGE: Produto Interno Bruto dos Municípios'
   agency: Instituto Brasileiro de Geografia e Estatística (IBGE)
@@ -545,6 +583,8 @@ sources:
   rice_score: 580
   roadmap_wave: 4
   status: HOMOLOGATED
+  freshness_sla_hours: 8760
+  cron_schedule_expression: 0 2 15 1 *
 - source_id: ibge_censo2022
   name: 'IBGE: Microdados do Censo Demográfico 2022'
   agency: Instituto Brasileiro de Geografia e Estatística (IBGE)
@@ -570,6 +610,8 @@ sources:
   rice_score: 570
   roadmap_wave: 4
   status: HOMOLOGATED
+  freshness_sla_hours: 87600
+  cron_schedule_expression: 0 2 1 1 *
 - source_id: mte_novo_caged
   name: 'MTE: Microdados do Novo CAGED'
   agency: Ministério do Trabalho e Emprego (MTE)
@@ -597,6 +639,8 @@ sources:
   rice_score: 570
   roadmap_wave: 4
   status: HOMOLOGATED
+  freshness_sla_hours: 720
+  cron_schedule_expression: 0 3 5 * *
 - source_id: ibge_pnad_continua
   name: 'IBGE: Pesquisa Nacional por Amostra de Domicílios Contínua (PNAD Contínua)'
   agency: Instituto Brasileiro de Geografia e Estatística (IBGE)
@@ -620,6 +664,8 @@ sources:
   rice_score: 560
   roadmap_wave: 4
   status: HOMOLOGATED
+  freshness_sla_hours: 2160
+  cron_schedule_expression: 0 2 1 */3 *
 - source_id: ibge_cnefe
   name: 'IBGE: Cadastro Nacional de Endereços para Fins Estatísticos (CNEFE)'
   agency: Instituto Brasileiro de Geografia e Estatística (IBGE)
@@ -645,6 +691,8 @@ sources:
   rice_score: 560
   roadmap_wave: 4
   status: HOMOLOGATED
+  freshness_sla_hours: 87600
+  cron_schedule_expression: 0 2 1 1 *
 - source_id: mte_rais
   name: 'MTE: Relação Anual de Informações Sociais (RAIS)'
   agency: Ministério do Trabalho e Emprego (MTE)
@@ -671,6 +719,8 @@ sources:
   rice_score: 550
   roadmap_wave: 4
   status: HOMOLOGATED
+  freshness_sla_hours: 8760
+  cron_schedule_expression: 0 2 15 1 *
 - source_id: ibge_malhas
   name: 'IBGE: Malhas Territoriais Vetoriais (Municípios e UFs)'
   agency: Instituto Brasileiro de Geografia e Estatística (IBGE)
@@ -695,6 +745,8 @@ sources:
   rice_score: 540
   roadmap_wave: 4
   status: HOMOLOGATED
+  freshness_sla_hours: 8760
+  cron_schedule_expression: 0 2 15 1 *
 - source_id: anatel_mosaico
   name: 'ANATEL: Sistema Mosaico de Estações e Cobertura de Telecomunicações'
   agency: Agência Nacional de Telecomunicações (ANATEL)
@@ -719,6 +771,8 @@ sources:
   rice_score: 510
   roadmap_wave: 4
   status: HOMOLOGATED
+  freshness_sla_hours: 720
+  cron_schedule_expression: 0 3 5 * *
 - source_id: antt_malha_transporte
   name: 'ANTT: Malha de Transporte Rodoviário e Ferroviário de Cargas'
   agency: Agência Nacional de Transportes Terrestres (ANTT)
@@ -744,6 +798,8 @@ sources:
   rice_score: 500
   roadmap_wave: 4
   status: HOMOLOGATED
+  freshness_sla_hours: 2160
+  cron_schedule_expression: 0 2 1 */3 *
 - source_id: datasus_cnes
   name: 'DataSUS: Cadastro Nacional de Estabelecimentos de Saúde (CNES)'
   agency: Ministério da Saúde / DataSUS
@@ -770,6 +826,8 @@ sources:
   rice_score: 480
   roadmap_wave: 5
   status: HOMOLOGATED
+  freshness_sla_hours: 720
+  cron_schedule_expression: 0 3 5 * *
 - source_id: datasus_sih
   name: 'DataSUS: Sistema de Informações Hospitalares (SIH/SUS)'
   agency: Ministério da Saúde / DataSUS
@@ -794,6 +852,8 @@ sources:
   rice_score: 470
   roadmap_wave: 5
   status: HOMOLOGATED
+  freshness_sla_hours: 720
+  cron_schedule_expression: 0 3 5 * *
 - source_id: inep_censo_escolar
   name: 'INEP: Microdados do Censo Escolar da Educação Básica'
   agency: Instituto Nacional de Estudos e Pesquisas Educacionais Anísio Teixeira (INEP)
@@ -819,6 +879,8 @@ sources:
   rice_score: 470
   roadmap_wave: 5
   status: HOMOLOGATED
+  freshness_sla_hours: 8760
+  cron_schedule_expression: 0 2 15 1 *
 - source_id: datasus_sim
   name: 'DataSUS: Sistema de Informações sobre Mortalidade (SIM)'
   agency: Ministério da Saúde / DataSUS
@@ -843,6 +905,8 @@ sources:
   rice_score: 460
   roadmap_wave: 5
   status: HOMOLOGATED
+  freshness_sla_hours: 8760
+  cron_schedule_expression: 0 2 15 1 *
 - source_id: inep_censo_superior
   name: 'INEP: Microdados do Censo da Educação Superior'
   agency: Instituto Nacional de Estudos e Pesquisas Educacionais Anísio Teixeira (INEP)
@@ -868,6 +932,8 @@ sources:
   rice_score: 460
   roadmap_wave: 5
   status: HOMOLOGATED
+  freshness_sla_hours: 8760
+  cron_schedule_expression: 0 2 15 1 *
 - source_id: cnj_justica_aberta
   name: 'CNJ: Justiça Aberta (Cadastro e Produtividade de Cartórios)'
   agency: Conselho Nacional de Justiça (CNJ)
@@ -892,6 +958,8 @@ sources:
   rice_score: 460
   roadmap_wave: 5
   status: HOMOLOGATED
+  freshness_sla_hours: 4320
+  cron_schedule_expression: 0 2 1 1,7 *
 - source_id: datasus_sinasc
   name: 'DataSUS: Sistema de Informações sobre Nascidos Vivos (SINASC)'
   agency: Ministério da Saúde / DataSUS
@@ -916,6 +984,8 @@ sources:
   rice_score: 450
   roadmap_wave: 5
   status: HOMOLOGATED
+  freshness_sla_hours: 8760
+  cron_schedule_expression: 0 2 15 1 *
 - source_id: anvisa_cmed
   name: 'ANVISA: Câmara de Regulação do Mercado de Medicamentos (CMED)'
   agency: Agência Nacional de Vigilância Sanitária (ANVISA)
@@ -939,6 +1009,8 @@ sources:
   rice_score: 450
   roadmap_wave: 5
   status: HOMOLOGATED
+  freshness_sla_hours: 720
+  cron_schedule_expression: 0 3 5 * *
 - source_id: inep_ideb
   name: 'INEP: Índice de Desenvolvimento da Educação Básica (IDEB)'
   agency: Instituto Nacional de Estudos e Pesquisas Educacionais Anísio Teixeira (INEP)
@@ -963,6 +1035,8 @@ sources:
   rice_score: 450
   roadmap_wave: 5
   status: HOMOLOGATED
+  freshness_sla_hours: 17520
+  cron_schedule_expression: 0 2 1 1 *
 - source_id: onr_registro_imoveis
   name: 'ONR: Sistema de Registro Eletrônico de Imóveis (SREI)'
   agency: Operador Nacional do Registro de Imóveis Eletrônico (ONR)
@@ -987,6 +1061,8 @@ sources:
   rice_score: 450
   roadmap_wave: 5
   status: HOMOLOGATED
+  freshness_sla_hours: 720
+  cron_schedule_expression: 0 3 5 * *
 - source_id: opendatasus_vigilancia
   name: 'OpenDataSUS: Notificações de Síndromes e Vigilância Epidemiológica'
   agency: Ministério da Saúde
@@ -1011,6 +1087,8 @@ sources:
   rice_score: 440
   roadmap_wave: 5
   status: HOMOLOGATED
+  freshness_sla_hours: 168
+  cron_schedule_expression: 0 4 * * 1
 - source_id: inep_enem
   name: 'INEP: Microdados do Exame Nacional do Ensino Médio (ENEM)'
   agency: Instituto Nacional de Estudos e Pesquisas Educacionais Anísio Teixeira (INEP)
@@ -1035,6 +1113,8 @@ sources:
   rice_score: 440
   roadmap_wave: 5
   status: HOMOLOGATED
+  freshness_sla_hours: 8760
+  cron_schedule_expression: 0 2 15 1 *
 - source_id: capitais_iptu_itbi
   name: 'Capitais: Cadastros Imobiliários Municipais (IPTU / ITBI)'
   agency: Prefeituras Municipais das Capitais
@@ -1060,6 +1140,8 @@ sources:
   rice_score: 430
   roadmap_wave: 5
   status: HOMOLOGATED
+  freshness_sla_hours: 720
+  cron_schedule_expression: 0 3 5 * *
 - source_id: capes_sucupira
   name: 'CAPES: Plataforma Sucupira (Pós-Graduação Stricto Sensu)'
   agency: Coordenação de Aperfeiçoamento de Pessoal de Nível Superior (CAPES)
@@ -1084,6 +1166,8 @@ sources:
   rice_score: 410
   roadmap_wave: 5
   status: HOMOLOGATED
+  freshness_sla_hours: 8760
+  cron_schedule_expression: 0 2 15 1 *
 - source_id: inpe_terrabrasilis
   name: 'INPE: Plataforma TerraBrasilis (DETER & PRODES)'
   agency: Instituto Nacional de Pesquisas Espaciais (INPE)
@@ -1109,6 +1193,8 @@ sources:
   rice_score: 390
   roadmap_wave: 6
   status: HOMOLOGATED
+  freshness_sla_hours: 24
+  cron_schedule_expression: 0 6 * * *
 - source_id: datalake_federado_bq
   name: 'PDG: Datalake Público Federado & Catálogo Nacional SQL (DuckDB / BigQuery)'
   agency: Infraestrutura Nacional de Dados (IND / GOV.BR) & PDG
@@ -1139,6 +1225,8 @@ sources:
   rice_score: 390
   roadmap_wave: 6
   status: HOMOLOGATED
+  freshness_sla_hours: 6
+  cron_schedule_expression: 0 */6 * * *
 - source_id: ana_hidroweb_telemetria
   name: 'ANA: Rede Hidrometeorológica Nacional (HidroWeb)'
   agency: Agência Nacional de Águas e Saneamento Básico (ANA)
@@ -1163,6 +1251,8 @@ sources:
   rice_score: 380
   roadmap_wave: 6
   status: HOMOLOGATED
+  freshness_sla_hours: 24
+  cron_schedule_expression: 0 6 * * *
 - source_id: mapbiomas_cobertura
   name: 'MapBiomas: Cobertura e Uso da Terra no Brasil (1985-2024)'
   agency: Projeto MapBiomas
@@ -1188,6 +1278,8 @@ sources:
   rice_score: 370
   roadmap_wave: 6
   status: HOMOLOGATED
+  freshness_sla_hours: 8760
+  cron_schedule_expression: 0 2 15 1 *
 - source_id: sfb_sicar
   name: 'SFB: Sistema Nacional de Cadastro Ambiental Rural (SICAR)'
   agency: Serviço Florestal Brasileiro (SFB) / MMA
@@ -1213,6 +1305,8 @@ sources:
   rice_score: 360
   roadmap_wave: 6
   status: HOMOLOGATED
+  freshness_sla_hours: 4320
+  cron_schedule_expression: 0 2 1 1,7 *
 - source_id: mapa_zarc
   name: 'MAPA: Zoneamento Agrícola de Risco Climático (ZARC)'
   agency: Ministério da Agricultura e Pecuária (MAPA) / Embrapa
@@ -1237,6 +1331,8 @@ sources:
   rice_score: 350
   roadmap_wave: 6
   status: HOMOLOGATED
+  freshness_sla_hours: 8760
+  cron_schedule_expression: 0 2 15 1 *
 - source_id: dadosgov_ckan
   name: 'Dados.gov.br: Portal Brasileiro de Dados Abertos (Catálogo CKAN)'
   agency: Governo Federal (Dados.gov.br)
@@ -1259,3 +1355,5 @@ sources:
   rice_score: 340
   roadmap_wave: 6
   status: HOMOLOGATED
+  freshness_sla_hours: 6
+  cron_schedule_expression: 0 */6 * * *

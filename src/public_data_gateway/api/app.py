@@ -3232,4 +3232,69 @@ def create_app(settings: GatewaySettings | None = None) -> FastAPI:
         except ValueError as exc:
             raise HTTPException(status_code=400, detail=str(exc)) from exc
 
+    # Phase 11: Cloud Lakehouse Mirror, CDC & Serverless Warehouse Endpoints
+    @app.get("/api/v1/lakehouse/sla")
+    async def get_lakehouse_sla(
+        source_id: str | None = Query(None, description="Optional source_id or api_id filter"),
+        include_public_apis: bool = Query(True, description="Include curated public APIs registry"),
+    ) -> dict[str, Any]:
+        from public_data_gateway.lakehouse.sla import FreshnessSlaAuditor
+
+        return FreshnessSlaAuditor(settings=app_settings).audit_sources(
+            source_id=source_id, include_public_apis=include_public_apis
+        )
+
+    @app.get("/api/v1/lakehouse/cdc/plan")
+    async def get_lakehouse_cdc_plan(
+        layers: str = Query("silver,gold", description="Comma-separated Medallion layers"),
+        sources: str | None = Query(None, description="Optional comma-separated source IDs"),
+    ) -> dict[str, Any]:
+        from public_data_gateway.lakehouse.cdc import CdcDeltaTracker
+
+        layer_tuple = tuple(x.strip() for x in layers.split(",") if x.strip()) or ("silver", "gold")
+        source_list = [x.strip() for x in sources.split(",") if x.strip()] if sources else None
+        return CdcDeltaTracker(settings=app_settings).build_delta_plan(
+            layers=layer_tuple, sources=source_list
+        )
+
+    @app.post("/api/v1/lakehouse/mirror/sync")
+    async def post_lakehouse_mirror_sync(
+        provider: str | None = Query(None, description="Mirror provider: local | s3 | r2"),
+        dry_run: bool = Query(True, description="Dry-run without uploading files"),
+        layers: str = Query("silver,gold", description="Comma-separated Medallion layers"),
+        sources: str | None = Query(None, description="Optional comma-separated source IDs"),
+    ) -> dict[str, Any]:
+        from public_data_gateway.lakehouse.mirror import CloudLakehouseMirror
+
+        layer_tuple = tuple(x.strip() for x in layers.split(",") if x.strip()) or ("silver", "gold")
+        source_list = [x.strip() for x in sources.split(",") if x.strip()] if sources else None
+        return CloudLakehouseMirror(settings=app_settings).sync(
+            layers=layer_tuple, sources=source_list, provider=provider, dry_run=dry_run
+        )
+
+    @app.post("/api/v1/lakehouse/warehouse/publish")
+    async def post_lakehouse_warehouse_publish(
+        provider: str | None = Query(None, description="Warehouse provider: duckdb | motherduck | bigquery"),
+        dry_run: bool = Query(True, description="Generate DDL without executing"),
+        layers: str = Query("silver,gold", description="Comma-separated Medallion layers"),
+        sources: str | None = Query(None, description="Optional comma-separated source IDs"),
+    ) -> dict[str, Any]:
+        from public_data_gateway.lakehouse.warehouse import PublicWarehouseAdapter
+
+        layer_tuple = tuple(x.strip() for x in layers.split(",") if x.strip()) or ("silver", "gold")
+        source_list = [x.strip() for x in sources.split(",") if x.strip()] if sources else None
+        return PublicWarehouseAdapter(settings=app_settings).publish_views(
+            provider=provider, layers=layer_tuple, sources=source_list, dry_run=dry_run
+        )
+
+    @app.get("/api/v1/lakehouse/warehouse/query")
+    async def get_lakehouse_warehouse_query(
+        sql: str = Query(..., description="Read-only SELECT/WITH SQL query"),
+        limit: int = Query(100, ge=1, le=1000),
+    ) -> dict[str, Any]:
+        from public_data_gateway.lakehouse.warehouse import PublicWarehouseAdapter
+
+        rows = PublicWarehouseAdapter(settings=app_settings).query_sql(sql=sql, limit=limit)
+        return {"count": len(rows), "rows": rows}
+
     return app

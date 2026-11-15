@@ -2271,6 +2271,7 @@ class BrazilData:
         self.cross_domain = CrossDomainFacade(self)
         self.lifecycle = LifecycleFacade(self)
         self.public_apis = PublicApisHubFacade(self)
+        self.lakehouse = LakehouseFacade(self)
 
     def list_sources(
         self,
@@ -3387,6 +3388,100 @@ class BrazilData:
             input_table=input_table,
             uf_column=uf_column,
             output_path=output_path,
+        )
+
+
+class LakehouseFacade:
+    """Cloud Lakehouse Mirror, CDC Delta, Freshness SLA, and Serverless Warehouse facade (Phase 11)."""
+
+    def __init__(self, sdk: "BrazilData") -> None:
+        self._sdk = sdk
+
+    def audit_sla(
+        self,
+        source_id: str | None = None,
+        include_public_apis: bool = True,
+    ) -> dict[str, Any]:
+        """Audit update_frequency, freshness_sla_hours, cron schedules, and local snapshot age."""
+        from public_data_gateway.lakehouse.sla import FreshnessSlaAuditor
+
+        return FreshnessSlaAuditor(settings=self._sdk.settings).audit_sources(
+            source_id=source_id,
+            include_public_apis=include_public_apis,
+        )
+
+    def cdc_plan(
+        self,
+        layers: tuple[str, ...] = ("silver", "gold"),
+        sources: list[str] | None = None,
+    ) -> dict[str, Any]:
+        """Compute incremental CDC delta plan comparing local Parquet SHA-256 against state."""
+        from public_data_gateway.lakehouse.cdc import CdcDeltaTracker
+
+        return CdcDeltaTracker(settings=self._sdk.settings).build_delta_plan(
+            layers=layers, sources=sources
+        )
+
+    def mirror_plan(
+        self,
+        layers: tuple[str, ...] = ("silver", "gold"),
+        sources: list[str] | None = None,
+        provider: str | None = None,
+    ) -> dict[str, Any]:
+        """Compute cloud lakehouse mirror plan (local, s3, r2) without transferring bytes."""
+        from public_data_gateway.lakehouse.mirror import CloudLakehouseMirror
+
+        return CloudLakehouseMirror(settings=self._sdk.settings).plan(
+            layers=layers, sources=sources, provider=provider
+        )
+
+    def mirror_sync(
+        self,
+        layers: tuple[str, ...] = ("silver", "gold"),
+        sources: list[str] | None = None,
+        provider: str | None = None,
+        dry_run: bool = False,
+    ) -> dict[str, Any]:
+        """Execute incremental Silver/Gold Parquet ZSTD mirror sync and publish manifest."""
+        from public_data_gateway.lakehouse.mirror import CloudLakehouseMirror
+
+        return CloudLakehouseMirror(settings=self._sdk.settings).sync(
+            layers=layers, sources=sources, provider=provider, dry_run=dry_run
+        )
+
+    def warehouse_ddl(
+        self,
+        provider: str | None = None,
+        layers: tuple[str, ...] = ("silver", "gold"),
+        sources: list[str] | None = None,
+    ) -> dict[str, Any]:
+        """Generate DuckDB, MotherDuck, or BigQuery serverless DDL statements."""
+        from public_data_gateway.lakehouse.warehouse import PublicWarehouseAdapter
+
+        return PublicWarehouseAdapter(settings=self._sdk.settings).generate_ddl(
+            provider=provider, layers=layers, sources=sources
+        )
+
+    def warehouse_publish(
+        self,
+        provider: str | None = None,
+        layers: tuple[str, ...] = ("silver", "gold"),
+        sources: list[str] | None = None,
+        dry_run: bool = False,
+    ) -> dict[str, Any]:
+        """Publish mirrored Parquet views to DuckDB, MotherDuck, or BigQuery."""
+        from public_data_gateway.lakehouse.warehouse import PublicWarehouseAdapter
+
+        return PublicWarehouseAdapter(settings=self._sdk.settings).publish_views(
+            provider=provider, layers=layers, sources=sources, dry_run=dry_run
+        )
+
+    def warehouse_query(self, sql: str, limit: int = 100) -> list[dict[str, Any]]:
+        """Execute a strictly read-only SQL query against the DuckDB warehouse."""
+        from public_data_gateway.lakehouse.warehouse import PublicWarehouseAdapter
+
+        return PublicWarehouseAdapter(settings=self._sdk.settings).query_sql(
+            sql=sql, limit=limit
         )
 
 

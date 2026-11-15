@@ -17,6 +17,31 @@ class GatewaySettings:
     user_agent: str = "public-data-gateway/0.1.0 (+https://github.com/jhsfhtls/public-data-gateway)"
     cache_ttl_seconds: int = 86400
     bq_max_bytes_billed: int = 1073741824  # 1 GiB safety limit
+    mirror_provider: str = field(
+        default_factory=lambda: os.environ.get("BDG_MIRROR_PROVIDER", "local").lower()
+    )
+    mirror_bucket: str = field(
+        default_factory=lambda: os.environ.get("BDG_MIRROR_BUCKET", "")
+    )
+    mirror_prefix: str = field(
+        default_factory=lambda: os.environ.get("BDG_MIRROR_PREFIX", "public-data-gateway")
+    )
+    mirror_endpoint_url: str = field(
+        default_factory=lambda: os.environ.get("BDG_MIRROR_ENDPOINT_URL", "")
+    )
+    mirror_region: str = field(
+        default_factory=lambda: os.environ.get("BDG_MIRROR_REGION", "auto")
+    )
+    mirror_local_dir: Path | None = None
+    warehouse_provider: str = field(
+        default_factory=lambda: os.environ.get("BDG_WAREHOUSE_PROVIDER", "duckdb").lower()
+    )
+    warehouse_database: str = field(
+        default_factory=lambda: os.environ.get("BDG_MOTHERDUCK_DATABASE", "public_data_gateway")
+    )
+    bq_dataset: str = field(
+        default_factory=lambda: os.environ.get("BDG_BQ_DATASET", "public_data_gateway")
+    )
 
     def __post_init__(self) -> None:
         if self.data_dir is None:
@@ -27,6 +52,14 @@ class GatewaySettings:
                 self.data_dir = (self.repo_root / "data").resolve()
         else:
             self.data_dir = Path(self.data_dir).resolve()
+        if self.mirror_local_dir is None:
+            mirror_env = os.environ.get("BDG_MIRROR_LOCAL_DIR")
+            if mirror_env:
+                self.mirror_local_dir = Path(mirror_env).resolve()
+            else:
+                self.mirror_local_dir = (self.data_dir / "mirror").resolve()
+        else:
+            self.mirror_local_dir = Path(self.mirror_local_dir).resolve()
 
     @property
     def bronze_dir(self) -> Path:

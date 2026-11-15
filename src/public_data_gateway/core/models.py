@@ -22,6 +22,8 @@ class SourceEntry(BaseModel):
     auth_type: str = "none"
     canonical_keys: list[str] = Field(default_factory=list)
     update_frequency: str = "daily"
+    freshness_sla_hours: int = 24
+    cron_schedule_expression: str = "0 6 * * *"
     estimated_volume: str = ""
     lgpd_tier: str = "public"
     ml_feature_domains: list[str] = Field(default_factory=list)

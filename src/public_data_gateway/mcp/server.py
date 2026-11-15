@@ -2449,6 +2449,53 @@ class MCPDispatcher:
                                     },
                                 },
                             },
+                            {
+                                "name": "bdg_lakehouse_sla_audit",
+                                "description": "Audit freshness SLA hours, update frequency, and cron schedules across cataloged sources (Phase 11).",
+                                "inputSchema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "source_id": {"type": "string", "description": "Optional source_id or api_id filter"},
+                                        "include_public_apis": {"type": "boolean", "description": "Include curated public APIs registry"},
+                                    },
+                                },
+                            },
+                            {
+                                "name": "bdg_lakehouse_cdc_plan",
+                                "description": "Compute incremental CDC delta plan comparing local Silver/Gold Parquet SHA-256 against watermark state (Phase 11).",
+                                "inputSchema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "layers": {"type": "array", "items": {"type": "string"}},
+                                        "sources": {"type": "array", "items": {"type": "string"}},
+                                    },
+                                },
+                            },
+                            {
+                                "name": "bdg_lakehouse_mirror_sync",
+                                "description": "Plan or execute Cloud Lakehouse Mirror sync (local | s3 | r2) for Silver/Gold Parquet snapshots (Phase 11).",
+                                "inputSchema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "provider": {"type": "string", "enum": ["local", "s3", "r2"]},
+                                        "dry_run": {"type": "boolean"},
+                                        "layers": {"type": "array", "items": {"type": "string"}},
+                                        "sources": {"type": "array", "items": {"type": "string"}},
+                                    },
+                                },
+                            },
+                            {
+                                "name": "bdg_lakehouse_warehouse_ddl",
+                                "description": "Generate serverless SQL DDL for DuckDB, MotherDuck, or BigQuery external tables/views (Phase 11).",
+                                "inputSchema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "provider": {"type": "string", "enum": ["duckdb", "motherduck", "bigquery"]},
+                                        "layers": {"type": "array", "items": {"type": "string"}},
+                                        "sources": {"type": "array", "items": {"type": "string"}},
+                                    },
+                                },
+                            },
                         ]
                     },
                 }
@@ -5134,6 +5181,37 @@ class MCPDispatcher:
                 "gdelt_doc_api",
                 lambda sdk: sdk.public_apis.query_gdelt_doc(
                     str(args["query"]), maxrecords=int(args.get("maxrecords", 5))
+                ),
+            ),
+            "bdg_lakehouse_sla_audit": (
+                "lakehouse_sla",
+                lambda sdk: sdk.lakehouse.audit_sla(
+                    source_id=args.get("source_id"),
+                    include_public_apis=bool(args.get("include_public_apis", True)),
+                ),
+            ),
+            "bdg_lakehouse_cdc_plan": (
+                "lakehouse_cdc",
+                lambda sdk: sdk.lakehouse.cdc_plan(
+                    layers=tuple(args.get("layers") or ("silver", "gold")),
+                    sources=args.get("sources"),
+                ),
+            ),
+            "bdg_lakehouse_mirror_sync": (
+                "lakehouse_mirror",
+                lambda sdk: sdk.lakehouse.mirror_sync(
+                    provider=args.get("provider"),
+                    dry_run=bool(args.get("dry_run", True)),
+                    layers=tuple(args.get("layers") or ("silver", "gold")),
+                    sources=args.get("sources"),
+                ),
+            ),
+            "bdg_lakehouse_warehouse_ddl": (
+                "lakehouse_warehouse",
+                lambda sdk: sdk.lakehouse.warehouse_ddl(
+                    provider=args.get("provider"),
+                    layers=tuple(args.get("layers") or ("silver", "gold")),
+                    sources=args.get("sources"),
                 ),
             ),
         }

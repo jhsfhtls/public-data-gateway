@@ -60,6 +60,9 @@ apis:
   notes: Camada primaria de baixa latencia para CNPJ, QSA, Simples/MEI e CNAEs.
   medallion_parity: true
   connector_id: minha_receita
+  update_frequency: Diária (Sincronização RFB)
+  freshness_sla_hours: 24
+  cron_schedule_expression: 0 5 * * *
 - api_id: cnpja_open
   name: CNPJa Open API
   block: BLOCO_1_KYC_GEO
@@ -75,6 +78,9 @@ apis:
   notes: Segundo fallback em cascata para QSA, regime tributario e inscricoes estaduais.
   medallion_parity: true
   connector_id: cnpja_open
+  update_frequency: Tempo Real (Sob demanda)
+  freshness_sla_hours: 1
+  cron_schedule_expression: 0 * * * *
 - api_id: receitaws
   name: ReceitaWS
   block: BLOCO_1_KYC_GEO
@@ -90,6 +96,9 @@ apis:
   notes: Fallback final da cascata CNPJ (3 req/min na camada gratuita).
   medallion_parity: true
   connector_id: receitaws
+  update_frequency: Tempo Real (Sob demanda)
+  freshness_sla_hours: 1
+  cron_schedule_expression: 0 * * * *
 - api_id: viacep
   name: ViaCEP
   block: BLOCO_1_KYC_GEO
@@ -106,6 +115,9 @@ apis:
     busca reversa.
   medallion_parity: true
   connector_id: viacep
+  update_frequency: Semanal (DNE/Correios)
+  freshness_sla_hours: 168
+  cron_schedule_expression: 0 4 * * 1
 - api_id: opencep
   name: OpenCEP
   block: BLOCO_1_KYC_GEO
@@ -121,6 +133,9 @@ apis:
   notes: Fallback rapido para consulta de CEP e codigo IBGE municipal.
   medallion_parity: true
   connector_id: opencep
+  update_frequency: Semanal (DNE/Correios)
+  freshness_sla_hours: 168
+  cron_schedule_expression: 0 4 * * 1
 - api_id: nominatim_osm
   name: Nominatim (OpenStreetMap)
   block: BLOCO_1_KYC_GEO
@@ -137,6 +152,9 @@ apis:
     req/s).
   medallion_parity: true
   connector_id: nominatim_osm
+  update_frequency: Diária (OSM Planet)
+  freshness_sla_hours: 24
+  cron_schedule_expression: 0 5 * * *
 - api_id: rdap_registro_br
   name: RDAP Registro.br
   block: BLOCO_1_KYC_GEO
@@ -152,6 +170,9 @@ apis:
   notes: Substituto JSON do WHOIS para idade de dominio .br, titularidade e DNS antifraude.
   medallion_parity: true
   connector_id: rdap_registro_br
+  update_frequency: Tempo Real (WHOIS/RDAP)
+  freshness_sla_hours: 1
+  cron_schedule_expression: 0 * * * *
 - api_id: gleif_lei
   name: GLEIF Global LEI API
   block: BLOCO_1_KYC_GEO
@@ -167,6 +188,9 @@ apis:
   notes: Validacao global de entidades juridicas (LEI) e arvore de holdings controladoras.
   medallion_parity: true
   connector_id: gleif_lei
+  update_frequency: Diária (Golden Copy LEI)
+  freshness_sla_hours: 24
+  cron_schedule_expression: 0 6 * * *
 - api_id: bgpview_ip_intel
   name: BGPView / IP-API
   block: BLOCO_1_KYC_GEO
@@ -182,6 +206,9 @@ apis:
   notes: Enriquecimento de IP com ASN, prefixo, pais e deteccao de datacenter/hosting.
   medallion_parity: true
   connector_id: bgpview_ip_intel
+  update_frequency: Diária (BGP Routing)
+  freshness_sla_hours: 24
+  cron_schedule_expression: 0 6 * * *
 - api_id: company_enrich_apollo_bdc
   name: CompanyEnrich / Apollo / BigDataCorp (Adaptador B2B Freemium)
   block: BLOCO_1_KYC_GEO
@@ -198,6 +225,9 @@ apis:
     / APOLLO_API_KEY).
   medallion_parity: true
   connector_id: company_enrich_apollo_bdc
+  update_frequency: Semanal (B2B Firmographics)
+  freshness_sla_hours: 168
+  cron_schedule_expression: 0 4 * * 1
 - api_id: brapi_b3
   name: brapi (Cotacoes B3, Dividendos & FIIs)
   block: BLOCO_2_MERCADO_REGULATORIO
@@ -214,6 +244,9 @@ apis:
   connector_id: brapi_b3
   notes: Cotacoes B3, dividendos, FIIs e indicadores fundamentalistas em JSON (BRAPI_TOKEN
     opcional).
+  update_frequency: Diária (Pregão B3)
+  freshness_sla_hours: 24
+  cron_schedule_expression: 0 20 * * 1-5
 - api_id: awesomeapi_fx
   name: AwesomeAPI (Cambio & Cripto)
   block: BLOCO_2_MERCADO_REGULATORIO
@@ -228,6 +261,9 @@ apis:
   medallion_parity: true
   connector_id: awesomeapi_fx
   notes: Cotacoes em tempo real e fechamentos de moedas internacionais e criptomoedas.
+  update_frequency: Horária (Câmbio Spot)
+  freshness_sla_hours: 1
+  cron_schedule_expression: 0 * * * *
 - api_id: ipeadata_odata
   name: IPEA Data (OData v4)
   block: BLOCO_2_MERCADO_REGULATORIO
@@ -244,6 +280,9 @@ apis:
   connector_id: ipeadata_odata
   notes: Milhares de series historicas macroeconomicas, sociais e de financas regionais
     em OData v4.
+  update_frequency: Diária / Mensal (Séries IPEA)
+  freshness_sla_hours: 24
+  cron_schedule_expression: 0 7 * * *
 - api_id: aneel_anp_ckan
   name: ANEEL & ANP (CKAN DataStore)
   block: BLOCO_2_MERCADO_REGULATORIO
@@ -260,6 +299,9 @@ apis:
   connector_id: aneel_anp_ckan
   notes: Consultas SQL/JSON em tarifas eletricas, geracao distribuida (ANEEL) e combustiveis
     (ANP).
+  update_frequency: Mensal (Regulatório Energia)
+  freshness_sla_hours: 720
+  cron_schedule_expression: 0 3 5 * *
 - api_id: camara_senado_dados_abertos
   name: Camara dos Deputados & Senado Federal
   block: BLOCO_2_MERCADO_REGULATORIO
@@ -275,6 +317,9 @@ apis:
   medallion_parity: true
   connector_id: camara_senado_dados_abertos
   notes: Cota parlamentar (com CNPJ do fornecedor), proposicoes legislativas e votacoes.
+  update_frequency: Diária (Tramitação Legislativa)
+  freshness_sla_hours: 24
+  cron_schedule_expression: 0 7 * * *
 - api_id: world_bank_v2
   name: World Bank Indicators API v2
   block: BLOCO_2_MERCADO_REGULATORIO
@@ -290,6 +335,9 @@ apis:
   medallion_parity: true
   connector_id: world_bank_v2
   notes: Cerca de 16 mil indicadores macroeconomicos, demograficos e sociais globais.
+  update_frequency: Trimestral / Anual (Indicadores WDI)
+  freshness_sla_hours: 2160
+  cron_schedule_expression: 0 2 1 */3 *
 - api_id: who_gho_odata
   name: Observatorio da OMS (WHO GHO)
   block: BLOCO_2_MERCADO_REGULATORIO
@@ -305,6 +353,9 @@ apis:
   medallion_parity: true
   connector_id: who_gho_odata
   notes: Series temporais globais de indicadores sanitarios e epidemiologicos da OMS.
+  update_frequency: Anual (Observatório Global OMS)
+  freshness_sla_hours: 8760
+  cron_schedule_expression: 0 2 15 1 *
 - api_id: overpass_osm
   name: Overpass API (POIs OpenStreetMap)
   block: BLOCO_3_ESPACIAL_CLIMA_ML
@@ -321,6 +372,9 @@ apis:
   connector_id: overpass_osm
   notes: Contagem espacial de POIs (escolas, farmacias, bancos, paradas) em raio de
     coordenada.
+  update_frequency: Diária (POIs OSM)
+  freshness_sla_hours: 24
+  cron_schedule_expression: 0 5 * * *
 - api_id: osrm_routing
   name: OSRM (Open Source Routing Machine)
   block: BLOCO_3_ESPACIAL_CLIMA_ML
@@ -337,6 +391,9 @@ apis:
   connector_id: osrm_routing
   notes: Distancia viaria real (km) e tempo de deslocamento entre coordenadas (supera
     Haversine).
+  update_frequency: Semanal (Malha Viária)
+  freshness_sla_hours: 168
+  cron_schedule_expression: 0 4 * * 1
 - api_id: open_meteo
   name: Open-Meteo Historical & Forecast
   block: BLOCO_3_ESPACIAL_CLIMA_ML
@@ -353,6 +410,9 @@ apis:
   connector_id: open_meteo
   notes: Variaveis exogenas de clima horarias e historicas para modelos de previsao
     de demanda.
+  update_frequency: Horária (Previsão & Clima)
+  freshness_sla_hours: 1
+  cron_schedule_expression: 0 * * * *
 - api_id: nasa_power
   name: NASA POWER API
   block: BLOCO_3_ESPACIAL_CLIMA_ML
@@ -369,6 +429,9 @@ apis:
   connector_id: nasa_power
   notes: Radiacao solar, precipitacao, umidade e temperatura para modelos de agro
     e energia.
+  update_frequency: Diária (Agroclimatologia)
+  freshness_sla_hours: 24
+  cron_schedule_expression: 0 8 * * *
 - api_id: open_elevation
   name: Open-Elevation / OpenTopoData (SRTM)
   block: BLOCO_3_ESPACIAL_CLIMA_ML
@@ -385,6 +448,9 @@ apis:
   connector_id: open_elevation
   notes: Altitude exata do terreno por lat/lon para risco de alagamento, logistica
     e engenharia.
+  update_frequency: Anual (Modelo SRTM)
+  freshness_sla_hours: 8760
+  cron_schedule_expression: 0 2 1 1 *
 - api_id: huggingface_inference
   name: Hugging Face Inference API
   block: BLOCO_3_ESPACIAL_CLIMA_ML
@@ -399,6 +465,9 @@ apis:
   medallion_parity: true
   connector_id: huggingface_inference
   notes: Embeddings, NER e analise de sentimento via HTTP sem gerenciar GPUs (HF_TOKEN).
+  update_frequency: Sob demanda (Modelos ML)
+  freshness_sla_hours: 24
+  cron_schedule_expression: 0 6 * * *
 - api_id: alpha_vantage
   name: Alpha Vantage
   block: BLOCO_3_ESPACIAL_CLIMA_ML
@@ -413,6 +482,9 @@ apis:
   medallion_parity: true
   connector_id: alpha_vantage
   notes: Series temporais financeiras e indicadores tecnicos (ALPHA_VANTAGE_API_KEY).
+  update_frequency: Diária (Mercados Globais)
+  freshness_sla_hours: 24
+  cron_schedule_expression: 0 21 * * 1-5
 - api_id: nasa_youtube_open_ml
   name: NASA Open APIs & YouTube Data (NLP / Visao)
   block: BLOCO_3_ESPACIAL_CLIMA_ML
@@ -427,6 +499,9 @@ apis:
   medallion_parity: true
   connector_id: nasa_youtube_open_ml
   notes: Imagens astronomicas/satelite (DEMO_KEY padrao) e datasets de NLP.
+  update_frequency: Semanal (Datasets ML)
+  freshness_sla_hours: 168
+  cron_schedule_expression: 0 4 * * 1
 - api_id: upgini_adapter
   name: Upgini Public Feature Enrichment
   block: BLOCO_3_ESPACIAL_CLIMA_ML
@@ -443,6 +518,9 @@ apis:
   connector_id: upgini_adapter
   notes: Catalogo de features publicas automatizadas integravel a pipelines tabular
     ML.
+  update_frequency: Semanal (Feature Store)
+  freshness_sla_hours: 168
+  cron_schedule_expression: 0 4 * * 1
 - api_id: rest_countries
   name: REST Countries v3.1
   block: BLOCO_4_GLOBAL_PESQUISA
@@ -458,6 +536,9 @@ apis:
   notes: Normalizacao ISO-3166 (Alpha-2/3), DDI, moedas, idiomas, fronteiras e populacao.
   medallion_parity: true
   connector_id: rest_countries
+  update_frequency: Anual (ISO-3166 Países)
+  freshness_sla_hours: 8760
+  cron_schedule_expression: 0 2 1 1 *
 - api_id: openalex_api
   name: OpenAlex Scientific Graph API
   block: BLOCO_4_GLOBAL_PESQUISA
@@ -474,6 +555,9 @@ apis:
     NLP/grafos.
   medallion_parity: true
   connector_id: openalex_api
+  update_frequency: Diária (Grafo Científico)
+  freshness_sla_hours: 24
+  cron_schedule_expression: 0 6 * * *
 - api_id: gdelt_doc_api
   name: GDELT Project Doc 2.0 API
   block: BLOCO_4_GLOBAL_PESQUISA
@@ -490,3 +574,6 @@ apis:
     quase em tempo real.
   medallion_parity: true
   connector_id: gdelt_doc_api
+  update_frequency: Horária (Eventos & Sentimento)
+  freshness_sla_hours: 1
+  cron_schedule_expression: 0 * * * *

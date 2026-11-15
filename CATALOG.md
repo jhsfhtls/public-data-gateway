@@ -226,7 +226,65 @@ Normalizacao ISO-3166 de paises, grafo cientifico aberto (OpenAlex) e monitorame
 
 ---
 
-## 8. Instruções de Manutenção & Verificação de Integridade
+## 8. Matriz de Freshness, SLA & Agendamento Cron (Phase 11)
+
+Todas as **49 fontes governamentais** possuem metas explícitas de `freshness_sla_hours` e `cron_schedule_expression` para orquestração de mirror/CDC em nuvem:
+
+| ID Fonte | Frequência Oficial | SLA Freshness (h) | Expressão Cron (UTC) | Modo de Acesso |
+| :--- | :--- | :---: | :--- | :--- |
+| `ibge_localidades` | Eventual (Criação de novos municípios) | `720h` | `0 3 1 * *` | `FEDERATED_API` |
+| `brasilapi_core` | Tempo Real (< 150 ms) | `1h` | `0 * * * *` | `FEDERATED_API` |
+| `bcb_sgs` | Diária / Mensal | `24h` | `0 6 * * *` | `FEDERATED_API` |
+| `bcb_olinda_ptax` | Diária (Tempo Real) | `24h` | `0 6 * * *` | `FEDERATED_API` |
+| `rfb_cnpj_lakehouse` | Mensal | `720h` | `0 2 15 * *` | `LAKEHOUSE_BATCH` |
+| `pncp_contratacoes` | Tempo Real Contínuo | `1h` | `0 * * * *` | `FEDERATED_API` |
+| `cnj_datajud` | Diária em tempo real | `24h` | `0 6 * * *` | `FEDERATED_API` |
+| `cgu_ceis_cnep` | Diária | `24h` | `0 6 * * *` | `FEDERATED_API` |
+| `cgu_pep` | Diária | `24h` | `0 6 * * *` | `FEDERATED_API` |
+| `rfb_simples_mei` | Mensal | `720h` | `0 2 15 * *` | `LAKEHOUSE_BATCH` |
+| `tst_cndt` | Sob demanda / Diária | `24h` | `0 6 * * *` | `FEDERATED_API` |
+| `suframa_pim_zfm` | Mensal | `720h` | `0 3 5 * *` | `LAKEHOUSE_BATCH` |
+| `cvm_dfp_itr` | Trimestral / Anual | `2160h` | `0 3 15 */3 *` | `LAKEHOUSE_BATCH` |
+| `mdic_comexstat` | Mensal | `720h` | `0 3 5 * *` | `LAKEHOUSE_BATCH` |
+| `cvm_fundos` | Diária | `24h` | `0 7 * * 1-5` | `LAKEHOUSE_BATCH` |
+| `bcb_ifdata` | Trimestral | `2160h` | `0 2 1 */3 *` | `FEDERATED_API` |
+| `stn_tesouro_transparente` | Mensal | `720h` | `0 3 5 * *` | `FEDERATED_API` |
+| `comprasgov_catmat` | Semanal | `168h` | `0 4 * * 1` | `FEDERATED_API` |
+| `ibge_sidra` | Mensal / Variável | `720h` | `0 3 5 * *` | `FEDERATED_API` |
+| `ibge_pib_municipal` | Anual (defasagem 2 anos) | `8760h` | `0 2 15 1 *` | `LAKEHOUSE_BATCH` |
+| `ibge_censo2022` | Decenal | `87600h` | `0 2 1 1 *` | `LAKEHOUSE_BATCH` |
+| `mte_novo_caged` | Mensal | `720h` | `0 3 5 * *` | `LAKEHOUSE_BATCH` |
+| `ibge_cnefe` | Decenal | `87600h` | `0 2 1 1 *` | `LAKEHOUSE_BATCH` |
+| `ibge_pnad_continua` | Trimestral | `2160h` | `0 2 1 */3 *` | `LAKEHOUSE_BATCH` |
+| `mte_rais` | Anual | `8760h` | `0 2 15 1 *` | `LAKEHOUSE_BATCH` |
+| `ibge_malhas` | Anual | `8760h` | `0 2 15 1 *` | `LAKEHOUSE_BATCH` |
+| `anatel_mosaico` | Mensal | `720h` | `0 3 5 * *` | `FEDERATED_API` |
+| `antt_malha_transporte` | Trimestral | `2160h` | `0 2 1 */3 *` | `FEDERATED_API` |
+| `datasus_cnes` | Mensal | `720h` | `0 3 5 * *` | `LAKEHOUSE_BATCH` |
+| `datasus_sih` | Mensal | `720h` | `0 3 5 * *` | `LAKEHOUSE_BATCH` |
+| `inep_censo_escolar` | Anual | `8760h` | `0 2 15 1 *` | `LAKEHOUSE_BATCH` |
+| `cnj_justica_aberta` | Semestral | `4320h` | `0 2 1 1,7 *` | `FEDERATED_API` |
+| `datasus_sim` | Anual | `8760h` | `0 2 15 1 *` | `LAKEHOUSE_BATCH` |
+| `inep_censo_superior` | Anual | `8760h` | `0 2 15 1 *` | `LAKEHOUSE_BATCH` |
+| `anvisa_cmed` | Mensal | `720h` | `0 3 5 * *` | `FEDERATED_API` |
+| `datasus_sinasc` | Anual | `8760h` | `0 2 15 1 *` | `LAKEHOUSE_BATCH` |
+| `inep_ideb` | Bienal | `17520h` | `0 2 1 1 *` | `FEDERATED_API` |
+| `onr_registro_imoveis` | Mensal | `720h` | `0 3 5 * *` | `FEDERATED_API` |
+| `inep_enem` | Anual | `8760h` | `0 2 15 1 *` | `LAKEHOUSE_BATCH` |
+| `opendatasus_vigilancia` | Semanal | `168h` | `0 4 * * 1` | `FEDERATED_API` |
+| `capitais_iptu_itbi` | Anual / Mensal | `720h` | `0 3 5 * *` | `FEDERATED_API` |
+| `capes_sucupira` | Anual | `8760h` | `0 2 15 1 *` | `FEDERATED_API` |
+| `datalake_federado_bq` | Contínua | `6h` | `0 */6 * * *` | `BIGQUERY_FEDERATED` |
+| `inpe_terrabrasilis` | Diária (DETER) / Anual (PRODES) | `24h` | `0 6 * * *` | `FEDERATED_API` |
+| `ana_hidroweb_telemetria` | Diária (Telemetria horária) | `24h` | `0 6 * * *` | `FEDERATED_API` |
+| `mapbiomas_cobertura` | Anual | `8760h` | `0 2 15 1 *` | `BIGQUERY_FEDERATED` |
+| `sfb_sicar` | Semestral | `4320h` | `0 2 1 1,7 *` | `LAKEHOUSE_BATCH` |
+| `mapa_zarc` | Safra / Anual | `8760h` | `0 2 15 1 *` | `FEDERATED_API` |
+| `dadosgov_ckan` | Contínua | `6h` | `0 */6 * * *` | `FEDERATED_API` |
+
+---
+
+## 9. Instruções de Manutenção & Verificação de Integridade
 
 O arquivo `CATALOG.md` é gerado de forma **100% determinística** a partir de `catalog/sources_registry.yaml` e `catalog/public_apis_registry.yaml`.
 

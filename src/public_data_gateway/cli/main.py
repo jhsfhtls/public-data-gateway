@@ -1422,6 +1422,42 @@ def build_parser() -> argparse.ArgumentParser:
     pnad_s_p.add_argument("uf", type=str, help="IBGE 2-digit UF code or 2-letter state abbreviation (e.g. SP, 35)")
     pnad_s_p.add_argument("--json", action="store_true", help="Output in JSON format")
 
+    # Phase 11: Lakehouse Mirror, CDC & Serverless Warehouse command group
+    lh_p = subparsers.add_parser(
+        "lakehouse",
+        help="Cloud Lakehouse Mirror (S3/R2/local), CDC delta plan, Freshness SLA audit, and Serverless Warehouse.",
+    )
+    lh_sub = lh_p.add_subparsers(dest="lakehouse_action", required=True)
+
+    lh_sla = lh_sub.add_parser("sla", help="Audit update_frequency, freshness_sla_hours, and cron schedules.")
+    lh_sla.add_argument("--source-id", type=str, help="Filter by specific source_id or api_id")
+    lh_sla.add_argument("--json", action="store_true", help="Output in JSON format")
+
+    lh_cdc = lh_sub.add_parser("cdc-plan", help="Compute incremental CDC delta plan for Silver/Gold Parquet.")
+    lh_cdc.add_argument("--layers", type=str, default="silver,gold", help="Comma-separated layers")
+    lh_cdc.add_argument("--sources", type=str, help="Optional comma-separated source IDs")
+    lh_cdc.add_argument("--json", action="store_true", help="Output in JSON format")
+
+    lh_sync = lh_sub.add_parser("mirror-sync", help="Sync Silver/Gold Parquet snapshots to local/S3/R2 mirror.")
+    lh_sync.add_argument("--provider", type=str, choices=["local", "s3", "r2"], help="Mirror provider")
+    lh_sync.add_argument("--dry-run", action="store_true", help="Preview without transferring bytes")
+    lh_sync.add_argument("--layers", type=str, default="silver,gold", help="Comma-separated layers")
+    lh_sync.add_argument("--sources", type=str, help="Optional comma-separated source IDs")
+    lh_sync.add_argument("--json", action="store_true", help="Output in JSON format")
+
+    lh_ddl = lh_sub.add_parser("warehouse-ddl", help="Generate DuckDB/MotherDuck/BigQuery DDL statements.")
+    lh_ddl.add_argument("--provider", type=str, choices=["duckdb", "motherduck", "bigquery"], help="Warehouse provider")
+    lh_ddl.add_argument("--layers", type=str, default="silver,gold", help="Comma-separated layers")
+    lh_ddl.add_argument("--sources", type=str, help="Optional comma-separated source IDs")
+    lh_ddl.add_argument("--json", action="store_true", help="Output in JSON format")
+
+    lh_pub = lh_sub.add_parser("warehouse-publish", help="Publish Parquet views to DuckDB/MotherDuck/BigQuery.")
+    lh_pub.add_argument("--provider", type=str, choices=["duckdb", "motherduck", "bigquery"], help="Warehouse provider")
+    lh_pub.add_argument("--dry-run", action="store_true", help="Preview DDL without executing")
+    lh_pub.add_argument("--layers", type=str, default="silver,gold", help="Comma-separated layers")
+    lh_pub.add_argument("--sources", type=str, help="Optional comma-separated source IDs")
+    lh_pub.add_argument("--json", action="store_true", help="Output in JSON format")
+
     return parser
 
 
@@ -4728,6 +4764,39 @@ def main(argv: Sequence[str] | None = None) -> int:
                 return 0
             if args.public_apis_action == "gdelt":
                 print(json.dumps(sdk.public_apis.query_gdelt_doc(args.query, maxrecords=args.maxrecords), ensure_ascii=False, indent=2, default=str))
+                return 0
+
+        if args.command == "lakehouse":
+            from public_data_gateway.sdk import BrazilData
+
+            sdk = BrazilData(settings=settings)
+            if args.lakehouse_action == "sla":
+                res = sdk.lakehouse.audit_sla(source_id=args.source_id)
+                print(json.dumps(res, ensure_ascii=False, indent=2, default=str))
+                return 0
+            layers_t = tuple(x.strip() for x in args.layers.split(",") if x.strip()) or ("silver", "gold")
+            sources_l = [x.strip() for x in args.sources.split(",") if x.strip()] if args.sources else None
+            if args.lakehouse_action == "cdc-plan":
+                res = sdk.lakehouse.cdc_plan(layers=layers_t, sources=sources_l)
+                print(json.dumps(res, ensure_ascii=False, indent=2, default=str))
+                return 0
+            if args.lakehouse_action == "mirror-sync":
+                res = sdk.lakehouse.mirror_sync(
+                    layers=layers_t, sources=sources_l, provider=args.provider, dry_run=args.dry_run
+                )
+                print(json.dumps(res, ensure_ascii=False, indent=2, default=str))
+                return 0
+            if args.lakehouse_action == "warehouse-ddl":
+                res = sdk.lakehouse.warehouse_ddl(
+                    provider=args.provider, layers=layers_t, sources=sources_l
+                )
+                print(json.dumps(res, ensure_ascii=False, indent=2, default=str))
+                return 0
+            if args.lakehouse_action == "warehouse-publish":
+                res = sdk.lakehouse.warehouse_publish(
+                    provider=args.provider, layers=layers_t, sources=sources_l, dry_run=args.dry_run
+                )
+                print(json.dumps(res, ensure_ascii=False, indent=2, default=str))
                 return 0
 
     except Exception as exc:
