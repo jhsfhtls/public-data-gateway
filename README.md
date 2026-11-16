@@ -1,66 +1,89 @@
-<div align="center">
-  <h2>Public Data Gateway — Plataforma Unificada de Dados Públicos, Analytics/ML & Enriquecimento</h2>
-  <p><i>Plataforma Aberta de Integração, Curadoria Medallion e Enriquecimento de Dados Públicos</i></p>
-  <p><b>Versão:</b> 0.1.0 &nbsp;|&nbsp; <b>Governança:</b> ODCS v3.1 • Observabilidade (5 Pilares) • DevSecOps &amp; LGPD • ADR-001..003</p>
-  <hr/>
-</div>
-<br/>
+# Public Data Gateway — Medallion Lakehouse, dbt Models & API Gateway (Python, DuckDB, dbt, FastAPI, MCP)
 
-# `public-data-gateway`
-
-Barramento modular corporativo que unifica **bases de dados públicas oficiais, APIs governamentais do Brasil e fontes públicas globais** estruturadas nos macrosegmentos estratégicos, curadas em arquitetura **Medallion (`Bronze -> Silver -> Gold / ML Feature Views`)** e expostas simultaneamente via **Python SDK (`PublicData` / `BrazilData`)**, **FastAPI (`/api/v1`)**, **CLI (`pdg` / `bdg`)** e **Servidor MCP (`pdg-mcp` / `bdg-mcp`)** para aplicações analíticas, pipelines de engenharia de dados e agentes de IA.
+> **Context & Architecture:**  
+> Open-source Medallion data platform (`Bronze` ➔ `Silver` ➔ `Gold` + `dbt` marts) and multi-interface gateway (**Python SDK**, **FastAPI REST**, **CLI**, and **MCP Server**) built with **Python 3.12**, **DuckDB**, **Apache Parquet (`ZSTD`)**, **SQLite (`WAL`)**, and **dbt-duckdb** over official Brazilian government datasets and complementary public/global APIs.  
+> *Note on documentation:* Source registries ([`CATALOG.md`](CATALOG.md)), ADRs ([`docs/adr/`](docs/adr/)), implementation logs ([`JORNADA_IMPLEMENTACAO.md`](JORNADA_IMPLEMENTACAO.md)), and dataset column descriptions are maintained in Portuguese to align with official Brazilian public-sector schemas.
 
 ---
 
-## Painéis Vivos de Governança
+## 1. Architecture & Data Flow (`Bronze` ➔ `Silver` ➔ `Gold` & Delivery)
 
-- **[JORNADA_IMPLEMENTACAO.md](JORNADA_IMPLEMENTACAO.md)**: Controle em tempo real do que estamos construindo, conector ativo (`IN_PROGRESS`), checklist de 9 Gates, histórico de entregas e habilitação dos **10 Produtos Modulares**.
-- **[CATALOG.md](CATALOG.md)**: Cobertura completa das fontes públicas nos 13 macrosegmentos, protocolos, chaves canônicas, ondas (`Wave 1..6`) e scores de priorização `RICE`.
-- **[docs/adr/](docs/adr/)**: *Architecture Decision Records* documentando escolhas de motor analítico, contratos de dados e hardening DevSecOps.
+```mermaid
+flowchart LR
+    SRC["Official APIs & Bulk Dumps (Gov & Public Sources)"] --> BRZ["Bronze Layer (SQLite WAL Cache + Raw Snapshots + SHA-256)"]
+    BRZ --> GATE["Contract Gate (ODCS v3.1 Validation / Quarantine)"]
+    GATE --> SLV["Silver Layer (DuckDB Parquet ZSTD + Canonical String Keys)"]
+    SLV --> DBT["dbt & Gold Layer (Staging -> Core -> Marts & ASOF Views)"]
+    DBT --> API["Gateways (Python SDK | FastAPI REST | CLI pdg/bdg | MCP)"]
+```
+
+### Layer Breakdown
+1. **Hybrid Ingestion & Storage (`src/public_data_gateway/core/storage.py` — [ADR-001](docs/adr/ADR-001-medallion-hybrid-storage.md)):**
+   - **Bronze:** Local SQLite (`WAL` mode with TTL & `Stale-While-Error` fallback) for low-latency REST endpoints, plus raw snapshots sealed with `SHA-256` manifests.
+   - **Silver:** Embedded **DuckDB** materialized as `ZSTD`-compressed Apache Parquet via atomic swaps, eliminating cloud warehouse infrastructure costs for local analytics.
+2. **Data Contracts, Canonical Keys & Quarantine (`ODCS v3.1` — [ADR-002](docs/adr/ADR-002-canonical-keys-odcs-quarantine.md), [ADR-004](docs/adr/ADR-004-connector-medallion-parity-policy.md)):**
+   - Declarative `contract.yaml` policies per connector enforcing freshness, volume, schema, null thresholds, and sentinel-to-`NULL` normalization (`99`, `999`, `-1`, `"SEM INFORMACAO"`).
+   - Preserves relational keys as explicit `STRING` identifiers (`id_municipio` 7D/6D crosswalks, `cnpj_14`, `cep_8`, `cnae_7`, `cbo_6`, `ncm_8`, `cpf_masked`) so leading zeros are never stripped; failed batches are routed to `quarantine/` without corrupting clean `Silver` partitions.
+3. **Analytics Engineering & Cross-Domain Marts (`dbt/` + DuckDB):**
+   - Modular dbt pipeline structured in `Staging` (`source.yml` + normalization) ➔ `Core` (`dim_*`, `fct_*`) ➔ domain and cross-domain `Gold` marts (`feature_store_cross_domain_municipio`) with point-in-time `ASOF JOIN` support.
+   - Governed by automated schema assertions and `scripts/lint_dbt_docs.py` enforcing 100% model and column documentation coverage.
+4. **Enrichment, DevSecOps & Cloud Mirror (`src/public_data_gateway/` — [ADR-003](docs/adr/ADR-003-devsecops-lgpd-isolation.md)):**
+   - **Enrichment (`enrichment/engine.py`):** Offline Mod-11 check-digit validation (`CNPJ`, `CPF`, `IBGE`), municipality/UF disambiguation, **Client Path Shield** (external outputs cannot write inside internal `data/` storage), zip-bomb expansion limits (`<= 100:1`), CSV formula-injection sanitization (`CWE-1236`), masked CPF preservation (`LGPD`), and `<untrusted_gov_data>` prompt-injection delimiters on MCP responses (`OWASP LLM01`).
+   - **Open-Core Lakehouse Adapters (`lakehouse/`):** Freshness SLA auditing, `SHA-256`/row-count CDC delta planning, S3/R2/local mirror adapters, and read-only DuckDB/MotherDuck/BigQuery warehouse DDL generators.
 
 ---
 
-## Arquitetura Hexagonal & Diferenciais Enterprise
+## 2. Running Locally & Verification
 
-1. **Medallion Analytics & ML-Ready (ADR-001 / ADR-002):**
-   - **Bronze:** Cache local SQLite (`WAL`) com TTL + snapshots brutos selados com manifesto `SHA-256`.
-   - **Gate 5 Pilares & Quarentena (ODCS v3.1):** Validação automática de *Freshness, Volume, Schema ODCS v3.1, Nulls e Sentinelas*. Lotes governamentais truncados vão para `data/quarantine/` sem corromper `Silver`.
-   - **Silver:** Parquet `ZSTD` via DuckDB (`atomic swap`), chaves canônicas estritas em `STRING` (`id_municipio` 7D, `cnpj_14`, `cep_8`, `cnae_7`, `cbo_6`), conversão de códigos sentinela (`99`, `999`, `-1`, `"SEM INFORMACAO"`) em `NULL` reais e `reference_date` explícita.
-   - **Gold (ML Feature Views):** Vetores de *features* por entidade, deflacionamento monetário (`IPCA`/`IGP-M`/`PTAX`) e suporte nativo a **`ASOF JOIN` (*Point-in-Time*)** prevenindo *Data Leakage* em modelos de Machine Learning.
-2. **Motor de Enriquecimento Híbrido (`EnrichmentEngine` — Client Path Shield):**
-   - Validação matemática offline de dígitos verificadores Mod-11 (`CNPJ`/`CPF`/`IBGE`) antes de qualquer chamada de rede.
-   - Conciliação tolerante a ruído de nomes municipais + UF para `id_municipio` 7D.
-   - Isolamento estrito de diretórios: ao enriquecer datasets externos, lê e grava exclusivamente no caminho de saída especificado (nunca dentro do Lakehouse interno `data/`).
-3. **Hardening DevSecOps & LGPD (ADR-003):**
-   - Proteção contra *Zip Bombs* (`<= 100:1`) e verificação de *Magic Bytes*.
-   - Sanitização contra *CSV Formula Injection* (`CWE-1236`) na exportação de planilhas enriquecidas.
-   - Envelopamento `<untrusted_gov_data>` nas ferramentas MCP prevenindo *Indirect Prompt Injection* (`OWASP LLM01`).
-   - Preservação compulsória de máscaras de CPF (`***.123.456-**`) e conformidade com o Art. 7º, §§ 3º e 4º e Art. 14 da LGPD.
+### Prerequisites
+- Python `3.12+` with pinned dependencies in [`requirements.txt`](requirements.txt) and [`requirements-dev.txt`](requirements-dev.txt).
 
----
-
-## Instalação Rápida (Isolamento Python 3.12)
-
-```powershell
-py -3.12 -m venv .venv
-.\.venv\Scripts\Activate.ps1
+```bash
+python -m venv .venv
+source .venv/bin/activate  # Windows: .\.venv\Scripts\Activate.ps1
 pip install -r requirements.txt -r requirements-dev.txt
 pip install --no-deps -e .
+
+# Lint, catalog/progress sync, dbt metadata coverage & offline test suite
+ruff check .
+python scripts/render_catalog.py --check
+python scripts/render_progress.py --check
+python scripts/lint_dbt_docs.py
+pytest -m "not live"
 ```
 
-## Uso Rápido
+### Quick Usage (`CLI`, `Python SDK`, `FastAPI`, `MCP`)
 
-```powershell
-# Consultar status evolutivo e catálogo de fontes (suporta pdg ou bdg)
+```bash
+# CLI inspection (supports pdg or bdg)
 pdg status
 pdg catalog --wave 1
+pdg dict ibge_localidades
 
-# Consultar schema semântico ou perfilar um Parquet sem estourar contexto de IA
-pdg schema ibge_localidades
-
-# Subir servidor REST OpenAPI 3.1
+# REST API (OpenAPI docs at /docs)
 uvicorn public_data_gateway.api.app:create_app --factory --reload
 
-# Iniciar servidor MCP stdio para clientes e agentes de IA compatíveis
+# Stdio MCP Server
 pdg-mcp
 ```
+
+```python
+from public_data_gateway import PublicData
+
+gw = PublicData()
+print(gw.resolve_municipality("Manaus", uf="AM"))
+```
+
+---
+
+## 3. Repository Map
+
+| Path | Purpose |
+| :--- | :--- |
+| [`src/public_data_gateway/connectors/`](src/public_data_gateway/connectors/) | Domain connectors, `contract.yaml` policies, and per-source dbt staging models |
+| [`src/public_data_gateway/enrichment/`](src/public_data_gateway/enrichment/) | Offline check-digit validator, municipality normalizer, and guarded enrichment engine |
+| [`src/public_data_gateway/lakehouse/`](src/public_data_gateway/lakehouse/) | CDC delta tracker, freshness SLA auditor, mirror, and warehouse adapters |
+| [`src/public_data_gateway/api/`](src/public_data_gateway/api/), [`cli/`](src/public_data_gateway/cli/), [`mcp/`](src/public_data_gateway/mcp/), [`sdk.py`](src/public_data_gateway/sdk.py) | Unified FastAPI, CLI (`pdg`/`bdg`), MCP stdio, and Python SDK interfaces |
+| [`dbt/`](dbt/) | DuckDB dbt configuration, `core`/`marts` SQL models, and automated tests |
+| [`catalog/`](catalog/) & [`docs/adr/`](docs/adr/) | YAML source registries and Architecture Decision Records (`ADR-001`–`ADR-004`) |
+| [`tests/`](tests/) | Offline deterministic suite (`pytest -m "not live"`) and live endpoint smoke tests (`@pytest.mark.live`) |
