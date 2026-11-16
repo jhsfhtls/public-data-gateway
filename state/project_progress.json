@@ -234,8 +234,8 @@
         "Onda 11.5B (Agro, ESG, Terras & Energia — 8 conectores): ibama_fiscalizacao, bcb_sicor, ibge_agro_municipal (PAM/PPM/PEVS), rfb_cafir, inpe_queimadas_seeg, aneel_geracao_distribuida, anp_combustiveis, mdr_snis",
         "Onda 11.5C (Mobilidade, Segurança, Clima & Previdência — 6 conectores): senatran_frota, sinesp_seguranca (SINESP/FBSP), sedec_desastres, prf_acidentes, mme_ons_energia, mps_inss_beneficios",
         "Onda 11.5D (Transparência Federal, Política, Saúde & Fomento — 6 conectores): cgu_transparencia_gastos, cgu_servidores_federais (SIAPE), tse_eleicoes, bndes_operacoes, cvm_mercado_extra (RCVM 160/Adm), ans_saude_suplementar",
-        "Onda 11.5E (Diferenciais de Mercado & Sub-módulos Complementares): querido_diario_okbr, anm_mineracao (SIGMINE/CFEM), susep_seguros, inpi_propriedade_intelectual + extensões datasus_extra (SIA/SINAN/SISVAN/PNS), inep_mec_extra (SAEB/PROUNI/SISU/FUNDEB/CNPq), ibge_institucional (MUNIC/ESTADIC/POF), rfb_arrecadacao e cgu_beneficios_cidadao",
-        "Padrão Obrigatório dos 11 Gates + Testes: BaseConnector, contract.yaml (ODCS v3.1), bronze/silver/gold isolados, 5 Pilares & Quarentena, dbt (source.yml + stg_* + dim_*/fct_* + _models.yml 100% documentado), marts cross-domain, exposição em SDK/FastAPI/CLI/MCP (com wrap_untrusted_gov_data), testes unitários offline e teste ao vivo fail-hard"
+        "Onda 11.5E (Diferenciais de Mercado & Complementares — 4+ fontes): querido_diario_okbr, anm_mineracao (SIGMINE/CFEM), susep_seguros, inpi_propriedade_intelectual + extensões datasus_extra (SIA/SINAN/SISVAN/PNS), inep_mec_extra (SAEB/PROUNI/SISU/FUNDEB/CNPq), ibge_institucional (MUNIC/ESTADIC/POF), rfb_arrecadacao e cgu_beneficios_cidadao",
+        "Padrão Obrigatório dos 11 Gates + Marts Intra-Domínio & Cross-Domain + Testes: BaseConnector, contract.yaml (ODCS v3.1), bronze/silver/gold isolados, 5 Pilares & Quarentena, dbt (source.yml + stg_* + dim_*/fct_* + _models.yml 100% documentado), criação obrigatória de marts intra-domínio em dbt/models/marts/<dominio>/ e integração às marts cross-domain em dbt/models/marts/cross_domain/, exposição em SDK/FastAPI/CLI/MCP (com wrap_untrusted_gov_data), dbt test, testes unitários offline e teste ao vivo fail-hard"
       ]
     },
     {
@@ -295,7 +295,7 @@
         "gate_id": "GATE_07",
         "name": "Integracao ao EnrichmentEngine & Marts Cross-Domain",
         "status": "PLANNED",
-        "criteria": "Disponibilizacao para enriquecimento fiscal municipal respeitando o Client Path Shield e alimentando o cross_domain_feature_store."
+        "criteria": "Disponibilizacao para enriquecimento fiscal municipal respeitando o Client Path Shield e integracao obrigatoria as marts cross-domain (dbt/models/marts/cross_domain/ + CrossDomainService)."
       },
       {
         "gate_id": "GATE_08",
@@ -311,9 +311,9 @@
       },
       {
         "gate_id": "GATE_10",
-        "name": "dbt Staging, source.yml e 100% Colunas Documentadas",
+        "name": "dbt Staging, Marts Intra-Domínio/Cross-Domain & 100% Colunas Documentadas",
         "status": "PLANNED",
-        "criteria": "Modelos dbt com source.yml proprio, staging, dims, fcts, mart fiscal e 100% de colunas documentadas aprovadas no lint_dbt_docs.py."
+        "criteria": "Modelos dbt com source.yml proprio, stg_*, dim_*/fct_*, mart intra-domínio dedicada (dbt/models/marts/macrofinanceiro/mart_contabilidade_fiscal_siconfi.sql) + cruzamento em marts cross-domain, dbt test verde e 100% de colunas documentadas no lint_dbt_docs.py."
       },
       {
         "gate_id": "GATE_11",
