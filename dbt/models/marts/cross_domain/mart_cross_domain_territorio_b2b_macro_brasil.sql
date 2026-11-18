@@ -229,6 +229,16 @@ seguros_uf AS (
     GROUP BY sigla_uf
 ),
 
+inovacao_pi_uf AS (
+    SELECT
+        sigla_uf,
+        SUM(patentes_depositadas_12m) AS patentes_depositadas_inpi_uf,
+        SUM(registros_software_total) AS registros_software_inpi_uf,
+        ROUND(AVG(score_inovacao_propriedade_intelectual), 2) AS avg_score_inovacao_pi_uf
+    FROM {{ ref('mart_inpi_propriedade_intelectual_brasil') }}
+    GROUP BY sigla_uf
+),
+
 base AS (
     SELECT
         t.sigla_uf,
@@ -296,6 +306,9 @@ base AS (
         COALESCE(sg.premios_seguros_susep_uf_mil_brl, 0.0) AS premios_seguros_susep_uf_mil_brl,
         COALESCE(sg.corretoras_ativas_susep_uf, 0) AS corretoras_ativas_susep_uf,
         COALESCE(sg.avg_score_maturidade_seguros_uf, 75.0) AS avg_score_maturidade_seguros_uf,
+        COALESCE(ip.patentes_depositadas_inpi_uf, 0) AS patentes_depositadas_inpi_uf,
+        COALESCE(ip.registros_software_inpi_uf, 0) AS registros_software_inpi_uf,
+        COALESCE(ip.avg_score_inovacao_pi_uf, 70.0) AS avg_score_inovacao_pi_uf,
         COALESCE(m.ano_mes, '2025-03') AS macro_ano_mes_referencia,
         COALESCE(m.selic_meta_fim_mes_pct, 14.25) AS selic_meta_fim_mes_pct,
         COALESCE(m.ipca_acumulado_12m_pct, 5.06) AS ipca_acumulado_12m_pct,
@@ -323,6 +336,7 @@ base AS (
     LEFT JOIN diarios_uf qd ON t.sigla_uf = qd.sigla_uf
     LEFT JOIN mineracao_uf mn ON t.sigla_uf = mn.sigla_uf
     LEFT JOIN seguros_uf sg ON t.sigla_uf = sg.sigla_uf
+    LEFT JOIN inovacao_pi_uf ip ON t.sigla_uf = ip.sigla_uf
     CROSS JOIN macro_latest m
 ),
 

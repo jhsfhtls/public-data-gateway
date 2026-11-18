@@ -1,0 +1,84 @@
+contract_id: ODCS-BR-INPI-PROPRIEDADE-INTELECTUAL-001
+source_id: inpi_propriedade_intelectual
+version: 1.0.0
+grain: 1 row per INPI intellectual property modality, IPC/Nice classification, and municipality (RPI)
+name: "INPI Propriedade Intelectual (RPI): Patentes, Marcas, Desenhos Industriais & Software"
+agency: Instituto Nacional da Propriedade Industrial (INPI / MDIC)
+official_url: https://www.gov.br/inpi/pt-br/acesso-a-informacao/dados-abertos
+segment_id: 01_b2b_empresarial
+access_mode: LAKEHOUSE_BATCH
+protocol: HTTP_BULK_ZIP
+auth_type: NONE
+update_frequency: Semanal (Revista da Propriedade Industrial - RPI) / Mensal (Dados Abertos)
+freshness_sla_hours: 168
+cron_schedule_expression: "0 7 * * 2"
+lgpd_legal_basis: public_interest_lei_9279_1996_propriedade_industrial_publicidade_rpi_inpi
+min_expected_rows: 10
+primary_keys:
+  - cod_processo_inpi
+  - id_municipio
+  - sigla_uf
+canonical_keys:
+  - id_municipio
+  - sigla_uf
+sentinel_values:
+  - -1
+  - -99
+  - N/D
+  - SEM INFORMACAO
+columns:
+  - name: cod_processo_inpi
+    data_type: STRING
+    required: true
+    nullable: false
+    description: Identificador único do agrupamento de processos de propriedade industrial no INPI
+  - name: natureza_ativo_pi
+    data_type: STRING
+    required: true
+    nullable: false
+    description: Natureza do ativo intangível (PATENTE_INVECAO, PATENTE_MODELO_UTILIDADE, MARCA_PRODUTO_SERVICO, DESENHO_INDUSTRIAL, PROGRAMA_COMPUTADOR)
+  - name: classificacao_ipc_nice
+    data_type: STRING
+    required: true
+    nullable: false
+    description: Classificação técnica internacional IPC ou Classe de Nice predominante (e.g. IPC_G06N_IA_COMPUTACAO, NICE_CLASSE_42_SAAS)
+  - name: situacao_concessao_inpi
+    data_type: STRING
+    required: true
+    nullable: false
+    description: Estágio processual na Revista da Propriedade Industrial (CONCEDIDO_VIGENTE, EXAME_TECNICO_ATIVO, DEPOSITADO_PUBLICADO)
+  - name: id_municipio
+    data_type: STRING
+    required: true
+    nullable: false
+    description: Código IBGE canônico de 7 dígitos do município sede do titular ou inventor
+  - name: sigla_uf
+    data_type: STRING
+    required: true
+    nullable: false
+    description: Sigla de 2 letras da Unidade Federativa (UF)
+  - name: nome_municipio
+    data_type: STRING
+    required: true
+    nullable: false
+    description: Nome oficial do município
+  - name: regiao
+    data_type: STRING
+    required: true
+    nullable: false
+    description: Macrorregião geográfica brasileira
+  - name: depositos_anuais_rpi
+    data_type: INT64
+    required: true
+    nullable: false
+    description: Quantidade anual de pedidos depositados publicados na RPI/INPI no município
+  - name: concessoes_anuais_inpi
+    data_type: INT64
+    required: true
+    nullable: false
+    description: Quantidade anual de cartas-patente ou registros concedidos pelo INPI no município
+  - name: ano_referencia
+    data_type: INT64
+    required: true
+    nullable: false
+    description: Ano-calendário de apuração dos dados abertos do INPI

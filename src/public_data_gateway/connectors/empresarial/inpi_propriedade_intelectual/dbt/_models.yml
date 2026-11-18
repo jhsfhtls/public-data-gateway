@@ -1,0 +1,175 @@
+version: 2
+
+models:
+  - name: stg_inpi_patentes_depositos_municipio
+    description: "Staging view tipada dos depósitos e concessões anuais de patentes e programas de computador publicados na RPI/INPI."
+    columns:
+      - name: cod_processo_inpi
+        description: "Identificador único consolidado do agrupamento de processos de PI no INPI (STRING)."
+        tests: [not_null, unique]
+      - name: natureza_ativo_pi
+        description: "Natureza do ativo intangível no INPI (PATENTE_INVECAO, PROGRAMA_COMPUTADOR, DESENHO_INDUSTRIAL)."
+        tests: [not_null]
+      - name: classificacao_ipc_nice
+        description: "Classificação internacional de patentes IPC ou Classe de Nice predominante."
+        tests: [not_null]
+      - name: situacao_concessao_inpi
+        description: "Situação processual do pedido na Revista da Propriedade Industrial (CONCEDIDO_VIGENTE, EXAME_TECNICO_ATIVO)."
+        tests: [not_null]
+      - name: id_municipio
+        description: "Código IBGE de 7 dígitos do município (STRING)."
+        tests: [not_null]
+      - name: sigla_uf
+        description: "Sigla de 2 letras da Unidade Federativa (UF)."
+        tests: [not_null]
+      - name: nome_municipio
+        description: "Nome oficial do município."
+        tests: [not_null]
+      - name: regiao
+        description: "Macrorregião geográfica brasileira."
+        tests: [not_null]
+      - name: depositos_anuais_rpi
+        description: "Quantidade anual de pedidos depositados na RPI/INPI pelo município."
+        tests: [not_null]
+      - name: concessoes_anuais_inpi
+        description: "Quantidade anual de concessões publicadas pelo INPI para titulares locais."
+        tests: [not_null]
+      - name: ano_referencia
+        description: "Ano-calendário de referência da base INPI."
+        tests: [not_null]
+
+  - name: stg_inpi_marcas_desenhos_industriais
+    description: "Staging view tipada dos registros ativos de marcas, desenhos industriais e participação SaaS/Tech no INPI."
+    columns:
+      - name: cod_marca_inpi
+        description: "Identificador único consolidado de marcas municipais no INPI (STRING)."
+        tests: [not_null, unique]
+      - name: id_municipio
+        description: "Código IBGE de 7 dígitos do município (STRING)."
+        tests: [not_null]
+      - name: sigla_uf
+        description: "Sigla de 2 letras da Unidade Federativa (UF)."
+        tests: [not_null]
+      - name: nome_municipio
+        description: "Nome oficial do município."
+        tests: [not_null]
+      - name: registros_marcas_ativos
+        description: "Total de registros de marcas de produto e serviço vigentes no INPI."
+        tests: [not_null]
+      - name: desenhos_industriais_vigentes
+        description: "Total de desenhos industriais concedidos e vigentes no município."
+        tests: [not_null]
+      - name: taxa_concessao_marcas_pct
+        description: "Percentual histórico de deferimento nos pedidos de registro de marcas (%)."
+        tests: [not_null]
+      - name: participacao_saas_tech_pct
+        description: "Participação percentual de registros em classes de software, dados e tecnologia Nice 9/42 (%)."
+        tests: [not_null]
+
+  - name: stg_inpi_software_transferencia_tecnologia
+    description: "Staging view tipada de programas de computador, transferência de tecnologia, ICTs e indicações geográficas INPI."
+    columns:
+      - name: id_municipio
+        description: "Código IBGE de 7 dígitos do município (STRING)."
+        tests: [not_null, unique]
+      - name: sigla_uf
+        description: "Sigla de 2 letras da Unidade Federativa (UF)."
+        tests: [not_null]
+      - name: nome_municipio
+        description: "Nome oficial do município."
+        tests: [not_null]
+      - name: registros_programa_computador
+        description: "Quantidade de certificados de registro de programa de computador emitidos pelo INPI."
+        tests: [not_null]
+      - name: contratos_transferencia_tecnologia
+        description: "Quantidade de contratos averbados de licenciamento e transferência de tecnologia."
+        tests: [not_null]
+      - name: ict_universidades_depositantes
+        description: "Quantidade de Instituições de Ciência e Tecnologia (ICTs) e universidades depositantes ativas."
+        tests: [not_null]
+      - name: indicacoes_geograficas_locais
+        description: "Quantidade de Indicações Geográficas (IG) reconhecidas pelo INPI vinculadas ao polo."
+        tests: [not_null]
+
+  - name: stg_inpi_pi_resumo_municipal
+    description: "Staging view tipada do consolidado municipal de patentes, marcas, software e intensidade de PI por habitante."
+    columns:
+      - name: id_municipio
+        description: "Código IBGE de 7 dígitos do município (STRING)."
+        tests: [not_null, unique]
+      - name: sigla_uf
+        description: "Sigla de 2 letras da Unidade Federativa (UF)."
+        tests: [not_null]
+      - name: nome_municipio
+        description: "Nome oficial do município."
+        tests: [not_null]
+      - name: regiao
+        description: "Macrorregião geográfica brasileira."
+        tests: [not_null]
+      - name: patentes_depositadas_12m
+        description: "Total de depósitos anuais de patentes de invenção e modelos de utilidade."
+        tests: [not_null]
+      - name: marcas_concedidas_12m
+        description: "Total de marcas ativas e concedidas vinculadas ao município."
+        tests: [not_null]
+      - name: registros_software_total
+        description: "Total de registros de software formalizados junto ao INPI."
+        tests: [not_null]
+      - name: contratos_tecnologia_ativos
+        description: "Total de contratos averbados de transferência tecnológica."
+        tests: [not_null]
+      - name: patentes_por_100k_hab
+        description: "Taxa de depósitos de patentes por 100 mil habitantes no município."
+        tests: [not_null]
+
+  - name: fct_inpi_propriedade_intelectual_municipal
+    description: "Fato intermediária municipal integrando patentes, marcas, desenhos industriais, software e transferência de tecnologia INPI."
+    columns:
+      - name: id_municipio
+        description: "Código IBGE de 7 dígitos do município (STRING)."
+        tests: [not_null, unique]
+      - name: sigla_uf
+        description: "Sigla de 2 letras da Unidade Federativa (UF)."
+        tests: [not_null]
+      - name: nome_municipio
+        description: "Nome oficial do município."
+        tests: [not_null]
+      - name: regiao
+        description: "Macrorregião geográfica brasileira."
+        tests: [not_null]
+      - name: patentes_depositadas_12m
+        description: "Total anual de patentes depositadas no INPI no município."
+        tests: [not_null]
+      - name: marcas_concedidas_12m
+        description: "Total de marcas concedidas e vigentes no município."
+        tests: [not_null]
+      - name: registros_software_total
+        description: "Quantidade total de programas de computador registrados no INPI."
+        tests: [not_null]
+      - name: contratos_tecnologia_ativos
+        description: "Contratos ativos de transferência de tecnologia averbados no INPI."
+        tests: [not_null]
+      - name: patentes_por_100k_hab
+        description: "Densidade anual de depósitos de patentes por 100 mil habitantes."
+        tests: [not_null]
+      - name: qtd_naturezas_pi_rpi
+        description: "Quantidade de naturezas de ativos intangíveis consolidadas na camada Silver RPI."
+        tests: [not_null]
+      - name: concessoes_patentes_software_12m
+        description: "Soma anual de concessões de patentes e registros de software publicados."
+        tests: [not_null]
+      - name: desenhos_industriais_vigentes
+        description: "Total de registros vigentes de desenhos industriais no município."
+        tests: [not_null]
+      - name: taxa_concessao_marcas_pct
+        description: "Taxa percentual de deferimento em registros de marcas INPI (%)."
+        tests: [not_null]
+      - name: participacao_saas_tech_pct
+        description: "Participação percentual de registros de marcas nas classes de tecnologia Nice (%)."
+        tests: [not_null]
+      - name: ict_universidades_depositantes
+        description: "Quantidade de universidades e ICTs depositantes ativos no INPI."
+        tests: [not_null]
+      - name: indicacoes_geograficas_locais
+        description: "Quantidade de Indicações Geográficas (IG) associadas ao território."
+        tests: [not_null]

@@ -1023,6 +1023,60 @@ class CompanyFacade:
             limit=limit, sigla_uf=sigla_uf
         )
 
+    @property
+    def inpi_pi_connector(self) -> Any:
+        if (
+            not hasattr(self, "_inpi_pi_connector")
+            or self._inpi_pi_connector is None
+        ):
+            from public_data_gateway.connectors.empresarial.inpi_propriedade_intelectual import (
+                InpiPropriedadeIntelectualConnector,
+            )
+
+            self._inpi_pi_connector = InpiPropriedadeIntelectualConnector(
+                settings=self._sdk.settings
+            )
+        return self._inpi_pi_connector
+
+    def get_inpi_patentes(self, termo: str) -> list[dict[str, Any]]:
+        """Lookup INPI patents and IP filings by process code, nature, IPC/Nice, IBGE, UF, or city."""
+        return self.inpi_pi_connector.get_inpi_patentes(termo)
+
+    def get_inpi_marcas(self, termo: str) -> list[dict[str, Any]]:
+        """Lookup INPI active trademark registrations and industrial designs."""
+        return self.inpi_pi_connector.get_inpi_marcas(termo)
+
+    def get_inpi_software_transferencia(
+        self, id_municipio_or_name: str
+    ) -> dict[str, Any] | None:
+        """Retrieve municipal INPI computer program registrations and technology transfers."""
+        return self.inpi_pi_connector.get_inpi_software_transferencia(
+            id_municipio_or_name
+        )
+
+    def get_inpi_municipal_summary(
+        self, id_municipio_or_name: str
+    ) -> dict[str, Any] | None:
+        """Retrieve consolidated municipal INPI patents, trademarks, software, and per-capita."""
+        return self.inpi_pi_connector.get_inpi_municipal_summary(
+            id_municipio_or_name
+        )
+
+    def get_inpi_features(self, id_municipio_or_name: str) -> dict[str, Any] | None:
+        """Retrieve Gold INPI intellectual-property innovation score and Deep Tech tier."""
+        return self.inpi_pi_connector.get_inpi_features(id_municipio_or_name)
+
+    def list_top_inpi_municipalities(
+        self,
+        limit: int = 10,
+        sigla_uf: str | None = None,
+        sort_by_patentes: bool = False,
+    ) -> list[dict[str, Any]]:
+        """List municipalities ranked by INPI intellectual-property innovation score or patents."""
+        return self.inpi_pi_connector.list_top_inpi_municipalities(
+            limit=limit, sigla_uf=sigla_uf, sort_by_patentes=sort_by_patentes
+        )
+
 
 class FinanceFacade:
     """Capital markets, standardized financial statements and solvency metrics (CVM DFP/ITR)."""
@@ -4212,6 +4266,41 @@ class BrazilData:
         """Listar municípios líderes em expansão da construção civil no CNO (RFB)."""
         return self.company.list_top_cno_municipalities(
             limit=limit, sigla_uf=sigla_uf
+        )
+
+    def get_inpi_patentes(self, termo: str) -> list[dict[str, Any]]:
+        """Consultar depósitos e concessões de patentes no INPI/RPI por código, natureza, IPC/Nice, IBGE, UF ou cidade."""
+        return self.company.get_inpi_patentes(termo)
+
+    def get_inpi_marcas(self, termo: str) -> list[dict[str, Any]]:
+        """Consultar marcas registradas e desenhos industriais ativos no INPI por município ou UF."""
+        return self.company.get_inpi_marcas(termo)
+
+    def get_inpi_software_transferencia(
+        self, id_municipio_or_name: str
+    ) -> dict[str, Any] | None:
+        """Consultar registros de programa de computador, ICTs e contratos de transferência de tecnologia no INPI."""
+        return self.company.get_inpi_software_transferencia(id_municipio_or_name)
+
+    def get_inpi_municipal_summary(
+        self, id_municipio_or_name: str
+    ) -> dict[str, Any] | None:
+        """Consultar consolidado municipal INPI de patentes, marcas, software e densidade por 100 mil hab."""
+        return self.company.get_inpi_municipal_summary(id_municipio_or_name)
+
+    def get_inpi_features(self, id_municipio_or_name: str) -> dict[str, Any] | None:
+        """Consultar features Gold INPI de inovação tecnológica e propriedade intelectual."""
+        return self.company.get_inpi_features(id_municipio_or_name)
+
+    def list_top_inpi_municipalities(
+        self,
+        limit: int = 10,
+        sigla_uf: str | None = None,
+        sort_by_patentes: bool = False,
+    ) -> list[dict[str, Any]]:
+        """Listar municípios ranqueados por inovação em propriedade intelectual INPI ou depósitos de patentes."""
+        return self.company.list_top_inpi_municipalities(
+            limit=limit, sigla_uf=sigla_uf, sort_by_patentes=sort_by_patentes
         )
 
     def get_cvm_company(self, cnpj_or_codigo: str) -> dict[str, Any]:

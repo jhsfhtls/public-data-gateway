@@ -105,6 +105,7 @@ model-paths:
   - "../src/public_data_gateway/connectors/empresarial/cnpja_open/dbt"
   - "../src/public_data_gateway/connectors/empresarial/company_enrich_apollo_bdc/dbt"
   - "../src/public_data_gateway/connectors/empresarial/gleif_lei/dbt"
+  - "../src/public_data_gateway/connectors/empresarial/inpi_propriedade_intelectual/dbt"
   - "../src/public_data_gateway/connectors/empresarial/minha_receita/dbt"
   - "../src/public_data_gateway/connectors/empresarial/receitaws/dbt"
   - "../src/public_data_gateway/connectors/geografico/nominatim_osm/dbt"

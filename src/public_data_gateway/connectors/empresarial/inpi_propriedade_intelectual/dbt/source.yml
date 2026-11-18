@@ -1,0 +1,26 @@
+version: 2
+
+sources:
+  - name: inpi_propriedade_intelectual
+    description: "Tabelas Silver do Instituto Nacional da Propriedade Industrial (INPI/RPI): Patentes, Marcas, Software e Transferência de Tecnologia"
+    meta:
+      agency: "Instituto Nacional da Propriedade Industrial (INPI)"
+      domain: "empresarial_propriedade_intelectual_inovacao"
+      freshness_sla: "Semanal (168h)"
+    tables:
+      - name: inpi_patentes_depositos_municipio
+        description: "Depósitos e concessões anuais de patentes e programas de computador publicados na RPI/INPI por classificação IPC/Nice"
+        meta:
+          external_location: "data/inpi_propriedade_intelectual/silver/inpi_patentes_depositos_municipio.parquet"
+      - name: inpi_marcas_desenhos_industriais
+        description: "Registros ativos de marcas, desenhos industriais vigentes e participação de tecnologia/SaaS no município"
+        meta:
+          external_location: "data/inpi_propriedade_intelectual/silver/inpi_marcas_desenhos_industriais.parquet"
+      - name: inpi_software_transferencia_tecnologia
+        description: "Registros de software, contratos de transferência de tecnologia, ICTs depositantes e indicações geográficas"
+        meta:
+          external_location: "data/inpi_propriedade_intelectual/silver/inpi_software_transferencia_tecnologia.parquet"
+      - name: inpi_pi_resumo_municipal
+        description: "Consolidado municipal INPI de patentes depositadas, marcas concedidas, software e densidade por 100 mil habitantes"
+        meta:
+          external_location: "data/inpi_propriedade_intelectual/silver/inpi_pi_resumo_municipal.parquet"
