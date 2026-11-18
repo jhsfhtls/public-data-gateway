@@ -2108,6 +2108,55 @@ class EnvironmentFacade:
             limit=limit, sigla_uf=sigla_uf, sort_by_risk=sort_by_risk
         )
 
+    @property
+    def bcb_sicor_connector(self) -> Any:
+        if not hasattr(self, "_bcb_sicor_connector") or self._bcb_sicor_connector is None:
+            from public_data_gateway.connectors.ambiental.bcb_sicor import (
+                BcbSicorConnector,
+            )
+
+            self._bcb_sicor_connector = BcbSicorConnector(
+                settings=self._sdk.settings
+            )
+        return self._bcb_sicor_connector
+
+    def get_sicor_custeio(self, termo: str) -> list[dict[str, Any]]:
+        """Lookup BACEN SICOR operating rural credit (custeio) by IBGE, UF, crop, or program."""
+        return self.bcb_sicor_connector.get_custeio(termo)
+
+    def get_sicor_investimento(self, termo: str) -> list[dict[str, Any]]:
+        """Lookup BACEN SICOR rural investment lines (RenovAgro ABC+, Pronaf Mais Alimentos)."""
+        return self.bcb_sicor_connector.get_investimento(termo)
+
+    def get_sicor_pronaf_proagro(
+        self, id_municipio_or_name: str
+    ) -> dict[str, Any] | None:
+        """Retrieve municipal Pronaf share, Proagro coverage, RenovAgro ABC+, and Res. BCB 140 rate."""
+        return self.bcb_sicor_connector.get_pronaf_proagro(id_municipio_or_name)
+
+    def get_sicor_municipal_summary(
+        self, id_municipio_or_name: str
+    ) -> dict[str, Any] | None:
+        """Retrieve consolidated municipal BACEN SICOR contracts and rural credit volumes."""
+        return self.bcb_sicor_connector.get_municipal_summary(id_municipio_or_name)
+
+    def get_sicor_features(
+        self, id_municipio_or_name: str
+    ) -> dict[str, Any] | None:
+        """Retrieve Gold BACEN SICOR rural credit dynamism and ESG sustainability features."""
+        return self.bcb_sicor_connector.get_sicor_features(id_municipio_or_name)
+
+    def list_top_sicor_municipalities(
+        self,
+        limit: int = 10,
+        sigla_uf: str | None = None,
+        sort_by_pronaf: bool = False,
+    ) -> list[dict[str, Any]]:
+        """List municipalities ranked by Gold BACEN SICOR score or Pronaf smallholder share."""
+        return self.bcb_sicor_connector.list_top_municipalities(
+            limit=limit, sigla_uf=sigla_uf, sort_by_pronaf=sort_by_pronaf
+        )
+
 
 class MetaportalsFacade:
     """Sub-facade for Metaportals & Aggregator Hubs (Datalake Federado SQL, Dados.gov.br CKAN)."""
@@ -3964,6 +4013,43 @@ class BrazilData:
         """Listar municípios ranqueados por conformidade ambiental IBAMA ou pressão de embargos."""
         return self.environment.list_top_ibama_municipalities(
             limit=limit, sigla_uf=sigla_uf, sort_by_risk=sort_by_risk
+        )
+
+    def get_sicor_custeio(self, termo: str) -> list[dict[str, Any]]:
+        """Consultar operações de crédito de custeio rural BACEN SICOR por município, UF, cultura ou programa."""
+        return self.environment.get_sicor_custeio(termo)
+
+    def get_sicor_investimento(self, termo: str) -> list[dict[str, Any]]:
+        """Consultar operações de investimento agropecuário BACEN SICOR (RenovAgro ABC+, Pronaf Mais Alimentos)."""
+        return self.environment.get_sicor_investimento(termo)
+
+    def get_sicor_pronaf_proagro(
+        self, id_municipio_or_name: str
+    ) -> dict[str, Any] | None:
+        """Consultar participação PRONAF, cobertura PROAGRO, crédito ABC+ e glosas Res. BCB 140/2021."""
+        return self.environment.get_sicor_pronaf_proagro(id_municipio_or_name)
+
+    def get_sicor_municipal_summary(
+        self, id_municipio_or_name: str
+    ) -> dict[str, Any] | None:
+        """Consultar consolidado municipal de contratos e volume financeiro de crédito rural no BACEN SICOR."""
+        return self.environment.get_sicor_municipal_summary(id_municipio_or_name)
+
+    def get_sicor_features(
+        self, id_municipio_or_name: str
+    ) -> dict[str, Any] | None:
+        """Consultar features Gold de dinamismo do crédito rural e sustentabilidade no BACEN SICOR."""
+        return self.environment.get_sicor_features(id_municipio_or_name)
+
+    def list_top_sicor_municipalities(
+        self,
+        limit: int = 10,
+        sigla_uf: str | None = None,
+        sort_by_pronaf: bool = False,
+    ) -> list[dict[str, Any]]:
+        """Listar municípios ranqueados por dinamismo de crédito rural SICOR ou participação PRONAF."""
+        return self.environment.list_top_sicor_municipalities(
+            limit=limit, sigla_uf=sigla_uf, sort_by_pronaf=sort_by_pronaf
         )
 
     def get_bd_coverage(self, id_municipio: str) -> dict[str, Any]:

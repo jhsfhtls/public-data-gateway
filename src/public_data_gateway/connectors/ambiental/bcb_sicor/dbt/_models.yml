@@ -1,0 +1,208 @@
+version: 2
+
+models:
+  - name: stg_bcb_sicor_custeio
+    description: "Staging view tipada das operações municipais de crédito de custeio rural no BACEN SICOR."
+    columns:
+      - name: cod_operacao_sicor
+        description: "Identificador determinístico do agrupamento de custeio rural SICOR."
+        tests: [not_null, unique]
+      - name: id_municipio
+        description: "Código IBGE de 7 dígitos do município beneficiário (STRING)."
+        tests: [not_null]
+      - name: sigla_uf
+        description: "Sigla de 2 letras da Unidade Federativa (UF)."
+        tests: [not_null]
+      - name: nome_municipio
+        description: "Nome oficial do município."
+        tests: [not_null]
+      - name: ano_emissao
+        description: "Ano de emissão das cédulas rurais no SICOR."
+        tests: [not_null]
+      - name: mes_emissao
+        description: "Mês de emissão em dois dígitos (01-12)."
+        tests: [not_null]
+      - name: cd_produto
+        description: "Código oficial BACEN do produto agropecuário financiado."
+        tests: [not_null]
+      - name: nome_produto
+        description: "Cultura agrícola ou atividade pecuária financiada."
+        tests: [not_null]
+      - name: atividade
+        description: "Ramo produtivo da operação (Agricola ou Pecuaria)."
+        tests: [not_null]
+      - name: cd_programa
+        description: "Código do programa de crédito rural no MCR/BACEN."
+        tests: [not_null]
+      - name: nome_programa
+        description: "Denominação da linha de crédito (PRONAF, PRONAMP ou Custeio_Padrao)."
+        tests: [not_null]
+      - name: qtd_contratos_custeio
+        description: "Quantidade de contratos de custeio rural contratados."
+        tests: [not_null]
+      - name: valor_custeio_brl
+        description: "Montante contratado em crédito de custeio em Reais (BRL)."
+        tests: [not_null]
+      - name: area_financiada_ha
+        description: "Área declarada nas operações de custeio em hectares (ha)."
+        tests: [not_null]
+
+  - name: stg_bcb_sicor_investimento
+    description: "Staging view tipada das linhas de crédito de investimento rural (RenovAgro ABC+, Pronaf Mais Alimentos)."
+    columns:
+      - name: cod_investimento_sicor
+        description: "Identificador determinístico do agrupamento de investimento rural SICOR."
+        tests: [not_null, unique]
+      - name: id_municipio
+        description: "Código IBGE de 7 dígitos do município beneficiário."
+        tests: [not_null]
+      - name: sigla_uf
+        description: "Sigla de 2 letras da Unidade Federativa (UF)."
+        tests: [not_null]
+      - name: nome_municipio
+        description: "Nome oficial do município."
+        tests: [not_null]
+      - name: ano_emissao
+        description: "Ano de contratação das operações de investimento."
+        tests: [not_null]
+      - name: nome_produto
+        description: "Produto agropecuário associado ao projeto de investimento."
+        tests: [not_null]
+      - name: cd_programa
+        description: "Código do programa oficial de investimento no SICOR."
+        tests: [not_null]
+      - name: nome_programa
+        description: "Programa de investimento (RenovAgro_ABC ou Pronaf_Mais_Alimentos)."
+        tests: [not_null]
+      - name: qtd_contratos_investimento
+        description: "Quantidade de contratos de investimento rural registrados."
+        tests: [not_null]
+      - name: valor_investimento_brl
+        description: "Montante contratado em crédito de investimento em Reais (BRL)."
+        tests: [not_null]
+
+  - name: stg_bcb_sicor_pronaf_proagro
+    description: "Staging view municipal de participação PRONAF, cobertura PROAGRO, crédito ABC+ e glosas Res. BCB 140/2021."
+    columns:
+      - name: id_municipio
+        description: "Código IBGE de 7 dígitos do município (STRING)."
+        tests: [not_null, unique]
+      - name: sigla_uf
+        description: "Sigla da Unidade da Federação (UF)."
+        tests: [not_null]
+      - name: nome_municipio
+        description: "Nome oficial do município."
+        tests: [not_null]
+      - name: bioma_predominante
+        description: "Bioma predominante no território municipal."
+        tests: [not_null]
+      - name: participacao_pronaf_pct
+        description: "Participação percentual da agricultura familiar (PRONAF) nos contratos locais (%)."
+        tests: [not_null]
+      - name: cobertura_proagro_sicor_pct
+        description: "Percentual das operações locais amparadas por PROAGRO ou seguro rural (%)."
+        tests: [not_null]
+      - name: participacao_abc_renovagro_pct
+        description: "Participação de crédito verde de baixo carbono RenovAgro/ABC+ no total financiado (%)."
+        tests: [not_null]
+      - name: taxa_glosa_res_bcb_140_pct
+        description: "Taxa de impedimentos ou glosas socioambientais conforme Resolução BCB nº 140/2021 (%)."
+        tests: [not_null]
+
+  - name: stg_bcb_sicor_resumo_municipal
+    description: "Staging view consolidada por município do volume e contratos de crédito rural no BACEN SICOR."
+    columns:
+      - name: id_municipio
+        description: "Código IBGE de 7 dígitos do município (STRING)."
+        tests: [not_null, unique]
+      - name: sigla_uf
+        description: "Sigla da Unidade da Federação (UF)."
+        tests: [not_null]
+      - name: nome_municipio
+        description: "Nome oficial do município."
+        tests: [not_null]
+      - name: bioma_predominante
+        description: "Bioma predominante no território municipal."
+        tests: [not_null]
+      - name: qtd_contratos_sicor
+        description: "Quantidade total acumulada de contratos de crédito rural SICOR no município."
+        tests: [not_null]
+      - name: valor_custeio_sicor_brl
+        description: "Montante anual contratado em crédito de custeio rural em Reais (BRL)."
+        tests: [not_null]
+      - name: valor_investimento_sicor_brl
+        description: "Montante anual contratado em crédito de investimento rural em Reais (BRL)."
+        tests: [not_null]
+      - name: valor_comercializacao_sicor_brl
+        description: "Montante contratado em linhas de comercialização e industrialização rural em Reais (BRL)."
+        tests: [not_null]
+      - name: valor_total_sicor_brl
+        description: "Volume financeiro consolidado de crédito rural SICOR no município em Reais (BRL)."
+        tests: [not_null]
+      - name: area_financiada_total_ha
+        description: "Extensão territorial total declarada em cédulas rurais no município (ha)."
+        tests: [not_null]
+      - name: ticket_medio_contrato_brl
+        description: "Ticket médio por operação de crédito rural contratada no município em Reais (BRL)."
+        tests: [not_null]
+
+  - name: fct_credito_rural_sicor_municipal
+    description: "Tabela fato municipal integrando custeio, investimento, cobertura PROAGRO, PRONAF e crédito baixo carbono ABC+ do BACEN SICOR."
+    columns:
+      - name: id_municipio
+        description: "Código IBGE de 7 dígitos do município (chave primária STRING)."
+        tests: [not_null, unique]
+      - name: sigla_uf
+        description: "Sigla de 2 letras da Unidade da Federação (UF)."
+        tests: [not_null]
+      - name: nome_municipio
+        description: "Nome oficial do município."
+        tests: [not_null]
+      - name: bioma_predominante
+        description: "Bioma predominante no território municipal."
+        tests: [not_null]
+      - name: qtd_contratos_sicor
+        description: "Quantidade total de contratos de crédito rural SICOR no município."
+        tests: [not_null]
+      - name: valor_custeio_sicor_brl
+        description: "Montante de crédito de custeio rural contratado em Reais (BRL)."
+        tests: [not_null]
+      - name: valor_investimento_sicor_brl
+        description: "Montante de crédito de investimento rural contratado em Reais (BRL)."
+        tests: [not_null]
+      - name: valor_comercializacao_sicor_brl
+        description: "Montante de crédito de comercialização rural contratado em Reais (BRL)."
+        tests: [not_null]
+      - name: valor_total_sicor_brl
+        description: "Volume financeiro consolidado de crédito rural SICOR em Reais (BRL)."
+        tests: [not_null]
+      - name: area_financiada_total_ha
+        description: "Área agropecuária total financiada declarada no SICOR (ha)."
+        tests: [not_null]
+      - name: ticket_medio_contrato_brl
+        description: "Valor médio por contrato rural SICOR no município em Reais (BRL)."
+        tests: [not_null]
+      - name: participacao_pronaf_pct
+        description: "Participação da agricultura familiar PRONAF (%)."
+        tests: [not_null]
+      - name: cobertura_proagro_sicor_pct
+        description: "Taxa de proteção PROAGRO / seguro agropecuário (%)."
+        tests: [not_null]
+      - name: participacao_abc_renovagro_pct
+        description: "Participação de crédito verde RenovAgro/ABC+ (%)."
+        tests: [not_null]
+      - name: taxa_glosa_res_bcb_140_pct
+        description: "Taxa de glosas socioambientais Res. BCB nº 140/2021 (%)."
+        tests: [not_null]
+      - name: qtd_contratos_custeio_amostra
+        description: "Soma de contratos de custeio na amostra granular Silver."
+        tests: [not_null]
+      - name: valor_custeio_amostra_brl
+        description: "Valor somado de custeio na amostra granular Silver em Reais (BRL)."
+        tests: [not_null]
+      - name: qtd_contratos_investimento_amostra
+        description: "Soma de contratos de investimento na amostra granular Silver."
+        tests: [not_null]
+      - name: valor_investimento_amostra_brl
+        description: "Valor somado de investimento na amostra granular Silver em Reais (BRL)."
+        tests: [not_null]

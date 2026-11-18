@@ -1,0 +1,99 @@
+contract_id: ODCS-BR-BCB-SICOR-001
+source_id: bcb_sicor
+version: 1.0.0
+grain: 1 row per rural credit operation group (municipality x product x program) in BACEN SICOR
+name: "BACEN: Sistema de Operações do Crédito Rural e do Proagro (SICOR)"
+agency: Banco Central do Brasil (BACEN)
+official_url: https://olinda.bcb.gov.br/olinda/servico/SICOR/versao/v2/odata/
+segment_id: 11_agronegocio_meio_ambiente
+access_mode: FEDERATED_API
+protocol: ODATA_V4
+auth_type: NONE
+update_frequency: Mensal (Olinda OData SICOR BACEN)
+freshness_sla_hours: 720
+cron_schedule_expression: "0 5 12 * *"
+lgpd_legal_basis: public_interest_lai_lei_4829_1965_res_bcb_140_2021
+min_expected_rows: 10
+primary_keys:
+  - cod_operacao_sicor
+  - id_municipio
+  - sigla_uf
+canonical_keys:
+  - id_municipio
+  - sigla_uf
+sentinel_values:
+  - -1
+  - -99
+  - N/D
+  - SEM INFORMACAO
+columns:
+  - name: cod_operacao_sicor
+    data_type: STRING
+    required: true
+    nullable: false
+    description: Identificador determinístico do agrupamento municipal de custeio rural no SICOR
+  - name: id_municipio
+    data_type: STRING
+    required: true
+    nullable: false
+    description: Código IBGE canônico de 7 dígitos do município tomador do crédito rural
+  - name: sigla_uf
+    data_type: STRING
+    required: true
+    nullable: false
+    description: Sigla de 2 letras da Unidade Federativa do empreendimento rural
+  - name: nome_municipio
+    data_type: STRING
+    required: true
+    nullable: false
+    description: Nome oficial do município beneficiário
+  - name: ano_emissao
+    data_type: INT64
+    required: true
+    nullable: false
+    description: Ano de emissão da cédula rural no SICOR
+  - name: mes_emissao
+    data_type: STRING
+    required: true
+    nullable: false
+    description: Mês de emissão em dois dígitos (01 a 12)
+  - name: cd_produto
+    data_type: STRING
+    required: true
+    nullable: false
+    description: Código oficial BACEN do produto agropecuário financiado
+  - name: nome_produto
+    data_type: STRING
+    required: true
+    nullable: false
+    description: Produto agropecuário financiado (Soja, Milho, Cafe, Bovinos, Cana_Acucar ou Arroz)
+  - name: atividade
+    data_type: STRING
+    required: true
+    nullable: false
+    description: Ramo da atividade financiada (Agricola ou Pecuaria)
+  - name: cd_programa
+    data_type: STRING
+    required: true
+    nullable: false
+    description: Código do programa oficial de crédito rural no MCR/BACEN
+  - name: nome_programa
+    data_type: STRING
+    required: true
+    nullable: false
+    description: Linha de financiamento aplicada (PRONAF, PRONAMP ou Custeio_Padrao)
+  - name: qtd_contratos_custeio
+    data_type: INT64
+    required: true
+    nullable: false
+    description: Quantidade de contratos de custeio rural registrados no agrupamento
+  - name: valor_custeio_brl
+    data_type: FLOAT64
+    required: true
+    nullable: false
+    description: Montante contratado de crédito de custeio em Reais (BRL)
+  - name: area_financiada_ha
+    data_type: FLOAT64
+    required: true
+    nullable: false
+    description: Área declarada sob financiamento agropecuário em hectares (ha)

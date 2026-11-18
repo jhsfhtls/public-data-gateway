@@ -191,6 +191,21 @@ models:
       - name: score_conformidade_ibama
         description: "Score de conformidade regulatória e baixa pressão de embargos IBAMA/EUDR no município (0-100)."
         tests: [not_null]
+      - name: qtd_contratos_sicor
+        description: "Quantidade acumulada de contratos de crédito rural BACEN SICOR no município."
+        tests: [not_null]
+      - name: valor_total_sicor_brl
+        description: "Volume financeiro consolidado de crédito rural SICOR (custeio, investimento e comercialização) em Reais (BRL)."
+        tests: [not_null]
+      - name: cobertura_proagro_sicor_pct
+        description: "Percentual de operações locais de crédito rural cobertas pelo PROAGRO ou seguro rural (%)."
+        tests: [not_null]
+      - name: participacao_abc_renovagro_pct
+        description: "Participação percentual de crédito sustentável de baixo carbono RenovAgro/ABC+ (%)."
+        tests: [not_null]
+      - name: score_dinamismo_credito_rural_sicor
+        description: "Score de dinamismo do crédito rural, cobertura PROAGRO e adesão RenovAgro ABC+ no BACEN SICOR (0-100)."
+        tests: [not_null]
       - name: reference_date
         description: "Data de referência ISO-8601 (YYYY-MM-DD)."
         tests: [not_null]

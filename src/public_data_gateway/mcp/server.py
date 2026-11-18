@@ -2103,6 +2103,69 @@ class MCPDispatcher:
                                 },
                             },
                             {
+                                "name": "bdg_get_bcb_sicor_custeio",
+                                "description": "Lookup BACEN SICOR operating rural credit (custeio) by IBGE municipality code, UF, crop, or program.",
+                                "inputSchema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "termo": {
+                                            "type": "string",
+                                            "description": "IBGE code, UF, crop product (e.g. Soja), program (PRONAF/PRONAMP), or municipality name",
+                                        }
+                                    },
+                                    "required": ["termo"],
+                                },
+                            },
+                            {
+                                "name": "bdg_get_bcb_sicor_pronaf_proagro",
+                                "description": "Get municipal BACEN SICOR Pronaf family-farming share, Proagro coverage, RenovAgro ABC+ low-carbon share, and Res. BCB 140 ESG block rate.",
+                                "inputSchema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "id_municipio_or_name": {
+                                            "type": "string",
+                                            "description": "7-digit IBGE municipality code or municipality name",
+                                        }
+                                    },
+                                    "required": ["id_municipio_or_name"],
+                                },
+                            },
+                            {
+                                "name": "bdg_get_bcb_sicor_credit_features",
+                                "description": "Get normalized Gold BACEN SICOR rural credit dynamism score, volume BRL, Proagro protection, and agricultural tier.",
+                                "inputSchema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "id_municipio_or_name": {
+                                            "type": "string",
+                                            "description": "7-digit IBGE municipality code or municipality name",
+                                        }
+                                    },
+                                    "required": ["id_municipio_or_name"],
+                                },
+                            },
+                            {
+                                "name": "bdg_list_top_bcb_sicor_municipalities",
+                                "description": "List Brazilian municipalities ranked by BACEN SICOR rural credit dynamism score or Pronaf share.",
+                                "inputSchema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "limit": {
+                                            "type": "integer",
+                                            "description": "Maximum rows (default: 10)",
+                                        },
+                                        "sigla_uf": {
+                                            "type": "string",
+                                            "description": "Optional 2-letter state filter (e.g. GO)",
+                                        },
+                                        "sort_by_pronaf": {
+                                            "type": "boolean",
+                                            "description": "Set true to rank municipalities by highest Pronaf share first",
+                                        },
+                                    },
+                                },
+                            },
+                            {
                                 "name": "bdg_get_bd_coverage",
                                 "description": "Get official Federated Public Datalake (DuckDB / BigQuery) municipal treated dataset and table coverage metrics.",
                                 "inputSchema": {
@@ -5355,6 +5418,67 @@ class MCPDispatcher:
                     },
                 }
             wrapped = wrap_untrusted_gov_data(result, source_id="ibama_fiscalizacao")
+            return {
+                "jsonrpc": "2.0",
+                "id": req_id,
+                "result": {"content": [{"type": "text", "text": wrapped}], "isError": False},
+            }
+
+        if tool_name in {
+            "bdg_get_bcb_sicor_custeio",
+            "bdg_get_bcb_sicor_pronaf_proagro",
+            "bdg_get_bcb_sicor_credit_features",
+            "bdg_list_top_bcb_sicor_municipalities",
+        }:
+            from public_data_gateway.connectors.ambiental.bcb_sicor import (
+                BcbSicorConnector,
+            )
+
+            connector = BcbSicorConnector(settings=self.settings)
+            try:
+                if tool_name == "bdg_get_bcb_sicor_custeio":
+                    result: Any = connector.get_custeio(str(args.get("termo", "")))
+                elif tool_name == "bdg_get_bcb_sicor_pronaf_proagro":
+                    result = connector.get_pronaf_proagro(
+                        str(args.get("id_municipio_or_name", ""))
+                    )
+                elif tool_name == "bdg_get_bcb_sicor_credit_features":
+                    result = connector.get_sicor_features(
+                        str(args.get("id_municipio_or_name", ""))
+                    )
+                else:
+                    result = connector.list_top_municipalities(
+                        limit=int(args.get("limit", 10)),
+                        sigla_uf=args.get("sigla_uf"),
+                        sort_by_pronaf=bool(args.get("sort_by_pronaf", False)),
+                    )
+            except (ValueError, KeyError) as exc:
+                return {
+                    "jsonrpc": "2.0",
+                    "id": req_id,
+                    "result": {
+                        "content": [
+                            {"type": "text", "text": f"BACEN SICOR parameter error: {exc}"}
+                        ],
+                        "isError": True,
+                    },
+                }
+
+            if not result:
+                return {
+                    "jsonrpc": "2.0",
+                    "id": req_id,
+                    "result": {
+                        "content": [
+                            {
+                                "type": "text",
+                                "text": "No BACEN SICOR data found for the query.",
+                            }
+                        ],
+                        "isError": True,
+                    },
+                }
+            wrapped = wrap_untrusted_gov_data(result, source_id="bcb_sicor")
             return {
                 "jsonrpc": "2.0",
                 "id": req_id,

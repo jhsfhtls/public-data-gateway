@@ -1629,3 +1629,35 @@ sources:
   status: HOMOLOGATED
   freshness_sla_hours: 168
   cron_schedule_expression: 0 4 * * 1
+- source_id: bcb_sicor
+  name: 'BACEN: Sistema de Operações do Crédito Rural e do Proagro (SICOR)'
+  agency: Banco Central do Brasil (BACEN)
+  official_url: https://olinda.bcb.gov.br/olinda/servico/SICOR/versao/v2/odata/
+  segment_id: 11_agronegocio_meio_ambiente
+  segment_name: Agronegócio, Terra & Meio Ambiente
+  access_mode: FEDERATED_API
+  protocol: ODATA_V4
+  auth_type: NONE
+  canonical_keys:
+  - id_municipio
+  - sigla_uf
+  update_frequency: Mensal (Olinda OData SICOR BACEN)
+  estimated_volume: ~18 milhões de cédulas e contratos de crédito rural (~450 MB OData)
+  lgpd_tier: PUBLIC_NON_PERSONAL
+  ml_feature_domains:
+  - rural_credit_custeio_investimento
+  - proagro_crop_insurance
+  - pronaf_abc_sustainability
+  solution_packs:
+  - P01
+  - P02
+  - P03
+  - P05
+  - P06
+  - P08
+  - P09
+  rice_score: 910
+  roadmap_wave: 2
+  status: HOMOLOGATED
+  freshness_sla_hours: 720
+  cron_schedule_expression: 0 5 12 * *
