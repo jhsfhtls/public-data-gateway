@@ -127,6 +127,15 @@ models:
       - name: avg_score_integridade_execucao_cgu_uf
         description: "Média estadual do score de integridade na execução fiscal e convênios CGU (0-100)."
         tests: [not_null]
+      - name: total_servidores_siape_uf
+        description: "Contingente total estadual de servidores públicos federais ativos no SIAPE."
+        tests: [not_null]
+      - name: folha_mensal_siape_uf_mil_brl
+        description: "Folha salarial bruta mensal do funcionalismo federal SIAPE na UF (R$ mil)."
+        tests: [not_null]
+      - name: avg_score_integridade_siape_uf
+        description: "Média estadual do score de governança e integridade funcional SIAPE/CGU (0-100)."
+        tests: [not_null]
       - name: macro_ano_mes_referencia
         description: "Competência macroeconômica de referência (YYYY-MM)."
         tests: [not_null]

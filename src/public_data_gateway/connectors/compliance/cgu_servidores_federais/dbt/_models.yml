@@ -1,0 +1,169 @@
+version: 2
+
+models:
+  - name: stg_siape_servidores_ativos_municipio
+    description: "Staging view tipada de lotação municipal de servidores públicos federais por regime jurídico SIAPE e situação funcional."
+    columns:
+      - name: cod_lotacao_siape
+        description: "Identificador único do agrupamento municipal de servidores no SIAPE (STRING)."
+        tests: [not_null, unique]
+      - name: orgao_exercicio_codigo
+        description: "Código SIAPE/SIAFI do órgão ou ministério de exercício."
+        tests: [not_null]
+      - name: regime_juridico_siape
+        description: "Regime jurídico do vínculo (RJU_ESTATUTARIO, MILITAR_FA ou CLT_ESTATAIS)."
+        tests: [not_null]
+      - name: situacao_vinculo
+        description: "Situação funcional do servidor (ATIVO_PERMANENTE, APOSENTADO_PENSIONISTA ou CEDIDO_REQUISITADO)."
+        tests: [not_null]
+      - name: id_municipio
+        description: "Código IBGE de 7 dígitos do município (STRING)."
+        tests: [not_null]
+      - name: sigla_uf
+        description: "Sigla de 2 letras da Unidade Federativa (UF)."
+        tests: [not_null]
+      - name: nome_municipio
+        description: "Nome oficial do município."
+        tests: [not_null]
+      - name: regiao
+        description: "Macrorregião geográfica brasileira."
+        tests: [not_null]
+      - name: qtd_servidores_lotados
+        description: "Total de vínculos federais lotados no município no regime."
+        tests: [not_null]
+      - name: massa_salarial_bruta_mil_brl
+        description: "Folha bruta mensal paga aos vínculos no agrupamento (R$ mil)."
+        tests: [not_null]
+      - name: competencia_siape
+        description: "Competência mensal da folha SIAPE (YYYY-MM)."
+        tests: [not_null]
+
+  - name: stg_siape_remuneracao_folha_orgao
+    description: "Staging view tipada da folha de pagamento SIAPE, salário médio bruto e funções comissionadas DAS/FCE."
+    columns:
+      - name: cod_folha_siape
+        description: "Identificador único do registro municipal de folha SIAPE (STRING)."
+        tests: [not_null, unique]
+      - name: id_municipio
+        description: "Código IBGE de 7 dígitos do município (STRING)."
+        tests: [not_null]
+      - name: sigla_uf
+        description: "Sigla de 2 letras da Unidade Federativa (UF)."
+        tests: [not_null]
+      - name: nome_municipio
+        description: "Nome oficial do município."
+        tests: [not_null]
+      - name: remuneracao_media_bruta_brl
+        description: "Remuneração bruta média mensal dos servidores federais no município (BRL)."
+        tests: [not_null]
+      - name: remuneracao_teto_pct
+        description: "Percentual de servidores com remuneração igual ou próxima ao teto constitucional (%)."
+        tests: [not_null]
+      - name: adicional_funcao_das_fce_mil_brl
+        description: "Montante mensal pago em gratificações de cargos DAS e FCE no município (R$ mil)."
+        tests: [not_null]
+      - name: competencia_siape
+        description: "Competência da folha de pagamento SIAPE (YYYY-MM)."
+        tests: [not_null]
+
+  - name: stg_cgu_acumulo_cargos_conflitos
+    description: "Staging view tipada de dedicação exclusiva, alertas de acúmulo ilícito e integridade cadastral CGU/SIAPE."
+    columns:
+      - name: id_municipio
+        description: "Código IBGE de 7 dígitos do município (STRING)."
+        tests: [not_null, unique]
+      - name: sigla_uf
+        description: "Sigla de 2 letras da Unidade Federativa (UF)."
+        tests: [not_null]
+      - name: nome_municipio
+        description: "Nome oficial do município."
+        tests: [not_null]
+      - name: servidores_dedicacao_exclusiva_pct
+        description: "Percentual de vínculos federais com regime regular de dedicação exclusiva (%)."
+        tests: [not_null]
+      - name: alertas_acumulo_ilicito
+        description: "Quantidade de trilhas e alertas de eventual acúmulo irregular sob apuração CGU."
+        tests: [not_null]
+      - name: servidores_cedidos_count
+        description: "Total de servidores federais cedidos ou requisitados no município."
+        tests: [not_null]
+      - name: indice_integridade_siape_pct
+        description: "Índice de conformidade e regularidade funcional na auditoria CGU/SIAPE (%)."
+        tests: [not_null]
+
+  - name: stg_siape_servidores_resumo_municipal
+    description: "Staging view tipada do consolidado municipal de servidores públicos federais e folha mensal bruta."
+    columns:
+      - name: id_municipio
+        description: "Código IBGE de 7 dígitos do município (STRING)."
+        tests: [not_null, unique]
+      - name: sigla_uf
+        description: "Sigla de 2 letras da Unidade Federativa (UF)."
+        tests: [not_null]
+      - name: nome_municipio
+        description: "Nome oficial do município."
+        tests: [not_null]
+      - name: regiao
+        description: "Macrorregião geográfica brasileira."
+        tests: [not_null]
+      - name: total_servidores_federais_siape
+        description: "Contingente total de servidores federais vinculados ao município."
+        tests: [not_null]
+      - name: folha_mensal_bruta_siape_mil_brl
+        description: "Folha de pagamento bruta mensal injetada na economia municipal (R$ mil)."
+        tests: [not_null]
+      - name: remuneracao_media_bruta_brl
+        description: "Salário bruto médio mensal dos servidores federais no município (BRL)."
+        tests: [not_null]
+      - name: pct_cargos_comissionados_das
+        description: "Participação de cargos em comissão DAS e FCE sobre o total de vínculos (%)."
+        tests: [not_null]
+
+  - name: fct_servidores_federais_siape_municipal
+    description: "Fato Silver municipal consolidando servidores federais SIAPE, folha salarial bruta, DAS/FCE e trilhas de integridade CGU."
+    columns:
+      - name: id_municipio
+        description: "Código IBGE de 7 dígitos do município (STRING)."
+        tests: [not_null, unique]
+      - name: sigla_uf
+        description: "Sigla de 2 letras da Unidade Federativa (UF)."
+        tests: [not_null]
+      - name: nome_municipio
+        description: "Nome oficial do município."
+        tests: [not_null]
+      - name: regiao
+        description: "Macrorregião geográfica brasileira."
+        tests: [not_null]
+      - name: total_servidores_federais_siape
+        description: "Quantidade total de servidores federais lotados no município."
+        tests: [not_null]
+      - name: folha_mensal_bruta_siape_mil_brl
+        description: "Massa salarial bruta mensal do funcionalismo federal no município (R$ mil)."
+        tests: [not_null]
+      - name: remuneracao_media_bruta_brl
+        description: "Remuneração bruta média mensal por vínculo SIAPE no município (BRL)."
+        tests: [not_null]
+      - name: pct_cargos_comissionados_das
+        description: "Participação percentual de funções comissionadas DAS/FCE no efetivo (%)."
+        tests: [not_null]
+      - name: qtd_regimes_lotacao_siape
+        description: "Quantidade de regimes jurídicos consolidados na camada Silver SIAPE."
+        tests: [not_null]
+      - name: remuneracao_teto_pct
+        description: "Fatia de servidores próximos ao teto constitucional (%)."
+        tests: [not_null]
+      - name: adicional_funcao_das_fce_mil_brl
+        description: "Gasto mensal com gratificações de direção e assessoramento no município (R$ mil)."
+        tests: [not_null]
+      - name: servidores_dedicacao_exclusiva_pct
+        description: "Percentual de vínculos federais sob dedicação exclusiva regular (%)."
+        tests: [not_null]
+      - name: alertas_acumulo_ilicito
+        description: "Contagem de alertas CGU/SIAPE de possível acúmulo ilícito de cargos."
+        tests: [not_null]
+      - name: servidores_cedidos_count
+        description: "Quantidade de servidores cedidos ou requisitados no polo."
+        tests: [not_null]
+      - name: indice_integridade_siape_pct
+        description: "Índice composto de integridade cadastral e funcional CGU/SIAPE (%)."
+        tests: [not_null]

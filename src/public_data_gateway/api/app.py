@@ -1293,6 +1293,86 @@ def create_app(settings: GatewaySettings | None = None) -> FastAPI:
             limit=limit, sigla_uf=uf, sort_by_spending=sort_by_spending
         )
 
+    # 15F. CGU / SIAPE Servidores Federais (Funcionalismo, Folha & Acúmulos)
+    @app.get("/api/v1/compliance/servidores-siape/lotacao/{termo}")
+    async def get_servidores_siape_lotacao(termo: str) -> list[dict[str, Any]]:
+        from public_data_gateway.connectors.compliance.cgu_servidores_federais import (
+            CguServidoresFederaisConnector,
+        )
+
+        return CguServidoresFederaisConnector(settings=app_settings).get_siape_active_staff(termo)
+
+    @app.get("/api/v1/compliance/servidores-siape/folha/{termo}")
+    async def get_servidores_siape_folha(termo: str) -> list[dict[str, Any]]:
+        from public_data_gateway.connectors.compliance.cgu_servidores_federais import (
+            CguServidoresFederaisConnector,
+        )
+
+        return CguServidoresFederaisConnector(settings=app_settings).get_siape_payroll(termo)
+
+    @app.get("/api/v1/compliance/servidores-siape/acumulo/{id_municipio_or_name}")
+    async def get_servidores_siape_acumulo(id_municipio_or_name: str) -> dict[str, Any]:
+        from public_data_gateway.connectors.compliance.cgu_servidores_federais import (
+            CguServidoresFederaisConnector,
+        )
+
+        res = CguServidoresFederaisConnector(settings=app_settings).get_cgu_staff_compliance(
+            id_municipio_or_name
+        )
+        if res is None:
+            raise HTTPException(
+                status_code=404, detail="CGU/SIAPE staff integrity metrics not found"
+            )
+        return res
+
+    @app.get("/api/v1/compliance/servidores-siape/municipio/{id_municipio_or_name}")
+    async def get_servidores_siape_municipio(id_municipio_or_name: str) -> dict[str, Any]:
+        from public_data_gateway.connectors.compliance.cgu_servidores_federais import (
+            CguServidoresFederaisConnector,
+        )
+
+        res = CguServidoresFederaisConnector(settings=app_settings).get_siape_municipal_summary(
+            id_municipio_or_name
+        )
+        if res is None:
+            raise HTTPException(
+                status_code=404, detail="SIAPE municipal staff summary not found"
+            )
+        return res
+
+    @app.get("/api/v1/compliance/servidores-siape/features/{id_municipio_or_name}")
+    async def get_servidores_siape_features(id_municipio_or_name: str) -> dict[str, Any]:
+        from public_data_gateway.connectors.compliance.cgu_servidores_federais import (
+            CguServidoresFederaisConnector,
+        )
+
+        res = CguServidoresFederaisConnector(settings=app_settings).get_siape_features(
+            id_municipio_or_name
+        )
+        if res is None:
+            raise HTTPException(
+                status_code=404, detail="SIAPE Gold governance features not found"
+            )
+        return res
+
+    @app.get("/api/v1/compliance/servidores-siape/ranking")
+    async def get_servidores_siape_ranking(
+        limit: int = Query(10, ge=1, le=50, description="Max municipalities to list"),
+        uf: str | None = Query(None, description="Optional 2-letter state filter"),
+        sort_by_payroll: bool = Query(
+            False, description="Sort descending by monthly gross SIAPE payroll (R$ mil)"
+        ),
+    ) -> list[dict[str, Any]]:
+        from public_data_gateway.connectors.compliance.cgu_servidores_federais import (
+            CguServidoresFederaisConnector,
+        )
+
+        return CguServidoresFederaisConnector(
+            settings=app_settings
+        ).list_top_siape_municipalities(
+            limit=limit, sigla_uf=uf, sort_by_payroll=sort_by_payroll
+        )
+
     # 15D. CNJ Improbidade Administrativa (CNCIAI)
     @app.get("/api/v1/judicial/improbidade/condenacoes/{documento_or_name}")
     async def get_improbidade_condenacoes(

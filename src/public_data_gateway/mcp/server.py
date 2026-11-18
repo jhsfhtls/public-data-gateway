@@ -614,6 +614,51 @@ class MCPDispatcher:
                                 },
                             },
                             {
+                                "name": "bdg_get_cgu_servidores_lotacao",
+                                "description": "Lookup SIAPE federal civil servants by code, agency, legal regime, IBGE, UF, or city.",
+                                "inputSchema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "termo": {"type": "string", "description": "SIAPE lotacao code, agency code, regime, IBGE 7-digit code, UF, or municipality name"},
+                                    },
+                                    "required": ["termo"],
+                                },
+                            },
+                            {
+                                "name": "bdg_get_cgu_servidores_folha",
+                                "description": "Lookup SIAPE monthly average gross salary, constitutional ceiling share, and DAS/FCE extras by code, IBGE, UF, or city.",
+                                "inputSchema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "termo": {"type": "string", "description": "Payroll code, IBGE 7-digit code, UF, or municipality name"},
+                                    },
+                                    "required": ["termo"],
+                                },
+                            },
+                            {
+                                "name": "bdg_get_cgu_servidores_features",
+                                "description": "Get normalized Gold CGU/SIAPE civil service governance score, monthly payroll, and functional tier.",
+                                "inputSchema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "id_municipio_or_name": {"type": "string", "description": "7-digit IBGE municipality code or municipality name"},
+                                    },
+                                    "required": ["id_municipio_or_name"],
+                                },
+                            },
+                            {
+                                "name": "bdg_list_top_cgu_servidores_municipalities",
+                                "description": "List Brazilian municipalities ranked by SIAPE civil service governance score or monthly gross payroll (R$ mil).",
+                                "inputSchema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "limit": {"type": "integer", "description": "Maximum rows (default: 10)"},
+                                        "sigla_uf": {"type": "string", "description": "Optional 2-letter state filter (e.g. SP)"},
+                                        "sort_by_payroll": {"type": "boolean", "description": "Set true to rank municipalities by highest monthly federal payroll first"},
+                                    },
+                                },
+                            },
+                            {
                                 "name": "bdg_get_cnciai_improbidade_condemnations",
                                 "description": "Query CNJ CNCIAI administrative misconduct condemnations by document, party name, or IBGE code (Tier 1).",
                                 "inputSchema": {
@@ -4486,6 +4531,67 @@ class MCPDispatcher:
                     },
                 }
             wrapped = wrap_untrusted_gov_data(result, source_id="cgu_transparencia_gastos")
+            return {
+                "jsonrpc": "2.0",
+                "id": req_id,
+                "result": {"content": [{"type": "text", "text": wrapped}], "isError": False},
+            }
+
+        if tool_name in {
+            "bdg_get_cgu_servidores_lotacao",
+            "bdg_get_cgu_servidores_folha",
+            "bdg_get_cgu_servidores_features",
+            "bdg_list_top_cgu_servidores_municipalities",
+        }:
+            from public_data_gateway.connectors.compliance.cgu_servidores_federais import (
+                CguServidoresFederaisConnector,
+            )
+
+            connector = CguServidoresFederaisConnector(settings=self.settings)
+            try:
+                if tool_name == "bdg_get_cgu_servidores_lotacao":
+                    result: Any = connector.get_siape_active_staff(
+                        str(args.get("termo", ""))
+                    )
+                elif tool_name == "bdg_get_cgu_servidores_folha":
+                    result = connector.get_siape_payroll(str(args.get("termo", "")))
+                elif tool_name == "bdg_get_cgu_servidores_features":
+                    result = connector.get_siape_features(
+                        str(args.get("id_municipio_or_name", ""))
+                    )
+                else:
+                    result = connector.list_top_siape_municipalities(
+                        limit=int(args.get("limit", 10)),
+                        sigla_uf=args.get("sigla_uf"),
+                        sort_by_payroll=bool(args.get("sort_by_payroll", False)),
+                    )
+            except (ValueError, KeyError) as exc:
+                return {
+                    "jsonrpc": "2.0",
+                    "id": req_id,
+                    "result": {
+                        "content": [
+                            {"type": "text", "text": f"CGU/SIAPE Servidores parameter error: {exc}"}
+                        ],
+                        "isError": True,
+                    },
+                }
+
+            if not result:
+                return {
+                    "jsonrpc": "2.0",
+                    "id": req_id,
+                    "result": {
+                        "content": [
+                            {
+                                "type": "text",
+                                "text": "No CGU/SIAPE federal staff data found for the query.",
+                            }
+                        ],
+                        "isError": True,
+                    },
+                }
+            wrapped = wrap_untrusted_gov_data(result, source_id="cgu_servidores_federais")
             return {
                 "jsonrpc": "2.0",
                 "id": req_id,

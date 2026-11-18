@@ -608,6 +608,60 @@ class ComplianceFacade:
             limit=limit, sigla_uf=sigla_uf, sort_by_spending=sort_by_spending
         )
 
+    @property
+    def cgu_servidores_connector(self) -> Any:
+        if (
+            not hasattr(self, "_cgu_servidores_connector")
+            or self._cgu_servidores_connector is None
+        ):
+            from public_data_gateway.connectors.compliance.cgu_servidores_federais import (
+                CguServidoresFederaisConnector,
+            )
+
+            self._cgu_servidores_connector = CguServidoresFederaisConnector(
+                settings=self._sdk.settings
+            )
+        return self._cgu_servidores_connector
+
+    def get_siape_active_staff(self, termo: str) -> list[dict[str, Any]]:
+        """Lookup SIAPE federal civil servants by code, agency, legal regime, IBGE, UF, or city."""
+        return self.cgu_servidores_connector.get_siape_active_staff(termo)
+
+    def get_siape_payroll(self, termo: str) -> list[dict[str, Any]]:
+        """Lookup SIAPE monthly gross average salary, ceiling share, and DAS/FCE extras."""
+        return self.cgu_servidores_connector.get_siape_payroll(termo)
+
+    def get_cgu_staff_compliance(
+        self, id_municipio_or_name: str
+    ) -> dict[str, Any] | None:
+        """Retrieve municipal SIAPE exclusive dedication share, double-dipping alerts, and integrity."""
+        return self.cgu_servidores_connector.get_cgu_staff_compliance(
+            id_municipio_or_name
+        )
+
+    def get_siape_municipal_summary(
+        self, id_municipio_or_name: str
+    ) -> dict[str, Any] | None:
+        """Retrieve consolidated municipal SIAPE headcount, monthly gross payroll, and DAS share."""
+        return self.cgu_servidores_connector.get_siape_municipal_summary(
+            id_municipio_or_name
+        )
+
+    def get_siape_features(self, id_municipio_or_name: str) -> dict[str, Any] | None:
+        """Retrieve Gold CGU/SIAPE civil service governance score and tier."""
+        return self.cgu_servidores_connector.get_siape_features(id_municipio_or_name)
+
+    def list_top_siape_municipalities(
+        self,
+        limit: int = 10,
+        sigla_uf: str | None = None,
+        sort_by_payroll: bool = False,
+    ) -> list[dict[str, Any]]:
+        """List municipalities ranked by SIAPE governance score or monthly federal payroll."""
+        return self.cgu_servidores_connector.list_top_siape_municipalities(
+            limit=limit, sigla_uf=sigla_uf, sort_by_payroll=sort_by_payroll
+        )
+
 
 class JudicialFacade:
     """Judicial proceedings, procedural metadata and litigation risk interface (CNJ DataJud)."""
@@ -3592,6 +3646,41 @@ class BrazilData:
         """Listar municípios ranqueados por integridade de execução CGU ou volume de gastos federais."""
         return self.compliance.list_top_cgu_transparency_municipalities(
             limit=limit, sigla_uf=sigla_uf, sort_by_spending=sort_by_spending
+        )
+
+    def get_siape_active_staff(self, termo: str) -> list[dict[str, Any]]:
+        """Consultar servidores públicos federais SIAPE por código, órgão, regime jurídico, IBGE, UF ou cidade."""
+        return self.compliance.get_siape_active_staff(termo)
+
+    def get_siape_payroll(self, termo: str) -> list[dict[str, Any]]:
+        """Consultar folha bruta SIAPE, teto constitucional e gratificações DAS/FCE por município."""
+        return self.compliance.get_siape_payroll(termo)
+
+    def get_cgu_staff_compliance(
+        self, id_municipio_or_name: str
+    ) -> dict[str, Any] | None:
+        """Consultar dedicação exclusiva, alertas de acúmulo ilícito e integridade funcional CGU/SIAPE."""
+        return self.compliance.get_cgu_staff_compliance(id_municipio_or_name)
+
+    def get_siape_municipal_summary(
+        self, id_municipio_or_name: str
+    ) -> dict[str, Any] | None:
+        """Consultar consolidado municipal de efetivo federal SIAPE, massa salarial bruta e % DAS."""
+        return self.compliance.get_siape_municipal_summary(id_municipio_or_name)
+
+    def get_siape_features(self, id_municipio_or_name: str) -> dict[str, Any] | None:
+        """Consultar features Gold CGU/SIAPE de governança de pessoal e integridade funcional."""
+        return self.compliance.get_siape_features(id_municipio_or_name)
+
+    def list_top_siape_municipalities(
+        self,
+        limit: int = 10,
+        sigla_uf: str | None = None,
+        sort_by_payroll: bool = False,
+    ) -> list[dict[str, Any]]:
+        """Listar municípios ranqueados por integridade funcional SIAPE ou maior folha salarial federal."""
+        return self.compliance.list_top_siape_municipalities(
+            limit=limit, sigla_uf=sigla_uf, sort_by_payroll=sort_by_payroll
         )
 
     def get_litigation_risk(self, cnpj_or_cpf: str) -> dict[str, Any]:

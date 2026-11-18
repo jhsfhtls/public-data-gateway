@@ -1,6 +1,6 @@
 {
   "schema_version": "1.0.0",
-  "last_updated": "2026-11-18T12:40:00.000000",
+  "last_updated": "2026-11-18T13:10:00.000000",
   "project_name": "public-data-gateway",
   "architecture": "Hexagonal Medallion Lakehouse (Bronze -> Silver -> Gold / Feature Store)",
   "governance_standards": [
@@ -15,7 +15,7 @@
   "current_macro_phase": "Fase 11.5 - Expansão Completa de Fontes Públicas (Ondas 11.5A a 11.5E — Padrão 11-Gates)",
   "overall_status": "ON_TRACK",
   "active_connector": null,
-  "next_connector": "cgu_servidores_federais",
+  "next_connector": "tse_eleicoes",
   "structural_phases": [
     {
       "phase_id": "00",
@@ -252,74 +252,74 @@
     }
   ],
   "active_connector_gates": {
-    "target_connector": "cgu_transparencia_gastos",
+    "target_connector": "cgu_servidores_federais",
     "target_wave": "11.5D",
     "gates": [
       {
         "gate_id": "GATE_01",
         "name": "Contrato Declarativo ODCS v3.1 das N Tabelas da API",
         "status": "PASSED",
-        "criteria": "Schema tipado, chaves primarias STRING (cod_despesa_cgu, cod_transf_cgu, id_municipio 7D, sigla_uf) e regras semanticas para Gastos Diretos SIAFI/CPGF, Transferencias Constitucionais FPM/SUS, Convenios/Emendas e Resumo Municipal."
+        "criteria": "Schema tipado ODCS-BR-CGU-SERVIDORES-SIAPE-001 (11 colunas), chaves primarias STRING (id_municipio 7D, sigla_uf) e regras semanticas para Servidores Ativos SIAPE, Remuneracao/Folha por Orgao, Acumulo de Cargos/Conflitos e Resumo Municipal."
       },
       {
         "gate_id": "GATE_02",
         "name": "Ingestao Bronze Isolada (Todas as Tabelas) & Cache WAL",
         "status": "PASSED",
-        "criteria": "Ingestao resiliente dos portais oficiais Portal da Transparencia Despesas (portaldatransparencia.gov.br/despesas) e CGU (gov.br/cgu) em data/cgu_transparencia_gastos/bronze/ com registro de linhagem SHA-256."
+        "criteria": "Ingestao resiliente dos portais oficiais Portal da Transparencia Servidores (portaldatransparencia.gov.br/servidores) e Portal do Servidor SIAPE (gov.br/servidor/pt-br) em data/cgu_servidores_federais/bronze/ com registro de linhagem SHA-256."
       },
       {
         "gate_id": "GATE_03",
         "name": "Sanitizacao de Sentinelas & Nulls",
         "status": "PASSED",
-        "criteria": "Conversao deterministica de sentinelas em NULLs reais e normalizacao de modalidades orcamentarias (TRANSFERENCIA_CONSTITUCIONAL, CONVENIO_REPASSE, EXECUCAO_DIRETA_CPGF) e adimplencia de prestacao de contas."
+        "criteria": "Conversao deterministica de sentinelas em NULLs reais e normalizacao de regimes funcionais SIAPE, tetos constitucionais de remuneracao e gravidades de acumulo ilicito/conflito de interesse."
       },
       {
         "gate_id": "GATE_04",
         "name": "Materializacao Silver Parquet Isolada (Todas as Tabelas)",
         "status": "PASSED",
-        "criteria": "Gravacao ZSTD em data/cgu_transparencia_gastos/silver/ (cgu_gastos_diretos_orgaos, cgu_transferencias_constitucionais_fpm, cgu_emendas_convenios_municipio, cgu_transparencia_resumo_municipal)."
+        "criteria": "Gravacao ZSTD em data/cgu_servidores_federais/silver/ (siape_servidores_ativos_municipio, siape_remuneracao_folha_orgao, cgu_acumulo_cargos_conflitos, siape_servidores_resumo_municipal)."
       },
       {
         "gate_id": "GATE_05",
         "name": "Validacao dos 5 Pilares & Quarentena",
         "status": "PASSED",
-        "criteria": "Aprovacao em Freshness, Volume, Schema, Null Ceiling e Lineage com suporte a desvio para data/cgu_transparencia_gastos/quarantine/."
+        "criteria": "Aprovacao em Freshness, Volume, Schema, Null Ceiling e Lineage com suporte a desvio para data/cgu_servidores_federais/quarantine/."
       },
       {
         "gate_id": "GATE_06",
         "name": "Gold Feature View Isolada & ASOF Join ML",
         "status": "PASSED",
-        "criteria": "Features de integridade de execucao orçamentaria e transparencia fiscal em data/cgu_transparencia_gastos/gold/features_transparencia_gastos_cgu.parquet."
+        "criteria": "Features de densidade funcional, pressao de folha e risco de acumulo em data/cgu_servidores_federais/gold/features_servidores_siape_cgu.parquet."
       },
       {
         "gate_id": "GATE_07",
         "name": "Integracao ao EnrichmentEngine & Marts Cross-Domain",
         "status": "PASSED",
-        "criteria": "Integracao transparencia-territorio em mart_cross_domain_territorio_b2b_macro_brasil (total_gastos_federais_cgu_uf_mil_brl, total_transferencias_cgu_uf_mil_brl e avg_score_integridade_execucao_cgu_uf)."
+        "criteria": "Integracao funcionalismo-territorio em mart_cross_domain_territorio_b2b_macro_brasil (total_servidores_siape_uf, folha_mensal_siape_uf_mil_brl e avg_score_integridade_siape_uf)."
       },
       {
         "gate_id": "GATE_08",
         "name": "Exposicao Multi-Interface (4 Interfaces)",
         "status": "PASSED",
-        "criteria": "Exposicao simultanea via SDK (BrazilData.compliance + shortcuts), FastAPI (/api/v1/compliance/transparencia-gastos/*), CLI (bdg transparencia *) e MCP (bdg_*_cgu_* com wrap_untrusted_gov_data)."
+        "criteria": "Exposicao simultanea via SDK (BrazilData.compliance + shortcuts), FastAPI (/api/v1/compliance/servidores-siape/*), CLI (bdg servidores-siape *) e MCP (bdg_get_cgu_servidores_lotacao, bdg_get_cgu_servidores_folha, bdg_get_cgu_servidores_features, bdg_list_top_cgu_servidores_municipalities com wrap_untrusted_gov_data)."
       },
       {
         "gate_id": "GATE_09",
         "name": "Bateria de Testes Unitarios & Paridade Offline",
         "status": "PASSED",
-        "criteria": "Testes unitarios offline completos em tests/connectors/test_cgu_transparencia_gastos.py cobrindo 4 tabelas Silver, Gold ML e paridade nas 4 interfaces."
+        "criteria": "Testes unitarios offline completos em tests/connectors/test_cgu_servidores_federais.py cobrindo 4 tabelas Silver, Gold ML e paridade nas 4 interfaces."
       },
       {
         "gate_id": "GATE_10",
         "name": "dbt Staging, Marts Intra-Domínio/Cross-Domain & 100% Colunas Documentadas",
         "status": "PASSED",
-        "criteria": "Modelos dbt com source.yml, stg_*, fct_gastos_publicos_cgu_municipal, mart intra-dominio mart_transparencia_gastos_cgu_brasil e cross-domain mart_cross_domain_territorio_b2b_macro_brasil aprovados no dbt test (125/125) e lint_dbt_docs.py (100% cobertura)."
+        "criteria": "Modelos dbt com source.yml, stg_*, fct_servidores_federais_siape_municipal, mart intra-dominio mart_servidores_federais_siape_brasil e cross-domain mart_cross_domain_territorio_b2b_macro_brasil aprovados no dbt test (124/124) e lint_dbt_docs.py (100% cobertura em 620 modelos / 8.428 colunas / 344 fontes)."
       },
       {
         "gate_id": "GATE_11",
         "name": "Teste Real de 1 Linha com API ao Vivo (Fail-Hard)",
         "status": "PASSED",
-        "criteria": "Execucao obrigatoria contra portais oficiais Portal da Transparencia Despesas e CGU validando HTTP 200; falha reprova o pipeline."
+        "criteria": "Execucao obrigatoria contra portais oficiais Portal da Transparencia Servidores e Portal do Servidor SIAPE validando HTTP 200; falha reprova o pipeline."
       }
     ]
   },
@@ -816,6 +816,12 @@
       "phase_id": "11.5",
       "milestone": "Wave 11.5D (1/6) — Homologação do Conector cgu_transparencia_gastos (4 Tabelas Silver CGU Despesas/FPM, Mart Intra-Domínio, Mart Cross-Domain Território & Paridade 4 Interfaces)",
       "summary": "Abertura da Wave 11.5D (Transparência Federal, Política, Saúde & Fomento) com implementação completa nos 11 Gates do conector cgu_transparencia_gastos (CGU Portal da Transparência): contrato ODCS v3.1, ingestão Bronze + 4 tabelas Silver ZSTD (cgu_gastos_diretos_orgaos, cgu_transferencias_constitucionais_fpm, cgu_emendas_convenios_municipio, cgu_transparencia_resumo_municipal) + Gold ML (features_transparencia_gastos_cgu), 4 staging views + fct_gastos_publicos_cgu_municipal + mart intra-domínio mart_transparencia_gastos_cgu_brasil + enriquecimento da mart cross-domain mart_cross_domain_territorio_b2b_macro_brasil (125 testes dbt OK, 100% colunas documentadas no lint_dbt_docs.py com 614 modelos / 8.359 colunas), paridade em SDK/FastAPI/CLI/MCP, bateria offline e teste live fail-hard contra portaldatransparencia.gov.br/despesas e gov.br/cgu."
+    },
+    {
+      "date": "2026-11-18",
+      "phase_id": "11.5",
+      "milestone": "Wave 11.5D (2/6) — Homologação do Conector cgu_servidores_federais (4 Tabelas Silver SIAPE/CGU, Mart Intra-Domínio, Mart Cross-Domain Território & Paridade 4 Interfaces)",
+      "summary": "Conclusão do conector 2/6 da Wave 11.5D (cgu_servidores_federais — CGU/SIAPE Servidores Federais: Funcionalismo, Folha & Acúmulos) nos 11 Gates: contrato ODCS v3.1 (ODCS-BR-CGU-SERVIDORES-SIAPE-001), ingestão Bronze + 4 tabelas Silver ZSTD (siape_servidores_ativos_municipio, siape_remuneracao_folha_orgao, cgu_acumulo_cargos_conflitos, siape_servidores_resumo_municipal) + Gold ML (features_servidores_siape_cgu), 4 staging views + fct_servidores_federais_siape_municipal + mart intra-domínio mart_servidores_federais_siape_brasil + enriquecimento da mart cross-domain mart_cross_domain_territorio_b2b_macro_brasil (124 testes dbt OK, 100% colunas documentadas no lint_dbt_docs.py com 620 modelos / 8.428 colunas / 344 fontes), paridade em SDK/FastAPI/CLI/MCP, bateria offline e teste live fail-hard contra portaldatransparencia.gov.br/servidores e gov.br/servidor/pt-br."
     }
   ]
 }
