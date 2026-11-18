@@ -1139,6 +1139,78 @@ def create_app(settings: GatewaySettings | None = None) -> FastAPI:
             limit=limit, sigla_uf=uf
         )
 
+    # SINESP / MJSP & FBSP Segurança Pública
+    @app.get("/api/v1/compliance/seguranca/ocorrencias/{termo}")
+    async def get_seguranca_ocorrencias(termo: str) -> list[dict[str, Any]]:
+        from public_data_gateway.connectors.compliance.sinesp_seguranca import (
+            SinespSegurancaConnector,
+        )
+
+        return SinespSegurancaConnector(settings=app_settings).get_sinesp_crimes(termo)
+
+    @app.get("/api/v1/compliance/seguranca/vitimas/{termo}")
+    async def get_seguranca_vitimas(termo: str) -> list[dict[str, Any]]:
+        from public_data_gateway.connectors.compliance.sinesp_seguranca import (
+            SinespSegurancaConnector,
+        )
+
+        return SinespSegurancaConnector(settings=app_settings).get_sinesp_mvi_victims(termo)
+
+    @app.get("/api/v1/compliance/seguranca/capacidade/{id_municipio_or_name}")
+    async def get_seguranca_capacidade(id_municipio_or_name: str) -> dict[str, Any]:
+        from public_data_gateway.connectors.compliance.sinesp_seguranca import (
+            SinespSegurancaConnector,
+        )
+
+        res = SinespSegurancaConnector(settings=app_settings).get_sinesp_security_capacity(
+            id_municipio_or_name
+        )
+        if res is None:
+            raise HTTPException(status_code=404, detail="SINESP security capacity metrics not found")
+        return res
+
+    @app.get("/api/v1/compliance/seguranca/municipio/{id_municipio_or_name}")
+    async def get_seguranca_municipio(id_municipio_or_name: str) -> dict[str, Any]:
+        from public_data_gateway.connectors.compliance.sinesp_seguranca import (
+            SinespSegurancaConnector,
+        )
+
+        res = SinespSegurancaConnector(settings=app_settings).get_sinesp_municipal_summary(
+            id_municipio_or_name
+        )
+        if res is None:
+            raise HTTPException(status_code=404, detail="SINESP municipal safety summary not found")
+        return res
+
+    @app.get("/api/v1/compliance/seguranca/features/{id_municipio_or_name}")
+    async def get_seguranca_features(id_municipio_or_name: str) -> dict[str, Any]:
+        from public_data_gateway.connectors.compliance.sinesp_seguranca import (
+            SinespSegurancaConnector,
+        )
+
+        res = SinespSegurancaConnector(settings=app_settings).get_sinesp_features(
+            id_municipio_or_name
+        )
+        if res is None:
+            raise HTTPException(status_code=404, detail="SINESP Gold safety features not found")
+        return res
+
+    @app.get("/api/v1/compliance/seguranca/ranking")
+    async def get_seguranca_ranking(
+        limit: int = Query(10, ge=1, le=50, description="Max municipalities to list"),
+        uf: str | None = Query(None, description="Optional 2-letter state filter"),
+        sort_by_cargo_theft: bool = Query(
+            False, description="Sort descending by freight cargo theft rate per 100k hab"
+        ),
+    ) -> list[dict[str, Any]]:
+        from public_data_gateway.connectors.compliance.sinesp_seguranca import (
+            SinespSegurancaConnector,
+        )
+
+        return SinespSegurancaConnector(settings=app_settings).list_top_safest_sinesp_municipalities(
+            limit=limit, sigla_uf=uf, sort_by_cargo_theft=sort_by_cargo_theft
+        )
+
     # 15D. CNJ Improbidade Administrativa (CNCIAI)
     @app.get("/api/v1/judicial/improbidade/condenacoes/{documento_or_name}")
     async def get_improbidade_condenacoes(

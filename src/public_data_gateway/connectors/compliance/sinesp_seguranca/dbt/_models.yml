@@ -1,0 +1,166 @@
+version: 2
+
+models:
+  - name: stg_sinesp_ocorrencias_municipais
+    description: "Staging view tipada das ocorrências criminais municipais SINESP-VDE (roubo de carga, veículos e estelionato)."
+    columns:
+      - name: cod_ocorrencia_sinesp
+        description: "Código identificador único ocorrência-município no SINESP-VDE (STRING)."
+        tests: [not_null, unique]
+      - name: id_municipio
+        description: "Código IBGE de 7 dígitos do município (STRING)."
+        tests: [not_null]
+      - name: sigla_uf
+        description: "Sigla de 2 letras da Unidade Federativa (UF)."
+        tests: [not_null]
+      - name: nome_municipio
+        description: "Nome oficial do município."
+        tests: [not_null]
+      - name: tipo_crime
+        description: "Natureza penal registrada (ROUBO_CARGA_LOGISTICA, ROUBO_FURTO_VEICULO ou ESTELIONATO_FRAUDE)."
+        tests: [not_null]
+      - name: qtd_ocorrencias
+        description: "Total anual de ocorrências registradas para a tipificação penal."
+        tests: [not_null]
+      - name: taxa_por_100k_hab
+        description: "Taxa padronizada de incidência criminal por 100 mil habitantes."
+        tests: [not_null]
+      - name: ano_referencia
+        description: "Ano de referência do boletim estatístico SINESP-VDE."
+        tests: [not_null]
+
+  - name: stg_sinesp_vitimizacao_mvi_uf
+    description: "Staging view tipada de Mortes Violentas Intencionais (MVI) e taxa de elucidação policial por município."
+    columns:
+      - name: cod_vitimizacao_mvi
+        description: "Código composto da série municipal MVI SINESP/FBSP (STRING)."
+        tests: [not_null, unique]
+      - name: id_municipio
+        description: "Código IBGE de 7 dígitos do município (STRING)."
+        tests: [not_null]
+      - name: sigla_uf
+        description: "Sigla de 2 letras da Unidade Federativa (UF)."
+        tests: [not_null]
+      - name: nome_municipio
+        description: "Nome oficial do município."
+        tests: [not_null]
+      - name: total_vitimas_mvi
+        description: "Contagem absoluta de vítimas de Mortes Violentas Intencionais (MVI)."
+        tests: [not_null]
+      - name: taxa_mvi_por_100k_hab
+        description: "Taxa de MVI por 100 mil habitantes no município."
+        tests: [not_null]
+      - name: taxa_elucidacao_inqueritos_pct
+        description: "Percentual de elucidação de inquéritos de homicídios/MVI (%)."
+        tests: [not_null]
+      - name: ano_referencia
+        description: "Ano de referência dos microdados MVI/FBSP."
+        tests: [not_null]
+
+  - name: stg_sinesp_capacidade_seguranca
+    description: "Staging view tipada de infraestrutura policial, delegacias, guarda municipal e gasto per capita."
+    columns:
+      - name: id_municipio
+        description: "Código IBGE de 7 dígitos do município (STRING)."
+        tests: [not_null, unique]
+      - name: sigla_uf
+        description: "Sigla de 2 letras da Unidade Federativa (UF)."
+        tests: [not_null]
+      - name: nome_municipio
+        description: "Nome oficial do município."
+        tests: [not_null]
+      - name: qtd_delegacias_unidades
+        description: "Quantidade de delegacias e unidades policiais ativas no município."
+        tests: [not_null]
+      - name: possui_guarda_municipal_ativa
+        description: "Indicador booleano de existência de Guarda Civil Municipal estruturada."
+        tests: [not_null]
+      - name: efetivo_seguranca_100k_hab
+        description: "Efetivo de forças de segurança por 100 mil habitantes."
+        tests: [not_null]
+      - name: investimento_seguranca_per_capita_brl
+        description: "Gasto público per capita em segurança pública (BRL/hab)."
+        tests: [not_null]
+
+  - name: stg_sinesp_seguranca_resumo_municipal
+    description: "Staging view tipada do consolidado municipal de risco criminal, MVI e sinistralidade patrimonial."
+    columns:
+      - name: id_municipio
+        description: "Código IBGE de 7 dígitos do município (STRING)."
+        tests: [not_null, unique]
+      - name: sigla_uf
+        description: "Sigla de 2 letras da Unidade Federativa (UF)."
+        tests: [not_null]
+      - name: nome_municipio
+        description: "Nome oficial do município."
+        tests: [not_null]
+      - name: regiao
+        description: "Macrorregião geográfica oficial do município."
+        tests: [not_null]
+      - name: taxa_mvi_por_100k_hab
+        description: "Taxa municipal de Mortes Violentas Intencionais por 100 mil hab."
+        tests: [not_null]
+      - name: taxa_roubo_carga_100k_hab
+        description: "Taxa de roubo de cargas rodoviárias por 100 mil hab."
+        tests: [not_null]
+      - name: taxa_furto_roubo_veiculo_100k_hab
+        description: "Taxa consolidada de roubo e furto de veículos por 100 mil hab."
+        tests: [not_null]
+      - name: taxa_estelionato_100k_hab
+        description: "Taxa municipal de ocorrências de estelionato e fraude por 100 mil hab."
+        tests: [not_null]
+      - name: investimento_seguranca_per_capita_brl
+        description: "Investimento estadual e municipal per capita em segurança (BRL)."
+        tests: [not_null]
+
+  - name: fct_seguranca_publica_sinesp_municipal
+    description: "Tabela Fato municipal unificando MVI, sinistralidade de cargas/veículos, estelionato e efetivo policial SINESP/FBSP."
+    columns:
+      - name: id_municipio
+        description: "Código IBGE de 7 dígitos do município (STRING)."
+        tests: [not_null, unique]
+      - name: sigla_uf
+        description: "Sigla de 2 letras da Unidade Federativa (UF)."
+        tests: [not_null]
+      - name: nome_municipio
+        description: "Nome oficial do município."
+        tests: [not_null]
+      - name: regiao
+        description: "Macrorregião geográfica do município."
+        tests: [not_null]
+      - name: taxa_mvi_por_100k_hab
+        description: "Taxa de Mortes Violentas Intencionais por 100 mil habitantes."
+        tests: [not_null]
+      - name: taxa_roubo_carga_100k_hab
+        description: "Taxa de roubo de carga logística por 100 mil habitantes."
+        tests: [not_null]
+      - name: taxa_furto_roubo_veiculo_100k_hab
+        description: "Taxa de furto e roubo de veículos por 100 mil habitantes."
+        tests: [not_null]
+      - name: taxa_estelionato_100k_hab
+        description: "Taxa de ocorrências de estelionato e fraude por 100 mil habitantes."
+        tests: [not_null]
+      - name: investimento_seguranca_per_capita_brl
+        description: "Investimento público anual em segurança pública per capita (BRL)."
+        tests: [not_null]
+      - name: total_vitimas_mvi
+        description: "Total absoluto de vítimas de Mortes Violentas Intencionais no município."
+        tests: [not_null]
+      - name: taxa_elucidacao_inqueritos_pct
+        description: "Taxa de resolução e elucidação de inquéritos de homicídio (%)."
+        tests: [not_null]
+      - name: qtd_delegacias_unidades
+        description: "Quantidade de delegacias e unidades policiais presentes."
+        tests: [not_null]
+      - name: possui_guarda_municipal_ativa
+        description: "Presença de Guarda Civil Municipal ativa."
+        tests: [not_null]
+      - name: efetivo_seguranca_100k_hab
+        description: "Efetivo de policiamento e segurança por 100 mil habitantes."
+        tests: [not_null]
+      - name: qtd_tipos_crime_amostra
+        description: "Quantidade de tipificações criminais presentes na amostra SINESP."
+        tests: [not_null]
+      - name: qtd_ocorrencias_amostra_sinesp
+        description: "Total de ocorrências patrimoniais agregadas na amostra SINESP."
+        tests: [not_null]

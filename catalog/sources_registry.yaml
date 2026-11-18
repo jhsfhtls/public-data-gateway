@@ -1878,3 +1878,33 @@ sources:
   status: HOMOLOGATED
   freshness_sla_hours: 720
   cron_schedule_expression: 0 5 5 * *
+- source_id: sinesp_seguranca
+  name: 'SINESP / FBSP Segurança Pública: Ocorrências Criminais, MVI & Risco Patrimonial'
+  agency: Ministério da Justiça e Segurança Pública (SENASP / SINESP) & Fórum Brasileiro de Segurança Pública (FBSP)
+  official_url: https://www.gov.br/mj/pt-br/assuntos/sua-seguranca/seguranca-publica/estatistica/dados-nacionais-1/base-de-dados-e-notas-metodologicas-dos-gestores-estaduais-sinesp-vde-2022-e-2023
+  segment_id: 08_judicial_compliance
+  segment_name: Judicial, Integridade & Compliance
+  access_mode: LAKEHOUSE_BATCH
+  protocol: HTTP_BULK_ZIP
+  auth_type: NONE
+  canonical_keys:
+  - id_municipio
+  - sigla_uf
+  update_frequency: Anual (SINESP VDE & Anuário FBSP) / Mensal (Série Estatística)
+  estimated_volume: ~5.570 municípios com ocorrências VDE, roubo de carga e taxa MVI (~320 MB)
+  lgpd_tier: PUBLIC_NON_PERSONAL
+  ml_feature_domains:
+  - public_safety_mvi_homicide_rate
+  - cargo_theft_logistics_security
+  - urban_fraud_property_crime_risk
+  solution_packs:
+  - P01
+  - P03
+  - P04
+  - P05
+  - P07
+  rice_score: 895
+  roadmap_wave: 2
+  status: HOMOLOGATED
+  freshness_sla_hours: 720
+  cron_schedule_expression: 0 6 10 * *

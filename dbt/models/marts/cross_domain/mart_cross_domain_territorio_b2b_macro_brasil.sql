@@ -119,6 +119,16 @@ frota_uf AS (
     GROUP BY sigla_uf
 ),
 
+sinesp_uf AS (
+    SELECT
+        sigla_uf,
+        ROUND(AVG(taxa_mvi_por_100k_hab), 2) AS mvi_por_100k_hab_sinesp,
+        ROUND(AVG(taxa_roubo_carga_100k_hab), 2) AS roubo_carga_por_100k_hab_sinesp,
+        ROUND(AVG(score_seguranca_publica_sinesp), 2) AS avg_score_seguranca_publica_uf
+    FROM {{ ref('mart_seguranca_publica_sinesp_brasil') }}
+    GROUP BY sigla_uf
+),
+
 base AS (
     SELECT
         t.sigla_uf,
@@ -153,6 +163,9 @@ base AS (
         COALESCE(fr.qtd_veiculos_frota_uf, 0) AS qtd_veiculos_frota_uf,
         COALESCE(fr.frota_eletrificados_hibridos_uf, 0) AS frota_eletrificados_hibridos_uf,
         COALESCE(fr.avg_score_modernizacao_frota_uf, 60.0) AS avg_score_modernizacao_frota_uf,
+        COALESCE(sn.mvi_por_100k_hab_sinesp, 22.0) AS mvi_por_100k_hab_sinesp,
+        COALESCE(sn.roubo_carga_por_100k_hab_sinesp, 12.0) AS roubo_carga_por_100k_hab_sinesp,
+        COALESCE(sn.avg_score_seguranca_publica_uf, 65.0) AS avg_score_seguranca_publica_uf,
         COALESCE(m.ano_mes, '2025-03') AS macro_ano_mes_referencia,
         COALESCE(m.selic_meta_fim_mes_pct, 14.25) AS selic_meta_fim_mes_pct,
         COALESCE(m.ipca_acumulado_12m_pct, 5.06) AS ipca_acumulado_12m_pct,
@@ -169,6 +182,7 @@ base AS (
     LEFT JOIN agencias_uf ag ON t.sigla_uf = ag.sigla_uf
     LEFT JOIN cno_uf cn ON t.sigla_uf = cn.sigla_uf
     LEFT JOIN frota_uf fr ON t.sigla_uf = fr.sigla_uf
+    LEFT JOIN sinesp_uf sn ON t.sigla_uf = sn.sigla_uf
     CROSS JOIN macro_latest m
 ),
 
