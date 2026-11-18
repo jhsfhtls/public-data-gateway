@@ -1,0 +1,184 @@
+version: 2
+
+models:
+  - name: stg_snis_agua_esgoto_municipio
+    description: "Staging view tipada dos indicadores municipais de Água e Esgoto SNIS/SINISA (IN055, IN056, IN046, IN049)."
+    columns:
+      - name: cod_snis_ae
+        description: "Código identificador único do registro água/esgoto municipal no SNIS (STRING)."
+        tests: [not_null, unique]
+      - name: id_municipio
+        description: "Código IBGE de 7 dígitos do município (STRING)."
+        tests: [not_null]
+      - name: sigla_uf
+        description: "Sigla de 2 letras da Unidade Federativa (UF)."
+        tests: [not_null]
+      - name: nome_municipio
+        description: "Nome oficial do município."
+        tests: [not_null]
+      - name: prestador_servico
+        description: "Operadora ou autarquia responsável pelo abastecimento e esgotamento sanitário."
+        tests: [not_null]
+      - name: natureza_juridica_prestador
+        description: "Natureza jurídica da operadora (COMPANHIA_ESTADUAL, AUTARQUIA_MUNICIPAL, CONCESSAO_PRIVADA ou PPP)."
+        tests: [not_null]
+      - name: atendimento_agua_total_pct
+        description: "Índice IN055 de atendimento total de água potável (%)."
+        tests: [not_null]
+      - name: atendimento_esgoto_total_pct
+        description: "Índice IN056 de atendimento total de coleta de esgoto (%)."
+        tests: [not_null]
+      - name: esgoto_tratado_sobre_consumido_pct
+        description: "Índice IN046 de tratamento de esgoto referido à água consumida (%)."
+        tests: [not_null]
+      - name: indice_perdas_distribuicao_pct
+        description: "Índice IN049 de perdas de água na rede de distribuição (%)."
+        tests: [not_null]
+      - name: ano_referencia
+        description: "Ano de referência do diagnóstico anual SNIS/SINISA."
+        tests: [not_null]
+
+  - name: stg_snis_residuos_solidos_municipio
+    description: "Staging view tipada do manejo de Resíduos Sólidos Urbanos (RDO), coleta seletiva e reciclagem no SNIS/SINISA."
+    columns:
+      - name: cod_snis_rs
+        description: "Código identificador único do registro de resíduos sólidos no SNIS (STRING)."
+        tests: [not_null, unique]
+      - name: id_municipio
+        description: "Código IBGE de 7 dígitos do município (STRING)."
+        tests: [not_null]
+      - name: sigla_uf
+        description: "Sigla de 2 letras da Unidade Federativa (UF)."
+        tests: [not_null]
+      - name: nome_municipio
+        description: "Nome oficial do município."
+        tests: [not_null]
+      - name: cobertura_coleta_rdo_pct
+        description: "Percentual da população atendida com coleta regular de resíduos domésticos (%)."
+        tests: [not_null]
+      - name: coleta_seletiva_ativa
+        description: "Indicador booleano de existência de programa municipal ativo de coleta seletiva."
+        tests: [not_null]
+      - name: destinacao_adequada_aterro_pct
+        description: "Percentual dos resíduos com destinação ambientalmente adequada em aterros sanitários (%)."
+        tests: [not_null]
+      - name: massa_recuperada_reciclagem_t
+        description: "Massa recuperada de materiais recicláveis secos no município (toneladas)."
+        tests: [not_null]
+      - name: ano_referencia
+        description: "Ano de referência do diagnóstico de resíduos sólidos SNIS/SINISA."
+        tests: [not_null]
+
+  - name: stg_snis_investimentos_tarifas
+    description: "Staging view tipada dos indicadores econômico-financeiros, tarifas médias e investimentos SNIS."
+    columns:
+      - name: id_municipio
+        description: "Código IBGE de 7 dígitos do município (STRING)."
+        tests: [not_null, unique]
+      - name: sigla_uf
+        description: "Sigla de 2 letras da Unidade Federativa (UF)."
+        tests: [not_null]
+      - name: nome_municipio
+        description: "Nome oficial do município."
+        tests: [not_null]
+      - name: tarifa_media_agua_esgoto_m3
+        description: "Tarifa média praticada pelos serviços de água e esgoto (BRL/m3)."
+        tests: [not_null]
+      - name: indice_suficiencia_caixa_pct
+        description: "Índice de suficiência financeira de caixa da operação de saneamento (%)."
+        tests: [not_null]
+      - name: investimento_anual_per_capita_brl
+        description: "Investimento anual realizado em saneamento básico por habitante (BRL/hab)."
+        tests: [not_null]
+      - name: investimento_total_milhoes_brl
+        description: "Montante total investido em expansão e modernização no município (R$ milhões)."
+        tests: [not_null]
+
+  - name: stg_snis_saneamento_resumo_municipal
+    description: "Staging view tipada do consolidado municipal de cobertura de saneamento básico e metas do Marco Legal."
+    columns:
+      - name: id_municipio
+        description: "Código IBGE de 7 dígitos do município (STRING)."
+        tests: [not_null, unique]
+      - name: sigla_uf
+        description: "Sigla de 2 letras da Unidade Federativa (UF)."
+        tests: [not_null]
+      - name: nome_municipio
+        description: "Nome oficial do município."
+        tests: [not_null]
+      - name: prestador_servico
+        description: "Principal prestador de serviços de água e esgotamento sanitário no município."
+        tests: [not_null]
+      - name: atendimento_agua_total_pct
+        description: "Percentual da população municipal com acesso à rede de água potável (%)."
+        tests: [not_null]
+      - name: atendimento_esgoto_total_pct
+        description: "Percentual da população municipal atendida com coleta de esgoto (%)."
+        tests: [not_null]
+      - name: esgoto_tratado_sobre_consumido_pct
+        description: "Percentual do esgoto tratado em relação à água consumida (%)."
+        tests: [not_null]
+      - name: indice_perdas_distribuicao_pct
+        description: "Percentual de perdas de água na distribuição (%)."
+        tests: [not_null]
+      - name: cobertura_coleta_rdo_pct
+        description: "Cobertura municipal de coleta regular de resíduos sólidos (%)."
+        tests: [not_null]
+      - name: investimento_total_milhoes_brl
+        description: "Investimento total anual em saneamento básico (R$ milhões)."
+        tests: [not_null]
+
+  - name: fct_saneamento_basico_snis_municipal
+    description: "Tabela Fato municipal unificando cobertura água/esgoto, perdas hídricas, resíduos sólidos e investimentos SNIS/SINISA."
+    columns:
+      - name: id_municipio
+        description: "Código IBGE de 7 dígitos do município (STRING)."
+        tests: [not_null, unique]
+      - name: sigla_uf
+        description: "Sigla de 2 letras da Unidade Federativa (UF)."
+        tests: [not_null]
+      - name: nome_municipio
+        description: "Nome oficial do município."
+        tests: [not_null]
+      - name: prestador_servico
+        description: "Prestador predominante dos serviços municipais de água e esgoto."
+        tests: [not_null]
+      - name: natureza_juridica_prestador
+        description: "Modelo institucional e regulatório do prestador local."
+        tests: [not_null]
+      - name: atendimento_agua_total_pct
+        description: "Índice IN055 de atendimento de abastecimento de água (%)."
+        tests: [not_null]
+      - name: atendimento_esgoto_total_pct
+        description: "Índice IN056 de atendimento de esgotamento sanitário (%)."
+        tests: [not_null]
+      - name: esgoto_tratado_sobre_consumido_pct
+        description: "Índice IN046 de tratamento de esgotos (%)."
+        tests: [not_null]
+      - name: indice_perdas_distribuicao_pct
+        description: "Índice IN049 de perdas hídricas na distribuição (%)."
+        tests: [not_null]
+      - name: cobertura_coleta_rdo_pct
+        description: "Cobertura de coleta regular de resíduos sólidos domésticos (%)."
+        tests: [not_null]
+      - name: investimento_total_milhoes_brl
+        description: "Volume total anual de investimentos realizados (R$ milhões)."
+        tests: [not_null]
+      - name: coleta_seletiva_ativa
+        description: "Existência de serviço ativo de coleta seletiva municipal."
+        tests: [not_null]
+      - name: destinacao_adequada_aterro_pct
+        description: "Percentual de destinação ambientalmente adequada em aterros (%)."
+        tests: [not_null]
+      - name: massa_recuperada_reciclagem_t
+        description: "Massa total de recicláveis recuperados (t)."
+        tests: [not_null]
+      - name: tarifa_media_agua_esgoto_m3
+        description: "Tarifa média praticada de água e esgoto (BRL/m3)."
+        tests: [not_null]
+      - name: indice_suficiencia_caixa_pct
+        description: "Suficiência financeira de caixa da prestadora (%)."
+        tests: [not_null]
+      - name: investimento_anual_per_capita_brl
+        description: "Investimento anual em saneamento por habitante (BRL)."
+        tests: [not_null]

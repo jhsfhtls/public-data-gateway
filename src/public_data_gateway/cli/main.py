@@ -1515,6 +1515,36 @@ def build_parser() -> argparse.ArgumentParser:
     comb_rk_p.add_argument("--biocombustivel", action="store_true", help="Sort descending by biofuel share (%)")
     comb_rk_p.add_argument("--json", action="store_true", help="Output in JSON format")
 
+    # MDR/MCidades SNIS & SINISA (Saneamento Básico) command group
+    san_p = subparsers.add_parser("saneamento", help="Query SNIS/SINISA municipal water, sewage, solid waste, investments, and 2033 rankings.")
+    san_sub = san_p.add_subparsers(dest="saneamento_action", required=True)
+
+    san_ae_p = san_sub.add_parser("agua-esgoto", help="Lookup SNIS water and sewage coverage by code, utility, IBGE, UF, or city.")
+    san_ae_p.add_argument("termo", help="SNIS code, utility name, IBGE code, UF, or municipality name")
+    san_ae_p.add_argument("--json", action="store_true", help="Output in JSON format")
+
+    san_rs_p = san_sub.add_parser("residuos", help="Lookup SNIS municipal solid waste, landfill adequacy, and recycling metrics.")
+    san_rs_p.add_argument("termo", help="SNIS RSU code, IBGE code, UF, or municipality name")
+    san_rs_p.add_argument("--json", action="store_true", help="Output in JSON format")
+
+    san_fin_p = san_sub.add_parser("financeiro", help="Get municipal SNIS tariffs, cash sufficiency, and annual capex per capita.")
+    san_fin_p.add_argument("id_municipio_or_name", help="7-digit IBGE code or municipality name")
+    san_fin_p.add_argument("--json", action="store_true", help="Output in JSON format")
+
+    san_mun_p = san_sub.add_parser("municipio", help="Get consolidated municipal SNIS water, sewage, distribution losses, and capex.")
+    san_mun_p.add_argument("id_municipio_or_name", help="7-digit IBGE code or municipality name")
+    san_mun_p.add_argument("--json", action="store_true", help="Output in JSON format")
+
+    san_ft_p = san_sub.add_parser("features", help="Get Gold SNIS sanitation universalization score and 2033 readiness tier.")
+    san_ft_p.add_argument("id_municipio_or_name", help="7-digit IBGE code or municipality name")
+    san_ft_p.add_argument("--json", action="store_true", help="Output in JSON format")
+
+    san_rk_p = san_sub.add_parser("ranking", help="List municipalities ranked by SNIS sanitation universalization score or sewage coverage (%).")
+    san_rk_p.add_argument("--limit", type=int, default=10, help="Max municipalities to list")
+    san_rk_p.add_argument("--uf", type=str, help="Optional 2-letter state filter")
+    san_rk_p.add_argument("--esgoto", action="store_true", help="Sort descending by total sewage coverage (%)")
+    san_rk_p.add_argument("--json", action="store_true", help="Output in JSON format")
+
     # Datalake Público Federado (DuckDB / BigQuery) command group
     bd_p = subparsers.add_parser("datalake", help="Query Federated Public Datalake (DuckDB / BigQuery) coverage, thematic datasets, governance, SQL efficiency, and rankings.")
     bd_sub = bd_p.add_subparsers(dest="datalake_action", required=True)
@@ -5373,6 +5403,82 @@ def main(argv: Sequence[str] | None = None) -> int:
                     return 0
             except (ValueError, KeyError) as exc:
                 print(f"Erro ANP Combustíveis: {exc}", file=sys.stderr)
+                return 1
+
+        elif args.command == "saneamento":
+            from public_data_gateway.connectors.ambiental.mdr_snis import MdrSnisConnector
+
+            sn_conn = MdrSnisConnector()
+            sn_action = getattr(args, "saneamento_action", "")
+            try:
+                if sn_action == "agua-esgoto":
+                    rows = sn_conn.get_snis_water_sewage(args.termo)
+                    if getattr(args, "json", False):
+                        print(json.dumps(rows, indent=2, ensure_ascii=False, default=str))
+                    else:
+                        print(f"SNIS Água & Esgoto ({len(rows)}):")
+                        for r in rows:
+                            print(f"  {r.get('cod_snis_ae')} | {r.get('nome_municipio')} ({r.get('sigla_uf')}): Água {r.get('atendimento_agua_total_pct')}% | Esgoto {r.get('atendimento_esgoto_total_pct')}%")
+                    return 0
+
+                if sn_action == "residuos":
+                    rows = sn_conn.get_snis_solid_waste(args.termo)
+                    if getattr(args, "json", False):
+                        print(json.dumps(rows, indent=2, ensure_ascii=False, default=str))
+                    else:
+                        print(f"SNIS Resíduos Sólidos ({len(rows)}):")
+                        for r in rows:
+                            print(f"  {r.get('cod_snis_rs')} | {r.get('nome_municipio')} ({r.get('sigla_uf')}): RDO {r.get('cobertura_coleta_rdo_pct')}% | Aterro {r.get('destinacao_adequada_aterro_pct')}%")
+                    return 0
+
+                if sn_action == "financeiro":
+                    res = sn_conn.get_snis_financial_investments(args.id_municipio_or_name)
+                    if res is None:
+                        print(f"Dados financeiros SNIS não encontrados para: {args.id_municipio_or_name}", file=sys.stderr)
+                        return 1
+                    if getattr(args, "json", False):
+                        print(json.dumps(res, indent=2, ensure_ascii=False, default=str))
+                    else:
+                        print(f"SNIS Financeiro ({res.get('nome_municipio')} - {res.get('sigla_uf')}): Tarifa R$ {res.get('tarifa_media_agua_esgoto_m3')}/m3 | Capex {res.get('investimento_total_milhoes_brl')}M")
+                    return 0
+
+                if sn_action == "municipio":
+                    res = sn_conn.get_snis_municipal_summary(args.id_municipio_or_name)
+                    if res is None:
+                        print(f"Resumo SNIS não encontrado para: {args.id_municipio_or_name}", file=sys.stderr)
+                        return 1
+                    if getattr(args, "json", False):
+                        print(json.dumps(res, indent=2, ensure_ascii=False, default=str))
+                    else:
+                        print(f"SNIS Saneamento Município ({res.get('nome_municipio')} - {res.get('sigla_uf')}): Água {res.get('atendimento_agua_total_pct')}% | Esgoto {res.get('atendimento_esgoto_total_pct')}%")
+                    return 0
+
+                if sn_action == "features":
+                    res = sn_conn.get_snis_features(args.id_municipio_or_name)
+                    if res is None:
+                        print(f"Features SNIS não encontradas para: {args.id_municipio_or_name}", file=sys.stderr)
+                        return 1
+                    if getattr(args, "json", False):
+                        print(json.dumps(res, indent=2, ensure_ascii=False, default=str))
+                    else:
+                        print(f"SNIS Saneamento Gold ({res.get('nome_municipio')} - {res.get('id_municipio')}): Score {res.get('score_universalizacao_saneamento_snis')} | {res.get('tier_marco_saneamento_2033')}")
+                    return 0
+
+                if sn_action == "ranking":
+                    ranks = sn_conn.list_top_snis_municipalities(
+                        limit=getattr(args, "limit", 10),
+                        sigla_uf=getattr(args, "uf", None),
+                        sort_by_sewage=getattr(args, "esgoto", False),
+                    )
+                    if getattr(args, "json", False):
+                        print(json.dumps(ranks, indent=2, ensure_ascii=False, default=str))
+                    else:
+                        print(f"Ranking SNIS Saneamento ({len(ranks)}):")
+                        for idx, r in enumerate(ranks, 1):
+                            print(f"  {idx}. {r.get('nome_municipio')} ({r.get('sigla_uf')}): {r.get('score_universalizacao_saneamento_snis')} | {r.get('tier_marco_saneamento_2033')}")
+                    return 0
+            except (ValueError, KeyError) as exc:
+                print(f"Erro SNIS Saneamento: {exc}", file=sys.stderr)
                 return 1
 
         elif args.command == "datalake":

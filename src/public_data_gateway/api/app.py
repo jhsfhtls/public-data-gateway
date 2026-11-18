@@ -3595,6 +3595,64 @@ def create_app(settings: GatewaySettings | None = None) -> FastAPI:
         conn = AnpCombustiveisConnector(settings=app_settings)
         return conn.list_top_anp_municipalities(limit=limit, sigla_uf=uf, sort_by_biofuel=sort_by_biofuel)
 
+    # MDR/MCidades SNIS & SINISA (Saneamento Básico)
+    @app.get("/api/v1/environment/saneamento/agua-esgoto/{termo}")
+    async def get_saneamento_agua_esgoto(termo: str) -> list[dict[str, Any]]:
+        from public_data_gateway.connectors.ambiental.mdr_snis import MdrSnisConnector
+
+        conn = MdrSnisConnector(settings=app_settings)
+        return conn.get_snis_water_sewage(termo)
+
+    @app.get("/api/v1/environment/saneamento/residuos/{termo}")
+    async def get_saneamento_residuos(termo: str) -> list[dict[str, Any]]:
+        from public_data_gateway.connectors.ambiental.mdr_snis import MdrSnisConnector
+
+        conn = MdrSnisConnector(settings=app_settings)
+        return conn.get_snis_solid_waste(termo)
+
+    @app.get("/api/v1/environment/saneamento/financeiro/{id_municipio_or_name}")
+    async def get_saneamento_financeiro(id_municipio_or_name: str) -> dict[str, Any]:
+        from public_data_gateway.connectors.ambiental.mdr_snis import MdrSnisConnector
+
+        conn = MdrSnisConnector(settings=app_settings)
+        res = conn.get_snis_financial_investments(id_municipio_or_name)
+        if res is None:
+            raise HTTPException(status_code=404, detail="SNIS financial investments metrics not found")
+        return res
+
+    @app.get("/api/v1/environment/saneamento/municipio/{id_municipio_or_name}")
+    async def get_saneamento_municipio(id_municipio_or_name: str) -> dict[str, Any]:
+        from public_data_gateway.connectors.ambiental.mdr_snis import MdrSnisConnector
+
+        conn = MdrSnisConnector(settings=app_settings)
+        res = conn.get_snis_municipal_summary(id_municipio_or_name)
+        if res is None:
+            raise HTTPException(status_code=404, detail="SNIS municipal sanitation summary not found")
+        return res
+
+    @app.get("/api/v1/environment/saneamento/features/{id_municipio_or_name}")
+    async def get_saneamento_features(id_municipio_or_name: str) -> dict[str, Any]:
+        from public_data_gateway.connectors.ambiental.mdr_snis import MdrSnisConnector
+
+        conn = MdrSnisConnector(settings=app_settings)
+        res = conn.get_snis_features(id_municipio_or_name)
+        if res is None:
+            raise HTTPException(status_code=404, detail="SNIS Gold sanitation features not found")
+        return res
+
+    @app.get("/api/v1/environment/saneamento/ranking")
+    async def get_saneamento_ranking(
+        limit: int = Query(10, ge=1, le=50, description="Max municipalities to list"),
+        uf: str | None = Query(None, description="Optional 2-letter state filter"),
+        sort_by_sewage: bool = Query(
+            False, description="Sort descending by total sewage coverage (%)"
+        ),
+    ) -> list[dict[str, Any]]:
+        from public_data_gateway.connectors.ambiental.mdr_snis import MdrSnisConnector
+
+        conn = MdrSnisConnector(settings=app_settings)
+        return conn.list_top_snis_municipalities(limit=limit, sigla_uf=uf, sort_by_sewage=sort_by_sewage)
+
     @app.get("/api/v1/metaportals/datalake/top-municipalities")
     async def get_top_bd_municipalities(
         limit: int = Query(10, ge=1, le=50, description="Max municipalities to list"),

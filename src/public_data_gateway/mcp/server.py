@@ -2481,6 +2481,69 @@ class MCPDispatcher:
                                 },
                             },
                             {
+                                "name": "bdg_get_mdr_snis_agua_esgoto",
+                                "description": "Lookup SNIS/SINISA municipal water supply, sewage coverage, treatment rate, and distribution losses by code, utility, IBGE, UF, or city.",
+                                "inputSchema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "termo": {
+                                            "type": "string",
+                                            "description": "SNIS code, utility name, IBGE 7-digit code, UF, or municipality name",
+                                        }
+                                    },
+                                    "required": ["termo"],
+                                },
+                            },
+                            {
+                                "name": "bdg_get_mdr_snis_residuos",
+                                "description": "Lookup SNIS/SINISA municipal solid waste collection, landfill adequacy, and recycling metrics.",
+                                "inputSchema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "termo": {
+                                            "type": "string",
+                                            "description": "SNIS RSU code, IBGE code, UF, or municipality name",
+                                        }
+                                    },
+                                    "required": ["termo"],
+                                },
+                            },
+                            {
+                                "name": "bdg_get_mdr_snis_features",
+                                "description": "Get normalized Gold SNIS/SINISA sanitation universalization score, water/sewage coverage, and 2033 readiness tier.",
+                                "inputSchema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "id_municipio_or_name": {
+                                            "type": "string",
+                                            "description": "7-digit IBGE municipality code or municipality name",
+                                        }
+                                    },
+                                    "required": ["id_municipio_or_name"],
+                                },
+                            },
+                            {
+                                "name": "bdg_list_top_mdr_snis_municipalities",
+                                "description": "List Brazilian municipalities ranked by SNIS sanitation universalization score or sewage coverage (%).",
+                                "inputSchema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "limit": {
+                                            "type": "integer",
+                                            "description": "Maximum rows (default: 10)",
+                                        },
+                                        "sigla_uf": {
+                                            "type": "string",
+                                            "description": "Optional 2-letter state filter (e.g. SP)",
+                                        },
+                                        "sort_by_sewage": {
+                                            "type": "boolean",
+                                            "description": "Set true to rank municipalities by highest total sewage coverage (%) first",
+                                        },
+                                    },
+                                },
+                            },
+                            {
                                 "name": "bdg_get_bd_coverage",
                                 "description": "Get official Federated Public Datalake (DuckDB / BigQuery) municipal treated dataset and table coverage metrics.",
                                 "inputSchema": {
@@ -6093,6 +6156,63 @@ class MCPDispatcher:
                     },
                 }
             wrapped = wrap_untrusted_gov_data(result, source_id="anp_combustiveis")
+            return {
+                "jsonrpc": "2.0",
+                "id": req_id,
+                "result": {"content": [{"type": "text", "text": wrapped}], "isError": False},
+            }
+
+        if tool_name in {
+            "bdg_get_mdr_snis_agua_esgoto",
+            "bdg_get_mdr_snis_residuos",
+            "bdg_get_mdr_snis_features",
+            "bdg_list_top_mdr_snis_municipalities",
+        }:
+            from public_data_gateway.connectors.ambiental.mdr_snis import MdrSnisConnector
+
+            connector = MdrSnisConnector(settings=self.settings)
+            try:
+                if tool_name == "bdg_get_mdr_snis_agua_esgoto":
+                    result: Any = connector.get_snis_water_sewage(str(args.get("termo", "")))
+                elif tool_name == "bdg_get_mdr_snis_residuos":
+                    result = connector.get_snis_solid_waste(str(args.get("termo", "")))
+                elif tool_name == "bdg_get_mdr_snis_features":
+                    result = connector.get_snis_features(
+                        str(args.get("id_municipio_or_name", ""))
+                    )
+                else:
+                    result = connector.list_top_snis_municipalities(
+                        limit=int(args.get("limit", 10)),
+                        sigla_uf=args.get("sigla_uf"),
+                        sort_by_sewage=bool(args.get("sort_by_sewage", False)),
+                    )
+            except (ValueError, KeyError) as exc:
+                return {
+                    "jsonrpc": "2.0",
+                    "id": req_id,
+                    "result": {
+                        "content": [
+                            {"type": "text", "text": f"MDR SNIS parameter error: {exc}"}
+                        ],
+                        "isError": True,
+                    },
+                }
+
+            if not result:
+                return {
+                    "jsonrpc": "2.0",
+                    "id": req_id,
+                    "result": {
+                        "content": [
+                            {
+                                "type": "text",
+                                "text": "No MDR SNIS data found for the query.",
+                            }
+                        ],
+                        "isError": True,
+                    },
+                }
+            wrapped = wrap_untrusted_gov_data(result, source_id="mdr_snis")
             return {
                 "jsonrpc": "2.0",
                 "id": req_id,

@@ -1,6 +1,6 @@
 {
   "schema_version": "1.0.0",
-  "last_updated": "2026-11-18T09:34:00.000000",
+  "last_updated": "2026-11-18T09:57:00.000000",
   "project_name": "public-data-gateway",
   "architecture": "Hexagonal Medallion Lakehouse (Bronze -> Silver -> Gold / Feature Store)",
   "governance_standards": [
@@ -15,7 +15,7 @@
   "current_macro_phase": "Fase 11.5 - Expansão Completa de Fontes Públicas (Ondas 11.5A a 11.5E — Padrão 11-Gates)",
   "overall_status": "ON_TRACK",
   "active_connector": null,
-  "next_connector": "mdr_snis",
+  "next_connector": "senatran_frota",
   "structural_phases": [
     {
       "phase_id": "00",
@@ -252,74 +252,74 @@
     }
   ],
   "active_connector_gates": {
-    "target_connector": "anp_combustiveis",
+    "target_connector": "mdr_snis",
     "target_wave": "11.5B",
     "gates": [
       {
         "gate_id": "GATE_01",
         "name": "Contrato Declarativo ODCS v3.1 das N Tabelas da API",
         "status": "PASSED",
-        "criteria": "Schema tipado, chaves primarias STRING (cod_coleta_anp, cod_venda_uf_anp, id_municipio 7D, sigla_uf) e regras semanticas para Precos LPC ANP, Vendas de Derivados/Biocombustiveis, Postos Revendedores PMQC e Resumo Municipal."
+        "criteria": "Schema tipado, chaves primarias STRING (cod_snis_ae, cod_snis_rs, id_municipio 7D, sigla_uf) e regras semanticas para Agua/Esgoto SNIS, Residuos Solidos RSU, Investimentos/Tarifas e Resumo Municipal."
       },
       {
         "gate_id": "GATE_02",
         "name": "Ingestao Bronze Isolada (Todas as Tabelas) & Cache WAL",
         "status": "PASSED",
-        "criteria": "Ingestao resiliente das fontes oficiais ANP Levantamento de Precos e Vendas de Derivados (gov.br/anp) em data/anp_combustiveis/bronze/ com registro de linhagem SHA-256."
+        "criteria": "Ingestao resiliente das fontes oficiais SNIS e SINISA do Ministerio das Cidades (gov.br/cidades) em data/mdr_snis/bronze/ com registro de linhagem SHA-256."
       },
       {
         "gate_id": "GATE_03",
         "name": "Sanitizacao de Sentinelas & Nulls",
         "status": "PASSED",
-        "criteria": "Conversao deterministica de sentinelas em NULLs reais e normalizacao de combustiveis (GASOLINA_COMUM, ETANOL_HIDRATADO, DIESEL_S10, GLP_13KG) e razao etanol/gasolina."
+        "criteria": "Conversao deterministica de sentinelas em NULLs reais e normalizacao de prestadores de servico, natureza juridica e indicadores IN055/IN056/IN046/IN049."
       },
       {
         "gate_id": "GATE_04",
         "name": "Materializacao Silver Parquet Isolada (Todas as Tabelas)",
         "status": "PASSED",
-        "criteria": "Gravacao ZSTD em data/anp_combustiveis/silver/ (anp_precos_revenda_municipio, anp_vendas_derivados_estado, anp_postos_revendedores_resumo, anp_combustiveis_resumo_municipal)."
+        "criteria": "Gravacao ZSTD em data/mdr_snis/silver/ (snis_agua_esgoto_municipio, snis_residuos_solidos_municipio, snis_investimentos_tarifas, snis_saneamento_resumo_municipal)."
       },
       {
         "gate_id": "GATE_05",
         "name": "Validacao dos 5 Pilares & Quarentena",
         "status": "PASSED",
-        "criteria": "Aprovacao em Freshness, Volume, Schema, Null Ceiling e Lineage com suporte a desvio para data/anp_combustiveis/quarantine/."
+        "criteria": "Aprovacao em Freshness, Volume, Schema, Null Ceiling e Lineage com suporte a desvio para data/mdr_snis/quarantine/."
       },
       {
         "gate_id": "GATE_06",
         "name": "Gold Feature View Isolada & ASOF Join ML",
         "status": "PASSED",
-        "criteria": "Features de competitividade logistica diesel e participacao de biocombustiveis em data/anp_combustiveis/gold/features_combustiveis_biocombustiveis_anp.parquet."
+        "criteria": "Features de universalizacao do saneamento basico e metas 2033 em data/mdr_snis/gold/features_saneamento_snis.parquet."
       },
       {
         "gate_id": "GATE_07",
         "name": "Integracao ao EnrichmentEngine & Marts Cross-Domain",
         "status": "PASSED",
-        "criteria": "Integracao combustiveis-ESG em mart_cross_domain_esg_agro_infra_brasil (preco_diesel_s10_anp_brl, participacao_biocombustivel_anp_pct e score_competitividade_combustiveis_bio)."
+        "criteria": "Integracao saneamento-ESG em mart_cross_domain_esg_agro_infra_brasil (atendimento_agua_snis_pct, atendimento_esgoto_snis_pct e score_universalizacao_saneamento_snis)."
       },
       {
         "gate_id": "GATE_08",
         "name": "Exposicao Multi-Interface (4 Interfaces)",
         "status": "PASSED",
-        "criteria": "Exposicao simultanea via SDK (BrazilData.environment + shortcuts), FastAPI (/api/v1/environment/combustiveis/*), CLI (bdg combustiveis *) e MCP (bdg_*_anp_combustiveis_* com wrap_untrusted_gov_data)."
+        "criteria": "Exposicao simultanea via SDK (BrazilData.environment + shortcuts), FastAPI (/api/v1/environment/saneamento/*), CLI (bdg saneamento *) e MCP (bdg_*_mdr_snis_* com wrap_untrusted_gov_data)."
       },
       {
         "gate_id": "GATE_09",
         "name": "Bateria de Testes Unitarios & Paridade Offline",
         "status": "PASSED",
-        "criteria": "Testes unitarios offline completos em tests/connectors/test_anp_combustiveis.py cobrindo 4 tabelas Silver, Gold ML e paridade nas 4 interfaces."
+        "criteria": "Testes unitarios offline completos em tests/connectors/test_mdr_snis.py cobrindo 4 tabelas Silver, Gold ML e paridade nas 4 interfaces."
       },
       {
         "gate_id": "GATE_10",
         "name": "dbt Staging, Marts Intra-Domínio/Cross-Domain & 100% Colunas Documentadas",
         "status": "PASSED",
-        "criteria": "Modelos dbt com source.yml, stg_*, fct_combustiveis_biocombustiveis_anp_municipal, mart intra-dominio mart_combustiveis_biocombustiveis_anp_brasil e cross-domain mart_cross_domain_esg_agro_infra_brasil aprovados no dbt test (129/129) e lint_dbt_docs.py (100% cobertura)."
+        "criteria": "Modelos dbt com source.yml, stg_*, fct_saneamento_basico_snis_municipal, mart intra-dominio mart_saneamento_basico_snis_brasil e cross-domain mart_cross_domain_esg_agro_infra_brasil aprovados no dbt test (133/133) e lint_dbt_docs.py (100% cobertura)."
       },
       {
         "gate_id": "GATE_11",
         "name": "Teste Real de 1 Linha com API ao Vivo (Fail-Hard)",
         "status": "PASSED",
-        "criteria": "Execucao obrigatoria contra portais oficiais ANP Levantamento de Precos e Vendas de Derivados/Biocombustiveis (gov.br/anp) validando HTTP 200; falha reprova o pipeline."
+        "criteria": "Execucao obrigatoria contra portais oficiais Ministerio das Cidades SNIS e SINISA (gov.br/cidades) validando HTTP 200; falha reprova o pipeline."
       }
     ]
   },
@@ -768,6 +768,12 @@
       "phase_id": "11.5",
       "milestone": "Wave 11.5B (7/8) — Homologação do Conector anp_combustiveis (4 Tabelas Silver ANP LPC/Biocombustíveis, Mart Intra-Domínio, Mart Cross-Domain ESG & Paridade 4 Interfaces)",
       "summary": "Implementação completa nos 11 Gates do conector anp_combustiveis (ANP Levantamento Semanal de Preços LPC, Margens & Biocombustíveis): contrato ODCS v3.1, ingestão Bronze + 4 tabelas Silver ZSTD (anp_precos_revenda_municipio, anp_vendas_derivados_estado, anp_postos_revendedores_resumo, anp_combustiveis_resumo_municipal) + Gold ML (features_combustiveis_biocombustiveis_anp), 4 staging views + fct_combustiveis_biocombustiveis_anp_municipal + mart intra-domínio mart_combustiveis_biocombustiveis_anp_brasil + enriquecimento da mart cross-domain mart_cross_domain_esg_agro_infra_brasil (129 testes dbt OK, 100% colunas documentadas no lint_dbt_docs.py com 566 modelos / 7.779 colunas), paridade em SDK/FastAPI/CLI/MCP, bateria offline e teste live fail-hard contra portais oficiais ANP Levantamento de Preços e Vendas de Derivados."
+    },
+    {
+      "date": "2026-11-18",
+      "phase_id": "11.5",
+      "milestone": "Wave 11.5B (8/8 — Concluída) — Homologação do Conector mdr_snis (4 Tabelas Silver SNIS/SINISA, Mart Intra-Domínio, Mart Cross-Domain ESG & Paridade 4 Interfaces)",
+      "summary": "Fechamento integral da Wave 11.5B (8/8) com implementação completa nos 11 Gates do conector mdr_snis (MDR/Ministério das Cidades SNIS & SINISA Saneamento Básico — Lei nº 14.026/2020): contrato ODCS v3.1, ingestão Bronze + 4 tabelas Silver ZSTD (snis_agua_esgoto_municipio, snis_residuos_solidos_municipio, snis_investimentos_tarifas, snis_saneamento_resumo_municipal) + Gold ML (features_saneamento_snis), 4 staging views + fct_saneamento_basico_snis_municipal + mart intra-domínio mart_saneamento_basico_snis_brasil + enriquecimento da mart cross-domain mart_cross_domain_esg_agro_infra_brasil (133 testes dbt OK, 100% colunas documentadas no lint_dbt_docs.py com 572 modelos / 7.855 colunas), paridade em SDK/FastAPI/CLI/MCP, bateria offline e teste live fail-hard contra gov.br/cidades SNIS e SINISA."
     }
   ]
 }

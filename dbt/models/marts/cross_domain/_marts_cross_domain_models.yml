@@ -257,6 +257,15 @@ models:
       - name: score_competitividade_combustiveis_bio
         description: "Score municipal de competitividade de combustíveis e adoção de biocombustíveis ANP (0-100)."
         tests: [not_null]
+      - name: atendimento_agua_snis_pct
+        description: "Percentual de atendimento municipal de abastecimento de água potável no SNIS/SINISA (%)."
+        tests: [not_null]
+      - name: atendimento_esgoto_snis_pct
+        description: "Percentual de atendimento municipal de esgotamento sanitário no SNIS/SINISA (%)."
+        tests: [not_null]
+      - name: score_universalizacao_saneamento_snis
+        description: "Score municipal de universalização do saneamento básico SNIS/SINISA rumo às metas 2033 (0-100)."
+        tests: [not_null]
       - name: reference_date
         description: "Data de referência ISO-8601 (YYYY-MM-DD)."
         tests: [not_null]

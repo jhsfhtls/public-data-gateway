@@ -2423,6 +2423,58 @@ class EnvironmentFacade:
             limit=limit, sigla_uf=sigla_uf, sort_by_biofuel=sort_by_biofuel
         )
 
+    @property
+    def mdr_snis_connector(self) -> Any:
+        if (
+            not hasattr(self, "_mdr_snis_connector")
+            or self._mdr_snis_connector is None
+        ):
+            from public_data_gateway.connectors.ambiental.mdr_snis import (
+                MdrSnisConnector,
+            )
+
+            self._mdr_snis_connector = MdrSnisConnector(settings=self._sdk.settings)
+        return self._mdr_snis_connector
+
+    def get_snis_water_sewage(self, termo: str) -> list[dict[str, Any]]:
+        """Lookup SNIS/SINISA water and sewage indicators by code, utility, IBGE, UF, or city."""
+        return self.mdr_snis_connector.get_snis_water_sewage(termo)
+
+    def get_snis_solid_waste(self, termo: str) -> list[dict[str, Any]]:
+        """Lookup SNIS/SINISA municipal solid waste, selective collection, and recycling metrics."""
+        return self.mdr_snis_connector.get_snis_solid_waste(termo)
+
+    def get_snis_financial_investments(
+        self, id_municipio_or_name: str
+    ) -> dict[str, Any] | None:
+        """Retrieve municipal SNIS average tariffs, cash sufficiency, and capex per capita."""
+        return self.mdr_snis_connector.get_snis_financial_investments(
+            id_municipio_or_name
+        )
+
+    def get_snis_municipal_summary(
+        self, id_municipio_or_name: str
+    ) -> dict[str, Any] | None:
+        """Retrieve consolidated municipal SNIS water, sewage, losses, and capex summary."""
+        return self.mdr_snis_connector.get_snis_municipal_summary(
+            id_municipio_or_name
+        )
+
+    def get_snis_features(self, id_municipio_or_name: str) -> dict[str, Any] | None:
+        """Retrieve Gold SNIS/SINISA 2033 sanitation universalization score and readiness tier."""
+        return self.mdr_snis_connector.get_snis_features(id_municipio_or_name)
+
+    def list_top_snis_municipalities(
+        self,
+        limit: int = 10,
+        sigla_uf: str | None = None,
+        sort_by_sewage: bool = False,
+    ) -> list[dict[str, Any]]:
+        """List municipalities ranked by SNIS sanitation universalization score or sewage coverage."""
+        return self.mdr_snis_connector.list_top_snis_municipalities(
+            limit=limit, sigla_uf=sigla_uf, sort_by_sewage=sort_by_sewage
+        )
+
 
 class MetaportalsFacade:
     """Sub-facade for Metaportals & Aggregator Hubs (Datalake Federado SQL, Dados.gov.br CKAN)."""
@@ -4505,6 +4557,41 @@ class BrazilData:
         """Listar municípios ranqueados por competitividade ANP ou participação de biocombustíveis (%)."""
         return self.environment.list_top_anp_municipalities(
             limit=limit, sigla_uf=sigla_uf, sort_by_biofuel=sort_by_biofuel
+        )
+
+    def get_snis_water_sewage(self, termo: str) -> list[dict[str, Any]]:
+        """Consultar indicadores municipais SNIS/SINISA de abastecimento de água e esgotamento sanitário."""
+        return self.environment.get_snis_water_sewage(termo)
+
+    def get_snis_solid_waste(self, termo: str) -> list[dict[str, Any]]:
+        """Consultar dados municipais SNIS/SINISA de coleta de resíduos sólidos, aterros e reciclagem."""
+        return self.environment.get_snis_solid_waste(termo)
+
+    def get_snis_financial_investments(
+        self, id_municipio_or_name: str
+    ) -> dict[str, Any] | None:
+        """Consultar tarifas médias, suficiência de caixa e investimentos per capita em saneamento (SNIS)."""
+        return self.environment.get_snis_financial_investments(id_municipio_or_name)
+
+    def get_snis_municipal_summary(
+        self, id_municipio_or_name: str
+    ) -> dict[str, Any] | None:
+        """Consultar consolidado municipal SNIS de água, esgoto tratado, perdas e investimentos."""
+        return self.environment.get_snis_municipal_summary(id_municipio_or_name)
+
+    def get_snis_features(self, id_municipio_or_name: str) -> dict[str, Any] | None:
+        """Consultar features Gold SNIS de universalização do saneamento básico (Novo Marco Legal 2033)."""
+        return self.environment.get_snis_features(id_municipio_or_name)
+
+    def list_top_snis_municipalities(
+        self,
+        limit: int = 10,
+        sigla_uf: str | None = None,
+        sort_by_sewage: bool = False,
+    ) -> list[dict[str, Any]]:
+        """Listar municípios ranqueados por universalização do saneamento SNIS ou atendimento de esgoto (%)."""
+        return self.environment.list_top_snis_municipalities(
+            limit=limit, sigla_uf=sigla_uf, sort_by_sewage=sort_by_sewage
         )
 
     def get_bd_coverage(self, id_municipio: str) -> dict[str, Any]:
