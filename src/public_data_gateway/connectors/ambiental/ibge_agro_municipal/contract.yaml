@@ -1,0 +1,89 @@
+contract_id: ODCS-BR-IBGE-AGRO-001
+source_id: ibge_agro_municipal
+version: 1.0.0
+grain: 1 row per municipality x agricultural crop (IBGE SIDRA PAM Tabela 5457)
+name: "IBGE: Produção Agrícola, Pecuária & Silvicultura Municipal (PAM / PPM / PEVS)"
+agency: Instituto Brasileiro de Geografia e Estatística (IBGE)
+official_url: https://apisidra.ibge.gov.br/
+segment_id: 11_agronegocio_meio_ambiente
+access_mode: FEDERATED_API
+protocol: REST_JSON
+auth_type: NONE
+update_frequency: Anual (IBGE SIDRA Tabelas 5457 / 3939 / 289)
+freshness_sla_hours: 8760
+cron_schedule_expression: "0 6 15 9 *"
+lgpd_legal_basis: public_interest_lai_lei_5878_1973_ibge_sidra
+min_expected_rows: 10
+primary_keys:
+  - cod_registro_pam
+  - id_municipio
+  - sigla_uf
+canonical_keys:
+  - id_municipio
+  - sigla_uf
+sentinel_values:
+  - -1
+  - -99
+  - N/D
+  - SEM INFORMACAO
+columns:
+  - name: cod_registro_pam
+    data_type: STRING
+    required: true
+    nullable: false
+    description: Identificador determinístico do registro municipal por cultura agrícola na PAM (Tabela 5457)
+  - name: id_municipio
+    data_type: STRING
+    required: true
+    nullable: false
+    description: Código IBGE canônico de 7 dígitos do município produtor
+  - name: sigla_uf
+    data_type: STRING
+    required: true
+    nullable: false
+    description: Sigla de 2 letras da Unidade Federativa (UF)
+  - name: nome_municipio
+    data_type: STRING
+    required: true
+    nullable: false
+    description: Nome oficial do município produtor
+  - name: ano_referencia
+    data_type: INT64
+    required: true
+    nullable: false
+    description: Ano de referência da safra consolidada no IBGE PAM
+  - name: cod_cultura_sidra
+    data_type: STRING
+    required: true
+    nullable: false
+    description: Código SIDRA/IBGE da cultura agrícola temporária ou permanente
+  - name: nome_cultura
+    data_type: STRING
+    required: true
+    nullable: false
+    description: Cultura agrícola principal (Soja, Milho, Cafe, Cana_Acucar, Arroz ou Mandioca)
+  - name: tipo_lavoura
+    data_type: STRING
+    required: true
+    nullable: false
+    description: Classificação da lavoura no IBGE PAM (Temporaria ou Permanente)
+  - name: area_plantada_ha
+    data_type: FLOAT64
+    required: true
+    nullable: false
+    description: Área plantada ou destinada à colheita no município em hectares (ha)
+  - name: area_colhida_ha
+    data_type: FLOAT64
+    required: true
+    nullable: false
+    description: Área efetivamente colhida no município em hectares (ha)
+  - name: quantidade_produzida_t
+    data_type: FLOAT64
+    required: true
+    nullable: false
+    description: Volume físico produzido em toneladas (t)
+  - name: valor_producao_mil_brl
+    data_type: FLOAT64
+    required: true
+    nullable: false
+    description: Valor bruto da produção agrícola municipal em mil Reais (R$ mil)

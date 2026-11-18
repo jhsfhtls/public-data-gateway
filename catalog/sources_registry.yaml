@@ -1661,3 +1661,34 @@ sources:
   status: HOMOLOGATED
   freshness_sla_hours: 720
   cron_schedule_expression: 0 5 12 * *
+- source_id: ibge_agro_municipal
+  name: 'IBGE: Produção Agrícola, Pecuária & Silvicultura Municipal (PAM / PPM / PEVS)'
+  agency: Instituto Brasileiro de Geografia e Estatística (IBGE)
+  official_url: https://apisidra.ibge.gov.br/
+  segment_id: 11_agronegocio_meio_ambiente
+  segment_name: Agronegócio, Terra & Meio Ambiente
+  access_mode: FEDERATED_API
+  protocol: REST_JSON
+  auth_type: NONE
+  canonical_keys:
+  - id_municipio
+  - sigla_uf
+  update_frequency: Anual (IBGE SIDRA Tabelas 5457 / 3939 / 289)
+  estimated_volume: ~5.570 municípios x 70+ culturas agrícolas, rebanhos e extrativismo vegetal
+  lgpd_tier: PUBLIC_NON_PERSONAL
+  ml_feature_domains:
+  - municipal_crop_production_pam
+  - livestock_herds_ppm
+  - silviculture_forestry_pevs
+  solution_packs:
+  - P01
+  - P02
+  - P03
+  - P05
+  - P06
+  - P09
+  rice_score: 905
+  roadmap_wave: 2
+  status: HOMOLOGATED
+  freshness_sla_hours: 8760
+  cron_schedule_expression: 0 6 15 9 *

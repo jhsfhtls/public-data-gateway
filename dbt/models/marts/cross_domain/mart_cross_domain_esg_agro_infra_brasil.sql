@@ -78,6 +78,16 @@ sicor AS (
     FROM {{ ref('mart_credito_rural_proagro_sicor_brasil') }}
 ),
 
+ibge_agro AS (
+    SELECT
+        id_municipio,
+        area_colhida_pam_ha,
+        efetivo_rebanho_bovino_cabecas,
+        valor_bruto_agro_total_mil_brl,
+        score_potencia_agropecuaria_ibge
+    FROM {{ ref('mart_producao_agropecuaria_ibge_brasil') }}
+),
+
 joined AS (
     SELECT
         t.id_municipio,
@@ -110,6 +120,10 @@ joined AS (
         COALESCE(sc.cobertura_proagro_sicor_pct, 0.0) AS cobertura_proagro_sicor_pct,
         COALESCE(sc.participacao_abc_renovagro_pct, 0.0) AS participacao_abc_renovagro_pct,
         COALESCE(sc.score_dinamismo_credito_rural_sicor, 50.0) AS score_dinamismo_credito_rural_sicor,
+        COALESCE(ag.area_colhida_pam_ha, 0.0) AS area_colhida_pam_ha,
+        COALESCE(ag.efetivo_rebanho_bovino_cabecas, 0) AS efetivo_rebanho_bovino_cabecas,
+        COALESCE(ag.valor_bruto_agro_total_mil_brl, 0.0) AS valor_bruto_agro_total_mil_brl,
+        COALESCE(ag.score_potencia_agropecuaria_ibge, 45.0) AS score_potencia_agropecuaria_ibge,
         t.reference_date
     FROM terra t
     LEFT JOIN sicar s ON t.id_municipio = s.id_municipio
@@ -118,6 +132,7 @@ joined AS (
     LEFT JOIN telecom tel ON t.id_municipio = tel.id_municipio
     LEFT JOIN ibama ib ON t.id_municipio = ib.id_municipio
     LEFT JOIN sicor sc ON t.id_municipio = sc.id_municipio
+    LEFT JOIN ibge_agro ag ON t.id_municipio = ag.id_municipio
 ),
 
 scored AS (

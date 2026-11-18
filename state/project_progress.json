@@ -1,6 +1,6 @@
 {
   "schema_version": "1.0.0",
-  "last_updated": "2026-11-18T08:05:00.000000",
+  "last_updated": "2026-11-18T08:22:00.000000",
   "project_name": "public-data-gateway",
   "architecture": "Hexagonal Medallion Lakehouse (Bronze -> Silver -> Gold / Feature Store)",
   "governance_standards": [
@@ -15,7 +15,7 @@
   "current_macro_phase": "Fase 11.5 - Expansão Completa de Fontes Públicas (Ondas 11.5A a 11.5E — Padrão 11-Gates)",
   "overall_status": "ON_TRACK",
   "active_connector": null,
-  "next_connector": "ibge_agro_municipal",
+  "next_connector": "rfb_cafir",
   "structural_phases": [
     {
       "phase_id": "00",
@@ -252,20 +252,20 @@
     }
   ],
   "active_connector_gates": {
-    "target_connector": "bcb_sicor",
+    "target_connector": "ibge_agro_municipal",
     "target_wave": "11.5B",
     "gates": [
       {
         "gate_id": "GATE_01",
         "name": "Contrato Declarativo ODCS v3.1 das N Tabelas da API",
         "status": "PASSED",
-        "criteria": "Schema tipado, chaves primarias STRING (cod_operacao_sicor, id_municipio 7D, sigla_uf) e regras semanticas para Custeio, Investimento, Cobertura PRONAF/PROAGRO e Resumo Municipal BACEN SICOR."
+        "criteria": "Schema tipado, chaves primarias STRING (cod_registro_pam, id_municipio 7D, sigla_uf) e regras semanticas para Lavouras PAM, Pecuaria PPM, Silvicultura PEVS e Resumo Municipal IBGE Agro."
       },
       {
         "gate_id": "GATE_02",
         "name": "Ingestao Bronze Isolada (Todas as Tabelas) & Cache WAL",
         "status": "PASSED",
-        "criteria": "Ingestao resiliente da API oficial BACEN Olinda SICOR OData v2 (olinda.bcb.gov.br/olinda/servico/SICOR/versao/v2/odata/) em data/bcb_sicor/bronze/ com registro de linhagem SHA-256."
+        "criteria": "Ingestao resiliente das tabelas IBGE SIDRA PAM (5457), PPM (3939) e PEVS (289) em data/ibge_agro_municipal/bronze/ com registro de linhagem SHA-256."
       },
       {
         "gate_id": "GATE_03",
@@ -277,49 +277,49 @@
         "gate_id": "GATE_04",
         "name": "Materializacao Silver Parquet Isolada (Todas as Tabelas)",
         "status": "PASSED",
-        "criteria": "Gravacao ZSTD em data/bcb_sicor/silver/ (sicor_custeio_municipio_produto, sicor_investimento_municipio_produto, sicor_pronaf_proagro_cobertura, sicor_resumo_municipal)."
+        "criteria": "Gravacao ZSTD em data/ibge_agro_municipal/silver/ (ibge_pam_lavouras, ibge_ppm_pecuaria, ibge_pevs_silvicultura, ibge_agro_resumo_municipal)."
       },
       {
         "gate_id": "GATE_05",
         "name": "Validacao dos 5 Pilares & Quarentena",
         "status": "PASSED",
-        "criteria": "Aprovacao em Freshness, Volume, Schema, Null Ceiling e Lineage com suporte a desvio para data/bcb_sicor/quarantine/."
+        "criteria": "Aprovacao em Freshness, Volume, Schema, Null Ceiling e Lineage com suporte a desvio para data/ibge_agro_municipal/quarantine/."
       },
       {
         "gate_id": "GATE_06",
         "name": "Gold Feature View Isolada & ASOF Join ML",
         "status": "PASSED",
-        "criteria": "Features de dinamismo do credito rural, PRONAF, PROAGRO e RenovAgro ABC+ em data/bcb_sicor/gold/features_credito_rural_sicor.parquet."
+        "criteria": "Features de potencia agropecuaria e VBP municipal em data/ibge_agro_municipal/gold/features_producao_agro_ibge.parquet."
       },
       {
         "gate_id": "GATE_07",
         "name": "Integracao ao EnrichmentEngine & Marts Cross-Domain",
         "status": "PASSED",
-        "criteria": "Integracao agro-ESG em mart_cross_domain_esg_agro_infra_brasil (contratos, volume BRL, PROAGRO, ABC+ e score SICOR)."
+        "criteria": "Integracao agro-ESG em mart_cross_domain_esg_agro_infra_brasil (area PAM, rebanho bovino, VBP total e score IBGE Agro)."
       },
       {
         "gate_id": "GATE_08",
         "name": "Exposicao Multi-Interface (4 Interfaces)",
         "status": "PASSED",
-        "criteria": "Exposicao simultanea via SDK (BrazilData.environment + shortcuts), FastAPI (/api/v1/environment/sicor/*), CLI (bdg sicor *) e MCP (bdg_*_bcb_sicor_* com wrap_untrusted_gov_data)."
+        "criteria": "Exposicao simultanea via SDK (BrazilData.environment + shortcuts), FastAPI (/api/v1/environment/agro/*), CLI (bdg agro *) e MCP (bdg_*_ibge_agro_* com wrap_untrusted_gov_data)."
       },
       {
         "gate_id": "GATE_09",
         "name": "Bateria de Testes Unitarios & Paridade Offline",
         "status": "PASSED",
-        "criteria": "Testes unitarios offline completos em tests/connectors/test_bcb_sicor.py cobrindo 4 tabelas Silver, Gold ML e paridade nas 4 interfaces."
+        "criteria": "Testes unitarios offline completos em tests/connectors/test_ibge_agro_municipal.py cobrindo 4 tabelas Silver, Gold ML e paridade nas 4 interfaces."
       },
       {
         "gate_id": "GATE_10",
         "name": "dbt Staging, Marts Intra-Domínio/Cross-Domain & 100% Colunas Documentadas",
         "status": "PASSED",
-        "criteria": "Modelos dbt com source.yml, stg_*, fct_credito_rural_sicor_municipal, mart intra-dominio mart_credito_rural_proagro_sicor_brasil e cross-domain mart_cross_domain_esg_agro_infra_brasil aprovados no dbt test (123/123) e lint_dbt_docs.py (100% cobertura)."
+        "criteria": "Modelos dbt com source.yml, stg_*, fct_producao_agropecuaria_ibge_municipal, mart intra-dominio mart_producao_agropecuaria_ibge_brasil e cross-domain mart_cross_domain_esg_agro_infra_brasil aprovados no dbt test (118/118) e lint_dbt_docs.py (100% cobertura)."
       },
       {
         "gate_id": "GATE_11",
         "name": "Teste Real de 1 Linha com API ao Vivo (Fail-Hard)",
         "status": "PASSED",
-        "criteria": "Execucao obrigatoria contra API oficial BACEN Olinda SICOR OData v2 (CusteioMunicipioProduto e InvestMunicipioProduto) validando HTTP 200; falha reprova o pipeline."
+        "criteria": "Execucao obrigatoria contra API oficial IBGE SIDRA (Tabelas 5457 PAM, 3939 PPM e 289 PEVS) validando HTTP 200; falha reprova o pipeline."
       }
     ]
   },
@@ -738,6 +738,12 @@
       "phase_id": "11.5",
       "milestone": "Wave 11.5B (2/8) — Homologação do Conector bcb_sicor (4 Tabelas Silver, Mart Intra-Domínio Crédito Rural/Proagro, Mart Cross-Domain ESG & Paridade 4 Interfaces)",
       "summary": "Implementação completa nos 11 Gates do conector bcb_sicor (BACEN SICOR Crédito Rural & Proagro via Olinda OData v2): contrato ODCS v3.1, ingestão Bronze + 4 tabelas Silver ZSTD (sicor_custeio_municipio_produto, sicor_investimento_municipio_produto, sicor_pronaf_proagro_cobertura, sicor_resumo_municipal) + Gold ML (features_credito_rural_sicor), 4 staging views + fct_credito_rural_sicor_municipal + mart intra-domínio mart_credito_rural_proagro_sicor_brasil + enriquecimento da mart cross-domain mart_cross_domain_esg_agro_infra_brasil (123 testes dbt OK, 100% colunas documentadas no lint_dbt_docs.py com 536 modelos / 7.389 colunas), paridade em SDK/FastAPI/CLI/MCP, bateria offline e teste live fail-hard contra olinda.bcb.gov.br SICOR OData v2."
+    },
+    {
+      "date": "2026-11-18",
+      "phase_id": "11.5",
+      "milestone": "Wave 11.5B (3/8) — Homologação do Conector ibge_agro_municipal (4 Tabelas Silver PAM/PPM/PEVS, Mart Intra-Domínio, Mart Cross-Domain ESG & Paridade 4 Interfaces)",
+      "summary": "Implementação completa nos 11 Gates do conector ibge_agro_municipal (IBGE SIDRA PAM 5457, PPM 3939 e PEVS 289): contrato ODCS v3.1, ingestão Bronze + 4 tabelas Silver ZSTD (ibge_pam_lavouras, ibge_ppm_pecuaria, ibge_pevs_silvicultura, ibge_agro_resumo_municipal) + Gold ML (features_producao_agro_ibge), 4 staging views + fct_producao_agropecuaria_ibge_municipal + mart intra-domínio mart_producao_agropecuaria_ibge_brasil + enriquecimento da mart cross-domain mart_cross_domain_esg_agro_infra_brasil (118 testes dbt OK, 100% colunas documentadas no lint_dbt_docs.py com 542 modelos / 7.467 colunas), paridade em SDK/FastAPI/CLI/MCP, bateria offline e teste live fail-hard contra apisidra.ibge.gov.br."
     }
   ]
 }

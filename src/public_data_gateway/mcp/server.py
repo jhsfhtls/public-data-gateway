@@ -2166,6 +2166,69 @@ class MCPDispatcher:
                                 },
                             },
                             {
+                                "name": "bdg_get_ibge_agro_pam_crops",
+                                "description": "Lookup IBGE PAM municipal agricultural crops (Tabela 5457) by IBGE code, UF, crop, or municipality.",
+                                "inputSchema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "termo": {
+                                            "type": "string",
+                                            "description": "IBGE code, UF, crop name (e.g. Soja, Cafe), or municipality name",
+                                        }
+                                    },
+                                    "required": ["termo"],
+                                },
+                            },
+                            {
+                                "name": "bdg_get_ibge_agro_ppm_livestock",
+                                "description": "Lookup IBGE PPM livestock herds and milk production (Tabela 3939) by IBGE code, UF, species, or municipality.",
+                                "inputSchema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "termo": {
+                                            "type": "string",
+                                            "description": "IBGE code, UF, species (e.g. Bovino), or municipality name",
+                                        }
+                                    },
+                                    "required": ["termo"],
+                                },
+                            },
+                            {
+                                "name": "bdg_get_ibge_agro_production_features",
+                                "description": "Get normalized Gold IBGE Agro Municipal gross value (VBP), harvested hectares, cattle herd, and vocation tier.",
+                                "inputSchema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "id_municipio_or_name": {
+                                            "type": "string",
+                                            "description": "7-digit IBGE municipality code or municipality name",
+                                        }
+                                    },
+                                    "required": ["id_municipio_or_name"],
+                                },
+                            },
+                            {
+                                "name": "bdg_list_top_ibge_agro_municipalities",
+                                "description": "List Brazilian municipalities ranked by IBGE agricultural power score or gross VBP value.",
+                                "inputSchema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "limit": {
+                                            "type": "integer",
+                                            "description": "Maximum rows (default: 10)",
+                                        },
+                                        "sigla_uf": {
+                                            "type": "string",
+                                            "description": "Optional 2-letter state filter (e.g. GO)",
+                                        },
+                                        "sort_by_vbp": {
+                                            "type": "boolean",
+                                            "description": "Set true to rank municipalities by highest gross agro value (VBP) first",
+                                        },
+                                    },
+                                },
+                            },
+                            {
                                 "name": "bdg_get_bd_coverage",
                                 "description": "Get official Federated Public Datalake (DuckDB / BigQuery) municipal treated dataset and table coverage metrics.",
                                 "inputSchema": {
@@ -5479,6 +5542,65 @@ class MCPDispatcher:
                     },
                 }
             wrapped = wrap_untrusted_gov_data(result, source_id="bcb_sicor")
+            return {
+                "jsonrpc": "2.0",
+                "id": req_id,
+                "result": {"content": [{"type": "text", "text": wrapped}], "isError": False},
+            }
+
+        if tool_name in {
+            "bdg_get_ibge_agro_pam_crops",
+            "bdg_get_ibge_agro_ppm_livestock",
+            "bdg_get_ibge_agro_production_features",
+            "bdg_list_top_ibge_agro_municipalities",
+        }:
+            from public_data_gateway.connectors.ambiental.ibge_agro_municipal import (
+                IbgeAgroMunicipalConnector,
+            )
+
+            connector = IbgeAgroMunicipalConnector(settings=self.settings)
+            try:
+                if tool_name == "bdg_get_ibge_agro_pam_crops":
+                    result: Any = connector.get_pam_crops(str(args.get("termo", "")))
+                elif tool_name == "bdg_get_ibge_agro_ppm_livestock":
+                    result = connector.get_ppm_livestock(str(args.get("termo", "")))
+                elif tool_name == "bdg_get_ibge_agro_production_features":
+                    result = connector.get_agro_features(
+                        str(args.get("id_municipio_or_name", ""))
+                    )
+                else:
+                    result = connector.list_top_municipalities(
+                        limit=int(args.get("limit", 10)),
+                        sigla_uf=args.get("sigla_uf"),
+                        sort_by_vbp=bool(args.get("sort_by_vbp", False)),
+                    )
+            except (ValueError, KeyError) as exc:
+                return {
+                    "jsonrpc": "2.0",
+                    "id": req_id,
+                    "result": {
+                        "content": [
+                            {"type": "text", "text": f"IBGE Agro parameter error: {exc}"}
+                        ],
+                        "isError": True,
+                    },
+                }
+
+            if not result:
+                return {
+                    "jsonrpc": "2.0",
+                    "id": req_id,
+                    "result": {
+                        "content": [
+                            {
+                                "type": "text",
+                                "text": "No IBGE Agro Municipal data found for the query.",
+                            }
+                        ],
+                        "isError": True,
+                    },
+                }
+            wrapped = wrap_untrusted_gov_data(result, source_id="ibge_agro_municipal")
             return {
                 "jsonrpc": "2.0",
                 "id": req_id,

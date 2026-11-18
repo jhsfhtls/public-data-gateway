@@ -1,0 +1,26 @@
+version: 2
+
+sources:
+  - name: ibge_agro_municipal
+    description: "Tabelas Silver das Pesquisas Agropecuárias Municipais do IBGE SIDRA (PAM Tabela 5457, PPM Tabela 3939 e PEVS Tabela 289)"
+    meta:
+      agency: "Instituto Brasileiro de Geografia e Estatística (IBGE)"
+      domain: "ambiental_agro"
+      freshness_sla: "Anual (8760h)"
+    tables:
+      - name: ibge_pam_lavouras
+        description: "Produção Agrícola Municipal (PAM): área plantada, área colhida, quantidade produzida e valor da produção por cultura"
+        meta:
+          external_location: "data/ibge_agro_municipal/silver/ibge_pam_lavouras.parquet"
+      - name: ibge_ppm_pecuaria
+        description: "Pesquisa da Pecuária Municipal (PPM): efetivos de rebanhos e produção de leite por espécie"
+        meta:
+          external_location: "data/ibge_agro_municipal/silver/ibge_ppm_pecuaria.parquet"
+      - name: ibge_pevs_silvicultura
+        description: "Produção da Extração Vegetal e da Silvicultura (PEVS): área florestal plantada, madeira em tora e valor bruto"
+        meta:
+          external_location: "data/ibge_agro_municipal/silver/ibge_pevs_silvicultura.parquet"
+      - name: ibge_agro_resumo_municipal
+        description: "Consolidado municipal do Valor Bruto da Produção Agropecuária (PAM + PPM + PEVS) e produtividade média"
+        meta:
+          external_location: "data/ibge_agro_municipal/silver/ibge_agro_resumo_municipal.parquet"

@@ -1,0 +1,190 @@
+version: 2
+
+models:
+  - name: stg_ibge_agro_pam_lavouras
+    description: "Staging view tipada das lavouras temporárias e permanentes municipais na IBGE PAM (Tabela 5457)."
+    columns:
+      - name: cod_registro_pam
+        description: "Identificador único determinístico do registro municipal por cultura na PAM."
+        tests: [not_null, unique]
+      - name: id_municipio
+        description: "Código IBGE de 7 dígitos do município produtor (STRING)."
+        tests: [not_null]
+      - name: sigla_uf
+        description: "Sigla de 2 letras da Unidade da Federação (UF)."
+        tests: [not_null]
+      - name: nome_municipio
+        description: "Nome oficial do município."
+        tests: [not_null]
+      - name: ano_referencia
+        description: "Ano de referência da safra consolidada no IBGE PAM."
+        tests: [not_null]
+      - name: cod_cultura_sidra
+        description: "Código SIDRA/IBGE da cultura agrícola."
+        tests: [not_null]
+      - name: nome_cultura
+        description: "Nome da cultura agrícola (Soja, Milho, Cafe, Cana_Acucar, Arroz ou Mandioca)."
+        tests: [not_null]
+      - name: tipo_lavoura
+        description: "Tipo de lavoura no IBGE PAM (Temporaria ou Permanente)."
+        tests: [not_null]
+      - name: area_plantada_ha
+        description: "Área plantada ou destinada à colheita em hectares (ha)."
+        tests: [not_null]
+      - name: area_colhida_ha
+        description: "Área efetivamente colhida em hectares (ha)."
+        tests: [not_null]
+      - name: quantidade_produzida_t
+        description: "Quantidade produzida em toneladas (t)."
+        tests: [not_null]
+      - name: valor_producao_mil_brl
+        description: "Valor bruto da produção da lavoura em mil Reais (R$ mil)."
+        tests: [not_null]
+
+  - name: stg_ibge_agro_ppm_pecuaria
+    description: "Staging view tipada da Pesquisa da Pecuária Municipal (IBGE PPM Tabela 3939)."
+    columns:
+      - name: cod_registro_ppm
+        description: "Identificador determinístico do registro pecuário municipal no IBGE PPM."
+        tests: [not_null, unique]
+      - name: id_municipio
+        description: "Código IBGE de 7 dígitos do município (STRING)."
+        tests: [not_null]
+      - name: sigla_uf
+        description: "Sigla da Unidade da Federação (UF)."
+        tests: [not_null]
+      - name: nome_municipio
+        description: "Nome oficial do município."
+        tests: [not_null]
+      - name: ano_referencia
+        description: "Ano de referência da Pesquisa da Pecuária Municipal."
+        tests: [not_null]
+      - name: especie_rebanho
+        description: "Espécie do efetivo pecuário (Bovino ou Aves_Galinaceos)."
+        tests: [not_null]
+      - name: efetivo_rebanho_cabecas
+        description: "Efetivo do rebanho municipal em cabeças."
+        tests: [not_null]
+      - name: producao_leite_mil_litros
+        description: "Produção anual de leite de vaca no município em mil litros."
+        tests: [not_null]
+      - name: valor_producao_pecuaria_mil_brl
+        description: "Valor estimado da produção pecuária municipal em mil Reais (R$ mil)."
+        tests: [not_null]
+
+  - name: stg_ibge_agro_pevs_silvicultura
+    description: "Staging view municipal de extração vegetal e silvicultura no IBGE PEVS (Tabela 289)."
+    columns:
+      - name: id_municipio
+        description: "Código IBGE de 7 dígitos do município (STRING)."
+        tests: [not_null, unique]
+      - name: sigla_uf
+        description: "Sigla da Unidade da Federação (UF)."
+        tests: [not_null]
+      - name: nome_municipio
+        description: "Nome oficial do município."
+        tests: [not_null]
+      - name: ano_referencia
+        description: "Ano de referência do levantamento IBGE PEVS."
+        tests: [not_null]
+      - name: area_floresta_plantada_eucalipto_pinus_ha
+        description: "Área total de florestas plantadas (eucalipto, pinus e outras) em hectares (ha)."
+        tests: [not_null]
+      - name: producao_madeira_tora_m3
+        description: "Volume extraído de madeira em tora em metros cúbicos (m³)."
+        tests: [not_null]
+      - name: valor_extracao_vegetal_mil_brl
+        description: "Valor da produção da extração vegetal não madereira e madereira em mil Reais."
+        tests: [not_null]
+      - name: valor_silvicultura_mil_brl
+        description: "Valor da produção de silvicultura comercial em mil Reais."
+        tests: [not_null]
+
+  - name: stg_ibge_agro_resumo_municipal
+    description: "Staging view consolidada por município do Valor Bruto da Produção Agropecuária IBGE (PAM + PPM + PEVS)."
+    columns:
+      - name: id_municipio
+        description: "Código IBGE de 7 dígitos do município (STRING)."
+        tests: [not_null, unique]
+      - name: sigla_uf
+        description: "Sigla da Unidade da Federação (UF)."
+        tests: [not_null]
+      - name: nome_municipio
+        description: "Nome oficial do município."
+        tests: [not_null]
+      - name: bioma_predominante
+        description: "Bioma predominante no território municipal."
+        tests: [not_null]
+      - name: area_colhida_pam_ha
+        description: "Área colhida consolidada das lavouras no município em hectares (ha)."
+        tests: [not_null]
+      - name: valor_producao_pam_mil_brl
+        description: "Valor bruto da produção agrícola (PAM) em mil Reais (R$ mil)."
+        tests: [not_null]
+      - name: efetivo_rebanho_bovino_cabecas
+        description: "Efetivo total do rebanho bovino municipal em cabeças (PPM)."
+        tests: [not_null]
+      - name: valor_producao_pecuaria_mil_brl
+        description: "Valor estimado da produção pecuária municipal (PPM) em mil Reais."
+        tests: [not_null]
+      - name: valor_producao_silvicultura_pevs_mil_brl
+        description: "Valor consolidado de silvicultura e extração vegetal (PEVS) em mil Reais."
+        tests: [not_null]
+      - name: valor_bruto_agro_total_mil_brl
+        description: "Valor Bruto da Produção Agropecuária total (PAM + PPM + PEVS) em mil Reais."
+        tests: [not_null]
+      - name: produtividade_media_pam_kg_ha
+        description: "Produtividade física média das lavouras PAM no município em kg/ha."
+        tests: [not_null]
+
+  - name: fct_producao_agropecuaria_ibge_municipal
+    description: "Tabela fato municipal integrando produção agrícola PAM, pecuária PPM e silvicultura/extração PEVS do IBGE."
+    columns:
+      - name: id_municipio
+        description: "Código IBGE de 7 dígitos do município (chave primária STRING)."
+        tests: [not_null, unique]
+      - name: sigla_uf
+        description: "Sigla de 2 letras da Unidade da Federação (UF)."
+        tests: [not_null]
+      - name: nome_municipio
+        description: "Nome oficial do município."
+        tests: [not_null]
+      - name: bioma_predominante
+        description: "Bioma predominante no território municipal."
+        tests: [not_null]
+      - name: area_colhida_pam_ha
+        description: "Área total colhida nas lavouras IBGE PAM em hectares (ha)."
+        tests: [not_null]
+      - name: valor_producao_pam_mil_brl
+        description: "Valor bruto da produção das lavouras PAM em mil Reais (R$ mil)."
+        tests: [not_null]
+      - name: efetivo_rebanho_bovino_cabecas
+        description: "Efetivo de rebanho bovino no município em cabeças (IBGE PPM)."
+        tests: [not_null]
+      - name: valor_producao_pecuaria_mil_brl
+        description: "Valor da produção pecuária municipal em mil Reais (R$ mil)."
+        tests: [not_null]
+      - name: valor_producao_silvicultura_pevs_mil_brl
+        description: "Valor da produção de silvicultura e extração vegetal PEVS em mil Reais."
+        tests: [not_null]
+      - name: valor_bruto_agro_total_mil_brl
+        description: "Valor Bruto da Produção Agropecuária total (PAM + PPM + PEVS) em mil Reais."
+        tests: [not_null]
+      - name: produtividade_media_pam_kg_ha
+        description: "Produtividade física média das lavouras PAM no município em kg/ha."
+        tests: [not_null]
+      - name: area_floresta_plantada_eucalipto_pinus_ha
+        description: "Área de florestas plantadas de eucalipto e pinus no município (ha)."
+        tests: [not_null]
+      - name: producao_madeira_tora_m3
+        description: "Produção anual de madeira em tora no município em metros cúbicos (m³)."
+        tests: [not_null]
+      - name: qtd_culturas_pam_amostra
+        description: "Quantidade de culturas agrícolas principais registradas na amostra Silver PAM."
+        tests: [not_null]
+      - name: quantidade_produzida_amostra_t
+        description: "Soma da quantidade produzida na amostra granular Silver PAM em toneladas."
+        tests: [not_null]
+      - name: producao_leite_mil_litros
+        description: "Produção anual de leite de vaca no município em mil litros (PPM)."
+        tests: [not_null]

@@ -1365,6 +1365,36 @@ def build_parser() -> argparse.ArgumentParser:
     sicor_rk_p.add_argument("--pronaf", action="store_true", help="Sort by highest Pronaf share first")
     sicor_rk_p.add_argument("--json", action="store_true", help="Output in JSON format")
 
+    # IBGE Agropecuária Municipal (PAM / PPM / PEVS) command group
+    agro_p = subparsers.add_parser("agro", help="Query IBGE municipal agricultural crops (PAM), livestock (PPM), forestry (PEVS), VBP, and rankings.")
+    agro_sub = agro_p.add_subparsers(dest="agro_action", required=True)
+
+    agro_pam_p = agro_sub.add_parser("pam", help="Lookup IBGE PAM agricultural production by IBGE code, UF, crop, or municipality.")
+    agro_pam_p.add_argument("termo", help="IBGE code, UF, crop name, or municipality name")
+    agro_pam_p.add_argument("--json", action="store_true", help="Output in JSON format")
+
+    agro_ppm_p = agro_sub.add_parser("ppm", help="Lookup IBGE PPM livestock herds and milk production by IBGE code, UF, or species.")
+    agro_ppm_p.add_argument("termo", help="IBGE code, UF, species, or municipality name")
+    agro_ppm_p.add_argument("--json", action="store_true", help="Output in JSON format")
+
+    agro_pevs_p = agro_sub.add_parser("pevs", help="Get municipal IBGE PEVS forestry and vegetal extraction metrics.")
+    agro_pevs_p.add_argument("id_municipio_or_name", help="7-digit IBGE code or municipality name")
+    agro_pevs_p.add_argument("--json", action="store_true", help="Output in JSON format")
+
+    agro_mun_p = agro_sub.add_parser("municipio", help="Get consolidated municipal IBGE PAM/PPM/PEVS gross agricultural value (VBP).")
+    agro_mun_p.add_argument("id_municipio_or_name", help="7-digit IBGE code or municipality name")
+    agro_mun_p.add_argument("--json", action="store_true", help="Output in JSON format")
+
+    agro_ft_p = agro_sub.add_parser("features", help="Get Gold IBGE Agro Municipal agricultural power score and vocation features.")
+    agro_ft_p.add_argument("id_municipio_or_name", help="7-digit IBGE code or municipality name")
+    agro_ft_p.add_argument("--json", action="store_true", help="Output in JSON format")
+
+    agro_rk_p = agro_sub.add_parser("ranking", help="List municipalities ranked by IBGE agricultural power score or total VBP.")
+    agro_rk_p.add_argument("--limit", type=int, default=10, help="Max municipalities to list")
+    agro_rk_p.add_argument("--uf", type=str, help="Optional 2-letter state filter")
+    agro_rk_p.add_argument("--vbp", action="store_true", help="Sort descending by gross VBP value")
+    agro_rk_p.add_argument("--json", action="store_true", help="Output in JSON format")
+
     # Datalake Público Federado (DuckDB / BigQuery) command group
     bd_p = subparsers.add_parser("datalake", help="Query Federated Public Datalake (DuckDB / BigQuery) coverage, thematic datasets, governance, SQL efficiency, and rankings.")
     bd_sub = bd_p.add_subparsers(dest="datalake_action", required=True)
@@ -4832,6 +4862,84 @@ def main(argv: Sequence[str] | None = None) -> int:
                     return 0
             except (ValueError, KeyError) as exc:
                 print(f"Erro BACEN SICOR: {exc}", file=sys.stderr)
+                return 1
+
+        elif args.command == "agro":
+            from public_data_gateway.connectors.ambiental.ibge_agro_municipal import (
+                IbgeAgroMunicipalConnector,
+            )
+
+            agro_conn = IbgeAgroMunicipalConnector()
+            agro_action = getattr(args, "agro_action", "")
+            try:
+                if agro_action == "pam":
+                    rows = agro_conn.get_pam_crops(args.termo)
+                    if getattr(args, "json", False):
+                        print(json.dumps(rows, indent=2, ensure_ascii=False, default=str))
+                    else:
+                        print(f"IBGE PAM Lavouras ({len(rows)}):")
+                        for r in rows:
+                            print(f"  {r.get('cod_registro_pam')} | {r.get('nome_municipio')} ({r.get('sigla_uf')}): {r.get('nome_cultura')} - {r.get('quantidade_produzida_t')} t")
+                    return 0
+
+                if agro_action == "ppm":
+                    rows = agro_conn.get_ppm_livestock(args.termo)
+                    if getattr(args, "json", False):
+                        print(json.dumps(rows, indent=2, ensure_ascii=False, default=str))
+                    else:
+                        print(f"IBGE PPM Pecuária ({len(rows)}):")
+                        for r in rows:
+                            print(f"  {r.get('cod_registro_ppm')} | {r.get('nome_municipio')} ({r.get('sigla_uf')}): {r.get('especie_rebanho')} - {r.get('efetivo_rebanho_cabecas')} cabecas")
+                    return 0
+
+                if agro_action == "pevs":
+                    res = agro_conn.get_pevs_forestry(args.id_municipio_or_name)
+                    if res is None:
+                        print(f"Dados IBGE PEVS não encontrados para: {args.id_municipio_or_name}", file=sys.stderr)
+                        return 1
+                    if getattr(args, "json", False):
+                        print(json.dumps(res, indent=2, ensure_ascii=False, default=str))
+                    else:
+                        print(f"IBGE PEVS ({res.get('nome_municipio')} - {res.get('sigla_uf')}): Floresta {res.get('area_floresta_plantada_eucalipto_pinus_ha')} ha | Tora {res.get('producao_madeira_tora_m3')} m3")
+                    return 0
+
+                if agro_action == "municipio":
+                    res = agro_conn.get_municipal_summary(args.id_municipio_or_name)
+                    if res is None:
+                        print(f"Resumo IBGE Agro não encontrado para: {args.id_municipio_or_name}", file=sys.stderr)
+                        return 1
+                    if getattr(args, "json", False):
+                        print(json.dumps(res, indent=2, ensure_ascii=False, default=str))
+                    else:
+                        print(f"IBGE Agro Município ({res.get('nome_municipio')} - {res.get('sigla_uf')}): VBP R$ {res.get('valor_bruto_agro_total_mil_brl')} mil")
+                    return 0
+
+                if agro_action == "features":
+                    res = agro_conn.get_agro_features(args.id_municipio_or_name)
+                    if res is None:
+                        print(f"Features IBGE Agro não encontradas para: {args.id_municipio_or_name}", file=sys.stderr)
+                        return 1
+                    if getattr(args, "json", False):
+                        print(json.dumps(res, indent=2, ensure_ascii=False, default=str))
+                    else:
+                        print(f"IBGE Agro Gold ({res.get('nome_municipio')} - {res.get('id_municipio')}): Score {res.get('score_potencia_agropecuaria_ibge')} | {res.get('classificacao_vocacao_agro_ibge')}")
+                    return 0
+
+                if agro_action == "ranking":
+                    ranks = agro_conn.list_top_municipalities(
+                        limit=getattr(args, "limit", 10),
+                        sigla_uf=getattr(args, "uf", None),
+                        sort_by_vbp=getattr(args, "vbp", False),
+                    )
+                    if getattr(args, "json", False):
+                        print(json.dumps(ranks, indent=2, ensure_ascii=False, default=str))
+                    else:
+                        print(f"Ranking IBGE Agro ({len(ranks)}):")
+                        for idx, r in enumerate(ranks, 1):
+                            print(f"  {idx}. {r.get('nome_municipio')} ({r.get('sigla_uf')}): {r.get('score_potencia_agropecuaria_ibge')} | {r.get('classificacao_vocacao_agro_ibge')}")
+                    return 0
+            except (ValueError, KeyError) as exc:
+                print(f"Erro IBGE Agro: {exc}", file=sys.stderr)
                 return 1
 
         elif args.command == "datalake":
