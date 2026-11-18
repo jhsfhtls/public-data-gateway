@@ -61,6 +61,12 @@ models:
       - name: valor_multas_ativas_uf
         description: "Valor agregado de multas administrativas ativas na UF."
         tests: [not_null]
+      - name: avg_despesa_pessoal_rcl_siconfi_pct
+        description: "Média estadual de comprometimento da RCL com despesa de pessoal no SICONFI (%)."
+        tests: [not_null]
+      - name: avg_score_solidez_siconfi_uf
+        description: "Média estadual do score composto de solidez contábil e fiscal SICONFI."
+        tests: [not_null]
       - name: macro_ano_mes_referencia
         description: "Competência macroeconômica de referência (YYYY-MM)."
         tests: [not_null]

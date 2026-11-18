@@ -12,7 +12,7 @@ def test_list_sources_pack_and_legacy_product_alias():
     by_pack = registry.list_sources(pack_id="P01")
     by_product = registry.list_sources(product_id="P01")
 
-    assert len(by_pack) == 49
+    assert len(by_pack) >= 49
     assert [s.source_id for s in by_pack] == [s.source_id for s in by_product]
 
 

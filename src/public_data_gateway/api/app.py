@@ -694,6 +694,92 @@ def create_app(settings: GatewaySettings | None = None) -> FastAPI:
             )
         return res
 
+    # 15B. STN SICONFI (Contabilidade Pública DCA/RREO/RGF & Limites LRF)
+    @app.get("/api/v1/treasury/siconfi/ente/{id_municipio_or_name}")
+    async def get_siconfi_ente(id_municipio_or_name: str) -> dict[str, Any]:
+        from public_data_gateway.connectors.macrofinanceiro.stn_siconfi import (
+            StnSiconfiConnector,
+        )
+
+        res = StnSiconfiConnector(settings=app_settings).get_ente_profile(id_municipio_or_name)
+        if not res:
+            raise HTTPException(
+                status_code=404,
+                detail=f"SICONFI ente not found for '{id_municipio_or_name}'",
+            )
+        return res
+
+    @app.get("/api/v1/treasury/siconfi/dca/{id_municipio}")
+    async def get_siconfi_dca(
+        id_municipio: str,
+        ano: int | None = Query(None, description="Exercise year filter (e.g. 2024)"),
+    ) -> list[dict[str, Any]]:
+        from public_data_gateway.connectors.macrofinanceiro.stn_siconfi import (
+            StnSiconfiConnector,
+        )
+
+        return StnSiconfiConnector(settings=app_settings).get_dca_balance(id_municipio, ano=ano)
+
+    @app.get("/api/v1/treasury/siconfi/rreo/{id_municipio}")
+    async def get_siconfi_rreo(
+        id_municipio: str,
+        ano: int | None = Query(None, description="Exercise year filter (e.g. 2024)"),
+    ) -> list[dict[str, Any]]:
+        from public_data_gateway.connectors.macrofinanceiro.stn_siconfi import (
+            StnSiconfiConnector,
+        )
+
+        return StnSiconfiConnector(settings=app_settings).get_rreo_execution(id_municipio, ano=ano)
+
+    @app.get("/api/v1/treasury/siconfi/rgf/{id_municipio}")
+    async def get_siconfi_rgf(
+        id_municipio: str,
+        ano: int | None = Query(None, description="Exercise year filter (e.g. 2024)"),
+    ) -> list[dict[str, Any]]:
+        from public_data_gateway.connectors.macrofinanceiro.stn_siconfi import (
+            StnSiconfiConnector,
+        )
+
+        return StnSiconfiConnector(settings=app_settings).get_rgf_limits(id_municipio, ano=ano)
+
+    @app.get("/api/v1/treasury/siconfi/extratos/{id_municipio}")
+    async def get_siconfi_extratos(
+        id_municipio: str,
+        ano: int | None = Query(None, description="Exercise year filter (e.g. 2024)"),
+    ) -> list[dict[str, Any]]:
+        from public_data_gateway.connectors.macrofinanceiro.stn_siconfi import (
+            StnSiconfiConnector,
+        )
+
+        return StnSiconfiConnector(settings=app_settings).get_delivery_extracts(id_municipio, ano=ano)
+
+    @app.get("/api/v1/treasury/siconfi/features/{id_municipio_or_name}")
+    async def get_siconfi_features(id_municipio_or_name: str) -> dict[str, Any]:
+        from public_data_gateway.connectors.macrofinanceiro.stn_siconfi import (
+            StnSiconfiConnector,
+        )
+
+        res = StnSiconfiConnector(settings=app_settings).get_siconfi_features(id_municipio_or_name)
+        if not res:
+            raise HTTPException(
+                status_code=404,
+                detail=f"SICONFI fiscal features not found for '{id_municipio_or_name}'",
+            )
+        return res
+
+    @app.get("/api/v1/treasury/siconfi/ranking")
+    async def get_siconfi_ranking(
+        limit: int = Query(10, ge=1, le=50, description="Max municipalities to return"),
+        uf: str | None = Query(None, description="Optional 2-letter UF state filter"),
+    ) -> list[dict[str, Any]]:
+        from public_data_gateway.connectors.macrofinanceiro.stn_siconfi import (
+            StnSiconfiConnector,
+        )
+
+        return StnSiconfiConnector(settings=app_settings).list_top_municipalities(
+            limit=limit, sigla_uf=uf
+        )
+
     # 16. Public Procurement Catalog & Pricing (Compras.gov.br CATMAT/CATSER)
     @app.get("/api/v1/procurement/materials/search")
     async def search_materials(

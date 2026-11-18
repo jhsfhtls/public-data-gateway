@@ -562,3 +562,140 @@ models:
         tests:
           - not_null
 
+  - name: mart_contabilidade_fiscal_siconfi
+    description: "Datamart intra-domínio macrofinanceiro consolidando balanços patrimoniais (DCA), execução orçamentária (RREO), limites LRF de pessoal e dívida (RGF) e score de solidez contábil SICONFI por município"
+    columns:
+      - name: id_municipio
+        description: "Código IBGE canônico de 7 dígitos do município"
+        tests:
+          - not_null
+          - unique
+      - name: sigla_uf
+        description: "Sigla de 2 letras da Unidade da Federação"
+        tests:
+          - not_null
+      - name: nome_ente
+        description: "Nome oficial do ente federativo no SICONFI"
+        tests:
+          - not_null
+      - name: esfera
+        description: "Esfera federativa do ente (M, E, D ou U)"
+        tests:
+          - not_null
+      - name: regiao
+        description: "Macrorregião geográfica brasileira"
+        tests:
+          - not_null
+      - name: populacao
+        description: "População oficial informada no SICONFI"
+        tests:
+          - not_null
+      - name: cnpj_14
+        description: "CNPJ institucional de 14 dígitos da prefeitura"
+        tests:
+          - not_null
+      - name: ano_exercicio
+        description: "Ano de exercício contábil de referência"
+        tests:
+          - not_null
+      - name: is_capital
+        description: "Indicador booleano de capital estadual"
+        tests:
+          - not_null
+      - name: ativo_total_brl
+        description: "Ativo total consolidado na DCA em BRL"
+        tests:
+          - not_null
+      - name: passivo_total_brl
+        description: "Passivo total exigível na DCA em BRL"
+        tests:
+          - not_null
+      - name: patrimonio_liquido_brl
+        description: "Patrimônio líquido contábil do município em BRL"
+        tests:
+          - not_null
+      - name: receita_orcamentaria_realizada_brl
+        description: "Receita orçamentária realizada anual em BRL"
+        tests:
+          - not_null
+      - name: despesa_orcamentaria_empenhada_brl
+        description: "Despesa orçamentária empenhada anual em BRL"
+        tests:
+          - not_null
+      - name: resultado_orcamentario_brl
+        description: "Resultado orçamentário anual apurado em BRL"
+        tests:
+          - not_null
+      - name: receita_corrente_liquida_brl
+        description: "Receita Corrente Líquida (RCL) base LRF em BRL"
+        tests:
+          - not_null
+      - name: receita_tributaria_propria_brl
+        description: "Receita tributária própria arrecadada no exercício em BRL"
+        tests:
+          - not_null
+      - name: transferencias_correntes_brl
+        description: "Transferências correntes intergovernamentais recebidas em BRL"
+        tests:
+          - not_null
+      - name: despesa_capital_investimento_brl
+        description: "Despesas de capital e investimentos liquidados em BRL"
+        tests:
+          - not_null
+      - name: resultado_primario_brl
+        description: "Resultado primário acima da linha apurado no RREO em BRL"
+        tests:
+          - not_null
+      - name: despesa_total_pessoal_brl
+        description: "Despesa Total com Pessoal (DTP) apurada no RGF em BRL"
+        tests:
+          - not_null
+      - name: despesa_pessoal_rcl_pct
+        description: "Percentual de comprometimento da RCL com despesa total de pessoal (%)"
+        tests:
+          - not_null
+      - name: limite_prudencial_pessoal_pct
+        description: "Limite prudencial legal LRF para despesa com pessoal (51.3%)"
+        tests:
+          - not_null
+      - name: limite_maximo_pessoal_pct
+        description: "Limite máximo legal LRF para despesa com pessoal (54.0%)"
+        tests:
+          - not_null
+      - name: divida_consolidada_liquida_brl
+        description: "Dívida Consolidada Líquida (DCL) do município em BRL"
+        tests:
+          - not_null
+      - name: status_alerta_lrf
+        description: "Classificação de risco LRF frente ao teto de pessoal (REGULAR, ALERTA_48_6, PRUDENCIAL_51_3, ACIMA_LIMITE_54)"
+        tests:
+          - not_null
+      - name: autonomia_tributaria_pct
+        description: "Percentual da RCL originado em arrecadação tributária própria (%)"
+        tests:
+          - not_null
+      - name: taxa_investimento_rcl_pct
+        description: "Percentual da RCL aplicado em despesas de capital e investimentos (%)"
+        tests:
+          - not_null
+      - name: total_entregas_monitoradas
+        description: "Quantidade de demonstrativos contábeis monitorados no extrato SICONFI"
+        tests:
+          - not_null
+      - name: entregas_homologadas
+        description: "Quantidade de demonstrativos efetivamente homologados na STN"
+        tests:
+          - not_null
+      - name: indice_adimplencia_siconfi_pct
+        description: "Índice percentual de adimplência de obrigações fiscais no SICONFI (%)"
+        tests:
+          - not_null
+      - name: score_solidez_contabil_siconfi
+        description: "Score composto de solidez contábil, folga LRF de pessoal e capacidade de investimento (10 a 99)"
+        tests:
+          - not_null
+      - name: classificacao_solidez_siconfi
+        description: "Faixa executiva de solidez fiscal contábil (ALTA_SOLIDEZ_CONTABIL, SOLIDEZ_MODERADA, ATENCAO_FISCAL)"
+        tests:
+          - not_null
+

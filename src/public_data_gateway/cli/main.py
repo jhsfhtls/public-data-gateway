@@ -365,6 +365,32 @@ def build_parser() -> argparse.ArgumentParser:
     sadipem_p.add_argument("termo", type=str, help="IBGE 7-digit code, UF acronym or municipality name")
     sadipem_p.add_argument("--json", action="store_true", help="Output in JSON format")
 
+    # Subcommand: siconfi (STN SICONFI / Finbra)
+    sic_p = subparsers.add_parser(
+        "siconfi",
+        help="Query municipal/state SICONFI accounting (DCA, RREO, RGF LRF limits, extratos, Gold solidity).",
+    )
+    sic_sub = sic_p.add_subparsers(dest="siconfi_action", required=True)
+
+    for act_name, act_help, has_ano in [
+        ("ente", "Query SICONFI entity registration profile.", False),
+        ("dca", "Query DCA annual balance sheet & budgetary accounts.", True),
+        ("rreo", "Query RREO bimonthly budgetary execution.", True),
+        ("rgf", "Query RGF LRF personnel spending & net consolidated debt limits.", True),
+        ("extratos", "Query SICONFI fiscal statement delivery compliance.", True),
+        ("features", "Query Gold SICONFI fiscal solidity & LRF feature store.", False),
+    ]:
+        sp = sic_sub.add_parser(act_name, help=act_help)
+        sp.add_argument("termo", type=str, help="IBGE 7-digit code or municipality name")
+        if has_ano:
+            sp.add_argument("--ano", type=int, default=None, help="Exercise year filter (e.g. 2024)")
+        sp.add_argument("--json", action="store_true", help="Output in JSON format")
+
+    sic_rk = sic_sub.add_parser("ranking", help="List top municipalities ranked by SICONFI accounting solidity.")
+    sic_rk.add_argument("--limit", type=int, default=10, help="Max municipalities to list")
+    sic_rk.add_argument("--uf", type=str, default=None, help="Optional 2-letter UF state filter")
+    sic_rk.add_argument("--json", action="store_true", help="Output in JSON format")
+
     # Subcommand: procurement (Compras.gov.br CATMAT/CATSER & Preços)
     proc_p = subparsers.add_parser(
         "procurement", help="Query Compras.gov.br CATMAT/CATSER catalogs and procurement price benchmarks."
@@ -2315,6 +2341,39 @@ def main(argv: Sequence[str] | None = None) -> int:
                     print(f"  Ind 2 (Poupança Corr):   {cap.get('indicador_2_poupanca_corrente_pct')}% (Nota {cap.get('nota_indicador_2')})")
                     print(f"  Ind 3 (Liquidez Rel):    {cap.get('indicador_3_liquidez_relativa_pct')}% (Nota {cap.get('nota_indicador_3')})")
                 return 0
+
+        elif args.command == "siconfi":
+            from public_data_gateway.connectors.macrofinanceiro.stn_siconfi import (
+                StnSiconfiConnector,
+            )
+
+            sic_conn = StnSiconfiConnector(settings=settings)
+            sic_action = getattr(args, "siconfi_action", None)
+            if sic_action == "ente":
+                out = sic_conn.get_ente_profile(args.termo)
+            elif sic_action == "dca":
+                out = sic_conn.get_dca_balance(args.termo, ano=args.ano)
+            elif sic_action == "rreo":
+                out = sic_conn.get_rreo_execution(args.termo, ano=args.ano)
+            elif sic_action == "rgf":
+                out = sic_conn.get_rgf_limits(args.termo, ano=args.ano)
+            elif sic_action == "extratos":
+                out = sic_conn.get_delivery_extracts(args.termo, ano=args.ano)
+            elif sic_action == "features":
+                out = sic_conn.get_siconfi_features(args.termo)
+            elif sic_action == "ranking":
+                out = sic_conn.list_top_municipalities(limit=args.limit, sigla_uf=args.uf)
+            else:
+                out = None
+
+            if not out:
+                print(f"No SICONFI records found for action '{sic_action}'", file=sys.stderr)
+                return 1
+            if args.json:
+                print(json.dumps(out, indent=2, ensure_ascii=False))
+            else:
+                print(json.dumps(out, indent=2, ensure_ascii=False))
+            return 0
 
         elif args.command in {"procurement", "catmat"}:
             from public_data_gateway.connectors.compras_publicas.comprasgov_catmat import (

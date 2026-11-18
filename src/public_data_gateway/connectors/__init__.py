@@ -71,6 +71,7 @@ import public_data_gateway.connectors.macrofinanceiro.brapi_b3  # noqa: F401
 import public_data_gateway.connectors.macrofinanceiro.cvm_dfp_itr  # noqa: F401
 import public_data_gateway.connectors.macrofinanceiro.cvm_fundos  # noqa: F401
 import public_data_gateway.connectors.macrofinanceiro.ipeadata_odata  # noqa: F401
+import public_data_gateway.connectors.macrofinanceiro.stn_siconfi  # noqa: F401
 import public_data_gateway.connectors.macrofinanceiro.stn_tesouro_transparente  # noqa: F401
 import public_data_gateway.connectors.macrofinanceiro.world_bank_v2  # noqa: F401
 import public_data_gateway.connectors.saude.anvisa_cmed  # noqa: F401
