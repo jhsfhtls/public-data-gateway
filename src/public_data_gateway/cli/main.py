@@ -1395,6 +1395,36 @@ def build_parser() -> argparse.ArgumentParser:
     ans_rk_p.add_argument("--beneficiarios", action="store_true", help="Sort descending by active medical+dental beneficiaries")
     ans_rk_p.add_argument("--json", action="store_true", help="Output in JSON format")
 
+    # DATASUS Extra (SIA, SINAN, SISVAN & PNS) command group
+    dsx_p = subparsers.add_parser("datasus-extra", help="Query DATASUS SIA outpatient production, SINAN disease notifications, SISVAN nutrition, and SUS resolutivity rankings.")
+    dsx_sub = dsx_p.add_subparsers(dest="datasus_extra_action", required=True)
+
+    dsx_sia_p = dsx_sub.add_parser("sia", help="Lookup DATASUS SIA outpatient production by code, procedure, disease, IBGE, UF, or city.")
+    dsx_sia_p.add_argument("termo", help="SIA code, procedure group, SINAN disease, IBGE code, UF, or municipality name")
+    dsx_sia_p.add_argument("--json", action="store_true", help="Output in JSON format")
+
+    dsx_sin_p = dsx_sub.add_parser("sinan", help="Lookup DATASUS SINAN notifiable disease counts and closure timeliness.")
+    dsx_sin_p.add_argument("termo", help="SINAN code, IBGE code, UF, or municipality name")
+    dsx_sin_p.add_argument("--json", action="store_true", help="Output in JSON format")
+
+    dsx_sv_p = dsx_sub.add_parser("sisvan", help="Get municipal SISVAN/PNS nutritional surveillance and chronic condition coverage.")
+    dsx_sv_p.add_argument("id_municipio_or_name", help="7-digit IBGE code or municipality name")
+    dsx_sv_p.add_argument("--json", action="store_true", help="Output in JSON format")
+
+    dsx_mn_p = dsx_sub.add_parser("municipio", help="Get consolidated municipal DATASUS SIA volume, SINAN notifications, and SISVAN coverage.")
+    dsx_mn_p.add_argument("id_municipio_or_name", help="7-digit IBGE code or municipality name")
+    dsx_mn_p.add_argument("--json", action="store_true", help="Output in JSON format")
+
+    dsx_ft_p = dsx_sub.add_parser("features", help="Get Gold DATASUS Extra SUS ambulatory resolutivity score and tier.")
+    dsx_ft_p.add_argument("id_municipio_or_name", help="7-digit IBGE code or municipality name")
+    dsx_ft_p.add_argument("--json", action="store_true", help="Output in JSON format")
+
+    dsx_rk_p = dsx_sub.add_parser("ranking", help="List municipalities ranked by SUS ambulatory resolutivity score or SIA production.")
+    dsx_rk_p.add_argument("--limit", type=int, default=10, help="Max municipalities to list")
+    dsx_rk_p.add_argument("--uf", type=str, help="Optional 2-letter state filter")
+    dsx_rk_p.add_argument("--sia", action="store_true", help="Sort descending by annual SIA outpatient production")
+    dsx_rk_p.add_argument("--json", action="store_true", help="Output in JSON format")
+
     # INEP Censo Escolar (Educação Básica) command group
     ce_p = subparsers.add_parser("censo-escolar", help="Query INEP Censo Escolar schools, enrollments, teachers, flow, and education scores.")
     ce_sub = ce_p.add_subparsers(dest="censo_escolar_action", required=True)
@@ -5623,6 +5653,84 @@ def main(argv: Sequence[str] | None = None) -> int:
                     return 0
             except (ValueError, KeyError) as exc:
                 print(f"Erro ANS Saúde Suplementar: {exc}", file=sys.stderr)
+                return 1
+
+        elif args.command == "datasus-extra":
+            from public_data_gateway.connectors.saude.datasus_extra import (
+                DatasusExtraConnector,
+            )
+
+            dsx_conn = DatasusExtraConnector()
+            dsx_action = getattr(args, "datasus_extra_action", "")
+            try:
+                if dsx_action == "sia":
+                    rows = dsx_conn.get_datasus_sia_production(args.termo)
+                    if getattr(args, "json", False):
+                        print(json.dumps(rows, indent=2, ensure_ascii=False, default=str))
+                    else:
+                        print(f"DATASUS SIA Produção ({len(rows)}):")
+                        for r in rows:
+                            print(f"  {r.get('cod_atendimento_sia')} | {r.get('nome_municipio')} ({r.get('sigla_uf')}): {r.get('grupo_procedimento_sia')} | {r.get('producao_ambulatorial_sia_12m')} atend.")
+                    return 0
+
+                if dsx_action == "sinan":
+                    rows = dsx_conn.get_datasus_sinan_notifications(args.termo)
+                    if getattr(args, "json", False):
+                        print(json.dumps(rows, indent=2, ensure_ascii=False, default=str))
+                    else:
+                        print(f"DATASUS SINAN Agravos ({len(rows)}):")
+                        for r in rows:
+                            print(f"  {r.get('cod_sinan_id')} | {r.get('nome_municipio')} ({r.get('sigla_uf')}): Dengue {r.get('notificacoes_dengue_12m')} | Enc {r.get('oportunidade_encerramento_pct')}%")
+                    return 0
+
+                if dsx_action == "sisvan":
+                    res = dsx_conn.get_datasus_sisvan_nutrition(args.id_municipio_or_name)
+                    if res is None:
+                        print(f"Dados SISVAN/PNS não encontrados para: {args.id_municipio_or_name}", file=sys.stderr)
+                        return 1
+                    if getattr(args, "json", False):
+                        print(json.dumps(res, indent=2, ensure_ascii=False, default=str))
+                    else:
+                        print(f"DATASUS SISVAN ({res.get('nome_municipio')} - {res.get('sigla_uf')}): Cobertura {res.get('cobertura_sisvan_atencao_basica_pct')}% | Obesidade {res.get('prevalencia_obesidade_adulto_pns_pct')}%")
+                    return 0
+
+                if dsx_action == "municipio":
+                    res = dsx_conn.get_datasus_extra_summary(args.id_municipio_or_name)
+                    if res is None:
+                        print(f"Resumo DATASUS Extra não encontrado para: {args.id_municipio_or_name}", file=sys.stderr)
+                        return 1
+                    if getattr(args, "json", False):
+                        print(json.dumps(res, indent=2, ensure_ascii=False, default=str))
+                    else:
+                        print(f"DATASUS Extra Município ({res.get('nome_municipio')} - {res.get('sigla_uf')}): SIA {res.get('producao_sia_total_12m')} | SINAN {res.get('notificacoes_sinan_total_12m')}")
+                    return 0
+
+                if dsx_action == "features":
+                    res = dsx_conn.get_datasus_extra_features(args.id_municipio_or_name)
+                    if res is None:
+                        print(f"Features DATASUS Extra não encontradas para: {args.id_municipio_or_name}", file=sys.stderr)
+                        return 1
+                    if getattr(args, "json", False):
+                        print(json.dumps(res, indent=2, ensure_ascii=False, default=str))
+                    else:
+                        print(f"DATASUS Extra Gold ({res.get('nome_municipio')} - {res.get('id_municipio')}): Score {res.get('score_resolutividade_sus_datasus')} | {res.get('tier_capacidade_ambulatorial_sus')}")
+                    return 0
+
+                if dsx_action == "ranking":
+                    ranks = dsx_conn.list_top_datasus_extra_municipalities(
+                        limit=getattr(args, "limit", 10),
+                        sigla_uf=getattr(args, "uf", None),
+                        sort_by_sia=getattr(args, "sia", False),
+                    )
+                    if getattr(args, "json", False):
+                        print(json.dumps(ranks, indent=2, ensure_ascii=False, default=str))
+                    else:
+                        print(f"Ranking DATASUS Extra SUS ({len(ranks)}):")
+                        for idx, r in enumerate(ranks, 1):
+                            print(f"  {idx}. {r.get('nome_municipio')} ({r.get('sigla_uf')}): {r.get('score_resolutividade_sus_datasus')} | {r.get('tier_capacidade_ambulatorial_sus')}")
+                    return 0
+            except (ValueError, KeyError) as exc:
+                print(f"Erro DATASUS Extra: {exc}", file=sys.stderr)
                 return 1
 
         elif args.command == "censo-escolar":

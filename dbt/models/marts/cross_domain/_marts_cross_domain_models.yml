@@ -208,6 +208,15 @@ models:
       - name: avg_score_inovacao_pi_uf
         description: "Média estadual do score de intensidade de propriedade intelectual e inovação tecnológica INPI (0-100)."
         tests: [not_null]
+      - name: producao_ambulatorial_sia_uf
+        description: "Volume anual estadual de procedimentos ambulatoriais aprovados no SIA/SUS (DATASUS)."
+        tests: [not_null]
+      - name: notificacoes_sinan_uf
+        description: "Total anual estadual de agravos de notificação compulsória registrados no SINAN."
+        tests: [not_null]
+      - name: avg_score_resolutividade_sus_uf
+        description: "Média estadual do score de resolutividade ambulatorial SUS, vigilância SINAN e cobertura SISVAN (0-100)."
+        tests: [not_null]
       - name: macro_ano_mes_referencia
         description: "Competência macroeconômica de referência (YYYY-MM)."
         tests: [not_null]

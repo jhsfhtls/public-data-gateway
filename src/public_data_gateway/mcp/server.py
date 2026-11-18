@@ -2089,6 +2089,51 @@ class MCPDispatcher:
                                 },
                             },
                             {
+                                "name": "bdg_get_datasus_sia_production",
+                                "description": "Lookup DATASUS SIA/SUS outpatient production and approved reimbursements by code, procedure, SINAN disease, IBGE, UF, or city.",
+                                "inputSchema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "termo": {"type": "string", "description": "SIA code, procedure group, disease, IBGE code, UF, or municipality name"},
+                                    },
+                                    "required": ["termo"],
+                                },
+                            },
+                            {
+                                "name": "bdg_get_datasus_sinan_notifications",
+                                "description": "Lookup DATASUS SINAN notifiable disease counts (dengue, SRAG) and timeliness closure rate.",
+                                "inputSchema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "termo": {"type": "string", "description": "SINAN code, IBGE code, UF, or municipality name"},
+                                    },
+                                    "required": ["termo"],
+                                },
+                            },
+                            {
+                                "name": "bdg_get_datasus_extra_features",
+                                "description": "Get normalized Gold DATASUS Extra SUS ambulatory resolutivity score, SIA volume, and SISVAN coverage tier.",
+                                "inputSchema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "id_municipio_or_name": {"type": "string", "description": "7-digit IBGE municipality code or municipality name"},
+                                    },
+                                    "required": ["id_municipio_or_name"],
+                                },
+                            },
+                            {
+                                "name": "bdg_list_top_datasus_extra_municipalities",
+                                "description": "List Brazilian municipalities ranked by SUS ambulatory resolutivity score or annual SIA outpatient production.",
+                                "inputSchema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "limit": {"type": "integer", "description": "Maximum rows (default: 10)"},
+                                        "sigla_uf": {"type": "string", "description": "Optional 2-letter state filter (e.g. SP)"},
+                                        "sort_by_sia": {"type": "boolean", "description": "Set true to rank municipalities by highest annual SIA production first"},
+                                    },
+                                },
+                            },
+                            {
                                 "name": "bdg_get_censo_escolar_schools",
                                 "description": "Get municipal active schools inventory, broadband internet, science labs, libraries, and PcD accessibility (INEP Censo Escolar).",
                                 "inputSchema": {
@@ -6740,6 +6785,69 @@ class MCPDispatcher:
                     },
                 }
             wrapped = wrap_untrusted_gov_data(result, source_id="ans_saude_suplementar")
+            return {
+                "jsonrpc": "2.0",
+                "id": req_id,
+                "result": {"content": [{"type": "text", "text": wrapped}], "isError": False},
+            }
+
+        if tool_name in {
+            "bdg_get_datasus_sia_production",
+            "bdg_get_datasus_sinan_notifications",
+            "bdg_get_datasus_extra_features",
+            "bdg_list_top_datasus_extra_municipalities",
+        }:
+            from public_data_gateway.connectors.saude.datasus_extra import (
+                DatasusExtraConnector,
+            )
+
+            connector = DatasusExtraConnector(settings=self.settings)
+            try:
+                if tool_name == "bdg_get_datasus_sia_production":
+                    result: Any = connector.get_datasus_sia_production(
+                        str(args.get("termo", ""))
+                    )
+                elif tool_name == "bdg_get_datasus_sinan_notifications":
+                    result = connector.get_datasus_sinan_notifications(
+                        str(args.get("termo", ""))
+                    )
+                elif tool_name == "bdg_get_datasus_extra_features":
+                    result = connector.get_datasus_extra_features(
+                        str(args.get("id_municipio_or_name", ""))
+                    )
+                else:
+                    result = connector.list_top_datasus_extra_municipalities(
+                        limit=int(args.get("limit", 10)),
+                        sigla_uf=args.get("sigla_uf"),
+                        sort_by_sia=bool(args.get("sort_by_sia", False)),
+                    )
+            except (ValueError, KeyError) as exc:
+                return {
+                    "jsonrpc": "2.0",
+                    "id": req_id,
+                    "result": {
+                        "content": [
+                            {"type": "text", "text": f"DATASUS Extra parameter error: {exc}"}
+                        ],
+                        "isError": True,
+                    },
+                }
+
+            if not result:
+                return {
+                    "jsonrpc": "2.0",
+                    "id": req_id,
+                    "result": {
+                        "content": [
+                            {
+                                "type": "text",
+                                "text": "No DATASUS Extra health data found for the query.",
+                            }
+                        ],
+                        "isError": True,
+                    },
+                }
+            wrapped = wrap_untrusted_gov_data(result, source_id="datasus_extra")
             return {
                 "jsonrpc": "2.0",
                 "id": req_id,

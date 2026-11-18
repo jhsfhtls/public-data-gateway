@@ -3342,6 +3342,89 @@ def create_app(settings: GatewaySettings | None = None) -> FastAPI:
             limit=limit, sigla_uf=uf, sort_by_beneficiaries=sort_by_beneficiaries
         )
 
+    @app.get("/api/v1/health/datasus-extra/sia/{termo}")
+    async def get_datasus_sia(termo: str) -> list[dict[str, Any]]:
+        from public_data_gateway.connectors.saude.datasus_extra import (
+            DatasusExtraConnector,
+        )
+
+        return DatasusExtraConnector(settings=app_settings).get_datasus_sia_production(
+            termo
+        )
+
+    @app.get("/api/v1/health/datasus-extra/sinan/{termo}")
+    async def get_datasus_sinan(termo: str) -> list[dict[str, Any]]:
+        from public_data_gateway.connectors.saude.datasus_extra import (
+            DatasusExtraConnector,
+        )
+
+        return DatasusExtraConnector(
+            settings=app_settings
+        ).get_datasus_sinan_notifications(termo)
+
+    @app.get("/api/v1/health/datasus-extra/sisvan/{id_municipio_or_name}")
+    async def get_datasus_sisvan(id_municipio_or_name: str) -> dict[str, Any]:
+        from public_data_gateway.connectors.saude.datasus_extra import (
+            DatasusExtraConnector,
+        )
+
+        res = DatasusExtraConnector(settings=app_settings).get_datasus_sisvan_nutrition(
+            id_municipio_or_name
+        )
+        if res is None:
+            raise HTTPException(
+                status_code=404, detail="DATASUS SISVAN/PNS nutrition data not found"
+            )
+        return res
+
+    @app.get("/api/v1/health/datasus-extra/municipio/{id_municipio_or_name}")
+    async def get_datasus_extra_municipio(id_municipio_or_name: str) -> dict[str, Any]:
+        from public_data_gateway.connectors.saude.datasus_extra import (
+            DatasusExtraConnector,
+        )
+
+        res = DatasusExtraConnector(settings=app_settings).get_datasus_extra_summary(
+            id_municipio_or_name
+        )
+        if res is None:
+            raise HTTPException(
+                status_code=404, detail="DATASUS Extra municipal summary not found"
+            )
+        return res
+
+    @app.get("/api/v1/health/datasus-extra/features/{id_municipio_or_name}")
+    async def get_datasus_extra_features(id_municipio_or_name: str) -> dict[str, Any]:
+        from public_data_gateway.connectors.saude.datasus_extra import (
+            DatasusExtraConnector,
+        )
+
+        res = DatasusExtraConnector(settings=app_settings).get_datasus_extra_features(
+            id_municipio_or_name
+        )
+        if res is None:
+            raise HTTPException(
+                status_code=404, detail="DATASUS Extra Gold SUS features not found"
+            )
+        return res
+
+    @app.get("/api/v1/health/datasus-extra/ranking")
+    async def get_datasus_extra_ranking(
+        limit: int = Query(10, ge=1, le=50, description="Max municipalities to list"),
+        uf: str | None = Query(None, description="Optional 2-letter state filter"),
+        sort_by_sia: bool = Query(
+            False, description="Sort descending by annual SIA outpatient production"
+        ),
+    ) -> list[dict[str, Any]]:
+        from public_data_gateway.connectors.saude.datasus_extra import (
+            DatasusExtraConnector,
+        )
+
+        return DatasusExtraConnector(
+            settings=app_settings
+        ).list_top_datasus_extra_municipalities(
+            limit=limit, sigla_uf=uf, sort_by_sia=sort_by_sia
+        )
+
     @app.get("/api/v1/education/censo-escolar/top-municipalities")
     async def get_top_censo_escolar_municipalities(
         limit: int = Query(10, ge=1, le=50, description="Max municipalities to list"),
