@@ -3795,6 +3795,66 @@ def create_app(settings: GatewaySettings | None = None) -> FastAPI:
         conn = MdrSnisConnector(settings=app_settings)
         return conn.list_top_snis_municipalities(limit=limit, sigla_uf=uf, sort_by_sewage=sort_by_sewage)
 
+    # SEDEC/S2ID & CEMADEN (Desastres Naturais & Defesa Civil)
+    @app.get("/api/v1/environment/desastres/ocorrencias/{termo}")
+    async def get_desastres_ocorrencias(termo: str) -> list[dict[str, Any]]:
+        from public_data_gateway.connectors.ambiental.sedec_desastres import SedecDesastresConnector
+
+        conn = SedecDesastresConnector(settings=app_settings)
+        return conn.get_sedec_disasters(termo)
+
+    @app.get("/api/v1/environment/desastres/decretos/{termo}")
+    async def get_desastres_decretos(termo: str) -> list[dict[str, Any]]:
+        from public_data_gateway.connectors.ambiental.sedec_desastres import SedecDesastresConnector
+
+        conn = SedecDesastresConnector(settings=app_settings)
+        return conn.get_sedec_decrees(termo)
+
+    @app.get("/api/v1/environment/desastres/cemaden/{id_municipio_or_name}")
+    async def get_desastres_cemaden(id_municipio_or_name: str) -> dict[str, Any]:
+        from public_data_gateway.connectors.ambiental.sedec_desastres import SedecDesastresConnector
+
+        conn = SedecDesastresConnector(settings=app_settings)
+        res = conn.get_sedec_cemaden_monitoring(id_municipio_or_name)
+        if res is None:
+            raise HTTPException(status_code=404, detail="CEMADEN municipal monitoring not found")
+        return res
+
+    @app.get("/api/v1/environment/desastres/municipio/{id_municipio_or_name}")
+    async def get_desastres_municipio(id_municipio_or_name: str) -> dict[str, Any]:
+        from public_data_gateway.connectors.ambiental.sedec_desastres import SedecDesastresConnector
+
+        conn = SedecDesastresConnector(settings=app_settings)
+        res = conn.get_sedec_municipal_summary(id_municipio_or_name)
+        if res is None:
+            raise HTTPException(status_code=404, detail="SEDEC municipal disaster summary not found")
+        return res
+
+    @app.get("/api/v1/environment/desastres/features/{id_municipio_or_name}")
+    async def get_desastres_features(id_municipio_or_name: str) -> dict[str, Any]:
+        from public_data_gateway.connectors.ambiental.sedec_desastres import SedecDesastresConnector
+
+        conn = SedecDesastresConnector(settings=app_settings)
+        res = conn.get_sedec_features(id_municipio_or_name)
+        if res is None:
+            raise HTTPException(status_code=404, detail="SEDEC Gold disaster features not found")
+        return res
+
+    @app.get("/api/v1/environment/desastres/ranking")
+    async def get_desastres_ranking(
+        limit: int = Query(10, ge=1, le=50, description="Max municipalities to list"),
+        uf: str | None = Query(None, description="Optional 2-letter state filter"),
+        sort_by_damages: bool = Query(
+            False, description="Sort descending by accumulated economic damages (R$ mil)"
+        ),
+    ) -> list[dict[str, Any]]:
+        from public_data_gateway.connectors.ambiental.sedec_desastres import SedecDesastresConnector
+
+        conn = SedecDesastresConnector(settings=app_settings)
+        return conn.list_top_resilient_sedec_municipalities(
+            limit=limit, sigla_uf=uf, sort_by_damages=sort_by_damages
+        )
+
     @app.get("/api/v1/metaportals/datalake/top-municipalities")
     async def get_top_bd_municipalities(
         limit: int = Query(10, ge=1, le=50, description="Max municipalities to list"),

@@ -2587,6 +2587,60 @@ class EnvironmentFacade:
             limit=limit, sigla_uf=sigla_uf, sort_by_sewage=sort_by_sewage
         )
 
+    @property
+    def sedec_desastres_connector(self) -> Any:
+        if (
+            not hasattr(self, "_sedec_desastres_connector")
+            or self._sedec_desastres_connector is None
+        ):
+            from public_data_gateway.connectors.ambiental.sedec_desastres import (
+                SedecDesastresConnector,
+            )
+
+            self._sedec_desastres_connector = SedecDesastresConnector(
+                settings=self._sdk.settings
+            )
+        return self._sedec_desastres_connector
+
+    def get_sedec_disasters(self, termo: str) -> list[dict[str, Any]]:
+        """Lookup S2ID/COBRADE natural disaster occurrences by code, typology, IBGE, UF, or city."""
+        return self.sedec_desastres_connector.get_sedec_disasters(termo)
+
+    def get_sedec_decrees(self, termo: str) -> list[dict[str, Any]]:
+        """Lookup federal emergency (SE) and calamity (ECP) decrees and funds by code, IBGE, UF, or city."""
+        return self.sedec_desastres_connector.get_sedec_decrees(termo)
+
+    def get_sedec_cemaden_monitoring(
+        self, id_municipio_or_name: str
+    ) -> dict[str, Any] | None:
+        """Retrieve municipal CEMADEN pluviometer network, risk-area exposure, and alerts."""
+        return self.sedec_desastres_connector.get_sedec_cemaden_monitoring(
+            id_municipio_or_name
+        )
+
+    def get_sedec_municipal_summary(
+        self, id_municipio_or_name: str
+    ) -> dict[str, Any] | None:
+        """Retrieve consolidated 5-year municipal S2ID disaster count, losses, and CEMADEN alerts."""
+        return self.sedec_desastres_connector.get_sedec_municipal_summary(
+            id_municipio_or_name
+        )
+
+    def get_sedec_features(self, id_municipio_or_name: str) -> dict[str, Any] | None:
+        """Retrieve Gold SEDEC/CEMADEN disaster resilience score and vulnerability tier."""
+        return self.sedec_desastres_connector.get_sedec_features(id_municipio_or_name)
+
+    def list_top_resilient_sedec_municipalities(
+        self,
+        limit: int = 10,
+        sigla_uf: str | None = None,
+        sort_by_damages: bool = False,
+    ) -> list[dict[str, Any]]:
+        """List municipalities ranked by SEDEC disaster resilience score or highest economic damages."""
+        return self.sedec_desastres_connector.list_top_resilient_sedec_municipalities(
+            limit=limit, sigla_uf=sigla_uf, sort_by_damages=sort_by_damages
+        )
+
 
 class MetaportalsFacade:
     """Sub-facade for Metaportals & Aggregator Hubs (Datalake Federado SQL, Dados.gov.br CKAN)."""
@@ -4780,6 +4834,41 @@ class BrazilData:
         """Listar municípios ranqueados por universalização do saneamento SNIS ou atendimento de esgoto (%)."""
         return self.environment.list_top_snis_municipalities(
             limit=limit, sigla_uf=sigla_uf, sort_by_sewage=sort_by_sewage
+        )
+
+    def get_sedec_disasters(self, termo: str) -> list[dict[str, Any]]:
+        """Consultar ocorrências de desastres naturais S2ID/COBRADE por código, tipologia, IBGE, UF ou município."""
+        return self.environment.get_sedec_disasters(termo)
+
+    def get_sedec_decrees(self, termo: str) -> list[dict[str, Any]]:
+        """Consultar decretações federais de emergência (SE) e calamidade (ECP) por código, IBGE, UF ou cidade."""
+        return self.environment.get_sedec_decrees(termo)
+
+    def get_sedec_cemaden_monitoring(
+        self, id_municipio_or_name: str
+    ) -> dict[str, Any] | None:
+        """Consultar rede pluviométrica CEMADEN, exposição em áreas de risco e alertas geohidrológicos."""
+        return self.environment.get_sedec_cemaden_monitoring(id_municipio_or_name)
+
+    def get_sedec_municipal_summary(
+        self, id_municipio_or_name: str
+    ) -> dict[str, Any] | None:
+        """Consultar consolidado municipal 5 anos de desastres S2ID, prejuízos econômicos e alertas CEMADEN."""
+        return self.environment.get_sedec_municipal_summary(id_municipio_or_name)
+
+    def get_sedec_features(self, id_municipio_or_name: str) -> dict[str, Any] | None:
+        """Consultar features Gold SEDEC/CEMADEN de resiliência climática e vulnerabilidade a desastres."""
+        return self.environment.get_sedec_features(id_municipio_or_name)
+
+    def list_top_resilient_sedec_municipalities(
+        self,
+        limit: int = 10,
+        sigla_uf: str | None = None,
+        sort_by_damages: bool = False,
+    ) -> list[dict[str, Any]]:
+        """Listar municípios ranqueados por resiliência a desastres SEDEC ou maiores prejuízos econômicos."""
+        return self.environment.list_top_resilient_sedec_municipalities(
+            limit=limit, sigla_uf=sigla_uf, sort_by_damages=sort_by_damages
         )
 
     def get_bd_coverage(self, id_municipio: str) -> dict[str, Any]:

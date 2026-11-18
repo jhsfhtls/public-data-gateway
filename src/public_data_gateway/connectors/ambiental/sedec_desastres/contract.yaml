@@ -1,0 +1,84 @@
+contract_id: ODCS-BR-SEDEC-DESASTRES-001
+source_id: sedec_desastres
+version: 1.0.0
+grain: 1 row per civil defense disaster recognition record by municipality (S2ID / Atlas Digital)
+name: "SEDEC / S2ID & CEMADEN: Desastres Naturais, Decretações & Alertas"
+agency: Secretaria Nacional de Proteção e Defesa Civil (SEDEC / MIDR) & CEMADEN
+official_url: https://www.gov.br/mdr/pt-br/assuntos/protecao-e-defesa-civil
+segment_id: 11_agronegocio_meio_ambiente
+access_mode: LAKEHOUSE_BATCH
+protocol: HTTP_BULK_ZIP
+auth_type: NONE
+update_frequency: Diária (Alertas CEMADEN) / Mensal (S2ID & Atlas Digital dos Desastres)
+freshness_sla_hours: 168
+cron_schedule_expression: "0 5 * * 2"
+lgpd_legal_basis: public_interest_lei_12608_2012_pnpdec
+min_expected_rows: 10
+primary_keys:
+  - cod_registro_s2id
+  - id_municipio
+  - sigla_uf
+canonical_keys:
+  - id_municipio
+  - sigla_uf
+sentinel_values:
+  - -1
+  - -99
+  - N/D
+  - SEM INFORMACAO
+columns:
+  - name: cod_registro_s2id
+    data_type: STRING
+    required: true
+    nullable: false
+    description: Identificador único do evento de desastre registrado no S2ID / Atlas Digital SEDEC
+  - name: cobrade_codigo
+    data_type: STRING
+    required: true
+    nullable: false
+    description: Código oficial COBRADE (Classificação e Codificação Brasileira de Desastres)
+  - name: tipologia_desastre
+    data_type: STRING
+    required: true
+    nullable: false
+    description: Tipologia agregada do evento (ESTIAGEM_SECA, INUNDACAO_ENXURRADA ou DESLIZAMENTO_GEOLOGICO)
+  - name: id_municipio
+    data_type: STRING
+    required: true
+    nullable: false
+    description: Código IBGE canônico de 7 dígitos do município atingido
+  - name: sigla_uf
+    data_type: STRING
+    required: true
+    nullable: false
+    description: Sigla de 2 letras da Unidade Federativa (UF)
+  - name: nome_municipio
+    data_type: STRING
+    required: true
+    nullable: false
+    description: Nome oficial do município afetado pelo evento climático ou geológico
+  - name: regiao
+    data_type: STRING
+    required: true
+    nullable: false
+    description: Macrorregião geográfica oficial do município
+  - name: status_reconhecimento
+    data_type: STRING
+    required: true
+    nullable: false
+    description: Grau jurídico do decreto reconhecido pela União (SITUACAO_EMERGENCIA ou CALAMIDADE_PUBLICA)
+  - name: populacao_afetada
+    data_type: INT64
+    required: true
+    nullable: false
+    description: Estimativa oficial de habitantes diretamente afetados pelo desastre (FIDE S2ID)
+  - name: danos_materiais_mil_brl
+    data_type: FLOAT64
+    required: true
+    nullable: false
+    description: Danos materiais e prejuízos econômicos registrados no FIDE S2ID em mil Reais (R$ mil)
+  - name: data_ocorrencia
+    data_type: STRING
+    required: true
+    nullable: false
+    description: Data oficial da ocorrência registrada no S2ID (ISO-8601)

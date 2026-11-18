@@ -1605,6 +1605,36 @@ def build_parser() -> argparse.ArgumentParser:
     san_rk_p.add_argument("--esgoto", action="store_true", help="Sort descending by total sewage coverage (%)")
     san_rk_p.add_argument("--json", action="store_true", help="Output in JSON format")
 
+    # SEDEC/S2ID & CEMADEN (Desastres Naturais & Defesa Civil) command group
+    des_p = subparsers.add_parser("desastres", help="Query SEDEC/S2ID natural disasters, decrees, CEMADEN risk alerts, and climate resilience rankings.")
+    des_sub = des_p.add_subparsers(dest="desastres_action", required=True)
+
+    des_oc_p = des_sub.add_parser("ocorrencias", help="Lookup S2ID/COBRADE disaster occurrences by code, typology, IBGE, UF, or city.")
+    des_oc_p.add_argument("termo", help="S2ID code, COBRADE typology, IBGE code, UF, or municipality name")
+    des_oc_p.add_argument("--json", action="store_true", help="Output in JSON format")
+
+    des_dec_p = des_sub.add_parser("decretos", help="Lookup federal emergency (SE) and calamity (ECP) decrees by code, IBGE, UF, or city.")
+    des_dec_p.add_argument("termo", help="Decree code, IBGE code, UF, or municipality name")
+    des_dec_p.add_argument("--json", action="store_true", help="Output in JSON format")
+
+    des_cem_p = des_sub.add_parser("cemaden", help="Get municipal CEMADEN pluviometers, risk-area population share, and alerts.")
+    des_cem_p.add_argument("id_municipio_or_name", help="7-digit IBGE code or municipality name")
+    des_cem_p.add_argument("--json", action="store_true", help="Output in JSON format")
+
+    des_mun_p = des_sub.add_parser("municipio", help="Get consolidated 5-year municipal S2ID disaster count, losses, and CEMADEN alerts.")
+    des_mun_p.add_argument("id_municipio_or_name", help="7-digit IBGE code or municipality name")
+    des_mun_p.add_argument("--json", action="store_true", help="Output in JSON format")
+
+    des_ft_p = des_sub.add_parser("features", help="Get Gold SEDEC disaster resilience score and S2ID climate vulnerability tier.")
+    des_ft_p.add_argument("id_municipio_or_name", help="7-digit IBGE code or municipality name")
+    des_ft_p.add_argument("--json", action="store_true", help="Output in JSON format")
+
+    des_rk_p = des_sub.add_parser("ranking", help="List municipalities ranked by SEDEC disaster resilience score or accumulated economic damages.")
+    des_rk_p.add_argument("--limit", type=int, default=10, help="Max municipalities to list")
+    des_rk_p.add_argument("--uf", type=str, help="Optional 2-letter state filter")
+    des_rk_p.add_argument("--prejuizos", action="store_true", help="Sort descending by accumulated economic damages (R$ mil)")
+    des_rk_p.add_argument("--json", action="store_true", help="Output in JSON format")
+
     # Datalake Público Federado (DuckDB / BigQuery) command group
     bd_p = subparsers.add_parser("datalake", help="Query Federated Public Datalake (DuckDB / BigQuery) coverage, thematic datasets, governance, SQL efficiency, and rankings.")
     bd_sub = bd_p.add_subparsers(dest="datalake_action", required=True)
@@ -5695,6 +5725,84 @@ def main(argv: Sequence[str] | None = None) -> int:
                     return 0
             except (ValueError, KeyError) as exc:
                 print(f"Erro SNIS Saneamento: {exc}", file=sys.stderr)
+                return 1
+
+        elif args.command == "desastres":
+            from public_data_gateway.connectors.ambiental.sedec_desastres import (
+                SedecDesastresConnector,
+            )
+
+            des_conn = SedecDesastresConnector()
+            des_action = getattr(args, "desastres_action", "")
+            try:
+                if des_action == "ocorrencias":
+                    rows = des_conn.get_sedec_disasters(args.termo)
+                    if getattr(args, "json", False):
+                        print(json.dumps(rows, indent=2, ensure_ascii=False, default=str))
+                    else:
+                        print(f"SEDEC Ocorrências S2ID ({len(rows)}):")
+                        for r in rows:
+                            print(f"  {r.get('cod_registro_s2id')} | {r.get('nome_municipio')} ({r.get('sigla_uf')}): {r.get('tipologia_desastre')} | Afetados {r.get('populacao_afetada')}")
+                    return 0
+
+                if des_action == "decretos":
+                    rows = des_conn.get_sedec_decrees(args.termo)
+                    if getattr(args, "json", False):
+                        print(json.dumps(rows, indent=2, ensure_ascii=False, default=str))
+                    else:
+                        print(f"SEDEC Decretos Reconhecimento ({len(rows)}):")
+                        for r in rows:
+                            print(f"  {r.get('cod_decreto_municipio')} | {r.get('nome_municipio')} ({r.get('sigla_uf')}): SE={r.get('qtd_decretos_se_5_anos')} | ECP={r.get('qtd_decretos_calamidade_5_anos')}")
+                    return 0
+
+                if des_action == "cemaden":
+                    res = des_conn.get_sedec_cemaden_monitoring(args.id_municipio_or_name)
+                    if res is None:
+                        print(f"Monitoramento CEMADEN não encontrado para: {args.id_municipio_or_name}", file=sys.stderr)
+                        return 1
+                    if getattr(args, "json", False):
+                        print(json.dumps(res, indent=2, ensure_ascii=False, default=str))
+                    else:
+                        print(f"CEMADEN ({res.get('nome_municipio')} - {res.get('sigla_uf')}): Pluviômetros {res.get('qtd_pluviometros_cemaden')} | Alertas 12m {res.get('alertas_risco_alto_12m')}")
+                    return 0
+
+                if des_action == "municipio":
+                    res = des_conn.get_sedec_municipal_summary(args.id_municipio_or_name)
+                    if res is None:
+                        print(f"Resumo SEDEC não encontrado para: {args.id_municipio_or_name}", file=sys.stderr)
+                        return 1
+                    if getattr(args, "json", False):
+                        print(json.dumps(res, indent=2, ensure_ascii=False, default=str))
+                    else:
+                        print(f"SEDEC Desastres Município ({res.get('nome_municipio')} - {res.get('sigla_uf')}): Desastres 5a={res.get('qtd_desastres_s2id_5a')} | Prejuízo R$ {res.get('prejuizos_economicos_mil_brl')}k")
+                    return 0
+
+                if des_action == "features":
+                    res = des_conn.get_sedec_features(args.id_municipio_or_name)
+                    if res is None:
+                        print(f"Features SEDEC não encontradas para: {args.id_municipio_or_name}", file=sys.stderr)
+                        return 1
+                    if getattr(args, "json", False):
+                        print(json.dumps(res, indent=2, ensure_ascii=False, default=str))
+                    else:
+                        print(f"SEDEC Desastres Gold ({res.get('nome_municipio')} - {res.get('id_municipio')}): Score {res.get('score_resiliencia_desastres_sedec')} | {res.get('tier_vulnerabilidade_climatica_s2id')}")
+                    return 0
+
+                if des_action == "ranking":
+                    ranks = des_conn.list_top_resilient_sedec_municipalities(
+                        limit=getattr(args, "limit", 10),
+                        sigla_uf=getattr(args, "uf", None),
+                        sort_by_damages=getattr(args, "prejuizos", False),
+                    )
+                    if getattr(args, "json", False):
+                        print(json.dumps(ranks, indent=2, ensure_ascii=False, default=str))
+                    else:
+                        print(f"Ranking SEDEC Resiliência Climática ({len(ranks)}):")
+                        for idx, r in enumerate(ranks, 1):
+                            print(f"  {idx}. {r.get('nome_municipio')} ({r.get('sigla_uf')}): {r.get('score_resiliencia_desastres_sedec')} | {r.get('tier_vulnerabilidade_climatica_s2id')}")
+                    return 0
+            except (ValueError, KeyError) as exc:
+                print(f"Erro SEDEC Desastres: {exc}", file=sys.stderr)
                 return 1
 
         elif args.command == "datalake":

@@ -1908,3 +1908,32 @@ sources:
   status: HOMOLOGATED
   freshness_sla_hours: 720
   cron_schedule_expression: 0 6 10 * *
+- source_id: sedec_desastres
+  name: 'SEDEC / S2ID & CEMADEN: Desastres Naturais, Decretações & Alertas'
+  agency: Secretaria Nacional de Proteção e Defesa Civil (SEDEC / MIDR) & CEMADEN (MCTI)
+  official_url: https://www.gov.br/mdr/pt-br/assuntos/protecao-e-defesa-civil
+  segment_id: 11_agronegocio_meio_ambiente
+  segment_name: Agronegócio, Meio Ambiente & Clima
+  access_mode: LAKEHOUSE_BATCH
+  protocol: HTTP_BULK_ZIP
+  auth_type: NONE
+  canonical_keys:
+  - id_municipio
+  - sigla_uf
+  update_frequency: Contínua (S2ID Decretações & CEMADEN Alertas) / Anual (Atlas Digital)
+  estimated_volume: ~5.570 municípios com ocorrências S2ID, danos materiais e alertas CEMADEN (~180 MB)
+  lgpd_tier: PUBLIC_NON_PERSONAL
+  ml_feature_domains:
+  - climate_disaster_resilience_score
+  - emergency_calamity_decrees_frequency
+  - hydroclimatic_loss_exposure_brl
+  solution_packs:
+  - P02
+  - P04
+  - P05
+  - P07
+  rice_score: 870
+  roadmap_wave: 2
+  status: HOMOLOGATED
+  freshness_sla_hours: 720
+  cron_schedule_expression: 0 7 12 * *

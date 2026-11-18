@@ -68,6 +68,7 @@ model-paths:
   - "../src/public_data_gateway/connectors/ambiental/mapbiomas_cobertura/dbt"
   - "../src/public_data_gateway/connectors/ambiental/mapa_zarc/dbt"
   - "../src/public_data_gateway/connectors/ambiental/mdr_snis/dbt"
+  - "../src/public_data_gateway/connectors/ambiental/sedec_desastres/dbt"
   - "../src/public_data_gateway/connectors/ambiental/sfb_sicar/dbt"
   - "../src/public_data_gateway/connectors/agregadores/aneel_anp_ckan/dbt"
   - "../src/public_data_gateway/connectors/compliance/camara_senado_dados_abertos/dbt"

@@ -2652,6 +2652,69 @@ class MCPDispatcher:
                                 },
                             },
                             {
+                                "name": "bdg_get_sedec_desastres_ocorrencias",
+                                "description": "Lookup S2ID/COBRADE municipal natural disaster occurrences and economic damages by code, typology, IBGE, UF, or city.",
+                                "inputSchema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "termo": {
+                                            "type": "string",
+                                            "description": "S2ID code, COBRADE typology, IBGE 7-digit code, UF, or municipality name",
+                                        }
+                                    },
+                                    "required": ["termo"],
+                                },
+                            },
+                            {
+                                "name": "bdg_get_sedec_decretos_reconhecimento",
+                                "description": "Lookup federal emergency (SE) and calamity (ECP) decrees and federal relief funds by code, IBGE, UF, or city.",
+                                "inputSchema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "termo": {
+                                            "type": "string",
+                                            "description": "Decree code, IBGE 7-digit code, UF, or municipality name",
+                                        }
+                                    },
+                                    "required": ["termo"],
+                                },
+                            },
+                            {
+                                "name": "bdg_get_sedec_desastres_features",
+                                "description": "Get normalized Gold SEDEC/CEMADEN disaster resilience score, 5-year losses, and climate vulnerability tier.",
+                                "inputSchema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "id_municipio_or_name": {
+                                            "type": "string",
+                                            "description": "7-digit IBGE municipality code or municipality name",
+                                        }
+                                    },
+                                    "required": ["id_municipio_or_name"],
+                                },
+                            },
+                            {
+                                "name": "bdg_list_top_sedec_resilient_municipalities",
+                                "description": "List Brazilian municipalities ranked by SEDEC disaster resilience score or highest economic damages (R$ mil).",
+                                "inputSchema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "limit": {
+                                            "type": "integer",
+                                            "description": "Maximum rows (default: 10)",
+                                        },
+                                        "sigla_uf": {
+                                            "type": "string",
+                                            "description": "Optional 2-letter state filter (e.g. RS)",
+                                        },
+                                        "sort_by_damages": {
+                                            "type": "boolean",
+                                            "description": "Set true to rank municipalities by highest accumulated economic damages first",
+                                        },
+                                    },
+                                },
+                            },
+                            {
                                 "name": "bdg_get_bd_coverage",
                                 "description": "Get official Federated Public Datalake (DuckDB / BigQuery) municipal treated dataset and table coverage metrics.",
                                 "inputSchema": {
@@ -6439,6 +6502,65 @@ class MCPDispatcher:
                     },
                 }
             wrapped = wrap_untrusted_gov_data(result, source_id="mdr_snis")
+            return {
+                "jsonrpc": "2.0",
+                "id": req_id,
+                "result": {"content": [{"type": "text", "text": wrapped}], "isError": False},
+            }
+
+        if tool_name in {
+            "bdg_get_sedec_desastres_ocorrencias",
+            "bdg_get_sedec_decretos_reconhecimento",
+            "bdg_get_sedec_desastres_features",
+            "bdg_list_top_sedec_resilient_municipalities",
+        }:
+            from public_data_gateway.connectors.ambiental.sedec_desastres import (
+                SedecDesastresConnector,
+            )
+
+            connector = SedecDesastresConnector(settings=self.settings)
+            try:
+                if tool_name == "bdg_get_sedec_desastres_ocorrencias":
+                    result: Any = connector.get_sedec_disasters(str(args.get("termo", "")))
+                elif tool_name == "bdg_get_sedec_decretos_reconhecimento":
+                    result = connector.get_sedec_decrees(str(args.get("termo", "")))
+                elif tool_name == "bdg_get_sedec_desastres_features":
+                    result = connector.get_sedec_features(
+                        str(args.get("id_municipio_or_name", ""))
+                    )
+                else:
+                    result = connector.list_top_resilient_sedec_municipalities(
+                        limit=int(args.get("limit", 10)),
+                        sigla_uf=args.get("sigla_uf"),
+                        sort_by_damages=bool(args.get("sort_by_damages", False)),
+                    )
+            except (ValueError, KeyError) as exc:
+                return {
+                    "jsonrpc": "2.0",
+                    "id": req_id,
+                    "result": {
+                        "content": [
+                            {"type": "text", "text": f"SEDEC Desastres parameter error: {exc}"}
+                        ],
+                        "isError": True,
+                    },
+                }
+
+            if not result:
+                return {
+                    "jsonrpc": "2.0",
+                    "id": req_id,
+                    "result": {
+                        "content": [
+                            {
+                                "type": "text",
+                                "text": "No SEDEC Desastres data found for the query.",
+                            }
+                        ],
+                        "isError": True,
+                    },
+                }
+            wrapped = wrap_untrusted_gov_data(result, source_id="sedec_desastres")
             return {
                 "jsonrpc": "2.0",
                 "id": req_id,

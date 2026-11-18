@@ -27,6 +27,7 @@ import public_data_gateway.connectors.ambiental.mdr_snis  # noqa: F401
 import public_data_gateway.connectors.ambiental.nasa_power  # noqa: F401
 import public_data_gateway.connectors.ambiental.open_meteo  # noqa: F401
 import public_data_gateway.connectors.ambiental.rfb_cafir  # noqa: F401
+import public_data_gateway.connectors.ambiental.sedec_desastres  # noqa: F401
 import public_data_gateway.connectors.ambiental.sfb_sicar  # noqa: F401
 import public_data_gateway.connectors.comercio_exterior.mdic_comexstat  # noqa: F401
 import public_data_gateway.connectors.compliance.bgpview_ip_intel  # noqa: F401

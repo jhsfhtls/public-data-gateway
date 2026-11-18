@@ -1,0 +1,175 @@
+version: 2
+
+models:
+  - name: stg_sedec_ocorrencias_desastres
+    description: "Staging view tipada das ocorrências municipais S2ID/COBRADE de desastres naturais e danos materiais."
+    columns:
+      - name: cod_registro_s2id
+        description: "Identificador único do registro de desastre no Sistema S2ID (STRING)."
+        tests: [not_null, unique]
+      - name: cobrade_codigo
+        description: "Código oficial da Classificação e Codificação Brasileira de Desastres (COBRADE)."
+        tests: [not_null]
+      - name: tipologia_desastre
+        description: "Tipologia padronizada do evento adverso (INUNDACAO_ENXURRADA, ESTIAGEM_SECA, DESLIZAMENTO_GEOLOGICO)."
+        tests: [not_null]
+      - name: id_municipio
+        description: "Código IBGE de 7 dígitos do município (STRING)."
+        tests: [not_null]
+      - name: sigla_uf
+        description: "Sigla de 2 letras da Unidade Federativa (UF)."
+        tests: [not_null]
+      - name: nome_municipio
+        description: "Nome oficial do município."
+        tests: [not_null]
+      - name: regiao
+        description: "Macrorregião geográfica brasileira."
+        tests: [not_null]
+      - name: status_reconhecimento
+        description: "Status federal de reconhecimento (SITUACAO_EMERGENCIA ou CALAMIDADE_PUBLICA)."
+        tests: [not_null]
+      - name: populacao_afetada
+        description: "Total de pessoas afetadas, desalojadas ou desabrigadas pelo evento."
+        tests: [not_null]
+      - name: danos_materiais_mil_brl
+        description: "Danos materiais públicos e privados estimados no FIDE/S2ID (R$ mil)."
+        tests: [not_null]
+      - name: data_ocorrencia
+        description: "Data da ocorrência registrada no S2ID (ISO-8601)."
+        tests: [not_null]
+
+  - name: stg_sedec_decretos_reconhecimento
+    description: "Staging view tipada das decretações de emergência e calamidade pública reconhecidas pela SEDEC."
+    columns:
+      - name: cod_decreto_municipio
+        description: "Identificador consolidado das decretações municipais no quinquênio (STRING)."
+        tests: [not_null, unique]
+      - name: id_municipio
+        description: "Código IBGE de 7 dígitos do município (STRING)."
+        tests: [not_null]
+      - name: sigla_uf
+        description: "Sigla de 2 letras da Unidade Federativa (UF)."
+        tests: [not_null]
+      - name: nome_municipio
+        description: "Nome oficial do município."
+        tests: [not_null]
+      - name: qtd_decretos_se_5_anos
+        description: "Quantidade de decretos federais de Situação de Emergência (SE) nos últimos 5 anos."
+        tests: [not_null]
+      - name: qtd_decretos_calamidade_5_anos
+        description: "Quantidade de decretos federais de Estado de Calamidade Pública (ECP) nos últimos 5 anos."
+        tests: [not_null]
+      - name: recursos_federais_liberados_mil_brl
+        description: "Volume de recursos federais de resposta e reconstrução empenhados/liberados (R$ mil)."
+        tests: [not_null]
+      - name: ano_referencia
+        description: "Ano de referência da consolidação S2ID."
+        tests: [not_null]
+
+  - name: stg_sedec_cemaden_monitoramento
+    description: "Staging view tipada da rede pluviométrica CEMADEN e exposição em áreas de risco geohidrológico."
+    columns:
+      - name: id_municipio
+        description: "Código IBGE de 7 dígitos do município (STRING)."
+        tests: [not_null, unique]
+      - name: sigla_uf
+        description: "Sigla de 2 letras da Unidade Federativa (UF)."
+        tests: [not_null]
+      - name: nome_municipio
+        description: "Nome oficial do município."
+        tests: [not_null]
+      - name: qtd_pluviometros_cemaden
+        description: "Quantidade de pluviômetros e estações automáticas CEMADEN ativas no município."
+        tests: [not_null]
+      - name: populacao_area_risco_pct
+        description: "Percentual estimado da população municipal residente em áreas de risco geohidrológico (%)."
+        tests: [not_null]
+      - name: possui_plano_contingencia_ativo
+        description: "Indicador booleano de vigência do Plano de Contingência de Proteção e Defesa Civil."
+        tests: [not_null]
+      - name: alertas_risco_alto_12m
+        description: "Quantidade de alertas geohidrológicos de risco alto ou muito alto emitidos em 12 meses."
+        tests: [not_null]
+
+  - name: stg_sedec_desastres_resumo_municipal
+    description: "Staging view tipada do consolidado municipal de desastres naturais, prejuízos e alertas."
+    columns:
+      - name: id_municipio
+        description: "Código IBGE de 7 dígitos do município (STRING)."
+        tests: [not_null, unique]
+      - name: sigla_uf
+        description: "Sigla de 2 letras da Unidade Federativa (UF)."
+        tests: [not_null]
+      - name: nome_municipio
+        description: "Nome oficial do município."
+        tests: [not_null]
+      - name: regiao
+        description: "Macrorregião geográfica brasileira."
+        tests: [not_null]
+      - name: qtd_desastres_s2id_5a
+        description: "Total acumulado de eventos de desastres naturais no S2ID nos últimos 5 anos."
+        tests: [not_null]
+      - name: qtd_decretos_emergencia_5a
+        description: "Total acumulado de decretações SE + ECP reconhecidas nos últimos 5 anos."
+        tests: [not_null]
+      - name: total_afetados_5a
+        description: "População total acumulada afetada por desastres naturais nos últimos 5 anos."
+        tests: [not_null]
+      - name: prejuizos_economicos_mil_brl
+        description: "Prejuízos econômicos públicos e privados acumulados no município (R$ mil)."
+        tests: [not_null]
+      - name: alertas_cemaden_12m
+        description: "Quantidade de alertas CEMADEN emitidos nos últimos 12 meses."
+        tests: [not_null]
+
+  - name: fct_desastres_defesa_civil_sedec_municipal
+    description: "Fato Silver municipal consolidando ocorrências S2ID/COBRADE, decretações SEDEC, prejuízos econômicos e monitoramento CEMADEN."
+    columns:
+      - name: id_municipio
+        description: "Código IBGE de 7 dígitos do município (STRING)."
+        tests: [not_null, unique]
+      - name: sigla_uf
+        description: "Sigla de 2 letras da Unidade Federativa (UF)."
+        tests: [not_null]
+      - name: nome_municipio
+        description: "Nome oficial do município."
+        tests: [not_null]
+      - name: regiao
+        description: "Macrorregião geográfica brasileira."
+        tests: [not_null]
+      - name: qtd_desastres_s2id_5a
+        description: "Total de desastres naturais registrados no S2ID em 5 anos."
+        tests: [not_null]
+      - name: qtd_ocorrencias_s2id_registradas
+        description: "Quantidade de registros FIDE/COBRADE detalhados na camada Silver."
+        tests: [not_null]
+      - name: qtd_decretos_emergencia_5a
+        description: "Soma de decretos de Situação de Emergência e Calamidade Pública em 5 anos."
+        tests: [not_null]
+      - name: qtd_decretos_se_5_anos
+        description: "Quantidade de decretos federais de Situação de Emergência em 5 anos."
+        tests: [not_null]
+      - name: qtd_decretos_calamidade_5_anos
+        description: "Quantidade de decretos federais de Estado de Calamidade Pública em 5 anos."
+        tests: [not_null]
+      - name: total_afetados_5a
+        description: "Total de habitantes afetados por eventos climáticos extremos em 5 anos."
+        tests: [not_null]
+      - name: prejuizos_economicos_mil_brl
+        description: "Prejuízos econômicos totais reportados ao S2ID/Atlas Digital (R$ mil)."
+        tests: [not_null]
+      - name: recursos_federais_liberados_mil_brl
+        description: "Recursos federais da Defesa Civil transferidos para resposta e reconstrução (R$ mil)."
+        tests: [not_null]
+      - name: qtd_pluviometros_cemaden
+        description: "Quantidade de estações pluviométricas CEMADEN instaladas no município."
+        tests: [not_null]
+      - name: populacao_area_risco_pct
+        description: "Percentual da população municipal exposta em áreas de risco mapeadas (%)."
+        tests: [not_null]
+      - name: possui_plano_contingencia_ativo
+        description: "Flag indicando vigência ativa do Plano de Contingência Municipal (PLANCON)."
+        tests: [not_null]
+      - name: alertas_cemaden_12m
+        description: "Alertas geohidrológicos emitidos pelo CEMADEN nos últimos 12 meses."
+        tests: [not_null]
