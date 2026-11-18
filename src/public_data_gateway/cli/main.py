@@ -483,6 +483,29 @@ def build_parser() -> argparse.ArgumentParser:
     est_rk.add_argument("--uf", type=str, default=None, help="Optional 2-letter UF state filter")
     est_rk.add_argument("--json", action="store_true", help="Output in JSON format")
 
+    # Subcommand: agencias (BACEN Bank Branches & Service Outposts)
+    ag_p = subparsers.add_parser(
+        "agencias",
+        help="Query BACEN bank branches, service outposts (PA/PAE), municipal coverage, and Gold capillarity features.",
+    )
+    ag_sub = ag_p.add_subparsers(dest="agencias_action", required=True)
+
+    for act_name, act_help in [
+        ("lista", "List registered BACEN bank branches by IBGE code, CNPJ, CEP, or name."),
+        ("postos", "Query municipal service outposts (PA, PAE, administrative units)."),
+        ("cobertura", "Query municipal branch density per 100k inhabitants."),
+        ("inclusao", "Query financial inclusion status and bank-correspondent dependency."),
+        ("features", "Query Gold BACEN physical banking capillarity features."),
+    ]:
+        sp = ag_sub.add_parser(act_name, help=act_help)
+        sp.add_argument("termo", type=str, help="IBGE 7-digit code, CNPJ, CEP, UF, or municipality/bank name")
+        sp.add_argument("--json", action="store_true", help="Output in JSON format")
+
+    ag_rk = ag_sub.add_parser("ranking", help="List municipalities ranked by Gold BACEN banking capillarity score.")
+    ag_rk.add_argument("--limit", type=int, default=10, help="Max municipalities to list")
+    ag_rk.add_argument("--uf", type=str, default=None, help="Optional 2-letter UF state filter")
+    ag_rk.add_argument("--json", action="store_true", help="Output in JSON format")
+
     # Subcommand: procurement (Compras.gov.br CATMAT/CATSER & Preços)
     proc_p = subparsers.add_parser(
         "procurement", help="Query Compras.gov.br CATMAT/CATSER catalogs and procurement price benchmarks."
@@ -2588,6 +2611,39 @@ def main(argv: Sequence[str] | None = None) -> int:
             if not out:
                 print(
                     f"No BACEN ESTBAN records found for action '{est_action}'",
+                    file=sys.stderr,
+                )
+                return 1
+            print(json.dumps(out, indent=2, ensure_ascii=False))
+            return 0
+
+        elif args.command == "agencias":
+            from public_data_gateway.connectors.macrofinanceiro.bcb_agencia import (
+                BcbAgenciaConnector,
+            )
+
+            ag_conn = BcbAgenciaConnector(settings=settings)
+            ag_action = getattr(args, "agencias_action", None)
+            if ag_action == "lista":
+                out = ag_conn.get_branches(args.termo)
+            elif ag_action == "postos":
+                out = ag_conn.get_service_outposts(args.termo)
+            elif ag_action == "cobertura":
+                out = ag_conn.get_municipal_coverage(args.termo)
+            elif ag_action == "inclusao":
+                out = ag_conn.get_financial_inclusion_status(args.termo)
+            elif ag_action == "features":
+                out = ag_conn.get_agencia_features(args.termo)
+            elif ag_action == "ranking":
+                out = ag_conn.list_top_municipalities(
+                    limit=args.limit, sigla_uf=args.uf
+                )
+            else:
+                out = None
+
+            if not out:
+                print(
+                    f"No BACEN Agencias records found for action '{ag_action}'",
                     file=sys.stderr,
                 )
                 return 1

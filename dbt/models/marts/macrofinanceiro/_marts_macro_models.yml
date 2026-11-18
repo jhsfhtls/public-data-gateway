@@ -929,3 +929,84 @@ models:
         tests:
           - not_null
 
+  - name: mart_capilaridade_agencias_bancarias_brasil
+    description: "Datamart executivo intra-domínio de capilaridade bancária presencial BACEN integrando cadastro de agências, postos PA/PAE e inclusão financeira municipal."
+    columns:
+      - name: id_municipio
+        description: "Código IBGE canônico de 7 dígitos do município."
+        tests:
+          - not_null
+          - unique
+      - name: sigla_uf
+        description: "Sigla de 2 letras da Unidade Federativa."
+        tests:
+          - not_null
+      - name: nome_municipio
+        description: "Nome oficial do município."
+        tests:
+          - not_null
+      - name: total_agencias_fisicas
+        description: "Quantidade total de agências bancárias físicas ativas."
+        tests:
+          - not_null
+      - name: total_bancos_presentes
+        description: "Quantidade de bancos distintos com presença física local."
+        tests:
+          - not_null
+      - name: agencias_por_100k_hab
+        description: "Densidade de agências bancárias por 100 mil habitantes."
+        tests:
+          - not_null
+      - name: percentual_bancos_publicos_pct
+        description: "Percentual de agências pertencentes a instituições financeiras públicas (%)."
+        tests:
+          - not_null
+      - name: percentual_bancos_privados_pct
+        description: "Percentual de agências pertencentes a bancos privados e cooperativas (%)."
+        tests:
+          - not_null
+      - name: qtd_postos_pa
+        description: "Quantidade de Postos de Atendimento bancário (PA) no município."
+        tests:
+          - not_null
+      - name: qtd_postos_pae_eletronico
+        description: "Quantidade de Postos de Atendimento Eletrônico (PAE)."
+        tests:
+          - not_null
+      - name: qtd_unidades_administrativas
+        description: "Quantidade de unidades administrativas bancárias no município."
+        tests:
+          - not_null
+      - name: cobertura_autoatendimento_24h_pct
+        description: "Percentual de cobertura de autoatendimento 24h (%)."
+        tests:
+          - not_null
+      - name: possui_agencia_fisica
+        description: "Indicador booleano de existência de agência física no município."
+        tests:
+          - not_null
+      - name: dependencia_correspondente_bancario_pct
+        description: "Percentual de dependência de correspondentes bancários (%)."
+        tests:
+          - not_null
+      - name: distancia_media_agencia_km
+        description: "Distância média estimada da população até a agência presencial em km."
+        tests:
+          - not_null
+      - name: status_inclusao_financeira
+        description: "Classificação municipal de inclusão financeira presencial."
+        tests:
+          - not_null
+      - name: qtd_dependencias_amostra_cadastral
+        description: "Quantidade de dependências registradas na amostra cadastral Olinda BACEN."
+        tests:
+          - not_null
+      - name: score_capilaridade_bancaria_bcb
+        description: "Score composto de capilaridade física e atendimento bancário presencial (10 a 99)."
+        tests:
+          - not_null
+      - name: classificacao_capilaridade_agencias
+        description: "Tier executivo de capilaridade presencial (ALTA_CAPILARIDADE_BANCARIA, CAPILARIDADE_ADEQUADA, DESERTO_BANCARIO_ALERTA)."
+        tests:
+          - not_null
+

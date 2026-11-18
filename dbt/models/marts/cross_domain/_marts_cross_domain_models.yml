@@ -79,6 +79,12 @@ models:
       - name: volume_depositos_estban_uf_brl
         description: "Volume agregado de depósitos bancários municipais ESTBAN captados na UF em BRL."
         tests: [not_null]
+      - name: total_agencias_bancarias_bcb_uf
+        description: "Quantidade total de agências bancárias físicas ativas na UF (BACEN CAD/Olinda)."
+        tests: [not_null]
+      - name: avg_score_capilaridade_bancaria_uf
+        description: "Média estadual do score de capilaridade bancária presencial BACEN (10 a 99)."
+        tests: [not_null]
       - name: macro_ano_mes_referencia
         description: "Competência macroeconômica de referência (YYYY-MM)."
         tests: [not_null]

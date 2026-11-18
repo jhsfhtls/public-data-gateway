@@ -734,6 +734,104 @@ def create_app(settings: GatewaySettings | None = None) -> FastAPI:
             limit=limit, sigla_uf=uf
         )
 
+    # 14C. BACEN Agências & Postos de Atendimento (Olinda CAD/OData)
+    @app.get("/api/v1/banking/agencias/lista/{id_municipio_or_cnpj}")
+    async def get_agencias_lista(
+        id_municipio_or_cnpj: str,
+    ) -> list[dict[str, Any]]:
+        from public_data_gateway.connectors.macrofinanceiro.bcb_agencia import (
+            BcbAgenciaConnector,
+        )
+
+        return BcbAgenciaConnector(settings=app_settings).get_branches(
+            id_municipio_or_cnpj
+        )
+
+    @app.get("/api/v1/banking/agencias/postos/{id_municipio_or_name}")
+    async def get_agencias_postos(
+        id_municipio_or_name: str,
+    ) -> dict[str, Any]:
+        from public_data_gateway.connectors.macrofinanceiro.bcb_agencia import (
+            BcbAgenciaConnector,
+        )
+
+        res = BcbAgenciaConnector(settings=app_settings).get_service_outposts(
+            id_municipio_or_name
+        )
+        if not res:
+            raise HTTPException(
+                status_code=404,
+                detail=f"BACEN service outposts not found for '{id_municipio_or_name}'",
+            )
+        return res
+
+    @app.get("/api/v1/banking/agencias/cobertura/{id_municipio_or_name}")
+    async def get_agencias_cobertura(
+        id_municipio_or_name: str,
+    ) -> dict[str, Any]:
+        from public_data_gateway.connectors.macrofinanceiro.bcb_agencia import (
+            BcbAgenciaConnector,
+        )
+
+        res = BcbAgenciaConnector(settings=app_settings).get_municipal_coverage(
+            id_municipio_or_name
+        )
+        if not res:
+            raise HTTPException(
+                status_code=404,
+                detail=f"BACEN branch coverage not found for '{id_municipio_or_name}'",
+            )
+        return res
+
+    @app.get("/api/v1/banking/agencias/inclusao/{id_municipio_or_name}")
+    async def get_agencias_inclusao(
+        id_municipio_or_name: str,
+    ) -> dict[str, Any]:
+        from public_data_gateway.connectors.macrofinanceiro.bcb_agencia import (
+            BcbAgenciaConnector,
+        )
+
+        res = BcbAgenciaConnector(settings=app_settings).get_financial_inclusion_status(
+            id_municipio_or_name
+        )
+        if not res:
+            raise HTTPException(
+                status_code=404,
+                detail=f"BACEN financial inclusion status not found for '{id_municipio_or_name}'",
+            )
+        return res
+
+    @app.get("/api/v1/banking/agencias/features/{id_municipio_or_name}")
+    async def get_agencias_features(
+        id_municipio_or_name: str,
+    ) -> dict[str, Any]:
+        from public_data_gateway.connectors.macrofinanceiro.bcb_agencia import (
+            BcbAgenciaConnector,
+        )
+
+        res = BcbAgenciaConnector(settings=app_settings).get_agencia_features(
+            id_municipio_or_name
+        )
+        if not res:
+            raise HTTPException(
+                status_code=404,
+                detail=f"BACEN Agencias Gold features not found for '{id_municipio_or_name}'",
+            )
+        return res
+
+    @app.get("/api/v1/banking/agencias/ranking")
+    async def get_agencias_ranking(
+        limit: int = Query(10, ge=1, le=50, description="Max municipalities to return"),
+        uf: str | None = Query(None, description="Optional 2-letter UF state filter"),
+    ) -> list[dict[str, Any]]:
+        from public_data_gateway.connectors.macrofinanceiro.bcb_agencia import (
+            BcbAgenciaConnector,
+        )
+
+        return BcbAgenciaConnector(settings=app_settings).list_top_municipalities(
+            limit=limit, sigla_uf=uf
+        )
+
     @app.get("/api/v1/treasury/profile/{id_municipio_or_name}")
     @app.get("/api/v1/sadipem/profile/{id_municipio_or_name}")
     async def get_treasury_profile(id_municipio_or_name: str) -> dict[str, Any]:

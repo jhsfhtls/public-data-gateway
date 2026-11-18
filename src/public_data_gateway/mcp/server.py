@@ -656,6 +656,50 @@ class MCPDispatcher:
                                 },
                             },
                             {
+                                "name": "bdg_get_bcb_agencias_branches",
+                                "description": "Lookup registered BACEN bank branches by IBGE 7D, CNPJ, CEP, or name (Tier 1).",
+                                "inputSchema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "id_municipio_or_cnpj": {"type": "string", "description": "7-digit IBGE code, CNPJ, CEP, UF, or bank/city name"},
+                                    },
+                                    "required": ["id_municipio_or_cnpj"],
+                                },
+                            },
+                            {
+                                "name": "bdg_get_bcb_agencias_coverage",
+                                "description": "Retrieve municipal bank branch density per 100k inhabitants and public/private share (Tier 1).",
+                                "inputSchema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "id_municipio_or_name": {"type": "string", "description": "7-digit IBGE code or municipality name"},
+                                    },
+                                    "required": ["id_municipio_or_name"],
+                                },
+                            },
+                            {
+                                "name": "bdg_get_bcb_agencias_capilaridade_features",
+                                "description": "Retrieve Gold BACEN physical banking capillarity and inclusion features (Tier 1).",
+                                "inputSchema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "id_municipio_or_name": {"type": "string", "description": "7-digit IBGE code or municipality name"},
+                                    },
+                                    "required": ["id_municipio_or_name"],
+                                },
+                            },
+                            {
+                                "name": "bdg_list_top_bcb_agencias_municipalities",
+                                "description": "List municipalities ranked by Gold BACEN physical banking capillarity score (Tier 1).",
+                                "inputSchema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "limit": {"type": "integer", "description": "Max municipalities to return (default: 10)"},
+                                        "sigla_uf": {"type": "string", "description": "Optional 2-letter UF state filter"},
+                                    },
+                                },
+                            },
+                            {
                                 "name": "bdg_search_catmat_materials",
                                 "description": "Search materials and catalog descriptions in Compras.gov.br CATMAT/SIASG with PDM, class, and sustainability flags (Tier 1).",
                                 "inputSchema": {
@@ -3624,6 +3668,85 @@ class MCPDispatcher:
                 sigla_uf=args.get("sigla_uf"),
             )
             wrapped = wrap_untrusted_gov_data(rows, source_id="bcb_estban")
+            return {
+                "jsonrpc": "2.0",
+                "id": req_id,
+                "result": {"content": [{"type": "text", "text": wrapped}], "isError": False},
+            }
+
+        if tool_name == "bdg_get_bcb_agencias_branches":
+            from public_data_gateway.connectors.macrofinanceiro.bcb_agencia import (
+                BcbAgenciaConnector,
+            )
+
+            ag_conn = BcbAgenciaConnector(settings=self.settings)
+            rows = ag_conn.get_branches(str(args.get("id_municipio_or_cnpj", "")))
+            wrapped = wrap_untrusted_gov_data(rows, source_id="bcb_agencia")
+            return {
+                "jsonrpc": "2.0",
+                "id": req_id,
+                "result": {"content": [{"type": "text", "text": wrapped}], "isError": False},
+            }
+
+        if tool_name == "bdg_get_bcb_agencias_coverage":
+            from public_data_gateway.connectors.macrofinanceiro.bcb_agencia import (
+                BcbAgenciaConnector,
+            )
+
+            ag_conn = BcbAgenciaConnector(settings=self.settings)
+            termo = str(args.get("id_municipio_or_name", ""))
+            cov = ag_conn.get_municipal_coverage(termo)
+            if not cov:
+                return {
+                    "jsonrpc": "2.0",
+                    "id": req_id,
+                    "result": {
+                        "content": [{"type": "text", "text": f"BACEN Agencias coverage not found for '{termo}'"}],
+                        "isError": True,
+                    },
+                }
+            wrapped = wrap_untrusted_gov_data(cov, source_id="bcb_agencia")
+            return {
+                "jsonrpc": "2.0",
+                "id": req_id,
+                "result": {"content": [{"type": "text", "text": wrapped}], "isError": False},
+            }
+
+        if tool_name == "bdg_get_bcb_agencias_capilaridade_features":
+            from public_data_gateway.connectors.macrofinanceiro.bcb_agencia import (
+                BcbAgenciaConnector,
+            )
+
+            ag_conn = BcbAgenciaConnector(settings=self.settings)
+            termo = str(args.get("id_municipio_or_name", ""))
+            feat = ag_conn.get_agencia_features(termo)
+            if not feat:
+                return {
+                    "jsonrpc": "2.0",
+                    "id": req_id,
+                    "result": {
+                        "content": [{"type": "text", "text": f"BACEN Agencias features not found for '{termo}'"}],
+                        "isError": True,
+                    },
+                }
+            wrapped = wrap_untrusted_gov_data(feat, source_id="bcb_agencia")
+            return {
+                "jsonrpc": "2.0",
+                "id": req_id,
+                "result": {"content": [{"type": "text", "text": wrapped}], "isError": False},
+            }
+
+        if tool_name == "bdg_list_top_bcb_agencias_municipalities":
+            from public_data_gateway.connectors.macrofinanceiro.bcb_agencia import (
+                BcbAgenciaConnector,
+            )
+
+            ag_conn = BcbAgenciaConnector(settings=self.settings)
+            rows = ag_conn.list_top_municipalities(
+                limit=int(args.get("limit", 10)),
+                sigla_uf=args.get("sigla_uf"),
+            )
+            wrapped = wrap_untrusted_gov_data(rows, source_id="bcb_agencia")
             return {
                 "jsonrpc": "2.0",
                 "id": req_id,
