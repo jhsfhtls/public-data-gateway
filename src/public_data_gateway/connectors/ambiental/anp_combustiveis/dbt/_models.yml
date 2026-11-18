@@ -1,0 +1,181 @@
+version: 2
+
+models:
+  - name: stg_anp_precos_revenda_municipio
+    description: "Staging view tipada do Levantamento Semanal de Preços de Combustíveis (LPC ANP) por produto e município."
+    columns:
+      - name: cod_coleta_anp
+        description: "Código identificador único da coleta municipal por produto na ANP (STRING)."
+        tests: [not_null, unique]
+      - name: produto_combustivel
+        description: "Tipo de combustível pesquisado (GASOLINA_COMUM, ETANOL_HIDRATADO ou DIESEL_S10)."
+        tests: [not_null]
+      - name: id_municipio
+        description: "Código IBGE de 7 dígitos do município (STRING)."
+        tests: [not_null]
+      - name: sigla_uf
+        description: "Sigla de 2 letras da Unidade Federativa (UF)."
+        tests: [not_null]
+      - name: nome_municipio
+        description: "Nome oficial do município."
+        tests: [not_null]
+      - name: regiao
+        description: "Macrorregião geográfica oficial do município."
+        tests: [not_null]
+      - name: preco_medio_revenda_brl
+        description: "Preço médio ao consumidor final na revenda em BRL/litro."
+        tests: [not_null]
+      - name: preco_medio_distribuicao_brl
+        description: "Preço médio de aquisição pelas distribuidoras em BRL/litro."
+        tests: [not_null]
+      - name: margem_media_revenda_brl
+        description: "Margem bruta média da revenda em BRL/litro."
+        tests: [not_null]
+      - name: desvio_padrao_revenda_brl
+        description: "Desvio padrão dos preços observados entre postos amostrados (BRL/litro)."
+        tests: [not_null]
+      - name: qtd_postos_pesquisados
+        description: "Quantidade de postos incluídos na amostra semanal ANP."
+        tests: [not_null]
+      - name: data_coleta
+        description: "Data de referência da pesquisa semanal ANP (ISO-8601)."
+        tests: [not_null]
+
+  - name: stg_anp_vendas_derivados_estado
+    description: "Staging view tipada dos volumes comercializados de biocombustíveis e derivados de petróleo por município."
+    columns:
+      - name: cod_venda_uf_anp
+        description: "Chave composta de comercialização ANP por município e categoria (STRING)."
+        tests: [not_null, unique]
+      - name: id_municipio
+        description: "Código IBGE de 7 dígitos do município (STRING)."
+        tests: [not_null]
+      - name: sigla_uf
+        description: "Sigla de 2 letras da Unidade Federativa (UF)."
+        tests: [not_null]
+      - name: nome_municipio
+        description: "Nome oficial do município."
+        tests: [not_null]
+      - name: categoria_combustivel
+        description: "Grupo comercializado (Etanol_Biodiesel_B14 ou Diesel_S10_Gasolina)."
+        tests: [not_null]
+      - name: volume_vendido_m3
+        description: "Volume total comercializado na categoria em metros cúbicos (m3)."
+        tests: [not_null]
+      - name: participacao_biocombustivel_pct
+        description: "Participação percentual de combustíveis renováveis no volume comercializado (%)."
+        tests: [not_null]
+      - name: ano_referencia
+        description: "Ano de referência da consolidação ANP."
+        tests: [not_null]
+
+  - name: stg_anp_postos_revendedores_resumo
+    description: "Staging view tipada da rede municipal de postos revendedores autorizados ANP e conformidade PMQC."
+    columns:
+      - name: id_municipio
+        description: "Código IBGE de 7 dígitos do município (STRING)."
+        tests: [not_null, unique]
+      - name: sigla_uf
+        description: "Sigla de 2 letras da Unidade Federativa (UF)."
+        tests: [not_null]
+      - name: nome_municipio
+        description: "Nome oficial do município."
+        tests: [not_null]
+      - name: qtd_postos_ativos_anp
+        description: "Quantidade de postos revendedores ativos autorizados pela ANP no município."
+        tests: [not_null]
+      - name: participacao_bandeira_branca_pct
+        description: "Percentual de postos sem vínculo exclusivo de bandeira distribuidora (%)."
+        tests: [not_null]
+      - name: taxa_conformidade_pmqc_pct
+        description: "Índice de aprovação nas análises físico-químicas do PMQC/ANP (%)."
+        tests: [not_null]
+      - name: capacidade_armazenagem_m3
+        description: "Capacidade instalada de armazenagem em tanques na revenda municipal (m3)."
+        tests: [not_null]
+
+  - name: stg_anp_combustiveis_resumo_municipal
+    description: "Staging view tipada do consolidado municipal de preços médios, paridade etanol e volume de diesel S10."
+    columns:
+      - name: id_municipio
+        description: "Código IBGE de 7 dígitos do município (STRING)."
+        tests: [not_null, unique]
+      - name: sigla_uf
+        description: "Sigla de 2 letras da Unidade Federativa (UF)."
+        tests: [not_null]
+      - name: nome_municipio
+        description: "Nome oficial do município."
+        tests: [not_null]
+      - name: preco_gasolina_brl
+        description: "Preço médio de revenda da Gasolina Comum (BRL/litro)."
+        tests: [not_null]
+      - name: preco_etanol_brl
+        description: "Preço médio de revenda do Etanol Hidratado (BRL/litro)."
+        tests: [not_null]
+      - name: preco_diesel_s10_brl
+        description: "Preço médio de revenda do Óleo Diesel S10 rodoviário (BRL/litro)."
+        tests: [not_null]
+      - name: razao_etanol_gasolina_pct
+        description: "Paridade de preço Etanol / Gasolina (%) para decisão econômica flex."
+        tests: [not_null]
+      - name: participacao_biocombustivel_pct
+        description: "Participação consolidada de biocombustíveis (etanol + biodiesel B14) na matriz local (%)."
+        tests: [not_null]
+      - name: volume_diesel_m3
+        description: "Volume de diesel S10 demandado no município (m3)."
+        tests: [not_null]
+
+  - name: fct_combustiveis_biocombustiveis_anp_municipal
+    description: "Tabela Fato municipal unificando preços LPC ANP, paridade etanol/gasolina, vendas de biocombustíveis e rede PMQC."
+    columns:
+      - name: id_municipio
+        description: "Código IBGE de 7 dígitos do município (STRING)."
+        tests: [not_null, unique]
+      - name: sigla_uf
+        description: "Sigla de 2 letras da Unidade Federativa (UF)."
+        tests: [not_null]
+      - name: nome_municipio
+        description: "Nome oficial do município."
+        tests: [not_null]
+      - name: preco_gasolina_brl
+        description: "Preço médio municipal da Gasolina Comum (BRL/litro)."
+        tests: [not_null]
+      - name: preco_etanol_brl
+        description: "Preço médio municipal do Etanol Hidratado (BRL/litro)."
+        tests: [not_null]
+      - name: preco_diesel_s10_brl
+        description: "Preço médio municipal do Diesel S10 logístico (BRL/litro)."
+        tests: [not_null]
+      - name: razao_etanol_gasolina_pct
+        description: "Relação percentual entre o preço do etanol e da gasolina (%)."
+        tests: [not_null]
+      - name: participacao_biocombustivel_pct
+        description: "Fatia de biocombustíveis renováveis na matriz energética automotiva (%)."
+        tests: [not_null]
+      - name: volume_diesel_m3
+        description: "Volume demandado de diesel S10 no município (m3)."
+        tests: [not_null]
+      - name: qtd_postos_ativos_anp
+        description: "Número de postos revendedores ativos registrados na ANP."
+        tests: [not_null]
+      - name: participacao_bandeira_branca_pct
+        description: "Percentual de postos bandeira branca no município (%)."
+        tests: [not_null]
+      - name: taxa_conformidade_pmqc_pct
+        description: "Taxa de conformidade de qualidade de combustíveis PMQC ANP (%)."
+        tests: [not_null]
+      - name: capacidade_armazenagem_m3
+        description: "Capacidade total de estocagem dos postos municipais (m3)."
+        tests: [not_null]
+      - name: volume_biocombustivel_m3
+        description: "Volume comercializado em etanol e biodiesel B14 no município (m3)."
+        tests: [not_null]
+      - name: volume_total_comercializado_m3
+        description: "Volume agregado comercializado na amostra ANP municipal (m3)."
+        tests: [not_null]
+      - name: qtd_produtos_coletados_anp
+        description: "Quantidade de combustíveis com série coletada no município."
+        tests: [not_null]
+      - name: margem_media_revenda_brl
+        description: "Margem bruta média observada nos postos revendedores (BRL/litro)."
+        tests: [not_null]

@@ -116,6 +116,15 @@ aneel_mmgd AS (
     FROM {{ ref('mart_geracao_distribuida_aneel_brasil') }}
 ),
 
+anp_comb AS (
+    SELECT
+        id_municipio,
+        preco_diesel_s10_brl AS preco_diesel_s10_anp_brl,
+        participacao_biocombustivel_pct AS participacao_biocombustivel_anp_pct,
+        score_competitividade_combustiveis_bio
+    FROM {{ ref('mart_combustiveis_biocombustiveis_anp_brasil') }}
+),
+
 joined AS (
     SELECT
         t.id_municipio,
@@ -162,6 +171,9 @@ joined AS (
         COALESCE(an.qtd_usinas_mmgd_aneel, 0) AS qtd_usinas_mmgd_aneel,
         COALESCE(an.potencia_instalada_mmgd_kw, 0.0) AS potencia_instalada_mmgd_kw,
         COALESCE(an.score_transicao_energetica_mmgd, 60.0) AS score_transicao_energetica_mmgd,
+        COALESCE(anp.preco_diesel_s10_anp_brl, 6.20) AS preco_diesel_s10_anp_brl,
+        COALESCE(anp.participacao_biocombustivel_anp_pct, 30.0) AS participacao_biocombustivel_anp_pct,
+        COALESCE(anp.score_competitividade_combustiveis_bio, 65.0) AS score_competitividade_combustiveis_bio,
         t.reference_date
     FROM terra t
     LEFT JOIN sicar s ON t.id_municipio = s.id_municipio
@@ -174,6 +186,7 @@ joined AS (
     LEFT JOIN cafir cf ON t.id_municipio = cf.id_municipio
     LEFT JOIN queimadas qm ON t.id_municipio = qm.id_municipio
     LEFT JOIN aneel_mmgd an ON t.id_municipio = an.id_municipio
+    LEFT JOIN anp_comb anp ON t.id_municipio = anp.id_municipio
 ),
 
 scored AS (

@@ -2418,6 +2418,69 @@ class MCPDispatcher:
                                 },
                             },
                             {
+                                "name": "bdg_get_anp_combustiveis_precos",
+                                "description": "Lookup ANP weekly fuel retail and distribution prices (Gasolina, Etanol, Diesel S10) by product, survey code, IBGE code, UF, or municipality.",
+                                "inputSchema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "termo": {
+                                            "type": "string",
+                                            "description": "Fuel product, survey code, IBGE 7-digit code, UF, or municipality name",
+                                        }
+                                    },
+                                    "required": ["termo"],
+                                },
+                            },
+                            {
+                                "name": "bdg_get_anp_combustiveis_vendas",
+                                "description": "Lookup ANP biofuel (Ethanol/Biodiesel) and petroleum derivative sales volume (m3) by code, category, IBGE, or UF.",
+                                "inputSchema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "termo": {
+                                            "type": "string",
+                                            "description": "Sales code, fuel category, IBGE code, UF, or municipality name",
+                                        }
+                                    },
+                                    "required": ["termo"],
+                                },
+                            },
+                            {
+                                "name": "bdg_get_anp_combustiveis_features",
+                                "description": "Get normalized Gold ANP fuel competitiveness score, Diesel S10 price, biofuel share, and matrix tier.",
+                                "inputSchema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "id_municipio_or_name": {
+                                            "type": "string",
+                                            "description": "7-digit IBGE municipality code or municipality name",
+                                        }
+                                    },
+                                    "required": ["id_municipio_or_name"],
+                                },
+                            },
+                            {
+                                "name": "bdg_list_top_anp_combustiveis_municipalities",
+                                "description": "List Brazilian municipalities ranked by ANP fuel competitiveness score or highest biofuel share (%).",
+                                "inputSchema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "limit": {
+                                            "type": "integer",
+                                            "description": "Maximum rows (default: 10)",
+                                        },
+                                        "sigla_uf": {
+                                            "type": "string",
+                                            "description": "Optional 2-letter state filter (e.g. SP)",
+                                        },
+                                        "sort_by_biofuel": {
+                                            "type": "boolean",
+                                            "description": "Set true to rank municipalities by highest biofuel share (%) first",
+                                        },
+                                    },
+                                },
+                            },
+                            {
                                 "name": "bdg_get_bd_coverage",
                                 "description": "Get official Federated Public Datalake (DuckDB / BigQuery) municipal treated dataset and table coverage metrics.",
                                 "inputSchema": {
@@ -5971,6 +6034,65 @@ class MCPDispatcher:
                     },
                 }
             wrapped = wrap_untrusted_gov_data(result, source_id="aneel_geracao_distribuida")
+            return {
+                "jsonrpc": "2.0",
+                "id": req_id,
+                "result": {"content": [{"type": "text", "text": wrapped}], "isError": False},
+            }
+
+        if tool_name in {
+            "bdg_get_anp_combustiveis_precos",
+            "bdg_get_anp_combustiveis_vendas",
+            "bdg_get_anp_combustiveis_features",
+            "bdg_list_top_anp_combustiveis_municipalities",
+        }:
+            from public_data_gateway.connectors.ambiental.anp_combustiveis import (
+                AnpCombustiveisConnector,
+            )
+
+            connector = AnpCombustiveisConnector(settings=self.settings)
+            try:
+                if tool_name == "bdg_get_anp_combustiveis_precos":
+                    result: Any = connector.get_anp_fuel_prices(str(args.get("termo", "")))
+                elif tool_name == "bdg_get_anp_combustiveis_vendas":
+                    result = connector.get_anp_fuel_sales(str(args.get("termo", "")))
+                elif tool_name == "bdg_get_anp_combustiveis_features":
+                    result = connector.get_anp_features(
+                        str(args.get("id_municipio_or_name", ""))
+                    )
+                else:
+                    result = connector.list_top_anp_municipalities(
+                        limit=int(args.get("limit", 10)),
+                        sigla_uf=args.get("sigla_uf"),
+                        sort_by_biofuel=bool(args.get("sort_by_biofuel", False)),
+                    )
+            except (ValueError, KeyError) as exc:
+                return {
+                    "jsonrpc": "2.0",
+                    "id": req_id,
+                    "result": {
+                        "content": [
+                            {"type": "text", "text": f"ANP Combustiveis parameter error: {exc}"}
+                        ],
+                        "isError": True,
+                    },
+                }
+
+            if not result:
+                return {
+                    "jsonrpc": "2.0",
+                    "id": req_id,
+                    "result": {
+                        "content": [
+                            {
+                                "type": "text",
+                                "text": "No ANP Combustiveis data found for the query.",
+                            }
+                        ],
+                        "isError": True,
+                    },
+                }
+            wrapped = wrap_untrusted_gov_data(result, source_id="anp_combustiveis")
             return {
                 "jsonrpc": "2.0",
                 "id": req_id,

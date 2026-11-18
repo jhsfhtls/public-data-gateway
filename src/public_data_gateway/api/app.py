@@ -3525,6 +3525,76 @@ def create_app(settings: GatewaySettings | None = None) -> FastAPI:
         conn = AneelGeracaoDistribuidaConnector(settings=app_settings)
         return conn.list_top_mmgd_municipalities(limit=limit, sigla_uf=uf, sort_by_power=sort_by_power)
 
+    # ANP Combustíveis (LPC Preços, Vendas & Biocombustíveis)
+    @app.get("/api/v1/environment/combustiveis/precos/{termo}")
+    async def get_combustiveis_precos(termo: str) -> list[dict[str, Any]]:
+        from public_data_gateway.connectors.ambiental.anp_combustiveis import (
+            AnpCombustiveisConnector,
+        )
+
+        conn = AnpCombustiveisConnector(settings=app_settings)
+        return conn.get_anp_fuel_prices(termo)
+
+    @app.get("/api/v1/environment/combustiveis/vendas/{termo}")
+    async def get_combustiveis_vendas(termo: str) -> list[dict[str, Any]]:
+        from public_data_gateway.connectors.ambiental.anp_combustiveis import (
+            AnpCombustiveisConnector,
+        )
+
+        conn = AnpCombustiveisConnector(settings=app_settings)
+        return conn.get_anp_fuel_sales(termo)
+
+    @app.get("/api/v1/environment/combustiveis/postos/{id_municipio_or_name}")
+    async def get_combustiveis_postos(id_municipio_or_name: str) -> dict[str, Any]:
+        from public_data_gateway.connectors.ambiental.anp_combustiveis import (
+            AnpCombustiveisConnector,
+        )
+
+        conn = AnpCombustiveisConnector(settings=app_settings)
+        res = conn.get_anp_retail_network(id_municipio_or_name)
+        if res is None:
+            raise HTTPException(status_code=404, detail="ANP retail network metrics not found")
+        return res
+
+    @app.get("/api/v1/environment/combustiveis/municipio/{id_municipio_or_name}")
+    async def get_combustiveis_municipio(id_municipio_or_name: str) -> dict[str, Any]:
+        from public_data_gateway.connectors.ambiental.anp_combustiveis import (
+            AnpCombustiveisConnector,
+        )
+
+        conn = AnpCombustiveisConnector(settings=app_settings)
+        res = conn.get_anp_municipal_summary(id_municipio_or_name)
+        if res is None:
+            raise HTTPException(status_code=404, detail="ANP municipal fuel summary not found")
+        return res
+
+    @app.get("/api/v1/environment/combustiveis/features/{id_municipio_or_name}")
+    async def get_combustiveis_features(id_municipio_or_name: str) -> dict[str, Any]:
+        from public_data_gateway.connectors.ambiental.anp_combustiveis import (
+            AnpCombustiveisConnector,
+        )
+
+        conn = AnpCombustiveisConnector(settings=app_settings)
+        res = conn.get_anp_features(id_municipio_or_name)
+        if res is None:
+            raise HTTPException(status_code=404, detail="ANP Combustiveis Gold features not found")
+        return res
+
+    @app.get("/api/v1/environment/combustiveis/ranking")
+    async def get_combustiveis_ranking(
+        limit: int = Query(10, ge=1, le=50, description="Max municipalities to list"),
+        uf: str | None = Query(None, description="Optional 2-letter state filter"),
+        sort_by_biofuel: bool = Query(
+            False, description="Sort descending by biofuel share (%)"
+        ),
+    ) -> list[dict[str, Any]]:
+        from public_data_gateway.connectors.ambiental.anp_combustiveis import (
+            AnpCombustiveisConnector,
+        )
+
+        conn = AnpCombustiveisConnector(settings=app_settings)
+        return conn.list_top_anp_municipalities(limit=limit, sigla_uf=uf, sort_by_biofuel=sort_by_biofuel)
+
     @app.get("/api/v1/metaportals/datalake/top-municipalities")
     async def get_top_bd_municipalities(
         limit: int = Query(10, ge=1, le=50, description="Max municipalities to list"),

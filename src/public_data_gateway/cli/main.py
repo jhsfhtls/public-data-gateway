@@ -1485,6 +1485,36 @@ def build_parser() -> argparse.ArgumentParser:
     mmgd_rk_p.add_argument("--potencia", action="store_true", help="Sort descending by total installed MMGD power (kW)")
     mmgd_rk_p.add_argument("--json", action="store_true", help="Output in JSON format")
 
+    # ANP Combustíveis (LPC Preços, Vendas & Biocombustíveis) command group
+    comb_p = subparsers.add_parser("combustiveis", help="Query ANP weekly fuel prices, biofuel sales, gas stations, and competitiveness rankings.")
+    comb_sub = comb_p.add_subparsers(dest="combustiveis_action", required=True)
+
+    comb_pr_p = comb_sub.add_parser("precos", help="Lookup ANP weekly retail/distribution fuel prices by product, code, IBGE, UF, or city.")
+    comb_pr_p.add_argument("termo", help="Fuel product, survey code, IBGE code, UF, or municipality name")
+    comb_pr_p.add_argument("--json", action="store_true", help="Output in JSON format")
+
+    comb_vd_p = comb_sub.add_parser("vendas", help="Lookup ANP biofuel and petroleum derivative sales volume by code, category, IBGE, or UF.")
+    comb_vd_p.add_argument("termo", help="Sales code, fuel category, IBGE code, UF, or municipality name")
+    comb_vd_p.add_argument("--json", action="store_true", help="Output in JSON format")
+
+    comb_ps_p = comb_sub.add_parser("postos", help="Get municipal ANP authorized gas station network and PMQC fuel quality compliance.")
+    comb_ps_p.add_argument("id_municipio_or_name", help="7-digit IBGE code or municipality name")
+    comb_ps_p.add_argument("--json", action="store_true", help="Output in JSON format")
+
+    comb_mun_p = comb_sub.add_parser("municipio", help="Get consolidated municipal ANP fuel prices, ethanol parity ratio, and biofuel share.")
+    comb_mun_p.add_argument("id_municipio_or_name", help="7-digit IBGE code or municipality name")
+    comb_mun_p.add_argument("--json", action="store_true", help="Output in JSON format")
+
+    comb_ft_p = comb_sub.add_parser("features", help="Get Gold ANP Combustiveis competitiveness score and fuel matrix tier.")
+    comb_ft_p.add_argument("id_municipio_or_name", help="7-digit IBGE code or municipality name")
+    comb_ft_p.add_argument("--json", action="store_true", help="Output in JSON format")
+
+    comb_rk_p = comb_sub.add_parser("ranking", help="List municipalities ranked by fuel competitiveness score or biofuel share (%).")
+    comb_rk_p.add_argument("--limit", type=int, default=10, help="Max municipalities to list")
+    comb_rk_p.add_argument("--uf", type=str, help="Optional 2-letter state filter")
+    comb_rk_p.add_argument("--biocombustivel", action="store_true", help="Sort descending by biofuel share (%)")
+    comb_rk_p.add_argument("--json", action="store_true", help="Output in JSON format")
+
     # Datalake Público Federado (DuckDB / BigQuery) command group
     bd_p = subparsers.add_parser("datalake", help="Query Federated Public Datalake (DuckDB / BigQuery) coverage, thematic datasets, governance, SQL efficiency, and rankings.")
     bd_sub = bd_p.add_subparsers(dest="datalake_action", required=True)
@@ -5265,6 +5295,84 @@ def main(argv: Sequence[str] | None = None) -> int:
                     return 0
             except (ValueError, KeyError) as exc:
                 print(f"Erro ANEEL MMGD: {exc}", file=sys.stderr)
+                return 1
+
+        elif args.command == "combustiveis":
+            from public_data_gateway.connectors.ambiental.anp_combustiveis import (
+                AnpCombustiveisConnector,
+            )
+
+            anp_conn = AnpCombustiveisConnector()
+            anp_action = getattr(args, "combustiveis_action", "")
+            try:
+                if anp_action == "precos":
+                    rows = anp_conn.get_anp_fuel_prices(args.termo)
+                    if getattr(args, "json", False):
+                        print(json.dumps(rows, indent=2, ensure_ascii=False, default=str))
+                    else:
+                        print(f"ANP Preços LPC ({len(rows)}):")
+                        for r in rows:
+                            print(f"  {r.get('cod_coleta_anp')} | {r.get('nome_municipio')} ({r.get('sigla_uf')}): {r.get('produto_combustivel')} R$ {r.get('preco_medio_revenda_brl')}")
+                    return 0
+
+                if anp_action == "vendas":
+                    rows = anp_conn.get_anp_fuel_sales(args.termo)
+                    if getattr(args, "json", False):
+                        print(json.dumps(rows, indent=2, ensure_ascii=False, default=str))
+                    else:
+                        print(f"ANP Vendas Derivados ({len(rows)}):")
+                        for r in rows:
+                            print(f"  {r.get('cod_venda_uf_anp')} | {r.get('nome_municipio')} ({r.get('sigla_uf')}): {r.get('volume_vendido_m3')} m3")
+                    return 0
+
+                if anp_action == "postos":
+                    res = anp_conn.get_anp_retail_network(args.id_municipio_or_name)
+                    if res is None:
+                        print(f"Rede de postos ANP não encontrada para: {args.id_municipio_or_name}", file=sys.stderr)
+                        return 1
+                    if getattr(args, "json", False):
+                        print(json.dumps(res, indent=2, ensure_ascii=False, default=str))
+                    else:
+                        print(f"ANP Postos ({res.get('nome_municipio')} - {res.get('sigla_uf')}): {res.get('qtd_postos_ativos_anp')} postos | PMQC {res.get('taxa_conformidade_pmqc_pct')}%")
+                    return 0
+
+                if anp_action == "municipio":
+                    res = anp_conn.get_anp_municipal_summary(args.id_municipio_or_name)
+                    if res is None:
+                        print(f"Resumo ANP não encontrado para: {args.id_municipio_or_name}", file=sys.stderr)
+                        return 1
+                    if getattr(args, "json", False):
+                        print(json.dumps(res, indent=2, ensure_ascii=False, default=str))
+                    else:
+                        print(f"ANP Combustíveis Município ({res.get('nome_municipio')} - {res.get('sigla_uf')}): Gasolina R$ {res.get('preco_gasolina_brl')} | Diesel S10 R$ {res.get('preco_diesel_s10_brl')}")
+                    return 0
+
+                if anp_action == "features":
+                    res = anp_conn.get_anp_features(args.id_municipio_or_name)
+                    if res is None:
+                        print(f"Features ANP Combustíveis não encontradas para: {args.id_municipio_or_name}", file=sys.stderr)
+                        return 1
+                    if getattr(args, "json", False):
+                        print(json.dumps(res, indent=2, ensure_ascii=False, default=str))
+                    else:
+                        print(f"ANP Combustíveis Gold ({res.get('nome_municipio')} - {res.get('id_municipio')}): Score {res.get('score_competitividade_combustiveis_bio')} | {res.get('tier_matriz_combustiveis_anp')}")
+                    return 0
+
+                if anp_action == "ranking":
+                    ranks = anp_conn.list_top_anp_municipalities(
+                        limit=getattr(args, "limit", 10),
+                        sigla_uf=getattr(args, "uf", None),
+                        sort_by_biofuel=getattr(args, "biocombustivel", False),
+                    )
+                    if getattr(args, "json", False):
+                        print(json.dumps(ranks, indent=2, ensure_ascii=False, default=str))
+                    else:
+                        print(f"Ranking ANP Combustíveis ({len(ranks)}):")
+                        for idx, r in enumerate(ranks, 1):
+                            print(f"  {idx}. {r.get('nome_municipio')} ({r.get('sigla_uf')}): {r.get('score_competitividade_combustiveis_bio')} | {r.get('tier_matriz_combustiveis_anp')}")
+                    return 0
+            except (ValueError, KeyError) as exc:
+                print(f"Erro ANP Combustíveis: {exc}", file=sys.stderr)
                 return 1
 
         elif args.command == "datalake":

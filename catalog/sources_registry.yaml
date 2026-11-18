@@ -1787,3 +1787,34 @@ sources:
   status: HOMOLOGATED
   freshness_sla_hours: 168
   cron_schedule_expression: 0 4 * * 1
+- source_id: anp_combustiveis
+  name: 'ANP Combustíveis: Levantamento de Preços, Margens & Biocombustíveis'
+  agency: Agência Nacional do Petróleo, Gás Natural e Biocombustíveis (ANP)
+  official_url: https://www.gov.br/anp/pt-br/assuntos/precos-e-defesa-da-concorrencia/precos/levantamento-de-precos-de-combustiveis-ultimas-semanas-pesquisadas
+  segment_id: 11_agronegocio_meio_ambiente
+  segment_name: Agronegócio, Terra & Meio Ambiente
+  access_mode: LAKEHOUSE_BATCH
+  protocol: HTTP_BULK_ZIP
+  auth_type: NONE
+  canonical_keys:
+  - id_municipio
+  - sigla_uf
+  update_frequency: Semanal (LPC Preços) / Mensal (Vendas Derivados & PMQC)
+  estimated_volume: ~45 milhões de registros de coleta semanal de preços, margens e vendas de biocombustíveis (~950 MB)
+  lgpd_tier: PUBLIC_NON_PERSONAL
+  ml_feature_domains:
+  - fuel_price_logistics_diesel
+  - biofuel_ethanol_biodiesel_share
+  - retail_fuel_station_pmqc
+  solution_packs:
+  - P01
+  - P02
+  - P05
+  - P06
+  - P08
+  - P09
+  rice_score: 890
+  roadmap_wave: 2
+  status: HOMOLOGATED
+  freshness_sla_hours: 168
+  cron_schedule_expression: 0 5 * * 1

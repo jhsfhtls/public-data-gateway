@@ -677,3 +677,64 @@ models:
       - name: tier_maturidade_solar_mmgd
         description: "Tier municipal de maturidade solar e renovável (POLO_SOLAR_MMGD_AVANCADO, EXPANSAO_RENOVAVEL_CONSOLIDADA ou TRANSICAO_MMGD_EMERGENTE)."
         tests: [not_null]
+
+  - name: mart_combustiveis_biocombustiveis_anp_brasil
+    description: "Data Mart Gold intra-domínio consolidando preços LPC ANP, paridade etanol/gasolina, penetração de biocombustíveis e conformidade PMQC."
+    columns:
+      - name: id_municipio
+        description: "Código IBGE de 7 dígitos do município (STRING)."
+        tests: [not_null, unique]
+      - name: sigla_uf
+        description: "Sigla de 2 letras da Unidade Federativa (UF)."
+        tests: [not_null]
+      - name: nome_municipio
+        description: "Nome oficial do município."
+        tests: [not_null]
+      - name: preco_gasolina_brl
+        description: "Preço médio municipal da Gasolina Comum (BRL/litro)."
+        tests: [not_null]
+      - name: preco_etanol_brl
+        description: "Preço médio municipal do Etanol Hidratado (BRL/litro)."
+        tests: [not_null]
+      - name: preco_diesel_s10_brl
+        description: "Preço médio municipal do Óleo Diesel S10 logístico (BRL/litro)."
+        tests: [not_null]
+      - name: razao_etanol_gasolina_pct
+        description: "Paridade de preço Etanol / Gasolina comum (%)."
+        tests: [not_null]
+      - name: participacao_biocombustivel_pct
+        description: "Participação percentual de biocombustíveis renováveis na matriz local (%)."
+        tests: [not_null]
+      - name: volume_diesel_m3
+        description: "Volume de diesel S10 comercializado no município (m3)."
+        tests: [not_null]
+      - name: qtd_postos_ativos_anp
+        description: "Total de postos revendedores ativos homologados pela ANP."
+        tests: [not_null]
+      - name: participacao_bandeira_branca_pct
+        description: "Participação percentual de postos bandeira branca (%)."
+        tests: [not_null]
+      - name: taxa_conformidade_pmqc_pct
+        description: "Percentual de aprovação no Programa de Monitoramento da Qualidade dos Combustíveis (PMQC)."
+        tests: [not_null]
+      - name: capacidade_armazenagem_m3
+        description: "Capacidade nominal de armazenagem em tanques na rede varejista (m3)."
+        tests: [not_null]
+      - name: volume_biocombustivel_m3
+        description: "Volume comercializado em etanol e biodiesel B14 no município (m3)."
+        tests: [not_null]
+      - name: volume_total_comercializado_m3
+        description: "Volume agregado de combustíveis comercializados na amostra ANP (m3)."
+        tests: [not_null]
+      - name: qtd_produtos_coletados_anp
+        description: "Quantidade de produtos combustíveis amostrados no LPC semanal ANP."
+        tests: [not_null]
+      - name: margem_media_revenda_brl
+        description: "Margem média de revenda observada nos postos amostrados (BRL/litro)."
+        tests: [not_null]
+      - name: score_competitividade_combustiveis_bio
+        description: "Score sintético municipal de competitividade logística e adoção de biocombustíveis ANP (0-100)."
+        tests: [not_null]
+      - name: tier_matriz_combustiveis_anp
+        description: "Classificação municipal da matriz de combustíveis (POLO_BIOCOMBUSTIVEL_COMPETITIVO, MERCADO_EQUILIBRADO_DERIVADOS ou ALTA_PRESSAO_CUSTO_LOGISTICO)."
+        tests: [not_null]
