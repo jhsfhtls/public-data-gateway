@@ -662,6 +662,56 @@ class ComplianceFacade:
             limit=limit, sigla_uf=sigla_uf, sort_by_payroll=sort_by_payroll
         )
 
+    @property
+    def tse_eleicoes_connector(self) -> Any:
+        if (
+            not hasattr(self, "_tse_eleicoes_connector")
+            or self._tse_eleicoes_connector is None
+        ):
+            from public_data_gateway.connectors.compliance.tse_eleicoes import (
+                TseEleicoesConnector,
+            )
+
+            self._tse_eleicoes_connector = TseEleicoesConnector(
+                settings=self._sdk.settings
+            )
+        return self._tse_eleicoes_connector
+
+    def get_tse_candidacies(self, termo: str) -> list[dict[str, Any]]:
+        """Lookup TSE municipal candidacies by election code, office, IBGE, UF, or city."""
+        return self.tse_eleicoes_connector.get_candidacies(termo)
+
+    def get_tse_turnout(self, termo: str) -> list[dict[str, Any]]:
+        """Lookup TSE municipal electorate, turnout, abstention, and valid votes."""
+        return self.tse_eleicoes_connector.get_turnout_stats(termo)
+
+    def get_tse_campaign_finance(
+        self, id_municipio_or_name: str
+    ) -> dict[str, Any] | None:
+        """Retrieve TSE campaign revenue, spending, approval rate, and distinct donors."""
+        return self.tse_eleicoes_connector.get_campaign_finance(id_municipio_or_name)
+
+    def get_tse_municipal_summary(
+        self, id_municipio_or_name: str
+    ) -> dict[str, Any] | None:
+        """Retrieve consolidated municipal TSE electorate, candidacies, and campaign cost."""
+        return self.tse_eleicoes_connector.get_electoral_summary(id_municipio_or_name)
+
+    def get_tse_features(self, id_municipio_or_name: str) -> dict[str, Any] | None:
+        """Retrieve Gold TSE electoral participation and integrity score and tier."""
+        return self.tse_eleicoes_connector.get_electoral_features(id_municipio_or_name)
+
+    def list_top_tse_municipalities(
+        self,
+        limit: int = 10,
+        sigla_uf: str | None = None,
+        sort_by_electorate: bool = False,
+    ) -> list[dict[str, Any]]:
+        """List municipalities ranked by TSE electoral integrity score or electorate size."""
+        return self.tse_eleicoes_connector.list_top_electoral_municipalities(
+            limit=limit, sigla_uf=sigla_uf, sort_by_electorate=sort_by_electorate
+        )
+
 
 class JudicialFacade:
     """Judicial proceedings, procedural metadata and litigation risk interface (CNJ DataJud)."""
@@ -3681,6 +3731,41 @@ class BrazilData:
         """Listar municípios ranqueados por integridade funcional SIAPE ou maior folha salarial federal."""
         return self.compliance.list_top_siape_municipalities(
             limit=limit, sigla_uf=sigla_uf, sort_by_payroll=sort_by_payroll
+        )
+
+    def get_tse_candidacies(self, termo: str) -> list[dict[str, Any]]:
+        """Consultar candidaturas e pluralismo partidário TSE por código, cargo, IBGE, UF ou município."""
+        return self.compliance.get_tse_candidacies(termo)
+
+    def get_tse_turnout(self, termo: str) -> list[dict[str, Any]]:
+        """Consultar eleitorado apto, comparecimento, abstenção e votos válidos TSE por município."""
+        return self.compliance.get_tse_turnout(termo)
+
+    def get_tse_campaign_finance(
+        self, id_municipio_or_name: str
+    ) -> dict[str, Any] | None:
+        """Consultar prestação de contas, receitas e doadores distintos de campanha TSE."""
+        return self.compliance.get_tse_campaign_finance(id_municipio_or_name)
+
+    def get_tse_municipal_summary(
+        self, id_municipio_or_name: str
+    ) -> dict[str, Any] | None:
+        """Consultar consolidado municipal TSE de eleitorado, candidaturas e custo por eleitor."""
+        return self.compliance.get_tse_municipal_summary(id_municipio_or_name)
+
+    def get_tse_features(self, id_municipio_or_name: str) -> dict[str, Any] | None:
+        """Consultar features Gold TSE de maturidade e integridade eleitoral."""
+        return self.compliance.get_tse_features(id_municipio_or_name)
+
+    def list_top_tse_municipalities(
+        self,
+        limit: int = 10,
+        sigla_uf: str | None = None,
+        sort_by_electorate: bool = False,
+    ) -> list[dict[str, Any]]:
+        """Listar municípios ranqueados por maturidade eleitoral TSE ou tamanho do eleitorado."""
+        return self.compliance.list_top_tse_municipalities(
+            limit=limit, sigla_uf=sigla_uf, sort_by_electorate=sort_by_electorate
         )
 
     def get_litigation_risk(self, cnpj_or_cpf: str) -> dict[str, Any]:

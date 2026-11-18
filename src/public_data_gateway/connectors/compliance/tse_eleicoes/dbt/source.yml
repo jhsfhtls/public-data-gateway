@@ -1,0 +1,26 @@
+version: 2
+
+sources:
+  - name: tse_eleicoes
+    description: "Tabelas Silver de Candidaturas, Votação, Comparecimento e Prestação de Contas Eleitorais (TSE Dados Abertos)"
+    meta:
+      agency: "Tribunal Superior Eleitoral (TSE)"
+      domain: "compliance_eleicoes_tse"
+      freshness_sla: "Bienal / Contínua (720h)"
+    tables:
+      - name: tse_candidaturas_partidos_municipio
+        description: "Candidaturas aptas e pluralismo partidário por cargo eletivo municipal e município"
+        meta:
+          external_location: "data/tse_eleicoes/silver/tse_candidaturas_partidos_municipio.parquet"
+      - name: tse_votacao_comparecimento_secao
+        description: "Eleitorado apto, comparecimento às urnas, abstenção e votos válidos por município"
+        meta:
+          external_location: "data/tse_eleicoes/silver/tse_votacao_comparecimento_secao.parquet"
+      - name: tse_prestacao_contas_campanha
+        description: "Receitas e despesas contratadas de campanha, aprovação de contas e doadores distintos"
+        meta:
+          external_location: "data/tse_eleicoes/silver/tse_prestacao_contas_campanha.parquet"
+      - name: tse_eleicoes_resumo_municipal
+        description: "Consolidado municipal de eleitorado, candidaturas e custo de campanha por eleitor"
+        meta:
+          external_location: "data/tse_eleicoes/silver/tse_eleicoes_resumo_municipal.parquet"

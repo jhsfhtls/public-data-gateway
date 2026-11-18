@@ -504,6 +504,36 @@ def build_parser() -> argparse.ArgumentParser:
     sp_rk_p.add_argument("--folha", action="store_true", help="Sort descending by monthly gross SIAPE payroll (R$ mil)")
     sp_rk_p.add_argument("--json", action="store_true", help="Output in JSON format")
 
+    # TSE Dados Abertos Eleitorais command group
+    tse_p = subparsers.add_parser("eleicoes-tse", help="Query TSE open electoral data: candidacies, turnout, campaign finance, and integrity rankings.")
+    tse_sub = tse_p.add_subparsers(dest="eleicoes_tse_action", required=True)
+
+    tse_cand_p = tse_sub.add_parser("candidaturas", help="Lookup TSE candidacies and party competition by election code, office, IBGE, UF, or city.")
+    tse_cand_p.add_argument("termo", help="Election code, office, IBGE code, UF, or municipality name")
+    tse_cand_p.add_argument("--json", action="store_true", help="Output in JSON format")
+
+    tse_vot_p = tse_sub.add_parser("votacao", help="Lookup TSE electorate, turnout, abstention, and valid votes by code, IBGE, UF, or city.")
+    tse_vot_p.add_argument("termo", help="Voting code, IBGE code, UF, or municipality name")
+    tse_vot_p.add_argument("--json", action="store_true", help="Output in JSON format")
+
+    tse_ct_p = tse_sub.add_parser("contas", help="Get municipal TSE campaign revenue, spending, approval rate, and distinct donors.")
+    tse_ct_p.add_argument("id_municipio_or_name", help="7-digit IBGE code or municipality name")
+    tse_ct_p.add_argument("--json", action="store_true", help="Output in JSON format")
+
+    tse_mn_p = tse_sub.add_parser("municipio", help="Get consolidated municipal TSE electorate, candidacies, and campaign cost per voter.")
+    tse_mn_p.add_argument("id_municipio_or_name", help="7-digit IBGE code or municipality name")
+    tse_mn_p.add_argument("--json", action="store_true", help="Output in JSON format")
+
+    tse_ft_p = tse_sub.add_parser("features", help="Get Gold TSE electoral integrity score and maturity tier.")
+    tse_ft_p.add_argument("id_municipio_or_name", help="7-digit IBGE code or municipality name")
+    tse_ft_p.add_argument("--json", action="store_true", help="Output in JSON format")
+
+    tse_rk_p = tse_sub.add_parser("ranking", help="List municipalities ranked by TSE electoral integrity score or electorate size.")
+    tse_rk_p.add_argument("--limit", type=int, default=10, help="Max municipalities to list")
+    tse_rk_p.add_argument("--uf", type=str, help="Optional 2-letter state filter")
+    tse_rk_p.add_argument("--eleitorado", action="store_true", help="Sort descending by eligible electorate count")
+    tse_rk_p.add_argument("--json", action="store_true", help="Output in JSON format")
+
     # Subcommand: improbidade (CNJ CNCIAI Improbidade Administrativa)
     imp_p = subparsers.add_parser(
         "improbidade",
@@ -3253,6 +3283,84 @@ def main(argv: Sequence[str] | None = None) -> int:
                     return 0
             except (ValueError, KeyError) as exc:
                 print(f"Erro CGU/SIAPE Servidores: {exc}", file=sys.stderr)
+                return 1
+
+        elif args.command == "eleicoes-tse":
+            from public_data_gateway.connectors.compliance.tse_eleicoes import (
+                TseEleicoesConnector,
+            )
+
+            tse_conn = TseEleicoesConnector()
+            tse_action = getattr(args, "eleicoes_tse_action", "")
+            try:
+                if tse_action == "candidaturas":
+                    rows = tse_conn.get_candidacies(args.termo)
+                    if getattr(args, "json", False):
+                        print(json.dumps(rows, indent=2, ensure_ascii=False, default=str))
+                    else:
+                        print(f"TSE Candidaturas ({len(rows)}):")
+                        for r in rows:
+                            print(f"  {r.get('cod_eleicao_tse')} | {r.get('nome_municipio')} ({r.get('sigla_uf')}): {r.get('cargo_disputado')} | {r.get('qtd_candidaturas_aptas')} cand")
+                    return 0
+
+                if tse_action == "votacao":
+                    rows = tse_conn.get_turnout_stats(args.termo)
+                    if getattr(args, "json", False):
+                        print(json.dumps(rows, indent=2, ensure_ascii=False, default=str))
+                    else:
+                        print(f"TSE Comparecimento & Votação ({len(rows)}):")
+                        for r in rows:
+                            print(f"  {r.get('cod_votacao_tse')} | {r.get('nome_municipio')} ({r.get('sigla_uf')}): {r.get('comparecimento_pct')}% comparecimento")
+                    return 0
+
+                if tse_action == "contas":
+                    res = tse_conn.get_campaign_finance(args.id_municipio_or_name)
+                    if res is None:
+                        print(f"Prestação de contas TSE não encontrada para: {args.id_municipio_or_name}", file=sys.stderr)
+                        return 1
+                    if getattr(args, "json", False):
+                        print(json.dumps(res, indent=2, ensure_ascii=False, default=str))
+                    else:
+                        print(f"TSE Contas de Campanha ({res.get('nome_municipio')} - {res.get('sigla_uf')}): R$ {res.get('receita_total_campanha_mil_brl')}k | Aprovadas {res.get('contas_aprovadas_pct')}%")
+                    return 0
+
+                if tse_action == "municipio":
+                    res = tse_conn.get_electoral_summary(args.id_municipio_or_name)
+                    if res is None:
+                        print(f"Resumo eleitoral TSE não encontrado para: {args.id_municipio_or_name}", file=sys.stderr)
+                        return 1
+                    if getattr(args, "json", False):
+                        print(json.dumps(res, indent=2, ensure_ascii=False, default=str))
+                    else:
+                        print(f"TSE Município ({res.get('nome_municipio')} - {res.get('sigla_uf')}): {res.get('eleitorado_apto_total')} eleitores | R$ {res.get('custo_por_eleitor_brl')}/eleitor")
+                    return 0
+
+                if tse_action == "features":
+                    res = tse_conn.get_electoral_features(args.id_municipio_or_name)
+                    if res is None:
+                        print(f"Features TSE não encontradas para: {args.id_municipio_or_name}", file=sys.stderr)
+                        return 1
+                    if getattr(args, "json", False):
+                        print(json.dumps(res, indent=2, ensure_ascii=False, default=str))
+                    else:
+                        print(f"TSE Gold ({res.get('nome_municipio')} - {res.get('id_municipio')}): Score {res.get('score_integridade_eleitoral_tse')} | {res.get('tier_maturidade_eleitoral_tse')}")
+                    return 0
+
+                if tse_action == "ranking":
+                    ranks = tse_conn.list_top_electoral_municipalities(
+                        limit=getattr(args, "limit", 10),
+                        sigla_uf=getattr(args, "uf", None),
+                        sort_by_electorate=getattr(args, "eleitorado", False),
+                    )
+                    if getattr(args, "json", False):
+                        print(json.dumps(ranks, indent=2, ensure_ascii=False, default=str))
+                    else:
+                        print(f"Ranking TSE Integridade Eleitoral ({len(ranks)}):")
+                        for idx, r in enumerate(ranks, 1):
+                            print(f"  {idx}. {r.get('nome_municipio')} ({r.get('sigla_uf')}): {r.get('score_integridade_eleitoral_tse')} | {r.get('tier_maturidade_eleitoral_tse')}")
+                    return 0
+            except (ValueError, KeyError) as exc:
+                print(f"Erro TSE Eleições: {exc}", file=sys.stderr)
                 return 1
 
         elif args.command == "improbidade":

@@ -1373,6 +1373,86 @@ def create_app(settings: GatewaySettings | None = None) -> FastAPI:
             limit=limit, sigla_uf=uf, sort_by_payroll=sort_by_payroll
         )
 
+    # 15G. TSE Dados Abertos Eleitorais (Candidaturas, Votação & Prestação de Contas)
+    @app.get("/api/v1/compliance/eleicoes-tse/candidaturas/{termo}")
+    async def get_eleicoes_tse_candidaturas(termo: str) -> list[dict[str, Any]]:
+        from public_data_gateway.connectors.compliance.tse_eleicoes import (
+            TseEleicoesConnector,
+        )
+
+        return TseEleicoesConnector(settings=app_settings).get_candidacies(termo)
+
+    @app.get("/api/v1/compliance/eleicoes-tse/votacao/{termo}")
+    async def get_eleicoes_tse_votacao(termo: str) -> list[dict[str, Any]]:
+        from public_data_gateway.connectors.compliance.tse_eleicoes import (
+            TseEleicoesConnector,
+        )
+
+        return TseEleicoesConnector(settings=app_settings).get_turnout_stats(termo)
+
+    @app.get("/api/v1/compliance/eleicoes-tse/contas/{id_municipio_or_name}")
+    async def get_eleicoes_tse_contas(id_municipio_or_name: str) -> dict[str, Any]:
+        from public_data_gateway.connectors.compliance.tse_eleicoes import (
+            TseEleicoesConnector,
+        )
+
+        res = TseEleicoesConnector(settings=app_settings).get_campaign_finance(
+            id_municipio_or_name
+        )
+        if res is None:
+            raise HTTPException(
+                status_code=404, detail="TSE campaign finance metrics not found"
+            )
+        return res
+
+    @app.get("/api/v1/compliance/eleicoes-tse/municipio/{id_municipio_or_name}")
+    async def get_eleicoes_tse_municipio(id_municipio_or_name: str) -> dict[str, Any]:
+        from public_data_gateway.connectors.compliance.tse_eleicoes import (
+            TseEleicoesConnector,
+        )
+
+        res = TseEleicoesConnector(settings=app_settings).get_electoral_summary(
+            id_municipio_or_name
+        )
+        if res is None:
+            raise HTTPException(
+                status_code=404, detail="TSE municipal electoral summary not found"
+            )
+        return res
+
+    @app.get("/api/v1/compliance/eleicoes-tse/features/{id_municipio_or_name}")
+    async def get_eleicoes_tse_features(id_municipio_or_name: str) -> dict[str, Any]:
+        from public_data_gateway.connectors.compliance.tse_eleicoes import (
+            TseEleicoesConnector,
+        )
+
+        res = TseEleicoesConnector(settings=app_settings).get_electoral_features(
+            id_municipio_or_name
+        )
+        if res is None:
+            raise HTTPException(
+                status_code=404, detail="TSE Gold electoral features not found"
+            )
+        return res
+
+    @app.get("/api/v1/compliance/eleicoes-tse/ranking")
+    async def get_eleicoes_tse_ranking(
+        limit: int = Query(10, ge=1, le=50, description="Max municipalities to list"),
+        uf: str | None = Query(None, description="Optional 2-letter state filter"),
+        sort_by_electorate: bool = Query(
+            False, description="Sort descending by eligible electorate count"
+        ),
+    ) -> list[dict[str, Any]]:
+        from public_data_gateway.connectors.compliance.tse_eleicoes import (
+            TseEleicoesConnector,
+        )
+
+        return TseEleicoesConnector(
+            settings=app_settings
+        ).list_top_electoral_municipalities(
+            limit=limit, sigla_uf=uf, sort_by_electorate=sort_by_electorate
+        )
+
     # 15D. CNJ Improbidade Administrativa (CNCIAI)
     @app.get("/api/v1/judicial/improbidade/condenacoes/{documento_or_name}")
     async def get_improbidade_condenacoes(

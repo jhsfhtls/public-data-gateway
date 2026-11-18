@@ -659,6 +659,51 @@ class MCPDispatcher:
                                 },
                             },
                             {
+                                "name": "bdg_get_tse_candidaturas",
+                                "description": "Lookup TSE municipal candidacies and party competition by election code, office, IBGE, UF, or city.",
+                                "inputSchema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "termo": {"type": "string", "description": "Election code, office, IBGE 7-digit code, UF, or municipality name"},
+                                    },
+                                    "required": ["termo"],
+                                },
+                            },
+                            {
+                                "name": "bdg_get_tse_votacao",
+                                "description": "Lookup TSE municipal electorate, turnout, abstention, and valid votes by code, IBGE, UF, or city.",
+                                "inputSchema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "termo": {"type": "string", "description": "Voting code, IBGE 7-digit code, UF, or municipality name"},
+                                    },
+                                    "required": ["termo"],
+                                },
+                            },
+                            {
+                                "name": "bdg_get_tse_features",
+                                "description": "Get normalized Gold TSE electoral integrity score, turnout, campaign approval rate, and maturity tier.",
+                                "inputSchema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "id_municipio_or_name": {"type": "string", "description": "7-digit IBGE municipality code or municipality name"},
+                                    },
+                                    "required": ["id_municipio_or_name"],
+                                },
+                            },
+                            {
+                                "name": "bdg_list_top_tse_municipalities",
+                                "description": "List Brazilian municipalities ranked by TSE electoral integrity score or eligible electorate size.",
+                                "inputSchema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "limit": {"type": "integer", "description": "Maximum rows (default: 10)"},
+                                        "sigla_uf": {"type": "string", "description": "Optional 2-letter state filter (e.g. SP)"},
+                                        "sort_by_electorate": {"type": "boolean", "description": "Set true to rank municipalities by highest eligible electorate first"},
+                                    },
+                                },
+                            },
+                            {
                                 "name": "bdg_get_cnciai_improbidade_condemnations",
                                 "description": "Query CNJ CNCIAI administrative misconduct condemnations by document, party name, or IBGE code (Tier 1).",
                                 "inputSchema": {
@@ -4592,6 +4637,65 @@ class MCPDispatcher:
                     },
                 }
             wrapped = wrap_untrusted_gov_data(result, source_id="cgu_servidores_federais")
+            return {
+                "jsonrpc": "2.0",
+                "id": req_id,
+                "result": {"content": [{"type": "text", "text": wrapped}], "isError": False},
+            }
+
+        if tool_name in {
+            "bdg_get_tse_candidaturas",
+            "bdg_get_tse_votacao",
+            "bdg_get_tse_features",
+            "bdg_list_top_tse_municipalities",
+        }:
+            from public_data_gateway.connectors.compliance.tse_eleicoes import (
+                TseEleicoesConnector,
+            )
+
+            connector = TseEleicoesConnector(settings=self.settings)
+            try:
+                if tool_name == "bdg_get_tse_candidaturas":
+                    result: Any = connector.get_candidacies(str(args.get("termo", "")))
+                elif tool_name == "bdg_get_tse_votacao":
+                    result = connector.get_turnout_stats(str(args.get("termo", "")))
+                elif tool_name == "bdg_get_tse_features":
+                    result = connector.get_electoral_features(
+                        str(args.get("id_municipio_or_name", ""))
+                    )
+                else:
+                    result = connector.list_top_electoral_municipalities(
+                        limit=int(args.get("limit", 10)),
+                        sigla_uf=args.get("sigla_uf"),
+                        sort_by_electorate=bool(args.get("sort_by_electorate", False)),
+                    )
+            except (ValueError, KeyError) as exc:
+                return {
+                    "jsonrpc": "2.0",
+                    "id": req_id,
+                    "result": {
+                        "content": [
+                            {"type": "text", "text": f"TSE Eleições parameter error: {exc}"}
+                        ],
+                        "isError": True,
+                    },
+                }
+
+            if not result:
+                return {
+                    "jsonrpc": "2.0",
+                    "id": req_id,
+                    "result": {
+                        "content": [
+                            {
+                                "type": "text",
+                                "text": "No TSE electoral data found for the query.",
+                            }
+                        ],
+                        "isError": True,
+                    },
+                }
+            wrapped = wrap_untrusted_gov_data(result, source_id="tse_eleicoes")
             return {
                 "jsonrpc": "2.0",
                 "id": req_id,
