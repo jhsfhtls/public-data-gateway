@@ -766,6 +766,64 @@ class ComplianceFacade:
             limit=limit, sigla_uf=sigla_uf, sort_by_electorate=sort_by_electorate
         )
 
+    @property
+    def cgu_beneficios_connector(self) -> Any:
+        if (
+            not hasattr(self, "_cgu_beneficios_connector")
+            or self._cgu_beneficios_connector is None
+        ):
+            from public_data_gateway.connectors.compliance.cgu_beneficios_cidadao import (
+                CguBeneficiosCidadaoConnector,
+            )
+
+            self._cgu_beneficios_connector = CguBeneficiosCidadaoConnector(
+                settings=self._sdk.settings
+            )
+        return self._cgu_beneficios_connector
+
+    def get_cgu_bolsa_familia_payments(self, termo: str) -> list[dict[str, Any]]:
+        """Lookup CGU Novo Bolsa Família & BPC tracks by code, program, channel, IBGE, UF, or city."""
+        return self.cgu_beneficios_connector.get_cgu_bolsa_familia_payments(termo)
+
+    def get_cgu_bpc_loas_benefits(self, termo: str) -> list[dict[str, Any]]:
+        """Lookup BPC/LOAS continuous benefits, Auxílio Gás, and CadÚnico poverty coverage."""
+        return self.cgu_beneficios_connector.get_cgu_bpc_loas_benefits(termo)
+
+    def get_cgu_defeso_safra_aid(
+        self, id_municipio_or_name: str
+    ) -> dict[str, Any] | None:
+        """Retrieve municipal Seguro-Defeso, Garantia-Safra, and CGU audit alerts."""
+        return self.cgu_beneficios_connector.get_cgu_defeso_safra_aid(
+            id_municipio_or_name
+        )
+
+    def get_cgu_beneficios_summary(
+        self, id_municipio_or_name: str
+    ) -> dict[str, Any] | None:
+        """Retrieve consolidated municipal CGU social transfers, families served, and CadÚnico reach."""
+        return self.cgu_beneficios_connector.get_cgu_beneficios_summary(
+            id_municipio_or_name
+        )
+
+    def get_cgu_beneficios_features(
+        self, id_municipio_or_name: str
+    ) -> dict[str, Any] | None:
+        """Retrieve Gold CGU social protection efficiency score and citizen safety-net tier."""
+        return self.cgu_beneficios_connector.get_cgu_beneficios_features(
+            id_municipio_or_name
+        )
+
+    def list_top_cgu_beneficios_municipalities(
+        self,
+        limit: int = 10,
+        sigla_uf: str | None = None,
+        sort_by_volume: bool = False,
+    ) -> list[dict[str, Any]]:
+        """List municipalities ranked by CGU social protection efficiency or monthly transfer volume."""
+        return self.cgu_beneficios_connector.list_top_cgu_beneficios_municipalities(
+            limit=limit, sigla_uf=sigla_uf, sort_by_volume=sort_by_volume
+        )
+
 
 class JudicialFacade:
     """Judicial proceedings, procedural metadata and litigation risk interface (CNJ DataJud)."""
@@ -4370,6 +4428,43 @@ class BrazilData:
         """Listar municípios ranqueados por maturidade eleitoral TSE ou tamanho do eleitorado."""
         return self.compliance.list_top_tse_municipalities(
             limit=limit, sigla_uf=sigla_uf, sort_by_electorate=sort_by_electorate
+        )
+
+    def get_cgu_bolsa_familia_payments(self, termo: str) -> list[dict[str, Any]]:
+        """Consultar folha Novo Bolsa Família e BPC/LOAS CGU por código, programa, IBGE, UF ou cidade."""
+        return self.compliance.get_cgu_bolsa_familia_payments(termo)
+
+    def get_cgu_bpc_loas_benefits(self, termo: str) -> list[dict[str, Any]]:
+        """Consultar benefícios continuados BPC/LOAS, Auxílio Gás e cobertura CadÚnico municipal."""
+        return self.compliance.get_cgu_bpc_loas_benefits(termo)
+
+    def get_cgu_defeso_safra_aid(
+        self, id_municipio_or_name: str
+    ) -> dict[str, Any] | None:
+        """Consultar repasses rurais Seguro-Defeso, Garantia-Safra e trilhas de elegibilidade CGU."""
+        return self.compliance.get_cgu_defeso_safra_aid(id_municipio_or_name)
+
+    def get_cgu_beneficios_summary(
+        self, id_municipio_or_name: str
+    ) -> dict[str, Any] | None:
+        """Consultar consolidado municipal CGU de famílias beneficiárias, BPC e volume mensal."""
+        return self.compliance.get_cgu_beneficios_summary(id_municipio_or_name)
+
+    def get_cgu_beneficios_features(
+        self, id_municipio_or_name: str
+    ) -> dict[str, Any] | None:
+        """Consultar features Gold CGU de eficácia de proteção social e integridade CadÚnico."""
+        return self.compliance.get_cgu_beneficios_features(id_municipio_or_name)
+
+    def list_top_cgu_beneficios_municipalities(
+        self,
+        limit: int = 10,
+        sigla_uf: str | None = None,
+        sort_by_volume: bool = False,
+    ) -> list[dict[str, Any]]:
+        """Listar municípios ranqueados por eficácia de proteção social CGU ou volume mensal."""
+        return self.compliance.list_top_cgu_beneficios_municipalities(
+            limit=limit, sigla_uf=sigla_uf, sort_by_volume=sort_by_volume
         )
 
     def get_litigation_risk(self, cnpj_or_cpf: str) -> dict[str, Any]:

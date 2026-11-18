@@ -34,6 +34,7 @@ import public_data_gateway.connectors.ambiental.sfb_sicar  # noqa: F401
 import public_data_gateway.connectors.comercio_exterior.mdic_comexstat  # noqa: F401
 import public_data_gateway.connectors.compliance.bgpview_ip_intel  # noqa: F401
 import public_data_gateway.connectors.compliance.camara_senado_dados_abertos  # noqa: F401
+import public_data_gateway.connectors.compliance.cgu_beneficios_cidadao  # noqa: F401
 import public_data_gateway.connectors.compliance.cgu_ceis_cnep  # noqa: F401
 import public_data_gateway.connectors.compliance.cgu_pep  # noqa: F401
 import public_data_gateway.connectors.compliance.cgu_servidores_federais  # noqa: F401

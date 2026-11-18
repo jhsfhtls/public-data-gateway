@@ -659,6 +659,51 @@ class MCPDispatcher:
                                 },
                             },
                             {
+                                "name": "bdg_get_cgu_bolsa_familia_payments",
+                                "description": "Lookup CGU Novo Bolsa Família & BPC payroll tracks by program code, track, payment channel, IBGE, UF, or city.",
+                                "inputSchema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "termo": {"type": "string", "description": "Program code, benefit name, payment mode, IBGE code, UF, or city"},
+                                    },
+                                    "required": ["termo"],
+                                },
+                            },
+                            {
+                                "name": "bdg_get_cgu_bpc_loas_benefits",
+                                "description": "Lookup BPC/LOAS continuous social benefits, Auxílio Gás, and CadÚnico poverty coverage by IBGE, UF, or city.",
+                                "inputSchema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "termo": {"type": "string", "description": "BPC code, IBGE code, UF, or municipality name"},
+                                    },
+                                    "required": ["termo"],
+                                },
+                            },
+                            {
+                                "name": "bdg_get_cgu_beneficios_features",
+                                "description": "Get normalized Gold CGU social protection efficiency score, CadÚnico coverage, and safety-net tier.",
+                                "inputSchema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "id_municipio_or_name": {"type": "string", "description": "7-digit IBGE municipality code or municipality name"},
+                                    },
+                                    "required": ["id_municipio_or_name"],
+                                },
+                            },
+                            {
+                                "name": "bdg_list_top_cgu_beneficios_municipalities",
+                                "description": "List Brazilian municipalities ranked by CGU social protection efficiency score or monthly transfer volume (R$ mil).",
+                                "inputSchema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "limit": {"type": "integer", "description": "Maximum rows (default: 10)"},
+                                        "sigla_uf": {"type": "string", "description": "Optional 2-letter state filter (e.g. SP)"},
+                                        "sort_by_volume": {"type": "boolean", "description": "Set true to rank municipalities by highest monthly social transfer volume first"},
+                                    },
+                                },
+                            },
+                            {
                                 "name": "bdg_get_cgu_servidores_lotacao",
                                 "description": "Lookup SIAPE federal civil servants by code, agency, legal regime, IBGE, UF, or city.",
                                 "inputSchema": {
@@ -5150,6 +5195,69 @@ class MCPDispatcher:
                     },
                 }
             wrapped = wrap_untrusted_gov_data(result, source_id="cgu_transparencia_gastos")
+            return {
+                "jsonrpc": "2.0",
+                "id": req_id,
+                "result": {"content": [{"type": "text", "text": wrapped}], "isError": False},
+            }
+
+        if tool_name in {
+            "bdg_get_cgu_bolsa_familia_payments",
+            "bdg_get_cgu_bpc_loas_benefits",
+            "bdg_get_cgu_beneficios_features",
+            "bdg_list_top_cgu_beneficios_municipalities",
+        }:
+            from public_data_gateway.connectors.compliance.cgu_beneficios_cidadao import (
+                CguBeneficiosCidadaoConnector,
+            )
+
+            connector = CguBeneficiosCidadaoConnector(settings=self.settings)
+            try:
+                if tool_name == "bdg_get_cgu_bolsa_familia_payments":
+                    result: Any = connector.get_cgu_bolsa_familia_payments(
+                        str(args.get("termo", ""))
+                    )
+                elif tool_name == "bdg_get_cgu_bpc_loas_benefits":
+                    result = connector.get_cgu_bpc_loas_benefits(
+                        str(args.get("termo", ""))
+                    )
+                elif tool_name == "bdg_get_cgu_beneficios_features":
+                    result = connector.get_cgu_beneficios_features(
+                        str(args.get("id_municipio_or_name", ""))
+                    )
+                else:
+                    result = connector.list_top_cgu_beneficios_municipalities(
+                        limit=int(args.get("limit", 10)),
+                        sigla_uf=args.get("sigla_uf"),
+                        sort_by_volume=bool(args.get("sort_by_volume", False)),
+                    )
+            except (ValueError, KeyError) as exc:
+                return {
+                    "jsonrpc": "2.0",
+                    "id": req_id,
+                    "result": {
+                        "content": [
+                            {"type": "text", "text": f"CGU Benefícios parameter error: {exc}"}
+                        ],
+                        "isError": True,
+                    },
+                }
+
+            if not result:
+                return {
+                    "jsonrpc": "2.0",
+                    "id": req_id,
+                    "result": {
+                        "content": [
+                            {
+                                "type": "text",
+                                "text": "No CGU Benefícios ao Cidadão data found for the query.",
+                            }
+                        ],
+                        "isError": True,
+                    },
+                }
+            wrapped = wrap_untrusted_gov_data(result, source_id="cgu_beneficios_cidadao")
             return {
                 "jsonrpc": "2.0",
                 "id": req_id,

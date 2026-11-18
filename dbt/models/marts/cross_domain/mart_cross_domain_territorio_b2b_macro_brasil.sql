@@ -276,6 +276,15 @@ rfb_arr_uf AS (
     FROM {{ ref('mart_rfb_arrecadacao_brasil') }}
     GROUP BY sigla_uf
 ),
+cgu_ben_uf AS (
+    SELECT
+        sigla_uf,
+        SUM(volume_mensal_transferencias_mil_brl) AS volume_transferencias_sociais_cgu_uf_mil_brl,
+        SUM(familias_bolsa_familia) AS familias_bolsa_familia_uf,
+        ROUND(AVG(score_eficacia_protecao_social_cgu), 2) AS avg_score_protecao_social_cgu_uf
+    FROM {{ ref('mart_cgu_beneficios_cidadao_brasil') }}
+    GROUP BY sigla_uf
+),
 
 base AS (
     SELECT
@@ -359,6 +368,9 @@ base AS (
         COALESCE(rfb.arrecadacao_federal_rfb_uf_mi_brl, 0.0) AS arrecadacao_federal_rfb_uf_mi_brl,
         COALESCE(rfb.contribuintes_pj_rfb_uf, 0) AS contribuintes_pj_rfb_uf,
         COALESCE(rfb.avg_score_arrecadacao_rfb_uf, 75.0) AS avg_score_arrecadacao_rfb_uf,
+        COALESCE(cben.volume_transferencias_sociais_cgu_uf_mil_brl, 0.0) AS volume_transferencias_sociais_cgu_uf_mil_brl,
+        COALESCE(cben.familias_bolsa_familia_uf, 0) AS familias_bolsa_familia_uf,
+        COALESCE(cben.avg_score_protecao_social_cgu_uf, 75.0) AS avg_score_protecao_social_cgu_uf,
         COALESCE(m.ano_mes, '2025-03') AS macro_ano_mes_referencia,
         COALESCE(m.selic_meta_fim_mes_pct, 14.25) AS selic_meta_fim_mes_pct,
         COALESCE(m.ipca_acumulado_12m_pct, 5.06) AS ipca_acumulado_12m_pct,
@@ -391,6 +403,7 @@ base AS (
     LEFT JOIN educacao_extra_uf ex ON t.sigla_uf = ex.sigla_uf
     LEFT JOIN ibge_inst_uf ibi ON t.sigla_uf = ibi.sigla_uf
     LEFT JOIN rfb_arr_uf rfb ON t.sigla_uf = rfb.sigla_uf
+    LEFT JOIN cgu_ben_uf cben ON t.sigla_uf = cben.sigla_uf
     CROSS JOIN macro_latest m
 ),
 

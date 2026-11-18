@@ -1,0 +1,178 @@
+version: 2
+
+models:
+  - name: stg_cgu_bolsa_familia_pagamentos
+    description: "Staging view tipada das folhas mensais do Novo Bolsa Família e BPC/LOAS auditadas pela CGU."
+    columns:
+      - name: cod_programa_social
+        description: "Identificador único do recorte de transferência social no município (STRING)."
+        tests: [not_null, unique]
+      - name: programa_transferencia_cgu
+        description: "Programa federal de proteção social auditado (NOVO_BOLSA_FAMILIA, BPC_LOAS_ASSISTENCIAL, SEGURO_DEFESO_GARANTIA_SAFRA)."
+        tests: [not_null]
+      - name: modalidade_pagamento
+        description: "Modalidade operacional de saque ou crédito social (CARTAO_SOCIAL_CAIXA_TEM, BENEFICIO_CONTINUADO_INSS)."
+        tests: [not_null]
+      - name: situacao_cadunico_elegibilidade
+        description: "Classificação de regularidade e atualização cadastral do CadÚnico (CADUNICO_ATUALIZADO_ALTA_COBERTURA, REVISAO_CADASTRAL_PRIORITARIA)."
+        tests: [not_null]
+      - name: id_municipio
+        description: "Código IBGE de 7 dígitos do município (STRING)."
+        tests: [not_null]
+      - name: sigla_uf
+        description: "Sigla de 2 letras da Unidade Federativa (UF)."
+        tests: [not_null]
+      - name: nome_municipio
+        description: "Nome oficial do município."
+        tests: [not_null]
+      - name: regiao
+        description: "Macrorregião geográfica brasileira."
+        tests: [not_null]
+      - name: familias_beneficiarias_ativas
+        description: "Quantidade de famílias ou beneficiários atendidos na competência mensal."
+        tests: [not_null]
+      - name: valor_mensal_transferido_mil_brl
+        description: "Montante mensal transferido às famílias no programa social (R$ mil)."
+        tests: [not_null]
+      - name: beneficio_medio_familiar_brl
+        description: "Valor médio mensal do benefício pago por família atendida (BRL)."
+        tests: [not_null]
+
+  - name: stg_cgu_bpc_loas_beneficios
+    description: "Staging view tipada do BPC/LOAS (Idoso e PcD), Auxílio Gás e cobertura CadÚnico municipal."
+    columns:
+      - name: cod_bpc_cgu
+        description: "Identificador único da consolidação BPC/LOAS municipal no Portal da Transparência CGU (STRING)."
+        tests: [not_null, unique]
+      - name: id_municipio
+        description: "Código IBGE de 7 dígitos do município (STRING)."
+        tests: [not_null]
+      - name: sigla_uf
+        description: "Sigla de 2 letras da Unidade Federativa (UF)."
+        tests: [not_null]
+      - name: nome_municipio
+        description: "Nome oficial do município."
+        tests: [not_null]
+      - name: beneficiarios_bpc_idoso_pcd
+        description: "Total de beneficiários ativos do BPC/LOAS (idosos e pessoas com deficiência)."
+        tests: [not_null]
+      - name: valor_mensal_bpc_mil_brl
+        description: "Folha mensal transferida aos beneficiários do BPC/LOAS no município (R$ mil)."
+        tests: [not_null]
+      - name: parcelas_auxilio_gas_ativas
+        description: "Quantidade de famílias atendidas pelo Auxílio Gás no município."
+        tests: [not_null]
+      - name: cobertura_cadunico_pobreza_pct
+        description: "Percentual de famílias de baixa renda com cadastro atualizado no CadÚnico (%)."
+        tests: [not_null]
+
+  - name: stg_cgu_seguro_defeso_safra
+    description: "Staging view tipada de Seguro-Defeso, Garantia-Safra e alertas de conformidade CGU."
+    columns:
+      - name: id_municipio
+        description: "Código IBGE de 7 dígitos do município (STRING)."
+        tests: [not_null, unique]
+      - name: sigla_uf
+        description: "Sigla de 2 letras da Unidade Federativa (UF)."
+        tests: [not_null]
+      - name: nome_municipio
+        description: "Nome oficial do município."
+        tests: [not_null]
+      - name: pescadores_seguro_defeso_ativos
+        description: "Quantidade de pescadores artesanais contemplados pelo Seguro-Defeso."
+        tests: [not_null]
+      - name: agricultores_garantia_safra
+        description: "Quantidade de agricultores familiares atendidos pelo Garantia-Safra."
+        tests: [not_null]
+      - name: repasses_rurais_emergenciais_mil_brl
+        description: "Volume acumulado de repasses de Seguro-Defeso e Garantia-Safra no município (R$ mil)."
+        tests: [not_null]
+      - name: alertas_elegibilidade_cgu_pct
+        description: "Percentual de benefícios sinalizados em trilhas de auditoria CGU sobre a folha local (%)."
+        tests: [not_null]
+
+  - name: stg_cgu_beneficios_resumo_municipal
+    description: "Staging view tipada do consolidado municipal de transferências CGU/MDS ao cidadão."
+    columns:
+      - name: id_municipio
+        description: "Código IBGE de 7 dígitos do município (STRING)."
+        tests: [not_null, unique]
+      - name: sigla_uf
+        description: "Sigla de 2 letras da Unidade Federativa (UF)."
+        tests: [not_null]
+      - name: nome_municipio
+        description: "Nome oficial do município."
+        tests: [not_null]
+      - name: regiao
+        description: "Macrorregião geográfica brasileira."
+        tests: [not_null]
+      - name: familias_bolsa_familia
+        description: "Quantidade de famílias atendidas pelo Novo Bolsa Família no município."
+        tests: [not_null]
+      - name: beneficiarios_bpc_loas
+        description: "Quantidade de beneficiários do Benefício de Prestação Continuada (BPC/LOAS)."
+        tests: [not_null]
+      - name: volume_mensal_transferencias_mil_brl
+        description: "Volume mensal consolidado de transferências diretas ao cidadão no município (R$ mil)."
+        tests: [not_null]
+      - name: valor_medio_beneficio_brl
+        description: "Valor médio mensal do benefício familiar pago no Novo Bolsa Família (BRL)."
+        tests: [not_null]
+      - name: cobertura_cadunico_pobreza_pct
+        description: "Taxa percentual de atualização e cobertura do CadÚnico sobre público elegível (%)."
+        tests: [not_null]
+
+  - name: fct_cgu_beneficios_cidadao_municipal
+    description: "Fato consolidado integrando Novo Bolsa Família, BPC/LOAS, Auxílio Gás, Seguro-Defeso e trilhas CGU."
+    columns:
+      - name: id_municipio
+        description: "Código IBGE de 7 dígitos do município (STRING)."
+        tests: [not_null, unique]
+      - name: sigla_uf
+        description: "Sigla de 2 letras da Unidade Federativa (UF)."
+        tests: [not_null]
+      - name: nome_municipio
+        description: "Nome oficial do município."
+        tests: [not_null]
+      - name: regiao
+        description: "Macrorregião geográfica brasileira."
+        tests: [not_null]
+      - name: familias_bolsa_familia
+        description: "Quantidade de famílias atendidas pelo Novo Bolsa Família."
+        tests: [not_null]
+      - name: beneficiarios_bpc_loas
+        description: "Quantidade de beneficiários do BPC/LOAS no município."
+        tests: [not_null]
+      - name: volume_mensal_transferencias_mil_brl
+        description: "Volume mensal total de transferências diretas CGU ao cidadão (R$ mil)."
+        tests: [not_null]
+      - name: valor_medio_beneficio_brl
+        description: "Valor médio mensal do benefício pago no município (BRL)."
+        tests: [not_null]
+      - name: cobertura_cadunico_pobreza_pct
+        description: "Percentual de cobertura atualizada no CadÚnico (%)."
+        tests: [not_null]
+      - name: qtd_programas_sociais_cgu
+        description: "Quantidade de eixos de benefícios ao cidadão observados no município."
+        tests: [not_null]
+      - name: soma_transferencias_bf_bpc_mil_brl
+        description: "Soma mensal auditada entre folha Novo Bolsa Família e BPC/LOAS (R$ mil)."
+        tests: [not_null]
+      - name: valor_mensal_bpc_mil_brl
+        description: "Volume mensal de pagamentos BPC/LOAS no município (R$ mil)."
+        tests: [not_null]
+      - name: parcelas_auxilio_gas_ativas
+        description: "Total de benefícios ativos do Auxílio Gás no município."
+        tests: [not_null]
+      - name: pescadores_seguro_defeso_ativos
+        description: "Pescadores contemplados pelo Seguro-Defeso no município."
+        tests: [not_null]
+      - name: agricultores_garantia_safra
+        description: "Agricultores atendidos pelo Garantia-Safra no município."
+        tests: [not_null]
+      - name: repasses_rurais_emergenciais_mil_brl
+        description: "Repasses acumulados de Seguro-Defeso e Garantia-Safra no município (R$ mil)."
+        tests: [not_null]
+      - name: alertas_elegibilidade_cgu_pct
+        description: "Taxa de inconsistência sinalizada em auditoria CGU (%)."
+        tests: [not_null]

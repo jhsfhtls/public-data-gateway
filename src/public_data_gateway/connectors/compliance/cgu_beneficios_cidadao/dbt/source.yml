@@ -1,0 +1,26 @@
+version: 2
+
+sources:
+  - name: cgu_beneficios_cidadao
+    description: "Tabelas Silver CGU Benefícios ao Cidadão (Novo Bolsa Família, BPC/LOAS, Seguro-Defeso & Garantia-Safra)"
+    meta:
+      agency: "Controladoria-Geral da União (CGU) & MDS"
+      domain: "compliance_protecao_social"
+      freshness_sla: "Mensal (720h)"
+    tables:
+      - name: cgu_bolsa_familia_pagamentos
+        description: "Folha mensal consolidada Novo Bolsa Família e BPC/LOAS auditada pelo Portal da Transparência CGU"
+        meta:
+          external_location: "data/cgu_beneficios_cidadao/silver/cgu_bolsa_familia_pagamentos.parquet"
+      - name: cgu_bpc_loas_beneficios
+        description: "Benefícios Continuados BPC Idoso/PcD, parcelas Auxílio Gás e cobertura CadÚnico de vulnerabilidade"
+        meta:
+          external_location: "data/cgu_beneficios_cidadao/silver/cgu_bpc_loas_beneficios.parquet"
+      - name: cgu_seguro_defeso_safra
+        description: "Beneficiários do Seguro-Defeso, Garantia-Safra, repasses rurais e taxa de alertas de conformidade CGU"
+        meta:
+          external_location: "data/cgu_beneficios_cidadao/silver/cgu_seguro_defeso_safra.parquet"
+      - name: cgu_beneficios_resumo_municipal
+        description: "Consolidado municipal combinando famílias Bolsa Família, BPC/LOAS, volume mensal e cobertura CadÚnico"
+        meta:
+          external_location: "data/cgu_beneficios_cidadao/silver/cgu_beneficios_resumo_municipal.parquet"

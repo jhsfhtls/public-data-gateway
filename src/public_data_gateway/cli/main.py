@@ -504,6 +504,36 @@ def build_parser() -> argparse.ArgumentParser:
     trp_rk_p.add_argument("--gasto", action="store_true", help="Sort descending by total federal spend (R$ mil)")
     trp_rk_p.add_argument("--json", action="store_true", help="Output in JSON format")
 
+    # CGU Benefícios ao Cidadão command group
+    cben_p = subparsers.add_parser("beneficios-cidadao", help="Query CGU Novo Bolsa Família, BPC/LOAS, Seguro-Defeso, Garantia-Safra, and social protection rankings.")
+    cben_sub = cben_p.add_subparsers(dest="beneficios_cidadao_action", required=True)
+
+    cben_bf_p = cben_sub.add_parser("bolsa-familia", help="Lookup CGU Novo Bolsa Família & BPC tracks by code, program, channel, IBGE, UF, or city.")
+    cben_bf_p.add_argument("termo", help="Program code, benefit name, payment mode, IBGE code, UF, or municipality name")
+    cben_bf_p.add_argument("--json", action="store_true", help="Output in JSON format")
+
+    cben_bp_p = cben_sub.add_parser("bpc", help="Lookup BPC/LOAS continuous social benefits, Auxílio Gás, and CadÚnico coverage.")
+    cben_bp_p.add_argument("termo", help="BPC code, IBGE code, UF, or municipality name")
+    cben_bp_p.add_argument("--json", action="store_true", help="Output in JSON format")
+
+    cben_df_p = cben_sub.add_parser("defeso-safra", help="Get municipal Seguro-Defeso fishers, Garantia-Safra, and CGU audit alerts.")
+    cben_df_p.add_argument("id_municipio_or_name", help="7-digit IBGE code or municipality name")
+    cben_df_p.add_argument("--json", action="store_true", help="Output in JSON format")
+
+    cben_mn_p = cben_sub.add_parser("municipio", help="Get consolidated municipal CGU social transfers, families served, and CadÚnico reach.")
+    cben_mn_p.add_argument("id_municipio_or_name", help="7-digit IBGE code or municipality name")
+    cben_mn_p.add_argument("--json", action="store_true", help="Output in JSON format")
+
+    cben_ft_p = cben_sub.add_parser("features", help="Get Gold CGU social protection efficiency score and tier.")
+    cben_ft_p.add_argument("id_municipio_or_name", help="7-digit IBGE code or municipality name")
+    cben_ft_p.add_argument("--json", action="store_true", help="Output in JSON format")
+
+    cben_rk_p = cben_sub.add_parser("ranking", help="List municipalities ranked by CGU social protection score or monthly transfer volume.")
+    cben_rk_p.add_argument("--limit", type=int, default=10, help="Max municipalities to list")
+    cben_rk_p.add_argument("--uf", type=str, help="Optional 2-letter state filter")
+    cben_rk_p.add_argument("--volume", action="store_true", help="Sort descending by monthly social transfer volume (R$ mil)")
+    cben_rk_p.add_argument("--json", action="store_true", help="Output in JSON format")
+
     # CGU / SIAPE Servidores Federais command group
     siape_p = subparsers.add_parser("servidores-siape", help="Query CGU/SIAPE federal civil servants, payroll, compliance, and governance rankings.")
     siape_sub = siape_p.add_subparsers(dest="servidores_siape_action", required=True)
@@ -3616,6 +3646,84 @@ def main(argv: Sequence[str] | None = None) -> int:
                     return 0
             except (ValueError, KeyError) as exc:
                 print(f"Erro CGU Transparência: {exc}", file=sys.stderr)
+                return 1
+
+        elif args.command == "beneficios-cidadao":
+            from public_data_gateway.connectors.compliance.cgu_beneficios_cidadao import (
+                CguBeneficiosCidadaoConnector,
+            )
+
+            cben_conn = CguBeneficiosCidadaoConnector()
+            cben_action = getattr(args, "beneficios_cidadao_action", "")
+            try:
+                if cben_action == "bolsa-familia":
+                    rows = cben_conn.get_cgu_bolsa_familia_payments(args.termo)
+                    if getattr(args, "json", False):
+                        print(json.dumps(rows, indent=2, ensure_ascii=False, default=str))
+                    else:
+                        print(f"CGU Novo Bolsa Família & BPC ({len(rows)}):")
+                        for r in rows:
+                            print(f"  {r.get('cod_programa_social')} | {r.get('nome_municipio')} ({r.get('sigla_uf')}): {r.get('programa_transferencia_cgu')} | {r.get('familias_beneficiarias_ativas')} fam")
+                    return 0
+
+                if cben_action == "bpc":
+                    rows = cben_conn.get_cgu_bpc_loas_benefits(args.termo)
+                    if getattr(args, "json", False):
+                        print(json.dumps(rows, indent=2, ensure_ascii=False, default=str))
+                    else:
+                        print(f"CGU BPC/LOAS ({len(rows)}):")
+                        for r in rows:
+                            print(f"  {r.get('cod_bpc_cgu')} | {r.get('nome_municipio')} ({r.get('sigla_uf')}): BPC={r.get('beneficiarios_bpc_idoso_pcd')} | CadÚnico={r.get('cobertura_cadunico_pobreza_pct')}%")
+                    return 0
+
+                if cben_action == "defeso-safra":
+                    res = cben_conn.get_cgu_defeso_safra_aid(args.id_municipio_or_name)
+                    if res is None:
+                        print(f"Dados Seguro-Defeso/Safra não encontrados para: {args.id_municipio_or_name}", file=sys.stderr)
+                        return 1
+                    if getattr(args, "json", False):
+                        print(json.dumps(res, indent=2, ensure_ascii=False, default=str))
+                    else:
+                        print(f"CGU Defeso & Safra ({res.get('nome_municipio')} - {res.get('sigla_uf')}): Defeso={res.get('pescadores_seguro_defeso_ativos')} | Safra={res.get('agricultores_garantia_safra')}")
+                    return 0
+
+                if cben_action == "municipio":
+                    res = cben_conn.get_cgu_beneficios_summary(args.id_municipio_or_name)
+                    if res is None:
+                        print(f"Resumo CGU Benefícios não encontrado para: {args.id_municipio_or_name}", file=sys.stderr)
+                        return 1
+                    if getattr(args, "json", False):
+                        print(json.dumps(res, indent=2, ensure_ascii=False, default=str))
+                    else:
+                        print(f"CGU Benefícios Município ({res.get('nome_municipio')} - {res.get('sigla_uf')}): BolsaFamília={res.get('familias_bolsa_familia')} | R$ {res.get('volume_mensal_transferencias_mil_brl')}k/mês")
+                    return 0
+
+                if cben_action == "features":
+                    res = cben_conn.get_cgu_beneficios_features(args.id_municipio_or_name)
+                    if res is None:
+                        print(f"Features CGU Benefícios não encontradas para: {args.id_municipio_or_name}", file=sys.stderr)
+                        return 1
+                    if getattr(args, "json", False):
+                        print(json.dumps(res, indent=2, ensure_ascii=False, default=str))
+                    else:
+                        print(f"CGU Benefícios Gold ({res.get('nome_municipio')} - {res.get('id_municipio')}): Score {res.get('score_eficacia_protecao_social_cgu')} | {res.get('tier_protecao_social_cidadao')}")
+                    return 0
+
+                if cben_action == "ranking":
+                    ranks = cben_conn.list_top_cgu_beneficios_municipalities(
+                        limit=getattr(args, "limit", 10),
+                        sigla_uf=getattr(args, "uf", None),
+                        sort_by_volume=getattr(args, "volume", False),
+                    )
+                    if getattr(args, "json", False):
+                        print(json.dumps(ranks, indent=2, ensure_ascii=False, default=str))
+                    else:
+                        print(f"Ranking CGU Benefícios Cidadão ({len(ranks)}):")
+                        for idx, r in enumerate(ranks, 1):
+                            print(f"  {idx}. {r.get('nome_municipio')} ({r.get('sigla_uf')}): {r.get('score_eficacia_protecao_social_cgu')} | {r.get('tier_protecao_social_cidadao')}")
+                    return 0
+            except (ValueError, KeyError) as exc:
+                print(f"Erro CGU Benefícios: {exc}", file=sys.stderr)
                 return 1
 
         elif args.command == "servidores-siape":
