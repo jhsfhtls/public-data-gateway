@@ -129,6 +129,16 @@ sinesp_uf AS (
     GROUP BY sigla_uf
 ),
 
+prf_uf AS (
+    SELECT
+        sigla_uf,
+        SUM(total_sinistros_prf_ano) AS total_sinistros_prf_uf,
+        SUM(total_obitos_prf_ano) AS total_obitos_rodovias_prf_uf,
+        ROUND(AVG(score_seguranca_viaria_prf), 2) AS avg_score_seguranca_viaria_prf_uf
+    FROM {{ ref('mart_sinistralidade_rodoviaria_prf_brasil') }}
+    GROUP BY sigla_uf
+),
+
 base AS (
     SELECT
         t.sigla_uf,
@@ -166,6 +176,9 @@ base AS (
         COALESCE(sn.mvi_por_100k_hab_sinesp, 22.0) AS mvi_por_100k_hab_sinesp,
         COALESCE(sn.roubo_carga_por_100k_hab_sinesp, 12.0) AS roubo_carga_por_100k_hab_sinesp,
         COALESCE(sn.avg_score_seguranca_publica_uf, 65.0) AS avg_score_seguranca_publica_uf,
+        COALESCE(pf.total_sinistros_prf_uf, 0) AS total_sinistros_prf_uf,
+        COALESCE(pf.total_obitos_rodovias_prf_uf, 0) AS total_obitos_rodovias_prf_uf,
+        COALESCE(pf.avg_score_seguranca_viaria_prf_uf, 65.0) AS avg_score_seguranca_viaria_prf_uf,
         COALESCE(m.ano_mes, '2025-03') AS macro_ano_mes_referencia,
         COALESCE(m.selic_meta_fim_mes_pct, 14.25) AS selic_meta_fim_mes_pct,
         COALESCE(m.ipca_acumulado_12m_pct, 5.06) AS ipca_acumulado_12m_pct,
@@ -183,6 +196,7 @@ base AS (
     LEFT JOIN cno_uf cn ON t.sigla_uf = cn.sigla_uf
     LEFT JOIN frota_uf fr ON t.sigla_uf = fr.sigla_uf
     LEFT JOIN sinesp_uf sn ON t.sigla_uf = sn.sigla_uf
+    LEFT JOIN prf_uf pf ON t.sigla_uf = pf.sigla_uf
     CROSS JOIN macro_latest m
 ),
 

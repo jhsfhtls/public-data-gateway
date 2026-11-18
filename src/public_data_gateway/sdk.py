@@ -250,6 +250,60 @@ class GeoFacade:
             limit=limit, sigla_uf=sigla_uf, sort_by_ev=sort_by_ev
         )
 
+    @property
+    def prf_acidentes_connector(self) -> Any:
+        if (
+            not hasattr(self, "_prf_acidentes_connector")
+            or self._prf_acidentes_connector is None
+        ):
+            from public_data_gateway.connectors.geografico.prf_acidentes import (
+                PrfAccidentsConnector,
+            )
+
+            self._prf_acidentes_connector = PrfAccidentsConnector(
+                settings=self._sdk.settings
+            )
+        return self._prf_acidentes_connector
+
+    def get_prf_accidents(self, termo: str) -> list[dict[str, Any]]:
+        """Lookup PRF highway accident records by code, BR highway, cause, IBGE, UF, or city."""
+        return self.prf_acidentes_connector.get_prf_accidents(termo)
+
+    def get_prf_corridors(self, termo: str) -> list[dict[str, Any]]:
+        """Lookup PRF logistics corridor accident & severity metrics by code, BR, IBGE, UF, or city."""
+        return self.prf_acidentes_connector.get_prf_corridors(termo)
+
+    def get_prf_causes_profile(
+        self, id_municipio_or_name: str
+    ) -> dict[str, Any] | None:
+        """Retrieve municipal PRF collision causes, heavy truck share, and DUI enforcement."""
+        return self.prf_acidentes_connector.get_prf_causes_profile(
+            id_municipio_or_name
+        )
+
+    def get_prf_municipal_summary(
+        self, id_municipio_or_name: str
+    ) -> dict[str, Any] | None:
+        """Retrieve consolidated municipal PRF annual crashes, injuries, and lethality."""
+        return self.prf_acidentes_connector.get_prf_municipal_summary(
+            id_municipio_or_name
+        )
+
+    def get_prf_features(self, id_municipio_or_name: str) -> dict[str, Any] | None:
+        """Retrieve Gold PRF road safety score and corridor risk tier."""
+        return self.prf_acidentes_connector.get_prf_features(id_municipio_or_name)
+
+    def list_top_safe_prf_municipalities(
+        self,
+        limit: int = 10,
+        sigla_uf: str | None = None,
+        sort_by_fatalities: bool = False,
+    ) -> list[dict[str, Any]]:
+        """List municipalities ranked by PRF road safety score or highest highway fatalities."""
+        return self.prf_acidentes_connector.list_top_safe_prf_municipalities(
+            limit=limit, sigla_uf=sigla_uf, sort_by_fatalities=sort_by_fatalities
+        )
+
 
 class ProcurementFacade:
     """Public procurement query interface powered by PNCP (Lei nº 14.133/2021)."""
@@ -3922,6 +3976,41 @@ class BrazilData:
         """Listar municípios ranqueados por modernização da frota SENATRAN ou volume de eletrificados BEV/HEV."""
         return self.geo.list_top_fleet_municipalities(
             limit=limit, sigla_uf=sigla_uf, sort_by_ev=sort_by_ev
+        )
+
+    def get_prf_accidents(self, termo: str) -> list[dict[str, Any]]:
+        """Consultar boletins agregados de sinistros rodoviários PRF por código, rodovia BR, causa, IBGE, UF ou município."""
+        return self.geo.get_prf_accidents(termo)
+
+    def get_prf_corridors(self, termo: str) -> list[dict[str, Any]]:
+        """Consultar corredores logísticos federais PRF e sinistralidade de carga pesada por código, BR, IBGE, UF ou município."""
+        return self.geo.get_prf_corridors(termo)
+
+    def get_prf_causes_profile(
+        self, id_municipio_or_name: str
+    ) -> dict[str, Any] | None:
+        """Consultar perfil causal de sinistros PRF (colisões, veículos pesados, clima e alcoolemia)."""
+        return self.geo.get_prf_causes_profile(id_municipio_or_name)
+
+    def get_prf_municipal_summary(
+        self, id_municipio_or_name: str
+    ) -> dict[str, Any] | None:
+        """Consultar consolidado anual municipal de sinistros PRF, feridos, óbitos e letalidade."""
+        return self.geo.get_prf_municipal_summary(id_municipio_or_name)
+
+    def get_prf_features(self, id_municipio_or_name: str) -> dict[str, Any] | None:
+        """Consultar features Gold PRF de segurança viária e severidade de corredores logísticos."""
+        return self.geo.get_prf_features(id_municipio_or_name)
+
+    def list_top_safe_prf_municipalities(
+        self,
+        limit: int = 10,
+        sigla_uf: str | None = None,
+        sort_by_fatalities: bool = False,
+    ) -> list[dict[str, Any]]:
+        """Listar municípios ranqueados por segurança viária PRF ou maior número de óbitos em BRs."""
+        return self.geo.list_top_safe_prf_municipalities(
+            limit=limit, sigla_uf=sigla_uf, sort_by_fatalities=sort_by_fatalities
         )
 
     def get_municipal_gdp_detail(self, id_municipio: str, year: int = 2023) -> dict[str, Any] | None:

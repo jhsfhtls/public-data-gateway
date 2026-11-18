@@ -68,6 +68,7 @@ import public_data_gateway.connectors.geografico.open_elevation  # noqa: F401
 import public_data_gateway.connectors.geografico.opencep  # noqa: F401
 import public_data_gateway.connectors.geografico.osrm_routing  # noqa: F401
 import public_data_gateway.connectors.geografico.overpass_osm  # noqa: F401
+import public_data_gateway.connectors.geografico.prf_acidentes  # noqa: F401
 import public_data_gateway.connectors.geografico.senatran_frota  # noqa: F401
 import public_data_gateway.connectors.geografico.viacep  # noqa: F401
 import public_data_gateway.connectors.imobiliario.capitais_iptu_itbi  # noqa: F401
