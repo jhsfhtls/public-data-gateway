@@ -2367,6 +2367,62 @@ class EnvironmentFacade:
             limit=limit, sigla_uf=sigla_uf, sort_by_power=sort_by_power
         )
 
+    @property
+    def anp_combustiveis_connector(self) -> Any:
+        if (
+            not hasattr(self, "_anp_combustiveis_connector")
+            or self._anp_combustiveis_connector is None
+        ):
+            from public_data_gateway.connectors.ambiental.anp_combustiveis import (
+                AnpCombustiveisConnector,
+            )
+
+            self._anp_combustiveis_connector = AnpCombustiveisConnector(
+                settings=self._sdk.settings
+            )
+        return self._anp_combustiveis_connector
+
+    def get_anp_fuel_prices(self, termo: str) -> list[dict[str, Any]]:
+        """Lookup ANP weekly fuel prices and margins by product, code, IBGE, UF, or city."""
+        return self.anp_combustiveis_connector.get_anp_fuel_prices(termo)
+
+    def get_anp_fuel_sales(self, termo: str) -> list[dict[str, Any]]:
+        """Lookup ANP biofuel and petroleum derivative sales volumes by code, category, or UF."""
+        return self.anp_combustiveis_connector.get_anp_fuel_sales(termo)
+
+    def get_anp_retail_network(
+        self, id_municipio_or_name: str
+    ) -> dict[str, Any] | None:
+        """Retrieve municipal ANP gas stations network and PMQC fuel quality compliance."""
+        return self.anp_combustiveis_connector.get_anp_retail_network(
+            id_municipio_or_name
+        )
+
+    def get_anp_municipal_summary(
+        self, id_municipio_or_name: str
+    ) -> dict[str, Any] | None:
+        """Retrieve consolidated municipal ANP prices, ethanol parity ratio, and biofuel share."""
+        return self.anp_combustiveis_connector.get_anp_municipal_summary(
+            id_municipio_or_name
+        )
+
+    def get_anp_features(
+        self, id_municipio_or_name: str
+    ) -> dict[str, Any] | None:
+        """Retrieve Gold ANP Combustiveis competitiveness score and fuel matrix tier."""
+        return self.anp_combustiveis_connector.get_anp_features(id_municipio_or_name)
+
+    def list_top_anp_municipalities(
+        self,
+        limit: int = 10,
+        sigla_uf: str | None = None,
+        sort_by_biofuel: bool = False,
+    ) -> list[dict[str, Any]]:
+        """List municipalities ranked by ANP competitiveness score or biofuel share (%)."""
+        return self.anp_combustiveis_connector.list_top_anp_municipalities(
+            limit=limit, sigla_uf=sigla_uf, sort_by_biofuel=sort_by_biofuel
+        )
+
 
 class MetaportalsFacade:
     """Sub-facade for Metaportals & Aggregator Hubs (Datalake Federado SQL, Dados.gov.br CKAN)."""
@@ -4412,6 +4468,43 @@ class BrazilData:
         """Listar municípios ranqueados por score de transição energética MMGD ou maior potência instalada (kW)."""
         return self.environment.list_top_mmgd_municipalities(
             limit=limit, sigla_uf=sigla_uf, sort_by_power=sort_by_power
+        )
+
+    def get_anp_fuel_prices(self, termo: str) -> list[dict[str, Any]]:
+        """Consultar preços médios semanais e margens ANP (LPC) por combustível, UF ou município."""
+        return self.environment.get_anp_fuel_prices(termo)
+
+    def get_anp_fuel_sales(self, termo: str) -> list[dict[str, Any]]:
+        """Consultar volumes comercializados ANP de biocombustíveis e derivados por UF ou município."""
+        return self.environment.get_anp_fuel_sales(termo)
+
+    def get_anp_retail_network(
+        self, id_municipio_or_name: str
+    ) -> dict[str, Any] | None:
+        """Consultar rede municipal de postos revendedores autorizados ANP e índice de qualidade PMQC."""
+        return self.environment.get_anp_retail_network(id_municipio_or_name)
+
+    def get_anp_municipal_summary(
+        self, id_municipio_or_name: str
+    ) -> dict[str, Any] | None:
+        """Consultar consolidado municipal ANP de gasolina, etanol hidratado, diesel S10 e biocombustíveis."""
+        return self.environment.get_anp_municipal_summary(id_municipio_or_name)
+
+    def get_anp_features(
+        self, id_municipio_or_name: str
+    ) -> dict[str, Any] | None:
+        """Consultar features Gold ANP de competitividade logística e matriz de biocombustíveis."""
+        return self.environment.get_anp_features(id_municipio_or_name)
+
+    def list_top_anp_municipalities(
+        self,
+        limit: int = 10,
+        sigla_uf: str | None = None,
+        sort_by_biofuel: bool = False,
+    ) -> list[dict[str, Any]]:
+        """Listar municípios ranqueados por competitividade ANP ou participação de biocombustíveis (%)."""
+        return self.environment.list_top_anp_municipalities(
+            limit=limit, sigla_uf=sigla_uf, sort_by_biofuel=sort_by_biofuel
         )
 
     def get_bd_coverage(self, id_municipio: str) -> dict[str, Any]:

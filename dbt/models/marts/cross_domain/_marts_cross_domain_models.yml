@@ -248,6 +248,15 @@ models:
       - name: score_transicao_energetica_mmgd
         description: "Score municipal de transição energética e capacidade solar/renovável MMGD na ANEEL (0-100)."
         tests: [not_null]
+      - name: preco_diesel_s10_anp_brl
+        description: "Preço médio municipal de revenda do Diesel S10 rodoviário no levantamento ANP (BRL/litro)."
+        tests: [not_null]
+      - name: participacao_biocombustivel_anp_pct
+        description: "Participação percentual de biocombustíveis renováveis (etanol e biodiesel) no mercado municipal ANP (%)."
+        tests: [not_null]
+      - name: score_competitividade_combustiveis_bio
+        description: "Score municipal de competitividade de combustíveis e adoção de biocombustíveis ANP (0-100)."
+        tests: [not_null]
       - name: reference_date
         description: "Data de referência ISO-8601 (YYYY-MM-DD)."
         tests: [not_null]

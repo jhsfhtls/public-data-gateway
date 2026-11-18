@@ -15,6 +15,7 @@ import public_data_gateway.connectors.agregadores.nasa_youtube_open_ml  # noqa: 
 import public_data_gateway.connectors.agregadores.upgini_adapter  # noqa: F401
 import public_data_gateway.connectors.ambiental.ana_hidroweb_telemetria  # noqa: F401
 import public_data_gateway.connectors.ambiental.aneel_geracao_distribuida  # noqa: F401
+import public_data_gateway.connectors.ambiental.anp_combustiveis  # noqa: F401
 import public_data_gateway.connectors.ambiental.bcb_sicor  # noqa: F401
 import public_data_gateway.connectors.ambiental.ibama_fiscalizacao  # noqa: F401
 import public_data_gateway.connectors.ambiental.ibge_agro_municipal  # noqa: F401
