@@ -1,6 +1,6 @@
 {
   "schema_version": "1.0.0",
-  "last_updated": "2026-11-18T13:45:30.000000",
+  "last_updated": "2026-11-18T14:06:00.000000",
   "project_name": "public-data-gateway",
   "architecture": "Hexagonal Medallion Lakehouse (Bronze -> Silver -> Gold / Feature Store)",
   "governance_standards": [
@@ -15,7 +15,7 @@
   "current_macro_phase": "Fase 11.5 - Expansão Completa de Fontes Públicas (Ondas 11.5A a 11.5E — Padrão 11-Gates)",
   "overall_status": "ON_TRACK",
   "active_connector": null,
-  "next_connector": "cvm_mercado_extra",
+  "next_connector": "ans_saude_suplementar",
   "structural_phases": [
     {
       "phase_id": "00",
@@ -252,74 +252,74 @@
     }
   ],
   "active_connector_gates": {
-    "target_connector": "bndes_operacoes",
+    "target_connector": "cvm_mercado_extra",
     "target_wave": "11.5D",
     "gates": [
       {
         "gate_id": "GATE_01",
         "name": "Contrato Declarativo ODCS v3.1 das N Tabelas da API",
         "status": "PASSED",
-        "criteria": "Schema tipado ODCS-BR-BNDES-OPERACOES-TRANSPARENCIA-001 (11 colunas), chaves primarias STRING (cod_operacao_bndes, id_municipio 7D, sigla_uf) e regras semanticas para Operacoes Diretas FINEM/Indiretas, Desembolsos Setoriais, Risco/FGI e Resumo Municipal."
+        "criteria": "Schema tipado ODCS-BR-CVM-MERCADO-EXTRA-RCVM160-001 (11 colunas), chaves primarias STRING (cod_emissao_rcvm160, id_municipio 7D, sigla_uf) e regras semanticas para Ofertas RCVM 160, Administradores FII/Carteira, Agentes Autonomos AAI e Resumo Municipal."
       },
       {
         "gate_id": "GATE_02",
         "name": "Ingestao Bronze Isolada (Todas as Tabelas) & Cache WAL",
         "status": "PASSED",
-        "criteria": "Ingestao resiliente da API CKAN BNDES (dadosabertos.bndes.gov.br/api/3/action/package_list) e Portal Dados Abertos BNDES (dadosabertos.bndes.gov.br) em data/bndes_operacoes/bronze/ com registro de linhagem SHA-256."
+        "criteria": "Ingestao resiliente da API CKAN CVM (dados.cvm.gov.br/api/3/action/package_list) e Portal Dados Abertos CVM (dados.cvm.gov.br) em data/cvm_mercado_extra/bronze/ com registro de linhagem SHA-256."
       },
       {
         "gate_id": "GATE_03",
         "name": "Sanitizacao de Sentinelas & Nulls",
         "status": "PASSED",
-        "criteria": "Conversao deterministica de sentinelas em NULLs reais e normalizacao de modalidades de apoio BNDES (OPERACAO_DIRETA_FINEM, OPERACAO_INDIRETA_AUTOMATICA), encargos TLP/TJLP e indicadores de fomento verde/MPME."
+        "criteria": "Conversao deterministica de sentinelas em NULLs reais e normalizacao de valores mobiliarios RCVM 160, ritos de registro, AUM de gestoras FII/FIP e alertas sancionatorios PASM."
       },
       {
         "gate_id": "GATE_04",
         "name": "Materializacao Silver Parquet Isolada (Todas as Tabelas)",
         "status": "PASSED",
-        "criteria": "Gravacao ZSTD em data/bndes_operacoes/silver/ (bndes_operacoes_credito_municipio, bndes_desembolsos_setoriais_uf, bndes_carteira_risco_garantias, bndes_operacoes_resumo_municipal)."
+        "criteria": "Gravacao ZSTD em data/cvm_mercado_extra/silver/ (cvm_ofertas_distrib_rcvm160, cvm_administradores_fii_carteira, cvm_agentes_autonomos_assessoria, cvm_mercado_extra_resumo_municipal)."
       },
       {
         "gate_id": "GATE_05",
         "name": "Validacao dos 5 Pilares & Quarentena",
         "status": "PASSED",
-        "criteria": "Aprovacao em Freshness, Volume, Schema, Null Ceiling e Lineage com suporte a desvio para data/bndes_operacoes/quarantine/."
+        "criteria": "Aprovacao em Freshness, Volume, Schema, Null Ceiling e Lineage com suporte a desvio para data/cvm_mercado_extra/quarantine/."
       },
       {
         "gate_id": "GATE_06",
         "name": "Gold Feature View Isolada & ASOF Join ML",
         "status": "PASSED",
-        "criteria": "Features de intensidade de fomento produtivo, economia verde ESG e cobertura FGI em data/bndes_operacoes/gold/features_bndes_operacoes_brasil.parquet."
+        "criteria": "Features de sofisticacao de mercado de capitais, captacao RCVM 160 e densidade de assessores em data/cvm_mercado_extra/gold/features_cvm_mercado_extra_brasil.parquet."
       },
       {
         "gate_id": "GATE_07",
         "name": "Integracao ao EnrichmentEngine & Marts Cross-Domain",
         "status": "PASSED",
-        "criteria": "Integracao fomento-territorio em mart_cross_domain_territorio_b2b_macro_brasil (valor_contratado_bndes_uf_mil_brl, desembolso_anual_bndes_uf_mil_brl e avg_score_fomento_bndes_uf)."
+        "criteria": "Integracao mercado-territorio em mart_cross_domain_territorio_b2b_macro_brasil (volume_captado_rcvm160_cvm_uf_mil_brl, assessores_investimento_cvm_uf e avg_score_mercado_capitais_cvm_uf)."
       },
       {
         "gate_id": "GATE_08",
         "name": "Exposicao Multi-Interface (4 Interfaces)",
         "status": "PASSED",
-        "criteria": "Exposicao simultanea via SDK (BrazilData.banking + shortcuts), FastAPI (/api/v1/banking/bndes-operacoes/*), CLI (bdg bndes-operacoes *) e MCP (bdg_get_bndes_operacoes, bdg_get_bndes_desembolsos, bdg_get_bndes_features, bdg_list_top_bndes_municipalities com wrap_untrusted_gov_data)."
+        "criteria": "Exposicao simultanea via SDK (BrazilData.finance + shortcuts), FastAPI (/api/v1/finance/cvm-extra/*), CLI (bdg cvm-extra *) e MCP (bdg_get_cvm_ofertas_rcvm160, bdg_get_cvm_administradores, bdg_get_cvm_extra_features, bdg_list_top_cvm_extra_municipalities com wrap_untrusted_gov_data)."
       },
       {
         "gate_id": "GATE_09",
         "name": "Bateria de Testes Unitarios & Paridade Offline",
         "status": "PASSED",
-        "criteria": "Testes unitarios offline completos em tests/connectors/test_bndes_operacoes.py cobrindo 4 tabelas Silver, Gold ML e paridade nas 4 interfaces."
+        "criteria": "Testes unitarios offline completos em tests/connectors/test_cvm_mercado_extra.py cobrindo 4 tabelas Silver, Gold ML e paridade nas 4 interfaces."
       },
       {
         "gate_id": "GATE_10",
         "name": "dbt Staging, Marts Intra-Domínio/Cross-Domain & 100% Colunas Documentadas",
         "status": "PASSED",
-        "criteria": "Modelos dbt com source.yml, stg_*, fct_bndes_operacoes_fomento_municipal, mart intra-dominio mart_bndes_operacoes_fomento_brasil e cross-domain mart_cross_domain_territorio_b2b_macro_brasil aprovados no dbt test (135/135) e lint_dbt_docs.py (100% cobertura em 632 modelos / 8.579 colunas / 352 fontes)."
+        "criteria": "Modelos dbt com source.yml, stg_*, fct_cvm_mercado_extra_municipal, mart intra-dominio mart_cvm_mercado_extra_brasil e cross-domain mart_cross_domain_territorio_b2b_macro_brasil aprovados no dbt test (138/138) e lint_dbt_docs.py (100% cobertura em 638 modelos / 8.653 colunas / 356 fontes)."
       },
       {
         "gate_id": "GATE_11",
         "name": "Teste Real de 1 Linha com API ao Vivo (Fail-Hard)",
         "status": "PASSED",
-        "criteria": "Execucao obrigatoria contra API CKAN Dados Abertos BNDES e Portal BNDES Transparencia validando HTTP 200; falha reprova o pipeline."
+        "criteria": "Execucao obrigatoria contra API CKAN Dados Abertos CVM e Portal Dados Abertos CVM validando HTTP 200; falha reprova o pipeline."
       }
     ]
   },
@@ -834,6 +834,12 @@
       "phase_id": "11.5",
       "milestone": "Wave 11.5D (4/6) — Homologação do Conector bndes_operacoes (4 Tabelas Silver BNDES Fomento, Mart Intra-Domínio, Mart Cross-Domain Território & Paridade 4 Interfaces)",
       "summary": "Conclusão do conector 4/6 da Wave 11.5D (bndes_operacoes — BNDES Transparência: Operações Diretas, Indiretas & Fomento Municipal) nos 11 Gates: contrato ODCS v3.1 (ODCS-BR-BNDES-OPERACOES-TRANSPARENCIA-001), ingestão Bronze + 4 tabelas Silver ZSTD (bndes_operacoes_credito_municipio, bndes_desembolsos_setoriais_uf, bndes_carteira_risco_garantias, bndes_operacoes_resumo_municipal) + Gold ML (features_bndes_operacoes_brasil), 4 staging views + fct_bndes_operacoes_fomento_municipal + mart intra-domínio mart_bndes_operacoes_fomento_brasil + enriquecimento da mart cross-domain mart_cross_domain_territorio_b2b_macro_brasil (135 testes dbt OK, 100% colunas documentadas no lint_dbt_docs.py com 632 modelos / 8.579 colunas / 352 fontes), paridade em SDK/FastAPI/CLI/MCP, bateria offline e teste live fail-hard contra dadosabertos.bndes.gov.br/api/3/action/package_list e dadosabertos.bndes.gov.br."
+    },
+    {
+      "date": "2026-11-18",
+      "phase_id": "11.5",
+      "milestone": "Wave 11.5D (5/6) — Homologação do Conector cvm_mercado_extra (4 Tabelas Silver CVM RCVM 160/Adm, Mart Intra-Domínio, Mart Cross-Domain Território & Paridade 4 Interfaces)",
+      "summary": "Conclusão do conector 5/6 da Wave 11.5D (cvm_mercado_extra — CVM Mercado de Capitais Extra: Ofertas RCVM 160, Administradores & Agentes) nos 11 Gates: contrato ODCS v3.1 (ODCS-BR-CVM-MERCADO-EXTRA-RCVM160-001), ingestão Bronze + 4 tabelas Silver ZSTD (cvm_ofertas_distrib_rcvm160, cvm_administradores_fii_carteira, cvm_agentes_autonomos_assessoria, cvm_mercado_extra_resumo_municipal) + Gold ML (features_cvm_mercado_extra_brasil), 4 staging views + fct_cvm_mercado_extra_municipal + mart intra-domínio mart_cvm_mercado_extra_brasil + enriquecimento da mart cross-domain mart_cross_domain_territorio_b2b_macro_brasil (138 testes dbt OK, 100% colunas documentadas no lint_dbt_docs.py com 638 modelos / 8.653 colunas / 356 fontes), paridade em SDK/FastAPI/CLI/MCP, bateria offline e teste live fail-hard contra dados.cvm.gov.br/api/3/action/package_list e dados.cvm.gov.br."
     }
   ]
 }

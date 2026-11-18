@@ -574,6 +574,86 @@ def create_app(settings: GatewaySettings | None = None) -> FastAPI:
         conn = CvmDfpItrConnector(settings=app_settings)
         return conn.get_financial_ratios(cnpj_or_codigo)
 
+    # 15I. CVM Mercado de Capitais Extra (RCVM 160, Administradores & Agentes)
+    @app.get("/api/v1/finance/cvm-extra/ofertas/{termo}")
+    async def get_cvm_extra_ofertas(termo: str) -> list[dict[str, Any]]:
+        from public_data_gateway.connectors.macrofinanceiro.cvm_mercado_extra import (
+            CvmMercadoExtraConnector,
+        )
+
+        return CvmMercadoExtraConnector(settings=app_settings).get_rcvm160_offerings(termo)
+
+    @app.get("/api/v1/finance/cvm-extra/administradores/{termo}")
+    async def get_cvm_extra_administradores(termo: str) -> list[dict[str, Any]]:
+        from public_data_gateway.connectors.macrofinanceiro.cvm_mercado_extra import (
+            CvmMercadoExtraConnector,
+        )
+
+        return CvmMercadoExtraConnector(settings=app_settings).get_fii_administrators(termo)
+
+    @app.get("/api/v1/finance/cvm-extra/agentes/{id_municipio_or_name}")
+    async def get_cvm_extra_agentes(id_municipio_or_name: str) -> dict[str, Any]:
+        from public_data_gateway.connectors.macrofinanceiro.cvm_mercado_extra import (
+            CvmMercadoExtraConnector,
+        )
+
+        res = CvmMercadoExtraConnector(settings=app_settings).get_investment_advisors(
+            id_municipio_or_name
+        )
+        if res is None:
+            raise HTTPException(
+                status_code=404, detail="CVM investment advisors metrics not found"
+            )
+        return res
+
+    @app.get("/api/v1/finance/cvm-extra/municipio/{id_municipio_or_name}")
+    async def get_cvm_extra_municipio(id_municipio_or_name: str) -> dict[str, Any]:
+        from public_data_gateway.connectors.macrofinanceiro.cvm_mercado_extra import (
+            CvmMercadoExtraConnector,
+        )
+
+        res = CvmMercadoExtraConnector(settings=app_settings).get_cvm_extra_summary(
+            id_municipio_or_name
+        )
+        if res is None:
+            raise HTTPException(
+                status_code=404, detail="CVM capital markets municipal summary not found"
+            )
+        return res
+
+    @app.get("/api/v1/finance/cvm-extra/features/{id_municipio_or_name}")
+    async def get_cvm_extra_features_endpoint(id_municipio_or_name: str) -> dict[str, Any]:
+        from public_data_gateway.connectors.macrofinanceiro.cvm_mercado_extra import (
+            CvmMercadoExtraConnector,
+        )
+
+        res = CvmMercadoExtraConnector(settings=app_settings).get_cvm_extra_features(
+            id_municipio_or_name
+        )
+        if res is None:
+            raise HTTPException(
+                status_code=404, detail="CVM Gold capital markets features not found"
+            )
+        return res
+
+    @app.get("/api/v1/finance/cvm-extra/ranking")
+    async def get_cvm_extra_ranking(
+        limit: int = Query(10, ge=1, le=50, description="Max municipalities to list"),
+        uf: str | None = Query(None, description="Optional 2-letter state filter"),
+        sort_by_volume: bool = Query(
+            False, description="Sort descending by total RCVM 160 volume raised (R$ mil)"
+        ),
+    ) -> list[dict[str, Any]]:
+        from public_data_gateway.connectors.macrofinanceiro.cvm_mercado_extra import (
+            CvmMercadoExtraConnector,
+        )
+
+        return CvmMercadoExtraConnector(
+            settings=app_settings
+        ).list_top_cvm_extra_municipalities(
+            limit=limit, sigla_uf=uf, sort_by_volume=sort_by_volume
+        )
+
     # 12. Foreign Trade & Trade Balance (MDIC Comex Stat)
     @app.get("/api/v1/trade/balance")
     @app.get("/api/v1/comex/balance")

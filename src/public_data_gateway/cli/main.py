@@ -656,6 +656,36 @@ def build_parser() -> argparse.ArgumentParser:
     bn_rk_p.add_argument("--volume", action="store_true", help="Sort descending by contracted BNDES volume (R$ mil)")
     bn_rk_p.add_argument("--json", action="store_true", help="Output in JSON format")
 
+    # CVM Mercado de Capitais Extra command group
+    cvmx_p = subparsers.add_parser("cvm-extra", help="Query CVM RCVM 160 public offerings, FII managers, investment advisors, and rankings.")
+    cvmx_sub = cvmx_p.add_subparsers(dest="cvm_extra_action", required=True)
+
+    cvmx_of_p = cvmx_sub.add_parser("ofertas", help="Lookup CVM RCVM 160 offerings by code, security type, rite, IBGE, UF, or city.")
+    cvmx_of_p.add_argument("termo", help="Emission code, security type, rite, IBGE code, UF, or municipality name")
+    cvmx_of_p.add_argument("--json", action="store_true", help="Output in JSON format")
+
+    cvmx_adm_p = cvmx_sub.add_parser("administradores", help="Lookup CVM portfolio managers and FII/FIP managers by code, IBGE, UF, or city.")
+    cvmx_adm_p.add_argument("termo", help="Administrator code, IBGE code, UF, or municipality name")
+    cvmx_adm_p.add_argument("--json", action="store_true", help="Output in JSON format")
+
+    cvmx_ag_p = cvmx_sub.add_parser("agentes", help="Get municipal CVM investment advisors (AAIs), firms, and PASM alert rate.")
+    cvmx_ag_p.add_argument("id_municipio_or_name", help="7-digit IBGE code or municipality name")
+    cvmx_ag_p.add_argument("--json", action="store_true", help="Output in JSON format")
+
+    cvmx_mn_p = cvmx_sub.add_parser("municipio", help="Get consolidated municipal CVM RCVM 160 volume, managers, and AAIs.")
+    cvmx_mn_p.add_argument("id_municipio_or_name", help="7-digit IBGE code or municipality name")
+    cvmx_mn_p.add_argument("--json", action="store_true", help="Output in JSON format")
+
+    cvmx_ft_p = cvmx_sub.add_parser("features", help="Get Gold CVM capital markets sophistication score and ecosystem tier.")
+    cvmx_ft_p.add_argument("id_municipio_or_name", help="7-digit IBGE code or municipality name")
+    cvmx_ft_p.add_argument("--json", action="store_true", help="Output in JSON format")
+
+    cvmx_rk_p = cvmx_sub.add_parser("ranking", help="List municipalities ranked by CVM capital markets sophistication or RCVM 160 volume.")
+    cvmx_rk_p.add_argument("--limit", type=int, default=10, help="Max municipalities to list")
+    cvmx_rk_p.add_argument("--uf", type=str, help="Optional 2-letter state filter")
+    cvmx_rk_p.add_argument("--volume", action="store_true", help="Sort descending by RCVM 160 volume (R$ mil)")
+    cvmx_rk_p.add_argument("--json", action="store_true", help="Output in JSON format")
+
     # Subcommand: cno (RFB Cadastro Nacional de Obras)
     cno_p = subparsers.add_parser(
         "cno",
@@ -3601,6 +3631,84 @@ def main(argv: Sequence[str] | None = None) -> int:
                     return 0
             except (ValueError, KeyError) as exc:
                 print(f"Erro BNDES Operações: {exc}", file=sys.stderr)
+                return 1
+
+        elif args.command == "cvm-extra":
+            from public_data_gateway.connectors.macrofinanceiro.cvm_mercado_extra import (
+                CvmMercadoExtraConnector,
+            )
+
+            cvmx_conn = CvmMercadoExtraConnector()
+            cvmx_action = getattr(args, "cvm_extra_action", "")
+            try:
+                if cvmx_action == "ofertas":
+                    rows = cvmx_conn.get_rcvm160_offerings(args.termo)
+                    if getattr(args, "json", False):
+                        print(json.dumps(rows, indent=2, ensure_ascii=False, default=str))
+                    else:
+                        print(f"CVM Ofertas RCVM 160 ({len(rows)}):")
+                        for r in rows:
+                            print(f"  {r.get('cod_emissao_rcvm160')} | {r.get('nome_municipio')} ({r.get('sigla_uf')}): {r.get('valor_mobiliario_tipo')} | R$ {r.get('volume_ofertado_mil_brl')}k")
+                    return 0
+
+                if cvmx_action == "administradores":
+                    rows = cvmx_conn.get_fii_administrators(args.termo)
+                    if getattr(args, "json", False):
+                        print(json.dumps(rows, indent=2, ensure_ascii=False, default=str))
+                    else:
+                        print(f"CVM Administradores FII/Carteira ({len(rows)}):")
+                        for r in rows:
+                            print(f"  {r.get('cod_adm_cvm')} | {r.get('nome_municipio')} ({r.get('sigla_uf')}): {r.get('administradores_ativos_count')} adm | R$ {r.get('patrimonio_administrado_mi_brl')}M")
+                    return 0
+
+                if cvmx_action == "agentes":
+                    res = cvmx_conn.get_investment_advisors(args.id_municipio_or_name)
+                    if res is None:
+                        print(f"Agentes autônomos CVM não encontrados para: {args.id_municipio_or_name}", file=sys.stderr)
+                        return 1
+                    if getattr(args, "json", False):
+                        print(json.dumps(res, indent=2, ensure_ascii=False, default=str))
+                    else:
+                        print(f"CVM Assessores AAI ({res.get('nome_municipio')} - {res.get('sigla_uf')}): {res.get('assessores_investimento_ativos')} AAI | PASM {res.get('alertas_sancionatorios_pasm_pct')}%")
+                    return 0
+
+                if cvmx_action == "municipio":
+                    res = cvmx_conn.get_cvm_extra_summary(args.id_municipio_or_name)
+                    if res is None:
+                        print(f"Resumo CVM Extra não encontrado para: {args.id_municipio_or_name}", file=sys.stderr)
+                        return 1
+                    if getattr(args, "json", False):
+                        print(json.dumps(res, indent=2, ensure_ascii=False, default=str))
+                    else:
+                        print(f"CVM Extra Município ({res.get('nome_municipio')} - {res.get('sigla_uf')}): {res.get('total_ofertas_rcvm160')} ofertas | R$ {res.get('volume_captado_rcvm160_mil_brl')}k")
+                    return 0
+
+                if cvmx_action == "features":
+                    res = cvmx_conn.get_cvm_extra_features(args.id_municipio_or_name)
+                    if res is None:
+                        print(f"Features CVM Extra não encontradas para: {args.id_municipio_or_name}", file=sys.stderr)
+                        return 1
+                    if getattr(args, "json", False):
+                        print(json.dumps(res, indent=2, ensure_ascii=False, default=str))
+                    else:
+                        print(f"CVM Extra Gold ({res.get('nome_municipio')} - {res.get('id_municipio')}): Score {res.get('score_sofisticacao_mercado_cvm')} | {res.get('tier_ecossistema_mercado_capitais')}")
+                    return 0
+
+                if cvmx_action == "ranking":
+                    ranks = cvmx_conn.list_top_cvm_extra_municipalities(
+                        limit=getattr(args, "limit", 10),
+                        sigla_uf=getattr(args, "uf", None),
+                        sort_by_volume=getattr(args, "volume", False),
+                    )
+                    if getattr(args, "json", False):
+                        print(json.dumps(ranks, indent=2, ensure_ascii=False, default=str))
+                    else:
+                        print(f"Ranking CVM Mercado de Capitais ({len(ranks)}):")
+                        for idx, r in enumerate(ranks, 1):
+                            print(f"  {idx}. {r.get('nome_municipio')} ({r.get('sigla_uf')}): {r.get('score_sofisticacao_mercado_cvm')} | {r.get('tier_ecossistema_mercado_capitais')}")
+                    return 0
+            except (ValueError, KeyError) as exc:
+                print(f"Erro CVM Extra: {exc}", file=sys.stderr)
                 return 1
 
         elif args.command == "cno":

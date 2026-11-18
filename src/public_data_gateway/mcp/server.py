@@ -837,6 +837,51 @@ class MCPDispatcher:
                                 },
                             },
                             {
+                                "name": "bdg_get_cvm_ofertas_rcvm160",
+                                "description": "Lookup CVM RCVM 160 public offerings by code, security type, rite, IBGE, UF, or city.",
+                                "inputSchema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "termo": {"type": "string", "description": "RCVM 160 code, security type, rite, IBGE 7-digit code, UF, or city"},
+                                    },
+                                    "required": ["termo"],
+                                },
+                            },
+                            {
+                                "name": "bdg_get_cvm_administradores",
+                                "description": "Lookup CVM portfolio managers and FII/FIP managers, AUM, and regulatory compliance by code, IBGE, UF, or city.",
+                                "inputSchema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "termo": {"type": "string", "description": "Administrator code, IBGE 7-digit code, UF, or municipality name"},
+                                    },
+                                    "required": ["termo"],
+                                },
+                            },
+                            {
+                                "name": "bdg_get_cvm_extra_features",
+                                "description": "Get normalized Gold CVM capital markets sophistication score, RCVM 160 volume, and ecosystem tier.",
+                                "inputSchema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "id_municipio_or_name": {"type": "string", "description": "7-digit IBGE municipality code or municipality name"},
+                                    },
+                                    "required": ["id_municipio_or_name"],
+                                },
+                            },
+                            {
+                                "name": "bdg_list_top_cvm_extra_municipalities",
+                                "description": "List Brazilian municipalities ranked by CVM capital markets sophistication score or RCVM 160 volume raised (R$ mil).",
+                                "inputSchema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "limit": {"type": "integer", "description": "Maximum rows (default: 10)"},
+                                        "sigla_uf": {"type": "string", "description": "Optional 2-letter state filter (e.g. SP)"},
+                                        "sort_by_volume": {"type": "boolean", "description": "Set true to rank municipalities by highest RCVM 160 volume first"},
+                                    },
+                                },
+                            },
+                            {
                                 "name": "bdg_get_estban_municipal_balance",
                                 "description": "Retrieve monthly BACEN ESTBAN COSIF municipal banking balance sheet (Tier 1).",
                                 "inputSchema": {
@@ -4968,6 +5013,65 @@ class MCPDispatcher:
                     },
                 }
             wrapped = wrap_untrusted_gov_data(result, source_id="bndes_operacoes")
+            return {
+                "jsonrpc": "2.0",
+                "id": req_id,
+                "result": {"content": [{"type": "text", "text": wrapped}], "isError": False},
+            }
+
+        if tool_name in {
+            "bdg_get_cvm_ofertas_rcvm160",
+            "bdg_get_cvm_administradores",
+            "bdg_get_cvm_extra_features",
+            "bdg_list_top_cvm_extra_municipalities",
+        }:
+            from public_data_gateway.connectors.macrofinanceiro.cvm_mercado_extra import (
+                CvmMercadoExtraConnector,
+            )
+
+            connector = CvmMercadoExtraConnector(settings=self.settings)
+            try:
+                if tool_name == "bdg_get_cvm_ofertas_rcvm160":
+                    result: Any = connector.get_rcvm160_offerings(str(args.get("termo", "")))
+                elif tool_name == "bdg_get_cvm_administradores":
+                    result = connector.get_fii_administrators(str(args.get("termo", "")))
+                elif tool_name == "bdg_get_cvm_extra_features":
+                    result = connector.get_cvm_extra_features(
+                        str(args.get("id_municipio_or_name", ""))
+                    )
+                else:
+                    result = connector.list_top_cvm_extra_municipalities(
+                        limit=int(args.get("limit", 10)),
+                        sigla_uf=args.get("sigla_uf"),
+                        sort_by_volume=bool(args.get("sort_by_volume", False)),
+                    )
+            except (ValueError, KeyError) as exc:
+                return {
+                    "jsonrpc": "2.0",
+                    "id": req_id,
+                    "result": {
+                        "content": [
+                            {"type": "text", "text": f"CVM Mercado Extra parameter error: {exc}"}
+                        ],
+                        "isError": True,
+                    },
+                }
+
+            if not result:
+                return {
+                    "jsonrpc": "2.0",
+                    "id": req_id,
+                    "result": {
+                        "content": [
+                            {
+                                "type": "text",
+                                "text": "No CVM capital markets data found for the query.",
+                            }
+                        ],
+                        "isError": True,
+                    },
+                }
+            wrapped = wrap_untrusted_gov_data(result, source_id="cvm_mercado_extra")
             return {
                 "jsonrpc": "2.0",
                 "id": req_id,

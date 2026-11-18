@@ -154,6 +154,15 @@ models:
       - name: avg_score_fomento_bndes_uf
         description: "Média estadual do score de dinamismo de fomento e economia verde BNDES (0-100)."
         tests: [not_null]
+      - name: volume_captado_rcvm160_cvm_uf_mil_brl
+        description: "Volume financeiro estadual captado em ofertas públicas RCVM 160 da CVM (R$ mil)."
+        tests: [not_null]
+      - name: assessores_investimento_cvm_uf
+        description: "Total estadual de assessores de investimento ativos credenciados na CVM."
+        tests: [not_null]
+      - name: avg_score_mercado_capitais_cvm_uf
+        description: "Média estadual do score de sofisticação e conformidade do mercado de capitais CVM (0-100)."
+        tests: [not_null]
       - name: macro_ano_mes_referencia
         description: "Competência macroeconômica de referência (YYYY-MM)."
         tests: [not_null]

@@ -92,6 +92,7 @@ import public_data_gateway.connectors.macrofinanceiro.bndes_operacoes  # noqa: F
 import public_data_gateway.connectors.macrofinanceiro.brapi_b3  # noqa: F401
 import public_data_gateway.connectors.macrofinanceiro.cvm_dfp_itr  # noqa: F401
 import public_data_gateway.connectors.macrofinanceiro.cvm_fundos  # noqa: F401
+import public_data_gateway.connectors.macrofinanceiro.cvm_mercado_extra  # noqa: F401
 import public_data_gateway.connectors.macrofinanceiro.ipeadata_odata  # noqa: F401
 import public_data_gateway.connectors.macrofinanceiro.stn_capag  # noqa: F401
 import public_data_gateway.connectors.macrofinanceiro.stn_siconfi  # noqa: F401
