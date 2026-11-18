@@ -462,6 +462,84 @@ def create_app(settings: GatewaySettings | None = None) -> FastAPI:
         conn = SuframaPimZfmConnector(settings=app_settings)
         return conn.get_tax_incentives_profile(cnpj)
 
+    # 10B. RFB CNO (Cadastro Nacional de Obras & Construção Civil)
+    @app.get("/api/v1/company/cno/obras/{termo}")
+    async def get_cno_obras(termo: str) -> list[dict[str, Any]]:
+        from public_data_gateway.connectors.empresarial.rfb_cno import (
+            RfbCnoConnector,
+        )
+
+        return RfbCnoConnector(settings=app_settings).get_works(termo)
+
+    @app.get("/api/v1/company/cno/areas/{id_municipio_or_name}")
+    async def get_cno_areas(id_municipio_or_name: str) -> dict[str, Any]:
+        from public_data_gateway.connectors.empresarial.rfb_cno import (
+            RfbCnoConnector,
+        )
+
+        res = RfbCnoConnector(settings=app_settings).get_area_breakdown(
+            id_municipio_or_name
+        )
+        if not res:
+            raise HTTPException(
+                status_code=404,
+                detail=f"RFB CNO area breakdown not found for '{id_municipio_or_name}'",
+            )
+        return res
+
+    @app.get("/api/v1/company/cno/vinculos/{termo}")
+    async def get_cno_vinculos(termo: str) -> list[dict[str, Any]]:
+        from public_data_gateway.connectors.empresarial.rfb_cno import (
+            RfbCnoConnector,
+        )
+
+        return RfbCnoConnector(settings=app_settings).get_responsible_links(termo)
+
+    @app.get("/api/v1/company/cno/municipio/{id_municipio_or_name}")
+    async def get_cno_municipio(id_municipio_or_name: str) -> dict[str, Any]:
+        from public_data_gateway.connectors.empresarial.rfb_cno import (
+            RfbCnoConnector,
+        )
+
+        res = RfbCnoConnector(settings=app_settings).get_municipal_summary(
+            id_municipio_or_name
+        )
+        if not res:
+            raise HTTPException(
+                status_code=404,
+                detail=f"RFB CNO municipal summary not found for '{id_municipio_or_name}'",
+            )
+        return res
+
+    @app.get("/api/v1/company/cno/features/{id_municipio_or_name}")
+    async def get_cno_features(id_municipio_or_name: str) -> dict[str, Any]:
+        from public_data_gateway.connectors.empresarial.rfb_cno import (
+            RfbCnoConnector,
+        )
+
+        res = RfbCnoConnector(settings=app_settings).get_cno_features(
+            id_municipio_or_name
+        )
+        if not res:
+            raise HTTPException(
+                status_code=404,
+                detail=f"RFB CNO Gold features not found for '{id_municipio_or_name}'",
+            )
+        return res
+
+    @app.get("/api/v1/company/cno/ranking")
+    async def get_cno_ranking(
+        limit: int = Query(10, ge=1, le=50, description="Max municipalities to return"),
+        uf: str | None = Query(None, description="Optional 2-letter UF state filter"),
+    ) -> list[dict[str, Any]]:
+        from public_data_gateway.connectors.empresarial.rfb_cno import (
+            RfbCnoConnector,
+        )
+
+        return RfbCnoConnector(settings=app_settings).list_top_municipalities(
+            limit=limit, sigla_uf=uf
+        )
+
     # 11. Capital Markets & Financial Statements (CVM DFP / ITR)
     @app.get("/api/v1/finance/cvm/cias")
     @app.get("/api/v1/cvm/cias")

@@ -100,6 +100,15 @@ agencias_uf AS (
     GROUP BY sigla_uf
 ),
 
+cno_uf AS (
+    SELECT
+        sigla_uf,
+        SUM(obras_ativas_em_andamento) AS total_obras_ativas_cno_uf,
+        ROUND(SUM(area_total_registrada_m2), 2) AS area_construida_cno_uf_m2
+    FROM {{ ref('mart_obras_construcao_civil_cno_brasil') }}
+    GROUP BY sigla_uf
+),
+
 base AS (
     SELECT
         t.sigla_uf,
@@ -129,6 +138,8 @@ base AS (
         COALESCE(eb.volume_depositos_estban_uf_brl, 0.0) AS volume_depositos_estban_uf_brl,
         COALESCE(ag.total_agencias_bancarias_bcb_uf, 0) AS total_agencias_bancarias_bcb_uf,
         COALESCE(ag.avg_score_capilaridade_bancaria_uf, 0.0) AS avg_score_capilaridade_bancaria_uf,
+        COALESCE(cn.total_obras_ativas_cno_uf, 0) AS total_obras_ativas_cno_uf,
+        COALESCE(cn.area_construida_cno_uf_m2, 0.0) AS area_construida_cno_uf_m2,
         COALESCE(m.ano_mes, '2025-03') AS macro_ano_mes_referencia,
         COALESCE(m.selic_meta_fim_mes_pct, 14.25) AS selic_meta_fim_mes_pct,
         COALESCE(m.ipca_acumulado_12m_pct, 5.06) AS ipca_acumulado_12m_pct,
@@ -143,6 +154,7 @@ base AS (
     LEFT JOIN capag_uf cg ON t.sigla_uf = cg.sigla_uf
     LEFT JOIN estban_uf eb ON t.sigla_uf = eb.sigla_uf
     LEFT JOIN agencias_uf ag ON t.sigla_uf = ag.sigla_uf
+    LEFT JOIN cno_uf cn ON t.sigla_uf = cn.sigla_uf
     CROSS JOIN macro_latest m
 ),
 

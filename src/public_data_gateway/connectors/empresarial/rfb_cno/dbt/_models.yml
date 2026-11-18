@@ -1,0 +1,187 @@
+version: 2
+
+models:
+  - name: stg_rfb_cno_obras_cadastradas
+    description: "Staging view de obras civis registradas no Cadastro Nacional de Obras (CNO/RFB)."
+    columns:
+      - name: inscricao_cno
+        description: "Número de inscrição único de 12 dígitos da obra no CNO/RFB."
+        tests: [not_null, unique]
+      - name: documento_responsavel
+        description: "CNPJ de 14 dígitos ou CPF mascarado conforme LGPD do responsável pela obra."
+        tests: [not_null]
+      - name: qualificacao_responsavel
+        description: "Tipo de vínculo jurídico do responsável no CNO (Construtora ou Proprietário)."
+        tests: [not_null]
+      - name: nome_responsavel
+        description: "Razão social ou nome público do responsável pela obra."
+        tests: [not_null]
+      - name: nome_empresarial_obra
+        description: "Título ou denominação do empreendimento/canteiro de obras."
+        tests: [not_null]
+      - name: situacao_cno
+        description: "Situação cadastral da obra na Receita Federal (Ativa, Paralisada ou Encerrada)."
+        tests: [not_null]
+      - name: id_municipio
+        description: "Código IBGE canônico de 7 dígitos do município da obra."
+        tests: [not_null]
+      - name: sigla_uf
+        description: "Sigla de 2 letras da Unidade Federativa da obra."
+        tests: [not_null]
+      - name: nome_municipio
+        description: "Nome oficial do município."
+        tests: [not_null]
+      - name: cep_8
+        description: "CEP normalizado de 8 dígitos do endereço do canteiro de obras."
+        tests: [not_null]
+      - name: cnae_7_obra
+        description: "Código CNAE subclasse de 7 dígitos da atividade de construção civil."
+        tests: [not_null]
+      - name: area_total_m2
+        description: "Área total averbada da obra civil em metros quadrados (m²)."
+        tests: [not_null]
+      - name: unidade_medida
+        description: "Unidade de medida cadastral declarada na obra (m²)."
+        tests: [not_null]
+      - name: data_inicio_obra
+        description: "Data oficial de início de execução da obra (YYYY-MM-DD)."
+        tests: [not_null]
+      - name: data_situacao
+        description: "Data da última atualização de status cadastral no CNO (YYYY-MM-DD)."
+        tests: [not_null]
+
+  - name: stg_rfb_cno_areas_destinacao
+    description: "Staging view de distribuição municipal de área construída por destinação no CNO."
+    columns:
+      - name: id_municipio
+        description: "Código IBGE canônico de 7 dígitos do município."
+        tests: [not_null, unique]
+      - name: sigla_uf
+        description: "Sigla de 2 letras da Unidade Federativa."
+        tests: [not_null]
+      - name: nome_municipio
+        description: "Nome oficial do município."
+        tests: [not_null]
+      - name: area_residencial_m2
+        description: "Área construída destinada a empreendimentos residenciais em m²."
+        tests: [not_null]
+      - name: area_comercial_industrial_m2
+        description: "Área construída destinada a imóveis comerciais, logísticos e industriais em m²."
+        tests: [not_null]
+      - name: area_infraestrutura_publica_m2
+        description: "Área averbada em obras de infraestrutura e equipamentos públicos em m²."
+        tests: [not_null]
+      - name: area_total_construida_m2
+        description: "Somatório municipal da área construída registrada no CNO em m²."
+        tests: [not_null]
+      - name: percentual_obras_ativas_pct
+        description: "Percentual de obras atualmente ativas no estoque municipal do CNO (%)."
+        tests: [not_null]
+
+  - name: stg_rfb_cno_vinculos_responsaveis
+    description: "Staging view de vínculos de construtoras e proprietários responsáveis pelas obras no CNO."
+    columns:
+      - name: inscricao_cno
+        description: "Número de inscrição CNO vinculado ao responsável."
+        tests: [not_null, unique]
+      - name: documento_responsavel
+        description: "CNPJ 14D ou CPF mascarado LGPD do responsável vinculado."
+        tests: [not_null]
+      - name: nome_responsavel
+        description: "Nome ou razão social do responsável pela execução da obra."
+        tests: [not_null]
+      - name: qualificacao_responsavel
+        description: "Qualificação do responsável (Empreiteira Total, Incorporadora ou Proprietário)."
+        tests: [not_null]
+      - name: id_municipio
+        description: "Código IBGE canônico de 7 dígitos do município."
+        tests: [not_null]
+      - name: sigla_uf
+        description: "Sigla de 2 letras da Unidade Federativa."
+        tests: [not_null]
+      - name: cnae_7_construtora
+        description: "Código CNAE subclasse 7D da construtora ou atividade vinculada."
+        tests: [not_null]
+      - name: data_inicio_vinculo
+        description: "Data de início da responsabilidade técnica ou cadastral na obra (YYYY-MM-DD)."
+        tests: [not_null]
+
+  - name: stg_rfb_cno_resumo_municipal
+    description: "Staging view consolidada de estoque de obras ativas, paralisadas e encerradas por município."
+    columns:
+      - name: id_municipio
+        description: "Código IBGE canônico de 7 dígitos do município."
+        tests: [not_null, unique]
+      - name: sigla_uf
+        description: "Sigla de 2 letras da Unidade Federativa."
+        tests: [not_null]
+      - name: nome_municipio
+        description: "Nome oficial do município."
+        tests: [not_null]
+      - name: total_obras_cno
+        description: "Contagem total histórica e ativa de obras cadastradas no CNO no município."
+        tests: [not_null]
+      - name: obras_ativas_em_andamento
+        description: "Quantidade de obras civis em andamento ativo no CNO."
+        tests: [not_null]
+      - name: obras_paralisadas_suspensas
+        description: "Quantidade de obras com situação cadastral paralisada ou suspensa."
+        tests: [not_null]
+      - name: obras_encerradas_habitese
+        description: "Quantidade de obras encerradas e baixadas no CNO."
+        tests: [not_null]
+      - name: area_total_registrada_m2
+        description: "Área total construída registrada no município no CNO em m²."
+        tests: [not_null]
+
+  - name: fct_obras_construcao_civil_cno_municipal
+    description: "Tabela fato consolidada municipal do Cadastro Nacional de Obras (RFB CNO) unindo estoque de obras, destinação de área m² e amostra de responsáveis."
+    columns:
+      - name: id_municipio
+        description: "Código IBGE canônico de 7 dígitos do município."
+        tests: [not_null, unique]
+      - name: sigla_uf
+        description: "Sigla de 2 letras da Unidade Federativa."
+        tests: [not_null]
+      - name: nome_municipio
+        description: "Nome oficial do município."
+        tests: [not_null]
+      - name: total_obras_cno
+        description: "Total de inscrições CNO registradas no município."
+        tests: [not_null]
+      - name: obras_ativas_em_andamento
+        description: "Obras civis com situação cadastral Ativa no município."
+        tests: [not_null]
+      - name: obras_paralisadas_suspensas
+        description: "Obras paralisadas ou suspensas no município."
+        tests: [not_null]
+      - name: obras_encerradas_habitese
+        description: "Obras encerradas no município."
+        tests: [not_null]
+      - name: area_total_registrada_m2
+        description: "Área total averbada no CNO municipal em m²."
+        tests: [not_null]
+      - name: area_residencial_m2
+        description: "Área construída de destinação residencial em m²."
+        tests: [not_null]
+      - name: area_comercial_industrial_m2
+        description: "Área construída de destinação comercial, logística ou industrial em m²."
+        tests: [not_null]
+      - name: area_infraestrutura_publica_m2
+        description: "Área de obras de infraestrutura pública no município em m²."
+        tests: [not_null]
+      - name: area_total_construida_m2
+        description: "Área construída consolidada em todas as destinações em m²."
+        tests: [not_null]
+      - name: percentual_obras_ativas_pct
+        description: "Percentual de obras ativas sobre o total de inscrições municipais (%)."
+        tests: [not_null]
+      - name: qtd_obras_amostra_cadastral
+        description: "Quantidade de obras detalhadas na amostra analítica cadastral CNO."
+        tests: [not_null]
+      - name: area_media_obra_amostra_m2
+        description: "Área média em m² das obras detalhadas na amostra analítica CNO."
+        tests: [not_null]
+      - name: qtd_responsaveis_amostra
+        description: "Contagem de responsáveis distintos na amostra de vínculos CNO do município."
+        tests: [not_null]

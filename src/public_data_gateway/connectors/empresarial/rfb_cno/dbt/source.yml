@@ -1,0 +1,26 @@
+version: 2
+
+sources:
+  - name: rfb_cno
+    description: "Tabelas Silver do Cadastro Nacional de Obras da Receita Federal (CNO/RFB)"
+    meta:
+      agency: "Receita Federal do Brasil (RFB)"
+      domain: "b2b_empresarial"
+      freshness_sla: "Mensal (720h)"
+    tables:
+      - name: cno_obras_cadastradas
+        description: "Cadastro analítico de obras civis registradas no CNO (área m², CNAE, situação e CEP)"
+        meta:
+          external_location: "data/rfb_cno/silver/cno_obras_cadastradas.parquet"
+      - name: cno_areas_destinacao
+        description: "Distribuição municipal da área construída averbada por destinação (residencial, comercial/industrial, infraestrutura)"
+        meta:
+          external_location: "data/rfb_cno/silver/cno_areas_destinacao.parquet"
+      - name: cno_vinculos_responsaveis
+        description: "Vínculos jurídicos de construtoras, incorporadoras e proprietários por inscrição CNO"
+        meta:
+          external_location: "data/rfb_cno/silver/cno_vinculos_responsaveis.parquet"
+      - name: cno_resumo_municipal
+        description: "Consolidado municipal de estoque de obras ativas, paralisadas e encerradas no CNO"
+        meta:
+          external_location: "data/rfb_cno/silver/cno_resumo_municipal.parquet"

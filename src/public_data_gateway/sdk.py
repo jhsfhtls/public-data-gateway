@@ -597,6 +597,50 @@ class CompanyFacade:
         """Resolve Simples Nacional and MEI tax regime for a given CNPJ."""
         return self._sdk.get_simples_status(cnpj)
 
+    @property
+    def cno_connector(self) -> Any:
+        if not hasattr(self, "_cno_conn") or self._cno_conn is None:
+            from public_data_gateway.connectors.empresarial.rfb_cno import (
+                RfbCnoConnector,
+            )
+
+            self._cno_conn = RfbCnoConnector(settings=self._sdk.settings)
+        return self._cno_conn
+
+    def get_cno_works(self, termo: str) -> list[dict[str, Any]]:
+        """Query registered RFB CNO civil works by CNO code, CNPJ, IBGE 7D, CEP, CNAE, or name."""
+        return self.cno_connector.get_works(termo)
+
+    def get_cno_area_breakdown(
+        self, id_municipio_or_name: str
+    ) -> dict[str, Any] | None:
+        """Retrieve municipal built area breakdown (residential, commercial, infrastructure m²)."""
+        return self.cno_connector.get_area_breakdown(id_municipio_or_name)
+
+    def get_cno_responsible_links(self, termo: str) -> list[dict[str, Any]]:
+        """Lookup construction firm and property owner links in RFB CNO."""
+        return self.cno_connector.get_responsible_links(termo)
+
+    def get_cno_municipal_summary(
+        self, id_municipio_or_name: str
+    ) -> dict[str, Any] | None:
+        """Retrieve municipal consolidated RFB CNO work counts and built area."""
+        return self.cno_connector.get_municipal_summary(id_municipio_or_name)
+
+    def get_cno_features(
+        self, id_municipio_or_name: str
+    ) -> dict[str, Any] | None:
+        """Retrieve Gold RFB CNO civil construction dynamism and CAPEX pipeline features."""
+        return self.cno_connector.get_cno_features(id_municipio_or_name)
+
+    def list_top_cno_municipalities(
+        self, limit: int = 10, sigla_uf: str | None = None
+    ) -> list[dict[str, Any]]:
+        """List municipalities ranked by Gold RFB CNO civil construction dynamism score."""
+        return self.cno_connector.list_top_municipalities(
+            limit=limit, sigla_uf=sigla_uf
+        )
+
 
 class FinanceFacade:
     """Capital markets, standardized financial statements and solvency metrics (CVM DFP/ITR)."""
@@ -2765,6 +2809,40 @@ class BrazilData:
     def get_tax_incentives(self, cnpj: str) -> dict[str, Any]:
         """Assess corporate fiscal incentive score and industrial capacity profile (PIM/ZFM/ALC)."""
         return self.company.tax_incentives(cnpj)
+
+    def get_cno_works(self, termo: str) -> list[dict[str, Any]]:
+        """Consultar obras civis registradas no Cadastro Nacional de Obras CNO (RFB)."""
+        return self.company.get_cno_works(termo)
+
+    def get_cno_area_breakdown(
+        self, id_municipio_or_name: str
+    ) -> dict[str, Any] | None:
+        """Consultar área construída (m²) por destinação no CNO municipal (RFB)."""
+        return self.company.get_cno_area_breakdown(id_municipio_or_name)
+
+    def get_cno_responsible_links(self, termo: str) -> list[dict[str, Any]]:
+        """Consultar vínculos de construtoras e proprietários de obras no CNO (RFB)."""
+        return self.company.get_cno_responsible_links(termo)
+
+    def get_cno_municipal_summary(
+        self, id_municipio_or_name: str
+    ) -> dict[str, Any] | None:
+        """Consultar sumário municipal de obras ativas, paralisadas e encerradas no CNO (RFB)."""
+        return self.company.get_cno_municipal_summary(id_municipio_or_name)
+
+    def get_cno_features(
+        self, id_municipio_or_name: str
+    ) -> dict[str, Any] | None:
+        """Consultar features Gold de dinamismo construtivo e CAPEX físico no CNO (RFB)."""
+        return self.company.get_cno_features(id_municipio_or_name)
+
+    def list_top_cno_municipalities(
+        self, limit: int = 10, sigla_uf: str | None = None
+    ) -> list[dict[str, Any]]:
+        """Listar municípios líderes em expansão da construção civil no CNO (RFB)."""
+        return self.company.list_top_cno_municipalities(
+            limit=limit, sigla_uf=sigla_uf
+        )
 
     def get_cvm_company(self, cnpj_or_codigo: str) -> dict[str, Any]:
         """Query CVM publicly traded company registration and financial profile."""

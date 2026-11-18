@@ -209,4 +209,81 @@ models:
         tests:
           - not_null
 
+  - name: mart_obras_construcao_civil_cno_brasil
+    description: "Datamart executivo intra-domínio do Cadastro Nacional de Obras (RFB CNO) consolidando estoque de obras, área construída m² por destinação e dinamismo imobiliário/CAPEX municipal."
+    columns:
+      - name: id_municipio
+        description: "Código IBGE canônico de 7 dígitos do município."
+        tests:
+          - not_null
+          - unique
+      - name: sigla_uf
+        description: "Sigla de 2 letras da Unidade Federativa."
+        tests:
+          - not_null
+      - name: nome_municipio
+        description: "Nome oficial do município."
+        tests:
+          - not_null
+      - name: total_obras_cno
+        description: "Quantidade total de obras cadastradas no CNO municipal."
+        tests:
+          - not_null
+      - name: obras_ativas_em_andamento
+        description: "Quantidade de obras civis ativas em andamento no município."
+        tests:
+          - not_null
+      - name: obras_paralisadas_suspensas
+        description: "Quantidade de obras paralisadas ou suspensas."
+        tests:
+          - not_null
+      - name: obras_encerradas_habitese
+        description: "Quantidade de obras concluídas e encerradas no CNO."
+        tests:
+          - not_null
+      - name: area_total_registrada_m2
+        description: "Área total registrada no cadastro municipal CNO em m²."
+        tests:
+          - not_null
+      - name: area_residencial_m2
+        description: "Área averbada destinada a edificações residenciais em m²."
+        tests:
+          - not_null
+      - name: area_comercial_industrial_m2
+        description: "Área averbada destinada a galpões, indústrias e empreendimentos comerciais em m²."
+        tests:
+          - not_null
+      - name: area_infraestrutura_publica_m2
+        description: "Área averbada em obras de infraestrutura pública no município em m²."
+        tests:
+          - not_null
+      - name: area_total_construida_m2
+        description: "Área total construída consolidada nas destinações CNO em m²."
+        tests:
+          - not_null
+      - name: percentual_obras_ativas_pct
+        description: "Taxa percentual de obras atualmente ativas no estoque municipal (%)."
+        tests:
+          - not_null
+      - name: qtd_obras_amostra_cadastral
+        description: "Quantidade de obras detalhadas na amostra cadastral analítica."
+        tests:
+          - not_null
+      - name: area_media_obra_amostra_m2
+        description: "Área média por obra na amostra cadastral em m²."
+        tests:
+          - not_null
+      - name: qtd_responsaveis_amostra
+        description: "Quantidade de construtoras ou responsáveis distintos na amostra municipal."
+        tests:
+          - not_null
+      - name: score_dinamismo_construcao_cno
+        description: "Score composto de dinamismo da construção civil e pipeline CAPEX físico (10 a 99)."
+        tests:
+          - not_null
+      - name: classificacao_expansao_imobiliaria_cno
+        description: "Tier executivo de expansão construtiva municipal (POLO_EXPANSAO_CONSTRUTIVA_ALTA, DINAMISMO_CONSTRUTIVO_MODERADO, BAIXA_ATIVIDADE_CNO)."
+        tests:
+          - not_null
+
 
