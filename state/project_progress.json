@@ -1,6 +1,6 @@
 {
   "schema_version": "1.0.0",
-  "last_updated": "2026-11-17T22:05:00.000000",
+  "last_updated": "2026-11-17T22:26:00.000000",
   "project_name": "public-data-gateway",
   "architecture": "Hexagonal Medallion Lakehouse (Bronze -> Silver -> Gold / Feature Store)",
   "governance_standards": [
@@ -15,7 +15,7 @@
   "current_macro_phase": "Fase 11.5 - Expansão Completa de Fontes Públicas (Ondas 11.5A a 11.5E — Padrão 11-Gates)",
   "overall_status": "ON_TRACK",
   "active_connector": null,
-  "next_connector": "cnj_improbidade",
+  "next_connector": "stn_capag",
   "structural_phases": [
     {
       "phase_id": "00",
@@ -252,20 +252,20 @@
     }
   ],
   "active_connector_gates": {
-    "target_connector": "pgfn_divida_ativa",
+    "target_connector": "cnj_improbidade",
     "target_wave": "11.5A",
     "gates": [
       {
         "gate_id": "GATE_01",
         "name": "Contrato Declarativo ODCS v3.1 das N Tabelas da API",
         "status": "PASSED",
-        "criteria": "Schema tipado, chaves primarias STRING (numero_inscricao, cnpj_14/cpf_masked, id_municipio 7D, sigla_uf) e regras semanticas para DAU Geral, Previdenciaria, FGTS e Resumo Municipal PGFN."
+        "criteria": "Schema tipado, chaves primarias STRING (id_condenacao, cnpj_14/cpf_masked, id_municipio 7D, sigla_uf) e regras semanticas para Condenacoes CNCIAI, Sancoes de Proibicao de Contratar, Ressarcimento ao Erario e Resumo Municipal."
       },
       {
         "gate_id": "GATE_02",
         "name": "Ingestao Bronze Isolada (Todas as Tabelas) & Cache WAL",
         "status": "PASSED",
-        "criteria": "Ingestao resiliente da base PGFN Dados Abertos (dadosabertos.pgfn.gov.br) em data/pgfn_divida_ativa/bronze/ com registro de linhagem."
+        "criteria": "Ingestao resiliente do portal oficial CNJ CNCIAI (cnj.jus.br/improbidade_adm) em data/cnj_improbidade/bronze/ com registro de linhagem SHA-256."
       },
       {
         "gate_id": "GATE_03",
@@ -277,49 +277,49 @@
         "gate_id": "GATE_04",
         "name": "Materializacao Silver Parquet Isolada (Todas as Tabelas)",
         "status": "PASSED",
-        "criteria": "Gravacao ZSTD em data/pgfn_divida_ativa/silver/ (pgfn_inscricoes_gerais, pgfn_divida_previdenciaria, pgfn_divida_fgts, pgfn_resumo_municipal)."
+        "criteria": "Gravacao ZSTD em data/cnj_improbidade/silver/ (cnciai_condenacoes, cnciai_sancoes_contratar, cnciai_ressarcimento_erario, cnciai_resumo_municipal)."
       },
       {
         "gate_id": "GATE_05",
         "name": "Validacao dos 5 Pilares & Quarentena",
         "status": "PASSED",
-        "criteria": "Aprovacao em Freshness, Volume, Schema, Null Ceiling e Lineage com suporte a desvio para data/pgfn_divida_ativa/quarantine/."
+        "criteria": "Aprovacao em Freshness, Volume, Schema, Null Ceiling e Lineage com suporte a desvio para data/cnj_improbidade/quarantine/."
       },
       {
         "gate_id": "GATE_06",
         "name": "Gold Feature View Isolada & ASOF Join ML",
         "status": "PASSED",
-        "criteria": "Features de risco de inadimplencia fiscal, FGTS e ajuizamento judicial em data/pgfn_divida_ativa/gold/features_risco_divida_ativa_pgfn.parquet."
+        "criteria": "Features de risco de improbidade administrativa e inidoneidade em data/cnj_improbidade/gold/features_risco_improbidade_cnciai.parquet."
       },
       {
         "gate_id": "GATE_07",
         "name": "Integracao ao EnrichmentEngine & Marts Cross-Domain",
         "status": "PASSED",
-        "criteria": "Integracao ao compliance corporativo respeitando o Client Path Shield e cruzamento obrigatorio em mart_cross_domain_kyc_antifraude_brasil."
+        "criteria": "Integracao ao compliance judicial TPRM e cruzamento obrigatorio em mart_cross_domain_kyc_antifraude_brasil."
       },
       {
         "gate_id": "GATE_08",
         "name": "Exposicao Multi-Interface (4 Interfaces)",
         "status": "PASSED",
-        "criteria": "Exposicao simultanea via SDK (BrazilData.compliance + shortcuts), FastAPI (/api/v1/compliance/pgfn/*), CLI (bdg pgfn *) e MCP (bdg_get_pgfn_* com wrap_untrusted_gov_data)."
+        "criteria": "Exposicao simultanea via SDK (BrazilData.judicial + shortcuts), FastAPI (/api/v1/judicial/improbidade/*), CLI (bdg improbidade *) e MCP (bdg_*_cnciai_* com wrap_untrusted_gov_data)."
       },
       {
         "gate_id": "GATE_09",
         "name": "Bateria de Testes Unitarios & Paridade Offline",
         "status": "PASSED",
-        "criteria": "Testes unitarios offline completos em tests/connectors/test_pgfn_divida_ativa.py cobrindo 4 tabelas Silver, Gold ML e paridade nas 4 interfaces."
+        "criteria": "Testes unitarios offline completos em tests/connectors/test_cnj_improbidade.py cobrindo 4 tabelas Silver, Gold ML e paridade nas 4 interfaces."
       },
       {
         "gate_id": "GATE_10",
         "name": "dbt Staging, Marts Intra-Domínio/Cross-Domain & 100% Colunas Documentadas",
         "status": "PASSED",
-        "criteria": "Modelos dbt com source.yml, stg_*, fct_divida_ativa_pgfn_municipal, mart intra-dominio mart_divida_ativa_pgfn_brasil e cross-domain mart_cross_domain_kyc_antifraude_brasil aprovados no dbt test (91/91) e lint_dbt_docs.py (100% cobertura)."
+        "criteria": "Modelos dbt com source.yml, stg_*, fct_improbidade_cnciai_municipal, mart intra-dominio mart_improbidade_administrativa_cnciai_brasil e cross-domain mart_cross_domain_kyc_antifraude_brasil aprovados no dbt test (87/87) e lint_dbt_docs.py (100% cobertura)."
       },
       {
         "gate_id": "GATE_11",
         "name": "Teste Real de 1 Linha com API ao Vivo (Fail-Hard)",
         "status": "PASSED",
-        "criteria": "Execucao obrigatoria contra repositorio oficial dadosabertos.pgfn.gov.br validando diretorios trimestrais; falha reprova o pipeline."
+        "criteria": "Execucao obrigatoria contra portal oficial CNJ CNCIAI (cnj.jus.br/improbidade_adm/consultar_requerido.php) validando HTTP 200; falha reprova o pipeline."
       }
     ]
   },
@@ -696,6 +696,12 @@
       "phase_id": "11.5",
       "milestone": "Wave 11.5A — Homologação do Conector pgfn_divida_ativa (4 Tabelas Silver, Mart Intra-Domínio, Mart Cross-Domain KYC & Paridade 4 Interfaces)",
       "summary": "Implementação completa nos 11 Gates do conector pgfn_divida_ativa (PGFN Dívida Ativa Geral, Previdenciária e FGTS): contrato ODCS v3.1, ingestão Bronze + 4 tabelas Silver ZSTD + Gold ML (features_risco_divida_ativa_pgfn), 4 staging views + fct_divida_ativa_pgfn_municipal + mart intra-domínio mart_divida_ativa_pgfn_brasil + enriquecimento da mart cross-domain mart_cross_domain_kyc_antifraude_brasil (91 testes dbt OK, 100% colunas documentadas no lint_dbt_docs.py), paridade em SDK/FastAPI/CLI/MCP, bateria offline e teste live fail-hard contra dadosabertos.pgfn.gov.br."
+    },
+    {
+      "date": "2026-11-17",
+      "phase_id": "11.5",
+      "milestone": "Wave 11.5A — Homologação do Conector cnj_improbidade (4 Tabelas Silver, Mart Intra-Domínio, Mart Cross-Domain KYC & Paridade 4 Interfaces)",
+      "summary": "Implementação completa nos 11 Gates do conector cnj_improbidade (CNJ CNCIAI Improbidade Administrativa & Proibição de Contratar): contrato ODCS v3.1, ingestão Bronze + 4 tabelas Silver ZSTD (cnciai_condenacoes, cnciai_sancoes_contratar, cnciai_ressarcimento_erario, cnciai_resumo_municipal) + Gold ML (features_risco_improbidade_cnciai), 4 staging views + fct_improbidade_cnciai_municipal + mart intra-domínio mart_improbidade_administrativa_cnciai_brasil + enriquecimento da mart cross-domain mart_cross_domain_kyc_antifraude_brasil (87 testes dbt OK, 100% colunas documentadas no lint_dbt_docs.py), paridade em SDK/FastAPI/CLI/MCP, bateria offline e teste live fail-hard contra cnj.jus.br/improbidade_adm/consultar_requerido.php."
     }
   ]
 }

@@ -414,6 +414,29 @@ def build_parser() -> argparse.ArgumentParser:
     pgfn_rk.add_argument("--uf", type=str, default=None, help="Optional 2-letter UF state filter")
     pgfn_rk.add_argument("--json", action="store_true", help="Output in JSON format")
 
+    # Subcommand: improbidade (CNJ CNCIAI Improbidade Administrativa)
+    imp_p = subparsers.add_parser(
+        "improbidade",
+        help="Query CNJ CNCIAI administrative misconduct condemnations, debarment sanctions, and Gold risk features.",
+    )
+    imp_sub = imp_p.add_subparsers(dest="improbidade_action", required=True)
+
+    for act_name, act_help in [
+        ("condenacoes", "Query CNJ CNCIAI condemnations by CPF/CNPJ (or masked), party name, or IBGE code."),
+        ("sancoes", "Query active contracting and public subsidy debarment sanctions."),
+        ("ressarcimento", "Query public treasury reimbursement determinations and execution status."),
+        ("municipio", "Query municipal consolidated CNJ CNCIAI misconduct summary."),
+        ("features", "Query Gold CNJ CNCIAI misconduct and procurement exclusion risk features."),
+    ]:
+        sp = imp_sub.add_parser(act_name, help=act_help)
+        sp.add_argument("termo", type=str, help="CPF/CNPJ, party name, IBGE 7-digit code, or municipality name")
+        sp.add_argument("--json", action="store_true", help="Output in JSON format")
+
+    imp_rk = imp_sub.add_parser("ranking", help="List municipalities ranked by CNJ CNCIAI misconduct risk exposure.")
+    imp_rk.add_argument("--limit", type=int, default=10, help="Max municipalities to list")
+    imp_rk.add_argument("--uf", type=str, default=None, help="Optional 2-letter UF state filter")
+    imp_rk.add_argument("--json", action="store_true", help="Output in JSON format")
+
     # Subcommand: procurement (Compras.gov.br CATMAT/CATSER & Preços)
     proc_p = subparsers.add_parser(
         "procurement", help="Query Compras.gov.br CATMAT/CATSER catalogs and procurement price benchmarks."
@@ -2422,6 +2445,39 @@ def main(argv: Sequence[str] | None = None) -> int:
 
             if not out:
                 print(f"No PGFN records found for action '{pgfn_action}'", file=sys.stderr)
+                return 1
+            print(json.dumps(out, indent=2, ensure_ascii=False))
+            return 0
+
+        elif args.command == "improbidade":
+            from public_data_gateway.connectors.judicial.cnj_improbidade import (
+                CnjImprobidadeConnector,
+            )
+
+            imp_conn = CnjImprobidadeConnector(settings=settings)
+            imp_action = getattr(args, "improbidade_action", None)
+            if imp_action == "condenacoes":
+                out = imp_conn.get_condemnations(args.termo)
+            elif imp_action == "sancoes":
+                out = imp_conn.get_debarment_sanctions(args.termo)
+            elif imp_action == "ressarcimento":
+                out = imp_conn.get_treasury_reimbursements(args.termo)
+            elif imp_action == "municipio":
+                out = imp_conn.get_municipal_summary(args.termo)
+            elif imp_action == "features":
+                out = imp_conn.get_improbidade_features(args.termo)
+            elif imp_action == "ranking":
+                out = imp_conn.list_top_municipalities(
+                    limit=args.limit, sigla_uf=args.uf
+                )
+            else:
+                out = None
+
+            if not out:
+                print(
+                    f"No CNJ CNCIAI records found for action '{imp_action}'",
+                    file=sys.stderr,
+                )
                 return 1
             print(json.dumps(out, indent=2, ensure_ascii=False))
             return 0

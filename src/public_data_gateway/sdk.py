@@ -484,6 +484,67 @@ class JudicialFacade:
         )
 
     @property
+    def improbidade_connector(self) -> Any:
+        if (
+            not hasattr(self, "_improbidade_connector")
+            or getattr(self, "_improbidade_connector", None) is None
+        ):
+            from public_data_gateway.connectors.judicial.cnj_improbidade import (
+                CnjImprobidadeConnector,
+            )
+
+            self._improbidade_connector = CnjImprobidadeConnector(
+                settings=self._sdk.settings
+            )
+        return self._improbidade_connector
+
+    def get_improbidade_condenacoes(
+        self, documento_or_name: str
+    ) -> list[dict[str, Any]]:
+        """Query CNJ CNCIAI administrative misconduct condemnations by document, name, or IBGE code."""
+        return self.improbidade_connector.get_condemnations(documento_or_name)
+
+    def get_improbidade_proibicoes_contratar(
+        self, id_municipio_or_doc: str
+    ) -> list[dict[str, Any]]:
+        """Query active public contracting and subsidy debarment sanctions (CNJ CNCIAI)."""
+        return self.improbidade_connector.get_debarment_sanctions(
+            id_municipio_or_doc
+        )
+
+    def get_improbidade_ressarcimentos(
+        self, id_municipio_or_doc: str
+    ) -> list[dict[str, Any]]:
+        """Query public treasury reimbursement determinations and execution status (CNJ CNCIAI)."""
+        return self.improbidade_connector.get_treasury_reimbursements(
+            id_municipio_or_doc
+        )
+
+    def get_improbidade_municipal_summary(
+        self, id_municipio_or_name: str
+    ) -> dict[str, Any] | None:
+        """Retrieve municipal consolidated CNJ CNCIAI administrative misconduct summary."""
+        return self.improbidade_connector.get_municipal_summary(
+            id_municipio_or_name
+        )
+
+    def get_improbidade_features(
+        self, id_municipio_or_name: str
+    ) -> dict[str, Any] | None:
+        """Retrieve Gold CNJ CNCIAI administrative misconduct and procurement exclusion risk features."""
+        return self.improbidade_connector.get_improbidade_features(
+            id_municipio_or_name
+        )
+
+    def list_top_improbidade_municipalities(
+        self, limit: int = 10, sigla_uf: str | None = None
+    ) -> list[dict[str, Any]]:
+        """List municipalities ranked by Gold CNJ CNCIAI misconduct risk exposure."""
+        return self.improbidade_connector.list_top_municipalities(
+            limit=limit, sigla_uf=sigla_uf
+        )
+
+    @property
     def onr_connector(self) -> Any:
         if (
             not hasattr(self, "_onr_connector")
@@ -2500,6 +2561,48 @@ class BrazilData:
     ) -> list[dict[str, Any]]:
         """Listar municípios líderes em eficiência e modernização cartorial (CNJ Justiça Aberta)."""
         return self.judicial.list_top_justica_aberta_municipalities(
+            limit=limit, sigla_uf=sigla_uf
+        )
+
+    def get_improbidade_condenacoes(
+        self, documento_or_name: str
+    ) -> list[dict[str, Any]]:
+        """Consultar condenações por improbidade administrativa (CNJ CNCIAI)."""
+        return self.judicial.get_improbidade_condenacoes(documento_or_name)
+
+    def get_improbidade_proibicoes_contratar(
+        self, id_municipio_or_doc: str
+    ) -> list[dict[str, Any]]:
+        """Consultar sanções ativas de proibição de contratar com o poder público (CNJ CNCIAI)."""
+        return self.judicial.get_improbidade_proibicoes_contratar(
+            id_municipio_or_doc
+        )
+
+    def get_improbidade_ressarcimentos(
+        self, id_municipio_or_doc: str
+    ) -> list[dict[str, Any]]:
+        """Consultar ressarcimentos ao erário em ações de improbidade (CNJ CNCIAI)."""
+        return self.judicial.get_improbidade_ressarcimentos(id_municipio_or_doc)
+
+    def get_improbidade_municipal_summary(
+        self, id_municipio_or_name: str
+    ) -> dict[str, Any] | None:
+        """Consultar sumário municipal consolidado de improbidade administrativa (CNJ CNCIAI)."""
+        return self.judicial.get_improbidade_municipal_summary(
+            id_municipio_or_name
+        )
+
+    def get_improbidade_features(
+        self, id_municipio_or_name: str
+    ) -> dict[str, Any] | None:
+        """Consultar features Gold de risco de improbidade e inidoneidade (CNJ CNCIAI)."""
+        return self.judicial.get_improbidade_features(id_municipio_or_name)
+
+    def list_top_improbidade_municipalities(
+        self, limit: int = 10, sigla_uf: str | None = None
+    ) -> list[dict[str, Any]]:
+        """Listar municípios ordenados por exposição a improbidade administrativa (CNJ CNCIAI)."""
+        return self.judicial.list_top_improbidade_municipalities(
             limit=limit, sigla_uf=sigla_uf
         )
 

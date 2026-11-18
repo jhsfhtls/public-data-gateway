@@ -852,6 +852,92 @@ def create_app(settings: GatewaySettings | None = None) -> FastAPI:
             limit=limit, sigla_uf=uf
         )
 
+    # 15D. CNJ Improbidade Administrativa (CNCIAI)
+    @app.get("/api/v1/judicial/improbidade/condenacoes/{documento_or_name}")
+    async def get_improbidade_condenacoes(
+        documento_or_name: str,
+    ) -> list[dict[str, Any]]:
+        from public_data_gateway.connectors.judicial.cnj_improbidade import (
+            CnjImprobidadeConnector,
+        )
+
+        return CnjImprobidadeConnector(settings=app_settings).get_condemnations(
+            documento_or_name
+        )
+
+    @app.get("/api/v1/judicial/improbidade/sancoes/{id_municipio_or_doc}")
+    async def get_improbidade_sancoes(
+        id_municipio_or_doc: str,
+    ) -> list[dict[str, Any]]:
+        from public_data_gateway.connectors.judicial.cnj_improbidade import (
+            CnjImprobidadeConnector,
+        )
+
+        return CnjImprobidadeConnector(settings=app_settings).get_debarment_sanctions(
+            id_municipio_or_doc
+        )
+
+    @app.get("/api/v1/judicial/improbidade/ressarcimento/{id_municipio_or_doc}")
+    async def get_improbidade_ressarcimento(
+        id_municipio_or_doc: str,
+    ) -> list[dict[str, Any]]:
+        from public_data_gateway.connectors.judicial.cnj_improbidade import (
+            CnjImprobidadeConnector,
+        )
+
+        return CnjImprobidadeConnector(
+            settings=app_settings
+        ).get_treasury_reimbursements(id_municipio_or_doc)
+
+    @app.get("/api/v1/judicial/improbidade/municipio/{id_municipio_or_name}")
+    async def get_improbidade_municipio(
+        id_municipio_or_name: str,
+    ) -> dict[str, Any]:
+        from public_data_gateway.connectors.judicial.cnj_improbidade import (
+            CnjImprobidadeConnector,
+        )
+
+        res = CnjImprobidadeConnector(settings=app_settings).get_municipal_summary(
+            id_municipio_or_name
+        )
+        if not res:
+            raise HTTPException(
+                status_code=404,
+                detail=f"CNJ CNCIAI municipal summary not found for '{id_municipio_or_name}'",
+            )
+        return res
+
+    @app.get("/api/v1/judicial/improbidade/features/{id_municipio_or_name}")
+    async def get_improbidade_features(
+        id_municipio_or_name: str,
+    ) -> dict[str, Any]:
+        from public_data_gateway.connectors.judicial.cnj_improbidade import (
+            CnjImprobidadeConnector,
+        )
+
+        res = CnjImprobidadeConnector(settings=app_settings).get_improbidade_features(
+            id_municipio_or_name
+        )
+        if not res:
+            raise HTTPException(
+                status_code=404,
+                detail=f"CNJ CNCIAI features not found for '{id_municipio_or_name}'",
+            )
+        return res
+
+    @app.get("/api/v1/judicial/improbidade/ranking")
+    async def get_improbidade_ranking(
+        limit: int = Query(10, ge=1, le=50, description="Max municipalities to return"),
+        uf: str | None = Query(None, description="Optional 2-letter UF state filter"),
+    ) -> list[dict[str, Any]]:
+        from public_data_gateway.connectors.judicial.cnj_improbidade import (
+            CnjImprobidadeConnector,
+        )
+
+        return CnjImprobidadeConnector(settings=app_settings).list_top_municipalities(
+            limit=limit, sigla_uf=uf
+        )
+
     # 16. Public Procurement Catalog & Pricing (Compras.gov.br CATMAT/CATSER)
     @app.get("/api/v1/procurement/materials/search")
     async def search_materials(

@@ -62,6 +62,14 @@ pgfn_uf AS (
         ROUND(SUM(valor_total_consolidado_brl), 2) AS valor_divida_ativa_pgfn_uf_brl
     FROM {{ ref('mart_divida_ativa_pgfn_brasil') }}
     GROUP BY sigla_uf
+),
+cnciai_uf AS (
+    SELECT
+        sigla_uf,
+        SUM(total_condenacoes_ativas) AS total_condenacoes_cnciai_uf,
+        ROUND(SUM(valor_total_ressarcimento_multa_brl), 2) AS valor_ressarcimento_cnciai_uf_brl
+    FROM {{ ref('mart_improbidade_administrativa_cnciai_brasil') }}
+    GROUP BY sigla_uf
 )
 SELECT
     u.sigla_uf,
@@ -79,7 +87,9 @@ SELECT
     bg.total_bgp_ips_monitorados,
     b2.total_perfis_b2b,
     COALESCE(pg.total_inscricoes_pgfn_uf, 0) AS total_inscricoes_pgfn_uf,
-    COALESCE(pg.valor_divida_ativa_pgfn_uf_brl, 0.0) AS valor_divida_ativa_pgfn_uf_brl
+    COALESCE(pg.valor_divida_ativa_pgfn_uf_brl, 0.0) AS valor_divida_ativa_pgfn_uf_brl,
+    COALESCE(ci.total_condenacoes_cnciai_uf, 0) AS total_condenacoes_cnciai_uf,
+    COALESCE(ci.valor_ressarcimento_cnciai_uf_brl, 0.0) AS valor_ressarcimento_cnciai_uf_brl
 FROM uf_base u
 LEFT JOIN cnpj_minha_receita mr ON u.sigla_uf = mr.sigla_uf
 LEFT JOIN cnpj_cnpja cn ON u.sigla_uf = cn.sigla_uf
@@ -88,6 +98,7 @@ LEFT JOIN cep_viacep vc ON u.sigla_uf = vc.sigla_uf
 LEFT JOIN cep_opencep oc ON u.sigla_uf = oc.sigla_uf
 LEFT JOIN geo_nominatim nm ON u.sigla_uf = nm.sigla_uf
 LEFT JOIN pgfn_uf pg ON u.sigla_uf = pg.sigla_uf
+LEFT JOIN cnciai_uf ci ON u.sigla_uf = ci.sigla_uf
 CROSS JOIN rdap_summary rd
 CROSS JOIN gleif_summary gl
 CROSS JOIN bgp_summary bg
