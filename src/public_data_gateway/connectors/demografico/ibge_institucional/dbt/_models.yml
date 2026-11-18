@@ -1,0 +1,178 @@
+version: 2
+
+models:
+  - name: stg_ibge_munic_governanca_municipal
+    description: "Staging view tipada das pesquisas IBGE MUNIC e POF com governança digital, plano diretor e estatutários municipais."
+    columns:
+      - name: cod_pesquisa_ibge
+        description: "Identificador único do recorte da pesquisa institucional/domiciliar IBGE no município (STRING)."
+        tests: [not_null, unique]
+      - name: eixo_pesquisa_ibge
+        description: "Eixo avaliado nas pesquisas IBGE (MUNIC_GESTAO_MUNICIPAL, POF_ORCAMENTOS_FAMILIARES, ESTADIC_GESTAO_ESTADUAL)."
+        tests: [not_null]
+      - name: capacidade_governanca_ti
+        description: "Estágio de maturidade em governança de TI pública (GOV_DIGITAL_PLENA, PLANO_DIRETOR_DIGITAL, INFRA_TI_EM_EXPANSAO)."
+        tests: [not_null]
+      - name: situacao_legislacao_urbana
+        description: "Situação normativa de planejamento urbano e Plano Diretor municipal (PLANO_DIRETOR_VIGENTE, DEFICIT_REGULATORIO)."
+        tests: [not_null]
+      - name: id_municipio
+        description: "Código IBGE de 7 dígitos do município (STRING)."
+        tests: [not_null]
+      - name: sigla_uf
+        description: "Sigla de 2 letras da Unidade Federativa (UF)."
+        tests: [not_null]
+      - name: nome_municipio
+        description: "Nome oficial do município."
+        tests: [not_null]
+      - name: regiao
+        description: "Macrorregião geográfica brasileira."
+        tests: [not_null]
+      - name: indice_capacidade_institucional_munic
+        description: "Índice sintético de capacidade institucional, instrumentos de gestão e governança digital (escala 0-100)."
+        tests: [not_null]
+      - name: servidores_estatutarios_municipio
+        description: "Efetivo de servidores públicos estatutários ativos na administração municipal."
+        tests: [not_null]
+      - name: despesa_familiar_media_pof_brl
+        description: "Despesa mensal média domiciliar na área de abrangência POF do município (BRL)."
+        tests: [not_null]
+
+  - name: stg_ibge_estadic_capacidade_estadual
+    description: "Staging view tipada da pesquisa ESTADIC com capacidade gestora estadual, saneamento/habitação e defesa civil."
+    columns:
+      - name: cod_estadic_ibge
+        description: "Identificador único da observação ESTADIC vinculada ao município e UF (STRING)."
+        tests: [not_null, unique]
+      - name: id_municipio
+        description: "Código IBGE de 7 dígitos do município (STRING)."
+        tests: [not_null]
+      - name: sigla_uf
+        description: "Sigla de 2 letras da Unidade Federativa (UF)."
+        tests: [not_null]
+      - name: nome_municipio
+        description: "Nome oficial do município."
+        tests: [not_null]
+      - name: efetivo_estatutario_estadual_uf
+        description: "Efetivo de servidores estatutários estaduais vinculados à UF."
+        tests: [not_null]
+      - name: politicas_habitacao_saneamento_ativas
+        description: "Quantidade de políticas setoriais de habitação e saneamento ativas na gestão estadual ESTADIC."
+        tests: [not_null]
+      - name: indice_governanca_estadual_estadic
+        description: "Índice de maturidade institucional e governança estadual ESTADIC (0-100)."
+        tests: [not_null]
+      - name: cobertura_sistema_protecao_civil_pct
+        description: "Percentual de cobertura de instrumentos estaduais/locais de proteção e defesa civil (%)."
+        tests: [not_null]
+
+  - name: stg_ibge_pof_orcamentos_consumo
+    description: "Staging view tipada da Pesquisa de Orçamentos Familiares (POF) com despesa, renda monetária e estrutura de consumo."
+    columns:
+      - name: id_municipio
+        description: "Código IBGE de 7 dígitos do município (STRING)."
+        tests: [not_null, unique]
+      - name: sigla_uf
+        description: "Sigla de 2 letras da Unidade Federativa (UF)."
+        tests: [not_null]
+      - name: nome_municipio
+        description: "Nome oficial do município."
+        tests: [not_null]
+      - name: despesa_mensal_familiar_pof_brl
+        description: "Despesa mensal total média das famílias na pesquisa POF (BRL)."
+        tests: [not_null]
+      - name: renda_monetaria_media_domiciliar_brl
+        description: "Rendimento monetário e não monetário médio mensal domiciliar POF (BRL)."
+        tests: [not_null]
+      - name: comprometimento_habitacao_transporte_pct
+        description: "Percentual de comprometimento do orçamento familiar com habitação e transporte (%)."
+        tests: [not_null]
+      - name: participacao_alimentacao_domicilio_pct
+        description: "Participação da despesa com alimentação no total do consumo domiciliar POF (%)."
+        tests: [not_null]
+
+  - name: stg_ibge_institucional_resumo_municipal
+    description: "Staging view tipada do consolidado municipal integrando MUNIC, ESTADIC e orçamentos familiares POF."
+    columns:
+      - name: id_municipio
+        description: "Código IBGE de 7 dígitos do município (STRING)."
+        tests: [not_null, unique]
+      - name: sigla_uf
+        description: "Sigla de 2 letras da Unidade Federativa (UF)."
+        tests: [not_null]
+      - name: nome_municipio
+        description: "Nome oficial do município."
+        tests: [not_null]
+      - name: regiao
+        description: "Macrorregião geográfica brasileira."
+        tests: [not_null]
+      - name: indice_capacidade_institucional_munic
+        description: "Índice sintético de capacidade institucional municipal MUNIC (0-100)."
+        tests: [not_null]
+      - name: servidores_estatutarios_municipio
+        description: "Efetivo de servidores públicos estatutários municipais ativos."
+        tests: [not_null]
+      - name: indice_governanca_estadual_estadic
+        description: "Índice de governança estadual ESTADIC na UF do município (0-100)."
+        tests: [not_null]
+      - name: despesa_familiar_media_pof_brl
+        description: "Despesa mensal média domiciliar apurada na POF (BRL)."
+        tests: [not_null]
+      - name: comprometimento_habitacao_transporte_pct
+        description: "Peso percentual de habitação e transporte no orçamento das famílias (%)."
+        tests: [not_null]
+
+  - name: fct_ibge_institucional_municipal
+    description: "Fato consolidado integrando capacidade gestora MUNIC, governança estadual ESTADIC e consumo domiciliar POF."
+    columns:
+      - name: id_municipio
+        description: "Código IBGE de 7 dígitos do município (STRING)."
+        tests: [not_null, unique]
+      - name: sigla_uf
+        description: "Sigla de 2 letras da Unidade Federativa (UF)."
+        tests: [not_null]
+      - name: nome_municipio
+        description: "Nome oficial do município."
+        tests: [not_null]
+      - name: regiao
+        description: "Macrorregião geográfica brasileira."
+        tests: [not_null]
+      - name: indice_capacidade_institucional_munic
+        description: "Índice sintético de capacidade institucional municipal MUNIC (0-100)."
+        tests: [not_null]
+      - name: servidores_estatutarios_municipio
+        description: "Efetivo de servidores públicos estatutários municipais."
+        tests: [not_null]
+      - name: indice_governanca_estadual_estadic
+        description: "Índice de governança estadual ESTADIC na UF (0-100)."
+        tests: [not_null]
+      - name: despesa_familiar_media_pof_brl
+        description: "Despesa familiar média mensal POF (BRL)."
+        tests: [not_null]
+      - name: comprometimento_habitacao_transporte_pct
+        description: "Percentual do orçamento familiar comprometido com habitação e transporte (%)."
+        tests: [not_null]
+      - name: qtd_eixos_pesquisa_ibge
+        description: "Quantidade de eixos de pesquisa institucional/domiciliar IBGE observados no município."
+        tests: [not_null]
+      - name: media_indice_institucional_munic
+        description: "Média ponderada do índice institucional MUNIC e ESTADIC no município (0-100)."
+        tests: [not_null]
+      - name: efetivo_estatutario_estadual_uf
+        description: "Efetivo estatutário da administração estadual ESTADIC na UF."
+        tests: [not_null]
+      - name: politicas_habitacao_saneamento_ativas
+        description: "Número de políticas estaduais de habitação e saneamento em execução."
+        tests: [not_null]
+      - name: cobertura_sistema_protecao_civil_pct
+        description: "Cobertura percentual do sistema estadual/municipal de proteção e defesa civil (%)."
+        tests: [not_null]
+      - name: despesa_mensal_familiar_pof_brl
+        description: "Despesa mensal familiar consolidada na pesquisa POF (BRL)."
+        tests: [not_null]
+      - name: renda_monetaria_media_domiciliar_brl
+        description: "Rendimento médio mensal domiciliar na pesquisa POF (BRL)."
+        tests: [not_null]
+      - name: participacao_alimentacao_domicilio_pct
+        description: "Peso percentual de alimentação no orçamento familiar POF (%)."
+        tests: [not_null]

@@ -1284,3 +1284,64 @@ models:
       - name: tier_sustentabilidade_previdenciaria
         description: "Classificação municipal (PREVIDENCIA_SUPERAVITARIA_FORMAL, COBERTURA_PREVIDENCIARIA_ESTAVEL ou ALTA_DEPENDENCIA_ASSISTENCIAL_BPC)."
         tests: [not_null]
+
+  - name: mart_ibge_institucional_brasil
+    description: "Mart analítico IBGE Institucional & Social (MUNIC, ESTADIC & POF) com capacidade gestora municipal/estadual, orçamentos familiares e tier de governança."
+    columns:
+      - name: id_municipio
+        description: "Código IBGE de 7 dígitos do município."
+        tests: [not_null, unique]
+      - name: sigla_uf
+        description: "Sigla de 2 letras da Unidade Federativa (UF)."
+        tests: [not_null]
+      - name: nome_municipio
+        description: "Nome oficial do município."
+        tests: [not_null]
+      - name: regiao
+        description: "Macrorregião geográfica brasileira."
+        tests: [not_null]
+      - name: indice_capacidade_institucional_munic
+        description: "Índice sintético de capacidade institucional municipal MUNIC (0-100)."
+        tests: [not_null]
+      - name: servidores_estatutarios_municipio
+        description: "Efetivo de servidores estatutários ativos na administração municipal."
+        tests: [not_null]
+      - name: indice_governanca_estadual_estadic
+        description: "Índice de governança e gestão pública estadual ESTADIC na UF (0-100)."
+        tests: [not_null]
+      - name: despesa_familiar_media_pof_brl
+        description: "Despesa mensal média das famílias na POF associada ao município (BRL)."
+        tests: [not_null]
+      - name: comprometimento_habitacao_transporte_pct
+        description: "Percentual do orçamento domiciliar comprometido com habitação e transporte (%)."
+        tests: [not_null]
+      - name: qtd_eixos_pesquisa_ibge
+        description: "Quantidade de eixos de pesquisa institucional/domiciliar IBGE avaliados."
+        tests: [not_null]
+      - name: media_indice_institucional_munic
+        description: "Média do índice institucional entre MUNIC e ESTADIC no município (0-100)."
+        tests: [not_null]
+      - name: efetivo_estatutario_estadual_uf
+        description: "Efetivo de servidores estatutários estaduais da UF."
+        tests: [not_null]
+      - name: politicas_habitacao_saneamento_ativas
+        description: "Quantidade de políticas setoriais de habitação e saneamento em vigor na UF."
+        tests: [not_null]
+      - name: cobertura_sistema_protecao_civil_pct
+        description: "Percentual de cobertura de instrumentos de proteção e defesa civil (%)."
+        tests: [not_null]
+      - name: despesa_mensal_familiar_pof_brl
+        description: "Despesa mensal total média domiciliar na Pesquisa de Orçamentos Familiares (BRL)."
+        tests: [not_null]
+      - name: renda_monetaria_media_domiciliar_brl
+        description: "Rendimento monetário médio mensal domiciliar na Pesquisa de Orçamentos Familiares (BRL)."
+        tests: [not_null]
+      - name: participacao_alimentacao_domicilio_pct
+        description: "Participação percentual da alimentação no gasto familiar POF (%)."
+        tests: [not_null]
+      - name: score_capacidade_institucional_ibge
+        description: "Score composto IBGE de capacidade institucional pública e poder de consumo familiar POF (0-100)."
+        tests: [not_null]
+      - name: tier_governanca_publica_ibge
+        description: "Classificação municipal (GOVERNANCA_INSTITUCIONAL_AVANCADA, CAPACIDADE_GESTORA_CONSOLIDADA ou ESTRUTURACAO_ADMINISTRATIVA_LOCAL)."
+        tests: [not_null]

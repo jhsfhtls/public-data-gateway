@@ -1,7 +1,7 @@
 <div align="center">
   <h2>Jornada de Implementação — Public Data Gateway</h2>
   <p><i>Painel Vivo de Evolução Arquitetural, Ciclo de Vida de Conectores & Solution Packs Analíticos</i></p>
-  <p><b>Versão:</b> 1.0.0 &nbsp;|&nbsp; <b>Última Atualização:</b> 2026-11-18T21:44:00.000000 &nbsp;|&nbsp; <b>Padrões:</b> ADR-001 • ADR-002 • ADR-003 • ODCS v3.1 • LGPD</p>
+  <p><b>Versão:</b> 1.0.0 &nbsp;|&nbsp; <b>Última Atualização:</b> 2026-11-18T22:05:00.000000 &nbsp;|&nbsp; <b>Padrões:</b> ADR-001 • ADR-002 • ADR-003 • ODCS v3.1 • LGPD</p>
   <hr/>
 </div>
 <br/>
@@ -17,9 +17,9 @@ Este artefato constitui a **Fonte Única da Verdade Operacional (SSOT)** do stat
 - **Macrofase Ativa:** `Fase 11.5 - Expansão Completa de Fontes Públicas (Ondas 11.5A a 11.5E — Padrão 11-Gates)`
 - **Status Geral de Governança:** `🟢 ON_TRACK`
 - **Conector Ativo em Desenvolvimento:** `Nenhum (Transição de Fase / Waves 1..6 Concluídas)`
-- **Próxima Etapa Planejada:** `ibge_institucional`
+- **Próxima Etapa Planejada:** `rfb_arrecadacao`
 - **Progresso Estrutural das Macrofases:** **15 de 17 Concluídas (88.2%)**
-- **Universo de Fontes Homologadas no Catálogo:** **82 fontes públicas** nos 13 macrosegmentos
+- **Universo de Fontes Homologadas no Catálogo:** **83 fontes públicas** nos 13 macrosegmentos
 
 ```mermaid
 flowchart LR
@@ -56,21 +56,21 @@ flowchart LR
 
 ## 3. Checklist dos 9 Gates de Qualidade do Conector Ativo
 
-Todo conector integrado ao `public-data-gateway` deve percorrer rigorosamente os **9 Gates de Qualidade** antes de ser promovido a `HOMOLOGATED`. O alvo atual do ciclo de vida é o conector `inep_mec_extra` (Wave 11.5E):
+Todo conector integrado ao `public-data-gateway` deve percorrer rigorosamente os **9 Gates de Qualidade** antes de ser promovido a `HOMOLOGATED`. O alvo atual do ciclo de vida é o conector `ibge_institucional` (Wave 11.5E):
 
 | Gate | Nome do Gate de Homologação | Critério Operacional de Aceite (ODCS v3.1 / ADR-001 / ADR-002) | Status |
 | :---: | :--- | :--- | :---: |
-| **GATE_01** | **Contrato Declarativo ODCS v3.1 das N Tabelas da API** | Schema tipado ODCS-BR-INEP-MEC-EXTRA-SAEB-FUNDEB-001 (11 colunas), chaves primarias STRING (cod_avaliacao_inep, id_municipio 7D, sigla_uf) e regras semanticas para Proficiencia SAEB, PROUNI/SISU, FUNDEB/CNPq e Resumo Municipal. | 🟢 APROVADO |
-| **GATE_02** | **Ingestao Bronze Isolada (Todas as Tabelas) & Cache WAL** | Ingestao resiliente dos portais oficiais INEP Microdados, FNDE (FUNDEB) e CNPq Dados Abertos em data/inep_mec_extra/bronze/ com registro de linhagem SHA-256. | 🟢 APROVADO |
-| **GATE_03** | **Sanitizacao de Sentinelas & Nulls** | Conversao deterministica de sentinelas em NULLs reais e normalizacao de etapas SAEB/MEC, programas federais (PROUNI_INTEGRAL, FUNDEB_VAAR) e equidade pedagógica. | 🟢 APROVADO |
-| **GATE_04** | **Materializacao Silver Parquet Isolada (Todas as Tabelas)** | Gravacao ZSTD em data/inep_mec_extra/silver/ (inep_saeb_proficiencia_municipio, mec_prouni_sisu_acesso_superior, fnde_fundeb_cnpq_fomento, inep_mec_extra_resumo_municipal). | 🟢 APROVADO |
-| **GATE_05** | **Validacao dos 5 Pilares & Quarentena** | Aprovacao em Freshness, Volume, Schema, Null Ceiling e Lineage com suporte a desvio para data/inep_mec_extra/quarantine/. | 🟢 APROVADO |
-| **GATE_06** | **Gold Feature View Isolada & ASOF Join ML** | Features de capital humano INEP/MEC, proficiencia SAEB e fomento CNPq em data/inep_mec_extra/gold/features_inep_mec_extra_brasil.parquet. | 🟢 APROVADO |
-| **GATE_07** | **Integracao ao EnrichmentEngine & Marts Cross-Domain** | Integracao educacao-territorio em mart_cross_domain_territorio_b2b_macro_brasil (repasses_fundeb_uf_mil_brl, bolsas_cnpq_ativas_uf e avg_score_capital_humano_mec_uf). | 🟢 APROVADO |
-| **GATE_08** | **Exposicao Multi-Interface (4 Interfaces)** | Exposicao simultanea via SDK (BrazilData.education + shortcuts), FastAPI (/api/v1/education/inep-mec-extra/*), CLI (bdg inep-mec-extra *) e MCP (bdg_get_inep_saeb_proficiency, bdg_get_mec_prouni_sisu_access, bdg_get_inep_mec_extra_features, bdg_list_top_inep_mec_extra_municipalities com wrap_untrusted_gov_data). | 🟢 APROVADO |
-| **GATE_09** | **Bateria de Testes Unitarios & Paridade Offline** | Testes unitarios offline completos em tests/connectors/test_inep_mec_extra.py cobrindo 4 tabelas Silver, Gold ML e paridade nas 4 interfaces. | 🟢 APROVADO |
-| **GATE_10** | **dbt Staging, Marts Intra-Domínio/Cross-Domain & 100% Colunas Documentadas** | Modelos dbt com source.yml, stg_*, fct_inep_mec_extra_municipal, mart intra-dominio mart_inep_mec_extra_brasil e cross-domain mart_cross_domain_territorio_b2b_macro_brasil aprovados no dbt test (2.132/2.132) e lint_dbt_docs.py (100% cobertura em 680 modelos / 9.168 colunas / 384 fontes). | 🟢 APROVADO |
-| **GATE_11** | **Teste Real de 1 Linha com API ao Vivo (Fail-Hard)** | Execucao obrigatoria contra portais oficiais INEP Microdados, FNDE (FUNDEB) e CNPq Dados Abertos validando HTTP 200; falha reprova o pipeline. | 🟢 APROVADO |
+| **GATE_01** | **Contrato Declarativo ODCS v3.1 das N Tabelas da API** | Schema tipado ODCS-BR-IBGE-INSTITUCIONAL-MUNIC-POF-001 (11 colunas), chaves primarias STRING (cod_pesquisa_ibge, id_municipio 7D, sigla_uf) e regras semanticas para MUNIC, ESTADIC, POF e Resumo Municipal. | 🟢 APROVADO |
+| **GATE_02** | **Ingestao Bronze Isolada (Todas as Tabelas) & Cache WAL** | Ingestao resiliente das APIs oficiais IBGE (servicodados.ibge.gov.br Pesquisas MUNIC, Agregados Assunto 70 e Localidades Estados) em data/ibge_institucional/bronze/ com registro de linhagem SHA-256. | 🟢 APROVADO |
+| **GATE_03** | **Sanitizacao de Sentinelas & Nulls** | Conversao deterministica de sentinelas em NULLs reais e normalizacao de eixos (MUNIC_GESTAO_MUNICIPAL, ESTADIC_GESTAO_ESTADUAL, POF_ORCAMENTOS_FAMILIARES), governanca TI e legislacao urbana. | 🟢 APROVADO |
+| **GATE_04** | **Materializacao Silver Parquet Isolada (Todas as Tabelas)** | Gravacao ZSTD em data/ibge_institucional/silver/ (ibge_munic_governanca_municipal, ibge_estadic_capacidade_estadual, ibge_pof_orcamentos_consumo, ibge_institucional_resumo_municipal). | 🟢 APROVADO |
+| **GATE_05** | **Validacao dos 5 Pilares & Quarentena** | Aprovacao em Freshness, Volume, Schema, Null Ceiling e Lineage com suporte a desvio para data/ibge_institucional/quarantine/. | 🟢 APROVADO |
+| **GATE_06** | **Gold Feature View Isolada & ASOF Join ML** | Features de capacidade institucional IBGE e orcamentos familiares POF em data/ibge_institucional/gold/features_ibge_institucional_brasil.parquet. | 🟢 APROVADO |
+| **GATE_07** | **Integracao ao EnrichmentEngine & Marts Cross-Domain** | Integracao institucional-territorio em mart_cross_domain_territorio_b2b_macro_brasil (servidores_estatutarios_munic_uf, avg_despesa_familiar_pof_uf_brl e avg_score_capacidade_institucional_uf). | 🟢 APROVADO |
+| **GATE_08** | **Exposicao Multi-Interface (4 Interfaces)** | Exposicao simultanea via SDK (BrazilData.socioeconomic + shortcuts), FastAPI (/api/v1/demographics/ibge-institucional/*), CLI (bdg ibge-institucional *) e MCP (bdg_get_ibge_munic_governance, bdg_get_ibge_pof_budgets, bdg_get_ibge_institucional_features, bdg_list_top_ibge_institucional_municipalities com wrap_untrusted_gov_data). | 🟢 APROVADO |
+| **GATE_09** | **Bateria de Testes Unitarios & Paridade Offline** | Testes unitarios offline completos em tests/connectors/test_ibge_institucional.py cobrindo 4 tabelas Silver, Gold ML e paridade nas 4 interfaces. | 🟢 APROVADO |
+| **GATE_10** | **dbt Staging, Marts Intra-Domínio/Cross-Domain & 100% Colunas Documentadas** | Modelos dbt com source.yml, stg_*, fct_ibge_institucional_municipal, mart intra-dominio mart_ibge_institucional_brasil e cross-domain mart_cross_domain_territorio_b2b_macro_brasil aprovados no dbt test (2.212/2.212) e lint_dbt_docs.py (100% cobertura em 686 modelos / 9.242 colunas / 388 fontes). | 🟢 APROVADO |
+| **GATE_11** | **Teste Real de 1 Linha com API ao Vivo (Fail-Hard)** | Execucao obrigatoria contra APIs oficiais IBGE (servicodados.ibge.gov.br/api/v1/pesquisas/1, api/v3/agregados?assunto=70 e api/v1/localidades/estados) validando HTTP 200; falha reprova o pipeline. | 🟢 APROVADO |
 
 ---
 
@@ -81,7 +81,7 @@ Estatísticas dinâmicas cruzadas diretamente com o catálogo mestre `catalog/so
 | Onda | Foco Estratégico | Total Fontes | RICE Médio | Modos Predominantes | Fontes Âncora | Status da Onda |
 | :---: | :--- | :---: | :---: | :--- | :--- | :---: |
 | **Wave 1** | APIs de Borda & Macroeconomia | 4 | 878 | `FEDERATED_API` | `ibge_localidades`, `brasilapi_core`, `bcb_sgs` (+1) | 🟢 100% Homologada |
-| **Wave 2** | B2B, Compras Públicas & Compliance | 38 | 861 | `FEDERATED_API, LAKEHOUSE_BATCH` | `rfb_cnpj_lakehouse`, `pncp_contratacoes`, `cnj_datajud` (+35) | 🟢 100% Homologada |
+| **Wave 2** | B2B, Compras Públicas & Compliance | 39 | 862 | `FEDERATED_API, LAKEHOUSE_BATCH` | `rfb_cnpj_lakehouse`, `pncp_contratacoes`, `cnj_datajud` (+36) | 🟢 100% Homologada |
 | **Wave 3** | Mercado de Capitais & Finanças Públicas | 9 | 733 | `FEDERATED_API, LAKEHOUSE_BATCH` | `cvm_dfp_itr`, `mdic_comexstat`, `cvm_fundos` (+6) | 🟢 100% Homologada |
 | **Wave 4** | Censo, Trabalho, Logística & Telecom | 10 | 553 | `FEDERATED_API, LAKEHOUSE_BATCH` | `ibge_sidra`, `ibge_pib_municipal`, `ibge_censo2022` (+7) | 🟢 100% Homologada |
 | **Wave 5** | Saúde, Educação & Setor Notarial | 14 | 451 | `FEDERATED_API, LAKEHOUSE_BATCH` | `datasus_cnes`, `datasus_sih`, `inep_censo_escolar` (+11) | 🟢 100% Homologada |
@@ -95,13 +95,13 @@ O `public-data-gateway` organiza suas fontes e marts de dados em **10 Perfis de 
 
 | Pack ID | Nome do Perfil Analítico | Status de Prontidão no Gateway | Fontes Mapeadas que Habilitam o Perfil |
 | :---: | :--- | :--- | :--- |
-| **P01** | **Modern Data Platform & Analytics (Lakehouse)** | 🟢 100% Operacional (49/49 Fontes Homologadas) | `ibge_localidades`, `brasilapi_core`, `bcb_sgs`, `bcb_olinda_ptax` *(+76 fontes)* |
-| **P02** | **IA Agêntica & Automação LLM (MCP & REST)** | 🟢 100% Operacional (49/49 Fontes Homologadas) | `ibge_localidades`, `brasilapi_core`, `bcb_sgs`, `rfb_cnpj_lakehouse` *(+47 fontes)* |
+| **P01** | **Modern Data Platform & Analytics (Lakehouse)** | 🟢 100% Operacional (49/49 Fontes Homologadas) | `ibge_localidades`, `brasilapi_core`, `bcb_sgs`, `bcb_olinda_ptax` *(+77 fontes)* |
+| **P02** | **IA Agêntica & Automação LLM (MCP & REST)** | 🟢 100% Operacional (49/49 Fontes Homologadas) | `ibge_localidades`, `brasilapi_core`, `bcb_sgs`, `rfb_cnpj_lakehouse` *(+48 fontes)* |
 | **P03** | **Engenharia FullStack & Geolocalização Offline-First** | 🟢 100% Operacional (49/49 Fontes Homologadas) | `ibge_localidades`, `brasilapi_core`, `ibge_censo2022`, `ibge_cnefe` *(+25 fontes)* |
 | **P04** | **Automação Inteligente de Onboarding & Compliance KYB** | 🟢 100% Operacional (49/49 Fontes Homologadas) | `brasilapi_core`, `rfb_cnpj_lakehouse`, `pncp_contratacoes`, `comprasgov_catmat` *(+17 fontes)* |
-| **P05** | **FinOps & Séries Macroeconômicas / Deflacionamento** | 🟢 100% Operacional (49/49 Fontes Homologadas) | `bcb_sgs`, `bcb_olinda_ptax`, `cvm_dfp_itr`, `cvm_fundos` *(+22 fontes)* |
+| **P05** | **FinOps & Séries Macroeconômicas / Deflacionamento** | 🟢 100% Operacional (49/49 Fontes Homologadas) | `bcb_sgs`, `bcb_olinda_ptax`, `cvm_dfp_itr`, `cvm_fundos` *(+23 fontes)* |
 | **P06** | **Data Clean Rooms & Benchmarks Anonimizados** | 🟢 100% Operacional (49/49 Fontes Homologadas) | `rfb_cnpj_lakehouse`, `cgu_ceis_cnep`, `cgu_pep`, `inpe_terrabrasilis` *(+22 fontes)* |
-| **P07** | **Due Diligence Corporativa, Sanções & Contencioso (TPRM)** | 🟢 100% Operacional (49/49 Fontes Homologadas) | `cnj_datajud`, `cgu_ceis_cnep`, `cgu_pep`, `tst_cndt` *(+13 fontes)* |
+| **P07** | **Due Diligence Corporativa, Sanções & Contencioso (TPRM)** | 🟢 100% Operacional (49/49 Fontes Homologadas) | `cnj_datajud`, `cgu_ceis_cnep`, `cgu_pep`, `tst_cndt` *(+14 fontes)* |
 | **P08** | **Segurança de Pipelines & Auditoria de Viés/Qualidade** | 🟢 100% Operacional (49/49 Fontes Homologadas) | `stn_siconfi`, `pgfn_divida_ativa`, `cnj_improbidade`, `stn_capag` *(+13 fontes)* |
 | **P09** | **Inteligência Industrial, Energia, Agro & Meio Ambiente** | 🟢 100% Operacional (49/49 Fontes Homologadas) | `suframa_pim_zfm`, `anatel_mosaico`, `antt_malha_transporte`, `inpe_terrabrasilis` *(+13 fontes)* |
 | **P10** | **Observabilidade de Dados, Contratos ODCS & Confiabilidade SRE** | 🟢 100% Operacional (49/49 Fontes Homologadas) | `stn_siconfi`, `pgfn_divida_ativa`, `cnj_improbidade`, `stn_capag` *(+3 fontes)* |

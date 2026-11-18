@@ -2163,6 +2163,97 @@ def create_app(settings: GatewaySettings | None = None) -> FastAPI:
         conn = IBGESidraConnector(settings=app_settings)
         return conn.list_top_municipalities_by_gdp(limit=limit)
 
+    # --- IBGE Institucional & Social (MUNIC, ESTADIC & POF) ---
+    @app.get("/api/v1/demographics/ibge-institucional/munic/{termo}")
+    async def get_ibge_institucional_munic(termo: str) -> list[dict[str, Any]]:
+        from public_data_gateway.connectors.demografico.ibge_institucional import (
+            IbgeInstitucionalConnector,
+        )
+
+        return IbgeInstitucionalConnector(
+            settings=app_settings
+        ).get_ibge_munic_governance(termo)
+
+    @app.get("/api/v1/demographics/ibge-institucional/estadic/{termo}")
+    async def get_ibge_institucional_estadic(termo: str) -> list[dict[str, Any]]:
+        from public_data_gateway.connectors.demografico.ibge_institucional import (
+            IbgeInstitucionalConnector,
+        )
+
+        return IbgeInstitucionalConnector(
+            settings=app_settings
+        ).get_ibge_estadic_state_capacity(termo)
+
+    @app.get("/api/v1/demographics/ibge-institucional/pof/{id_municipio_or_name}")
+    async def get_ibge_institucional_pof(
+        id_municipio_or_name: str,
+    ) -> dict[str, Any]:
+        from public_data_gateway.connectors.demografico.ibge_institucional import (
+            IbgeInstitucionalConnector,
+        )
+
+        res = IbgeInstitucionalConnector(
+            settings=app_settings
+        ).get_ibge_pof_budgets(id_municipio_or_name)
+        if res is None:
+            raise HTTPException(
+                status_code=404, detail="IBGE POF household budget data not found"
+            )
+        return res
+
+    @app.get("/api/v1/demographics/ibge-institucional/municipio/{id_municipio_or_name}")
+    async def get_ibge_institucional_municipio(
+        id_municipio_or_name: str,
+    ) -> dict[str, Any]:
+        from public_data_gateway.connectors.demografico.ibge_institucional import (
+            IbgeInstitucionalConnector,
+        )
+
+        res = IbgeInstitucionalConnector(
+            settings=app_settings
+        ).get_ibge_institucional_summary(id_municipio_or_name)
+        if res is None:
+            raise HTTPException(
+                status_code=404, detail="IBGE Institucional municipal summary not found"
+            )
+        return res
+
+    @app.get("/api/v1/demographics/ibge-institucional/features/{id_municipio_or_name}")
+    async def get_ibge_institucional_features(
+        id_municipio_or_name: str,
+    ) -> dict[str, Any]:
+        from public_data_gateway.connectors.demografico.ibge_institucional import (
+            IbgeInstitucionalConnector,
+        )
+
+        res = IbgeInstitucionalConnector(
+            settings=app_settings
+        ).get_ibge_institucional_features(id_municipio_or_name)
+        if res is None:
+            raise HTTPException(
+                status_code=404,
+                detail="IBGE Institucional Gold governance features not found",
+            )
+        return res
+
+    @app.get("/api/v1/demographics/ibge-institucional/ranking")
+    async def get_ibge_institucional_ranking(
+        limit: int = Query(10, ge=1, le=50, description="Max municipalities to list"),
+        uf: str | None = Query(None, description="Optional 2-letter state filter"),
+        sort_by_pof: bool = Query(
+            False, description="Sort descending by mean POF household expenditure (BRL)"
+        ),
+    ) -> list[dict[str, Any]]:
+        from public_data_gateway.connectors.demografico.ibge_institucional import (
+            IbgeInstitucionalConnector,
+        )
+
+        return IbgeInstitucionalConnector(
+            settings=app_settings
+        ).list_top_ibge_institucional_municipalities(
+            limit=limit, sigla_uf=uf, sort_by_pof=sort_by_pof
+        )
+
     # --- IBGE PIB Municipal (Contas Nacionais & VAB Setorial) ---
     @app.get("/api/v1/demographics/pib-municipal/top")
     async def get_top_pib_municipal(

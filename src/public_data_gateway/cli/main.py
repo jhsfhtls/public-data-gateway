@@ -1605,6 +1605,36 @@ def build_parser() -> argparse.ArgumentParser:
     ime_rk_p.add_argument("--fundeb", action="store_true", help="Sort descending by annual FUNDEB transfers (R$ mil)")
     ime_rk_p.add_argument("--json", action="store_true", help="Output in JSON format")
 
+    # IBGE Institucional & Social (MUNIC, ESTADIC & POF) command group
+    ibi_p = subparsers.add_parser("ibge-institucional", help="Query IBGE MUNIC/ESTADIC public governance capacity, POF household budgets, and institutional rankings.")
+    ibi_sub = ibi_p.add_subparsers(dest="ibge_institucional_action", required=True)
+
+    ibi_mn_p = ibi_sub.add_parser("munic", help="Lookup IBGE MUNIC & POF survey tracks by code, axis, TI tier, IBGE, UF, or city.")
+    ibi_mn_p.add_argument("termo", help="Survey code, axis, TI maturity tier, IBGE code, UF, or municipality name")
+    ibi_mn_p.add_argument("--json", action="store_true", help="Output in JSON format")
+
+    ibi_es_p = ibi_sub.add_parser("estadic", help="Lookup IBGE ESTADIC state institutional capacity & civil defense metrics.")
+    ibi_es_p.add_argument("termo", help="ESTADIC code, IBGE code, UF, or municipality name")
+    ibi_es_p.add_argument("--json", action="store_true", help="Output in JSON format")
+
+    ibi_pf_p = ibi_sub.add_parser("pof", help="Get municipal/metropolitan IBGE POF household spending & monetary income.")
+    ibi_pf_p.add_argument("id_municipio_or_name", help="7-digit IBGE code or municipality name")
+    ibi_pf_p.add_argument("--json", action="store_true", help="Output in JSON format")
+
+    ibi_mu_p = ibi_sub.add_parser("municipio", help="Get consolidated municipal IBGE MUNIC, ESTADIC, and POF summary.")
+    ibi_mu_p.add_argument("id_municipio_or_name", help="7-digit IBGE code or municipality name")
+    ibi_mu_p.add_argument("--json", action="store_true", help="Output in JSON format")
+
+    ibi_ft_p = ibi_sub.add_parser("features", help="Get Gold IBGE institutional capacity score and public governance tier.")
+    ibi_ft_p.add_argument("id_municipio_or_name", help="7-digit IBGE code or municipality name")
+    ibi_ft_p.add_argument("--json", action="store_true", help="Output in JSON format")
+
+    ibi_rk_p = ibi_sub.add_parser("ranking", help="List municipalities ranked by IBGE institutional capacity score or mean POF spending.")
+    ibi_rk_p.add_argument("--limit", type=int, default=10, help="Max municipalities to list")
+    ibi_rk_p.add_argument("--uf", type=str, help="Optional 2-letter state filter")
+    ibi_rk_p.add_argument("--pof", action="store_true", help="Sort descending by mean POF monthly household expenditure (BRL)")
+    ibi_rk_p.add_argument("--json", action="store_true", help="Output in JSON format")
+
     # INPE TerraBrasilis (DETER & PRODES) command group
     tb_p = subparsers.add_parser("terrabrasilis", help="Query INPE TerraBrasilis PRODES deforestation, DETER alerts, land cover, ESG governance, and rankings.")
     tb_sub = tb_p.add_subparsers(dest="terrabrasilis_action", required=True)
@@ -6206,6 +6236,84 @@ def main(argv: Sequence[str] | None = None) -> int:
                     return 0
             except (ValueError, KeyError) as exc:
                 print(f"Erro INEP/MEC Extra: {exc}", file=sys.stderr)
+                return 1
+
+        elif args.command == "ibge-institucional":
+            from public_data_gateway.connectors.demografico.ibge_institucional import (
+                IbgeInstitucionalConnector,
+            )
+
+            ibi_conn = IbgeInstitucionalConnector()
+            ibi_action = getattr(args, "ibge_institucional_action", "")
+            try:
+                if ibi_action == "munic":
+                    rows = ibi_conn.get_ibge_munic_governance(args.termo)
+                    if getattr(args, "json", False):
+                        print(json.dumps(rows, indent=2, ensure_ascii=False, default=str))
+                    else:
+                        print(f"IBGE MUNIC & POF ({len(rows)}):")
+                        for r in rows:
+                            print(f"  {r.get('cod_pesquisa_ibge')} | {r.get('nome_municipio')} ({r.get('sigla_uf')}): {r.get('capacidade_governanca_ti')} | {r.get('indice_capacidade_institucional_munic')}")
+                    return 0
+
+                if ibi_action == "estadic":
+                    rows = ibi_conn.get_ibge_estadic_state_capacity(args.termo)
+                    if getattr(args, "json", False):
+                        print(json.dumps(rows, indent=2, ensure_ascii=False, default=str))
+                    else:
+                        print(f"IBGE ESTADIC ({len(rows)}):")
+                        for r in rows:
+                            print(f"  {r.get('cod_estadic_ibge')} | {r.get('nome_municipio')} ({r.get('sigla_uf')}): gov={r.get('indice_governanca_estadual_estadic')} | defesa_civil={r.get('cobertura_sistema_protecao_civil_pct')}%")
+                    return 0
+
+                if ibi_action == "pof":
+                    res = ibi_conn.get_ibge_pof_budgets(args.id_municipio_or_name)
+                    if res is None:
+                        print(f"Orçamentos IBGE POF não encontrados para: {args.id_municipio_or_name}", file=sys.stderr)
+                        return 1
+                    if getattr(args, "json", False):
+                        print(json.dumps(res, indent=2, ensure_ascii=False, default=str))
+                    else:
+                        print(f"IBGE POF ({res.get('nome_municipio')} - {res.get('sigla_uf')}): despesa=R$ {res.get('despesa_mensal_familiar_pof_brl')} | renda=R$ {res.get('renda_monetaria_media_domiciliar_brl')}")
+                    return 0
+
+                if ibi_action == "municipio":
+                    res = ibi_conn.get_ibge_institucional_summary(args.id_municipio_or_name)
+                    if res is None:
+                        print(f"Resumo IBGE Institucional não encontrado para: {args.id_municipio_or_name}", file=sys.stderr)
+                        return 1
+                    if getattr(args, "json", False):
+                        print(json.dumps(res, indent=2, ensure_ascii=False, default=str))
+                    else:
+                        print(f"IBGE Institucional Município ({res.get('nome_municipio')} - {res.get('sigla_uf')}): MUNIC={res.get('indice_capacidade_institucional_munic')} | ESTADIC={res.get('indice_governanca_estadual_estadic')} | POF=R$ {res.get('despesa_familiar_media_pof_brl')}")
+                    return 0
+
+                if ibi_action == "features":
+                    res = ibi_conn.get_ibge_institucional_features(args.id_municipio_or_name)
+                    if res is None:
+                        print(f"Features IBGE Institucional não encontradas para: {args.id_municipio_or_name}", file=sys.stderr)
+                        return 1
+                    if getattr(args, "json", False):
+                        print(json.dumps(res, indent=2, ensure_ascii=False, default=str))
+                    else:
+                        print(f"IBGE Institucional Gold ({res.get('nome_municipio')} - {res.get('id_municipio')}): Score {res.get('score_capacidade_institucional_ibge')} | {res.get('tier_governanca_publica_ibge')}")
+                    return 0
+
+                if ibi_action == "ranking":
+                    ranks = ibi_conn.list_top_ibge_institucional_municipalities(
+                        limit=getattr(args, "limit", 10),
+                        sigla_uf=getattr(args, "uf", None),
+                        sort_by_pof=getattr(args, "pof", False),
+                    )
+                    if getattr(args, "json", False):
+                        print(json.dumps(ranks, indent=2, ensure_ascii=False, default=str))
+                    else:
+                        print(f"Ranking IBGE Institucional ({len(ranks)}):")
+                        for idx, r in enumerate(ranks, 1):
+                            print(f"  {idx}. {r.get('nome_municipio')} ({r.get('sigla_uf')}): {r.get('score_capacidade_institucional_ibge')} | {r.get('tier_governanca_publica_ibge')}")
+                    return 0
+            except (ValueError, KeyError) as exc:
+                print(f"Erro IBGE Institucional: {exc}", file=sys.stderr)
                 return 1
 
         elif args.command == "terrabrasilis":

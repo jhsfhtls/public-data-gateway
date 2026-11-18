@@ -258,6 +258,15 @@ educacao_extra_uf AS (
     FROM {{ ref('mart_inep_mec_extra_brasil') }}
     GROUP BY sigla_uf
 ),
+ibge_inst_uf AS (
+    SELECT
+        sigla_uf,
+        SUM(servidores_estatutarios_municipio) AS servidores_estatutarios_munic_uf,
+        ROUND(AVG(despesa_familiar_media_pof_brl), 2) AS avg_despesa_familiar_pof_uf_brl,
+        ROUND(AVG(score_capacidade_institucional_ibge), 2) AS avg_score_capacidade_institucional_uf
+    FROM {{ ref('mart_ibge_institucional_brasil') }}
+    GROUP BY sigla_uf
+),
 
 base AS (
     SELECT
@@ -335,6 +344,9 @@ base AS (
         COALESCE(ex.repasses_fundeb_uf_mil_brl, 0.0) AS repasses_fundeb_uf_mil_brl,
         COALESCE(ex.bolsas_cnpq_ativas_uf, 0) AS bolsas_cnpq_ativas_uf,
         COALESCE(ex.avg_score_capital_humano_mec_uf, 75.0) AS avg_score_capital_humano_mec_uf,
+        COALESCE(ibi.servidores_estatutarios_munic_uf, 0) AS servidores_estatutarios_munic_uf,
+        COALESCE(ibi.avg_despesa_familiar_pof_uf_brl, 5500.0) AS avg_despesa_familiar_pof_uf_brl,
+        COALESCE(ibi.avg_score_capacidade_institucional_uf, 75.0) AS avg_score_capacidade_institucional_uf,
         COALESCE(m.ano_mes, '2025-03') AS macro_ano_mes_referencia,
         COALESCE(m.selic_meta_fim_mes_pct, 14.25) AS selic_meta_fim_mes_pct,
         COALESCE(m.ipca_acumulado_12m_pct, 5.06) AS ipca_acumulado_12m_pct,
@@ -365,6 +377,7 @@ base AS (
     LEFT JOIN inovacao_pi_uf ip ON t.sigla_uf = ip.sigla_uf
     LEFT JOIN sus_extra_uf sx ON t.sigla_uf = sx.sigla_uf
     LEFT JOIN educacao_extra_uf ex ON t.sigla_uf = ex.sigla_uf
+    LEFT JOIN ibge_inst_uf ibi ON t.sigla_uf = ibi.sigla_uf
     CROSS JOIN macro_latest m
 ),
 

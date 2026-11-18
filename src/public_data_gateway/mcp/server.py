@@ -2474,6 +2474,51 @@ class MCPDispatcher:
                                 },
                             },
                             {
+                                "name": "bdg_get_ibge_munic_governance",
+                                "description": "Lookup IBGE MUNIC & POF institutional survey tracks by code, axis, TI maturity, IBGE, UF, or city.",
+                                "inputSchema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "termo": {"type": "string", "description": "Survey code, axis, TI tier, IBGE code, UF, or city"},
+                                    },
+                                    "required": ["termo"],
+                                },
+                            },
+                            {
+                                "name": "bdg_get_ibge_pof_budgets",
+                                "description": "Get municipal/metropolitan IBGE POF monthly household expenditure, income, and housing/food shares.",
+                                "inputSchema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "id_municipio_or_name": {"type": "string", "description": "7-digit IBGE municipality code or municipality name"},
+                                    },
+                                    "required": ["id_municipio_or_name"],
+                                },
+                            },
+                            {
+                                "name": "bdg_get_ibge_institucional_features",
+                                "description": "Get normalized Gold IBGE institutional governance score (MUNIC/ESTADIC/POF) and public governance tier.",
+                                "inputSchema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "id_municipio_or_name": {"type": "string", "description": "7-digit IBGE municipality code or municipality name"},
+                                    },
+                                    "required": ["id_municipio_or_name"],
+                                },
+                            },
+                            {
+                                "name": "bdg_list_top_ibge_institucional_municipalities",
+                                "description": "List Brazilian municipalities ranked by IBGE institutional capacity score or mean POF household spending.",
+                                "inputSchema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "limit": {"type": "integer", "description": "Maximum rows (default: 10)"},
+                                        "sigla_uf": {"type": "string", "description": "Optional 2-letter state filter (e.g. SP)"},
+                                        "sort_by_pof": {"type": "boolean", "description": "Set true to rank municipalities by highest mean POF spending first"},
+                                    },
+                                },
+                            },
+                            {
                                 "name": "bdg_get_terrabrasilis_prodes_deforestation",
                                 "description": "Get official municipal INPE TerraBrasilis PRODES annual deforestation increment, accumulated deforestation, and remaining forest cover.",
                                 "inputSchema": {
@@ -7245,6 +7290,69 @@ class MCPDispatcher:
                     },
                 }
             wrapped = wrap_untrusted_gov_data(result, source_id="inep_mec_extra")
+            return {
+                "jsonrpc": "2.0",
+                "id": req_id,
+                "result": {"content": [{"type": "text", "text": wrapped}], "isError": False},
+            }
+
+        if tool_name in {
+            "bdg_get_ibge_munic_governance",
+            "bdg_get_ibge_pof_budgets",
+            "bdg_get_ibge_institucional_features",
+            "bdg_list_top_ibge_institucional_municipalities",
+        }:
+            from public_data_gateway.connectors.demografico.ibge_institucional import (
+                IbgeInstitucionalConnector,
+            )
+
+            connector = IbgeInstitucionalConnector(settings=self.settings)
+            try:
+                if tool_name == "bdg_get_ibge_munic_governance":
+                    result = connector.get_ibge_munic_governance(
+                        str(args.get("termo", ""))
+                    )
+                elif tool_name == "bdg_get_ibge_pof_budgets":
+                    result = connector.get_ibge_pof_budgets(
+                        str(args.get("id_municipio_or_name", ""))
+                    )
+                elif tool_name == "bdg_get_ibge_institucional_features":
+                    result = connector.get_ibge_institucional_features(
+                        str(args.get("id_municipio_or_name", ""))
+                    )
+                else:
+                    result = connector.list_top_ibge_institucional_municipalities(
+                        limit=int(args.get("limit", 10)),
+                        sigla_uf=args.get("sigla_uf"),
+                        sort_by_pof=bool(args.get("sort_by_pof", False)),
+                    )
+            except (ValueError, KeyError) as exc:
+                return {
+                    "jsonrpc": "2.0",
+                    "id": req_id,
+                    "result": {
+                        "content": [
+                            {"type": "text", "text": f"IBGE Institucional parameter error: {exc}"}
+                        ],
+                        "isError": True,
+                    },
+                }
+
+            if not result:
+                return {
+                    "jsonrpc": "2.0",
+                    "id": req_id,
+                    "result": {
+                        "content": [
+                            {
+                                "type": "text",
+                                "text": "No IBGE Institucional data found for the query.",
+                            }
+                        ],
+                        "isError": True,
+                    },
+                }
+            wrapped = wrap_untrusted_gov_data(result, source_id="ibge_institucional")
             return {
                 "jsonrpc": "2.0",
                 "id": req_id,
