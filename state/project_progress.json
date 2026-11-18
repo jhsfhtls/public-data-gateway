@@ -1,6 +1,6 @@
 {
   "schema_version": "1.0.0",
-  "last_updated": "2026-11-17T23:16:00.000000",
+  "last_updated": "2026-11-17T23:34:00.000000",
   "project_name": "public-data-gateway",
   "architecture": "Hexagonal Medallion Lakehouse (Bronze -> Silver -> Gold / Feature Store)",
   "governance_standards": [
@@ -15,7 +15,7 @@
   "current_macro_phase": "Fase 11.5 - Expansão Completa de Fontes Públicas (Ondas 11.5A a 11.5E — Padrão 11-Gates)",
   "overall_status": "ON_TRACK",
   "active_connector": null,
-  "next_connector": "bcb_agencia",
+  "next_connector": "rfb_cno",
   "structural_phases": [
     {
       "phase_id": "00",
@@ -252,74 +252,74 @@
     }
   ],
   "active_connector_gates": {
-    "target_connector": "bcb_estban",
+    "target_connector": "bcb_agencia",
     "target_wave": "11.5A",
     "gates": [
       {
         "gate_id": "GATE_01",
         "name": "Contrato Declarativo ODCS v3.1 das N Tabelas da API",
         "status": "PASSED",
-        "criteria": "Schema tipado, chaves primarias STRING (id_municipio 7D, sigla_uf, data_base_yyyymm, cnpj_14) e regras semanticas para Balancete Municipal ESTBAN, Carteira de Credito Setorial, Captacoes e Instituicoes Locais."
+        "criteria": "Schema tipado, chaves primarias STRING (cnpj_14_agencia, id_municipio 7D, sigla_uf, cep_8) e regras semanticas para Cadastro Nacional de Agencias, Postos PA/PAE, Cobertura Municipal e Inclusao Financeira."
       },
       {
         "gate_id": "GATE_02",
         "name": "Ingestao Bronze Isolada (Todas as Tabelas) & Cache WAL",
         "status": "PASSED",
-        "criteria": "Ingestao resiliente da fonte oficial BACEN ESTBAN (bcb.gov.br/estatisticas/estatisticabancariamunicipios) em data/bcb_estban/bronze/ com registro de linhagem SHA-256."
+        "criteria": "Ingestao resiliente da API BACEN Olinda Informes_Agencias OData em data/bcb_agencia/bronze/ com registro de linhagem SHA-256."
       },
       {
         "gate_id": "GATE_03",
         "name": "Sanitizacao de Sentinelas & Nulls",
         "status": "PASSED",
-        "criteria": "Conversao deterministica de sentinelas em NULLs reais e padronizacao de competencias COSIF YYYYMM e CNPJs de IFs."
+        "criteria": "Conversao deterministica de sentinelas em NULLs reais e normalizacao de CNPJs 14D de dependencias, CEPs 8D e codigos IBGE."
       },
       {
         "gate_id": "GATE_04",
         "name": "Materializacao Silver Parquet Isolada (Todas as Tabelas)",
         "status": "PASSED",
-        "criteria": "Gravacao ZSTD em data/bcb_estban/silver/ (estban_balancete_municipal, estban_carteira_credito_setorial, estban_captacoes_depositos, estban_instituicoes_municipio)."
+        "criteria": "Gravacao ZSTD em data/bcb_agencia/silver/ (agencias_cadastro_nacional, agencias_postos_atendimento, agencias_cobertura_municipal, agencias_cidades_sem_atendimento)."
       },
       {
         "gate_id": "GATE_05",
         "name": "Validacao dos 5 Pilares & Quarentena",
         "status": "PASSED",
-        "criteria": "Aprovacao em Freshness, Volume, Schema, Null Ceiling e Lineage com suporte a desvio para data/bcb_estban/quarantine/."
+        "criteria": "Aprovacao em Freshness, Volume, Schema, Null Ceiling e Lineage com suporte a desvio para data/bcb_agencia/quarantine/."
       },
       {
         "gate_id": "GATE_06",
         "name": "Gold Feature View Isolada & ASOF Join ML",
         "status": "PASSED",
-        "criteria": "Features de profundidade bancaria e liquidez credito/deposito em data/bcb_estban/gold/features_liquidez_credito_estban.parquet."
+        "criteria": "Features de capilaridade bancaria fisica e inclusao financeira em data/bcb_agencia/gold/features_capilaridade_agencias_bcb.parquet."
       },
       {
         "gate_id": "GATE_07",
         "name": "Integracao ao EnrichmentEngine & Marts Cross-Domain",
         "status": "PASSED",
-        "criteria": "Integracao ao mercado bancario local e cruzamento obrigatorio em mart_cross_domain_territorio_b2b_macro_brasil."
+        "criteria": "Integracao a cobertura fisica bancaria e cruzamento obrigatorio em mart_cross_domain_territorio_b2b_macro_brasil."
       },
       {
         "gate_id": "GATE_08",
         "name": "Exposicao Multi-Interface (4 Interfaces)",
         "status": "PASSED",
-        "criteria": "Exposicao simultanea via SDK (BrazilData.banking + shortcuts), FastAPI (/api/v1/banking/estban/*), CLI (bdg estban *) e MCP (bdg_*_estban_* com wrap_untrusted_gov_data)."
+        "criteria": "Exposicao simultanea via SDK (BrazilData.banking + shortcuts), FastAPI (/api/v1/banking/agencias/*), CLI (bdg agencias *) e MCP (bdg_*_bcb_agencias_* com wrap_untrusted_gov_data)."
       },
       {
         "gate_id": "GATE_09",
         "name": "Bateria de Testes Unitarios & Paridade Offline",
         "status": "PASSED",
-        "criteria": "Testes unitarios offline completos em tests/connectors/test_bcb_estban.py cobrindo 4 tabelas Silver, Gold ML e paridade nas 4 interfaces."
+        "criteria": "Testes unitarios offline completos em tests/connectors/test_bcb_agencia.py cobrindo 4 tabelas Silver, Gold ML e paridade nas 4 interfaces."
       },
       {
         "gate_id": "GATE_10",
         "name": "dbt Staging, Marts Intra-Domínio/Cross-Domain & 100% Colunas Documentadas",
         "status": "PASSED",
-        "criteria": "Modelos dbt com source.yml, stg_*, fct_estatistica_bancaria_estban_municipal, mart intra-dominio mart_estatistica_bancaria_estban_brasil e cross-domain mart_cross_domain_territorio_b2b_macro_brasil aprovados no dbt test (130/130) e lint_dbt_docs.py (100% cobertura)."
+        "criteria": "Modelos dbt com source.yml, stg_*, fct_capilaridade_agencias_bancarias_municipal, mart intra-dominio mart_capilaridade_agencias_bancarias_brasil e cross-domain mart_cross_domain_territorio_b2b_macro_brasil aprovados no dbt test (112/112) e lint_dbt_docs.py (100% cobertura)."
       },
       {
         "gate_id": "GATE_11",
         "name": "Teste Real de 1 Linha com API ao Vivo (Fail-Hard)",
         "status": "PASSED",
-        "criteria": "Execucao obrigatoria contra portal oficial BACEN ESTBAN (bcb.gov.br/estatisticas/estatisticabancariamunicipios) validando HTTP 200; falha reprova o pipeline."
+        "criteria": "Execucao obrigatoria contra API OData oficial olinda.bcb.gov.br (Informes_Agencias) validando HTTP 200 e payload JSON; falha reprova o pipeline."
       }
     ]
   },
@@ -714,6 +714,12 @@
       "phase_id": "11.5",
       "milestone": "Wave 11.5A — Homologação do Conector bcb_estban (4 Tabelas Silver, Mart Intra-Domínio ESTBAN, Mart Cross-Domain & Paridade 4 Interfaces)",
       "summary": "Implementação completa nos 11 Gates do conector bcb_estban (BACEN Estatística Bancária Mensal por Município ESTBAN COSIF): contrato ODCS v3.1, ingestão Bronze + 4 tabelas Silver ZSTD (estban_balancete_municipal, estban_carteira_credito_setorial, estban_captacoes_depositos, estban_instituicoes_municipio) + Gold ML (features_liquidez_credito_estban), 4 staging views + fct_estatistica_bancaria_estban_municipal + mart intra-domínio mart_estatistica_bancaria_estban_brasil + enriquecimento da mart cross-domain mart_cross_domain_territorio_b2b_macro_brasil (130 testes dbt OK, 100% colunas documentadas no lint_dbt_docs.py), paridade em SDK/FastAPI/CLI/MCP, bateria offline e teste live fail-hard contra bcb.gov.br/estatisticas/estatisticabancariamunicipios."
+    },
+    {
+      "date": "2026-11-17",
+      "phase_id": "11.5",
+      "milestone": "Wave 11.5A — Homologação do Conector bcb_agencia (4 Tabelas Silver, Mart Intra-Domínio Capilaridade, Mart Cross-Domain & Paridade 4 Interfaces)",
+      "summary": "Implementação completa nos 11 Gates do conector bcb_agencia (BACEN Cadastro Nacional de Agências Bancárias e Postos de Atendimento Olinda OData): contrato ODCS v3.1, ingestão Bronze + 4 tabelas Silver ZSTD (agencias_cadastro_nacional, agencias_postos_atendimento, agencias_cobertura_municipal, agencias_cidades_sem_atendimento) + Gold ML (features_capilaridade_agencias_bcb), 4 staging views + fct_capilaridade_agencias_bancarias_municipal + mart intra-domínio mart_capilaridade_agencias_bancarias_brasil + enriquecimento da mart cross-domain mart_cross_domain_territorio_b2b_macro_brasil (112 testes dbt OK, 100% colunas documentadas no lint_dbt_docs.py), paridade em SDK/FastAPI/CLI/MCP, bateria offline e teste live fail-hard contra olinda.bcb.gov.br Informes_Agencias."
     }
   ]
 }

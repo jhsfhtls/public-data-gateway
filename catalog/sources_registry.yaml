@@ -1524,3 +1524,37 @@ sources:
   status: HOMOLOGATED
   freshness_sla_hours: 720
   cron_schedule_expression: 0 6 20 * *
+- source_id: bcb_agencia
+  name: 'Banco Central: Cadastro Nacional de Agências Bancárias e Postos de Atendimento (Olinda OData)'
+  agency: Banco Central do Brasil (BACEN)
+  official_url: https://olinda.bcb.gov.br/olinda/servico/Informes_Agencias/versao/v1/odata/Agencias?$top=1&$format=json
+  segment_id: 02_economico_macrofinanceiro
+  segment_name: Econômico, Monetário & Macrofinanceiro
+  access_mode: FEDERATED_API
+  protocol: ODATA_V4
+  auth_type: NONE
+  canonical_keys:
+  - cnpj_14
+  - id_municipio
+  - sigla_uf
+  - cep_8
+  update_frequency: Mensal
+  estimated_volume: ~17 mil agências e ~25 mil postos de atendimento (~120 MB OData/CSV)
+  lgpd_tier: PUBLIC_NON_PERSONAL
+  ml_feature_domains:
+  - physical_banking_capillarity
+  - municipal_financial_inclusion
+  - branch_density_per_100k_inhab
+  solution_packs:
+  - P01
+  - P02
+  - P03
+  - P05
+  - P06
+  - P08
+  - P10
+  rice_score: 905
+  roadmap_wave: 3
+  status: HOMOLOGATED
+  freshness_sla_hours: 720
+  cron_schedule_expression: 0 6 10 * *

@@ -1,0 +1,96 @@
+contract_id: ODCS-BR-BCB-AGENCIA-001
+source_id: bcb_agencia
+version: 1.0.0
+grain: 1 row per registered bank branch in BACEN Olinda Informes_Agencias OData service
+name: "Banco Central: Cadastro Nacional de Agências Bancárias e Postos de Atendimento (Olinda OData)"
+agency: Banco Central do Brasil (BACEN)
+official_url: https://olinda.bcb.gov.br/olinda/servico/Informes_Agencias/versao/v1/odata/Agencias?$top=1&$format=json
+segment_id: 02_economico_macrofinanceiro
+access_mode: FEDERATED_API
+protocol: ODATA_V4
+auth_type: NONE
+update_frequency: Mensal
+freshness_sla_hours: 720
+cron_schedule_expression: "0 6 10 * *"
+lgpd_legal_basis: public_interest_lai_resolucao_cmn_4072_2012
+min_expected_rows: 10
+primary_keys:
+  - cnpj_14_agencia
+  - id_municipio
+  - sigla_uf
+canonical_keys:
+  - cnpj_14
+  - id_municipio
+  - sigla_uf
+  - cep_8
+sentinel_values:
+  - -1
+  - -99
+  - N/D
+  - SEM INFORMACAO
+columns:
+  - name: cnpj_14_agencia
+    data_type: STRING
+    required: true
+    nullable: false
+    description: CNPJ completo de 14 dígitos da dependência bancária registrada no BACEN
+  - name: cnpj_8_if
+    data_type: STRING
+    required: true
+    nullable: false
+    description: CNPJ raiz de 8 dígitos da instituição financeira controladora
+  - name: nome_instituicao
+    data_type: STRING
+    required: true
+    nullable: false
+    description: Razão social da instituição financeira detentora da agência
+  - name: segmento_if
+    data_type: STRING
+    required: true
+    nullable: false
+    description: Segmento institucional no SFN (Banco Múltiplo, Caixa Econômica, Banco Comercial ou Cooperativa)
+  - name: nome_agencia
+    data_type: STRING
+    required: true
+    nullable: false
+    description: Denominação oficial da agência ou unidade bancária no CAD BACEN
+  - name: tipo_instalacao
+    data_type: STRING
+    required: true
+    nullable: false
+    description: Tipo de dependência física (Agência, Posto de Atendimento ou Unidade Administrativa)
+  - name: id_municipio
+    data_type: STRING
+    required: true
+    nullable: false
+    description: Código IBGE canônico de 7 dígitos do município onde a agência opera
+  - name: sigla_uf
+    data_type: STRING
+    required: true
+    nullable: false
+    description: Sigla de 2 letras da Unidade Federativa da dependência
+  - name: nome_municipio
+    data_type: STRING
+    required: true
+    nullable: false
+    description: Nome oficial do município brasileiro de localização
+  - name: bairro
+    data_type: STRING
+    required: true
+    nullable: false
+    description: Bairro ou distrito urbano de localização da agência bancária
+  - name: cep_8
+    data_type: STRING
+    required: true
+    nullable: false
+    description: CEP postal normalizado com 8 dígitos da dependência bancária
+  - name: fone_ddd
+    data_type: STRING
+    required: true
+    nullable: false
+    description: Código de Discagem Direta a Distância (DDD) de contato da dependência
+  - name: data_inicio_operacao
+    data_type: STRING
+    required: true
+    nullable: false
+    description: Data oficial de início de funcionamento registrada no BACEN (YYYY-MM-DD)

@@ -1,0 +1,26 @@
+version: 2
+
+sources:
+  - name: bcb_agencia
+    description: "Tabelas Silver do Cadastro Nacional de Agências Bancárias e Postos de Atendimento (BACEN Olinda OData)"
+    meta:
+      agency: "Banco Central do Brasil (BACEN)"
+      domain: "macrofinanceiro"
+      freshness_sla: "Mensal (720h)"
+    tables:
+      - name: agencias_cadastro_nacional
+        description: "Cadastro unitário de dependências e agências bancárias registradas no CAD/Olinda BACEN"
+        meta:
+          external_location: "data/bcb_agencia/silver/agencias_cadastro_nacional.parquet"
+      - name: agencias_postos_atendimento
+        description: "Quantitativo municipal de postos de atendimento bancário (PA), PAEs eletrônicos e unidades administrativas"
+        meta:
+          external_location: "data/bcb_agencia/silver/agencias_postos_atendimento.parquet"
+      - name: agencias_cobertura_municipal
+        description: "Indicadores municipais de cobertura e densidade de agências por 100 mil habitantes"
+        meta:
+          external_location: "data/bcb_agencia/silver/agencias_cobertura_municipal.parquet"
+      - name: agencias_cidades_sem_atendimento
+        description: "Mapeamento de inclusão financeira presencial, distância média de agência e correspondentes bancários"
+        meta:
+          external_location: "data/bcb_agencia/silver/agencias_cidades_sem_atendimento.parquet"

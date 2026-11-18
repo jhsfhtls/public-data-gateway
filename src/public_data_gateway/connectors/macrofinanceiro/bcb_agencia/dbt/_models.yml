@@ -1,0 +1,178 @@
+version: 2
+
+models:
+  - name: stg_bcb_agencias_cadastro_nacional
+    description: "Staging view do Cadastro Nacional de Agências Bancárias BACEN (Olinda OData)."
+    columns:
+      - name: cnpj_14_agencia
+        description: "CNPJ completo de 14 dígitos da dependência bancária."
+        tests: [not_null, unique]
+      - name: cnpj_8_if
+        description: "CNPJ raiz de 8 dígitos da instituição financeira controladora."
+        tests: [not_null]
+      - name: nome_instituicao
+        description: "Razão social da instituição financeira detentora da agência."
+        tests: [not_null]
+      - name: segmento_if
+        description: "Segmento institucional no Sistema Financeiro Nacional."
+        tests: [not_null]
+      - name: nome_agencia
+        description: "Nome oficial da agência ou unidade de atendimento no BACEN."
+        tests: [not_null]
+      - name: tipo_instalacao
+        description: "Tipo de dependência física registrada no BACEN."
+        tests: [not_null]
+      - name: id_municipio
+        description: "Código IBGE canônico de 7 dígitos do município da agência."
+        tests: [not_null]
+      - name: sigla_uf
+        description: "Sigla de 2 letras da Unidade Federativa."
+        tests: [not_null]
+      - name: nome_municipio
+        description: "Nome oficial do município de localização da agência."
+        tests: [not_null]
+      - name: bairro
+        description: "Bairro urbano onde a agência está instalada."
+        tests: [not_null]
+      - name: cep_8
+        description: "CEP postal normalizado de 8 dígitos da agência."
+        tests: [not_null]
+      - name: fone_ddd
+        description: "Código telefônico DDD da dependência."
+        tests: [not_null]
+      - name: data_inicio_operacao
+        description: "Data oficial de início de operação registrada no BACEN."
+        tests: [not_null]
+
+  - name: stg_bcb_agencias_postos_atendimento
+    description: "Staging view dos postos de atendimento bancário (PA), PAEs eletrônicos e unidades administrativas municipais."
+    columns:
+      - name: id_municipio
+        description: "Código IBGE canônico de 7 dígitos do município."
+        tests: [not_null, unique]
+      - name: sigla_uf
+        description: "Sigla de 2 letras da Unidade Federativa."
+        tests: [not_null]
+      - name: nome_municipio
+        description: "Nome oficial do município."
+        tests: [not_null]
+      - name: qtd_postos_pa
+        description: "Quantidade de Postos de Atendimento bancário (PA) ativos no município."
+        tests: [not_null]
+      - name: qtd_postos_pae_eletronico
+        description: "Quantidade de Postos de Atendimento Eletrônico (PAE) e ATMs no município."
+        tests: [not_null]
+      - name: qtd_unidades_administrativas
+        description: "Quantidade de unidades administrativas desdobradas no município."
+        tests: [not_null]
+      - name: cobertura_autoatendimento_24h_pct
+        description: "Percentual de cobertura de autoatendimento bancário 24h na rede local (%)."
+        tests: [not_null]
+
+  - name: stg_bcb_agencias_cobertura_municipal
+    description: "Staging view de densidade de agências e mix de instituições públicas vs privadas por município."
+    columns:
+      - name: id_municipio
+        description: "Código IBGE canônico de 7 dígitos do município."
+        tests: [not_null, unique]
+      - name: sigla_uf
+        description: "Sigla de 2 letras da Unidade Federativa."
+        tests: [not_null]
+      - name: nome_municipio
+        description: "Nome oficial do município."
+        tests: [not_null]
+      - name: total_agencias_fisicas
+        description: "Número total de agências bancárias físicas ativas no município."
+        tests: [not_null]
+      - name: total_bancos_presentes
+        description: "Quantidade de instituições financeiras distintas operando presencialmente."
+        tests: [not_null]
+      - name: agencias_por_100k_hab
+        description: "Taxa de agências bancárias físicas por 100 mil habitantes."
+        tests: [not_null]
+      - name: percentual_bancos_publicos_pct
+        description: "Percentual da rede física pertencente a bancos públicos (%)."
+        tests: [not_null]
+      - name: percentual_bancos_privados_pct
+        description: "Percentual da rede física pertencente a bancos privados ou cooperativas (%)."
+        tests: [not_null]
+
+  - name: stg_bcb_agencias_inclusao_financeira
+    description: "Staging view de diagnóstico de inclusão financeira presencial e dependência de correspondentes bancários."
+    columns:
+      - name: id_municipio
+        description: "Código IBGE canônico de 7 dígitos do município."
+        tests: [not_null, unique]
+      - name: sigla_uf
+        description: "Sigla de 2 letras da Unidade Federativa."
+        tests: [not_null]
+      - name: nome_municipio
+        description: "Nome oficial do município."
+        tests: [not_null]
+      - name: possui_agencia_fisica
+        description: "Indica presença de ao menos uma agência bancária física instalada no município."
+        tests: [not_null]
+      - name: dependencia_correspondente_bancario_pct
+        description: "Percentual de dependência de correspondentes bancários não-bancários no atendimento local (%)."
+        tests: [not_null]
+      - name: distancia_media_agencia_km
+        description: "Distância média estimada da população até uma agência física presencial em km."
+        tests: [not_null]
+      - name: status_inclusao_financeira
+        description: "Classificação municipal de inclusão e capilaridade de atendimento bancário presencial."
+        tests: [not_null]
+
+  - name: fct_capilaridade_agencias_bancarias_municipal
+    description: "Tabela fato consolidada de capilaridade bancária presencial BACEN unindo cadastro de agências, PA/PAE, densidade e inclusão financeira."
+    columns:
+      - name: id_municipio
+        description: "Código IBGE canônico de 7 dígitos do município."
+        tests: [not_null, unique]
+      - name: sigla_uf
+        description: "Sigla de 2 letras da Unidade Federativa."
+        tests: [not_null]
+      - name: nome_municipio
+        description: "Nome oficial do município."
+        tests: [not_null]
+      - name: total_agencias_fisicas
+        description: "Quantidade total de agências bancárias físicas ativas."
+        tests: [not_null]
+      - name: total_bancos_presentes
+        description: "Quantidade de bancos distintos com presença física local."
+        tests: [not_null]
+      - name: agencias_por_100k_hab
+        description: "Densidade de agências bancárias por 100 mil habitantes."
+        tests: [not_null]
+      - name: percentual_bancos_publicos_pct
+        description: "Participação percentual de bancos públicos na rede física local (%)."
+        tests: [not_null]
+      - name: percentual_bancos_privados_pct
+        description: "Participação percentual de bancos privados na rede física local (%)."
+        tests: [not_null]
+      - name: qtd_postos_pa
+        description: "Quantidade de Postos de Atendimento bancário (PA) ativos."
+        tests: [not_null]
+      - name: qtd_postos_pae_eletronico
+        description: "Quantidade de Postos de Atendimento Eletrônico (PAE)."
+        tests: [not_null]
+      - name: qtd_unidades_administrativas
+        description: "Quantidade de unidades administrativas bancárias no município."
+        tests: [not_null]
+      - name: cobertura_autoatendimento_24h_pct
+        description: "Cobertura de autoatendimento 24h na rede bancária municipal (%)."
+        tests: [not_null]
+      - name: possui_agencia_fisica
+        description: "Flag booleano indicando presença de agência bancária física."
+        tests: [not_null]
+      - name: dependencia_correspondente_bancario_pct
+        description: "Grau de dependência de correspondentes bancários (%)."
+        tests: [not_null]
+      - name: distancia_media_agencia_km
+        description: "Distância média até a agência presencial mais próxima em quilômetros."
+        tests: [not_null]
+      - name: status_inclusao_financeira
+        description: "Classificação de inclusão financeira municipal."
+        tests: [not_null]
+      - name: qtd_dependencias_amostra_cadastral
+        description: "Contagem de dependências unitárias detalhadas na amostra cadastral Olinda BACEN."
+        tests: [not_null]

@@ -781,6 +781,58 @@ class BankingFacade:
             limit=limit, sigla_uf=sigla_uf
         )
 
+    @property
+    def agencia_connector(self) -> Any:
+        if not hasattr(self, "_agencia_conn") or self._agencia_conn is None:
+            from public_data_gateway.connectors.macrofinanceiro.bcb_agencia import (
+                BcbAgenciaConnector,
+            )
+
+            self._agencia_conn = BcbAgenciaConnector(settings=self._sdk.settings)
+        return self._agencia_conn
+
+    def get_bcb_agencias(
+        self, id_municipio_or_cnpj: str
+    ) -> list[dict[str, Any]]:
+        """Lookup registered BACEN bank branches by IBGE 7D, CNPJ, CEP, UF, or name."""
+        return self.agencia_connector.get_branches(id_municipio_or_cnpj)
+
+    def get_bcb_postos_atendimento(
+        self, id_municipio_or_name: str
+    ) -> dict[str, Any] | None:
+        """Retrieve municipal banking service outposts (PA, PAE, administrative units)."""
+        return self.agencia_connector.get_service_outposts(id_municipio_or_name)
+
+    def get_bcb_cobertura_municipal(
+        self, id_municipio_or_name: str
+    ) -> dict[str, Any] | None:
+        """Retrieve municipal bank branch density per 100k inhabitants and public/private mix."""
+        return self.agencia_connector.get_municipal_coverage(
+            id_municipio_or_name
+        )
+
+    def get_bcb_inclusao_financeira(
+        self, id_municipio_or_name: str
+    ) -> dict[str, Any] | None:
+        """Retrieve financial inclusion readiness and bank-correspondent dependency status."""
+        return self.agencia_connector.get_financial_inclusion_status(
+            id_municipio_or_name
+        )
+
+    def get_bcb_agencia_features(
+        self, id_municipio_or_name: str
+    ) -> dict[str, Any] | None:
+        """Retrieve Gold BACEN physical banking capillarity features."""
+        return self.agencia_connector.get_agencia_features(id_municipio_or_name)
+
+    def list_top_bcb_agencia_municipalities(
+        self, limit: int = 10, sigla_uf: str | None = None
+    ) -> list[dict[str, Any]]:
+        """List municipalities ranked by Gold BACEN physical banking capillarity score."""
+        return self.agencia_connector.list_top_municipalities(
+            limit=limit, sigla_uf=sigla_uf
+        )
+
 
 class TreasuryFacade:
     """Public finances, SADIPEM credit operations, CAPAG rating and FPM transfers (STN Tesouro Transparente)."""
@@ -2805,6 +2857,44 @@ class BrazilData:
     ) -> list[dict[str, Any]]:
         """Listar municípios líderes em profundidade e liquidez bancária no ESTBAN (BACEN)."""
         return self.banking.list_top_estban_municipalities(
+            limit=limit, sigla_uf=sigla_uf
+        )
+
+    def get_bcb_agencias(
+        self, id_municipio_or_cnpj: str
+    ) -> list[dict[str, Any]]:
+        """Consultar cadastro de agências bancárias registradas no BACEN (Olinda OData)."""
+        return self.banking.get_bcb_agencias(id_municipio_or_cnpj)
+
+    def get_bcb_postos_atendimento(
+        self, id_municipio_or_name: str
+    ) -> dict[str, Any] | None:
+        """Consultar postos de atendimento bancário PA e PAEs eletrônicos municipais (BACEN)."""
+        return self.banking.get_bcb_postos_atendimento(id_municipio_or_name)
+
+    def get_bcb_cobertura_municipal(
+        self, id_municipio_or_name: str
+    ) -> dict[str, Any] | None:
+        """Consultar cobertura física de agências bancárias por 100 mil habitantes (BACEN)."""
+        return self.banking.get_bcb_cobertura_municipal(id_municipio_or_name)
+
+    def get_bcb_inclusao_financeira(
+        self, id_municipio_or_name: str
+    ) -> dict[str, Any] | None:
+        """Consultar status de inclusão financeira e dependência de correspondentes (BACEN)."""
+        return self.banking.get_bcb_inclusao_financeira(id_municipio_or_name)
+
+    def get_bcb_agencia_features(
+        self, id_municipio_or_name: str
+    ) -> dict[str, Any] | None:
+        """Consultar features Gold de capilaridade bancária presencial por município (BACEN)."""
+        return self.banking.get_bcb_agencia_features(id_municipio_or_name)
+
+    def list_top_bcb_agencia_municipalities(
+        self, limit: int = 10, sigla_uf: str | None = None
+    ) -> list[dict[str, Any]]:
+        """Listar municípios ordenados por capilaridade física de agências bancárias (BACEN)."""
+        return self.banking.list_top_bcb_agencia_municipalities(
             limit=limit, sigla_uf=sigla_uf
         )
 
