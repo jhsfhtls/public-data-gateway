@@ -40,6 +40,7 @@ import public_data_gateway.connectors.compliance.cgu_transparencia_gastos  # noq
 import public_data_gateway.connectors.compliance.pgfn_divida_ativa  # noqa: F401
 import public_data_gateway.connectors.compliance.rdap_registro_br  # noqa: F401
 import public_data_gateway.connectors.compliance.sinesp_seguranca  # noqa: F401
+import public_data_gateway.connectors.compliance.tse_eleicoes  # noqa: F401
 import public_data_gateway.connectors.compras_publicas.comprasgov_catmat  # noqa: F401
 import public_data_gateway.connectors.compras_publicas.pncp_contratacoes  # noqa: F401
 import public_data_gateway.connectors.demografico.ibge_censo2022  # noqa: F401

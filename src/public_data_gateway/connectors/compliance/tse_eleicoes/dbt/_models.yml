@@ -1,0 +1,184 @@
+version: 2
+
+models:
+  - name: stg_tse_candidaturas_partidos_municipio
+    description: "Staging view tipada de candidaturas aptas e pluralismo partidário municipal do TSE."
+    columns:
+      - name: cod_eleicao_tse
+        description: "Identificador único do agrupamento eleitoral municipal por cargo no TSE (STRING)."
+        tests: [not_null, unique]
+      - name: ano_eleicao
+        description: "Ano de realização do pleito municipal."
+        tests: [not_null]
+      - name: turno_eleicao
+        description: "Fase da eleição (1_TURNO ou 2_TURNO)."
+        tests: [not_null]
+      - name: cargo_disputado
+        description: "Cargo eletivo disputado no pleito (PREFEITO ou VEREADOR)."
+        tests: [not_null]
+      - name: id_municipio
+        description: "Código IBGE de 7 dígitos do município (STRING)."
+        tests: [not_null]
+      - name: sigla_uf
+        description: "Sigla de 2 letras da Unidade Federativa (UF)."
+        tests: [not_null]
+      - name: nome_municipio
+        description: "Nome oficial do município."
+        tests: [not_null]
+      - name: regiao
+        description: "Macrorregião geográfica brasileira."
+        tests: [not_null]
+      - name: qtd_candidaturas_aptas
+        description: "Total de candidaturas aptas deferidas na circunscrição para o cargo."
+        tests: [not_null]
+      - name: partidos_competitivos_count
+        description: "Quantidade de partidos ou federações com candidaturas ativas no cargo."
+        tests: [not_null]
+      - name: competicao_eleitoral_pct
+        description: "Índice percentual de pluralismo partidário e competitividade (%)."
+        tests: [not_null]
+
+  - name: stg_tse_votacao_comparecimento_secao
+    description: "Staging view tipada de eleitorado apto, comparecimento e votos válidos por município."
+    columns:
+      - name: cod_votacao_tse
+        description: "Identificador único do boletim consolidado de comparecimento municipal (STRING)."
+        tests: [not_null, unique]
+      - name: id_municipio
+        description: "Código IBGE de 7 dígitos do município (STRING)."
+        tests: [not_null]
+      - name: sigla_uf
+        description: "Sigla de 2 letras da Unidade Federativa (UF)."
+        tests: [not_null]
+      - name: nome_municipio
+        description: "Nome oficial do município."
+        tests: [not_null]
+      - name: eleitorado_apto_total
+        description: "Contingente total de eleitores aptos a votar no município."
+        tests: [not_null]
+      - name: comparecimento_pct
+        description: "Taxa percentual de comparecimento às urnas (%)."
+        tests: [not_null]
+      - name: abstencao_pct
+        description: "Taxa percentual de abstenção eleitoral no município (%)."
+        tests: [not_null]
+      - name: votos_validos_pct
+        description: "Percentual de votos válidos nominais e de legenda sobre o comparecimento (%)."
+        tests: [not_null]
+      - name: ano_eleicao
+        description: "Ano do pleito municipal de referência."
+        tests: [not_null]
+
+  - name: stg_tse_prestacao_contas_campanha
+    description: "Staging view tipada de prestação de contas eleitorais, receitas e doadores distintos."
+    columns:
+      - name: id_municipio
+        description: "Código IBGE de 7 dígitos do município (STRING)."
+        tests: [not_null, unique]
+      - name: sigla_uf
+        description: "Sigla de 2 letras da Unidade Federativa (UF)."
+        tests: [not_null]
+      - name: nome_municipio
+        description: "Nome oficial do município."
+        tests: [not_null]
+      - name: receita_total_campanha_mil_brl
+        description: "Total de receitas eleitorais declaradas na prestação de contas (R$ mil)."
+        tests: [not_null]
+      - name: despesa_contratada_mil_brl
+        description: "Total de despesas de campanha contratadas pelos comitês e candidatos (R$ mil)."
+        tests: [not_null]
+      - name: contas_aprovadas_pct
+        description: "Percentual de prestações de contas julgadas aprovadas ou aprovadas com ressalvas (%)."
+        tests: [not_null]
+      - name: doadores_cpf_cnpj_distintos
+        description: "Total de CPF/CNPJ distintos registrados como financiadores ou doadores."
+        tests: [not_null]
+
+  - name: stg_tse_eleicoes_resumo_municipal
+    description: "Staging view tipada do consolidado municipal eleitoral TSE."
+    columns:
+      - name: id_municipio
+        description: "Código IBGE de 7 dígitos do município (STRING)."
+        tests: [not_null, unique]
+      - name: sigla_uf
+        description: "Sigla de 2 letras da Unidade Federativa (UF)."
+        tests: [not_null]
+      - name: nome_municipio
+        description: "Nome oficial do município."
+        tests: [not_null]
+      - name: regiao
+        description: "Macrorregião geográfica brasileira."
+        tests: [not_null]
+      - name: eleitorado_apto_total
+        description: "Eleitorado total apto cadastrado no TSE no município."
+        tests: [not_null]
+      - name: total_candidaturas_aptas
+        description: "Total de candidaturas aptas na eleição municipal (Prefeito e Vereador)."
+        tests: [not_null]
+      - name: comparecimento_pct
+        description: "Percentual de comparecimento eleitoral no município (%)."
+        tests: [not_null]
+      - name: receita_total_campanha_mil_brl
+        description: "Receita eleitoral agregada declarada nas campanhas municipais (R$ mil)."
+        tests: [not_null]
+      - name: custo_por_eleitor_brl
+        description: "Financiamento eleitoral médio declarado dividido pelo eleitorado apto (BRL)."
+        tests: [not_null]
+
+  - name: fct_eleicoes_tse_municipal
+    description: "Tabela Fato municipal consolidando eleitorado, candidaturas, comparecimento e prestação de contas TSE."
+    columns:
+      - name: id_municipio
+        description: "Código IBGE de 7 dígitos do município (STRING)."
+        tests: [not_null, unique]
+      - name: sigla_uf
+        description: "Sigla de 2 letras da Unidade Federativa (UF)."
+        tests: [not_null]
+      - name: nome_municipio
+        description: "Nome oficial do município."
+        tests: [not_null]
+      - name: regiao
+        description: "Macrorregião geográfica brasileira."
+        tests: [not_null]
+      - name: eleitorado_apto_total
+        description: "Eleitorado total apto no município."
+        tests: [not_null]
+      - name: total_candidaturas_aptas
+        description: "Total de candidaturas deferidas aptas no município."
+        tests: [not_null]
+      - name: comparecimento_pct
+        description: "Percentual de comparecimento às urnas no pleito (%)."
+        tests: [not_null]
+      - name: receita_total_campanha_mil_brl
+        description: "Total de receitas de campanha declaradas no município (R$ mil)."
+        tests: [not_null]
+      - name: custo_por_eleitor_brl
+        description: "Receita média de campanha por eleitor apto (BRL)."
+        tests: [not_null]
+      - name: qtd_cargos_apurados_tse
+        description: "Quantidade de cargos municipais apurados na camada Silver TSE."
+        tests: [not_null]
+      - name: max_partidos_competitivos
+        description: "Maior quantidade de partidos e federações competitivas registradas nos cargos."
+        tests: [not_null]
+      - name: competicao_eleitoral_media_pct
+        description: "Média do índice percentual de pluralismo partidário nos cargos municipais (%)."
+        tests: [not_null]
+      - name: abstencao_pct
+        description: "Percentual de eleitores ausentes na votação (%)."
+        tests: [not_null]
+      - name: votos_validos_pct
+        description: "Percentual de votos válidos apurados sobre o comparecimento (%)."
+        tests: [not_null]
+      - name: ano_eleicao
+        description: "Ano do ciclo eleitoral consolidado."
+        tests: [not_null]
+      - name: despesa_contratada_mil_brl
+        description: "Despesa contratada total nas campanhas municipais (R$ mil)."
+        tests: [not_null]
+      - name: contas_aprovadas_pct
+        description: "Taxa de contas de campanha aprovadas junto à Justiça Eleitoral (%)."
+        tests: [not_null]
+      - name: doadores_cpf_cnpj_distintos
+        description: "Quantidade de doadores únicos identificados em prestação de contas."
+        tests: [not_null]

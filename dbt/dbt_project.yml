@@ -95,6 +95,7 @@ model-paths:
   - "../src/public_data_gateway/connectors/compliance/cgu_transparencia_gastos/dbt"
   - "../src/public_data_gateway/connectors/compliance/rdap_registro_br/dbt"
   - "../src/public_data_gateway/connectors/compliance/sinesp_seguranca/dbt"
+  - "../src/public_data_gateway/connectors/compliance/tse_eleicoes/dbt"
   - "../src/public_data_gateway/connectors/empresarial/cnpja_open/dbt"
   - "../src/public_data_gateway/connectors/empresarial/company_enrich_apollo_bdc/dbt"
   - "../src/public_data_gateway/connectors/empresarial/gleif_lei/dbt"

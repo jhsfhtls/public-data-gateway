@@ -159,6 +159,16 @@ siape_uf AS (
     GROUP BY sigla_uf
 ),
 
+eleicoes_uf AS (
+    SELECT
+        sigla_uf,
+        SUM(eleitorado_apto_total) AS eleitorado_apto_tse_uf,
+        ROUND(AVG(comparecimento_pct), 2) AS avg_comparecimento_eleitoral_uf_pct,
+        ROUND(AVG(score_integridade_eleitoral_tse), 2) AS avg_score_integridade_eleitoral_uf
+    FROM {{ ref('mart_eleicoes_tse_brasil') }}
+    GROUP BY sigla_uf
+),
+
 base AS (
     SELECT
         t.sigla_uf,
@@ -205,6 +215,9 @@ base AS (
         COALESCE(sp.total_servidores_siape_uf, 0) AS total_servidores_siape_uf,
         COALESCE(sp.folha_mensal_siape_uf_mil_brl, 0.0) AS folha_mensal_siape_uf_mil_brl,
         COALESCE(sp.avg_score_integridade_siape_uf, 80.0) AS avg_score_integridade_siape_uf,
+        COALESCE(el.eleitorado_apto_tse_uf, 0) AS eleitorado_apto_tse_uf,
+        COALESCE(el.avg_comparecimento_eleitoral_uf_pct, 75.0) AS avg_comparecimento_eleitoral_uf_pct,
+        COALESCE(el.avg_score_integridade_eleitoral_uf, 80.0) AS avg_score_integridade_eleitoral_uf,
         COALESCE(m.ano_mes, '2025-03') AS macro_ano_mes_referencia,
         COALESCE(m.selic_meta_fim_mes_pct, 14.25) AS selic_meta_fim_mes_pct,
         COALESCE(m.ipca_acumulado_12m_pct, 5.06) AS ipca_acumulado_12m_pct,
@@ -225,6 +238,7 @@ base AS (
     LEFT JOIN prf_uf pf ON t.sigla_uf = pf.sigla_uf
     LEFT JOIN cgu_gastos_uf cgf ON t.sigla_uf = cgf.sigla_uf
     LEFT JOIN siape_uf sp ON t.sigla_uf = sp.sigla_uf
+    LEFT JOIN eleicoes_uf el ON t.sigla_uf = el.sigla_uf
     CROSS JOIN macro_latest m
 ),
 

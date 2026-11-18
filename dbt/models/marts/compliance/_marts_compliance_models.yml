@@ -339,3 +339,67 @@ models:
       - name: tier_governanca_pessoal_siape
         description: "Classificação municipal SIAPE (ALTA_GOVERNANCA_FUNCIONAL_SIAPE, QUADRO_FEDERAL_CONSOLIDADO ou ALERTA_CONCENTRACAO_COMISSIONADOS)."
         tests: [not_null]
+
+  - name: mart_eleicoes_tse_brasil
+    description: "Data Mart Gold intra-domínio consolidando eleitorado apto, comparecimento, pluralismo partidário, prestação de contas e score de integridade eleitoral TSE."
+    columns:
+      - name: id_municipio
+        description: "Código IBGE de 7 dígitos do município (STRING)."
+        tests: [not_null, unique]
+      - name: sigla_uf
+        description: "Sigla de 2 letras da Unidade Federativa (UF)."
+        tests: [not_null]
+      - name: nome_municipio
+        description: "Nome oficial do município."
+        tests: [not_null]
+      - name: regiao
+        description: "Macrorregião geográfica brasileira."
+        tests: [not_null]
+      - name: eleitorado_apto_total
+        description: "Eleitorado total apto cadastrado no TSE no município."
+        tests: [not_null]
+      - name: total_candidaturas_aptas
+        description: "Total de candidaturas aptas na eleição municipal."
+        tests: [not_null]
+      - name: comparecimento_pct
+        description: "Taxa de comparecimento eleitoral no município (%)."
+        tests: [not_null]
+      - name: receita_total_campanha_mil_brl
+        description: "Receita agregada declarada nas campanhas municipais (R$ mil)."
+        tests: [not_null]
+      - name: custo_por_eleitor_brl
+        description: "Receita média de campanha dividida pelo eleitorado apto (BRL)."
+        tests: [not_null]
+      - name: qtd_cargos_apurados_tse
+        description: "Quantidade de cargos apurados na camada Silver TSE."
+        tests: [not_null]
+      - name: max_partidos_competitivos
+        description: "Maior número de legendas ou federações competitivas no município."
+        tests: [not_null]
+      - name: competicao_eleitoral_media_pct
+        description: "Média do índice percentual de pluralismo partidário municipal (%)."
+        tests: [not_null]
+      - name: abstencao_pct
+        description: "Taxa percentual de abstenção eleitoral (%)."
+        tests: [not_null]
+      - name: votos_validos_pct
+        description: "Percentual de votos válidos sobre o comparecimento total (%)."
+        tests: [not_null]
+      - name: ano_eleicao
+        description: "Ano do pleito municipal de referência."
+        tests: [not_null]
+      - name: despesa_contratada_mil_brl
+        description: "Despesa total contratada em campanhas eleitorais no município (R$ mil)."
+        tests: [not_null]
+      - name: contas_aprovadas_pct
+        description: "Percentual de prestações de contas julgadas aprovadas pelo TSE (%)."
+        tests: [not_null]
+      - name: doadores_cpf_cnpj_distintos
+        description: "Quantidade de CPF/CNPJ distintos registrados como financiadores de campanha."
+        tests: [not_null]
+      - name: score_integridade_eleitoral_tse
+        description: "Score sintético municipal de maturidade eleitoral, comparecimento e regularidade de contas TSE (0-100)."
+        tests: [not_null]
+      - name: tier_maturidade_eleitoral_tse
+        description: "Classificação municipal TSE (ALTA_MATURIDADE_ELEITORAL, PARTICIPACAO_ELEITORAL_REGULAR ou ALERTA_ABSTENCAO_CONCENTRACAO)."
+        tests: [not_null]

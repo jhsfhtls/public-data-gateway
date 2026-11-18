@@ -136,6 +136,15 @@ models:
       - name: avg_score_integridade_siape_uf
         description: "Média estadual do score de governança e integridade funcional SIAPE/CGU (0-100)."
         tests: [not_null]
+      - name: eleitorado_apto_tse_uf
+        description: "Contingente total estadual de eleitorado apto cadastrado no TSE."
+        tests: [not_null]
+      - name: avg_comparecimento_eleitoral_uf_pct
+        description: "Média estadual da taxa de comparecimento eleitoral TSE (%)."
+        tests: [not_null]
+      - name: avg_score_integridade_eleitoral_uf
+        description: "Média estadual do score de maturidade eleitoral e regularidade de contas TSE (0-100)."
+        tests: [not_null]
       - name: macro_ano_mes_referencia
         description: "Competência macroeconômica de referência (YYYY-MM)."
         tests: [not_null]

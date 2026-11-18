@@ -1,0 +1,84 @@
+contract_id: ODCS-BR-TSE-ELEICOES-DADOS-ABERTOS-001
+source_id: tse_eleicoes
+version: 1.0.0
+grain: 1 row per disputed office and municipality in TSE municipal elections
+name: "TSE Dados Abertos Eleitorais: Candidaturas, Votação & Prestação de Contas"
+agency: Tribunal Superior Eleitoral (TSE)
+official_url: https://dadosabertos.tse.jus.br/
+segment_id: 08_judicial_compliance
+access_mode: LAKEHOUSE_BATCH
+protocol: HTTP_BULK_ZIP
+auth_type: NONE
+update_frequency: Bienal / Contínua (Ciclos Eleitorais & Prestação de Contas DivulgaCandContas)
+freshness_sla_hours: 720
+cron_schedule_expression: "0 6 1 * *"
+lgpd_legal_basis: public_interest_lei_9504_1997_lei_eleitoral_e_transparencia_tse
+min_expected_rows: 10
+primary_keys:
+  - cod_eleicao_tse
+  - id_municipio
+  - sigla_uf
+canonical_keys:
+  - id_municipio
+  - sigla_uf
+sentinel_values:
+  - -1
+  - -99
+  - N/D
+  - "#NULO#"
+columns:
+  - name: cod_eleicao_tse
+    data_type: STRING
+    required: true
+    nullable: false
+    description: Identificador único do agrupamento eleitoral por município e cargo no TSE
+  - name: ano_eleicao
+    data_type: INT64
+    required: true
+    nullable: false
+    description: Ano de realização do pleito municipal de referência
+  - name: turno_eleicao
+    data_type: STRING
+    required: true
+    nullable: false
+    description: Fase da disputa eleitoral no município (1_TURNO ou 2_TURNO)
+  - name: cargo_disputado
+    data_type: STRING
+    required: true
+    nullable: false
+    description: Cargo eletivo municipal consolidado (PREFEITO ou VEREADOR)
+  - name: id_municipio
+    data_type: STRING
+    required: true
+    nullable: false
+    description: Código IBGE canônico de 7 dígitos do município
+  - name: sigla_uf
+    data_type: STRING
+    required: true
+    nullable: false
+    description: Sigla de 2 letras da Unidade Federativa (UF)
+  - name: nome_municipio
+    data_type: STRING
+    required: true
+    nullable: false
+    description: Nome oficial do município
+  - name: regiao
+    data_type: STRING
+    required: true
+    nullable: false
+    description: Macrorregião geográfica brasileira
+  - name: qtd_candidaturas_aptas
+    data_type: INT64
+    required: true
+    nullable: false
+    description: Quantidade total de candidaturas aptas deferidas na circunscrição municipal
+  - name: partidos_competitivos_count
+    data_type: INT64
+    required: true
+    nullable: false
+    description: Quantidade de legendas partidárias ou federações com candidaturas registradas
+  - name: competicao_eleitoral_pct
+    data_type: FLOAT64
+    required: true
+    nullable: false
+    description: Índice percentual de pluralismo partidário e competição eleitoral no cargo (%)
