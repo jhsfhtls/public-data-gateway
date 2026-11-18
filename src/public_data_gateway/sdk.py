@@ -672,6 +672,56 @@ class TreasuryFacade:
         """Retrieve official CAPAG payment capacity rating and indicators for a municipality."""
         return self.treasury_connector.get_capag_rating(id_municipio)
 
+    @property
+    def siconfi_connector(self) -> Any:
+        if not hasattr(self, "_siconfi_conn") or self._siconfi_conn is None:
+            from public_data_gateway.connectors.macrofinanceiro.stn_siconfi import (
+                StnSiconfiConnector,
+            )
+
+            self._siconfi_conn = StnSiconfiConnector(settings=self._sdk.settings)
+        return self._siconfi_conn
+
+    def get_siconfi_ente(self, id_municipio_or_name: str) -> dict[str, Any] | None:
+        """Retrieve SICONFI federative entity registration profile by IBGE 7D or name."""
+        return self.siconfi_connector.get_ente_profile(id_municipio_or_name)
+
+    def get_siconfi_dca(
+        self, id_municipio: str, ano: int | None = None
+    ) -> list[dict[str, Any]]:
+        """Retrieve Annual Accounts Declaration (DCA/Finbra) balance sheet for a municipality."""
+        return self.siconfi_connector.get_dca_balance(id_municipio, ano=ano)
+
+    def get_siconfi_rreo(
+        self, id_municipio: str, ano: int | None = None
+    ) -> list[dict[str, Any]]:
+        """Retrieve Budget Execution Summary (RREO) rows for a municipality."""
+        return self.siconfi_connector.get_rreo_execution(id_municipio, ano=ano)
+
+    def get_siconfi_rgf(
+        self, id_municipio: str, ano: int | None = None
+    ) -> list[dict[str, Any]]:
+        """Retrieve Fiscal Management Report (RGF) LRF personnel/debt limits for a municipality."""
+        return self.siconfi_connector.get_rgf_limits(id_municipio, ano=ano)
+
+    def get_siconfi_extratos(
+        self, id_municipio: str, ano: int | None = None
+    ) -> list[dict[str, Any]]:
+        """Retrieve SICONFI statement submission compliance extracts for a municipality."""
+        return self.siconfi_connector.get_delivery_extracts(id_municipio, ano=ano)
+
+    def get_siconfi_features(self, id_municipio_or_name: str) -> dict[str, Any] | None:
+        """Retrieve Gold SICONFI fiscal & LRF feature store profile for a municipality."""
+        return self.siconfi_connector.get_siconfi_features(id_municipio_or_name)
+
+    def list_top_siconfi_municipalities(
+        self, limit: int = 10, sigla_uf: str | None = None
+    ) -> list[dict[str, Any]]:
+        """List municipalities ranked by SICONFI accounting solidity score."""
+        return self.siconfi_connector.list_top_municipalities(
+            limit=limit, sigla_uf=sigla_uf
+        )
+
 
 class SocioeconomicFacade:
     """Socioeconomic, GDP and demographic query interface powered by IBGE SIDRA."""
@@ -2470,6 +2520,46 @@ class BrazilData:
     def get_capag_rating(self, id_municipio: str) -> dict[str, Any] | None:
         """Consultar nota da Capacidade de Pagamento CAPAG (A, B, C) e indicadores LRF (STN)."""
         return self.treasury.get_capag_rating(id_municipio)
+
+    def get_siconfi_ente(self, id_municipio_or_name: str) -> dict[str, Any] | None:
+        """Consultar cadastro oficial do ente federativo no SICONFI (STN)."""
+        return self.treasury.get_siconfi_ente(id_municipio_or_name)
+
+    def get_siconfi_dca(
+        self, id_municipio: str, ano: int | None = None
+    ) -> list[dict[str, Any]]:
+        """Consultar Declaração de Contas Anuais (DCA/Finbra) de um município (STN SICONFI)."""
+        return self.treasury.get_siconfi_dca(id_municipio, ano=ano)
+
+    def get_siconfi_rreo(
+        self, id_municipio: str, ano: int | None = None
+    ) -> list[dict[str, Any]]:
+        """Consultar Relatório Resumido da Execução Orçamentária RREO (STN SICONFI)."""
+        return self.treasury.get_siconfi_rreo(id_municipio, ano=ano)
+
+    def get_siconfi_rgf(
+        self, id_municipio: str, ano: int | None = None
+    ) -> list[dict[str, Any]]:
+        """Consultar Relatório de Gestão Fiscal RGF e limites de pessoal LRF (STN SICONFI)."""
+        return self.treasury.get_siconfi_rgf(id_municipio, ano=ano)
+
+    def get_siconfi_extratos(
+        self, id_municipio: str, ano: int | None = None
+    ) -> list[dict[str, Any]]:
+        """Consultar extrato de entregas e homologações fiscais no SICONFI (STN)."""
+        return self.treasury.get_siconfi_extratos(id_municipio, ano=ano)
+
+    def get_siconfi_features(self, id_municipio_or_name: str) -> dict[str, Any] | None:
+        """Consultar features Gold de solidez contábil, autonomia tributária e LRF (SICONFI)."""
+        return self.treasury.get_siconfi_features(id_municipio_or_name)
+
+    def list_top_siconfi_municipalities(
+        self, limit: int = 10, sigla_uf: str | None = None
+    ) -> list[dict[str, Any]]:
+        """Listar municípios líderes em solidez contábil e fiscal no SICONFI (STN)."""
+        return self.treasury.list_top_siconfi_municipalities(
+            limit=limit, sigla_uf=sigla_uf
+        )
 
     def search_catmat(self, query: str, limit: int = 20) -> list[dict[str, Any]]:
         """Pesquisar materiais no catálogo unificado de compras públicas CATMAT."""

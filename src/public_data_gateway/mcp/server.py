@@ -434,6 +434,52 @@ class MCPDispatcher:
                                 },
                             },
                             {
+                                "name": "bdg_get_siconfi_fiscal_profile",
+                                "description": "Query Gold SICONFI fiscal accounting profile, LRF personnel ratio, tax autonomy, and solidity score for a Brazilian municipality (Tier 1).",
+                                "inputSchema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "id_municipio_or_name": {"type": "string", "description": "IBGE 7-digit code or municipality name (e.g. 1302603 or Manaus)"},
+                                    },
+                                    "required": ["id_municipio_or_name"],
+                                },
+                            },
+                            {
+                                "name": "bdg_get_siconfi_rgf_limits",
+                                "description": "Query SICONFI Fiscal Management Report (RGF) LRF personnel spending % of RCL and net consolidated debt limits (Tier 1).",
+                                "inputSchema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "id_municipio": {"type": "string", "description": "IBGE 7-digit municipality code"},
+                                        "ano": {"type": "integer", "description": "Optional exercise year (e.g. 2024)"},
+                                    },
+                                    "required": ["id_municipio"],
+                                },
+                            },
+                            {
+                                "name": "bdg_get_siconfi_dca_balance",
+                                "description": "Query SICONFI Annual Accounts Declaration (DCA/Finbra) assets, liabilities, net equity, revenues, and expenses (Tier 1).",
+                                "inputSchema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "id_municipio": {"type": "string", "description": "IBGE 7-digit municipality code"},
+                                        "ano": {"type": "integer", "description": "Optional exercise year (e.g. 2024)"},
+                                    },
+                                    "required": ["id_municipio"],
+                                },
+                            },
+                            {
+                                "name": "bdg_list_top_siconfi_municipalities",
+                                "description": "List top Brazilian municipalities ranked by SICONFI fiscal & accounting solidity score (Tier 1).",
+                                "inputSchema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "limit": {"type": "integer", "description": "Max municipalities to return (default: 10)"},
+                                        "sigla_uf": {"type": "string", "description": "Optional 2-letter UF state filter"},
+                                    },
+                                },
+                            },
+                            {
                                 "name": "bdg_search_catmat_materials",
                                 "description": "Search materials and catalog descriptions in Compras.gov.br CATMAT/SIASG with PDM, class, and sustainability flags (Tier 1).",
                                 "inputSchema": {
@@ -2995,6 +3041,77 @@ class MCPDispatcher:
             st = args.get("status")
             pvls = treas_conn.get_credit_operations_pvl(termo, status=st)
             wrapped = wrap_untrusted_gov_data(pvls, source_id="stn_tesouro_transparente")
+            return {
+                "jsonrpc": "2.0",
+                "id": req_id,
+                "result": {"content": [{"type": "text", "text": wrapped}], "isError": False},
+            }
+
+        if tool_name == "bdg_get_siconfi_fiscal_profile":
+            from public_data_gateway.connectors.macrofinanceiro.stn_siconfi import (
+                StnSiconfiConnector,
+            )
+
+            sic_conn = StnSiconfiConnector(settings=self.settings)
+            termo = str(args.get("id_municipio_or_name", ""))
+            prof = sic_conn.get_siconfi_features(termo)
+            if not prof:
+                return {
+                    "jsonrpc": "2.0",
+                    "id": req_id,
+                    "result": {
+                        "content": [{"type": "text", "text": f"SICONFI fiscal profile not found for '{termo}'"}],
+                        "isError": True,
+                    },
+                }
+            wrapped = wrap_untrusted_gov_data(prof, source_id="stn_siconfi")
+            return {
+                "jsonrpc": "2.0",
+                "id": req_id,
+                "result": {"content": [{"type": "text", "text": wrapped}], "isError": False},
+            }
+
+        if tool_name == "bdg_get_siconfi_rgf_limits":
+            from public_data_gateway.connectors.macrofinanceiro.stn_siconfi import (
+                StnSiconfiConnector,
+            )
+
+            sic_conn = StnSiconfiConnector(settings=self.settings)
+            ano_val = int(args["ano"]) if args.get("ano") is not None else None
+            rows = sic_conn.get_rgf_limits(str(args.get("id_municipio", "")), ano=ano_val)
+            wrapped = wrap_untrusted_gov_data(rows, source_id="stn_siconfi")
+            return {
+                "jsonrpc": "2.0",
+                "id": req_id,
+                "result": {"content": [{"type": "text", "text": wrapped}], "isError": False},
+            }
+
+        if tool_name == "bdg_get_siconfi_dca_balance":
+            from public_data_gateway.connectors.macrofinanceiro.stn_siconfi import (
+                StnSiconfiConnector,
+            )
+
+            sic_conn = StnSiconfiConnector(settings=self.settings)
+            ano_val = int(args["ano"]) if args.get("ano") is not None else None
+            rows = sic_conn.get_dca_balance(str(args.get("id_municipio", "")), ano=ano_val)
+            wrapped = wrap_untrusted_gov_data(rows, source_id="stn_siconfi")
+            return {
+                "jsonrpc": "2.0",
+                "id": req_id,
+                "result": {"content": [{"type": "text", "text": wrapped}], "isError": False},
+            }
+
+        if tool_name == "bdg_list_top_siconfi_municipalities":
+            from public_data_gateway.connectors.macrofinanceiro.stn_siconfi import (
+                StnSiconfiConnector,
+            )
+
+            sic_conn = StnSiconfiConnector(settings=self.settings)
+            rows = sic_conn.list_top_municipalities(
+                limit=int(args.get("limit", 10)),
+                sigla_uf=args.get("sigla_uf"),
+            )
+            wrapped = wrap_untrusted_gov_data(rows, source_id="stn_siconfi")
             return {
                 "jsonrpc": "2.0",
                 "id": req_id,

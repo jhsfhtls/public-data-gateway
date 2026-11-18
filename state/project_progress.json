@@ -1,6 +1,6 @@
 {
   "schema_version": "1.0.0",
-  "last_updated": "2026-11-16T15:50:00.000000",
+  "last_updated": "2026-11-17T21:45:00.000000",
   "project_name": "public-data-gateway",
   "architecture": "Hexagonal Medallion Lakehouse (Bronze -> Silver -> Gold / Feature Store)",
   "governance_standards": [
@@ -15,7 +15,7 @@
   "current_macro_phase": "Fase 11.5 - Expansão Completa de Fontes Públicas (Ondas 11.5A a 11.5E — Padrão 11-Gates)",
   "overall_status": "ON_TRACK",
   "active_connector": null,
-  "next_connector": "stn_siconfi",
+  "next_connector": "pgfn_divida_ativa",
   "structural_phases": [
     {
       "phase_id": "00",
@@ -227,7 +227,7 @@
     {
       "phase_id": "11.5",
       "name": "Expansão Completa de Fontes Públicas (Ondas 11.5A a 11.5E — Padrão Medallion 11-Gates & Paridade 4 Interfaces)",
-      "status": "PENDING",
+      "status": "IN_PROGRESS",
       "completion_date": null,
       "deliverables": [
         "Onda 11.5A (Risco, KYC/KYB, Fiscal & Crédito — 7 conectores): stn_siconfi (iniciando por este), pgfn_divida_ativa, cnj_improbidade, stn_capag (+ FIRJAN IFGF), bcb_estban, bcb_agencia, rfb_cno",
@@ -258,67 +258,67 @@
       {
         "gate_id": "GATE_01",
         "name": "Contrato Declarativo ODCS v3.1 das N Tabelas da API",
-        "status": "PLANNED",
+        "status": "PASSED",
         "criteria": "Schema tipado, chaves primarias STRING (id_municipio 7D, sigla_uf, codigo_conta) e regras semanticas para entes, extratos de entregas, DCA, RREO e RGF do SICONFI."
       },
       {
         "gate_id": "GATE_02",
         "name": "Ingestao Bronze Isolada (Todas as Tabelas) & Cache WAL",
-        "status": "PLANNED",
+        "status": "PASSED",
         "criteria": "Ingestao resiliente da API REST apidatalake.tesouro.gov.br/ords/siconfi/tt/ em data/stn_siconfi/bronze/ com cache SQLite WAL."
       },
       {
         "gate_id": "GATE_03",
         "name": "Sanitizacao de Sentinelas & Nulls",
-        "status": "PLANNED",
+        "status": "PASSED",
         "criteria": "Conversao deterministica de valores ausentes/sentinelas fiscais em NULLs reais e normalizacao de contas contabeis."
       },
       {
         "gate_id": "GATE_04",
         "name": "Materializacao Silver Parquet Isolada (Todas as Tabelas)",
-        "status": "PLANNED",
+        "status": "PASSED",
         "criteria": "Gravacao de tabelas normalizadas (siconfi_entes, siconfi_dca, siconfi_rreo, siconfi_rgf, siconfi_extratos) em data/stn_siconfi/silver/ com SHA-256."
       },
       {
         "gate_id": "GATE_05",
         "name": "Validacao dos 5 Pilares & Quarentena",
-        "status": "PLANNED",
+        "status": "PASSED",
         "criteria": "Aprovacao em Freshness, Volume, Schema, Null Ceiling e Lineage; desvio para data/stn_siconfi/quarantine/ se violado."
       },
       {
         "gate_id": "GATE_06",
         "name": "Gold Feature View Isolada & ASOF Join ML",
-        "status": "PLANNED",
+        "status": "PASSED",
         "criteria": "Features fiscais municipais/estaduais (receita corrente liquida, despesa com pessoal %, endividamento, superavit) em data/stn_siconfi/gold/features_fiscais_siconfi.parquet."
       },
       {
         "gate_id": "GATE_07",
         "name": "Integracao ao EnrichmentEngine & Marts Cross-Domain",
-        "status": "PLANNED",
+        "status": "PASSED",
         "criteria": "Disponibilizacao para enriquecimento fiscal municipal respeitando o Client Path Shield e integracao obrigatoria as marts cross-domain (dbt/models/marts/cross_domain/ + CrossDomainService)."
       },
       {
         "gate_id": "GATE_08",
         "name": "Exposicao Multi-Interface (4 Interfaces)",
-        "status": "PLANNED",
+        "status": "PASSED",
         "criteria": "Exposicao simultanea via SDK (BrazilData.treasury / siconfi), FastAPI (/api/v1/treasury/siconfi/*), CLI (bdg treasury siconfi *) e Servidor MCP (bdg_* com wrap_untrusted_gov_data)."
       },
       {
         "gate_id": "GATE_09",
         "name": "Bateria de Testes Unitarios & Paridade Offline",
-        "status": "PLANNED",
+        "status": "PASSED",
         "criteria": "Testes unitarios offline completos com fixtures reais cobrindo extracao, 5 Pilares, quarentena, Gold ML e paridade nas 4 interfaces."
       },
       {
         "gate_id": "GATE_10",
         "name": "dbt Staging, Marts Intra-Domínio/Cross-Domain & 100% Colunas Documentadas",
-        "status": "PLANNED",
+        "status": "PASSED",
         "criteria": "Modelos dbt com source.yml proprio, stg_*, dim_*/fct_*, mart intra-domínio dedicada (dbt/models/marts/macrofinanceiro/mart_contabilidade_fiscal_siconfi.sql) + cruzamento em marts cross-domain, dbt test verde e 100% de colunas documentadas no lint_dbt_docs.py."
       },
       {
         "gate_id": "GATE_11",
         "name": "Teste Real de 1 Linha com API ao Vivo (Fail-Hard)",
-        "status": "PLANNED",
+        "status": "PASSED",
         "criteria": "Execucao obrigatoria contra endpoint ao vivo apidatalake.tesouro.gov.br/ords/siconfi/tt/entes limitado a registro real; falha reprova o pipeline."
       }
     ]
@@ -684,6 +684,12 @@
       "phase_id": "10.5",
       "milestone": "Conclusão da Wave 10.5D e da Fase 10.5 — Padronização Medallion 11-Gates das 3 APIs Globais & Pesquisa do Bloco 4 + Paridade Total",
       "summary": "Elevação completa dos 3 conectores finais do Bloco 4 (rest_countries, openalex_api e gdelt_doc_api) ao padrão 11-Gates: contratos ODCS v3.1, persistência isolada Bronze/Silver/Gold/Quarantine, 3 staging views (stg_*) + 3 modelos intradomínio (dim_paises_iso_3166, fct_openalex_pesquisa_cientifica e fct_gdelt_noticias_sentimento) + cross-domain mart_cross_domain_global_pesquisa_brasil, paridade 100% nas 4 interfaces (SDK, FastAPI, CLI e MCP com wrap_untrusted_gov_data), catálogo unificado sincronizado (29/29 APIs em medallion_parity: true), testes offline e testes live 1-linha."
+    },
+    {
+      "date": "2026-11-17",
+      "phase_id": "11.5",
+      "milestone": "Wave 11.5A — Homologação do Conector stn_siconfi (5 Tabelas Silver, Mart Intra-Domínio, Mart Cross-Domain & Paridade 4 Interfaces)",
+      "summary": "Implementação completa nos 11 Gates do conector stn_siconfi (STN SICONFI/Finbra): contrato ODCS v3.1, ingestão Bronze + 5 tabelas Silver ZSTD (siconfi_entes, siconfi_dca_balanco, siconfi_rreo_execucao, siconfi_rgf_limites, siconfi_extratos_entregas) + Gold ML (features_contabilidade_fiscal_siconfi), 5 staging views + fct_contabilidade_siconfi_municipal + mart intra-domínio mart_contabilidade_fiscal_siconfi + enriquecimento da mart cross-domain mart_cross_domain_territorio_b2b_macro_brasil (145 testes dbt OK, 100% colunas documentadas no lint_dbt_docs.py), paridade em SDK/FastAPI/CLI/MCP, bateria offline e teste live fail-hard contra apidatalake.tesouro.gov.br/ords/siconfi/tt/entes."
     }
   ]
 }

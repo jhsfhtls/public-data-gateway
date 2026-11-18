@@ -1,0 +1,30 @@
+version: 2
+
+sources:
+  - name: stn_siconfi
+    description: "Tabelas Silver da Secretaria do Tesouro Nacional SICONFI / Finbra (Entes, DCA, RREO, RGF e Extratos)"
+    meta:
+      agency: "Secretaria do Tesouro Nacional (STN)"
+      domain: "macrofinanceiro"
+      freshness_sla: "Mensal (720h)"
+    tables:
+      - name: siconfi_entes
+        description: "Cadastro oficial de entes federativos do SICONFI"
+        meta:
+          external_location: "data/stn_siconfi/silver/siconfi_entes.parquet"
+      - name: siconfi_dca_balanco
+        description: "Declaração de Contas Anuais (DCA/Finbra) - Balanço Patrimonial e Orçamento"
+        meta:
+          external_location: "data/stn_siconfi/silver/siconfi_dca_balanco.parquet"
+      - name: siconfi_rreo_execucao
+        description: "Relatório Resumido da Execução Orçamentária (RREO Bimestral)"
+        meta:
+          external_location: "data/stn_siconfi/silver/siconfi_rreo_execucao.parquet"
+      - name: siconfi_rgf_limites
+        description: "Relatório de Gestão Fiscal (RGF LRF) - Limites de Pessoal e Dívida Consolidada"
+        meta:
+          external_location: "data/stn_siconfi/silver/siconfi_rgf_limites.parquet"
+      - name: siconfi_extratos_entregas
+        description: "Extrato de entregas e homologações de demonstrativos fiscais no SICONFI"
+        meta:
+          external_location: "data/stn_siconfi/silver/siconfi_extratos_entregas.parquet"

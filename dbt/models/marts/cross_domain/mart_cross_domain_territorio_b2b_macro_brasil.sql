@@ -64,6 +64,15 @@ compliance_uf AS (
     GROUP BY sigla_uf_orgao
 ),
 
+siconfi_uf AS (
+    SELECT
+        sigla_uf,
+        ROUND(AVG(despesa_pessoal_rcl_pct), 2) AS avg_despesa_pessoal_rcl_siconfi_pct,
+        ROUND(AVG(score_solidez_contabil_siconfi), 2) AS avg_score_solidez_siconfi_uf
+    FROM {{ ref('mart_contabilidade_fiscal_siconfi') }}
+    GROUP BY sigla_uf
+),
+
 base AS (
     SELECT
         t.sigla_uf,
@@ -85,6 +94,8 @@ base AS (
         COALESCE(c.taxa_economia_licitatoria_uf_pct, 0.0) AS taxa_economia_licitatoria_uf_pct,
         COALESCE(s.total_sancoes_ativas_uf, 0) AS total_sancoes_ativas_uf,
         COALESCE(s.valor_multas_ativas_uf, 0.0) AS valor_multas_ativas_uf,
+        COALESCE(sf.avg_despesa_pessoal_rcl_siconfi_pct, 45.0) AS avg_despesa_pessoal_rcl_siconfi_pct,
+        COALESCE(sf.avg_score_solidez_siconfi_uf, 65.0) AS avg_score_solidez_siconfi_uf,
         COALESCE(m.ano_mes, '2025-03') AS macro_ano_mes_referencia,
         COALESCE(m.selic_meta_fim_mes_pct, 14.25) AS selic_meta_fim_mes_pct,
         COALESCE(m.ipca_acumulado_12m_pct, 5.06) AS ipca_acumulado_12m_pct,
@@ -95,6 +106,7 @@ base AS (
     LEFT JOIN b2b_uf b ON t.sigla_uf = b.sigla_uf
     LEFT JOIN compras_uf c ON t.sigla_uf = c.sigla_uf
     LEFT JOIN compliance_uf s ON t.sigla_uf = s.sigla_uf
+    LEFT JOIN siconfi_uf sf ON t.sigla_uf = sf.sigla_uf
     CROSS JOIN macro_latest m
 ),
 

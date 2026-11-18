@@ -1,0 +1,242 @@
+contract_id: ODCS-BR-STN-SICONFI-001
+source_id: stn_siconfi
+version: 1.0.0
+grain: 1 row per Brazilian municipality/state per fiscal exercise and financial statement period
+name: Secretaria do Tesouro Nacional - SICONFI & Finbra (Contabilidade e Gestão Fiscal)
+agency: Secretaria do Tesouro Nacional (STN / Ministério da Fazenda)
+official_url: https://apidatalake.tesouro.gov.br/docs/siconfi/
+segment_id: 02_economico_macrofinanceiro
+access_mode: FEDERATED_API
+protocol: REST_JSON
+auth_type: NONE
+update_frequency: Mensal / Bimestral (RREO) / Quadrimestral (RGF) / Anual (DCA)
+freshness_sla_hours: 720
+cron_schedule_expression: "0 4 10 * *"
+lgpd_legal_basis: public_interest_lai
+min_expected_rows: 10
+primary_keys:
+  - id_municipio
+  - sigla_uf
+canonical_keys:
+  - id_municipio
+  - sigla_uf
+  - cnpj_14
+sentinel_values:
+  - -1
+  - -99
+  - N/D
+  - SEM INFORMACAO
+columns:
+  - name: id_municipio
+    data_type: STRING
+    required: true
+    nullable: false
+    description: Código IBGE canônico de 7 dígitos do ente municipal ou estadual
+  - name: sigla_uf
+    data_type: STRING
+    required: true
+    nullable: false
+    description: Sigla da Unidade Federativa de 2 caracteres
+  - name: nome_ente
+    data_type: STRING
+    required: true
+    nullable: false
+    description: Nome oficial do ente federativo no SICONFI
+  - name: esfera
+    data_type: STRING
+    required: true
+    nullable: false
+    description: Esfera federativa do ente (M=Município, E=Estado, D=DF, U=União)
+  - name: regiao
+    data_type: STRING
+    required: true
+    nullable: false
+    description: Sigla da macrorregião geográfica brasileira
+  - name: populacao
+    data_type: INT64
+    required: true
+    nullable: true
+    description: População oficial de referência informada no SICONFI
+  - name: cnpj_14
+    data_type: STRING
+    required: true
+    nullable: false
+    description: CNPJ institucional de 14 dígitos da prefeitura ou ente público
+  - name: ano_exercicio
+    data_type: INT64
+    required: true
+    nullable: false
+    description: Ano de exercício financeiro no SICONFI
+  - name: is_capital
+    data_type: BOOLEAN
+    required: true
+    nullable: false
+    description: Indicador booleano de capital estadual
+tables:
+  - name: siconfi_entes
+    description: Cadastro oficial de entes federativos do SICONFI (Municípios, Estados, DF e União)
+    layer: silver
+    schema:
+      - name: id_municipio
+        type: STRING
+        description: Código IBGE canônico de 7 dígitos do município
+      - name: sigla_uf
+        type: STRING
+        description: Sigla de 2 letras da Unidade da Federação
+      - name: nome_ente
+        type: STRING
+        description: Nome oficial do ente federativo
+      - name: esfera
+        type: STRING
+        description: Esfera federativa (M, E, D ou U)
+      - name: regiao
+        type: STRING
+        description: Sigla da região geográfica (N, NE, CO, SE, S)
+      - name: populacao
+        type: INT64
+        description: População oficial estimada no exercício
+      - name: cnpj_14
+        type: STRING
+        description: CNPJ institucional de 14 dígitos do ente
+      - name: ano_exercicio
+        type: INT64
+        description: Exercício fiscal de referência
+      - name: is_capital
+        type: BOOLEAN
+        description: Indica se o município é capital estadual
+  - name: siconfi_dca_balanco
+    description: Declaração de Contas Anuais (DCA/Finbra) - Balanço Patrimonial e Execução Orçamentária Anual
+    layer: silver
+    schema:
+      - name: id_municipio
+        type: STRING
+        description: Código IBGE canônico de 7 dígitos
+      - name: sigla_uf
+        type: STRING
+        description: Sigla da Unidade da Federação
+      - name: nome_ente
+        type: STRING
+        description: Nome oficial do ente federativo
+      - name: ano_exercicio
+        type: INT64
+        description: Exercício contábil anual
+      - name: ativo_total_brl
+        type: FLOAT64
+        description: Ativo total consolidado no Balanço Patrimonial (DCA I-AB) em BRL
+      - name: passivo_total_brl
+        type: FLOAT64
+        description: Passivo exigível total no Balanço Patrimonial em BRL
+      - name: patrimonio_liquido_brl
+        type: FLOAT64
+        description: Patrimônio líquido contábil do ente em BRL
+      - name: receita_orcamentaria_realizada_brl
+        type: FLOAT64
+        description: Receita orçamentária anual realizada (DCA I-C) em BRL
+      - name: despesa_orcamentaria_empenhada_brl
+        type: FLOAT64
+        description: Despesa orçamentária anual empenhada (DCA I-D) em BRL
+      - name: resultado_orcamentario_brl
+        type: FLOAT64
+        description: Saldo orçamentário anual (receita realizada menos despesa empenhada) em BRL
+  - name: siconfi_rreo_execucao
+    description: Relatório Resumido da Execução Orçamentária (RREO Bimestral) - Receitas, Transferências e Investimentos
+    layer: silver
+    schema:
+      - name: id_municipio
+        type: STRING
+        description: Código IBGE canônico de 7 dígitos
+      - name: sigla_uf
+        type: STRING
+        description: Sigla da Unidade da Federação
+      - name: nome_ente
+        type: STRING
+        description: Nome oficial do ente
+      - name: ano_exercicio
+        type: INT64
+        description: Ano de exercício financeiro
+      - name: bimestre
+        type: INT64
+        description: Bimestre de apuração do RREO (1 a 6)
+      - name: receita_corrente_liquida_brl
+        type: FLOAT64
+        description: Receita Corrente Líquida (RCL) acumulada em 12 meses em BRL
+      - name: receita_tributaria_propria_brl
+        type: FLOAT64
+        description: Receita tributária própria arrecadada (ISS, IPTU, ITBI) em BRL
+      - name: transferencias_correntes_brl
+        type: FLOAT64
+        description: Total de transferências correntes intergovernamentais recebidas em BRL
+      - name: despesa_capital_investimento_brl
+        type: FLOAT64
+        description: Despesas de capital e investimentos liquidados em BRL
+      - name: resultado_primario_brl
+        type: FLOAT64
+        description: Resultado primário fiscal apurado acima da linha em BRL
+  - name: siconfi_rgf_limites
+    description: Relatório de Gestão Fiscal (RGF Quadrimestral LRF) - Limites de Despesa com Pessoal e Dívida Consolidada
+    layer: silver
+    schema:
+      - name: id_municipio
+        type: STRING
+        description: Código IBGE canônico de 7 dígitos
+      - name: sigla_uf
+        type: STRING
+        description: Sigla da Unidade da Federação
+      - name: nome_ente
+        type: STRING
+        description: Nome oficial do ente
+      - name: ano_exercicio
+        type: INT64
+        description: Ano de exercício financeiro
+      - name: quadrimestre
+        type: INT64
+        description: Quadrimestre de apuração do RGF (1, 2 ou 3)
+      - name: receita_corrente_liquida_brl
+        type: FLOAT64
+        description: Receita Corrente Líquida (RCL) base da LRF em BRL
+      - name: despesa_total_pessoal_brl
+        type: FLOAT64
+        description: Despesa Total com Pessoal (DTP) agregada do Poder Executivo em BRL
+      - name: despesa_pessoal_rcl_pct
+        type: FLOAT64
+        description: Razão percentual DTP/RCL frente ao teto de 54% da LRF para Executivo Municipal
+      - name: limite_prudencial_pessoal_pct
+        type: FLOAT64
+        description: Limite prudencial legal de 95% do teto LRF (51.3%)
+      - name: limite_maximo_pessoal_pct
+        type: FLOAT64
+        description: Limite máximo legal de despesa com pessoal LRF (54.0%)
+      - name: divida_consolidada_liquida_brl
+        type: FLOAT64
+        description: Dívida Consolidada Líquida (DCL) apurada no RGF em BRL
+      - name: status_alerta_lrf
+        type: STRING
+        description: Enquadramento LRF (REGULAR, ALERTA_48_6, PRUDENCIAL_51_3, ACIMA_LIMITE_54)
+  - name: siconfi_extratos_entregas
+    description: Extrato de entregas e homologações de demonstrativos contábeis e fiscais no SICONFI
+    layer: silver
+    schema:
+      - name: id_municipio
+        type: STRING
+        description: Código IBGE canônico de 7 dígitos
+      - name: sigla_uf
+        type: STRING
+        description: Sigla da Unidade da Federação
+      - name: nome_ente
+        type: STRING
+        description: Nome oficial do ente
+      - name: ano_exercicio
+        type: INT64
+        description: Exercício fiscal de referência
+      - name: demonstrativo
+        type: STRING
+        description: Sigla do demonstrativo fiscal entregue (DCA, RREO, RGF, MSC)
+      - name: periodicidade
+        type: STRING
+        description: Periodicidade legal do demonstrativo (A=Anual, B=Bimestral, Q=Quadrimestral, M=Mensal)
+      - name: status_entrega
+        type: STRING
+        description: Situação da entrega no Tesouro (HOMOLOGADO, PENDENTE)
+      - name: data_homologacao
+        type: STRING
+        description: Data da homologação eletrônica do demonstrativo (YYYY-MM-DD)

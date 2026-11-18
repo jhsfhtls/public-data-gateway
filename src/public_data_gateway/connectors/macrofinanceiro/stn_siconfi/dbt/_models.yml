@@ -1,0 +1,266 @@
+version: 2
+
+models:
+  - name: stg_siconfi_entes
+    description: "Staging view do cadastro oficial de entes federativos do SICONFI"
+    columns:
+      - name: id_municipio
+        description: "Código IBGE canônico de 7 dígitos do ente municipal"
+        tests: [not_null, unique]
+      - name: sigla_uf
+        description: "Sigla de 2 letras da Unidade da Federação"
+        tests: [not_null]
+      - name: nome_ente
+        description: "Nome oficial do ente federativo no SICONFI"
+        tests: [not_null]
+      - name: esfera
+        description: "Esfera federativa do ente (M, E, D ou U)"
+        tests: [not_null]
+      - name: regiao
+        description: "Macrorregião geográfica do ente"
+        tests: [not_null]
+      - name: populacao
+        description: "População oficial informada no SICONFI"
+        tests: [not_null]
+      - name: cnpj_14
+        description: "CNPJ institucional de 14 dígitos do ente federativo"
+        tests: [not_null]
+      - name: ano_exercicio
+        description: "Ano de exercício financeiro de referência"
+        tests: [not_null]
+      - name: is_capital
+        description: "Indicador booleano de capital estadual"
+        tests: [not_null]
+
+  - name: stg_siconfi_dca_balanco
+    description: "Staging view da Declaração de Contas Anuais (DCA/Finbra)"
+    columns:
+      - name: id_municipio
+        description: "Código IBGE canônico de 7 dígitos do ente"
+        tests: [not_null]
+      - name: sigla_uf
+        description: "Sigla da Unidade da Federação"
+        tests: [not_null]
+      - name: nome_ente
+        description: "Nome oficial do ente federativo"
+        tests: [not_null]
+      - name: ano_exercicio
+        description: "Ano de exercício contábil anual"
+        tests: [not_null]
+      - name: ativo_total_brl
+        description: "Ativo total consolidado no Balanço Patrimonial em BRL"
+        tests: [not_null]
+      - name: passivo_total_brl
+        description: "Passivo exigível total no Balanço Patrimonial em BRL"
+        tests: [not_null]
+      - name: patrimonio_liquido_brl
+        description: "Patrimônio líquido contábil do ente em BRL"
+        tests: [not_null]
+      - name: receita_orcamentaria_realizada_brl
+        description: "Receita orçamentária anual realizada em BRL"
+        tests: [not_null]
+      - name: despesa_orcamentaria_empenhada_brl
+        description: "Despesa orçamentária anual empenhada em BRL"
+        tests: [not_null]
+      - name: resultado_orcamentario_brl
+        description: "Saldo orçamentário anual (receita menos despesa) em BRL"
+        tests: [not_null]
+
+  - name: stg_siconfi_rreo_execucao
+    description: "Staging view do Relatório Resumido da Execução Orçamentária (RREO Bimestral)"
+    columns:
+      - name: id_municipio
+        description: "Código IBGE canônico de 7 dígitos"
+        tests: [not_null]
+      - name: sigla_uf
+        description: "Sigla da Unidade da Federação"
+        tests: [not_null]
+      - name: nome_ente
+        description: "Nome oficial do ente federativo"
+        tests: [not_null]
+      - name: ano_exercicio
+        description: "Ano de exercício financeiro do RREO"
+        tests: [not_null]
+      - name: bimestre
+        description: "Número do bimestre de apuração (1 a 6)"
+        tests: [not_null]
+      - name: receita_corrente_liquida_brl
+        description: "Receita Corrente Líquida (RCL) acumulada em 12 meses em BRL"
+        tests: [not_null]
+      - name: receita_tributaria_propria_brl
+        description: "Receita tributária própria arrecadada em BRL"
+        tests: [not_null]
+      - name: transferencias_correntes_brl
+        description: "Total de transferências correntes recebidas em BRL"
+        tests: [not_null]
+      - name: despesa_capital_investimento_brl
+        description: "Despesas de capital e investimentos liquidados em BRL"
+        tests: [not_null]
+      - name: resultado_primario_brl
+        description: "Resultado primário fiscal acima da linha em BRL"
+        tests: [not_null]
+
+  - name: stg_siconfi_rgf_limites
+    description: "Staging view do Relatório de Gestão Fiscal (RGF Quadrimestral LRF)"
+    columns:
+      - name: id_municipio
+        description: "Código IBGE canônico de 7 dígitos"
+        tests: [not_null]
+      - name: sigla_uf
+        description: "Sigla da Unidade da Federação"
+        tests: [not_null]
+      - name: nome_ente
+        description: "Nome oficial do ente federativo"
+        tests: [not_null]
+      - name: ano_exercicio
+        description: "Ano de exercício financeiro do RGF"
+        tests: [not_null]
+      - name: quadrimestre
+        description: "Número do quadrimestre de apuração LRF (1, 2 ou 3)"
+        tests: [not_null]
+      - name: receita_corrente_liquida_brl
+        description: "Receita Corrente Líquida (RCL) apurada no RGF em BRL"
+        tests: [not_null]
+      - name: despesa_total_pessoal_brl
+        description: "Despesa Total com Pessoal (DTP) do Poder Executivo em BRL"
+        tests: [not_null]
+      - name: despesa_pessoal_rcl_pct
+        description: "Percentual da Despesa Total com Pessoal sobre a RCL (%)"
+        tests: [not_null]
+      - name: limite_prudencial_pessoal_pct
+        description: "Limite prudencial legal LRF para despesa com pessoal (51.3%)"
+        tests: [not_null]
+      - name: limite_maximo_pessoal_pct
+        description: "Limite máximo legal LRF para despesa com pessoal (54.0%)"
+        tests: [not_null]
+      - name: divida_consolidada_liquida_brl
+        description: "Dívida Consolidada Líquida (DCL) do RGF em BRL"
+        tests: [not_null]
+      - name: status_alerta_lrf
+        description: "Status de enquadramento frente aos limites de pessoal da LRF"
+        tests: [not_null]
+
+  - name: stg_siconfi_extratos_entregas
+    description: "Staging view do extrato de entregas e homologações SICONFI"
+    columns:
+      - name: id_municipio
+        description: "Código IBGE canônico de 7 dígitos"
+        tests: [not_null]
+      - name: sigla_uf
+        description: "Sigla da Unidade da Federação"
+        tests: [not_null]
+      - name: nome_ente
+        description: "Nome oficial do ente federativo"
+        tests: [not_null]
+      - name: ano_exercicio
+        description: "Exercício fiscal de referência"
+        tests: [not_null]
+      - name: demonstrativo
+        description: "Sigla do demonstrativo fiscal (DCA, RREO, RGF, MSC)"
+        tests: [not_null]
+      - name: periodicidade
+        description: "Periodicidade legal do demonstrativo (A, B, Q ou M)"
+        tests: [not_null]
+      - name: status_entrega
+        description: "Situação de homologação da entrega perante a STN"
+        tests: [not_null]
+      - name: data_homologacao
+        description: "Data da homologação da entrega no formato YYYY-MM-DD"
+        tests: [not_null]
+
+  - name: fct_contabilidade_siconfi_municipal
+    description: "Tabela fato consolidada de contabilidade pública (DCA), execução orçamentária (RREO), limites de pessoal LRF (RGF) e adimplência SICONFI por município"
+    columns:
+      - name: id_municipio
+        description: "Código IBGE canônico de 7 dígitos do município"
+        tests: [not_null, unique]
+      - name: sigla_uf
+        description: "Sigla de 2 letras da Unidade da Federação"
+        tests: [not_null]
+      - name: nome_ente
+        description: "Nome oficial do ente municipal"
+        tests: [not_null]
+      - name: esfera
+        description: "Esfera federativa do ente (M, E, D ou U)"
+        tests: [not_null]
+      - name: regiao
+        description: "Macrorregião geográfica brasileira"
+        tests: [not_null]
+      - name: populacao
+        description: "População oficial de referência do ente"
+        tests: [not_null]
+      - name: cnpj_14
+        description: "CNPJ institucional de 14 dígitos da prefeitura"
+        tests: [not_null]
+      - name: ano_exercicio
+        description: "Ano de exercício fiscal consolidado"
+        tests: [not_null]
+      - name: is_capital
+        description: "Indicador booleano de capital estadual"
+        tests: [not_null]
+      - name: ativo_total_brl
+        description: "Ativo total consolidado na DCA em BRL"
+        tests: [not_null]
+      - name: passivo_total_brl
+        description: "Passivo total exigível na DCA em BRL"
+        tests: [not_null]
+      - name: patrimonio_liquido_brl
+        description: "Patrimônio líquido contábil do município em BRL"
+        tests: [not_null]
+      - name: receita_orcamentaria_realizada_brl
+        description: "Receita orçamentária anual realizada na DCA em BRL"
+        tests: [not_null]
+      - name: despesa_orcamentaria_empenhada_brl
+        description: "Despesa orçamentária anual empenhada na DCA em BRL"
+        tests: [not_null]
+      - name: resultado_orcamentario_brl
+        description: "Resultado orçamentário anual em BRL"
+        tests: [not_null]
+      - name: receita_corrente_liquida_brl
+        description: "Receita Corrente Líquida (RCL) em BRL"
+        tests: [not_null]
+      - name: receita_tributaria_propria_brl
+        description: "Receita tributária própria arrecadada em BRL"
+        tests: [not_null]
+      - name: transferencias_correntes_brl
+        description: "Transferências correntes recebidas em BRL"
+        tests: [not_null]
+      - name: despesa_capital_investimento_brl
+        description: "Despesa de capital e investimento em BRL"
+        tests: [not_null]
+      - name: resultado_primario_brl
+        description: "Resultado primário fiscal acima da linha em BRL"
+        tests: [not_null]
+      - name: despesa_total_pessoal_brl
+        description: "Despesa total agregada com pessoal (DTP) em BRL"
+        tests: [not_null]
+      - name: despesa_pessoal_rcl_pct
+        description: "Comprometimento percentual da RCL com despesa de pessoal (%)"
+        tests: [not_null]
+      - name: limite_prudencial_pessoal_pct
+        description: "Limite prudencial legal LRF de pessoal (51.3%)"
+        tests: [not_null]
+      - name: limite_maximo_pessoal_pct
+        description: "Limite máximo legal LRF de pessoal (54.0%)"
+        tests: [not_null]
+      - name: divida_consolidada_liquida_brl
+        description: "Dívida Consolidada Líquida (DCL) do RGF em BRL"
+        tests: [not_null]
+      - name: status_alerta_lrf
+        description: "Enquadramento do município frente aos alertas da LRF"
+        tests: [not_null]
+      - name: autonomia_tributaria_pct
+        description: "Proporção percentual da receita tributária própria sobre a RCL (%)"
+        tests: [not_null]
+      - name: taxa_investimento_rcl_pct
+        description: "Proporção percentual de investimentos sobre a RCL (%)"
+        tests: [not_null]
+      - name: total_entregas_monitoradas
+        description: "Total de demonstrativos monitorados no extrato SICONFI"
+        tests: [not_null]
+      - name: entregas_homologadas
+        description: "Quantidade de demonstrativos homologados no exercício"
+        tests: [not_null]
+      - name: indice_adimplencia_siconfi_pct
+        description: "Percentual de adimplência de entregas fiscais no SICONFI (%)"
+        tests: [not_null]

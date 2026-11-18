@@ -1357,3 +1357,37 @@ sources:
   status: HOMOLOGATED
   freshness_sla_hours: 6
   cron_schedule_expression: 0 */6 * * *
+- source_id: stn_siconfi
+  name: 'Secretaria do Tesouro Nacional: SICONFI & Finbra (Contabilidade e Gestão Fiscal)'
+  agency: Secretaria do Tesouro Nacional (STN)
+  official_url: https://apidatalake.tesouro.gov.br/docs/siconfi/
+  segment_id: 02_economico_macrofinanceiro
+  segment_name: Econômico, Monetário & Macrofinanceiro
+  access_mode: FEDERATED_API
+  protocol: REST_JSON
+  auth_type: NONE
+  canonical_keys:
+  - id_municipio
+  - sigla_uf
+  - cnpj_14
+  update_frequency: Mensal / Bimestral (RREO) / Quadrimestral (RGF) / Anual (DCA)
+  estimated_volume: 5.598 entes federativos (Municípios, Estados, DF e União)
+  lgpd_tier: PUBLIC_NON_PERSONAL
+  ml_feature_domains:
+  - fiscal_accounting_dca
+  - lrf_personnel_limits_rgf
+  - budgetary_execution_rreo
+  solution_packs:
+  - P01
+  - P02
+  - P04
+  - P05
+  - P06
+  - P07
+  - P08
+  - P10
+  rice_score: 910
+  roadmap_wave: 3
+  status: HOMOLOGATED
+  freshness_sla_hours: 720
+  cron_schedule_expression: 0 4 10 * *
