@@ -143,3 +143,58 @@ models:
         tests:
           - not_null
 
+  - name: mart_querido_diario_okbr_brasil
+    description: "Data Mart Gold intra-domínio consolidando Diários Oficiais Municipais do Querido Diário (OKBR), extratos licitatórios NLP, OCR e maturidade de transparência ativa."
+    columns:
+      - name: id_municipio
+        description: "Código IBGE de 7 dígitos do município (STRING)."
+        tests: [not_null, unique]
+      - name: sigla_uf
+        description: "Sigla de 2 letras da Unidade Federativa (UF)."
+        tests: [not_null]
+      - name: nome_municipio
+        description: "Nome oficial do município."
+        tests: [not_null]
+      - name: regiao
+        description: "Macrorregião geográfica brasileira."
+        tests: [not_null]
+      - name: edicoes_indexadas_12m
+        description: "Total de edições indexadas do Diário Oficial Municipal em 12 meses."
+        tests: [not_null]
+      - name: qtd_atos_licitatorios_12m
+        description: "Total de atos licitatórios e dispensas extraídos em 12 meses."
+        tests: [not_null]
+      - name: valor_extratos_citados_mil_brl
+        description: "Montante citado em extratos contratuais nos Diários Oficiais (R$ mil)."
+        tests: [not_null]
+      - name: taxa_ocr_legivel_pct
+        description: "Percentual de extração textual OCR legível dos exemplares (%)."
+        tests: [not_null]
+      - name: indice_transparencia_diario_pct
+        description: "Índice de transparência ativa e acessibilidade do Diário Oficial (%)."
+        tests: [not_null]
+      - name: qtd_temas_indexados_okbr
+        description: "Quantidade de temas normativos consolidados na Silver OKBR."
+        tests: [not_null]
+      - name: mencoes_educacao_saude_12m
+        description: "Quantidade de menções indexadas a Educação e Saúde em 12 meses."
+        tests: [not_null]
+      - name: mencoes_esg_clima_12m
+        description: "Quantidade de menções indexadas a sustentabilidade e clima em 12 meses."
+        tests: [not_null]
+      - name: cobertura_historica_anos
+        description: "Profundidade do arquivo histórico digital do Diário Oficial (anos)."
+        tests: [not_null]
+      - name: formato_aberto_pdf_txt_pct
+        description: "Percentual de edições em formato aberto e processável por máquina (%)."
+        tests: [not_null]
+      - name: regularidade_publicacao_pct
+        description: "Taxa percentual de regularidade das publicações oficiais (%)."
+        tests: [not_null]
+      - name: score_transparencia_diario_oficial
+        description: "Score sintético municipal de transparência oficial, legibilidade OCR e regularidade no Querido Diário (0-100)."
+        tests: [not_null]
+      - name: tier_maturidade_diario_oficial
+        description: "Classificação municipal OKBR (DIARIO_OFICIAL_EXEMPLAR, TRANSPARENCIA_MUNICIPAL_REGULAR ou BAIXA_DIGITALIZACAO_DIARIO)."
+        tests: [not_null]
+

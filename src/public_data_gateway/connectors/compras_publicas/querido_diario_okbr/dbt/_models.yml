@@ -1,0 +1,172 @@
+version: 2
+
+models:
+  - name: stg_okbr_diarios_licitacoes_dispensas
+    description: "Staging view tipada dos atos licitatórios e dispensas indexados nos Diários Oficiais Municipais."
+    columns:
+      - name: cod_ato_diario
+        description: "Identificador único do agrupamento municipal de atos em Diário Oficial (STRING)."
+        tests: [not_null, unique]
+      - name: tema_ato_normativo
+        description: "Tema indexado no exemplar oficial (LICITACAO_EDITAL ou DISPENSA_INEXIGIBILIDADE)."
+        tests: [not_null]
+      - name: poder_publico_emissor
+        description: "Esfera administrativa emissora no município."
+        tests: [not_null]
+      - name: situacao_extracao_nlp
+        description: "Modalidade de extração textual aplicada ao exemplar oficial."
+        tests: [not_null]
+      - name: id_municipio
+        description: "Código IBGE de 7 dígitos do município (STRING)."
+        tests: [not_null]
+      - name: sigla_uf
+        description: "Sigla de 2 letras da Unidade Federativa (UF)."
+        tests: [not_null]
+      - name: nome_municipio
+        description: "Nome oficial do município."
+        tests: [not_null]
+      - name: regiao
+        description: "Macrorregião geográfica brasileira."
+        tests: [not_null]
+      - name: qtd_atos_publicados_mes
+        description: "Quantidade mensal de atos de licitação ou dispensa extraídos do Diário Oficial."
+        tests: [not_null]
+      - name: valor_extratos_citados_mil_brl
+        description: "Soma financeira dos extratos contratuais citados no agrupamento (R$ mil)."
+        tests: [not_null]
+      - name: competencia_diario
+        description: "Competência mensal da publicação indexada (YYYY-MM)."
+        tests: [not_null]
+
+  - name: stg_okbr_diarios_excertos_tematicos
+    description: "Staging view tipada de edições anuais indexadas, menções temáticas e legibilidade OCR no Querido Diário."
+    columns:
+      - name: cod_excerto_qd
+        description: "Identificador único da consolidação anual de excertos do município (STRING)."
+        tests: [not_null, unique]
+      - name: id_municipio
+        description: "Código IBGE de 7 dígitos do município (STRING)."
+        tests: [not_null]
+      - name: sigla_uf
+        description: "Sigla de 2 letras da Unidade Federativa (UF)."
+        tests: [not_null]
+      - name: nome_municipio
+        description: "Nome oficial do município."
+        tests: [not_null]
+      - name: edicoes_indexadas_12m
+        description: "Quantidade de edições oficiais municipais coletadas e indexadas nos últimos 12 meses."
+        tests: [not_null]
+      - name: mencoes_educacao_saude_12m
+        description: "Quantidade de menções indexadas a políticas e contratações de Educação e Saúde em 12 meses."
+        tests: [not_null]
+      - name: mencoes_esg_clima_12m
+        description: "Quantidade de menções a meio ambiente, saneamento e clima nos Diários Oficiais em 12 meses."
+        tests: [not_null]
+      - name: taxa_ocr_legivel_pct
+        description: "Percentual de páginas extraídas com legibilidade textual plena via OCR/TXT (%)."
+        tests: [not_null]
+
+  - name: stg_okbr_diarios_transparencia_ativa
+    description: "Staging view tipada de profundidade histórica e abertura técnica dos Diários Oficiais Municipais."
+    columns:
+      - name: id_municipio
+        description: "Código IBGE de 7 dígitos do município (STRING)."
+        tests: [not_null, unique]
+      - name: sigla_uf
+        description: "Sigla de 2 letras da Unidade Federativa (UF)."
+        tests: [not_null]
+      - name: nome_municipio
+        description: "Nome oficial do município."
+        tests: [not_null]
+      - name: cobertura_historica_anos
+        description: "Quantidade de anos disponíveis no acervo histórico aberto indexado do município."
+        tests: [not_null]
+      - name: formato_aberto_pdf_txt_pct
+        description: "Percentual de edições disponibilizadas em formato aberto e processável por máquina (%)."
+        tests: [not_null]
+      - name: regularidade_publicacao_pct
+        description: "Índice percentual de pontualidade e continuidade das publicações oficiais (%)."
+        tests: [not_null]
+      - name: indice_transparencia_diario_pct
+        description: "Índice composto de transparência ativa e acessibilidade do Diário Oficial (%)."
+        tests: [not_null]
+
+  - name: stg_okbr_querido_diario_resumo_municipal
+    description: "Staging view tipada do consolidado municipal de Diários Oficiais no Projeto Querido Diário."
+    columns:
+      - name: id_municipio
+        description: "Código IBGE de 7 dígitos do município (STRING)."
+        tests: [not_null, unique]
+      - name: sigla_uf
+        description: "Sigla de 2 letras da Unidade Federativa (UF)."
+        tests: [not_null]
+      - name: nome_municipio
+        description: "Nome oficial do município."
+        tests: [not_null]
+      - name: regiao
+        description: "Macrorregião geográfica brasileira."
+        tests: [not_null]
+      - name: edicoes_indexadas_12m
+        description: "Edições oficiais indexadas nos últimos 12 meses no Querido Diário."
+        tests: [not_null]
+      - name: qtd_atos_licitatorios_12m
+        description: "Total de atos de licitação, dispensa e contratos detectados em 12 meses."
+        tests: [not_null]
+      - name: valor_extratos_citados_mil_brl
+        description: "Valor somado dos extratos publicados e citados nos exemplares (R$ mil)."
+        tests: [not_null]
+      - name: taxa_ocr_legivel_pct
+        description: "Percentual de legibilidade textual OCR dos exemplares municipais (%)."
+        tests: [not_null]
+      - name: indice_transparencia_diario_pct
+        description: "Índice municipal de transparência e publicidade oficial no Diário Oficial (%)."
+        tests: [not_null]
+
+  - name: fct_querido_diario_okbr_municipal
+    description: "Tabela Fato municipal consolidando edições do Querido Diário, extratos licitatórios NLP e abertura técnica."
+    columns:
+      - name: id_municipio
+        description: "Código IBGE de 7 dígitos do município (STRING)."
+        tests: [not_null, unique]
+      - name: sigla_uf
+        description: "Sigla de 2 letras da Unidade Federativa (UF)."
+        tests: [not_null]
+      - name: nome_municipio
+        description: "Nome oficial do município."
+        tests: [not_null]
+      - name: regiao
+        description: "Macrorregião geográfica brasileira."
+        tests: [not_null]
+      - name: edicoes_indexadas_12m
+        description: "Total de edições indexadas do Diário Oficial em 12 meses."
+        tests: [not_null]
+      - name: qtd_atos_licitatorios_12m
+        description: "Total de atos licitatórios e dispensas extraídos em 12 meses."
+        tests: [not_null]
+      - name: valor_extratos_citados_mil_brl
+        description: "Montante citado em extratos contratuais no Diário Oficial (R$ mil)."
+        tests: [not_null]
+      - name: taxa_ocr_legivel_pct
+        description: "Percentual de extração textual OCR sem perda (%)."
+        tests: [not_null]
+      - name: indice_transparencia_diario_pct
+        description: "Índice composto de transparência ativa oficial no município (%)."
+        tests: [not_null]
+      - name: qtd_temas_indexados_okbr
+        description: "Quantidade de agrupamentos temáticos indexados na Silver."
+        tests: [not_null]
+      - name: mencoes_educacao_saude_12m
+        description: "Quantidade anual de excertos indexados para Educação e Saúde."
+        tests: [not_null]
+      - name: mencoes_esg_clima_12m
+        description: "Quantidade anual de excertos ligados à agenda ambiental e climática."
+        tests: [not_null]
+      - name: cobertura_historica_anos
+        description: "Extensão histórica do acervo digital municipal (anos)."
+        tests: [not_null]
+      - name: formato_aberto_pdf_txt_pct
+        description: "Percentual de arquivos abertos e legíveis por máquina (%)."
+        tests: [not_null]
+      - name: regularidade_publicacao_pct
+        description: "Taxa de regularidade de disponibilização diária das edições (%)."
+        tests: [not_null]

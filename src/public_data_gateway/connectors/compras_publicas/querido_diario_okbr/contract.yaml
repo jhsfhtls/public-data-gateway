@@ -1,0 +1,84 @@
+contract_id: ODCS-BR-QUERIDO-DIARIO-OKBR-001
+source_id: querido_diario_okbr
+version: 1.0.0
+grain: 1 row per official gazette normative procurement theme and municipality (OKBR)
+name: "Querido Diário (OKBR): Diários Oficiais Municipais, Licitações & Atos"
+agency: Open Knowledge Brasil (OKBR) / Projeto Querido Diário
+official_url: https://queridodiario.ok.org.br/
+segment_id: 10_compras_publicas
+access_mode: FEDERATED_API
+protocol: REST_JSON
+auth_type: NONE
+update_frequency: Diária / Semanal (Coleta & Indexação NLP de Diários Oficiais Municipais)
+freshness_sla_hours: 168
+cron_schedule_expression: "0 9 * * *"
+lgpd_legal_basis: public_interest_lai_12527_2011_e_lei_14133_2021_publicidade_atos
+min_expected_rows: 10
+primary_keys:
+  - cod_ato_diario
+  - id_municipio
+  - sigla_uf
+canonical_keys:
+  - id_municipio
+  - sigla_uf
+sentinel_values:
+  - -1
+  - -99
+  - N/D
+  - SEM INFORMACAO
+columns:
+  - name: cod_ato_diario
+    data_type: STRING
+    required: true
+    nullable: false
+    description: Identificador único do agrupamento mensal de atos e licitações em Diário Oficial Municipal
+  - name: tema_ato_normativo
+    data_type: STRING
+    required: true
+    nullable: false
+    description: Tema predominante indexado (LICITACAO_EDITAL ou DISPENSA_INEXIGIBILIDADE)
+  - name: poder_publico_emissor
+    data_type: STRING
+    required: true
+    nullable: false
+    description: Esfera administrativa emissora no município (EXECUTIVO_MUNICIPAL ou AUTARQUIA_SAUDE_EDUCACAO)
+  - name: situacao_extracao_nlp
+    data_type: STRING
+    required: true
+    nullable: false
+    description: Modo técnico de processamento do exemplar oficial (PUBLICACAO_NATIVA_DIGITAL ou EXTRAIDO_OCR_INDEXADO)
+  - name: id_municipio
+    data_type: STRING
+    required: true
+    nullable: false
+    description: Código IBGE canônico de 7 dígitos do município publicador
+  - name: sigla_uf
+    data_type: STRING
+    required: true
+    nullable: false
+    description: Sigla de 2 letras da Unidade Federativa (UF)
+  - name: nome_municipio
+    data_type: STRING
+    required: true
+    nullable: false
+    description: Nome oficial do município
+  - name: regiao
+    data_type: STRING
+    required: true
+    nullable: false
+    description: Macrorregião geográfica brasileira
+  - name: qtd_atos_publicados_mes
+    data_type: INT64
+    required: true
+    nullable: false
+    description: Quantidade mensal de extratos de licitação, dispensas e contratos indexados no Diário Oficial
+  - name: valor_extratos_citados_mil_brl
+    data_type: FLOAT64
+    required: true
+    nullable: false
+    description: Somatório financeiro de valores citados nos extratos contratuais indexados (R$ mil)
+  - name: competencia_diario
+    data_type: STRING
+    required: true
+    nullable: false
+    description: Competência mensal de coleta do exemplar oficial (YYYY-MM)

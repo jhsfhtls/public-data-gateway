@@ -1037,6 +1037,51 @@ class MCPDispatcher:
                                 },
                             },
                             {
+                                "name": "bdg_get_querido_diario_licitacoes",
+                                "description": "Lookup municipal official gazette tenders and dispensations in Querido Diário (OKBR) by code, theme, IBGE, UF, or city.",
+                                "inputSchema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "termo": {"type": "string", "description": "Gazette act code, theme, IBGE 7-digit code, UF, or city"},
+                                    },
+                                    "required": ["termo"],
+                                },
+                            },
+                            {
+                                "name": "bdg_get_querido_diario_excertos",
+                                "description": "Lookup 12-month indexed municipal gazette editions, education/health/ESG mentions, and OCR legibility rate.",
+                                "inputSchema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "termo": {"type": "string", "description": "Excerpt code, IBGE 7-digit code, UF, or municipality name"},
+                                    },
+                                    "required": ["termo"],
+                                },
+                            },
+                            {
+                                "name": "bdg_get_querido_diario_features",
+                                "description": "Get normalized Gold Querido Diário OKBR official gazette transparency score, OCR rate, and maturity tier.",
+                                "inputSchema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "id_municipio_or_name": {"type": "string", "description": "7-digit IBGE municipality code or municipality name"},
+                                    },
+                                    "required": ["id_municipio_or_name"],
+                                },
+                            },
+                            {
+                                "name": "bdg_list_top_querido_diario_municipalities",
+                                "description": "List Brazilian municipalities ranked by Querido Diário OKBR gazette transparency score or cited contract value (R$ mil).",
+                                "inputSchema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "limit": {"type": "integer", "description": "Maximum rows (default: 10)"},
+                                        "sigla_uf": {"type": "string", "description": "Optional 2-letter state filter (e.g. SP)"},
+                                        "sort_by_volume": {"type": "boolean", "description": "Set true to rank municipalities by highest cited contract values first"},
+                                    },
+                                },
+                            },
+                            {
                                 "name": "bdg_get_municipality_gdp",
                                 "description": "Query official municipal GDP, agricultural, industrial, and services gross value added (VAB) from IBGE SIDRA (Tier 1).",
                                 "inputSchema": {
@@ -5409,6 +5454,65 @@ class MCPDispatcher:
                     },
                 }
             wrapped = wrap_untrusted_gov_data(bench, source_id="comprasgov_catmat")
+            return {
+                "jsonrpc": "2.0",
+                "id": req_id,
+                "result": {"content": [{"type": "text", "text": wrapped}], "isError": False},
+            }
+
+        if tool_name in {
+            "bdg_get_querido_diario_licitacoes",
+            "bdg_get_querido_diario_excertos",
+            "bdg_get_querido_diario_features",
+            "bdg_list_top_querido_diario_municipalities",
+        }:
+            from public_data_gateway.connectors.compras_publicas.querido_diario_okbr import (
+                QueridoDiarioOkbrConnector,
+            )
+
+            connector = QueridoDiarioOkbrConnector(settings=self.settings)
+            try:
+                if tool_name == "bdg_get_querido_diario_licitacoes":
+                    result: Any = connector.get_gazette_tenders(str(args.get("termo", "")))
+                elif tool_name == "bdg_get_querido_diario_excertos":
+                    result = connector.get_thematic_excerpts(str(args.get("termo", "")))
+                elif tool_name == "bdg_get_querido_diario_features":
+                    result = connector.get_gazette_features(
+                        str(args.get("id_municipio_or_name", ""))
+                    )
+                else:
+                    result = connector.list_top_gazette_municipalities(
+                        limit=int(args.get("limit", 10)),
+                        sigla_uf=args.get("sigla_uf"),
+                        sort_by_volume=bool(args.get("sort_by_volume", False)),
+                    )
+            except (ValueError, KeyError) as exc:
+                return {
+                    "jsonrpc": "2.0",
+                    "id": req_id,
+                    "result": {
+                        "content": [
+                            {"type": "text", "text": f"Querido Diário OKBR parameter error: {exc}"}
+                        ],
+                        "isError": True,
+                    },
+                }
+
+            if not result:
+                return {
+                    "jsonrpc": "2.0",
+                    "id": req_id,
+                    "result": {
+                        "content": [
+                            {
+                                "type": "text",
+                                "text": "No Querido Diário OKBR gazette data found for the query.",
+                            }
+                        ],
+                        "isError": True,
+                    },
+                }
+            wrapped = wrap_untrusted_gov_data(result, source_id="querido_diario_okbr")
             return {
                 "jsonrpc": "2.0",
                 "id": req_id,

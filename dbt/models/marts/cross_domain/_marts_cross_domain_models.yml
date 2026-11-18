@@ -172,6 +172,15 @@ models:
       - name: avg_score_saude_suplementar_ans_uf
         description: "Média estadual do score de maturidade, qualidade IDSS e equilíbrio de saúde suplementar ANS (0-100)."
         tests: [not_null]
+      - name: edicoes_diario_oficial_okbr_uf
+        description: "Total estadual de edições de Diários Oficiais Municipais indexadas no Querido Diário (OKBR) em 12 meses."
+        tests: [not_null]
+      - name: atos_licitatorios_diario_uf
+        description: "Total estadual de atos licitatórios e dispensas extraídos via NLP nos Diários Oficiais Municipais."
+        tests: [not_null]
+      - name: avg_score_transparencia_diario_uf
+        description: "Média estadual do score de transparência oficial e legibilidade OCR no Querido Diário (0-100)."
+        tests: [not_null]
       - name: macro_ano_mes_referencia
         description: "Competência macroeconômica de referência (YYYY-MM)."
         tests: [not_null]

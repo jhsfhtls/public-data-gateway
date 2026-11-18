@@ -376,6 +376,60 @@ class ProcurementFacade:
         """Lookup government procurement history by supplier CNPJ."""
         return self.catmat_connector.get_supplier_procurement_history(cnpj)
 
+    @property
+    def querido_diario_connector(self) -> Any:
+        if (
+            not hasattr(self, "_querido_diario_connector")
+            or self._querido_diario_connector is None
+        ):
+            from public_data_gateway.connectors.compras_publicas.querido_diario_okbr import (
+                QueridoDiarioOkbrConnector,
+            )
+
+            self._querido_diario_connector = QueridoDiarioOkbrConnector(
+                settings=self._sdk.settings
+            )
+        return self._querido_diario_connector
+
+    def get_querido_diario_tenders(self, termo: str) -> list[dict[str, Any]]:
+        """Lookup indexed municipal official gazette tenders/dispensations by code, theme, IBGE, UF, or city."""
+        return self.querido_diario_connector.get_gazette_tenders(termo)
+
+    def get_querido_diario_excerpts(self, termo: str) -> list[dict[str, Any]]:
+        """Lookup 12-month indexed gazette editions, education/health & ESG mentions, and OCR legibility."""
+        return self.querido_diario_connector.get_thematic_excerpts(termo)
+
+    def get_querido_diario_transparency(
+        self, id_municipio_or_name: str
+    ) -> dict[str, Any] | None:
+        """Retrieve historical gazette archive depth, open format share, and regularity."""
+        return self.querido_diario_connector.get_active_transparency_metrics(
+            id_municipio_or_name
+        )
+
+    def get_querido_diario_summary(
+        self, id_municipio_or_name: str
+    ) -> dict[str, Any] | None:
+        """Retrieve consolidated municipal Querido Diário editions, tenders, and cited values."""
+        return self.querido_diario_connector.get_gazette_summary(id_municipio_or_name)
+
+    def get_querido_diario_features(
+        self, id_municipio_or_name: str
+    ) -> dict[str, Any] | None:
+        """Retrieve Gold Querido Diário OKBR official gazette transparency score and tier."""
+        return self.querido_diario_connector.get_gazette_features(id_municipio_or_name)
+
+    def list_top_querido_diario_municipalities(
+        self,
+        limit: int = 10,
+        sigla_uf: str | None = None,
+        sort_by_volume: bool = False,
+    ) -> list[dict[str, Any]]:
+        """List municipalities ranked by gazette transparency score or cited contract value."""
+        return self.querido_diario_connector.list_top_gazette_municipalities(
+            limit=limit, sigla_uf=sigla_uf, sort_by_volume=sort_by_volume
+        )
+
 
 class ComplianceFacade:
     """Compliance, administrative sanctions and anti-corruption query interface (CGU CEIS/CNEP/CEPIM)."""
@@ -4373,6 +4427,43 @@ class BrazilData:
     def get_procurement_supplier(self, cnpj: str) -> dict[str, Any] | None:
         """Consultar histórico e volume de fornecimento de uma empresa ao poder público."""
         return self.procurement.get_supplier_history(cnpj)
+
+    def get_querido_diario_tenders(self, termo: str) -> list[dict[str, Any]]:
+        """Consultar atos licitatórios e dispensas em Diários Oficiais Municipais (Querido Diário/OKBR)."""
+        return self.procurement.get_querido_diario_tenders(termo)
+
+    def get_querido_diario_excerpts(self, termo: str) -> list[dict[str, Any]]:
+        """Consultar edições indexadas, menções temáticas Educação/Saúde/ESG e legibilidade OCR."""
+        return self.procurement.get_querido_diario_excerpts(termo)
+
+    def get_querido_diario_transparency(
+        self, id_municipio_or_name: str
+    ) -> dict[str, Any] | None:
+        """Consultar acervo histórico, formato aberto TXT/PDF e transparência ativa em Diários Oficiais."""
+        return self.procurement.get_querido_diario_transparency(id_municipio_or_name)
+
+    def get_querido_diario_summary(
+        self, id_municipio_or_name: str
+    ) -> dict[str, Any] | None:
+        """Consultar consolidado municipal do Querido Diário (edições, licitações e valores citados)."""
+        return self.procurement.get_querido_diario_summary(id_municipio_or_name)
+
+    def get_querido_diario_features(
+        self, id_municipio_or_name: str
+    ) -> dict[str, Any] | None:
+        """Consultar features Gold Querido Diário OKBR de transparência e maturidade oficial."""
+        return self.procurement.get_querido_diario_features(id_municipio_or_name)
+
+    def list_top_querido_diario_municipalities(
+        self,
+        limit: int = 10,
+        sigla_uf: str | None = None,
+        sort_by_volume: bool = False,
+    ) -> list[dict[str, Any]]:
+        """Listar municípios ranqueados por transparência em Diários Oficiais ou volume em extratos."""
+        return self.procurement.list_top_querido_diario_municipalities(
+            limit=limit, sigla_uf=sigla_uf, sort_by_volume=sort_by_volume
+        )
 
     def get_municipality_gdp(self, id_municipio: str) -> dict[str, Any] | None:
         """Consultar PIB municipal e valor adicionado por setor (IBGE SIDRA)."""

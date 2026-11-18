@@ -2198,3 +2198,32 @@ sources:
   status: HOMOLOGATED
   freshness_sla_hours: 720
   cron_schedule_expression: 0 8 10 * *
+- source_id: querido_diario_okbr
+  name: 'Querido Diário (OKBR): Diários Oficiais Municipais, Licitações & Atos'
+  agency: Open Knowledge Brasil (OKBR) / Projeto Querido Diário
+  official_url: https://queridodiario.ok.org.br/
+  segment_id: 10_compras_publicas
+  segment_name: Compras Públicas, Licitações & Contratos
+  access_mode: FEDERATED_API
+  protocol: REST_JSON
+  auth_type: NONE
+  canonical_keys:
+  - id_municipio
+  - sigla_uf
+  update_frequency: Diária / Semanal (Coleta & Indexação NLP de Diários Oficiais)
+  estimated_volume: ~5.570 municípios com diários oficiais municipais, licitações e excertos NLP (~610 MB)
+  lgpd_tier: PUBLIC_NON_PERSONAL
+  ml_feature_domains:
+  - municipal_gazette_openness
+  - public_tenders_nlp_extraction
+  - active_transparency_compliance
+  solution_packs:
+  - P01
+  - P03
+  - P04
+  - P07
+  rice_score: 890
+  roadmap_wave: 2
+  status: HOMOLOGATED
+  freshness_sla_hours: 168
+  cron_schedule_expression: 0 9 * * *
