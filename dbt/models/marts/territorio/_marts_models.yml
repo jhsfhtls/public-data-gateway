@@ -1226,3 +1226,61 @@ models:
       - name: tier_risco_rodoviario_prf
         description: "Classificação municipal de risco rodoviário PRF (SEGURANCA_VIARIA_ALTA, ATENCAO_CORREDOR_RODOVIARIO ou TRECHO_CRITICO_SINISTRALIDADE)."
         tests: [not_null]
+
+  - name: mart_previdencia_social_inss_brasil
+    description: "Data Mart Gold intra-domínio consolidando benefícios INSS emitidos (RGPS & BPC/LOAS), concessões, arrecadação e score de sustentabilidade previdenciária."
+    columns:
+      - name: id_municipio
+        description: "Código IBGE de 7 dígitos do município (STRING)."
+        tests: [not_null, unique]
+      - name: sigla_uf
+        description: "Sigla de 2 letras da Unidade Federativa (UF)."
+        tests: [not_null]
+      - name: nome_municipio
+        description: "Nome oficial do município."
+        tests: [not_null]
+      - name: regiao
+        description: "Macrorregião geográfica do município."
+        tests: [not_null]
+      - name: beneficios_inss_emitidos
+        description: "Quantidade mensal total de benefícios INSS emitidos no município."
+        tests: [not_null]
+      - name: valor_mensal_beneficios_mil_brl
+        description: "Volume financeiro mensal injetado por benefícios INSS no município (R$ mil)."
+        tests: [not_null]
+      - name: ticket_medio_beneficio_brl
+        description: "Valor médio mensal do benefício mantido pelo INSS (BRL)."
+        tests: [not_null]
+      - name: participacao_bpc_loas_pct
+        description: "Participação de benefícios assistenciais BPC/LOAS no estoque total municipal (%)."
+        tests: [not_null]
+      - name: qtd_grupos_especie_inss
+        description: "Quantidade de agrupamentos de espécies INSS consolidados na Silver."
+        tests: [not_null]
+      - name: qtd_concessoes_ano
+        description: "Concessões de novos benefícios realizadas em 12 meses."
+        tests: [not_null]
+      - name: valor_medio_concedido_brl
+        description: "Valor médio inicial concedido nos benefícios aprovados (BRL)."
+        tests: [not_null]
+      - name: taxa_indeferimento_pct
+        description: "Taxa percentual de indeferimento de requerimentos no município (%)."
+        tests: [not_null]
+      - name: tempo_medio_concessao_dias
+        description: "Tempo médio de concessão (TMC) dos pedidos no INSS (dias)."
+        tests: [not_null]
+      - name: massa_contribuintes_ativos
+        description: "Total de contribuintes ativos vinculados ao RGPS no município."
+        tests: [not_null]
+      - name: arrecadacao_previdenciaria_mil_brl
+        description: "Arrecadação mensal previdenciária vinculada ao município (R$ mil)."
+        tests: [not_null]
+      - name: razao_contribuintes_beneficiarios
+        description: "Razão contribuintes ativos por beneficiário mantido no município."
+        tests: [not_null]
+      - name: score_cobertura_previdenciaria_inss
+        description: "Score sintético municipal de cobertura formal e sustentabilidade previdenciária MPS/INSS (0-100)."
+        tests: [not_null]
+      - name: tier_sustentabilidade_previdenciaria
+        description: "Classificação municipal (PREVIDENCIA_SUPERAVITARIA_FORMAL, COBERTURA_PREVIDENCIARIA_ESTAVEL ou ALTA_DEPENDENCIA_ASSISTENCIAL_BPC)."
+        tests: [not_null]

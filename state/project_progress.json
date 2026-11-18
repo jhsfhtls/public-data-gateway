@@ -1,6 +1,6 @@
 {
   "schema_version": "1.0.0",
-  "last_updated": "2026-11-18T11:50:00.000000",
+  "last_updated": "2026-11-18T12:15:00.000000",
   "project_name": "public-data-gateway",
   "architecture": "Hexagonal Medallion Lakehouse (Bronze -> Silver -> Gold / Feature Store)",
   "governance_standards": [
@@ -15,7 +15,7 @@
   "current_macro_phase": "Fase 11.5 - Expansão Completa de Fontes Públicas (Ondas 11.5A a 11.5E — Padrão 11-Gates)",
   "overall_status": "ON_TRACK",
   "active_connector": null,
-  "next_connector": "mps_inss_beneficios",
+  "next_connector": "cgu_transparencia_gastos",
   "structural_phases": [
     {
       "phase_id": "00",
@@ -252,74 +252,74 @@
     }
   ],
   "active_connector_gates": {
-    "target_connector": "mme_ons_energia",
+    "target_connector": "mps_inss_beneficios",
     "target_wave": "11.5C",
     "gates": [
       {
         "gate_id": "GATE_01",
         "name": "Contrato Declarativo ODCS v3.1 das N Tabelas da API",
         "status": "PASSED",
-        "criteria": "Schema tipado, chaves primarias STRING (cod_usina_ons, cod_balanco_ons, id_municipio 7D, sigla_uf) e regras semanticas para Capacidade Geracao SIN, Balanco Carga/EAR/CMO, Rede Basica MME e Resumo Municipal."
+        "criteria": "Schema tipado, chaves primarias STRING (cod_beneficio_inss, cod_concessao_inss, id_municipio 7D, sigla_uf) e regras semanticas para Beneficios Emitidos INSS, Concessoes, Arrecadacao GPS/MPS e Resumo Municipal."
       },
       {
         "gate_id": "GATE_02",
         "name": "Ingestao Bronze Isolada (Todas as Tabelas) & Cache WAL",
         "status": "PASSED",
-        "criteria": "Ingestao resiliente da API CKAN oficial do ONS (dados.ons.org.br) e Portal MME (gov.br/mme) em data/mme_ons_energia/bronze/ com registro de linhagem SHA-256."
+        "criteria": "Ingestao resiliente da API CKAN oficial do INSS (dadosabertos.inss.gov.br) e Portal Previdencia (gov.br/previdencia) em data/mps_inss_beneficios/bronze/ com registro de linhagem SHA-256."
       },
       {
         "gate_id": "GATE_03",
         "name": "Sanitizacao de Sentinelas & Nulls",
         "status": "PASSED",
-        "criteria": "Conversao deterministica de sentinelas em NULLs reais e normalizacao de subsistemas SIN (SUDESTE_CENTRO_OESTE, SUL, NORDESTE, NORTE), fontes renovaveis e Custo Marginal de Operacao."
+        "criteria": "Conversao deterministica de sentinelas em NULLs reais e normalizacao de grupos previdenciarios (APOSENTADORIA, PENSAO_AUXILIO, BPC_LOAS), clientela urbana/rural e razao contribuintes/beneficiarios."
       },
       {
         "gate_id": "GATE_04",
         "name": "Materializacao Silver Parquet Isolada (Todas as Tabelas)",
         "status": "PASSED",
-        "criteria": "Gravacao ZSTD em data/mme_ons_energia/silver/ (ons_capacidade_geracao_municipio, ons_balanco_carga_subsistema_uf, mme_intercambio_seguranca_energetica, ons_energia_resumo_municipal)."
+        "criteria": "Gravacao ZSTD em data/mps_inss_beneficios/silver/ (inss_beneficios_emitidos_especie, inss_beneficios_concedidos_concessoes, mps_arrecadacao_previdenciaria_gps, inss_previdencia_resumo_municipal)."
       },
       {
         "gate_id": "GATE_05",
         "name": "Validacao dos 5 Pilares & Quarentena",
         "status": "PASSED",
-        "criteria": "Aprovacao em Freshness, Volume, Schema, Null Ceiling e Lineage com suporte a desvio para data/mme_ons_energia/quarantine/."
+        "criteria": "Aprovacao em Freshness, Volume, Schema, Null Ceiling e Lineage com suporte a desvio para data/mps_inss_beneficios/quarantine/."
       },
       {
         "gate_id": "GATE_06",
         "name": "Gold Feature View Isolada & ASOF Join ML",
         "status": "PASSED",
-        "criteria": "Features de seguranca energetica SIN e despacho renovavel em data/mme_ons_energia/gold/features_seguranca_energetica_ons.parquet."
+        "criteria": "Features de cobertura e sustentabilidade previdenciaria em data/mps_inss_beneficios/gold/features_previdencia_social_inss.parquet."
       },
       {
         "gate_id": "GATE_07",
         "name": "Integracao ao EnrichmentEngine & Marts Cross-Domain",
         "status": "PASSED",
-        "criteria": "Integracao energia-ESG em mart_cross_domain_esg_agro_infra_brasil (potencia_instalada_sin_mw, geracao_renovavel_sin_pct e score_seguranca_energetica_ons)."
+        "criteria": "Integracao previdencia-capital-humano em mart_cross_domain_capital_humano_saude_brasil (beneficios_inss_emitidos, valor_mensal_beneficios_inss_mil_brl e score_cobertura_previdenciaria_inss)."
       },
       {
         "gate_id": "GATE_08",
         "name": "Exposicao Multi-Interface (4 Interfaces)",
         "status": "PASSED",
-        "criteria": "Exposicao simultanea via SDK (BrazilData.environment + shortcuts), FastAPI (/api/v1/environment/sistema-eletrico/*), CLI (bdg sistema-eletrico *) e MCP (bdg_*_mme_ons_* com wrap_untrusted_gov_data)."
+        "criteria": "Exposicao simultanea via SDK (BrazilData.labor + shortcuts), FastAPI (/api/v1/labor/previdencia-inss/*), CLI (bdg previdencia *) e MCP (bdg_*_mps_inss_* com wrap_untrusted_gov_data)."
       },
       {
         "gate_id": "GATE_09",
         "name": "Bateria de Testes Unitarios & Paridade Offline",
         "status": "PASSED",
-        "criteria": "Testes unitarios offline completos em tests/connectors/test_mme_ons_energia.py cobrindo 4 tabelas Silver, Gold ML e paridade nas 4 interfaces."
+        "criteria": "Testes unitarios offline completos em tests/connectors/test_mps_inss_beneficios.py cobrindo 4 tabelas Silver, Gold ML e paridade nas 4 interfaces."
       },
       {
         "gate_id": "GATE_10",
         "name": "dbt Staging, Marts Intra-Domínio/Cross-Domain & 100% Colunas Documentadas",
         "status": "PASSED",
-        "criteria": "Modelos dbt com source.yml, stg_*, fct_energia_eletrica_mme_ons_municipal, mart intra-dominio mart_seguranca_energetica_ons_brasil e cross-domain mart_cross_domain_esg_agro_infra_brasil aprovados no dbt test (138/138) e lint_dbt_docs.py (100% cobertura)."
+        "criteria": "Modelos dbt com source.yml, stg_*, fct_previdencia_social_inss_municipal, mart intra-dominio mart_previdencia_social_inss_brasil e cross-domain mart_cross_domain_capital_humano_saude_brasil aprovados no dbt test (95/95) e lint_dbt_docs.py (100% cobertura)."
       },
       {
         "gate_id": "GATE_11",
         "name": "Teste Real de 1 Linha com API ao Vivo (Fail-Hard)",
         "status": "PASSED",
-        "criteria": "Execucao obrigatoria contra API CKAN dados.ons.org.br e portal gov.br/mme validando HTTP 200; falha reprova o pipeline."
+        "criteria": "Execucao obrigatoria contra API CKAN dadosabertos.inss.gov.br e portal gov.br/previdencia validando HTTP 200; falha reprova o pipeline."
       }
     ]
   },
@@ -804,6 +804,12 @@
       "phase_id": "11.5",
       "milestone": "Wave 11.5C (5/6) — Homologação do Conector mme_ons_energia (4 Tabelas Silver SIN/ONS, Mart Intra-Domínio, Mart Cross-Domain ESG & Paridade 4 Interfaces)",
       "summary": "Implementação completa nos 11 Gates do conector mme_ons_energia (ONS / MME Sistema Interligado Nacional): contrato ODCS v3.1, ingestão Bronze + 4 tabelas Silver ZSTD (ons_capacidade_geracao_municipio, ons_balanco_carga_subsistema_uf, mme_intercambio_seguranca_energetica, ons_energia_resumo_municipal) + Gold ML (features_seguranca_energetica_ons), 4 staging views + fct_energia_eletrica_mme_ons_municipal + mart intra-domínio mart_seguranca_energetica_ons_brasil + enriquecimento da mart cross-domain mart_cross_domain_esg_agro_infra_brasil (138 testes dbt OK, 100% colunas documentadas no lint_dbt_docs.py com 602 modelos / 8.216 colunas), paridade em SDK/FastAPI/CLI/MCP, bateria offline e teste live fail-hard contra API CKAN dados.ons.org.br e gov.br/mme."
+    },
+    {
+      "date": "2026-11-18",
+      "phase_id": "11.5",
+      "milestone": "Wave 11.5C (6/6 — Concluída) — Homologação do Conector mps_inss_beneficios (4 Tabelas Silver INSS/MPS, Mart Intra-Domínio, Mart Cross-Domain Capital Humano & Paridade 4 Interfaces)",
+      "summary": "Fechamento integral da Wave 11.5C (6/6) com implementação completa nos 11 Gates do conector mps_inss_beneficios (INSS / Ministério da Previdência Social BEPS & BPC/LOAS): contrato ODCS v3.1, ingestão Bronze + 4 tabelas Silver ZSTD (inss_beneficios_emitidos_especie, inss_beneficios_concedidos_concessoes, mps_arrecadacao_previdenciaria_gps, inss_previdencia_resumo_municipal) + Gold ML (features_previdencia_social_inss), 4 staging views + fct_previdencia_social_inss_municipal + mart intra-domínio mart_previdencia_social_inss_brasil + enriquecimento da mart cross-domain mart_cross_domain_capital_humano_saude_brasil (95 testes dbt OK, 100% colunas documentadas no lint_dbt_docs.py com 608 modelos / 8.286 colunas), paridade em SDK/FastAPI/CLI/MCP, bateria offline e teste live fail-hard contra API CKAN dadosabertos.inss.gov.br e gov.br/previdencia."
     }
   ]
 }

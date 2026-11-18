@@ -715,6 +715,36 @@ def build_parser() -> argparse.ArgumentParser:
     rais_rank_p.add_argument("--limit", type=int, default=10, help="Max municipalities to list")
     rais_rank_p.add_argument("--json", action="store_true", help="Output in JSON format")
 
+    # MPS / INSS Benefícios (Previdência Social, BPC/LOAS & Arrecadação) command group
+    prev_p = subparsers.add_parser("previdencia", help="Query MPS/INSS social security benefits, grants, contributions, and coverage rankings.")
+    prev_sub = prev_p.add_subparsers(dest="previdencia_action", required=True)
+
+    prev_ben_p = prev_sub.add_parser("beneficios", help="Lookup INSS active issued benefits by code, species, group, clientele, IBGE, UF, or city.")
+    prev_ben_p.add_argument("termo", help="INSS code, species code, group, clientele, IBGE, UF, or municipality name")
+    prev_ben_p.add_argument("--json", action="store_true", help="Output in JSON format")
+
+    prev_con_p = prev_sub.add_parser("concessoes", help="Lookup annual INSS benefit grants, denial rates, and concession lead times.")
+    prev_con_p.add_argument("termo", help="Grant code, IBGE code, UF, or municipality name")
+    prev_con_p.add_argument("--json", action="store_true", help="Output in JSON format")
+
+    prev_ctr_p = prev_sub.add_parser("contribuicoes", help="Get municipal RGPS active contributors, collections, and dependency ratio.")
+    prev_ctr_p.add_argument("id_municipio_or_name", help="7-digit IBGE code or municipality name")
+    prev_ctr_p.add_argument("--json", action="store_true", help="Output in JSON format")
+
+    prev_mun_p = prev_sub.add_parser("municipio", help="Get consolidated municipal INSS benefits count, monthly cash injection, and BPC share.")
+    prev_mun_p.add_argument("id_municipio_or_name", help="7-digit IBGE code or municipality name")
+    prev_mun_p.add_argument("--json", action="store_true", help="Output in JSON format")
+
+    prev_ft_p = prev_sub.add_parser("features", help="Get Gold MPS/INSS social security coverage score and sustainability tier.")
+    prev_ft_p.add_argument("id_municipio_or_name", help="7-digit IBGE code or municipality name")
+    prev_ft_p.add_argument("--json", action="store_true", help="Output in JSON format")
+
+    prev_rk_p = prev_sub.add_parser("ranking", help="List municipalities ranked by INSS coverage score or monthly payout volume.")
+    prev_rk_p.add_argument("--limit", type=int, default=10, help="Max municipalities to list")
+    prev_rk_p.add_argument("--uf", type=str, help="Optional 2-letter state filter")
+    prev_rk_p.add_argument("--volume", action="store_true", help="Sort descending by monthly payout volume (R$ mil)")
+    prev_rk_p.add_argument("--json", action="store_true", help="Output in JSON format")
+
     # Subcommand: pnad (IBGE PNAD Contínua)
     pnad_p = subparsers.add_parser(
         "pnad", help="Query official IBGE PNAD Contínua labor force, unemployment, earnings, and informality."
@@ -3545,6 +3575,84 @@ def main(argv: Sequence[str] | None = None) -> int:
                 for key, value in result.items():
                     print(f"  {key}: {value}")
             return 0
+
+        elif args.command == "previdencia":
+            from public_data_gateway.connectors.trabalho.mps_inss_beneficios import (
+                MpsInssBeneficiosConnector,
+            )
+
+            prev_conn = MpsInssBeneficiosConnector()
+            prev_action = getattr(args, "previdencia_action", "")
+            try:
+                if prev_action == "beneficios":
+                    rows = prev_conn.get_inss_issued_benefits(args.termo)
+                    if getattr(args, "json", False):
+                        print(json.dumps(rows, indent=2, ensure_ascii=False, default=str))
+                    else:
+                        print(f"INSS Benefícios Emitidos ({len(rows)}):")
+                        for r in rows:
+                            print(f"  {r.get('cod_beneficio_inss')} | {r.get('nome_municipio')} ({r.get('sigla_uf')}): {r.get('grupo_beneficio_inss')} | {r.get('qtd_beneficios_emitidos')} benef")
+                    return 0
+
+                if prev_action == "concessoes":
+                    rows = prev_conn.get_inss_benefit_grants(args.termo)
+                    if getattr(args, "json", False):
+                        print(json.dumps(rows, indent=2, ensure_ascii=False, default=str))
+                    else:
+                        print(f"INSS Concessões Anuais ({len(rows)}):")
+                        for r in rows:
+                            print(f"  {r.get('cod_concessao_inss')} | {r.get('nome_municipio')} ({r.get('sigla_uf')}): {r.get('qtd_concessoes_ano')} conc | Indef {r.get('taxa_indeferimento_pct')}%")
+                    return 0
+
+                if prev_action == "contribuicoes":
+                    res = prev_conn.get_mps_social_contributions(args.id_municipio_or_name)
+                    if res is None:
+                        print(f"Arrecadação MPS/INSS não encontrada para: {args.id_municipio_or_name}", file=sys.stderr)
+                        return 1
+                    if getattr(args, "json", False):
+                        print(json.dumps(res, indent=2, ensure_ascii=False, default=str))
+                    else:
+                        print(f"MPS Arrecadação ({res.get('nome_municipio')} - {res.get('sigla_uf')}): Contrib {res.get('massa_contribuintes_ativos')} | Razão {res.get('razao_contribuintes_beneficiarios')}")
+                    return 0
+
+                if prev_action == "municipio":
+                    res = prev_conn.get_inss_municipal_summary(args.id_municipio_or_name)
+                    if res is None:
+                        print(f"Resumo INSS não encontrado para: {args.id_municipio_or_name}", file=sys.stderr)
+                        return 1
+                    if getattr(args, "json", False):
+                        print(json.dumps(res, indent=2, ensure_ascii=False, default=str))
+                    else:
+                        print(f"INSS Previdência Município ({res.get('nome_municipio')} - {res.get('sigla_uf')}): {res.get('beneficios_inss_emitidos')} emitidos | R$ {res.get('valor_mensal_beneficios_mil_brl')}k/mês")
+                    return 0
+
+                if prev_action == "features":
+                    res = prev_conn.get_inss_features(args.id_municipio_or_name)
+                    if res is None:
+                        print(f"Features INSS não encontradas para: {args.id_municipio_or_name}", file=sys.stderr)
+                        return 1
+                    if getattr(args, "json", False):
+                        print(json.dumps(res, indent=2, ensure_ascii=False, default=str))
+                    else:
+                        print(f"MPS/INSS Gold ({res.get('nome_municipio')} - {res.get('id_municipio')}): Score {res.get('score_cobertura_previdenciaria_inss')} | {res.get('tier_sustentabilidade_previdenciaria')}")
+                    return 0
+
+                if prev_action == "ranking":
+                    ranks = prev_conn.list_top_inss_municipalities(
+                        limit=getattr(args, "limit", 10),
+                        sigla_uf=getattr(args, "uf", None),
+                        sort_by_volume=getattr(args, "volume", False),
+                    )
+                    if getattr(args, "json", False):
+                        print(json.dumps(ranks, indent=2, ensure_ascii=False, default=str))
+                    else:
+                        print(f"Ranking MPS/INSS Previdência ({len(ranks)}):")
+                        for idx, r in enumerate(ranks, 1):
+                            print(f"  {idx}. {r.get('nome_municipio')} ({r.get('sigla_uf')}): {r.get('score_cobertura_previdenciaria_inss')} | {r.get('tier_sustentabilidade_previdenciaria')}")
+                    return 0
+            except (ValueError, KeyError) as exc:
+                print(f"Erro MPS/INSS Previdência: {exc}", file=sys.stderr)
+                return 1
 
         elif args.command in ("pnad", "pnad-uf"):
             from public_data_gateway.connectors.trabalho.ibge_pnad_continua.connector import (

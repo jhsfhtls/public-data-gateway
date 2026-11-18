@@ -1709,6 +1709,78 @@ def create_app(settings: GatewaySettings | None = None) -> FastAPI:
             limit=limit
         )
 
+    # MPS / INSS Benefícios (Previdência Social, BPC/LOAS & Arrecadação)
+    @app.get("/api/v1/labor/previdencia-inss/beneficios/{termo}")
+    async def get_previdencia_beneficios(termo: str) -> list[dict[str, Any]]:
+        from public_data_gateway.connectors.trabalho.mps_inss_beneficios import (
+            MpsInssBeneficiosConnector,
+        )
+
+        conn = MpsInssBeneficiosConnector(settings=app_settings)
+        return conn.get_inss_issued_benefits(termo)
+
+    @app.get("/api/v1/labor/previdencia-inss/concessoes/{termo}")
+    async def get_previdencia_concessoes(termo: str) -> list[dict[str, Any]]:
+        from public_data_gateway.connectors.trabalho.mps_inss_beneficios import (
+            MpsInssBeneficiosConnector,
+        )
+
+        conn = MpsInssBeneficiosConnector(settings=app_settings)
+        return conn.get_inss_benefit_grants(termo)
+
+    @app.get("/api/v1/labor/previdencia-inss/contribuicoes/{id_municipio_or_name}")
+    async def get_previdencia_contribuicoes(id_municipio_or_name: str) -> dict[str, Any]:
+        from public_data_gateway.connectors.trabalho.mps_inss_beneficios import (
+            MpsInssBeneficiosConnector,
+        )
+
+        conn = MpsInssBeneficiosConnector(settings=app_settings)
+        res = conn.get_mps_social_contributions(id_municipio_or_name)
+        if res is None:
+            raise HTTPException(status_code=404, detail="MPS social contribution metrics not found")
+        return res
+
+    @app.get("/api/v1/labor/previdencia-inss/municipio/{id_municipio_or_name}")
+    async def get_previdencia_municipio(id_municipio_or_name: str) -> dict[str, Any]:
+        from public_data_gateway.connectors.trabalho.mps_inss_beneficios import (
+            MpsInssBeneficiosConnector,
+        )
+
+        conn = MpsInssBeneficiosConnector(settings=app_settings)
+        res = conn.get_inss_municipal_summary(id_municipio_or_name)
+        if res is None:
+            raise HTTPException(status_code=404, detail="INSS municipal summary not found")
+        return res
+
+    @app.get("/api/v1/labor/previdencia-inss/features/{id_municipio_or_name}")
+    async def get_previdencia_features(id_municipio_or_name: str) -> dict[str, Any]:
+        from public_data_gateway.connectors.trabalho.mps_inss_beneficios import (
+            MpsInssBeneficiosConnector,
+        )
+
+        conn = MpsInssBeneficiosConnector(settings=app_settings)
+        res = conn.get_inss_features(id_municipio_or_name)
+        if res is None:
+            raise HTTPException(status_code=404, detail="INSS Gold social security features not found")
+        return res
+
+    @app.get("/api/v1/labor/previdencia-inss/ranking")
+    async def get_previdencia_ranking(
+        limit: int = Query(10, ge=1, le=50, description="Max municipalities to list"),
+        uf: str | None = Query(None, description="Optional 2-letter state filter"),
+        sort_by_volume: bool = Query(
+            False, description="Sort descending by monthly INSS payout volume (R$ mil)"
+        ),
+    ) -> list[dict[str, Any]]:
+        from public_data_gateway.connectors.trabalho.mps_inss_beneficios import (
+            MpsInssBeneficiosConnector,
+        )
+
+        conn = MpsInssBeneficiosConnector(settings=app_settings)
+        return conn.list_top_inss_municipalities(
+            limit=limit, sigla_uf=uf, sort_by_volume=sort_by_volume
+        )
+
     # 19. State Labor Market & Household Survey Routes (IBGE PNAD Contínua)
     @app.get("/api/v1/labor/state/{uf}/indicators")
     async def get_pnad_labor_force_indicators(

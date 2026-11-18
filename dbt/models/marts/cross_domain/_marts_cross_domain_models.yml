@@ -369,6 +369,15 @@ models:
       - name: score_aquecimento_mercado_trabalho
         description: "Score de aquecimento do mercado de trabalho formal (0-100)."
         tests: [not_null]
+      - name: beneficios_inss_emitidos
+        description: "Quantidade mensal de benefícios ativos emitidos pelo INSS no município."
+        tests: [not_null]
+      - name: valor_mensal_beneficios_inss_mil_brl
+        description: "Volume financeiro mensal injetado na economia local via benefícios INSS (R$ mil)."
+        tests: [not_null]
+      - name: score_cobertura_previdenciaria_inss
+        description: "Score municipal de cobertura formal e sustentabilidade previdenciária MPS/INSS (0-100)."
+        tests: [not_null]
       - name: reference_date
         description: "Data de referência ISO-8601 (YYYY-MM-DD)."
         tests: [not_null]

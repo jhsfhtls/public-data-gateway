@@ -1,0 +1,169 @@
+version: 2
+
+models:
+  - name: stg_inss_beneficios_emitidos_especie
+    description: "Staging view tipada dos benefícios previdenciários e assistenciais BPC/LOAS ativos emitidos pelo INSS."
+    columns:
+      - name: cod_beneficio_inss
+        description: "Código identificador único do agrupamento de benefícios municipais INSS (STRING)."
+        tests: [not_null, unique]
+      - name: especie_beneficio_codigo
+        description: "Código das espécies previdenciárias agrupadas (B42/B21 RGPS ou B87/B88 LOAS)."
+        tests: [not_null]
+      - name: grupo_beneficio_inss
+        description: "Grupo oficial de benefício (APOSENTADORIA, PENSAO_AUXILIO ou BPC_LOAS)."
+        tests: [not_null]
+      - name: clientela_inss
+        description: "Enquadramento de clientela previdenciária (URBANA ou RURAL)."
+        tests: [not_null]
+      - name: id_municipio
+        description: "Código IBGE de 7 dígitos do município (STRING)."
+        tests: [not_null]
+      - name: sigla_uf
+        description: "Sigla de 2 letras da Unidade Federativa (UF)."
+        tests: [not_null]
+      - name: nome_municipio
+        description: "Nome oficial do município."
+        tests: [not_null]
+      - name: regiao
+        description: "Macrorregião geográfica brasileira."
+        tests: [not_null]
+      - name: qtd_beneficios_emitidos
+        description: "Quantidade mensal de benefícios emitidos ativos na espécie/grupo."
+        tests: [not_null]
+      - name: valor_mensal_emitido_mil_brl
+        description: "Massa mensal paga aos beneficiários no agrupamento (R$ mil)."
+        tests: [not_null]
+      - name: competencia_referencia
+        description: "Competência mensal de referência BEPS (YYYY-MM)."
+        tests: [not_null]
+
+  - name: stg_inss_beneficios_concedidos_concessoes
+    description: "Staging view tipada do fluxo anual de concessões INSS, indeferimentos e tempo médio de análise."
+    columns:
+      - name: cod_concessao_inss
+        description: "Código identificador único do consolidado municipal de concessões INSS (STRING)."
+        tests: [not_null, unique]
+      - name: id_municipio
+        description: "Código IBGE de 7 dígitos do município (STRING)."
+        tests: [not_null]
+      - name: sigla_uf
+        description: "Sigla de 2 letras da Unidade Federativa (UF)."
+        tests: [not_null]
+      - name: nome_municipio
+        description: "Nome oficial do município."
+        tests: [not_null]
+      - name: qtd_concessoes_ano
+        description: "Quantidade de novos benefícios concedidos no acumulado de 12 meses."
+        tests: [not_null]
+      - name: valor_medio_concedido_brl
+        description: "Renda mensal inicial (RMI) média dos benefícios concedidos em BRL."
+        tests: [not_null]
+      - name: taxa_indeferimento_pct
+        description: "Percentual de requerimentos indeferidos no município (%)."
+        tests: [not_null]
+      - name: tempo_medio_concessao_dias
+        description: "Tempo médio de concessão (TMC) dos requerimentos em dias."
+        tests: [not_null]
+
+  - name: stg_mps_arrecadacao_previdenciaria_gps
+    description: "Staging view tipada de contribuintes ativos, arrecadação previdenciária e razão de sustento no município."
+    columns:
+      - name: id_municipio
+        description: "Código IBGE de 7 dígitos do município (STRING)."
+        tests: [not_null, unique]
+      - name: sigla_uf
+        description: "Sigla de 2 letras da Unidade Federativa (UF)."
+        tests: [not_null]
+      - name: nome_municipio
+        description: "Nome oficial do município."
+        tests: [not_null]
+      - name: massa_contribuintes_ativos
+        description: "Total de segurados contribuintes ativos RGPS/eSocial vinculados ao município."
+        tests: [not_null]
+      - name: arrecadacao_previdenciaria_mil_brl
+        description: "Arrecadação previdenciária mensal equivalente no município (R$ mil)."
+        tests: [not_null]
+      - name: razao_contribuintes_beneficiarios
+        description: "Razão estrutural entre contribuintes ativos e benefícios INSS mantidos."
+        tests: [not_null]
+
+  - name: stg_inss_previdencia_resumo_municipal
+    description: "Staging view tipada do resumo municipal de benefícios INSS emitidos, valor mensal e participação BPC/LOAS."
+    columns:
+      - name: id_municipio
+        description: "Código IBGE de 7 dígitos do município (STRING)."
+        tests: [not_null, unique]
+      - name: sigla_uf
+        description: "Sigla de 2 letras da Unidade Federativa (UF)."
+        tests: [not_null]
+      - name: nome_municipio
+        description: "Nome oficial do município."
+        tests: [not_null]
+      - name: regiao
+        description: "Macrorregião geográfica brasileira."
+        tests: [not_null]
+      - name: beneficios_inss_emitidos
+        description: "Total de benefícios ativos pagos pelo INSS no município."
+        tests: [not_null]
+      - name: valor_mensal_beneficios_mil_brl
+        description: "Massa mensal total injetada via benefícios previdenciários e assistenciais (R$ mil)."
+        tests: [not_null]
+      - name: ticket_medio_beneficio_brl
+        description: "Valor médio mensal por benefício mantido no município (BRL)."
+        tests: [not_null]
+      - name: participacao_bpc_loas_pct
+        description: "Participação de benefícios assistenciais BPC/LOAS no estoque total municipal (%)."
+        tests: [not_null]
+
+  - name: fct_previdencia_social_inss_municipal
+    description: "Fato Silver municipal consolidando estoque de benefícios INSS, concessões, arrecadação RGPS e sustentabilidade previdenciária."
+    columns:
+      - name: id_municipio
+        description: "Código IBGE de 7 dígitos do município (STRING)."
+        tests: [not_null, unique]
+      - name: sigla_uf
+        description: "Sigla de 2 letras da Unidade Federativa (UF)."
+        tests: [not_null]
+      - name: nome_municipio
+        description: "Nome oficial do município."
+        tests: [not_null]
+      - name: regiao
+        description: "Macrorregião geográfica brasileira."
+        tests: [not_null]
+      - name: beneficios_inss_emitidos
+        description: "Quantidade total de benefícios ativos emitidos no município."
+        tests: [not_null]
+      - name: valor_mensal_beneficios_mil_brl
+        description: "Volume financeiro mensal dos benefícios INSS emitidos (R$ mil)."
+        tests: [not_null]
+      - name: ticket_medio_beneficio_brl
+        description: "Valor médio mensal do benefício mantido no município (BRL)."
+        tests: [not_null]
+      - name: participacao_bpc_loas_pct
+        description: "Percentual de benefícios assistenciais BPC/LOAS sobre o total emitido (%)."
+        tests: [not_null]
+      - name: qtd_grupos_especie_inss
+        description: "Quantidade de grupos de espécies INSS consolidados na camada Silver."
+        tests: [not_null]
+      - name: qtd_concessoes_ano
+        description: "Concessões de novos benefícios realizadas em 12 meses."
+        tests: [not_null]
+      - name: valor_medio_concedido_brl
+        description: "Renda mensal inicial média concedida no município (BRL)."
+        tests: [not_null]
+      - name: taxa_indeferimento_pct
+        description: "Percentual de pedidos indeferidos nas agências/CEAB (%)."
+        tests: [not_null]
+      - name: tempo_medio_concessao_dias
+        description: "Prazo médio de concessão (TMC) dos requerimentos previdenciários (dias)."
+        tests: [not_null]
+      - name: massa_contribuintes_ativos
+        description: "Quantidade estimada de contribuintes previdenciários ativos no município."
+        tests: [not_null]
+      - name: arrecadacao_previdenciaria_mil_brl
+        description: "Arrecadação previdenciária mensal apurada no município (R$ mil)."
+        tests: [not_null]
+      - name: razao_contribuintes_beneficiarios
+        description: "Razão entre contribuintes ativos e beneficiários INSS no município."
+        tests: [not_null]
