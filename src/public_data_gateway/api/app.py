@@ -910,6 +910,86 @@ def create_app(settings: GatewaySettings | None = None) -> FastAPI:
             limit=limit, sigla_uf=uf
         )
 
+    # 15H. BNDES Transparência Operações & Fomento Municipal
+    @app.get("/api/v1/banking/bndes-operacoes/operacoes/{termo}")
+    async def get_bndes_operacoes_credito(termo: str) -> list[dict[str, Any]]:
+        from public_data_gateway.connectors.macrofinanceiro.bndes_operacoes import (
+            BndesOperacoesConnector,
+        )
+
+        return BndesOperacoesConnector(settings=app_settings).get_credit_operations(termo)
+
+    @app.get("/api/v1/banking/bndes-operacoes/desembolsos/{termo}")
+    async def get_bndes_desembolsos(termo: str) -> list[dict[str, Any]]:
+        from public_data_gateway.connectors.macrofinanceiro.bndes_operacoes import (
+            BndesOperacoesConnector,
+        )
+
+        return BndesOperacoesConnector(settings=app_settings).get_disbursements(termo)
+
+    @app.get("/api/v1/banking/bndes-operacoes/risco/{id_municipio_or_name}")
+    async def get_bndes_risco(id_municipio_or_name: str) -> dict[str, Any]:
+        from public_data_gateway.connectors.macrofinanceiro.bndes_operacoes import (
+            BndesOperacoesConnector,
+        )
+
+        res = BndesOperacoesConnector(settings=app_settings).get_portfolio_risk(
+            id_municipio_or_name
+        )
+        if res is None:
+            raise HTTPException(
+                status_code=404, detail="BNDES portfolio risk metrics not found"
+            )
+        return res
+
+    @app.get("/api/v1/banking/bndes-operacoes/municipio/{id_municipio_or_name}")
+    async def get_bndes_municipio(id_municipio_or_name: str) -> dict[str, Any]:
+        from public_data_gateway.connectors.macrofinanceiro.bndes_operacoes import (
+            BndesOperacoesConnector,
+        )
+
+        res = BndesOperacoesConnector(settings=app_settings).get_bndes_summary(
+            id_municipio_or_name
+        )
+        if res is None:
+            raise HTTPException(
+                status_code=404, detail="BNDES municipal summary not found"
+            )
+        return res
+
+    @app.get("/api/v1/banking/bndes-operacoes/features/{id_municipio_or_name}")
+    async def get_bndes_features_endpoint(id_municipio_or_name: str) -> dict[str, Any]:
+        from public_data_gateway.connectors.macrofinanceiro.bndes_operacoes import (
+            BndesOperacoesConnector,
+        )
+
+        res = BndesOperacoesConnector(settings=app_settings).get_bndes_features(
+            id_municipio_or_name
+        )
+        if res is None:
+            raise HTTPException(
+                status_code=404, detail="BNDES Gold fomento features not found"
+            )
+        return res
+
+    @app.get("/api/v1/banking/bndes-operacoes/ranking")
+    async def get_bndes_ranking(
+        limit: int = Query(10, ge=1, le=50, description="Max municipalities to list"),
+        uf: str | None = Query(None, description="Optional 2-letter state filter"),
+        sort_by_volume: bool = Query(
+            False, description="Sort descending by total contracted BNDES volume (R$ mil)"
+        ),
+    ) -> list[dict[str, Any]]:
+        from public_data_gateway.connectors.macrofinanceiro.bndes_operacoes import (
+            BndesOperacoesConnector,
+        )
+
+        return BndesOperacoesConnector(
+            settings=app_settings
+        ).list_top_bndes_municipalities(
+            limit=limit, sigla_uf=uf, sort_by_volume=sort_by_volume
+        )
+
     @app.get("/api/v1/treasury/profile/{id_municipio_or_name}")
     @app.get("/api/v1/sadipem/profile/{id_municipio_or_name}")
     async def get_treasury_profile(id_municipio_or_name: str) -> dict[str, Any]:

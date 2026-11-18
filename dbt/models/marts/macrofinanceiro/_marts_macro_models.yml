@@ -1010,3 +1010,64 @@ models:
         tests:
           - not_null
 
+  - name: mart_bndes_operacoes_fomento_brasil
+    description: "Data Mart Gold intra-domínio consolidando carteira BNDES direta/indireta, desembolsos anuais, economia verde, MPMEs, garantias FGI e score de fomento produtivo municipal."
+    columns:
+      - name: id_municipio
+        description: "Código IBGE de 7 dígitos do município (STRING)."
+        tests: [not_null, unique]
+      - name: sigla_uf
+        description: "Sigla de 2 letras da Unidade Federativa (UF)."
+        tests: [not_null]
+      - name: nome_municipio
+        description: "Nome oficial do município."
+        tests: [not_null]
+      - name: regiao
+        description: "Macrorregião geográfica brasileira."
+        tests: [not_null]
+      - name: total_operacoes_bndes
+        description: "Contingente total de operações diretas e indiretas contratadas no BNDES."
+        tests: [not_null]
+      - name: valor_total_contratado_mil_brl
+        description: "Valor contratado acumulado nas operações BNDES no município (R$ mil)."
+        tests: [not_null]
+      - name: desembolso_anual_mil_brl
+        description: "Volume anual de desembolsos BNDES realizados no município (R$ mil)."
+        tests: [not_null]
+      - name: fomento_verde_esg_pct
+        description: "Percentual de projetos e recursos vinculados à economia verde/ESG (%)."
+        tests: [not_null]
+      - name: fomento_per_capita_brl
+        description: "Fomento BNDES contratado equivalente por habitante (BRL)."
+        tests: [not_null]
+      - name: qtd_modalidades_bndes
+        description: "Quantidade de modalidades contratuais BNDES consolidadas na Silver."
+        tests: [not_null]
+      - name: prazo_maximo_amortizacao_meses
+        description: "Prazo médio máximo de amortização nas modalidades contratadas (meses)."
+        tests: [not_null]
+      - name: mpme_participacao_pct
+        description: "Participação percentual de micro, pequenas e médias empresas (%)."
+        tests: [not_null]
+      - name: ano_referencia
+        description: "Ano de referência dos desembolsos BNDES consolidados."
+        tests: [not_null]
+      - name: juros_medio_tjlp_tlp_aa_pct
+        description: "Custo financeiro médio TLP/TJLP na carteira contratada (% a.a.)."
+        tests: [not_null]
+      - name: inadimplencia_carteira_bndes_pct
+        description: "Índice de inadimplência observada na carteira de fomento BNDES (%)."
+        tests: [not_null]
+      - name: cobertura_fgi_garantias_pct
+        description: "Percentual de cobertura garantidora FGI/PEAC nas operações (%)."
+        tests: [not_null]
+      - name: projetos_sustentaveis_count
+        description: "Quantidade de projetos enquadrados em linhas verdes e sustentáveis."
+        tests: [not_null]
+      - name: score_dinamismo_fomento_bndes
+        description: "Score sintético municipal de intensidade de fomento BNDES, economia verde e alavancagem garantidora (0-100)."
+        tests: [not_null]
+      - name: tier_maturidade_fomento_bndes
+        description: "Classificação municipal BNDES (POLO_ALTO_FOMENTO_BNDES, FOMENTO_PRODUTIVO_CONSOLIDADO ou BAIXA_PENETRACAO_FOMENTO)."
+        tests: [not_null]
+

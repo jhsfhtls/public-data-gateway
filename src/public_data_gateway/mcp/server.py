@@ -792,6 +792,51 @@ class MCPDispatcher:
                                 },
                             },
                             {
+                                "name": "bdg_get_bndes_operacoes",
+                                "description": "Lookup BNDES direct FINEM and indirect credit operations by code, modality, sector, IBGE, UF, or city.",
+                                "inputSchema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "termo": {"type": "string", "description": "BNDES operation code, modality, CNAE sector, IBGE 7-digit code, UF, or city"},
+                                    },
+                                    "required": ["termo"],
+                                },
+                            },
+                            {
+                                "name": "bdg_get_bndes_desembolsos",
+                                "description": "Lookup annual BNDES disbursements, green/ESG share, and MSME participation by code, IBGE, UF, or city.",
+                                "inputSchema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "termo": {"type": "string", "description": "Disbursement code, IBGE 7-digit code, UF, or municipality name"},
+                                    },
+                                    "required": ["termo"],
+                                },
+                            },
+                            {
+                                "name": "bdg_get_bndes_features",
+                                "description": "Get normalized Gold BNDES development financing dynamism score, green share, and maturity tier.",
+                                "inputSchema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "id_municipio_or_name": {"type": "string", "description": "7-digit IBGE municipality code or municipality name"},
+                                    },
+                                    "required": ["id_municipio_or_name"],
+                                },
+                            },
+                            {
+                                "name": "bdg_list_top_bndes_municipalities",
+                                "description": "List Brazilian municipalities ranked by BNDES development financing score or total contracted volume (R$ mil).",
+                                "inputSchema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "limit": {"type": "integer", "description": "Maximum rows (default: 10)"},
+                                        "sigla_uf": {"type": "string", "description": "Optional 2-letter state filter (e.g. SP)"},
+                                        "sort_by_volume": {"type": "boolean", "description": "Set true to rank municipalities by highest total BNDES volume first"},
+                                    },
+                                },
+                            },
+                            {
                                 "name": "bdg_get_estban_municipal_balance",
                                 "description": "Retrieve monthly BACEN ESTBAN COSIF municipal banking balance sheet (Tier 1).",
                                 "inputSchema": {
@@ -4864,6 +4909,65 @@ class MCPDispatcher:
                 sigla_uf=args.get("sigla_uf"),
             )
             wrapped = wrap_untrusted_gov_data(rows, source_id="stn_capag")
+            return {
+                "jsonrpc": "2.0",
+                "id": req_id,
+                "result": {"content": [{"type": "text", "text": wrapped}], "isError": False},
+            }
+
+        if tool_name in {
+            "bdg_get_bndes_operacoes",
+            "bdg_get_bndes_desembolsos",
+            "bdg_get_bndes_features",
+            "bdg_list_top_bndes_municipalities",
+        }:
+            from public_data_gateway.connectors.macrofinanceiro.bndes_operacoes import (
+                BndesOperacoesConnector,
+            )
+
+            connector = BndesOperacoesConnector(settings=self.settings)
+            try:
+                if tool_name == "bdg_get_bndes_operacoes":
+                    result: Any = connector.get_credit_operations(str(args.get("termo", "")))
+                elif tool_name == "bdg_get_bndes_desembolsos":
+                    result = connector.get_disbursements(str(args.get("termo", "")))
+                elif tool_name == "bdg_get_bndes_features":
+                    result = connector.get_bndes_features(
+                        str(args.get("id_municipio_or_name", ""))
+                    )
+                else:
+                    result = connector.list_top_bndes_municipalities(
+                        limit=int(args.get("limit", 10)),
+                        sigla_uf=args.get("sigla_uf"),
+                        sort_by_volume=bool(args.get("sort_by_volume", False)),
+                    )
+            except (ValueError, KeyError) as exc:
+                return {
+                    "jsonrpc": "2.0",
+                    "id": req_id,
+                    "result": {
+                        "content": [
+                            {"type": "text", "text": f"BNDES Operações parameter error: {exc}"}
+                        ],
+                        "isError": True,
+                    },
+                }
+
+            if not result:
+                return {
+                    "jsonrpc": "2.0",
+                    "id": req_id,
+                    "result": {
+                        "content": [
+                            {
+                                "type": "text",
+                                "text": "No BNDES development financing data found for the query.",
+                            }
+                        ],
+                        "isError": True,
+                    },
+                }
+            wrapped = wrap_untrusted_gov_data(result, source_id="bndes_operacoes")
             return {
                 "jsonrpc": "2.0",
                 "id": req_id,

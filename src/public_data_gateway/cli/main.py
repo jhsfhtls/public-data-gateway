@@ -626,6 +626,36 @@ def build_parser() -> argparse.ArgumentParser:
     ag_rk.add_argument("--uf", type=str, default=None, help="Optional 2-letter UF state filter")
     ag_rk.add_argument("--json", action="store_true", help="Output in JSON format")
 
+    # BNDES Transparência Operações command group
+    bn_p = subparsers.add_parser("bndes-operacoes", help="Query BNDES direct/indirect credit operations, disbursements, FGI risk, and rankings.")
+    bn_sub = bn_p.add_subparsers(dest="bndes_operacoes_action", required=True)
+
+    bn_op_p = bn_sub.add_parser("operacoes", help="Lookup BNDES credit operations by code, modality, sector, IBGE, UF, or city.")
+    bn_op_p.add_argument("termo", help="BNDES code, modality, sector, IBGE code, UF, or municipality name")
+    bn_op_p.add_argument("--json", action="store_true", help="Output in JSON format")
+
+    bn_ds_p = bn_sub.add_parser("desembolsos", help="Lookup annual BNDES disbursements, green/ESG share, and MSME share.")
+    bn_ds_p.add_argument("termo", help="Disbursement code, IBGE code, UF, or municipality name")
+    bn_ds_p.add_argument("--json", action="store_true", help="Output in JSON format")
+
+    bn_rk_r_p = bn_sub.add_parser("risco", help="Get municipal BNDES TLP rate, default rate, FGI coverage, and ESG projects.")
+    bn_rk_r_p.add_argument("id_municipio_or_name", help="7-digit IBGE code or municipality name")
+    bn_rk_r_p.add_argument("--json", action="store_true", help="Output in JSON format")
+
+    bn_mn_p = bn_sub.add_parser("municipio", help="Get consolidated municipal BNDES contracted volume, disbursements, and per-capita.")
+    bn_mn_p.add_argument("id_municipio_or_name", help="7-digit IBGE code or municipality name")
+    bn_mn_p.add_argument("--json", action="store_true", help="Output in JSON format")
+
+    bn_ft_p = bn_sub.add_parser("features", help="Get Gold BNDES development financing dynamism score and maturity tier.")
+    bn_ft_p.add_argument("id_municipio_or_name", help="7-digit IBGE code or municipality name")
+    bn_ft_p.add_argument("--json", action="store_true", help="Output in JSON format")
+
+    bn_rk_p = bn_sub.add_parser("ranking", help="List municipalities ranked by BNDES financing dynamism score or volume.")
+    bn_rk_p.add_argument("--limit", type=int, default=10, help="Max municipalities to list")
+    bn_rk_p.add_argument("--uf", type=str, help="Optional 2-letter state filter")
+    bn_rk_p.add_argument("--volume", action="store_true", help="Sort descending by contracted BNDES volume (R$ mil)")
+    bn_rk_p.add_argument("--json", action="store_true", help="Output in JSON format")
+
     # Subcommand: cno (RFB Cadastro Nacional de Obras)
     cno_p = subparsers.add_parser(
         "cno",
@@ -3494,6 +3524,84 @@ def main(argv: Sequence[str] | None = None) -> int:
                 return 1
             print(json.dumps(out, indent=2, ensure_ascii=False))
             return 0
+
+        elif args.command == "bndes-operacoes":
+            from public_data_gateway.connectors.macrofinanceiro.bndes_operacoes import (
+                BndesOperacoesConnector,
+            )
+
+            bn_conn = BndesOperacoesConnector()
+            bn_action = getattr(args, "bndes_operacoes_action", "")
+            try:
+                if bn_action == "operacoes":
+                    rows = bn_conn.get_credit_operations(args.termo)
+                    if getattr(args, "json", False):
+                        print(json.dumps(rows, indent=2, ensure_ascii=False, default=str))
+                    else:
+                        print(f"BNDES Operações ({len(rows)}):")
+                        for r in rows:
+                            print(f"  {r.get('cod_operacao_bndes')} | {r.get('nome_municipio')} ({r.get('sigla_uf')}): {r.get('modalidade_apoio_bndes')} | R$ {r.get('valor_contratado_bndes_mil_brl')}k")
+                    return 0
+
+                if bn_action == "desembolsos":
+                    rows = bn_conn.get_disbursements(args.termo)
+                    if getattr(args, "json", False):
+                        print(json.dumps(rows, indent=2, ensure_ascii=False, default=str))
+                    else:
+                        print(f"BNDES Desembolsos ({len(rows)}):")
+                        for r in rows:
+                            print(f"  {r.get('cod_desembolso_bndes')} | {r.get('nome_municipio')} ({r.get('sigla_uf')}): R$ {r.get('desembolso_anual_mil_brl')}k | Verde {r.get('fomento_verde_esg_pct')}%")
+                    return 0
+
+                if bn_action == "risco":
+                    res = bn_conn.get_portfolio_risk(args.id_municipio_or_name)
+                    if res is None:
+                        print(f"Carteira BNDES não encontrada para: {args.id_municipio_or_name}", file=sys.stderr)
+                        return 1
+                    if getattr(args, "json", False):
+                        print(json.dumps(res, indent=2, ensure_ascii=False, default=str))
+                    else:
+                        print(f"BNDES Risco & FGI ({res.get('nome_municipio')} - {res.get('sigla_uf')}): TLP {res.get('juros_medio_tjlp_tlp_aa_pct')}% | FGI {res.get('cobertura_fgi_garantias_pct')}%")
+                    return 0
+
+                if bn_action == "municipio":
+                    res = bn_conn.get_bndes_summary(args.id_municipio_or_name)
+                    if res is None:
+                        print(f"Resumo BNDES não encontrado para: {args.id_municipio_or_name}", file=sys.stderr)
+                        return 1
+                    if getattr(args, "json", False):
+                        print(json.dumps(res, indent=2, ensure_ascii=False, default=str))
+                    else:
+                        print(f"BNDES Município ({res.get('nome_municipio')} - {res.get('sigla_uf')}): {res.get('total_operacoes_bndes')} ops | Contratado R$ {res.get('valor_total_contratado_mil_brl')}k")
+                    return 0
+
+                if bn_action == "features":
+                    res = bn_conn.get_bndes_features(args.id_municipio_or_name)
+                    if res is None:
+                        print(f"Features BNDES não encontradas para: {args.id_municipio_or_name}", file=sys.stderr)
+                        return 1
+                    if getattr(args, "json", False):
+                        print(json.dumps(res, indent=2, ensure_ascii=False, default=str))
+                    else:
+                        print(f"BNDES Gold ({res.get('nome_municipio')} - {res.get('id_municipio')}): Score {res.get('score_dinamismo_fomento_bndes')} | {res.get('tier_maturidade_fomento_bndes')}")
+                    return 0
+
+                if bn_action == "ranking":
+                    ranks = bn_conn.list_top_bndes_municipalities(
+                        limit=getattr(args, "limit", 10),
+                        sigla_uf=getattr(args, "uf", None),
+                        sort_by_volume=getattr(args, "volume", False),
+                    )
+                    if getattr(args, "json", False):
+                        print(json.dumps(ranks, indent=2, ensure_ascii=False, default=str))
+                    else:
+                        print(f"Ranking BNDES Fomento ({len(ranks)}):")
+                        for idx, r in enumerate(ranks, 1):
+                            print(f"  {idx}. {r.get('nome_municipio')} ({r.get('sigla_uf')}): {r.get('score_dinamismo_fomento_bndes')} | {r.get('tier_maturidade_fomento_bndes')}")
+                    return 0
+            except (ValueError, KeyError) as exc:
+                print(f"Erro BNDES Operações: {exc}", file=sys.stderr)
+                return 1
 
         elif args.command == "cno":
             from public_data_gateway.connectors.empresarial.rfb_cno import (
