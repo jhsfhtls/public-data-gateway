@@ -219,6 +219,16 @@ mineracao_uf AS (
     GROUP BY sigla_uf
 ),
 
+seguros_uf AS (
+    SELECT
+        sigla_uf,
+        SUM(premios_emitidos_total_mil_brl) AS premios_seguros_susep_uf_mil_brl,
+        SUM(corretoras_ativas_susep) AS corretoras_ativas_susep_uf,
+        ROUND(AVG(score_maturidade_seguros_susep), 2) AS avg_score_maturidade_seguros_uf
+    FROM {{ ref('mart_susep_seguros_brasil') }}
+    GROUP BY sigla_uf
+),
+
 base AS (
     SELECT
         t.sigla_uf,
@@ -283,6 +293,9 @@ base AS (
         COALESCE(mn.arrecadacao_cfem_anm_uf_mil_brl, 0.0) AS arrecadacao_cfem_anm_uf_mil_brl,
         COALESCE(mn.processos_ativos_anm_uf, 0) AS processos_ativos_anm_uf,
         COALESCE(mn.avg_score_mineracao_esg_uf, 75.0) AS avg_score_mineracao_esg_uf,
+        COALESCE(sg.premios_seguros_susep_uf_mil_brl, 0.0) AS premios_seguros_susep_uf_mil_brl,
+        COALESCE(sg.corretoras_ativas_susep_uf, 0) AS corretoras_ativas_susep_uf,
+        COALESCE(sg.avg_score_maturidade_seguros_uf, 75.0) AS avg_score_maturidade_seguros_uf,
         COALESCE(m.ano_mes, '2025-03') AS macro_ano_mes_referencia,
         COALESCE(m.selic_meta_fim_mes_pct, 14.25) AS selic_meta_fim_mes_pct,
         COALESCE(m.ipca_acumulado_12m_pct, 5.06) AS ipca_acumulado_12m_pct,
@@ -309,6 +322,7 @@ base AS (
     LEFT JOIN ans_uf an ON t.sigla_uf = an.sigla_uf
     LEFT JOIN diarios_uf qd ON t.sigla_uf = qd.sigla_uf
     LEFT JOIN mineracao_uf mn ON t.sigla_uf = mn.sigla_uf
+    LEFT JOIN seguros_uf sg ON t.sigla_uf = sg.sigla_uf
     CROSS JOIN macro_latest m
 ),
 

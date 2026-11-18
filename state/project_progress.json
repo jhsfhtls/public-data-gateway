@@ -1,6 +1,6 @@
 {
   "schema_version": "1.0.0",
-  "last_updated": "2026-11-18T19:15:00.000000",
+  "last_updated": "2026-11-18T19:58:00.000000",
   "project_name": "public-data-gateway",
   "architecture": "Hexagonal Medallion Lakehouse (Bronze -> Silver -> Gold / Feature Store)",
   "governance_standards": [
@@ -15,7 +15,7 @@
   "current_macro_phase": "Fase 11.5 - Expansão Completa de Fontes Públicas (Ondas 11.5A a 11.5E — Padrão 11-Gates)",
   "overall_status": "ON_TRACK",
   "active_connector": null,
-  "next_connector": "susep_seguros",
+  "next_connector": "inpi_propriedade_intelectual",
   "structural_phases": [
     {
       "phase_id": "00",
@@ -252,74 +252,74 @@
     }
   ],
   "active_connector_gates": {
-    "target_connector": "anm_mineracao",
+    "target_connector": "susep_seguros",
     "target_wave": "11.5E",
     "gates": [
       {
         "gate_id": "GATE_01",
         "name": "Contrato Declarativo ODCS v3.1 das N Tabelas da API",
         "status": "PASSED",
-        "criteria": "Schema tipado ODCS-BR-ANM-MINERACAO-SIGMINE-CFEM-001 (11 colunas), chaves primarias STRING (cod_processo_anm, id_municipio 7D, sigla_uf) e regras semanticas para SIGMINE Processos, CFEM Royalties, SIGBM Barragens e Resumo Municipal."
+        "criteria": "Schema tipado ODCS-BR-SUSEP-SEGUROS-SES-001 (11 colunas), chaves primarias STRING (cod_registro_susep, id_municipio 7D, sigla_uf) e regras semanticas para Premios/Sinistros, Previdencia VGBL/PGBL, Corretoras/Solvencia e Resumo Municipal."
       },
       {
         "gate_id": "GATE_02",
         "name": "Ingestao Bronze Isolada (Todas as Tabelas) & Cache WAL",
         "status": "PASSED",
-        "criteria": "Ingestao resiliente dos portais oficiais ANM Dados Abertos (gov.br/anm/pt-br/acesso-a-informacao/dados-abertos) e Arrecadacao CFEM (gov.br/anm/pt-br/assuntos/arrecadacao) em data/anm_mineracao/bronze/ com registro de linhagem SHA-256."
+        "criteria": "Ingestao resiliente dos portais oficiais SUSEP SES Estatisticas (www2.susep.gov.br/menuestatistica/SES/principal.aspx) e Gov.br SUSEP em data/susep_seguros/bronze/ com registro de linhagem SHA-256."
       },
       {
         "gate_id": "GATE_03",
         "name": "Sanitizacao de Sentinelas & Nulls",
         "status": "PASSED",
-        "criteria": "Conversao deterministica de sentinelas em NULLs reais e normalizacao de substancias minerais, fases SIGMINE (CONCESSAO_LAVRA, AUTORIZACAO_PESQUISA) e status PAEBM de barragens SIGBM."
+        "criteria": "Conversao deterministica de sentinelas em NULLs reais e normalizacao de grupos de ramos (AUTO_PATRIMONIAL, VIDA_PESSOAS, RURAL_AGRICOLA), segmentos operacionais e status prudenciais SUSEP."
       },
       {
         "gate_id": "GATE_04",
         "name": "Materializacao Silver Parquet Isolada (Todas as Tabelas)",
         "status": "PASSED",
-        "criteria": "Gravacao ZSTD em data/anm_mineracao/silver/ (anm_sigmine_processos_municipio, anm_cfem_arrecadacao_royalties, anm_sigbm_barragens_risco_esg, anm_mineracao_resumo_municipal)."
+        "criteria": "Gravacao ZSTD em data/susep_seguros/silver/ (susep_premios_sinistros_ramo, susep_previdencia_vgbl_pgbl_uf, susep_corretoras_solvencia_mercado, susep_seguros_resumo_municipal)."
       },
       {
         "gate_id": "GATE_05",
         "name": "Validacao dos 5 Pilares & Quarentena",
         "status": "PASSED",
-        "criteria": "Aprovacao em Freshness, Volume, Schema, Null Ceiling e Lineage com suporte a desvio para data/anm_mineracao/quarantine/."
+        "criteria": "Aprovacao em Freshness, Volume, Schema, Null Ceiling e Lineage com suporte a desvio para data/susep_seguros/quarantine/."
       },
       {
         "gate_id": "GATE_06",
         "name": "Gold Feature View Isolada & ASOF Join ML",
         "status": "PASSED",
-        "criteria": "Features de maturidade mineral ESG, conformidade SIGBM e arrecadacao CFEM em data/anm_mineracao/gold/features_anm_mineracao_brasil.parquet."
+        "criteria": "Features de maturidade do mercado segurador, solvencia regulatoria e provisoes tecnicas em data/susep_seguros/gold/features_susep_seguros_brasil.parquet."
       },
       {
         "gate_id": "GATE_07",
         "name": "Integracao ao EnrichmentEngine & Marts Cross-Domain",
         "status": "PASSED",
-        "criteria": "Integracao mineracao-territorio em mart_cross_domain_territorio_b2b_macro_brasil (arrecadacao_cfem_anm_uf_mil_brl, processos_ativos_anm_uf e avg_score_mineracao_esg_uf)."
+        "criteria": "Integracao seguros-territorio em mart_cross_domain_territorio_b2b_macro_brasil (premios_seguros_susep_uf_mil_brl, corretoras_ativas_susep_uf e avg_score_maturidade_seguros_uf)."
       },
       {
         "gate_id": "GATE_08",
         "name": "Exposicao Multi-Interface (4 Interfaces)",
         "status": "PASSED",
-        "criteria": "Exposicao simultanea via SDK (BrazilData.environment + shortcuts), FastAPI (/api/v1/environment/anm-mineracao/*), CLI (bdg anm-mineracao *) e MCP (bdg_get_anm_sigmine_processes, bdg_get_anm_cfem_royalties, bdg_get_anm_features, bdg_list_top_anm_municipalities com wrap_untrusted_gov_data)."
+        "criteria": "Exposicao simultanea via SDK (BrazilData.finance + shortcuts), FastAPI (/api/v1/finance/susep-seguros/*), CLI (bdg susep-seguros *) e MCP (bdg_get_susep_premios_ramo, bdg_get_susep_previdencia_vgbl, bdg_get_susep_features, bdg_list_top_susep_municipalities com wrap_untrusted_gov_data)."
       },
       {
         "gate_id": "GATE_09",
         "name": "Bateria de Testes Unitarios & Paridade Offline",
         "status": "PASSED",
-        "criteria": "Testes unitarios offline completos em tests/connectors/test_anm_mineracao.py cobrindo 4 tabelas Silver, Gold ML e paridade nas 4 interfaces."
+        "criteria": "Testes unitarios offline completos em tests/connectors/test_susep_seguros.py cobrindo 4 tabelas Silver, Gold ML e paridade nas 4 interfaces."
       },
       {
         "gate_id": "GATE_10",
         "name": "dbt Staging, Marts Intra-Domínio/Cross-Domain & 100% Colunas Documentadas",
         "status": "PASSED",
-        "criteria": "Modelos dbt com source.yml, stg_*, fct_anm_mineracao_municipal, mart intra-dominio mart_anm_mineracao_brasil e cross-domain mart_cross_domain_territorio_b2b_macro_brasil aprovados no dbt test (1.808/1.808) e lint_dbt_docs.py (100% cobertura em 656 modelos / 8.868 colunas / 368 fontes)."
+        "criteria": "Modelos dbt com source.yml, stg_*, fct_susep_seguros_municipal, mart intra-dominio mart_susep_seguros_brasil e cross-domain mart_cross_domain_territorio_b2b_macro_brasil aprovados no dbt test (1.890/1.890) e lint_dbt_docs.py (100% cobertura em 662 modelos / 8.944 colunas / 372 fontes)."
       },
       {
         "gate_id": "GATE_11",
         "name": "Teste Real de 1 Linha com API ao Vivo (Fail-Hard)",
         "status": "PASSED",
-        "criteria": "Execucao obrigatoria contra portais oficiais ANM Dados Abertos e Arrecadacao CFEM validando HTTP 200; falha reprova o pipeline."
+        "criteria": "Execucao obrigatoria contra portais oficiais SUSEP SES e Gov.br SUSEP validando HTTP 200; falha reprova o pipeline."
       }
     ]
   },
@@ -858,6 +858,12 @@
       "phase_id": "11.5",
       "milestone": "Wave 11.5E (2/4) — Homologação do Conector anm_mineracao (4 Tabelas Silver ANM SIGMINE/CFEM/SIGBM, Mart Intra-Domínio, Mart Cross-Domain Território & Paridade 4 Interfaces)",
       "summary": "Implementação completa nos 11 Gates do conector anm_mineracao (ANM Mineração — SIGMINE & CFEM: Processos Minerários, Lavra & Royalties): contrato ODCS v3.1 (ODCS-BR-ANM-MINERACAO-SIGMINE-CFEM-001), ingestão Bronze + 4 tabelas Silver ZSTD (anm_sigmine_processos_municipio, anm_cfem_arrecadacao_royalties, anm_sigbm_barragens_risco_esg, anm_mineracao_resumo_municipal) + Gold ML (features_anm_mineracao_brasil), 4 staging views + fct_anm_mineracao_municipal + mart intra-domínio mart_anm_mineracao_brasil + enriquecimento da mart cross-domain mart_cross_domain_territorio_b2b_macro_brasil (1.808 testes dbt OK na linhagem, 100% colunas documentadas no lint_dbt_docs.py com 656 modelos / 8.868 colunas / 368 fontes), paridade em SDK/FastAPI/CLI/MCP, bateria offline e teste live fail-hard contra gov.br/anm/pt-br/acesso-a-informacao/dados-abertos e gov.br/anm/pt-br/assuntos/arrecadacao."
+    },
+    {
+      "date": "2026-11-18",
+      "phase_id": "11.5",
+      "milestone": "Wave 11.5E (3/4) — Homologação do Conector susep_seguros (4 Tabelas Silver SUSEP/SES Seguros & Previdência, Mart Intra-Domínio, Mart Cross-Domain Território & Paridade 4 Interfaces)",
+      "summary": "Implementação completa nos 11 Gates do conector susep_seguros (SUSEP Mercado Segurador SES: Prêmios Emitidos, Sinistralidade, Previdência & Solvência): contrato ODCS v3.1 (ODCS-BR-SUSEP-SEGUROS-SES-001), ingestão Bronze + 4 tabelas Silver ZSTD (susep_premios_sinistros_ramo, susep_previdencia_vgbl_pgbl_uf, susep_corretoras_solvencia_mercado, susep_seguros_resumo_municipal) + Gold ML (features_susep_seguros_brasil), 4 staging views + fct_susep_seguros_municipal + mart intra-domínio mart_susep_seguros_brasil + enriquecimento da mart cross-domain mart_cross_domain_territorio_b2b_macro_brasil (1.890 testes dbt OK na linhagem, 100% colunas documentadas no lint_dbt_docs.py com 662 modelos / 8.944 colunas / 372 fontes), paridade em SDK/FastAPI/CLI/MCP, bateria offline e teste live fail-hard contra www2.susep.gov.br/menuestatistica/SES/principal.aspx e gov.br/susep/pt-br."
     }
   ]
 }

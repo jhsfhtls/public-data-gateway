@@ -99,6 +99,7 @@ import public_data_gateway.connectors.macrofinanceiro.ipeadata_odata  # noqa: F4
 import public_data_gateway.connectors.macrofinanceiro.stn_capag  # noqa: F401
 import public_data_gateway.connectors.macrofinanceiro.stn_siconfi  # noqa: F401
 import public_data_gateway.connectors.macrofinanceiro.stn_tesouro_transparente  # noqa: F401
+import public_data_gateway.connectors.macrofinanceiro.susep_seguros  # noqa: F401
 import public_data_gateway.connectors.macrofinanceiro.world_bank_v2  # noqa: F401
 import public_data_gateway.connectors.saude.ans_saude_suplementar  # noqa: F401
 import public_data_gateway.connectors.saude.anvisa_cmed  # noqa: F401

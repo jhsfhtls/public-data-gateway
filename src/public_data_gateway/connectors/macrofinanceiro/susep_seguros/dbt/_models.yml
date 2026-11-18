@@ -1,0 +1,181 @@
+version: 2
+
+models:
+  - name: stg_susep_premios_sinistros_ramo
+    description: "Staging view tipada dos prêmios diretos emitidos, sinistros retidos e sinistralidade por grupo de ramos SUSEP."
+    columns:
+      - name: cod_registro_susep
+        description: "Identificador único consolidado do segmento segurador municipal no SES/SUSEP (STRING)."
+        tests: [not_null, unique]
+      - name: grupo_ramo_seguro
+        description: "Grupo de ramos de seguros privados (AUTO_PATRIMONIAL, VIDA_PESSOAS, RURAL_AGRICOLA, GARANTIA_CREDITO)."
+        tests: [not_null]
+      - name: porte_mercado_segurador
+        description: "Segmento operacional SUSEP (SEGURADORA_TIERS_1, PREVIDENCIA_VGBL_PGBL)."
+        tests: [not_null]
+      - name: situacao_solvencia_pl
+        description: "Situação de solvência patrimonial e cobertura de provisões técnicas SUSEP."
+        tests: [not_null]
+      - name: id_municipio
+        description: "Código IBGE de 7 dígitos do município (STRING)."
+        tests: [not_null]
+      - name: sigla_uf
+        description: "Sigla de 2 letras da Unidade Federativa (UF)."
+        tests: [not_null]
+      - name: nome_municipio
+        description: "Nome oficial do município."
+        tests: [not_null]
+      - name: regiao
+        description: "Macrorregião geográfica brasileira."
+        tests: [not_null]
+      - name: premio_direto_anual_mil_brl
+        description: "Volume anual de prêmios diretos emitidos no grupo de ramos (R$ mil)."
+        tests: [not_null]
+      - name: sinistro_retido_anual_mil_brl
+        description: "Volume anual de sinistros retidos e indenizados no município (R$ mil)."
+        tests: [not_null]
+      - name: indice_sinistralidade_pct
+        description: "Índice de sinistralidade apurado entre sinistros e prêmios emitidos (%)."
+        tests: [not_null]
+
+  - name: stg_susep_previdencia_vgbl_pgbl_uf
+    description: "Staging view tipada de previdência complementar aberta (VGBL/PGBL), contribuições e provisões técnicas SUSEP."
+    columns:
+      - name: cod_prev_susep
+        description: "Identificador único do consolidado municipal de previdência SUSEP (STRING)."
+        tests: [not_null, unique]
+      - name: id_municipio
+        description: "Código IBGE de 7 dígitos do município (STRING)."
+        tests: [not_null]
+      - name: sigla_uf
+        description: "Sigla de 2 letras da Unidade Federativa (UF)."
+        tests: [not_null]
+      - name: nome_municipio
+        description: "Nome oficial do município."
+        tests: [not_null]
+      - name: contribuicoes_previdencia_mil_brl
+        description: "Captação anual de contribuições em planos VGBL e PGBL (R$ mil)."
+        tests: [not_null]
+      - name: resgates_pagamentos_mil_brl
+        description: "Total anual de resgates e benefícios pagos em previdência complementar (R$ mil)."
+        tests: [not_null]
+      - name: provisoes_tecnicas_mi_brl
+        description: "Estoque de provisões matemáticas e reservas técnicas alocadas (R$ milhões)."
+        tests: [not_null]
+      - name: participacao_vgbl_pct
+        description: "Participação percentual da modalidade VGBL na captação previdenciária (%)."
+        tests: [not_null]
+
+  - name: stg_susep_corretoras_solvencia_mercado
+    description: "Staging view tipada das corretoras ativas credenciadas na SUSEP e indicadores prudenciais de solvência."
+    columns:
+      - name: id_municipio
+        description: "Código IBGE de 7 dígitos do município (STRING)."
+        tests: [not_null, unique]
+      - name: sigla_uf
+        description: "Sigla de 2 letras da Unidade Federativa (UF)."
+        tests: [not_null]
+      - name: nome_municipio
+        description: "Nome oficial do município."
+        tests: [not_null]
+      - name: corretoras_ativas_susep
+        description: "Quantidade total de corretores ativos autorizados pela SUSEP no município."
+        tests: [not_null]
+      - name: agentes_corretor_pj
+        description: "Quantidade de sociedades corretoras de seguros Pessoa Jurídica ativas."
+        tests: [not_null]
+      - name: indice_solvencia_regulatoria_pct
+        description: "Índice médio de suficiência de patrimônio líquido ajustado sobre capital mínimo requerido (%)."
+        tests: [not_null]
+      - name: indice_cobertura_provisoes_pct
+        description: "Índice de cobertura de ativos garantidores frente às provisões técnicas SUSEP (%)."
+        tests: [not_null]
+
+  - name: stg_susep_seguros_resumo_municipal
+    description: "Staging view tipada do consolidado municipal SUSEP de prêmios emitidos, sinistralidade e prêmio per capita."
+    columns:
+      - name: id_municipio
+        description: "Código IBGE de 7 dígitos do município (STRING)."
+        tests: [not_null, unique]
+      - name: sigla_uf
+        description: "Sigla de 2 letras da Unidade Federativa (UF)."
+        tests: [not_null]
+      - name: nome_municipio
+        description: "Nome oficial do município."
+        tests: [not_null]
+      - name: regiao
+        description: "Macrorregião geográfica brasileira."
+        tests: [not_null]
+      - name: premios_emitidos_total_mil_brl
+        description: "Total anual de prêmios diretos emitidos em seguros privados no município (R$ mil)."
+        tests: [not_null]
+      - name: sinistros_ocorridos_mil_brl
+        description: "Total anual de sinistros ocorridos e retidos no mercado segurador local (R$ mil)."
+        tests: [not_null]
+      - name: taxa_sinistralidade_media_pct
+        description: "Taxa média municipal de sinistralidade nas carteiras supervisionadas pela SUSEP (%)."
+        tests: [not_null]
+      - name: corretoras_ativas_susep
+        description: "Quantidade de corretores e corretoras ativas registradas na SUSEP."
+        tests: [not_null]
+      - name: premio_per_capita_brl
+        description: "Prêmio anual emitido equivalente por habitante do município (BRL)."
+        tests: [not_null]
+
+  - name: fct_susep_seguros_municipal
+    description: "Fato intermediária municipal integrando prêmios SUSEP, previdência VGBL/PGBL, corretores e solvência regulatória."
+    columns:
+      - name: id_municipio
+        description: "Código IBGE de 7 dígitos do município (STRING)."
+        tests: [not_null, unique]
+      - name: sigla_uf
+        description: "Sigla de 2 letras da Unidade Federativa (UF)."
+        tests: [not_null]
+      - name: nome_municipio
+        description: "Nome oficial do município."
+        tests: [not_null]
+      - name: regiao
+        description: "Macrorregião geográfica brasileira."
+        tests: [not_null]
+      - name: premios_emitidos_total_mil_brl
+        description: "Total anual de prêmios diretos emitidos no município (R$ mil)."
+        tests: [not_null]
+      - name: sinistros_ocorridos_mil_brl
+        description: "Total anual de sinistros ocorridos no município (R$ mil)."
+        tests: [not_null]
+      - name: taxa_sinistralidade_media_pct
+        description: "Taxa média municipal de sinistralidade SUSEP (%)."
+        tests: [not_null]
+      - name: corretoras_ativas_susep
+        description: "Quantidade total de corretores ativos SUSEP."
+        tests: [not_null]
+      - name: premio_per_capita_brl
+        description: "Prêmio direto anual emitido per capita no município (BRL)."
+        tests: [not_null]
+      - name: qtd_ramos_seguro_susep
+        description: "Quantidade de grupos de ramos consolidados na camada Silver SUSEP."
+        tests: [not_null]
+      - name: premios_amostra_ramos_mil_brl
+        description: "Soma dos prêmios diretos emitidos nos grupos principais SES/SUSEP (R$ mil)."
+        tests: [not_null]
+      - name: contribuicoes_previdencia_mil_brl
+        description: "Volume anual de contribuições em previdência aberta VGBL/PGBL (R$ mil)."
+        tests: [not_null]
+      - name: resgates_pagamentos_mil_brl
+        description: "Volume anual de resgates e benefícios pagos em previdência (R$ mil)."
+        tests: [not_null]
+      - name: provisoes_tecnicas_mi_brl
+        description: "Estoque de provisões técnicas alocadas no polo segurador (R$ milhões)."
+        tests: [not_null]
+      - name: participacao_vgbl_pct
+        description: "Percentual da modalidade VGBL sobre a captação previdenciária (%)."
+        tests: [not_null]
+      - name: agentes_corretor_pj
+        description: "Quantidade de sociedades corretoras Pessoa Jurídica credenciadas na SUSEP."
+        tests: [not_null]
+      - name: indice_solvencia_regulatoria_pct
+        description: "Índice prudencial de suficiência de patrimônio líquido regulatório SUSEP (%)."
+        tests: [not_null]
+      - name: indice_cobertura_provisoes_pct
+        description: "Índice de cobertura de provisões técnicas por ativos garantidores (%)."
+        tests: [not_null]

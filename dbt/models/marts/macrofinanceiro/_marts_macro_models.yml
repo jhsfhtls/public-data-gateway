@@ -1132,3 +1132,67 @@ models:
         description: "Classificação municipal CVM (HUB_MERCADO_CAPITAIS_CVM, MERCADO_FINANCEIRO_AVANCADO ou ECOSISTEMA_CAPTACAO_EMERGENTE)."
         tests: [not_null]
 
+  - name: mart_susep_seguros_brasil
+    description: "Data Mart Gold intra-domínio consolidando prêmios diretos emitidos SUSEP/SES, sinistralidade, previdência complementar VGBL/PGBL, corretoras e solvência regulatória."
+    columns:
+      - name: id_municipio
+        description: "Código IBGE de 7 dígitos do município (STRING)."
+        tests: [not_null, unique]
+      - name: sigla_uf
+        description: "Sigla de 2 letras da Unidade Federativa (UF)."
+        tests: [not_null]
+      - name: nome_municipio
+        description: "Nome oficial do município."
+        tests: [not_null]
+      - name: regiao
+        description: "Macrorregião geográfica brasileira."
+        tests: [not_null]
+      - name: premios_emitidos_total_mil_brl
+        description: "Volume anual total de prêmios diretos emitidos no município (R$ mil)."
+        tests: [not_null]
+      - name: sinistros_ocorridos_mil_brl
+        description: "Volume anual total de sinistros ocorridos no município (R$ mil)."
+        tests: [not_null]
+      - name: taxa_sinistralidade_media_pct
+        description: "Taxa média municipal de sinistralidade nas carteiras supervisionadas pela SUSEP (%)."
+        tests: [not_null]
+      - name: corretoras_ativas_susep
+        description: "Quantidade total de corretores ativos autorizados pela SUSEP."
+        tests: [not_null]
+      - name: premio_per_capita_brl
+        description: "Prêmio direto anual emitido per capita no município (BRL)."
+        tests: [not_null]
+      - name: qtd_ramos_seguro_susep
+        description: "Quantidade de grupos de ramos consolidados na camada Silver SUSEP."
+        tests: [not_null]
+      - name: premios_amostra_ramos_mil_brl
+        description: "Soma dos prêmios diretos nos grupos principais SES/SUSEP (R$ mil)."
+        tests: [not_null]
+      - name: contribuicoes_previdencia_mil_brl
+        description: "Volume anual de contribuições em previdência aberta VGBL/PGBL (R$ mil)."
+        tests: [not_null]
+      - name: resgates_pagamentos_mil_brl
+        description: "Volume anual de resgates e benefícios pagos em previdência (R$ mil)."
+        tests: [not_null]
+      - name: provisoes_tecnicas_mi_brl
+        description: "Estoque de provisões matemáticas e técnicas alocadas (R$ milhões)."
+        tests: [not_null]
+      - name: participacao_vgbl_pct
+        description: "Percentual da modalidade VGBL sobre a captação previdenciária (%)."
+        tests: [not_null]
+      - name: agentes_corretor_pj
+        description: "Quantidade de sociedades corretoras Pessoa Jurídica credenciadas na SUSEP."
+        tests: [not_null]
+      - name: indice_solvencia_regulatoria_pct
+        description: "Índice prudencial de solvência patrimonial regulatória SUSEP (%)."
+        tests: [not_null]
+      - name: indice_cobertura_provisoes_pct
+        description: "Índice de cobertura das provisões técnicas por ativos garantidores (%)."
+        tests: [not_null]
+      - name: score_maturidade_seguros_susep
+        description: "Score sintético municipal de maturidade do mercado segurador e solvência SUSEP (0-100)."
+        tests: [not_null]
+      - name: tier_mercado_segurador_susep
+        description: "Classificação municipal SUSEP (HUB_SEGUROS_SOLVENCIA_ALTA, MERCADO_SEGURADOR_CONSOLIDADO ou PENETRACAO_SEGURADORA_EXPANSAO)."
+        tests: [not_null]
+

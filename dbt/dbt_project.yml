@@ -82,6 +82,7 @@ model-paths:
   - "../src/public_data_gateway/connectors/macrofinanceiro/brapi_b3/dbt"
   - "../src/public_data_gateway/connectors/macrofinanceiro/cvm_mercado_extra/dbt"
   - "../src/public_data_gateway/connectors/macrofinanceiro/ipeadata_odata/dbt"
+  - "../src/public_data_gateway/connectors/macrofinanceiro/susep_seguros/dbt"
   - "../src/public_data_gateway/connectors/macrofinanceiro/world_bank_v2/dbt"
   - "../src/public_data_gateway/connectors/saude/ans_saude_suplementar/dbt"
   - "../src/public_data_gateway/connectors/saude/who_gho_odata/dbt"

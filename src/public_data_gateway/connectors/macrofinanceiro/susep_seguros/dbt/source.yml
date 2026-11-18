@@ -1,0 +1,26 @@
+version: 2
+
+sources:
+  - name: susep_seguros
+    description: "Tabelas Silver da Superintendência de Seguros Privados (SUSEP/SES): Prêmios, Sinistros, VGBL/PGBL e Solvência"
+    meta:
+      agency: "Superintendência de Seguros Privados (SUSEP)"
+      domain: "macrofinanceiro_seguros_previdencia"
+      freshness_sla: "Mensal (720h)"
+    tables:
+      - name: susep_premios_sinistros_ramo
+        description: "Prêmios diretos emitidos, sinistros retidos e índice de sinistralidade por grupo de ramos SUSEP"
+        meta:
+          external_location: "data/susep_seguros/silver/susep_premios_sinistros_ramo.parquet"
+      - name: susep_previdencia_vgbl_pgbl_uf
+        description: "Contribuições, resgates, provisões técnicas e participação VGBL em previdência complementar aberta"
+        meta:
+          external_location: "data/susep_seguros/silver/susep_previdencia_vgbl_pgbl_uf.parquet"
+      - name: susep_corretoras_solvencia_mercado
+        description: "Corretoras ativas autorizadas pela SUSEP, agentes PJ e índices de solvência e cobertura de provisões"
+        meta:
+          external_location: "data/susep_seguros/silver/susep_corretoras_solvencia_mercado.parquet"
+      - name: susep_seguros_resumo_municipal
+        description: "Consolidado municipal de prêmios emitidos, sinistralidade média e prêmio de seguros per capita (BRL)"
+        meta:
+          external_location: "data/susep_seguros/silver/susep_seguros_resumo_municipal.parquet"

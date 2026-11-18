@@ -1109,6 +1109,60 @@ class FinanceFacade:
             limit=limit, sigla_uf=sigla_uf, sort_by_volume=sort_by_volume
         )
 
+    @property
+    def susep_seguros_connector(self) -> Any:
+        if (
+            not hasattr(self, "_susep_seguros_connector")
+            or self._susep_seguros_connector is None
+        ):
+            from public_data_gateway.connectors.macrofinanceiro.susep_seguros import (
+                SusepSegurosConnector,
+            )
+
+            self._susep_seguros_connector = SusepSegurosConnector(
+                settings=self._sdk.settings
+            )
+        return self._susep_seguros_connector
+
+    def get_susep_premios_ramo(self, termo: str) -> list[dict[str, Any]]:
+        """Lookup SUSEP insurance premiums & loss ratios by code, branch, IBGE, UF, or city."""
+        return self.susep_seguros_connector.get_susep_premios_ramo(termo)
+
+    def get_susep_previdencia_vgbl(self, termo: str) -> list[dict[str, Any]]:
+        """Lookup SUSEP VGBL/PGBL pension contributions and technical provisions."""
+        return self.susep_seguros_connector.get_susep_previdencia_vgbl(termo)
+
+    def get_susep_corretoras_solvencia(
+        self, id_municipio_or_name: str
+    ) -> dict[str, Any] | None:
+        """Retrieve municipal SUSEP active insurance brokers and regulatory solvency index."""
+        return self.susep_seguros_connector.get_susep_corretoras_solvencia(
+            id_municipio_or_name
+        )
+
+    def get_susep_municipal_summary(
+        self, id_municipio_or_name: str
+    ) -> dict[str, Any] | None:
+        """Retrieve consolidated municipal SUSEP issued premiums, claims, and per-capita."""
+        return self.susep_seguros_connector.get_susep_municipal_summary(
+            id_municipio_or_name
+        )
+
+    def get_susep_features(self, id_municipio_or_name: str) -> dict[str, Any] | None:
+        """Retrieve Gold SUSEP insurance market maturity score and solvency tier."""
+        return self.susep_seguros_connector.get_susep_features(id_municipio_or_name)
+
+    def list_top_susep_municipalities(
+        self,
+        limit: int = 10,
+        sigla_uf: str | None = None,
+        sort_by_premios: bool = False,
+    ) -> list[dict[str, Any]]:
+        """List municipalities ranked by SUSEP insurance maturity score or issued premiums."""
+        return self.susep_seguros_connector.list_top_susep_municipalities(
+            limit=limit, sigla_uf=sigla_uf, sort_by_premios=sort_by_premios
+        )
+
 
 class TradeFacade:
     """Foreign trade statistics, export/import flows and trade balance (MDIC Comex Stat)."""
@@ -4203,6 +4257,41 @@ class BrazilData:
         """Listar municípios ranqueados por ecossistema de mercado de capitais CVM ou volume RCVM 160."""
         return self.finance.list_top_cvm_extra_municipalities(
             limit=limit, sigla_uf=sigla_uf, sort_by_volume=sort_by_volume
+        )
+
+    def get_susep_premios_ramo(self, termo: str) -> list[dict[str, Any]]:
+        """Consultar prêmios diretos emitidos e sinistralidade SUSEP/SES por código, ramo, IBGE, UF ou cidade."""
+        return self.finance.get_susep_premios_ramo(termo)
+
+    def get_susep_previdencia_vgbl(self, termo: str) -> list[dict[str, Any]]:
+        """Consultar contribuições VGBL/PGBL e provisões técnicas SUSEP por município ou UF."""
+        return self.finance.get_susep_previdencia_vgbl(termo)
+
+    def get_susep_corretoras_solvencia(
+        self, id_municipio_or_name: str
+    ) -> dict[str, Any] | None:
+        """Consultar corretoras de seguros ativas na SUSEP e índice de solvência regulatória."""
+        return self.finance.get_susep_corretoras_solvencia(id_municipio_or_name)
+
+    def get_susep_municipal_summary(
+        self, id_municipio_or_name: str
+    ) -> dict[str, Any] | None:
+        """Consultar consolidado municipal SUSEP de prêmios emitidos, sinistros e prêmio per capita."""
+        return self.finance.get_susep_municipal_summary(id_municipio_or_name)
+
+    def get_susep_features(self, id_municipio_or_name: str) -> dict[str, Any] | None:
+        """Consultar features Gold SUSEP de maturidade do mercado segurador e solvência."""
+        return self.finance.get_susep_features(id_municipio_or_name)
+
+    def list_top_susep_municipalities(
+        self,
+        limit: int = 10,
+        sigla_uf: str | None = None,
+        sort_by_premios: bool = False,
+    ) -> list[dict[str, Any]]:
+        """Listar municípios ranqueados por maturidade do mercado segurador SUSEP ou prêmios emitidos."""
+        return self.finance.list_top_susep_municipalities(
+            limit=limit, sigla_uf=sigla_uf, sort_by_premios=sort_by_premios
         )
 
     def get_municipality_trade(self, id_municipio: str) -> dict[str, Any]:
