@@ -125,6 +125,15 @@ anp_comb AS (
     FROM {{ ref('mart_combustiveis_biocombustiveis_anp_brasil') }}
 ),
 
+snis_saneamento AS (
+    SELECT
+        id_municipio,
+        atendimento_agua_total_pct AS atendimento_agua_snis_pct,
+        atendimento_esgoto_total_pct AS atendimento_esgoto_snis_pct,
+        score_universalizacao_saneamento_snis
+    FROM {{ ref('mart_saneamento_basico_snis_brasil') }}
+),
+
 joined AS (
     SELECT
         t.id_municipio,
@@ -174,6 +183,9 @@ joined AS (
         COALESCE(anp.preco_diesel_s10_anp_brl, 6.20) AS preco_diesel_s10_anp_brl,
         COALESCE(anp.participacao_biocombustivel_anp_pct, 30.0) AS participacao_biocombustivel_anp_pct,
         COALESCE(anp.score_competitividade_combustiveis_bio, 65.0) AS score_competitividade_combustiveis_bio,
+        COALESCE(sn.atendimento_agua_snis_pct, 85.0) AS atendimento_agua_snis_pct,
+        COALESCE(sn.atendimento_esgoto_snis_pct, 60.0) AS atendimento_esgoto_snis_pct,
+        COALESCE(sn.score_universalizacao_saneamento_snis, 65.0) AS score_universalizacao_saneamento_snis,
         t.reference_date
     FROM terra t
     LEFT JOIN sicar s ON t.id_municipio = s.id_municipio
@@ -187,6 +199,7 @@ joined AS (
     LEFT JOIN queimadas qm ON t.id_municipio = qm.id_municipio
     LEFT JOIN aneel_mmgd an ON t.id_municipio = an.id_municipio
     LEFT JOIN anp_comb anp ON t.id_municipio = anp.id_municipio
+    LEFT JOIN snis_saneamento sn ON t.id_municipio = sn.id_municipio
 ),
 
 scored AS (

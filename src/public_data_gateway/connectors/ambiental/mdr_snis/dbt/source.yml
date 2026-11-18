@@ -1,0 +1,26 @@
+version: 2
+
+sources:
+  - name: mdr_snis
+    description: "Tabelas Silver do Sistema Nacional de Informações sobre Saneamento (SNIS / SINISA — Ministério das Cidades)"
+    meta:
+      agency: "Ministério das Cidades (SNIS / SINISA)"
+      domain: "ambiental_saneamento_infra"
+      freshness_sla: "Anual (720h)"
+    tables:
+      - name: snis_agua_esgoto_municipio
+        description: "Indicadores municipais de atendimento de água (IN055), esgoto (IN056), tratamento e perdas na distribuição (IN049)"
+        meta:
+          external_location: "data/mdr_snis/silver/snis_agua_esgoto_municipio.parquet"
+      - name: snis_residuos_solidos_municipio
+        description: "Indicadores municipais de manejo de resíduos sólidos urbanos, coleta seletiva, aterro sanitário e reciclagem"
+        meta:
+          external_location: "data/mdr_snis/silver/snis_residuos_solidos_municipio.parquet"
+      - name: snis_investimentos_tarifas
+        description: "Sustentabilidade econômico-financeira dos prestadores de saneamento, tarifas médias e investimento anual per capita"
+        meta:
+          external_location: "data/mdr_snis/silver/snis_investimentos_tarifas.parquet"
+      - name: snis_saneamento_resumo_municipal
+        description: "Consolidado municipal de universalização do saneamento básico e metas do Novo Marco Legal (2033)"
+        meta:
+          external_location: "data/mdr_snis/silver/snis_saneamento_resumo_municipal.parquet"

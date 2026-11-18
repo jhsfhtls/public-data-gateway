@@ -738,3 +738,64 @@ models:
       - name: tier_matriz_combustiveis_anp
         description: "Classificação municipal da matriz de combustíveis (POLO_BIOCOMBUSTIVEL_COMPETITIVO, MERCADO_EQUILIBRADO_DERIVADOS ou ALTA_PRESSAO_CUSTO_LOGISTICO)."
         tests: [not_null]
+
+  - name: mart_saneamento_basico_snis_brasil
+    description: "Data Mart Gold intra-domínio consolidando atendimento de água, coleta/tratamento de esgoto, perdas hídricas e universalização SNIS/SINISA 2033."
+    columns:
+      - name: id_municipio
+        description: "Código IBGE de 7 dígitos do município (STRING)."
+        tests: [not_null, unique]
+      - name: sigla_uf
+        description: "Sigla de 2 letras da Unidade Federativa (UF)."
+        tests: [not_null]
+      - name: nome_municipio
+        description: "Nome oficial do município."
+        tests: [not_null]
+      - name: prestador_servico
+        description: "Principal operador dos serviços de água e esgoto no município."
+        tests: [not_null]
+      - name: natureza_juridica_prestador
+        description: "Natureza jurídica institucional da prestadora de saneamento."
+        tests: [not_null]
+      - name: atendimento_agua_total_pct
+        description: "Índice IN055 de cobertura de abastecimento de água (%)."
+        tests: [not_null]
+      - name: atendimento_esgoto_total_pct
+        description: "Índice IN056 de cobertura de esgotamento sanitário (%)."
+        tests: [not_null]
+      - name: esgoto_tratado_sobre_consumido_pct
+        description: "Índice IN046 de esgoto tratado referido à água consumida (%)."
+        tests: [not_null]
+      - name: indice_perdas_distribuicao_pct
+        description: "Índice IN049 de perdas hídricas na distribuição (%)."
+        tests: [not_null]
+      - name: cobertura_coleta_rdo_pct
+        description: "Percentual de cobertura de coleta de resíduos domésticos (%)."
+        tests: [not_null]
+      - name: investimento_total_milhoes_brl
+        description: "Investimento total anual em infraestrutura sanitária (R$ milhões)."
+        tests: [not_null]
+      - name: coleta_seletiva_ativa
+        description: "Indicador booleano de coleta seletiva ativa no município."
+        tests: [not_null]
+      - name: destinacao_adequada_aterro_pct
+        description: "Percentual de resíduos destinados a aterro sanitário adequado (%)."
+        tests: [not_null]
+      - name: massa_recuperada_reciclagem_t
+        description: "Massa anual de materiais recicláveis recuperados (t)."
+        tests: [not_null]
+      - name: tarifa_media_agua_esgoto_m3
+        description: "Tarifa média praticada de água e esgoto (BRL/m3)."
+        tests: [not_null]
+      - name: indice_suficiencia_caixa_pct
+        description: "Índice de suficiência de caixa operacional do prestador (%)."
+        tests: [not_null]
+      - name: investimento_anual_per_capita_brl
+        description: "Investimento anual em saneamento per capita (BRL)."
+        tests: [not_null]
+      - name: score_universalizacao_saneamento_snis
+        description: "Score sintético municipal de universalização do saneamento básico rumo às metas 2033 (0-100)."
+        tests: [not_null]
+      - name: tier_marco_saneamento_2033
+        description: "Classificação municipal frente ao Novo Marco Legal (UNIVERSALIZADO_META_2033, EM_CONSOLIDACAO_REGULATORIA ou DEFICIT_SANEAMENTO_CRITICO)."
+        tests: [not_null]
