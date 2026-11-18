@@ -1305,6 +1305,36 @@ def build_parser() -> argparse.ArgumentParser:
     zarc_rk_p.add_argument("--uf", type=str, help="Optional 2-letter state filter")
     zarc_rk_p.add_argument("--json", action="store_true", help="Output in JSON format")
 
+    # IBAMA SIFISC (Autos de Infração, Embargos & Fiscalização Ambiental) command group
+    ibama_p = subparsers.add_parser("ibama", help="Query IBAMA SIFISC environmental infraction notices, embargoes, fines judgment, and ESG/EUDR risk.")
+    ibama_sub = ibama_p.add_subparsers(dest="ibama_action", required=True)
+
+    ibama_ai_p = ibama_sub.add_parser("autos", help="Lookup IBAMA environmental infraction notices by AI number, CNPJ/CPF, IBGE, UF, or name.")
+    ibama_ai_p.add_argument("termo", help="AI code, CNPJ, IBGE code, UF, or name")
+    ibama_ai_p.add_argument("--json", action="store_true", help="Output in JSON format")
+
+    ibama_emb_p = ibama_sub.add_parser("embargos", help="Lookup IBAMA embargo orders (TAD) by TAD/AI code, CNPJ/CPF, IBGE, UF, or biome.")
+    ibama_emb_p.add_argument("termo", help="TAD code, CNPJ, IBGE code, UF, or biome")
+    ibama_emb_p.add_argument("--json", action="store_true", help="Output in JSON format")
+
+    ibama_mul_p = ibama_sub.add_parser("multas", help="Get municipal IBAMA fine judgment and PGFN debt recovery summary.")
+    ibama_mul_p.add_argument("id_municipio_or_name", help="7-digit IBGE code or municipality name")
+    ibama_mul_p.add_argument("--json", action="store_true", help="Output in JSON format")
+
+    ibama_mun_p = ibama_sub.add_parser("municipio", help="Get consolidated municipal IBAMA SIFISC infraction and embargo totals.")
+    ibama_mun_p.add_argument("id_municipio_or_name", help="7-digit IBGE code or municipality name")
+    ibama_mun_p.add_argument("--json", action="store_true", help="Output in JSON format")
+
+    ibama_ft_p = ibama_sub.add_parser("features", help="Get Gold IBAMA environmental enforcement compliance and EUDR risk features.")
+    ibama_ft_p.add_argument("id_municipio_or_name", help="7-digit IBGE code or municipality name")
+    ibama_ft_p.add_argument("--json", action="store_true", help="Output in JSON format")
+
+    ibama_rk_p = ibama_sub.add_parser("ranking", help="List municipalities ranked by IBAMA compliance score or embargo pressure.")
+    ibama_rk_p.add_argument("--limit", type=int, default=10, help="Max municipalities to list")
+    ibama_rk_p.add_argument("--uf", type=str, help="Optional 2-letter state filter")
+    ibama_rk_p.add_argument("--risco", action="store_true", help="Sort by highest embargo risk first")
+    ibama_rk_p.add_argument("--json", action="store_true", help="Output in JSON format")
+
     # Datalake Público Federado (DuckDB / BigQuery) command group
     bd_p = subparsers.add_parser("datalake", help="Query Federated Public Datalake (DuckDB / BigQuery) coverage, thematic datasets, governance, SQL efficiency, and rankings.")
     bd_sub = bd_p.add_subparsers(dest="datalake_action", required=True)
@@ -4616,6 +4646,84 @@ def main(argv: Sequence[str] | None = None) -> int:
                     return 0
             except (ValueError, KeyError) as exc:
                 print(f"Erro MAPA ZARC: {exc}", file=sys.stderr)
+                return 1
+
+        elif args.command == "ibama":
+            from public_data_gateway.connectors.ambiental.ibama_fiscalizacao import (
+                IbamaFiscalizacaoConnector,
+            )
+
+            ibama_conn = IbamaFiscalizacaoConnector()
+            ibama_action = getattr(args, "ibama_action", "")
+            try:
+                if ibama_action == "autos":
+                    rows = ibama_conn.get_infractions(args.termo)
+                    if getattr(args, "json", False):
+                        print(json.dumps(rows, indent=2, ensure_ascii=False, default=str))
+                    else:
+                        print(f"IBAMA Autos ({len(rows)}):")
+                        for r in rows:
+                            print(f"  {r.get('num_auto_infracao')} | {r.get('nome_municipio')} ({r.get('sigla_uf')}): R$ {r.get('valor_multa_brl')} [{r.get('tipo_infracao')}]")
+                    return 0
+
+                if ibama_action == "embargos":
+                    rows = ibama_conn.get_embargoes(args.termo)
+                    if getattr(args, "json", False):
+                        print(json.dumps(rows, indent=2, ensure_ascii=False, default=str))
+                    else:
+                        print(f"IBAMA Embargos ({len(rows)}):")
+                        for r in rows:
+                            print(f"  {r.get('num_tad_embargo')} | {r.get('nome_municipio')} ({r.get('sigla_uf')}): {r.get('area_embargada_ha')} ha [{r.get('status_embargo')}]")
+                    return 0
+
+                if ibama_action == "multas":
+                    res = ibama_conn.get_fines_judgment(args.id_municipio_or_name)
+                    if res is None:
+                        print(f"Julgamentos IBAMA não encontrados para: {args.id_municipio_or_name}", file=sys.stderr)
+                        return 1
+                    if getattr(args, "json", False):
+                        print(json.dumps(res, indent=2, ensure_ascii=False, default=str))
+                    else:
+                        print(f"IBAMA Multas ({res.get('nome_municipio')} - {res.get('sigla_uf')}): Arbitrado R$ {res.get('valor_multas_arbitradas_brl')} | Arrecadado R$ {res.get('valor_multas_arrecadadas_brl')}")
+                    return 0
+
+                if ibama_action == "municipio":
+                    res = ibama_conn.get_municipal_summary(args.id_municipio_or_name)
+                    if res is None:
+                        print(f"Resumo IBAMA não encontrado para: {args.id_municipio_or_name}", file=sys.stderr)
+                        return 1
+                    if getattr(args, "json", False):
+                        print(json.dumps(res, indent=2, ensure_ascii=False, default=str))
+                    else:
+                        print(f"IBAMA Município ({res.get('nome_municipio')} - {res.get('sigla_uf')}): {res.get('qtd_autos_infracao_ibama')} autos | {res.get('qtd_embargos_ativos_ibama')} embargos ativos | {res.get('area_embargada_ibama_ha')} ha")
+                    return 0
+
+                if ibama_action == "features":
+                    res = ibama_conn.get_ibama_features(args.id_municipio_or_name)
+                    if res is None:
+                        print(f"Features IBAMA não encontradas para: {args.id_municipio_or_name}", file=sys.stderr)
+                        return 1
+                    if getattr(args, "json", False):
+                        print(json.dumps(res, indent=2, ensure_ascii=False, default=str))
+                    else:
+                        print(f"IBAMA Gold ({res.get('nome_municipio')} - {res.get('id_municipio')}): Score {res.get('score_conformidade_ibama')} | {res.get('classificacao_risco_ibama')}")
+                    return 0
+
+                if ibama_action == "ranking":
+                    ranks = ibama_conn.list_top_municipalities(
+                        limit=getattr(args, "limit", 10),
+                        sigla_uf=getattr(args, "uf", None),
+                        sort_by_risk=getattr(args, "risco", False),
+                    )
+                    if getattr(args, "json", False):
+                        print(json.dumps(ranks, indent=2, ensure_ascii=False, default=str))
+                    else:
+                        print(f"Ranking IBAMA ({len(ranks)}):")
+                        for idx, r in enumerate(ranks, 1):
+                            print(f"  {idx}. {r.get('nome_municipio')} ({r.get('sigla_uf')}): {r.get('score_conformidade_ibama')} | {r.get('classificacao_risco_ibama')}")
+                    return 0
+            except (ValueError, KeyError) as exc:
+                print(f"Erro IBAMA: {exc}", file=sys.stderr)
                 return 1
 
         elif args.command == "datalake":

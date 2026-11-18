@@ -1,0 +1,96 @@
+contract_id: ODCS-BR-IBAMA-FISCALIZACAO-001
+source_id: ibama_fiscalizacao
+version: 1.0.0
+grain: 1 row per IBAMA environmental infraction notice or embargo order (SIFISC)
+name: "IBAMA: Autos de Infração, Termos de Embargo & Fiscalização Ambiental (SIFISC)"
+agency: Instituto Brasileiro do Meio Ambiente e dos Recursos Naturais Renováveis (IBAMA)
+official_url: https://dadosabertos.ibama.gov.br/dataset/fiscalizacao-auto-de-infracao
+segment_id: 11_agronegocio_meio_ambiente
+access_mode: LAKEHOUSE_BATCH
+protocol: HTTP_BULK_ZIP
+auth_type: NONE
+update_frequency: Semanal (Dados Abertos IBAMA SIFISC)
+freshness_sla_hours: 168
+cron_schedule_expression: "0 4 * * 1"
+lgpd_legal_basis: public_interest_lai_lei_9605_1998_dec_6514_2008
+min_expected_rows: 10
+primary_keys:
+  - num_auto_infracao
+  - id_municipio
+  - sigla_uf
+canonical_keys:
+  - cnpj_14
+  - cpf_masked
+  - id_municipio
+  - sigla_uf
+sentinel_values:
+  - -1
+  - -99
+  - N/D
+  - SEM INFORMACAO
+columns:
+  - name: num_auto_infracao
+    data_type: STRING
+    required: true
+    nullable: false
+    description: Número único do Auto de Infração Ambiental lavrado pelo IBAMA (SIFISC)
+  - name: documento_infrator
+    data_type: STRING
+    required: true
+    nullable: false
+    description: CNPJ de 14 dígitos do infrator PJ ou CPF mascarado LGPD de pessoa física (***.XXX.YYY-**)
+  - name: nome_infrator
+    data_type: STRING
+    required: true
+    nullable: false
+    description: Razão social ou identificação pública do autuado no processo administrativo ambiental
+  - name: tipo_infracao
+    data_type: STRING
+    required: true
+    nullable: false
+    description: Categoria temática da infração (Flora, Fauna, Poluicao ou Unidade_Conservacao)
+  - name: valor_multa_brl
+    data_type: FLOAT64
+    required: true
+    nullable: false
+    description: Valor arbitrado da multa ambiental em Reais (BRL)
+  - name: situacao_auto
+    data_type: STRING
+    required: true
+    nullable: false
+    description: Fase processual do auto de infração (Lavrado, Julgado_Subsistente ou Inscrito_Divida_Ativa)
+  - name: enquadramento_legal
+    data_type: STRING
+    required: true
+    nullable: false
+    description: Artigo e decreto regulamentador aplicável (ex. Decreto nº 6.514/2008)
+  - name: id_municipio
+    data_type: STRING
+    required: true
+    nullable: false
+    description: Código IBGE canônico de 7 dígitos do município onde ocorreu a autuação
+  - name: sigla_uf
+    data_type: STRING
+    required: true
+    nullable: false
+    description: Sigla de 2 letras da Unidade Federativa da autuação
+  - name: nome_municipio
+    data_type: STRING
+    required: true
+    nullable: false
+    description: Nome oficial do município da ocorrência fiscalizada
+  - name: data_hora_auto
+    data_type: STRING
+    required: true
+    nullable: false
+    description: Data de lavratura do auto de infração no formato ISO-8601 (YYYY-MM-DD)
+  - name: latitude
+    data_type: FLOAT64
+    required: true
+    nullable: false
+    description: Latitude WGS84 aproximada do polígono ou ponto fiscalizado
+  - name: longitude
+    data_type: FLOAT64
+    required: true
+    nullable: false
+    description: Longitude WGS84 aproximada do polígono ou ponto fiscalizado

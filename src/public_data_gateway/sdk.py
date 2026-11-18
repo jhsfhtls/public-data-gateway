@@ -2059,6 +2059,55 @@ class EnvironmentFacade:
             limit=limit, sigla_uf=sigla_uf
         )
 
+    @property
+    def ibama_connector(self) -> Any:
+        if not hasattr(self, "_ibama_connector") or self._ibama_connector is None:
+            from public_data_gateway.connectors.ambiental.ibama_fiscalizacao import (
+                IbamaFiscalizacaoConnector,
+            )
+
+            self._ibama_connector = IbamaFiscalizacaoConnector(
+                settings=self._sdk.settings
+            )
+        return self._ibama_connector
+
+    def get_ibama_infractions(self, termo: str) -> list[dict[str, Any]]:
+        """Lookup IBAMA environmental infraction notices by AI number, CNPJ/CPF, IBGE, UF, or name."""
+        return self.ibama_connector.get_infractions(termo)
+
+    def get_ibama_embargoes(self, termo: str) -> list[dict[str, Any]]:
+        """Lookup IBAMA environmental embargo orders by TAD/AI number, CNPJ/CPF, IBGE, UF, or biome."""
+        return self.ibama_connector.get_embargoes(termo)
+
+    def get_ibama_fines_judgment(
+        self, id_municipio_or_name: str
+    ) -> dict[str, Any] | None:
+        """Retrieve municipal IBAMA fine judgment and PGFN debt recovery summary."""
+        return self.ibama_connector.get_fines_judgment(id_municipio_or_name)
+
+    def get_ibama_municipal_summary(
+        self, id_municipio_or_name: str
+    ) -> dict[str, Any] | None:
+        """Retrieve consolidated municipal IBAMA SIFISC infraction and embargo totals."""
+        return self.ibama_connector.get_municipal_summary(id_municipio_or_name)
+
+    def get_ibama_features(
+        self, id_municipio_or_name: str
+    ) -> dict[str, Any] | None:
+        """Retrieve Gold IBAMA environmental enforcement compliance and EUDR risk features."""
+        return self.ibama_connector.get_ibama_features(id_municipio_or_name)
+
+    def list_top_ibama_municipalities(
+        self,
+        limit: int = 10,
+        sigla_uf: str | None = None,
+        sort_by_risk: bool = False,
+    ) -> list[dict[str, Any]]:
+        """List Brazilian municipalities ranked by IBAMA compliance score or embargo pressure."""
+        return self.ibama_connector.list_top_municipalities(
+            limit=limit, sigla_uf=sigla_uf, sort_by_risk=sort_by_risk
+        )
+
 
 class MetaportalsFacade:
     """Sub-facade for Metaportals & Aggregator Hubs (Datalake Federado SQL, Dados.gov.br CKAN)."""
@@ -3878,6 +3927,43 @@ class BrazilData:
         """Listar municípios líderes em aptidão agroclimática ZARC (MAPA)."""
         return self.environment.list_top_zarc_municipalities(
             limit=limit, sigla_uf=sigla_uf
+        )
+
+    def get_ibama_infractions(self, termo: str) -> list[dict[str, Any]]:
+        """Consultar autos de infração ambiental do IBAMA (SIFISC) por auto, CNPJ/CPF, município ou UF."""
+        return self.environment.get_ibama_infractions(termo)
+
+    def get_ibama_embargoes(self, termo: str) -> list[dict[str, Any]]:
+        """Consultar termos de embargo ambientais (TAD) do IBAMA/EUDR por TAD, CNPJ/CPF, município ou bioma."""
+        return self.environment.get_ibama_embargoes(termo)
+
+    def get_ibama_fines_judgment(
+        self, id_municipio_or_name: str
+    ) -> dict[str, Any] | None:
+        """Consultar julgamentos, arrecadação e inscrição em dívida ativa das multas IBAMA no município."""
+        return self.environment.get_ibama_fines_judgment(id_municipio_or_name)
+
+    def get_ibama_municipal_summary(
+        self, id_municipio_or_name: str
+    ) -> dict[str, Any] | None:
+        """Consultar consolidado municipal de autuações e embargos ativos do IBAMA (SIFISC)."""
+        return self.environment.get_ibama_municipal_summary(id_municipio_or_name)
+
+    def get_ibama_features(
+        self, id_municipio_or_name: str
+    ) -> dict[str, Any] | None:
+        """Consultar features Gold de risco ambiental, conformidade IBAMA e alertas EUDR por município."""
+        return self.environment.get_ibama_features(id_municipio_or_name)
+
+    def list_top_ibama_municipalities(
+        self,
+        limit: int = 10,
+        sigla_uf: str | None = None,
+        sort_by_risk: bool = False,
+    ) -> list[dict[str, Any]]:
+        """Listar municípios ranqueados por conformidade ambiental IBAMA ou pressão de embargos."""
+        return self.environment.list_top_ibama_municipalities(
+            limit=limit, sigla_uf=sigla_uf, sort_by_risk=sort_by_risk
         )
 
     def get_bd_coverage(self, id_municipio: str) -> dict[str, Any]:

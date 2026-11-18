@@ -2040,6 +2040,69 @@ class MCPDispatcher:
                                 },
                             },
                             {
+                                "name": "bdg_get_ibama_infractions",
+                                "description": "Lookup official IBAMA SIFISC environmental infraction notices by AI code, CNPJ/CPF, IBGE municipality code, UF, or name.",
+                                "inputSchema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "termo": {
+                                            "type": "string",
+                                            "description": "AI number, CNPJ, IBGE 7-digit code, UF, or infractor/municipality name",
+                                        }
+                                    },
+                                    "required": ["termo"],
+                                },
+                            },
+                            {
+                                "name": "bdg_get_ibama_embargoes",
+                                "description": "Lookup IBAMA environmental embargo orders (TAD) and linked CAR/EUDR risk properties by TAD/AI, CNPJ/CPF, IBGE, UF, or biome.",
+                                "inputSchema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "termo": {
+                                            "type": "string",
+                                            "description": "TAD/AI number, CNPJ, IBGE code, UF, biome, or name",
+                                        }
+                                    },
+                                    "required": ["termo"],
+                                },
+                            },
+                            {
+                                "name": "bdg_get_ibama_enforcement_features",
+                                "description": "Get normalized Gold IBAMA enforcement compliance score, active embargoes, embargoed area (ha), and EUDR risk tier.",
+                                "inputSchema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "id_municipio_or_name": {
+                                            "type": "string",
+                                            "description": "7-digit IBGE municipality code or municipality name",
+                                        }
+                                    },
+                                    "required": ["id_municipio_or_name"],
+                                },
+                            },
+                            {
+                                "name": "bdg_list_top_ibama_municipalities",
+                                "description": "List Brazilian municipalities ranked by IBAMA enforcement compliance score or highest embargo pressure.",
+                                "inputSchema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "limit": {
+                                            "type": "integer",
+                                            "description": "Maximum rows (default: 10)",
+                                        },
+                                        "sigla_uf": {
+                                            "type": "string",
+                                            "description": "Optional 2-letter state filter (e.g. PA)",
+                                        },
+                                        "sort_by_risk": {
+                                            "type": "boolean",
+                                            "description": "Set true to rank municipalities with highest embargo pressure first",
+                                        },
+                                    },
+                                },
+                            },
+                            {
                                 "name": "bdg_get_bd_coverage",
                                 "description": "Get official Federated Public Datalake (DuckDB / BigQuery) municipal treated dataset and table coverage metrics.",
                                 "inputSchema": {
@@ -5233,6 +5296,65 @@ class MCPDispatcher:
                     },
                 }
             wrapped = wrap_untrusted_gov_data(result, source_id="mapa_zarc")
+            return {
+                "jsonrpc": "2.0",
+                "id": req_id,
+                "result": {"content": [{"type": "text", "text": wrapped}], "isError": False},
+            }
+
+        if tool_name in {
+            "bdg_get_ibama_infractions",
+            "bdg_get_ibama_embargoes",
+            "bdg_get_ibama_enforcement_features",
+            "bdg_list_top_ibama_municipalities",
+        }:
+            from public_data_gateway.connectors.ambiental.ibama_fiscalizacao import (
+                IbamaFiscalizacaoConnector,
+            )
+
+            connector = IbamaFiscalizacaoConnector(settings=self.settings)
+            try:
+                if tool_name == "bdg_get_ibama_infractions":
+                    result: Any = connector.get_infractions(str(args.get("termo", "")))
+                elif tool_name == "bdg_get_ibama_embargoes":
+                    result = connector.get_embargoes(str(args.get("termo", "")))
+                elif tool_name == "bdg_get_ibama_enforcement_features":
+                    result = connector.get_ibama_features(
+                        str(args.get("id_municipio_or_name", ""))
+                    )
+                else:
+                    result = connector.list_top_municipalities(
+                        limit=int(args.get("limit", 10)),
+                        sigla_uf=args.get("sigla_uf"),
+                        sort_by_risk=bool(args.get("sort_by_risk", False)),
+                    )
+            except (ValueError, KeyError) as exc:
+                return {
+                    "jsonrpc": "2.0",
+                    "id": req_id,
+                    "result": {
+                        "content": [
+                            {"type": "text", "text": f"IBAMA SIFISC parameter error: {exc}"}
+                        ],
+                        "isError": True,
+                    },
+                }
+
+            if not result:
+                return {
+                    "jsonrpc": "2.0",
+                    "id": req_id,
+                    "result": {
+                        "content": [
+                            {
+                                "type": "text",
+                                "text": "No IBAMA SIFISC data found for the query.",
+                            }
+                        ],
+                        "isError": True,
+                    },
+                }
+            wrapped = wrap_untrusted_gov_data(result, source_id="ibama_fiscalizacao")
             return {
                 "jsonrpc": "2.0",
                 "id": req_id,

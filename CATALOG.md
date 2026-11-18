@@ -1,20 +1,20 @@
 <div align="center">
   <h2>Catálogo Mestre de Fontes Públicas & Registros Federativos Brasileiros</h2>
-  <p><i>Mapeamento Unificado de 56 Fontes Governamentais nos 13 Macrosegmentos, Ondas 1 a 6 e Chaves Canônicas</i></p>
+  <p><i>Mapeamento Unificado de 57 Fontes Governamentais nos 13 Macrosegmentos, Ondas 1 a 6 e Chaves Canônicas</i></p>
   <p><b>Versão:</b> 1.0.0 &nbsp;|&nbsp; <b>Última Atualização:</b> 2026-11-07 &nbsp;|&nbsp; <b>Padrões:</b> ADR-001 • ADR-002 • ADR-003 • ODCS v3.1 • LGPD</p>
   <hr/>
 </div>
 <br/>
 
-# Catálogo Mestre de Fontes Públicas Governamentais (56 Fontes)
+# Catálogo Mestre de Fontes Públicas Governamentais (57 Fontes)
 
-Este catálogo consolida formalmente as **56 bases de dados públicas e APIs governamentais do Brasil** integradas ao `public-data-gateway`. As fontes abrangem a totalidade dos **13 macrosegmentos estruturais federativos**, organizadas em **6 Ondas Estratégicas de Implementação** ordenadas por priorização ponderada `RICE`, garantindo integridade cadastral canônica (`ADR-002`), observabilidade de 5 pilares (`ODCS v3.1`) e conformidade com a LGPD (`ADR-003`, Lei nº 13.709/2018).
+Este catálogo consolida formalmente as **57 bases de dados públicas e APIs governamentais do Brasil** integradas ao `public-data-gateway`. As fontes abrangem a totalidade dos **13 macrosegmentos estruturais federativos**, organizadas em **6 Ondas Estratégicas de Implementação** ordenadas por priorização ponderada `RICE`, garantindo integridade cadastral canônica (`ADR-002`), observabilidade de 5 pilares (`ODCS v3.1`) e conformidade com a LGPD (`ADR-003`, Lei nº 13.709/2018).
 
 ---
 
 ## 1. Visão Geral & Métricas Consolidadas
 
-- **Total de Fontes Mapeadas:** 56 fontes governamentais homologadas
+- **Total de Fontes Mapeadas:** 57 fontes governamentais homologadas
 - **Total de Macrosegmentos:** 13 macrosegmentos federativos cobertos (100% de cobertura)
 - **Ondas de Implementação:** 6 ondas estruturadas por retorno analítico e complexidade operacional
 - **Chaves Canônicas Unificadas:** 8 chaves relacionais padronizadas em `STRING` (`id_municipio` 7D, `sigla_uf`, `cnpj_14`, `cpf_masked`, `cep_8`, `cnae_7`, `cbo_6`, `ncm_8`)
@@ -24,18 +24,18 @@ Este catálogo consolida formalmente as **56 bases de dados públicas e APIs gov
 
 | Modo de Acesso | Total Fontes | % do Catálogo | Perfil Operacional |
 | :--- | :---: | :---: | :--- |
-| `FEDERATED_API` | 30 | 53.6% | APIs REST / OData síncronas de borda e baixa latência (< 300 ms) |
-| `LAKEHOUSE_BATCH` | 24 | 42.9% | Dumps colunares e volumosos em DuckDB / Parquet com streaming |
-| `BIGQUERY_FEDERATED` | 2 | 3.6% | Consultas SQL em datalake federado (Datalake Federado SQL / MapBiomas) |
+| `FEDERATED_API` | 30 | 52.6% | APIs REST / OData síncronas de borda e baixa latência (< 300 ms) |
+| `LAKEHOUSE_BATCH` | 25 | 43.9% | Dumps colunares e volumosos em DuckDB / Parquet com streaming |
+| `BIGQUERY_FEDERATED` | 2 | 3.5% | Consultas SQL em datalake federado (Datalake Federado SQL / MapBiomas) |
 
 ### 1.2. Distribuição por Classificação LGPD
 
 | Tier LGPD | Total Fontes | % do Catálogo | Base Legal & Salvaguarda |
 | :--- | :---: | :---: | :--- |
-| `PUBLIC_NON_PERSONAL` | 33 | 58.9% | LAI / Dados abertos de pessoas jurídicas ou estatísticas sem PII |
-| `PUBLIC_CORPORATE_QSA` | 10 | 17.9% | Art. 7º, §§ 3º e 4º LGPD: Cadastros empresariais com máscara CPF |
-| `ANONYMIZED_MICRODATA` | 11 | 19.6% | Art. 12 LGPD: Microdados com bloqueio de reidentificação |
-| `PUBLIC_AGENT_PEP` | 2 | 3.6% | Finalidade estrita KYC/Compliance com trilha de auditoria |
+| `PUBLIC_NON_PERSONAL` | 33 | 57.9% | LAI / Dados abertos de pessoas jurídicas ou estatísticas sem PII |
+| `PUBLIC_CORPORATE_QSA` | 11 | 19.3% | Art. 7º, §§ 3º e 4º LGPD: Cadastros empresariais com máscara CPF |
+| `ANONYMIZED_MICRODATA` | 11 | 19.3% | Art. 12 LGPD: Microdados com bloqueio de reidentificação |
+| `PUBLIC_AGENT_PEP` | 2 | 3.5% | Finalidade estrita KYC/Compliance com trilha de auditoria |
 
 ---
 
@@ -53,7 +53,7 @@ Este catálogo consolida formalmente as **56 bases de dados públicas e APIs gov
 | `08_judicial_compliance` | **Judicial, Integridade & Compliance** | 6 | `W2` | Metadados de processos de todos os 90+ tribunais do Brasil (CNJ DataJud), cadastros de inidôneos e punidos (CEIS/CNEP/CEPIM), autoridades (PEP) e certidões negativas (CNDT). | 🟢 Ativo |
 | `09_comercio_exterior` | **Comércio Exterior & Balança Comercial** | 1 | `W3` | Exportações e importações detalhadas por NCM, valor FOB, peso líquido, modal de transporte e município do exportador (Comex Stat). | 🟢 Ativo |
 | `10_compras_publicas` | **Compras Públicas, Licitações & Contratos** | 2 | `W2, W3` | Repositório unificado da Lei nº 14.133/2021 (PNCP) com editais, atas e contratos de todos os entes federados e catálogo unificado CATMAT/CATSER. | 🟢 Ativo |
-| `11_agronegocio_meio_ambiente` | **Agronegócio, Terra & Meio Ambiente** | 5 | `W6` | 7+ milhões de imóveis rurais com polígonos de reserva legal e APP (SICAR/CAR), desmatamento e alertas por satélite (INPE DETER/PRODES), uso da terra (MapBiomas) e zoneamento climático (ZARC). | 🟢 Ativo |
+| `11_agronegocio_meio_ambiente` | **Agronegócio, Terra & Meio Ambiente** | 6 | `W2, W6` | 7+ milhões de imóveis rurais com polígonos de reserva legal e APP (SICAR/CAR), desmatamento e alertas por satélite (INPE DETER/PRODES), uso da terra (MapBiomas) e zoneamento climático (ZARC). | 🟢 Ativo |
 | `12_imobiliario_cartorial` | **Imobiliário, Notarial & Cartorial** | 3 | `W5` | Cadastro nacional de cartórios e produtividade (CNJ Justiça Aberta), transações registradas (ONR) e cadastros imobiliários municipais (IPTU/ITBI). | 🟢 Ativo |
 | `13_metaportais_agregadores` | **Metaportais & Hubs Agregadores** | 3 | `W1, W6` | Plataformas de facilitação técnica que unificam e padronizam centenas de fontes em protocolos únicos (Datalake Federado SQL, BrasilAPI, Dados.gov.br). | 🟢 Ativo |
 
@@ -64,7 +64,7 @@ Este catálogo consolida formalmente as **56 bases de dados públicas e APIs gov
 | Onda | Foco Estratégico & Justificativa | Total Fontes | Intervalo RICE | Modos de Acesso | Fontes Críticas | Status |
 | :---: | :--- | :---: | :---: | :--- | :--- | :---: |
 | **Wave 1** | APIs de Borda & Séries Macroeconômicas (Baixa Latência < 300ms) | 4 | 820–950 | `FEDERATED_API` | `ibge_localidades`, `brasilapi_core`, `bcb_sgs` (+1) | 🟢 100% Homologada |
-| **Wave 2** | B2B, Compras Públicas, Integridade & Compliance Cadastral | 12 | 610–920 | `FEDERATED_API, LAKEHOUSE_BATCH` | `pgfn_divida_ativa`, `stn_capag`, `cnj_improbidade` (+9) | 🟢 100% Homologada |
+| **Wave 2** | B2B, Compras Públicas, Integridade & Compliance Cadastral | 13 | 610–920 | `FEDERATED_API, LAKEHOUSE_BATCH` | `pgfn_divida_ativa`, `ibama_fiscalizacao`, `stn_capag` (+10) | 🟢 100% Homologada |
 | **Wave 3** | Mercado de Capitais, Balanços Contábeis & Finanças Públicas | 9 | 610–910 | `FEDERATED_API, LAKEHOUSE_BATCH` | `bcb_estban`, `stn_siconfi`, `bcb_agencia` (+6) | 🟢 100% Homologada |
 | **Wave 4** | Censo Demográfico, Trabalho, Renda, Logística & Telecomunicações | 10 | 500–590 | `FEDERATED_API, LAKEHOUSE_BATCH` | `ibge_sidra`, `ibge_pib_municipal`, `ibge_censo2022` (+7) | 🟢 100% Homologada |
 | **Wave 5** | Saúde Pública, Educação, Capital Humano & Serviços Notariais | 14 | 410–480 | `FEDERATED_API, LAKEHOUSE_BATCH` | `datasus_cnes`, `datasus_sih`, `inep_censo_escolar` (+11) | 🟢 100% Homologada |
@@ -83,6 +83,7 @@ Ordenada por **Onda de Implementação (`roadmap_wave`)**, **Score RICE decresce
 | `bcb_sgs` | [Banco Central: Sistema Gerenciador de Séries Temporais (SGS)](https://dadosabertos.bcb.gov.br/dataset/series-temporais)<br/>*Banco Central do Brasil (BACEN)* | Econômico, Monetário | **W1** | 860 | `FEDERATED_API`<br/>`REST_JSON` | *(macro)* | `PUBLIC_NON_PERSONAL` | `P01` `P02` `P05` | `HOMOLOGATED` |
 | `bcb_olinda_ptax` | [Banco Central Olinda: Cotações PTAX Moedas Diárias](https://olinda.bcb.gov.br/olinda/servico/PTAX/versao/v1/swagger-ui3)<br/>*Banco Central do Brasil (BACEN)* | Econômico, Monetário | **W1** | 820 | `FEDERATED_API`<br/>`ODATA_V4` | *(macro)* | `PUBLIC_NON_PERSONAL` | `P01` `P05` | `HOMOLOGATED` |
 | `pgfn_divida_ativa` | [PGFN: Créditos Inscritos em Dívida Ativa da União e do FGTS (Dados Abertos)](https://dadosabertos.pgfn.gov.br/)<br/>*Procuradoria-Geral da Fazenda Nacional (PGFN / Ministério da Fazenda)* | Judicial, Integridade | **W2** | 920 | `LAKEHOUSE_BATCH`<br/>`HTTP_BULK_ZIP` | `cnpj_14`<br/>`cpf_masked`<br/>`id_municipio`<br/>`sigla_uf` | `PUBLIC_CORPORATE_QSA` | `P01` `P02` `P04` `P06` `P07` `P08` `P10` | `HOMOLOGATED` |
+| `ibama_fiscalizacao` | [IBAMA: Autos de Infração, Termos de Embargo & Fiscalização Ambiental (SIFISC)](https://dadosabertos.ibama.gov.br/dataset/fiscalizacao-auto-de-infracao)<br/>*Instituto Brasileiro do Meio Ambiente e dos Recursos Naturais Renováveis (IBAMA)* | Agronegócio, Terra | **W2** | 915 | `LAKEHOUSE_BATCH`<br/>`HTTP_BULK_ZIP` | `cnpj_14`<br/>`cpf_masked`<br/>`id_municipio`<br/>`sigla_uf` | `PUBLIC_CORPORATE_QSA` | `P01` `P02` `P03` `P04` `P06` `P08` `P09` | `HOMOLOGATED` |
 | `stn_capag` | [STN: Capacidade de Pagamento (CAPAG) Subnacional & Índice FIRJAN de Gestão Fiscal (IFGF)](https://www.tesourotransparente.gov.br/temas/estados-e-municipios/capacidade-de-pagamento-capag)<br/>*Secretaria do Tesouro Nacional (STN / Ministério da Fazenda) & FIRJAN* | Econômico, Monetário | **W2** | 915 | `FEDERATED_API`<br/>`REST_JSON` | `id_municipio`<br/>`sigla_uf` | `PUBLIC_NON_PERSONAL` | `P01` `P02` `P04` `P05` `P06` `P08` `P10` | `HOMOLOGATED` |
 | `cnj_improbidade` | [CNJ: Cadastro Nacional de Condenações por Ato de Improbidade Administrativa (CNCIAI)](https://www.cnj.jus.br/improbidade_adm/consultar_requerido.php)<br/>*Conselho Nacional de Justiça (CNJ)* | Judicial, Integridade | **W2** | 905 | `FEDERATED_API`<br/>`REST_JSON` | `cnpj_14`<br/>`cpf_masked`<br/>`id_municipio`<br/>`sigla_uf` | `PUBLIC_AGENT_PEP` | `P01` `P02` `P04` `P06` `P07` `P08` `P10` | `HOMOLOGATED` |
 | `rfb_cno` | [Receita Federal: Cadastro Nacional de Obras (CNO — Construção Civil & Infraestrutura)](https://www.gov.br/receitafederal/pt-br/assuntos/orientacao-tributaria/cadastros/cno)<br/>*Secretaria Especial da Receita Federal do Brasil (RFB)* | Empresarial, Cadastral | **W2** | 900 | `LAKEHOUSE_BATCH`<br/>`HTTP_BULK_ZIP` | `cnpj_14`<br/>`cpf_masked`<br/>`id_municipio`<br/>`sigla_uf`<br/>`cnae_7`<br/>`cep_8` | `PUBLIC_CORPORATE_QSA` | `P01` `P02` `P03` `P04` `P06` `P08` `P09` `P10` | `HOMOLOGATED` |
@@ -235,7 +236,7 @@ Normalizacao ISO-3166 de paises, grafo cientifico aberto (OpenAlex) e monitorame
 
 ## 8. Matriz de Freshness, SLA & Agendamento Cron (Phase 11)
 
-Todas as **56 fontes governamentais** possuem metas explícitas de `freshness_sla_hours` e `cron_schedule_expression` para orquestração de mirror/CDC em nuvem:
+Todas as **57 fontes governamentais** possuem metas explícitas de `freshness_sla_hours` e `cron_schedule_expression` para orquestração de mirror/CDC em nuvem:
 
 | ID Fonte | Frequência Oficial | SLA Freshness (h) | Expressão Cron (UTC) | Modo de Acesso |
 | :--- | :--- | :---: | :--- | :--- |
@@ -244,6 +245,7 @@ Todas as **56 fontes governamentais** possuem metas explícitas de `freshness_sl
 | `bcb_sgs` | Diária / Mensal | `24h` | `0 6 * * *` | `FEDERATED_API` |
 | `bcb_olinda_ptax` | Diária (Tempo Real) | `24h` | `0 6 * * *` | `FEDERATED_API` |
 | `pgfn_divida_ativa` | Trimestral | `2160h` | `0 3 15 */3 *` | `LAKEHOUSE_BATCH` |
+| `ibama_fiscalizacao` | Semanal (Dados Abertos IBAMA SIFISC) | `168h` | `0 4 * * 1` | `LAKEHOUSE_BATCH` |
 | `stn_capag` | Anual / Quadrimestral | `720h` | `0 5 15 * *` | `FEDERATED_API` |
 | `cnj_improbidade` | Diária / Semanal | `168h` | `0 4 * * 1` | `FEDERATED_API` |
 | `rfb_cno` | Mensal | `720h` | `0 5 18 * *` | `LAKEHOUSE_BATCH` |

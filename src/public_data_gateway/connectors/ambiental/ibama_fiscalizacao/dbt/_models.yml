@@ -1,0 +1,199 @@
+version: 2
+
+models:
+  - name: stg_ibama_autos_infracao
+    description: "Staging view tipada dos Autos de Infração Ambiental do IBAMA (SIFISC)."
+    columns:
+      - name: num_auto_infracao
+        description: "Número único identificador do Auto de Infração Ambiental IBAMA."
+        tests: [not_null, unique]
+      - name: documento_infrator
+        description: "CNPJ de 14 dígitos do infrator PJ ou CPF mascarado LGPD de pessoa física."
+        tests: [not_null]
+      - name: nome_infrator
+        description: "Razão social ou identificação pública do autuado."
+        tests: [not_null]
+      - name: tipo_infracao
+        description: "Categoria temática da infração (Flora, Fauna, Poluicao ou Unidade_Conservacao)."
+        tests: [not_null]
+      - name: valor_multa_brl
+        description: "Valor arbitrado da multa ambiental em Reais (BRL)."
+        tests: [not_null]
+      - name: situacao_auto
+        description: "Fase processual do auto (Lavrado, Julgado_Subsistente ou Inscrito_Divida_Ativa)."
+        tests: [not_null]
+      - name: enquadramento_legal
+        description: "Dispositivo legal e decreto aplicável à autuação ambiental."
+        tests: [not_null]
+      - name: id_municipio
+        description: "Código IBGE canônico de 7 dígitos do município da autuação."
+        tests: [not_null]
+      - name: sigla_uf
+        description: "Sigla de 2 letras da Unidade Federativa da autuação."
+        tests: [not_null]
+      - name: nome_municipio
+        description: "Nome oficial do município fiscalizado."
+        tests: [not_null]
+      - name: data_hora_auto
+        description: "Data da lavratura do auto de infração no formato ISO-8601."
+        tests: [not_null]
+      - name: latitude
+        description: "Latitude WGS84 aproximada do ponto fiscalizado."
+        tests: [not_null]
+      - name: longitude
+        description: "Longitude WGS84 aproximada do ponto fiscalizado."
+        tests: [not_null]
+
+  - name: stg_ibama_termos_embargo
+    description: "Staging view tipada dos Termos de Embargo e Interdição (TAD) do IBAMA."
+    columns:
+      - name: num_tad_embargo
+        description: "Número único identificador do Termo de Embargo e Interdição (TAD)."
+        tests: [not_null, unique]
+      - name: num_auto_infracao
+        description: "Número do Auto de Infração Ambiental vinculado ao embargo."
+        tests: [not_null]
+      - name: documento_embargado
+        description: "CNPJ de 14 dígitos ou CPF mascarado LGPD do autuado embargado."
+        tests: [not_null]
+      - name: nome_embargado
+        description: "Nome público ou razão social do titular da área ou atividade embargada."
+        tests: [not_null]
+      - name: area_embargada_ha
+        description: "Extensão territorial da área embargada em hectares (ha)."
+        tests: [not_null]
+      - name: bioma
+        description: "Bioma brasileiro atingido pelo embargo ambiental."
+        tests: [not_null]
+      - name: status_embargo
+        description: "Situação vigente do embargo (Ativo, Regularizado_PRA ou Desembargado_Judicial)."
+        tests: [not_null]
+      - name: imovel_car_vinculado
+        description: "Identificador alfanumérico de imóvel rural no CAR/SICAR vinculado ao embargo."
+        tests: [not_null]
+      - name: id_municipio
+        description: "Código IBGE de 7 dígitos do município da área embargada."
+        tests: [not_null]
+      - name: sigla_uf
+        description: "Sigla de 2 letras da Unidade Federativa do embargo."
+        tests: [not_null]
+      - name: nome_municipio
+        description: "Nome oficial do município do embargo."
+        tests: [not_null]
+      - name: data_embargo
+        description: "Data de lavratura do termo de embargo em formato ISO-8601."
+        tests: [not_null]
+
+  - name: stg_ibama_julgamentos_multas
+    description: "Staging view municipal de julgamentos, arrecadação e inscrição em dívida ativa das multas IBAMA."
+    columns:
+      - name: id_municipio
+        description: "Código IBGE de 7 dígitos do município (STRING)."
+        tests: [not_null, unique]
+      - name: sigla_uf
+        description: "Sigla da Unidade da Federação (UF)."
+        tests: [not_null]
+      - name: nome_municipio
+        description: "Nome oficial do município."
+        tests: [not_null]
+      - name: qtd_processos_julgados
+        description: "Quantidade acumulada de processos administrativos julgados no município."
+        tests: [not_null]
+      - name: valor_multas_arbitradas_brl
+        description: "Valor total de multas ambientais arbitradas no município em Reais (BRL)."
+        tests: [not_null]
+      - name: valor_multas_arrecadadas_brl
+        description: "Valor efetivamente arrecadado de multas ambientais no município em Reais (BRL)."
+        tests: [not_null]
+      - name: percentual_divida_inscrita_pgfn_pct
+        description: "Percentual de autos não quitados encaminhados para inscrição em Dívida Ativa PGFN (%)."
+        tests: [not_null]
+      - name: indice_recuperacao_embargos_pct
+        description: "Taxa de regularização ou recuperação ambiental das áreas autuadas (%)."
+        tests: [not_null]
+
+  - name: stg_ibama_resumo_municipal
+    description: "Staging view consolidada por município de autuações e embargos IBAMA (SIFISC)."
+    columns:
+      - name: id_municipio
+        description: "Código IBGE de 7 dígitos do município (STRING)."
+        tests: [not_null, unique]
+      - name: sigla_uf
+        description: "Sigla da Unidade da Federação (UF)."
+        tests: [not_null]
+      - name: nome_municipio
+        description: "Nome oficial do município."
+        tests: [not_null]
+      - name: bioma_predominante
+        description: "Bioma predominante no território municipal."
+        tests: [not_null]
+      - name: qtd_autos_infracao_ibama
+        description: "Quantidade total acumulada de autos de infração IBAMA no município."
+        tests: [not_null]
+      - name: qtd_embargos_ativos_ibama
+        description: "Quantidade de termos de embargo ambientais ativos no município."
+        tests: [not_null]
+      - name: area_embargada_ibama_ha
+        description: "Área total embargada pelo IBAMA no município em hectares (ha)."
+        tests: [not_null]
+      - name: valor_multas_ibama_brl
+        description: "Montante consolidado de multas aplicadas pelo IBAMA no município em Reais (BRL)."
+        tests: [not_null]
+      - name: taxa_infracoes_flora_pct
+        description: "Percentual de autuações diretamente ligadas a infrações contra flora/desmatamento (%)."
+        tests: [not_null]
+
+  - name: fct_fiscalizacao_embargos_ibama_municipal
+    description: "Tabela fato municipal integrando autos de infração, termos de embargo ativos e julgamentos de multas do IBAMA (SIFISC)."
+    columns:
+      - name: id_municipio
+        description: "Código IBGE de 7 dígitos do município (chave primária STRING)."
+        tests: [not_null, unique]
+      - name: sigla_uf
+        description: "Sigla de 2 letras da Unidade da Federação (UF)."
+        tests: [not_null]
+      - name: nome_municipio
+        description: "Nome oficial do município."
+        tests: [not_null]
+      - name: bioma_predominante
+        description: "Bioma predominante no território municipal."
+        tests: [not_null]
+      - name: qtd_autos_infracao_ibama
+        description: "Quantidade total acumulada de autos de infração lavrados pelo IBAMA."
+        tests: [not_null]
+      - name: qtd_embargos_ativos_ibama
+        description: "Quantidade vigente de termos de embargo ativos no município."
+        tests: [not_null]
+      - name: area_embargada_ibama_ha
+        description: "Área territorial acumulada sob embargo do IBAMA em hectares (ha)."
+        tests: [not_null]
+      - name: valor_multas_ibama_brl
+        description: "Montante total de multas aplicadas pelo IBAMA no município em Reais (BRL)."
+        tests: [not_null]
+      - name: taxa_infracoes_flora_pct
+        description: "Participação percentual de infrações contra a flora e desmatamento ilegal (%)."
+        tests: [not_null]
+      - name: qtd_processos_julgados
+        description: "Quantidade de processos administrativos ambientais julgados no município."
+        tests: [not_null]
+      - name: valor_multas_arrecadadas_brl
+        description: "Valor arrecadado de multas ambientais no município em Reais (BRL)."
+        tests: [not_null]
+      - name: percentual_divida_inscrita_pgfn_pct
+        description: "Percentual de passivos ambientais inscritos em Dívida Ativa PGFN (%)."
+        tests: [not_null]
+      - name: indice_recuperacao_embargos_pct
+        description: "Índice de recuperação e regularização ambiental de áreas autuadas (%)."
+        tests: [not_null]
+      - name: qtd_autos_amostra_sifisc
+        description: "Quantidade de autos de infração detalhados na amostra Silver do conector."
+        tests: [not_null]
+      - name: ticket_medio_multa_amostra_brl
+        description: "Ticket médio das multas registradas na amostra Silver do município em Reais (BRL)."
+        tests: [not_null]
+      - name: qtd_termos_embargo_amostra
+        description: "Quantidade de termos de embargo detalhados na amostra Silver do município."
+        tests: [not_null]
+      - name: qtd_embargos_ativos_amostra
+        description: "Quantidade de embargos com status Ativo na amostra Silver do município."
+        tests: [not_null]

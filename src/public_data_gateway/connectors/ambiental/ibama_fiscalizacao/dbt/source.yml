@@ -1,0 +1,26 @@
+version: 2
+
+sources:
+  - name: ibama_fiscalizacao
+    description: "Tabelas Silver do Sistema de Fiscalização Ambiental do IBAMA (SIFISC: Autos de Infração, Termos de Embargo, Julgamentos e Resumo Municipal)"
+    meta:
+      agency: "Instituto Brasileiro do Meio Ambiente e dos Recursos Naturais Renováveis (IBAMA)"
+      domain: "ambiental_esg"
+      freshness_sla: "Semanal (168h)"
+    tables:
+      - name: ibama_autos_infracao
+        description: "Cadastro analítico de Autos de Infração Ambiental (SIFISC) com infrator PJ/CPF mascarado, valor da multa, enquadramento legal e geolocalização"
+        meta:
+          external_location: "data/ibama_fiscalizacao/silver/ibama_autos_infracao.parquet"
+      - name: ibama_termos_embargo
+        description: "Termos de Embargo e Interdição (TAD) georreferenciados com área embargada (ha), bioma, status e imóvel CAR vinculado"
+        meta:
+          external_location: "data/ibama_fiscalizacao/silver/ibama_termos_embargo.parquet"
+      - name: ibama_julgamentos_multas
+        description: "Consolidado municipal de julgamentos de processos ambientais, valores arbitrados/arrecadados e inscrição em dívida ativa"
+        meta:
+          external_location: "data/ibama_fiscalizacao/silver/ibama_julgamentos_multas.parquet"
+      - name: ibama_resumo_municipal
+        description: "Agregado municipal de autos de infração, embargos ativos, área embargada total e pressão de infrações contra flora"
+        meta:
+          external_location: "data/ibama_fiscalizacao/silver/ibama_resumo_municipal.parquet"

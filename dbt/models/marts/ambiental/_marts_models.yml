@@ -302,3 +302,67 @@ models:
       - name: reference_date
         description: "Data de referência ISO-8601 (YYYY-MM-DD)."
         tests: [not_null]
+
+  - name: mart_fiscalizacao_embargos_ibama_brasil
+    description: "Data Mart Gold intra-domínio consolidando fiscalização ambiental, autos de infração, termos de embargo ativos e risco ESG/EUDR do IBAMA (SIFISC) por município."
+    columns:
+      - name: id_municipio
+        description: "Código IBGE de 7 dígitos do município (STRING)."
+        tests: [not_null, unique]
+      - name: sigla_uf
+        description: "Sigla de 2 letras da Unidade da Federação (UF)."
+        tests: [not_null]
+      - name: nome_municipio
+        description: "Nome oficial do município."
+        tests: [not_null]
+      - name: bioma_predominante
+        description: "Bioma predominante no território municipal."
+        tests: [not_null]
+      - name: qtd_autos_infracao_ibama
+        description: "Quantidade acumulada de autos de infração ambiental lavrados no município."
+        tests: [not_null]
+      - name: qtd_embargos_ativos_ibama
+        description: "Quantidade de termos de embargo ambientais ativos no município."
+        tests: [not_null]
+      - name: area_embargada_ibama_ha
+        description: "Área total embargada pelo IBAMA no município em hectares (ha)."
+        tests: [not_null]
+      - name: valor_multas_ibama_brl
+        description: "Montante consolidado de multas ambientais aplicadas no município em Reais (BRL)."
+        tests: [not_null]
+      - name: taxa_infracoes_flora_pct
+        description: "Percentual de autos relacionados a infrações contra flora e desmatamento (%)."
+        tests: [not_null]
+      - name: qtd_processos_julgados
+        description: "Quantidade de processos ambientais com julgamento concluído no município."
+        tests: [not_null]
+      - name: valor_multas_arrecadadas_brl
+        description: "Valor arrecadado de multas ambientais no município em Reais (BRL)."
+        tests: [not_null]
+      - name: percentual_divida_inscrita_pgfn_pct
+        description: "Percentual de multas ambientais encaminhadas à inscrição em Dívida Ativa PGFN (%)."
+        tests: [not_null]
+      - name: indice_recuperacao_embargos_pct
+        description: "Taxa de regularização e recuperação de áreas autuadas no município (%)."
+        tests: [not_null]
+      - name: qtd_autos_amostra_sifisc
+        description: "Quantidade de autos de infração na amostra cadastral Silver."
+        tests: [not_null]
+      - name: ticket_medio_multa_amostra_brl
+        description: "Ticket médio das multas na amostra cadastral Silver em Reais (BRL)."
+        tests: [not_null]
+      - name: qtd_termos_embargo_amostra
+        description: "Quantidade de termos de embargo detalhados na amostra Silver."
+        tests: [not_null]
+      - name: qtd_embargos_ativos_amostra
+        description: "Quantidade de termos de embargo com status Ativo na amostra Silver."
+        tests: [not_null]
+      - name: score_conformidade_ibama
+        description: "Score sintético municipal de conformidade e baixa pressão de embargos IBAMA (0-100)."
+        tests: [not_null]
+      - name: classificacao_risco_ibama
+        description: "Tier municipal de risco regulatório IBAMA/EUDR (BAIXA_PRESSAO_AMBIENTAL, ATENCAO_FISCALIZACAO_MODERADA ou CRITICO_EMBARGO_IBAMA_EUDR)."
+        tests: [not_null]
+      - name: flag_alerta_embargo_eudr
+        description: "Indicador booleano de criticidade de embargos IBAMA para due diligence EUDR e crédito rural."
+        tests: [not_null]
