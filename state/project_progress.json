@@ -1,6 +1,6 @@
 {
   "schema_version": "1.0.0",
-  "last_updated": "2026-11-18T11:00:00.000000",
+  "last_updated": "2026-11-18T11:20:00.000000",
   "project_name": "public-data-gateway",
   "architecture": "Hexagonal Medallion Lakehouse (Bronze -> Silver -> Gold / Feature Store)",
   "governance_standards": [
@@ -15,7 +15,7 @@
   "current_macro_phase": "Fase 11.5 - Expansão Completa de Fontes Públicas (Ondas 11.5A a 11.5E — Padrão 11-Gates)",
   "overall_status": "ON_TRACK",
   "active_connector": null,
-  "next_connector": "prf_acidentes",
+  "next_connector": "mme_ons_energia",
   "structural_phases": [
     {
       "phase_id": "00",
@@ -252,74 +252,74 @@
     }
   ],
   "active_connector_gates": {
-    "target_connector": "sedec_desastres",
+    "target_connector": "prf_acidentes",
     "target_wave": "11.5C",
     "gates": [
       {
         "gate_id": "GATE_01",
         "name": "Contrato Declarativo ODCS v3.1 das N Tabelas da API",
         "status": "PASSED",
-        "criteria": "Schema tipado, chaves primarias STRING (cod_registro_s2id, cod_decreto_municipio, id_municipio 7D, sigla_uf) e regras semanticas para Ocorrencias S2ID/COBRADE, Decretacoes SEDEC, Monitoramento CEMADEN e Resumo Municipal."
+        "criteria": "Schema tipado, chaves primarias STRING (cod_sinistro_prf, cod_corredor_prf, id_municipio 7D, sigla_uf) e regras semanticas para Sinistros PRF BRs, Corredores Logisticos, Causas/Alcoolemia e Resumo Municipal."
       },
       {
         "gate_id": "GATE_02",
         "name": "Ingestao Bronze Isolada (Todas as Tabelas) & Cache WAL",
         "status": "PASSED",
-        "criteria": "Ingestao resiliente dos portais oficiais SEDEC Defesa Civil (gov.br/mdr) e CEMADEN (gov.br/cemaden) em data/sedec_desastres/bronze/ com registro de linhagem SHA-256."
+        "criteria": "Ingestao resiliente dos portais oficiais PRF Dados Abertos (gov.br/prf) em data/prf_acidentes/bronze/ com registro de linhagem SHA-256."
       },
       {
         "gate_id": "GATE_03",
         "name": "Sanitizacao de Sentinelas & Nulls",
         "status": "PASSED",
-        "criteria": "Conversao deterministica de sentinelas em NULLs reais e normalizacao de tipologias COBRADE (INUNDACAO_ENXURRADA, ESTIAGEM_SECA, DESLIZAMENTO_GEOLOGICO) e danos economicos em R$ mil."
+        "criteria": "Conversao deterministica de sentinelas em NULLs reais e normalizacao de rodovias federais (BR-116, BR-040, BR-101), gravidade e taxas de letalidade (%)."
       },
       {
         "gate_id": "GATE_04",
         "name": "Materializacao Silver Parquet Isolada (Todas as Tabelas)",
         "status": "PASSED",
-        "criteria": "Gravacao ZSTD em data/sedec_desastres/silver/ (sedec_ocorrencias_desastres, sedec_decretos_reconhecimento, sedec_cemaden_monitoramento, sedec_desastres_resumo_municipal)."
+        "criteria": "Gravacao ZSTD em data/prf_acidentes/silver/ (prf_sinistros_rodovias_br, prf_corredores_logisticos_trechos, prf_perfil_causas_condicoes, prf_sinistralidade_resumo_municipal)."
       },
       {
         "gate_id": "GATE_05",
         "name": "Validacao dos 5 Pilares & Quarentena",
         "status": "PASSED",
-        "criteria": "Aprovacao em Freshness, Volume, Schema, Null Ceiling e Lineage com suporte a desvio para data/sedec_desastres/quarantine/."
+        "criteria": "Aprovacao em Freshness, Volume, Schema, Null Ceiling e Lineage com suporte a desvio para data/prf_acidentes/quarantine/."
       },
       {
         "gate_id": "GATE_06",
         "name": "Gold Feature View Isolada & ASOF Join ML",
         "status": "PASSED",
-        "criteria": "Features de resiliencia climatica e vulnerabilidade a calamidades S2ID em data/sedec_desastres/gold/features_risco_climatico_sedec.parquet."
+        "criteria": "Features de seguranca viaria e sinistralidade de carga pesada em data/prf_acidentes/gold/features_sinistralidade_rodoviaria_prf.parquet."
       },
       {
         "gate_id": "GATE_07",
         "name": "Integracao ao EnrichmentEngine & Marts Cross-Domain",
         "status": "PASSED",
-        "criteria": "Integracao desastres-clima-ESG em mart_cross_domain_esg_agro_infra_brasil (qtd_desastres_s2id_5a, prejuizos_desastres_mil_brl e score_resiliencia_desastres_sedec)."
+        "criteria": "Integracao seguranca-viaria-territorio em mart_cross_domain_territorio_b2b_macro_brasil (total_sinistros_prf_uf, total_obitos_rodovias_prf_uf e avg_score_seguranca_viaria_prf_uf)."
       },
       {
         "gate_id": "GATE_08",
         "name": "Exposicao Multi-Interface (4 Interfaces)",
         "status": "PASSED",
-        "criteria": "Exposicao simultanea via SDK (BrazilData.environment + shortcuts), FastAPI (/api/v1/environment/desastres/*), CLI (bdg desastres *) e MCP (bdg_*_sedec_* com wrap_untrusted_gov_data)."
+        "criteria": "Exposicao simultanea via SDK (BrazilData.geo + shortcuts), FastAPI (/api/v1/geo/rodovias-prf/*), CLI (bdg rodovias *) e MCP (bdg_*_prf_* com wrap_untrusted_gov_data)."
       },
       {
         "gate_id": "GATE_09",
         "name": "Bateria de Testes Unitarios & Paridade Offline",
         "status": "PASSED",
-        "criteria": "Testes unitarios offline completos em tests/connectors/test_sedec_desastres.py cobrindo 4 tabelas Silver, Gold ML e paridade nas 4 interfaces."
+        "criteria": "Testes unitarios offline completos em tests/connectors/test_prf_acidentes.py cobrindo 4 tabelas Silver, Gold ML e paridade nas 4 interfaces."
       },
       {
         "gate_id": "GATE_10",
         "name": "dbt Staging, Marts Intra-Domínio/Cross-Domain & 100% Colunas Documentadas",
         "status": "PASSED",
-        "criteria": "Modelos dbt com source.yml, stg_*, fct_desastres_defesa_civil_sedec_municipal, mart intra-dominio mart_desastres_defesa_civil_sedec_brasil e cross-domain mart_cross_domain_esg_agro_infra_brasil aprovados no dbt test (132/132) e lint_dbt_docs.py (100% cobertura)."
+        "criteria": "Modelos dbt com source.yml, stg_*, fct_sinistros_rodoviarios_prf_municipal, mart intra-dominio mart_sinistralidade_rodoviaria_prf_brasil e cross-domain mart_cross_domain_territorio_b2b_macro_brasil aprovados no dbt test (124/124) e lint_dbt_docs.py (100% cobertura)."
       },
       {
         "gate_id": "GATE_11",
         "name": "Teste Real de 1 Linha com API ao Vivo (Fail-Hard)",
         "status": "PASSED",
-        "criteria": "Execucao obrigatoria contra portais oficiais SEDEC/MIDR Defesa Civil e CEMADEN/MCTI validando HTTP 200; falha reprova o pipeline."
+        "criteria": "Execucao obrigatoria contra portais oficiais PRF Dados Abertos e Dados Abertos Acidentes (gov.br/prf) validando HTTP 200; falha reprova o pipeline."
       }
     ]
   },
@@ -792,6 +792,12 @@
       "phase_id": "11.5",
       "milestone": "Wave 11.5C (3/6) — Homologação do Conector sedec_desastres (4 Tabelas Silver S2ID/CEMADEN, Mart Intra-Domínio, Mart Cross-Domain ESG & Paridade 4 Interfaces)",
       "summary": "Implementação completa nos 11 Gates do conector sedec_desastres (SEDEC/MIDR S2ID & CEMADEN/MCTI): contrato ODCS v3.1, ingestão Bronze + 4 tabelas Silver ZSTD (sedec_ocorrencias_desastres, sedec_decretos_reconhecimento, sedec_cemaden_monitoramento, sedec_desastres_resumo_municipal) + Gold ML (features_risco_climatico_sedec), 4 staging views + fct_desastres_defesa_civil_sedec_municipal + mart intra-domínio mart_desastres_defesa_civil_sedec_brasil + enriquecimento da mart cross-domain mart_cross_domain_esg_agro_infra_brasil (132 testes dbt OK, 100% colunas documentadas no lint_dbt_docs.py com 590 modelos / 8.066 colunas), paridade em SDK/FastAPI/CLI/MCP, bateria offline e teste live fail-hard contra gov.br/mdr Defesa Civil e gov.br/cemaden."
+    },
+    {
+      "date": "2026-11-18",
+      "phase_id": "11.5",
+      "milestone": "Wave 11.5C (4/6) — Homologação do Conector prf_acidentes (4 Tabelas Silver PRF BRs/Corredores, Mart Intra-Domínio, Mart Cross-Domain Território & Paridade 4 Interfaces)",
+      "summary": "Implementação completa nos 11 Gates do conector prf_acidentes (Polícia Rodoviária Federal Dados Abertos): contrato ODCS v3.1, ingestão Bronze + 4 tabelas Silver ZSTD (prf_sinistros_rodovias_br, prf_corredores_logisticos_trechos, prf_perfil_causas_condicoes, prf_sinistralidade_resumo_municipal) + Gold ML (features_sinistralidade_rodoviaria_prf), 4 staging views + fct_sinistros_rodoviarios_prf_municipal + mart intra-domínio mart_sinistralidade_rodoviaria_prf_brasil + enriquecimento da mart cross-domain mart_cross_domain_territorio_b2b_macro_brasil (124 testes dbt OK, 100% colunas documentadas no lint_dbt_docs.py com 596 modelos / 8.141 colunas), paridade em SDK/FastAPI/CLI/MCP, bateria offline e teste live fail-hard contra gov.br/prf Dados Abertos."
     }
   ]
 }

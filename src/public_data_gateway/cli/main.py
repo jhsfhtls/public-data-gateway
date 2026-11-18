@@ -885,6 +885,36 @@ def build_parser() -> argparse.ArgumentParser:
     fr_rk_p.add_argument("--ev", action="store_true", help="Sort descending by electrified BEV/PHEV/HEV fleet")
     fr_rk_p.add_argument("--json", action="store_true", help="Output in JSON format")
 
+    # PRF Dados Abertos (Sinistros Rodoviários & Corredores Logísticos) command group
+    rod_p = subparsers.add_parser("rodovias", help="Query PRF federal highway accidents, logistics corridors, causes, and road safety rankings.")
+    rod_sub = rod_p.add_subparsers(dest="rodovias_action", required=True)
+
+    rod_sin_p = rod_sub.add_parser("sinistros", help="Lookup PRF highway accident records by code, BR highway, cause, IBGE, UF, or city.")
+    rod_sin_p.add_argument("termo", help="PRF code, BR highway, cause, IBGE code, UF, or municipality name")
+    rod_sin_p.add_argument("--json", action="store_true", help="Output in JSON format")
+
+    rod_cor_p = rod_sub.add_parser("corredores", help="Lookup PRF federal logistics corridors and heavy-freight crash metrics.")
+    rod_cor_p.add_argument("termo", help="Corridor code, BR highway, IBGE code, UF, or municipality name")
+    rod_cor_p.add_argument("--json", action="store_true", help="Output in JSON format")
+
+    rod_cau_p = rod_sub.add_parser("causas", help="Get municipal PRF collision causes, heavy truck share, and DUI enforcement.")
+    rod_cau_p.add_argument("id_municipio_or_name", help="7-digit IBGE code or municipality name")
+    rod_cau_p.add_argument("--json", action="store_true", help="Output in JSON format")
+
+    rod_mun_p = rod_sub.add_parser("municipio", help="Get consolidated annual municipal PRF crashes, injuries, fatalities, and lethality.")
+    rod_mun_p.add_argument("id_municipio_or_name", help="7-digit IBGE code or municipality name")
+    rod_mun_p.add_argument("--json", action="store_true", help="Output in JSON format")
+
+    rod_ft_p = rod_sub.add_parser("features", help="Get Gold PRF road safety score and corridor risk tier.")
+    rod_ft_p.add_argument("id_municipio_or_name", help="7-digit IBGE code or municipality name")
+    rod_ft_p.add_argument("--json", action="store_true", help="Output in JSON format")
+
+    rod_rk_p = rod_sub.add_parser("ranking", help="List municipalities ranked by PRF road safety score or highest fatalities.")
+    rod_rk_p.add_argument("--limit", type=int, default=10, help="Max municipalities to list")
+    rod_rk_p.add_argument("--uf", type=str, help="Optional 2-letter state filter")
+    rod_rk_p.add_argument("--obitos", action="store_true", help="Sort descending by annual highway fatalities")
+    rod_rk_p.add_argument("--json", action="store_true", help="Output in JSON format")
+
     # DataSUS CNES (Cadastro Nacional de Estabelecimentos de Saúde) command group
     cnes_p = subparsers.add_parser("cnes", help="Query DataSUS CNES health establishments, beds/ICU, equipment, and workforce analytics.")
     cnes_sub = cnes_p.add_subparsers(dest="cnes_action", required=True)
@@ -3934,6 +3964,84 @@ def main(argv: Sequence[str] | None = None) -> int:
                     return 0
             except (ValueError, KeyError) as exc:
                 print(f"Erro SENATRAN Frota: {exc}", file=sys.stderr)
+                return 1
+
+        elif args.command == "rodovias":
+            from public_data_gateway.connectors.geografico.prf_acidentes import (
+                PrfAccidentsConnector,
+            )
+
+            rod_conn = PrfAccidentsConnector()
+            rod_action = getattr(args, "rodovias_action", "")
+            try:
+                if rod_action == "sinistros":
+                    rows = rod_conn.get_prf_accidents(args.termo)
+                    if getattr(args, "json", False):
+                        print(json.dumps(rows, indent=2, ensure_ascii=False, default=str))
+                    else:
+                        print(f"PRF Sinistros Rodoviários ({len(rows)}):")
+                        for r in rows:
+                            print(f"  {r.get('cod_sinistro_prf')} | {r.get('rodovia_br')} | {r.get('nome_municipio')} ({r.get('sigla_uf')}): {r.get('qtd_ocorrencias_trecho')} | Óbitos {r.get('qtd_obitos_rodovia')}")
+                    return 0
+
+                if rod_action == "corredores":
+                    rows = rod_conn.get_prf_corridors(args.termo)
+                    if getattr(args, "json", False):
+                        print(json.dumps(rows, indent=2, ensure_ascii=False, default=str))
+                    else:
+                        print(f"PRF Corredores Logísticos ({len(rows)}):")
+                        for r in rows:
+                            print(f"  {r.get('cod_corredor_prf')} | {r.get('rodovia_br_principal')} | {r.get('nome_municipio')} ({r.get('sigla_uf')}): Carga {r.get('sinistros_carga_pesada_ano')} | Sev {r.get('indice_severidade_corredor')}")
+                    return 0
+
+                if rod_action == "causas":
+                    res = rod_conn.get_prf_causes_profile(args.id_municipio_or_name)
+                    if res is None:
+                        print(f"Perfil de causas PRF não encontrado para: {args.id_municipio_or_name}", file=sys.stderr)
+                        return 1
+                    if getattr(args, "json", False):
+                        print(json.dumps(res, indent=2, ensure_ascii=False, default=str))
+                    else:
+                        print(f"PRF Causas ({res.get('nome_municipio')} - {res.get('sigla_uf')}): Pesados {res.get('pct_envolvimento_caminhao_onibus')}% | Alcoolemia {res.get('alcoolemia_autuacoes_ano')}")
+                    return 0
+
+                if rod_action == "municipio":
+                    res = rod_conn.get_prf_municipal_summary(args.id_municipio_or_name)
+                    if res is None:
+                        print(f"Resumo PRF não encontrado para: {args.id_municipio_or_name}", file=sys.stderr)
+                        return 1
+                    if getattr(args, "json", False):
+                        print(json.dumps(res, indent=2, ensure_ascii=False, default=str))
+                    else:
+                        print(f"PRF Rodovias Município ({res.get('nome_municipio')} - {res.get('sigla_uf')}): Sinistros {res.get('total_sinistros_prf_ano')} | Óbitos {res.get('total_obitos_prf_ano')}")
+                    return 0
+
+                if rod_action == "features":
+                    res = rod_conn.get_prf_features(args.id_municipio_or_name)
+                    if res is None:
+                        print(f"Features PRF não encontradas para: {args.id_municipio_or_name}", file=sys.stderr)
+                        return 1
+                    if getattr(args, "json", False):
+                        print(json.dumps(res, indent=2, ensure_ascii=False, default=str))
+                    else:
+                        print(f"PRF Segurança Viária Gold ({res.get('nome_municipio')} - {res.get('id_municipio')}): Score {res.get('score_seguranca_viaria_prf')} | {res.get('tier_risco_rodoviario_prf')}")
+                    return 0
+
+                if rod_action == "ranking":
+                    ranks = rod_conn.list_top_safe_prf_municipalities(
+                        limit=getattr(args, "limit", 10),
+                        sigla_uf=getattr(args, "uf", None),
+                        sort_by_fatalities=getattr(args, "obitos", False),
+                    )
+                    if getattr(args, "json", False):
+                        print(json.dumps(ranks, indent=2, ensure_ascii=False, default=str))
+                    else:
+                        print(f"Ranking PRF Segurança Viária ({len(ranks)}):")
+                        for idx, r in enumerate(ranks, 1):
+                            print(f"  {idx}. {r.get('nome_municipio')} ({r.get('sigla_uf')}): {r.get('score_seguranca_viaria_prf')} | {r.get('tier_risco_rodoviario_prf')}")
+                    return 0
+            except (ValueError, KeyError) as exc:
+                print(f"Erro PRF Rodovias: {exc}", file=sys.stderr)
                 return 1
 
         elif args.command == "cnes":

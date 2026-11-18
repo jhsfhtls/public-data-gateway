@@ -109,6 +109,15 @@ models:
       - name: avg_score_seguranca_publica_uf
         description: "Média estadual do score de segurança pública e proteção patrimonial SINESP/FBSP (0-100)."
         tests: [not_null]
+      - name: total_sinistros_prf_uf
+        description: "Total estadual anual de sinistros rodoviários registrados pela PRF."
+        tests: [not_null]
+      - name: total_obitos_rodovias_prf_uf
+        description: "Total estadual anual de óbitos em rodovias federais monitoradas pela PRF."
+        tests: [not_null]
+      - name: avg_score_seguranca_viaria_prf_uf
+        description: "Média estadual do score de segurança viária em rodovias federais PRF (0-100)."
+        tests: [not_null]
       - name: macro_ano_mes_referencia
         description: "Competência macroeconômica de referência (YYYY-MM)."
         tests: [not_null]

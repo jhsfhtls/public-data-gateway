@@ -1,0 +1,181 @@
+version: 2
+
+models:
+  - name: stg_prf_sinistros_rodovias_br
+    description: "Staging view tipada dos boletins agregados de sinistros rodoviários PRF por rodovia federal (BR), causa e gravidade."
+    columns:
+      - name: cod_sinistro_prf
+        description: "Código identificador único do agrupamento de sinistros PRF (STRING)."
+        tests: [not_null, unique]
+      - name: rodovia_br
+        description: "Designação oficial da rodovia federal sob policiamento PRF (ex. BR-116)."
+        tests: [not_null]
+      - name: id_municipio
+        description: "Código IBGE de 7 dígitos do município (STRING)."
+        tests: [not_null]
+      - name: sigla_uf
+        description: "Sigla de 2 letras da Unidade Federativa (UF)."
+        tests: [not_null]
+      - name: nome_municipio
+        description: "Nome oficial do município."
+        tests: [not_null]
+      - name: regiao
+        description: "Macrorregião geográfica brasileira."
+        tests: [not_null]
+      - name: causa_principal_sinistro
+        description: "Fator causal dominante apurado em boletim PRF."
+        tests: [not_null]
+      - name: classificacao_gravidade
+        description: "Categoria de gravidade do agrupamento (SEM_VITIMAS, COM_FERIDOS ou COM_OBITOS)."
+        tests: [not_null]
+      - name: qtd_ocorrencias_trecho
+        description: "Quantidade anual de sinistros registrados no trecho."
+        tests: [not_null]
+      - name: qtd_feridos_leves_graves
+        description: "Quantidade total de vítimas com ferimentos leves ou graves."
+        tests: [not_null]
+      - name: qtd_obitos_rodovia
+        description: "Quantidade anual de óbitos em rodovias federais no agrupamento."
+        tests: [not_null]
+
+  - name: stg_prf_corredores_logisticos_trechos
+    description: "Staging view tipada dos corredores logísticos federais PRF, extensão monitorada e sinistralidade de carga pesada."
+    columns:
+      - name: cod_corredor_prf
+        description: "Código identificador único do corredor rodoviário municipal PRF (STRING)."
+        tests: [not_null, unique]
+      - name: id_municipio
+        description: "Código IBGE de 7 dígitos do município (STRING)."
+        tests: [not_null]
+      - name: sigla_uf
+        description: "Sigla de 2 letras da Unidade Federativa (UF)."
+        tests: [not_null]
+      - name: nome_municipio
+        description: "Nome oficial do município."
+        tests: [not_null]
+      - name: rodovia_br_principal
+        description: "Rodovia federal de maior fluxo e volume de ocorrências no município."
+        tests: [not_null]
+      - name: extensao_monitorada_km
+        description: "Extensão rodoviária federal sob jurisdição PRF associada ao polo municipal (km)."
+        tests: [not_null]
+      - name: sinistros_carga_pesada_ano
+        description: "Quantidade anual de sinistros envolvendo veículos de transporte de cargas pesadas."
+        tests: [not_null]
+      - name: indice_severidade_corredor
+        description: "Índice composto de severidade logística do corredor rodoviário."
+        tests: [not_null]
+      - name: ano_referencia
+        description: "Ano de referência estatística PRF."
+        tests: [not_null]
+
+  - name: stg_prf_perfil_causas_condicoes
+    description: "Staging view tipada do perfil causal de colisões, veículos pesados, condições climáticas e alcoolemia PRF."
+    columns:
+      - name: id_municipio
+        description: "Código IBGE de 7 dígitos do município (STRING)."
+        tests: [not_null, unique]
+      - name: sigla_uf
+        description: "Sigla de 2 letras da Unidade Federativa (UF)."
+        tests: [not_null]
+      - name: nome_municipio
+        description: "Nome oficial do município."
+        tests: [not_null]
+      - name: pct_colisao_frontal_traseira
+        description: "Participação percentual de colisões frontais e traseiras nos sinistros municipais (%)."
+        tests: [not_null]
+      - name: pct_envolvimento_caminhao_onibus
+        description: "Percentual de ocorrências com envolvimento de caminhões ou ônibus (%)."
+        tests: [not_null]
+      - name: pct_condicao_clima_adverso
+        description: "Percentual de sinistros sob chuva, neblina ou pista molhada (%)."
+        tests: [not_null]
+      - name: alcoolemia_autuacoes_ano
+        description: "Autuações e constatações anuais por alcoolemia ao volante em operações PRF."
+        tests: [not_null]
+
+  - name: stg_prf_sinistralidade_resumo_municipal
+    description: "Staging view tipada do consolidado municipal anual de sinistros rodoviários PRF, feridos e letalidade."
+    columns:
+      - name: id_municipio
+        description: "Código IBGE de 7 dígitos do município (STRING)."
+        tests: [not_null, unique]
+      - name: sigla_uf
+        description: "Sigla de 2 letras da Unidade Federativa (UF)."
+        tests: [not_null]
+      - name: nome_municipio
+        description: "Nome oficial do município."
+        tests: [not_null]
+      - name: regiao
+        description: "Macrorregião geográfica brasileira."
+        tests: [not_null]
+      - name: rodovia_br_principal
+        description: "Rodovia federal principal no município."
+        tests: [not_null]
+      - name: total_sinistros_prf_ano
+        description: "Quantidade total de sinistros registrados pela PRF no município no ano."
+        tests: [not_null]
+      - name: total_feridos_prf_ano
+        description: "Total de pessoas feridas em sinistros rodoviários federais no ano."
+        tests: [not_null]
+      - name: total_obitos_prf_ano
+        description: "Total de óbitos registrados pela PRF no município no ano."
+        tests: [not_null]
+      - name: taxa_letalidade_sinistro_pct
+        description: "Razão entre óbitos totais e total de sinistros registrados no município (%)."
+        tests: [not_null]
+
+  - name: fct_sinistros_rodoviarios_prf_municipal
+    description: "Fato Silver municipal consolidando boletins de trânsito PRF, corredores logísticos, transporte pesado, causas e letalidade."
+    columns:
+      - name: id_municipio
+        description: "Código IBGE de 7 dígitos do município (STRING)."
+        tests: [not_null, unique]
+      - name: sigla_uf
+        description: "Sigla de 2 letras da Unidade Federativa (UF)."
+        tests: [not_null]
+      - name: nome_municipio
+        description: "Nome oficial do município."
+        tests: [not_null]
+      - name: regiao
+        description: "Macrorregião geográfica brasileira."
+        tests: [not_null]
+      - name: rodovia_br_principal
+        description: "Rodovia federal de maior movimento no município."
+        tests: [not_null]
+      - name: total_sinistros_prf_ano
+        description: "Total anual de boletins de sinistros rodoviários PRF no município."
+        tests: [not_null]
+      - name: total_feridos_prf_ano
+        description: "Total anual de feridos em rodovias federais no município."
+        tests: [not_null]
+      - name: total_obitos_prf_ano
+        description: "Total anual de óbitos em sinistros sob circunscrição PRF no município."
+        tests: [not_null]
+      - name: taxa_letalidade_sinistro_pct
+        description: "Taxa municipal de letalidade por sinistro PRF (%)."
+        tests: [not_null]
+      - name: qtd_agrupamentos_sinistro_prf
+        description: "Quantidade de agrupamentos causais/gravidade na tabela Silver PRF."
+        tests: [not_null]
+      - name: extensao_monitorada_km
+        description: "Extensão rodoviária federal monitorada no polo municipal (km)."
+        tests: [not_null]
+      - name: sinistros_carga_pesada_ano
+        description: "Quantidade anual de sinistros envolvendo transporte de carga pesada."
+        tests: [not_null]
+      - name: indice_severidade_corredor
+        description: "Índice composto de severidade logística do corredor rodoviário."
+        tests: [not_null]
+      - name: pct_colisao_frontal_traseira
+        description: "Percentual de sinistros classificados como colisão frontal ou traseira (%)."
+        tests: [not_null]
+      - name: pct_envolvimento_caminhao_onibus
+        description: "Percentual de sinistros envolvendo caminhões ou ônibus (%)."
+        tests: [not_null]
+      - name: pct_condicao_clima_adverso
+        description: "Percentual de ocorrências em condições climáticas adversas (%)."
+        tests: [not_null]
+      - name: alcoolemia_autuacoes_ano
+        description: "Quantidade anual de constatações/autuações de alcoolemia pela PRF."
+        tests: [not_null]

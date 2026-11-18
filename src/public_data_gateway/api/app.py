@@ -2061,6 +2061,78 @@ def create_app(settings: GatewaySettings | None = None) -> FastAPI:
         conn = SenatranFrotaConnector(settings=app_settings)
         return conn.list_top_fleet_municipalities(limit=limit, sigla_uf=uf, sort_by_ev=sort_by_ev)
 
+    # PRF Dados Abertos (Sinistros Rodoviários & Corredores Logísticos)
+    @app.get("/api/v1/geo/rodovias-prf/sinistros/{termo}")
+    async def get_rodovias_prf_sinistros(termo: str) -> list[dict[str, Any]]:
+        from public_data_gateway.connectors.geografico.prf_acidentes import (
+            PrfAccidentsConnector,
+        )
+
+        conn = PrfAccidentsConnector(settings=app_settings)
+        return conn.get_prf_accidents(termo)
+
+    @app.get("/api/v1/geo/rodovias-prf/corredores/{termo}")
+    async def get_rodovias_prf_corredores(termo: str) -> list[dict[str, Any]]:
+        from public_data_gateway.connectors.geografico.prf_acidentes import (
+            PrfAccidentsConnector,
+        )
+
+        conn = PrfAccidentsConnector(settings=app_settings)
+        return conn.get_prf_corridors(termo)
+
+    @app.get("/api/v1/geo/rodovias-prf/causas/{id_municipio_or_name}")
+    async def get_rodovias_prf_causas(id_municipio_or_name: str) -> dict[str, Any]:
+        from public_data_gateway.connectors.geografico.prf_acidentes import (
+            PrfAccidentsConnector,
+        )
+
+        conn = PrfAccidentsConnector(settings=app_settings)
+        res = conn.get_prf_causes_profile(id_municipio_or_name)
+        if res is None:
+            raise HTTPException(status_code=404, detail="PRF causes profile not found")
+        return res
+
+    @app.get("/api/v1/geo/rodovias-prf/municipio/{id_municipio_or_name}")
+    async def get_rodovias_prf_municipio(id_municipio_or_name: str) -> dict[str, Any]:
+        from public_data_gateway.connectors.geografico.prf_acidentes import (
+            PrfAccidentsConnector,
+        )
+
+        conn = PrfAccidentsConnector(settings=app_settings)
+        res = conn.get_prf_municipal_summary(id_municipio_or_name)
+        if res is None:
+            raise HTTPException(status_code=404, detail="PRF municipal summary not found")
+        return res
+
+    @app.get("/api/v1/geo/rodovias-prf/features/{id_municipio_or_name}")
+    async def get_rodovias_prf_features(id_municipio_or_name: str) -> dict[str, Any]:
+        from public_data_gateway.connectors.geografico.prf_acidentes import (
+            PrfAccidentsConnector,
+        )
+
+        conn = PrfAccidentsConnector(settings=app_settings)
+        res = conn.get_prf_features(id_municipio_or_name)
+        if res is None:
+            raise HTTPException(status_code=404, detail="PRF Gold road safety features not found")
+        return res
+
+    @app.get("/api/v1/geo/rodovias-prf/ranking")
+    async def get_rodovias_prf_ranking(
+        limit: int = Query(10, ge=1, le=50, description="Max municipalities to list"),
+        uf: str | None = Query(None, description="Optional 2-letter state filter"),
+        sort_by_fatalities: bool = Query(
+            False, description="Sort descending by annual highway fatalities"
+        ),
+    ) -> list[dict[str, Any]]:
+        from public_data_gateway.connectors.geografico.prf_acidentes import (
+            PrfAccidentsConnector,
+        )
+
+        conn = PrfAccidentsConnector(settings=app_settings)
+        return conn.list_top_safe_prf_municipalities(
+            limit=limit, sigla_uf=uf, sort_by_fatalities=sort_by_fatalities
+        )
+
     @app.get("/api/v1/health-public/cnes/top-hubs")
     async def get_top_health_hubs(
         limit: int = Query(10, ge=1, le=50, description="Max municipalities to list"),

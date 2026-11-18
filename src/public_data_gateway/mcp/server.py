@@ -1204,6 +1204,69 @@ class MCPDispatcher:
                                 },
                             },
                             {
+                                "name": "bdg_get_prf_sinistros_rodovias",
+                                "description": "Lookup PRF federal highway accident records by code, BR highway, cause, IBGE, UF, or city.",
+                                "inputSchema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "termo": {
+                                            "type": "string",
+                                            "description": "PRF code, BR highway, cause, IBGE 7-digit code, UF, or municipality name",
+                                        }
+                                    },
+                                    "required": ["termo"],
+                                },
+                            },
+                            {
+                                "name": "bdg_get_prf_corredores_logisticos",
+                                "description": "Lookup PRF federal logistics corridors, heavy freight crashes, and corridor severity by code, BR, IBGE, UF, or city.",
+                                "inputSchema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "termo": {
+                                            "type": "string",
+                                            "description": "Corridor code, BR highway, IBGE 7-digit code, UF, or municipality name",
+                                        }
+                                    },
+                                    "required": ["termo"],
+                                },
+                            },
+                            {
+                                "name": "bdg_get_prf_sinistralidade_features",
+                                "description": "Get normalized Gold PRF road safety score, lethality rate, heavy truck crashes, and highway risk tier.",
+                                "inputSchema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "id_municipio_or_name": {
+                                            "type": "string",
+                                            "description": "7-digit IBGE municipality code or municipality name",
+                                        }
+                                    },
+                                    "required": ["id_municipio_or_name"],
+                                },
+                            },
+                            {
+                                "name": "bdg_list_top_prf_seguranca_viaria",
+                                "description": "List Brazilian municipalities ranked by PRF road safety score or highest annual highway fatalities.",
+                                "inputSchema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "limit": {
+                                            "type": "integer",
+                                            "description": "Maximum rows (default: 10)",
+                                        },
+                                        "sigla_uf": {
+                                            "type": "string",
+                                            "description": "Optional 2-letter state filter (e.g. SP)",
+                                        },
+                                        "sort_by_fatalities": {
+                                            "type": "boolean",
+                                            "description": "Set true to rank municipalities by highest annual highway fatalities first",
+                                        },
+                                    },
+                                },
+                            },
+                            {
                                 "name": "bdg_get_cnes_establishments",
                                 "description": "Get municipal DataSUS CNES summary of active health establishments, hospitals, UBS, UPA, and SUS coverage share.",
                                 "inputSchema": {
@@ -5104,6 +5167,65 @@ class MCPDispatcher:
                     },
                 }
             wrapped = wrap_untrusted_gov_data(result, source_id="senatran_frota")
+            return {
+                "jsonrpc": "2.0",
+                "id": req_id,
+                "result": {"content": [{"type": "text", "text": wrapped}], "isError": False},
+            }
+
+        if tool_name in {
+            "bdg_get_prf_sinistros_rodovias",
+            "bdg_get_prf_corredores_logisticos",
+            "bdg_get_prf_sinistralidade_features",
+            "bdg_list_top_prf_seguranca_viaria",
+        }:
+            from public_data_gateway.connectors.geografico.prf_acidentes import (
+                PrfAccidentsConnector,
+            )
+
+            connector = PrfAccidentsConnector(settings=self.settings)
+            try:
+                if tool_name == "bdg_get_prf_sinistros_rodovias":
+                    result: Any = connector.get_prf_accidents(str(args.get("termo", "")))
+                elif tool_name == "bdg_get_prf_corredores_logisticos":
+                    result = connector.get_prf_corridors(str(args.get("termo", "")))
+                elif tool_name == "bdg_get_prf_sinistralidade_features":
+                    result = connector.get_prf_features(
+                        str(args.get("id_municipio_or_name", ""))
+                    )
+                else:
+                    result = connector.list_top_safe_prf_municipalities(
+                        limit=int(args.get("limit", 10)),
+                        sigla_uf=args.get("sigla_uf"),
+                        sort_by_fatalities=bool(args.get("sort_by_fatalities", False)),
+                    )
+            except (ValueError, KeyError) as exc:
+                return {
+                    "jsonrpc": "2.0",
+                    "id": req_id,
+                    "result": {
+                        "content": [
+                            {"type": "text", "text": f"PRF Acidentes parameter error: {exc}"}
+                        ],
+                        "isError": True,
+                    },
+                }
+
+            if not result:
+                return {
+                    "jsonrpc": "2.0",
+                    "id": req_id,
+                    "result": {
+                        "content": [
+                            {
+                                "type": "text",
+                                "text": "No PRF highway accidents data found for the query.",
+                            }
+                        ],
+                        "isError": True,
+                    },
+                }
+            wrapped = wrap_untrusted_gov_data(result, source_id="prf_acidentes")
             return {
                 "jsonrpc": "2.0",
                 "id": req_id,

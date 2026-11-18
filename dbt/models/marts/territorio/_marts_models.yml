@@ -1165,3 +1165,64 @@ models:
       - name: tier_mobilidade_frota_senatran
         description: "Tier municipal de modernização da frota (POLO_MOBILIDADE_FROTA_MODERNA, FROTA_URBANA_CONSOLIDADA ou FROTA_TRANSICAO_ENVELHECIDA)."
         tests: [not_null]
+
+  - name: mart_sinistralidade_rodoviaria_prf_brasil
+    description: "Data Mart Gold intra-domínio consolidando sinistros em rodovias federais (PRF), letalidade, carga pesada e score de segurança viária."
+    columns:
+      - name: id_municipio
+        description: "Código IBGE de 7 dígitos do município (STRING)."
+        tests: [not_null, unique]
+      - name: sigla_uf
+        description: "Sigla de 2 letras da Unidade Federativa (UF)."
+        tests: [not_null]
+      - name: nome_municipio
+        description: "Nome oficial do município."
+        tests: [not_null]
+      - name: regiao
+        description: "Macrorregião geográfica do município."
+        tests: [not_null]
+      - name: rodovia_br_principal
+        description: "Rodovia federal principal no município (BR)."
+        tests: [not_null]
+      - name: total_sinistros_prf_ano
+        description: "Total anual de sinistros registrados pela PRF no município."
+        tests: [not_null]
+      - name: total_feridos_prf_ano
+        description: "Total anual de vítimas feridas em rodovias federais no município."
+        tests: [not_null]
+      - name: total_obitos_prf_ano
+        description: "Total anual de óbitos em sinistros rodoviários PRF."
+        tests: [not_null]
+      - name: taxa_letalidade_sinistro_pct
+        description: "Taxa de letalidade por sinistro PRF no município (%)."
+        tests: [not_null]
+      - name: qtd_agrupamentos_sinistro_prf
+        description: "Quantidade de clusters causais PRF consolidados na Silver."
+        tests: [not_null]
+      - name: extensao_monitorada_km
+        description: "Extensão monitorada do corredor federal associado ao município (km)."
+        tests: [not_null]
+      - name: sinistros_carga_pesada_ano
+        description: "Quantidade anual de sinistros com caminhões ou veículos pesados."
+        tests: [not_null]
+      - name: indice_severidade_corredor
+        description: "Índice composto de severidade do corredor logístico."
+        tests: [not_null]
+      - name: pct_colisao_frontal_traseira
+        description: "Percentual de sinistros de colisão frontal ou traseira (%)."
+        tests: [not_null]
+      - name: pct_envolvimento_caminhao_onibus
+        description: "Percentual de sinistros com envolvimento de veículos pesados (%)."
+        tests: [not_null]
+      - name: pct_condicao_clima_adverso
+        description: "Percentual de ocorrências em clima adverso (%)."
+        tests: [not_null]
+      - name: alcoolemia_autuacoes_ano
+        description: "Autuações anuais por alcoolemia ao volante pela PRF."
+        tests: [not_null]
+      - name: score_seguranca_viaria_prf
+        description: "Score sintético municipal de segurança viária e fluidez logística PRF (0-100)."
+        tests: [not_null]
+      - name: tier_risco_rodoviario_prf
+        description: "Classificação municipal de risco rodoviário PRF (SEGURANCA_VIARIA_ALTA, ATENCAO_CORREDOR_RODOVIARIO ou TRECHO_CRITICO_SINISTRALIDADE)."
+        tests: [not_null]

@@ -1,7 +1,7 @@
 <div align="center">
   <h2>Jornada de Implementação — Public Data Gateway</h2>
   <p><i>Painel Vivo de Evolução Arquitetural, Ciclo de Vida de Conectores & Solution Packs Analíticos</i></p>
-  <p><b>Versão:</b> 1.0.0 &nbsp;|&nbsp; <b>Última Atualização:</b> 2026-11-18T11:00:00.000000 &nbsp;|&nbsp; <b>Padrões:</b> ADR-001 • ADR-002 • ADR-003 • ODCS v3.1 • LGPD</p>
+  <p><b>Versão:</b> 1.0.0 &nbsp;|&nbsp; <b>Última Atualização:</b> 2026-11-18T11:20:00.000000 &nbsp;|&nbsp; <b>Padrões:</b> ADR-001 • ADR-002 • ADR-003 • ODCS v3.1 • LGPD</p>
   <hr/>
 </div>
 <br/>
@@ -17,9 +17,9 @@ Este artefato constitui a **Fonte Única da Verdade Operacional (SSOT)** do stat
 - **Macrofase Ativa:** `Fase 11.5 - Expansão Completa de Fontes Públicas (Ondas 11.5A a 11.5E — Padrão 11-Gates)`
 - **Status Geral de Governança:** `🟢 ON_TRACK`
 - **Conector Ativo em Desenvolvimento:** `Nenhum (Transição de Fase / Waves 1..6 Concluídas)`
-- **Próxima Etapa Planejada:** `prf_acidentes`
+- **Próxima Etapa Planejada:** `mme_ons_energia`
 - **Progresso Estrutural das Macrofases:** **15 de 17 Concluídas (88.2%)**
-- **Universo de Fontes Homologadas no Catálogo:** **67 fontes públicas** nos 13 macrosegmentos
+- **Universo de Fontes Homologadas no Catálogo:** **68 fontes públicas** nos 13 macrosegmentos
 
 ```mermaid
 flowchart LR
@@ -56,21 +56,21 @@ flowchart LR
 
 ## 3. Checklist dos 9 Gates de Qualidade do Conector Ativo
 
-Todo conector integrado ao `public-data-gateway` deve percorrer rigorosamente os **9 Gates de Qualidade** antes de ser promovido a `HOMOLOGATED`. O alvo atual do ciclo de vida é o conector `sedec_desastres` (Wave 11.5C):
+Todo conector integrado ao `public-data-gateway` deve percorrer rigorosamente os **9 Gates de Qualidade** antes de ser promovido a `HOMOLOGATED`. O alvo atual do ciclo de vida é o conector `prf_acidentes` (Wave 11.5C):
 
 | Gate | Nome do Gate de Homologação | Critério Operacional de Aceite (ODCS v3.1 / ADR-001 / ADR-002) | Status |
 | :---: | :--- | :--- | :---: |
-| **GATE_01** | **Contrato Declarativo ODCS v3.1 das N Tabelas da API** | Schema tipado, chaves primarias STRING (cod_registro_s2id, cod_decreto_municipio, id_municipio 7D, sigla_uf) e regras semanticas para Ocorrencias S2ID/COBRADE, Decretacoes SEDEC, Monitoramento CEMADEN e Resumo Municipal. | 🟢 APROVADO |
-| **GATE_02** | **Ingestao Bronze Isolada (Todas as Tabelas) & Cache WAL** | Ingestao resiliente dos portais oficiais SEDEC Defesa Civil (gov.br/mdr) e CEMADEN (gov.br/cemaden) em data/sedec_desastres/bronze/ com registro de linhagem SHA-256. | 🟢 APROVADO |
-| **GATE_03** | **Sanitizacao de Sentinelas & Nulls** | Conversao deterministica de sentinelas em NULLs reais e normalizacao de tipologias COBRADE (INUNDACAO_ENXURRADA, ESTIAGEM_SECA, DESLIZAMENTO_GEOLOGICO) e danos economicos em R$ mil. | 🟢 APROVADO |
-| **GATE_04** | **Materializacao Silver Parquet Isolada (Todas as Tabelas)** | Gravacao ZSTD em data/sedec_desastres/silver/ (sedec_ocorrencias_desastres, sedec_decretos_reconhecimento, sedec_cemaden_monitoramento, sedec_desastres_resumo_municipal). | 🟢 APROVADO |
-| **GATE_05** | **Validacao dos 5 Pilares & Quarentena** | Aprovacao em Freshness, Volume, Schema, Null Ceiling e Lineage com suporte a desvio para data/sedec_desastres/quarantine/. | 🟢 APROVADO |
-| **GATE_06** | **Gold Feature View Isolada & ASOF Join ML** | Features de resiliencia climatica e vulnerabilidade a calamidades S2ID em data/sedec_desastres/gold/features_risco_climatico_sedec.parquet. | 🟢 APROVADO |
-| **GATE_07** | **Integracao ao EnrichmentEngine & Marts Cross-Domain** | Integracao desastres-clima-ESG em mart_cross_domain_esg_agro_infra_brasil (qtd_desastres_s2id_5a, prejuizos_desastres_mil_brl e score_resiliencia_desastres_sedec). | 🟢 APROVADO |
-| **GATE_08** | **Exposicao Multi-Interface (4 Interfaces)** | Exposicao simultanea via SDK (BrazilData.environment + shortcuts), FastAPI (/api/v1/environment/desastres/*), CLI (bdg desastres *) e MCP (bdg_*_sedec_* com wrap_untrusted_gov_data). | 🟢 APROVADO |
-| **GATE_09** | **Bateria de Testes Unitarios & Paridade Offline** | Testes unitarios offline completos em tests/connectors/test_sedec_desastres.py cobrindo 4 tabelas Silver, Gold ML e paridade nas 4 interfaces. | 🟢 APROVADO |
-| **GATE_10** | **dbt Staging, Marts Intra-Domínio/Cross-Domain & 100% Colunas Documentadas** | Modelos dbt com source.yml, stg_*, fct_desastres_defesa_civil_sedec_municipal, mart intra-dominio mart_desastres_defesa_civil_sedec_brasil e cross-domain mart_cross_domain_esg_agro_infra_brasil aprovados no dbt test (132/132) e lint_dbt_docs.py (100% cobertura). | 🟢 APROVADO |
-| **GATE_11** | **Teste Real de 1 Linha com API ao Vivo (Fail-Hard)** | Execucao obrigatoria contra portais oficiais SEDEC/MIDR Defesa Civil e CEMADEN/MCTI validando HTTP 200; falha reprova o pipeline. | 🟢 APROVADO |
+| **GATE_01** | **Contrato Declarativo ODCS v3.1 das N Tabelas da API** | Schema tipado, chaves primarias STRING (cod_sinistro_prf, cod_corredor_prf, id_municipio 7D, sigla_uf) e regras semanticas para Sinistros PRF BRs, Corredores Logisticos, Causas/Alcoolemia e Resumo Municipal. | 🟢 APROVADO |
+| **GATE_02** | **Ingestao Bronze Isolada (Todas as Tabelas) & Cache WAL** | Ingestao resiliente dos portais oficiais PRF Dados Abertos (gov.br/prf) em data/prf_acidentes/bronze/ com registro de linhagem SHA-256. | 🟢 APROVADO |
+| **GATE_03** | **Sanitizacao de Sentinelas & Nulls** | Conversao deterministica de sentinelas em NULLs reais e normalizacao de rodovias federais (BR-116, BR-040, BR-101), gravidade e taxas de letalidade (%). | 🟢 APROVADO |
+| **GATE_04** | **Materializacao Silver Parquet Isolada (Todas as Tabelas)** | Gravacao ZSTD em data/prf_acidentes/silver/ (prf_sinistros_rodovias_br, prf_corredores_logisticos_trechos, prf_perfil_causas_condicoes, prf_sinistralidade_resumo_municipal). | 🟢 APROVADO |
+| **GATE_05** | **Validacao dos 5 Pilares & Quarentena** | Aprovacao em Freshness, Volume, Schema, Null Ceiling e Lineage com suporte a desvio para data/prf_acidentes/quarantine/. | 🟢 APROVADO |
+| **GATE_06** | **Gold Feature View Isolada & ASOF Join ML** | Features de seguranca viaria e sinistralidade de carga pesada em data/prf_acidentes/gold/features_sinistralidade_rodoviaria_prf.parquet. | 🟢 APROVADO |
+| **GATE_07** | **Integracao ao EnrichmentEngine & Marts Cross-Domain** | Integracao seguranca-viaria-territorio em mart_cross_domain_territorio_b2b_macro_brasil (total_sinistros_prf_uf, total_obitos_rodovias_prf_uf e avg_score_seguranca_viaria_prf_uf). | 🟢 APROVADO |
+| **GATE_08** | **Exposicao Multi-Interface (4 Interfaces)** | Exposicao simultanea via SDK (BrazilData.geo + shortcuts), FastAPI (/api/v1/geo/rodovias-prf/*), CLI (bdg rodovias *) e MCP (bdg_*_prf_* com wrap_untrusted_gov_data). | 🟢 APROVADO |
+| **GATE_09** | **Bateria de Testes Unitarios & Paridade Offline** | Testes unitarios offline completos em tests/connectors/test_prf_acidentes.py cobrindo 4 tabelas Silver, Gold ML e paridade nas 4 interfaces. | 🟢 APROVADO |
+| **GATE_10** | **dbt Staging, Marts Intra-Domínio/Cross-Domain & 100% Colunas Documentadas** | Modelos dbt com source.yml, stg_*, fct_sinistros_rodoviarios_prf_municipal, mart intra-dominio mart_sinistralidade_rodoviaria_prf_brasil e cross-domain mart_cross_domain_territorio_b2b_macro_brasil aprovados no dbt test (124/124) e lint_dbt_docs.py (100% cobertura). | 🟢 APROVADO |
+| **GATE_11** | **Teste Real de 1 Linha com API ao Vivo (Fail-Hard)** | Execucao obrigatoria contra portais oficiais PRF Dados Abertos e Dados Abertos Acidentes (gov.br/prf) validando HTTP 200; falha reprova o pipeline. | 🟢 APROVADO |
 
 ---
 
@@ -81,7 +81,7 @@ Estatísticas dinâmicas cruzadas diretamente com o catálogo mestre `catalog/so
 | Onda | Foco Estratégico | Total Fontes | RICE Médio | Modos Predominantes | Fontes Âncora | Status da Onda |
 | :---: | :--- | :---: | :---: | :--- | :--- | :---: |
 | **Wave 1** | APIs de Borda & Macroeconomia | 4 | 878 | `FEDERATED_API` | `ibge_localidades`, `brasilapi_core`, `bcb_sgs` (+1) | 🟢 100% Homologada |
-| **Wave 2** | B2B, Compras Públicas & Compliance | 23 | 847 | `FEDERATED_API, LAKEHOUSE_BATCH` | `rfb_cnpj_lakehouse`, `pncp_contratacoes`, `cnj_datajud` (+20) | 🟢 100% Homologada |
+| **Wave 2** | B2B, Compras Públicas & Compliance | 24 | 847 | `FEDERATED_API, LAKEHOUSE_BATCH` | `rfb_cnpj_lakehouse`, `pncp_contratacoes`, `cnj_datajud` (+21) | 🟢 100% Homologada |
 | **Wave 3** | Mercado de Capitais & Finanças Públicas | 9 | 733 | `FEDERATED_API, LAKEHOUSE_BATCH` | `cvm_dfp_itr`, `mdic_comexstat`, `cvm_fundos` (+6) | 🟢 100% Homologada |
 | **Wave 4** | Censo, Trabalho, Logística & Telecom | 10 | 553 | `FEDERATED_API, LAKEHOUSE_BATCH` | `ibge_sidra`, `ibge_pib_municipal`, `ibge_censo2022` (+7) | 🟢 100% Homologada |
 | **Wave 5** | Saúde, Educação & Setor Notarial | 14 | 451 | `FEDERATED_API, LAKEHOUSE_BATCH` | `datasus_cnes`, `datasus_sih`, `inep_censo_escolar` (+11) | 🟢 100% Homologada |
@@ -95,13 +95,13 @@ O `public-data-gateway` organiza suas fontes e marts de dados em **10 Perfis de 
 
 | Pack ID | Nome do Perfil Analítico | Status de Prontidão no Gateway | Fontes Mapeadas que Habilitam o Perfil |
 | :---: | :--- | :--- | :--- |
-| **P01** | **Modern Data Platform & Analytics (Lakehouse)** | 🟢 100% Operacional (49/49 Fontes Homologadas) | `ibge_localidades`, `brasilapi_core`, `bcb_sgs`, `bcb_olinda_ptax` *(+62 fontes)* |
-| **P02** | **IA Agêntica & Automação LLM (MCP & REST)** | 🟢 100% Operacional (49/49 Fontes Homologadas) | `ibge_localidades`, `brasilapi_core`, `bcb_sgs`, `rfb_cnpj_lakehouse` *(+39 fontes)* |
+| **P01** | **Modern Data Platform & Analytics (Lakehouse)** | 🟢 100% Operacional (49/49 Fontes Homologadas) | `ibge_localidades`, `brasilapi_core`, `bcb_sgs`, `bcb_olinda_ptax` *(+63 fontes)* |
+| **P02** | **IA Agêntica & Automação LLM (MCP & REST)** | 🟢 100% Operacional (49/49 Fontes Homologadas) | `ibge_localidades`, `brasilapi_core`, `bcb_sgs`, `rfb_cnpj_lakehouse` *(+40 fontes)* |
 | **P03** | **Engenharia FullStack & Geolocalização Offline-First** | 🟢 100% Operacional (49/49 Fontes Homologadas) | `ibge_localidades`, `brasilapi_core`, `ibge_censo2022`, `ibge_cnefe` *(+14 fontes)* |
 | **P04** | **Automação Inteligente de Onboarding & Compliance KYB** | 🟢 100% Operacional (49/49 Fontes Homologadas) | `brasilapi_core`, `rfb_cnpj_lakehouse`, `pncp_contratacoes`, `comprasgov_catmat` *(+12 fontes)* |
-| **P05** | **FinOps & Séries Macroeconômicas / Deflacionamento** | 🟢 100% Operacional (49/49 Fontes Homologadas) | `bcb_sgs`, `bcb_olinda_ptax`, `cvm_dfp_itr`, `cvm_fundos` *(+15 fontes)* |
+| **P05** | **FinOps & Séries Macroeconômicas / Deflacionamento** | 🟢 100% Operacional (49/49 Fontes Homologadas) | `bcb_sgs`, `bcb_olinda_ptax`, `cvm_dfp_itr`, `cvm_fundos` *(+16 fontes)* |
 | **P06** | **Data Clean Rooms & Benchmarks Anonimizados** | 🟢 100% Operacional (49/49 Fontes Homologadas) | `rfb_cnpj_lakehouse`, `cgu_ceis_cnep`, `cgu_pep`, `inpe_terrabrasilis` *(+18 fontes)* |
-| **P07** | **Due Diligence Corporativa, Sanções & Contencioso (TPRM)** | 🟢 100% Operacional (49/49 Fontes Homologadas) | `cnj_datajud`, `cgu_ceis_cnep`, `cgu_pep`, `tst_cndt` *(+6 fontes)* |
+| **P07** | **Due Diligence Corporativa, Sanções & Contencioso (TPRM)** | 🟢 100% Operacional (49/49 Fontes Homologadas) | `cnj_datajud`, `cgu_ceis_cnep`, `cgu_pep`, `tst_cndt` *(+7 fontes)* |
 | **P08** | **Segurança de Pipelines & Auditoria de Viés/Qualidade** | 🟢 100% Operacional (49/49 Fontes Homologadas) | `stn_siconfi`, `pgfn_divida_ativa`, `cnj_improbidade`, `stn_capag` *(+10 fontes)* |
 | **P09** | **Inteligência Industrial, Energia, Agro & Meio Ambiente** | 🟢 100% Operacional (49/49 Fontes Homologadas) | `suframa_pim_zfm`, `anatel_mosaico`, `antt_malha_transporte`, `inpe_terrabrasilis` *(+12 fontes)* |
 | **P10** | **Observabilidade de Dados, Contratos ODCS & Confiabilidade SRE** | 🟢 100% Operacional (49/49 Fontes Homologadas) | `stn_siconfi`, `pgfn_divida_ativa`, `cnj_improbidade`, `stn_capag` *(+3 fontes)* |
