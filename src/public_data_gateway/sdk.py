@@ -1697,6 +1697,64 @@ class SocioeconomicFacade:
         """List top Brazilian municipalities ranked by total municipal GDP."""
         return self.pib_municipal_connector.list_top_municipalities(limit=limit)
 
+    @property
+    def ibge_institucional_connector(self) -> Any:
+        if (
+            not hasattr(self, "_ibge_institucional_conn")
+            or self._ibge_institucional_conn is None
+        ):
+            from public_data_gateway.connectors.demografico.ibge_institucional import (
+                IbgeInstitucionalConnector,
+            )
+
+            self._ibge_institucional_conn = IbgeInstitucionalConnector(
+                settings=self._sdk.settings
+            )
+        return self._ibge_institucional_conn
+
+    def get_ibge_munic_governance(self, termo: str) -> list[dict[str, Any]]:
+        """Lookup IBGE MUNIC & POF institutional survey tracks by code, axis, TI tier, IBGE, UF, or city."""
+        return self.ibge_institucional_connector.get_ibge_munic_governance(termo)
+
+    def get_ibge_estadic_state_capacity(self, termo: str) -> list[dict[str, Any]]:
+        """Lookup IBGE ESTADIC state-level institutional capacity & civil defense metrics."""
+        return self.ibge_institucional_connector.get_ibge_estadic_state_capacity(termo)
+
+    def get_ibge_pof_budgets(
+        self, id_municipio_or_name: str
+    ) -> dict[str, Any] | None:
+        """Retrieve municipal/metropolitan IBGE POF household expenditure and income breakdown."""
+        return self.ibge_institucional_connector.get_ibge_pof_budgets(
+            id_municipio_or_name
+        )
+
+    def get_ibge_institucional_summary(
+        self, id_municipio_or_name: str
+    ) -> dict[str, Any] | None:
+        """Retrieve consolidated IBGE MUNIC, ESTADIC, and POF indicators for a municipality."""
+        return self.ibge_institucional_connector.get_ibge_institucional_summary(
+            id_municipio_or_name
+        )
+
+    def get_ibge_institucional_features(
+        self, id_municipio_or_name: str
+    ) -> dict[str, Any] | None:
+        """Retrieve Gold IBGE institutional capacity score and public governance tier."""
+        return self.ibge_institucional_connector.get_ibge_institucional_features(
+            id_municipio_or_name
+        )
+
+    def list_top_ibge_institucional_municipalities(
+        self,
+        limit: int = 10,
+        sigla_uf: str | None = None,
+        sort_by_pof: bool = False,
+    ) -> list[dict[str, Any]]:
+        """List municipalities ranked by IBGE institutional capacity score or mean POF spending."""
+        return self.ibge_institucional_connector.list_top_ibge_institucional_municipalities(
+            limit=limit, sigla_uf=sigla_uf, sort_by_pof=sort_by_pof
+        )
+
 
 class LaborFacade:
     """Unified developer facade for formal employment, labor, and wages."""
@@ -4844,6 +4902,43 @@ class BrazilData:
     def get_highest_aging_municipalities(self, limit: int = 10) -> list[dict[str, Any]]:
         """Consultar ranking de municípios com maior índice de envelhecimento (Censo 2022)."""
         return self.socioeconomic.highest_aging_municipalities(limit=limit)
+
+    def get_ibge_munic_governance(self, termo: str) -> list[dict[str, Any]]:
+        """Consultar pesquisas IBGE MUNIC e POF sobre governança TI, plano diretor e estatutários."""
+        return self.socioeconomic.get_ibge_munic_governance(termo)
+
+    def get_ibge_estadic_state_capacity(self, termo: str) -> list[dict[str, Any]]:
+        """Consultar capacidade institucional estadual ESTADIC e cobertura de proteção civil."""
+        return self.socioeconomic.get_ibge_estadic_state_capacity(termo)
+
+    def get_ibge_pof_budgets(
+        self, id_municipio_or_name: str
+    ) -> dict[str, Any] | None:
+        """Consultar orçamentos familiares IBGE POF (despesa mensal, renda monetária e pesos)."""
+        return self.socioeconomic.get_ibge_pof_budgets(id_municipio_or_name)
+
+    def get_ibge_institucional_summary(
+        self, id_municipio_or_name: str
+    ) -> dict[str, Any] | None:
+        """Consultar consolidado municipal IBGE MUNIC, ESTADIC e POF."""
+        return self.socioeconomic.get_ibge_institucional_summary(id_municipio_or_name)
+
+    def get_ibge_institucional_features(
+        self, id_municipio_or_name: str
+    ) -> dict[str, Any] | None:
+        """Consultar features Gold IBGE Institucional de governança pública e consumo POF."""
+        return self.socioeconomic.get_ibge_institucional_features(id_municipio_or_name)
+
+    def list_top_ibge_institucional_municipalities(
+        self,
+        limit: int = 10,
+        sigla_uf: str | None = None,
+        sort_by_pof: bool = False,
+    ) -> list[dict[str, Any]]:
+        """Listar municípios ranqueados por capacidade institucional IBGE ou despesa média POF."""
+        return self.socioeconomic.list_top_ibge_institucional_municipalities(
+            limit=limit, sigla_uf=sigla_uf, sort_by_pof=sort_by_pof
+        )
 
     def get_employment_summary(
         self, id_municipio: str, competencia: str | None = None

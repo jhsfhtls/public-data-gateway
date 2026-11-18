@@ -33,6 +33,7 @@ model-paths:
   - "../src/public_data_gateway/connectors/macrofinanceiro/stn_tesouro_transparente/dbt"
   - "../src/public_data_gateway/connectors/compras_publicas/comprasgov_catmat/dbt"
   - "../src/public_data_gateway/connectors/demografico/ibge_censo2022/dbt"
+  - "../src/public_data_gateway/connectors/demografico/ibge_institucional/dbt"
   - "../src/public_data_gateway/connectors/demografico/ibge_sidra/dbt"
   - "../src/public_data_gateway/connectors/demografico/ibge_pib_municipal/dbt"
   - "../src/public_data_gateway/connectors/trabalho/ibge_pnad_continua/dbt"

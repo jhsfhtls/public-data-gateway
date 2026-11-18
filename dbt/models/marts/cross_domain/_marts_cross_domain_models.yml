@@ -226,6 +226,15 @@ models:
       - name: avg_score_capital_humano_mec_uf
         description: "Média estadual do score de capital humano INEP/MEC (SAEB, PROUNI/SISU e fomento CNPq, 0-100)."
         tests: [not_null]
+      - name: servidores_estatutarios_munic_uf
+        description: "Soma estadual de servidores estatutários municipais mapeados na pesquisa IBGE MUNIC."
+        tests: [not_null]
+      - name: avg_despesa_familiar_pof_uf_brl
+        description: "Média estadual da despesa mensal domiciliar na Pesquisa de Orçamentos Familiares IBGE POF (BRL)."
+        tests: [not_null]
+      - name: avg_score_capacidade_institucional_uf
+        description: "Média estadual do score IBGE de capacidade institucional pública e consumo familiar (MUNIC/ESTADIC/POF, 0-100)."
+        tests: [not_null]
       - name: macro_ano_mes_referencia
         description: "Competência macroeconômica de referência (YYYY-MM)."
         tests: [not_null]

@@ -1,6 +1,6 @@
 {
   "schema_version": "1.0.0",
-  "last_updated": "2026-11-18T21:44:00.000000",
+  "last_updated": "2026-11-18T22:05:00.000000",
   "project_name": "public-data-gateway",
   "architecture": "Hexagonal Medallion Lakehouse (Bronze -> Silver -> Gold / Feature Store)",
   "governance_standards": [
@@ -15,7 +15,7 @@
   "current_macro_phase": "Fase 11.5 - Expansão Completa de Fontes Públicas (Ondas 11.5A a 11.5E — Padrão 11-Gates)",
   "overall_status": "ON_TRACK",
   "active_connector": null,
-  "next_connector": "ibge_institucional",
+  "next_connector": "rfb_arrecadacao",
   "structural_phases": [
     {
       "phase_id": "00",
@@ -252,74 +252,74 @@
     }
   ],
   "active_connector_gates": {
-    "target_connector": "inep_mec_extra",
+    "target_connector": "ibge_institucional",
     "target_wave": "11.5E",
     "gates": [
       {
         "gate_id": "GATE_01",
         "name": "Contrato Declarativo ODCS v3.1 das N Tabelas da API",
         "status": "PASSED",
-        "criteria": "Schema tipado ODCS-BR-INEP-MEC-EXTRA-SAEB-FUNDEB-001 (11 colunas), chaves primarias STRING (cod_avaliacao_inep, id_municipio 7D, sigla_uf) e regras semanticas para Proficiencia SAEB, PROUNI/SISU, FUNDEB/CNPq e Resumo Municipal."
+        "criteria": "Schema tipado ODCS-BR-IBGE-INSTITUCIONAL-MUNIC-POF-001 (11 colunas), chaves primarias STRING (cod_pesquisa_ibge, id_municipio 7D, sigla_uf) e regras semanticas para MUNIC, ESTADIC, POF e Resumo Municipal."
       },
       {
         "gate_id": "GATE_02",
         "name": "Ingestao Bronze Isolada (Todas as Tabelas) & Cache WAL",
         "status": "PASSED",
-        "criteria": "Ingestao resiliente dos portais oficiais INEP Microdados, FNDE (FUNDEB) e CNPq Dados Abertos em data/inep_mec_extra/bronze/ com registro de linhagem SHA-256."
+        "criteria": "Ingestao resiliente das APIs oficiais IBGE (servicodados.ibge.gov.br Pesquisas MUNIC, Agregados Assunto 70 e Localidades Estados) em data/ibge_institucional/bronze/ com registro de linhagem SHA-256."
       },
       {
         "gate_id": "GATE_03",
         "name": "Sanitizacao de Sentinelas & Nulls",
         "status": "PASSED",
-        "criteria": "Conversao deterministica de sentinelas em NULLs reais e normalizacao de etapas SAEB/MEC, programas federais (PROUNI_INTEGRAL, FUNDEB_VAAR) e equidade pedagógica."
+        "criteria": "Conversao deterministica de sentinelas em NULLs reais e normalizacao de eixos (MUNIC_GESTAO_MUNICIPAL, ESTADIC_GESTAO_ESTADUAL, POF_ORCAMENTOS_FAMILIARES), governanca TI e legislacao urbana."
       },
       {
         "gate_id": "GATE_04",
         "name": "Materializacao Silver Parquet Isolada (Todas as Tabelas)",
         "status": "PASSED",
-        "criteria": "Gravacao ZSTD em data/inep_mec_extra/silver/ (inep_saeb_proficiencia_municipio, mec_prouni_sisu_acesso_superior, fnde_fundeb_cnpq_fomento, inep_mec_extra_resumo_municipal)."
+        "criteria": "Gravacao ZSTD em data/ibge_institucional/silver/ (ibge_munic_governanca_municipal, ibge_estadic_capacidade_estadual, ibge_pof_orcamentos_consumo, ibge_institucional_resumo_municipal)."
       },
       {
         "gate_id": "GATE_05",
         "name": "Validacao dos 5 Pilares & Quarentena",
         "status": "PASSED",
-        "criteria": "Aprovacao em Freshness, Volume, Schema, Null Ceiling e Lineage com suporte a desvio para data/inep_mec_extra/quarantine/."
+        "criteria": "Aprovacao em Freshness, Volume, Schema, Null Ceiling e Lineage com suporte a desvio para data/ibge_institucional/quarantine/."
       },
       {
         "gate_id": "GATE_06",
         "name": "Gold Feature View Isolada & ASOF Join ML",
         "status": "PASSED",
-        "criteria": "Features de capital humano INEP/MEC, proficiencia SAEB e fomento CNPq em data/inep_mec_extra/gold/features_inep_mec_extra_brasil.parquet."
+        "criteria": "Features de capacidade institucional IBGE e orcamentos familiares POF em data/ibge_institucional/gold/features_ibge_institucional_brasil.parquet."
       },
       {
         "gate_id": "GATE_07",
         "name": "Integracao ao EnrichmentEngine & Marts Cross-Domain",
         "status": "PASSED",
-        "criteria": "Integracao educacao-territorio em mart_cross_domain_territorio_b2b_macro_brasil (repasses_fundeb_uf_mil_brl, bolsas_cnpq_ativas_uf e avg_score_capital_humano_mec_uf)."
+        "criteria": "Integracao institucional-territorio em mart_cross_domain_territorio_b2b_macro_brasil (servidores_estatutarios_munic_uf, avg_despesa_familiar_pof_uf_brl e avg_score_capacidade_institucional_uf)."
       },
       {
         "gate_id": "GATE_08",
         "name": "Exposicao Multi-Interface (4 Interfaces)",
         "status": "PASSED",
-        "criteria": "Exposicao simultanea via SDK (BrazilData.education + shortcuts), FastAPI (/api/v1/education/inep-mec-extra/*), CLI (bdg inep-mec-extra *) e MCP (bdg_get_inep_saeb_proficiency, bdg_get_mec_prouni_sisu_access, bdg_get_inep_mec_extra_features, bdg_list_top_inep_mec_extra_municipalities com wrap_untrusted_gov_data)."
+        "criteria": "Exposicao simultanea via SDK (BrazilData.socioeconomic + shortcuts), FastAPI (/api/v1/demographics/ibge-institucional/*), CLI (bdg ibge-institucional *) e MCP (bdg_get_ibge_munic_governance, bdg_get_ibge_pof_budgets, bdg_get_ibge_institucional_features, bdg_list_top_ibge_institucional_municipalities com wrap_untrusted_gov_data)."
       },
       {
         "gate_id": "GATE_09",
         "name": "Bateria de Testes Unitarios & Paridade Offline",
         "status": "PASSED",
-        "criteria": "Testes unitarios offline completos em tests/connectors/test_inep_mec_extra.py cobrindo 4 tabelas Silver, Gold ML e paridade nas 4 interfaces."
+        "criteria": "Testes unitarios offline completos em tests/connectors/test_ibge_institucional.py cobrindo 4 tabelas Silver, Gold ML e paridade nas 4 interfaces."
       },
       {
         "gate_id": "GATE_10",
         "name": "dbt Staging, Marts Intra-Domínio/Cross-Domain & 100% Colunas Documentadas",
         "status": "PASSED",
-        "criteria": "Modelos dbt com source.yml, stg_*, fct_inep_mec_extra_municipal, mart intra-dominio mart_inep_mec_extra_brasil e cross-domain mart_cross_domain_territorio_b2b_macro_brasil aprovados no dbt test (2.132/2.132) e lint_dbt_docs.py (100% cobertura em 680 modelos / 9.168 colunas / 384 fontes)."
+        "criteria": "Modelos dbt com source.yml, stg_*, fct_ibge_institucional_municipal, mart intra-dominio mart_ibge_institucional_brasil e cross-domain mart_cross_domain_territorio_b2b_macro_brasil aprovados no dbt test (2.212/2.212) e lint_dbt_docs.py (100% cobertura em 686 modelos / 9.242 colunas / 388 fontes)."
       },
       {
         "gate_id": "GATE_11",
         "name": "Teste Real de 1 Linha com API ao Vivo (Fail-Hard)",
         "status": "PASSED",
-        "criteria": "Execucao obrigatoria contra portais oficiais INEP Microdados, FNDE (FUNDEB) e CNPq Dados Abertos validando HTTP 200; falha reprova o pipeline."
+        "criteria": "Execucao obrigatoria contra APIs oficiais IBGE (servicodados.ibge.gov.br/api/v1/pesquisas/1, api/v3/agregados?assunto=70 e api/v1/localidades/estados) validando HTTP 200; falha reprova o pipeline."
       }
     ]
   },
@@ -882,6 +882,12 @@
       "phase_id": "11.5",
       "milestone": "Wave 11.5E Extensão (2/5) — Homologação do Conector inep_mec_extra (4 Tabelas Silver SAEB/PROUNI/SISU/FUNDEB/CNPq, Mart Intra-Domínio, Mart Cross-Domain Território & Paridade 4 Interfaces)",
       "summary": "Implementação completa nos 11 Gates da extensão inep_mec_extra (INEP/MEC Complementar — SAEB, PROUNI, SISU, FUNDEB & CNPq): contrato ODCS v3.1 (ODCS-BR-INEP-MEC-EXTRA-SAEB-FUNDEB-001), ingestão Bronze + 4 tabelas Silver ZSTD (inep_saeb_proficiencia_municipio, mec_prouni_sisu_acesso_superior, fnde_fundeb_cnpq_fomento, inep_mec_extra_resumo_municipal) + Gold ML (features_inep_mec_extra_brasil), 4 staging views + fct_inep_mec_extra_municipal + mart intra-domínio mart_inep_mec_extra_brasil + enriquecimento da mart cross-domain mart_cross_domain_territorio_b2b_macro_brasil (2.132 testes dbt OK na linhagem, 100% colunas documentadas no lint_dbt_docs.py com 680 modelos / 9.168 colunas / 384 fontes), paridade em SDK/FastAPI/CLI/MCP, bateria offline e teste live fail-hard contra gov.br/inep (microdados), gov.br/fnde (dados-abertos) e gov.br/cnpq (dados-abertos)."
+    },
+    {
+      "date": "2026-11-18",
+      "phase_id": "11.5",
+      "milestone": "Wave 11.5E Extensão (3/5) — Homologação do Conector ibge_institucional (4 Tabelas Silver MUNIC/ESTADIC/POF, Mart Intra-Domínio, Mart Cross-Domain Território & Paridade 4 Interfaces)",
+      "summary": "Implementação completa nos 11 Gates da extensão ibge_institucional (IBGE Institucional & Social — MUNIC, ESTADIC & POF): contrato ODCS v3.1 (ODCS-BR-IBGE-INSTITUCIONAL-MUNIC-POF-001), ingestão Bronze + 4 tabelas Silver ZSTD (ibge_munic_governanca_municipal, ibge_estadic_capacidade_estadual, ibge_pof_orcamentos_consumo, ibge_institucional_resumo_municipal) + Gold ML (features_ibge_institucional_brasil), 4 staging views + fct_ibge_institucional_municipal + mart intra-domínio mart_ibge_institucional_brasil + enriquecimento da mart cross-domain mart_cross_domain_territorio_b2b_macro_brasil (2.212 testes dbt OK na linhagem, 100% colunas documentadas no lint_dbt_docs.py com 686 modelos / 9.242 colunas / 388 fontes), paridade em SDK/FastAPI/CLI/MCP, bateria offline e teste live fail-hard contra APIs oficiais IBGE (servicodados.ibge.gov.br Pesquisas MUNIC, Agregados Assunto 70 e Localidades Estados)."
     }
   ]
 }
