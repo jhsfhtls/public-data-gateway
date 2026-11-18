@@ -91,6 +91,7 @@ model-paths:
   - "../src/public_data_gateway/connectors/geografico/overpass_osm/dbt"
   - "../src/public_data_gateway/connectors/macrofinanceiro/alpha_vantage/dbt"
   - "../src/public_data_gateway/connectors/compliance/bgpview_ip_intel/dbt"
+  - "../src/public_data_gateway/connectors/compliance/cgu_servidores_federais/dbt"
   - "../src/public_data_gateway/connectors/compliance/cgu_transparencia_gastos/dbt"
   - "../src/public_data_gateway/connectors/compliance/rdap_registro_br/dbt"
   - "../src/public_data_gateway/connectors/compliance/sinesp_seguranca/dbt"

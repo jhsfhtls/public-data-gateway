@@ -149,6 +149,16 @@ cgu_gastos_uf AS (
     GROUP BY sigla_uf
 ),
 
+siape_uf AS (
+    SELECT
+        sigla_uf,
+        SUM(total_servidores_federais_siape) AS total_servidores_siape_uf,
+        ROUND(SUM(folha_mensal_bruta_siape_mil_brl), 2) AS folha_mensal_siape_uf_mil_brl,
+        ROUND(AVG(score_integridade_funcional_siape), 2) AS avg_score_integridade_siape_uf
+    FROM {{ ref('mart_servidores_federais_siape_brasil') }}
+    GROUP BY sigla_uf
+),
+
 base AS (
     SELECT
         t.sigla_uf,
@@ -192,6 +202,9 @@ base AS (
         COALESCE(cgf.total_gastos_federais_cgu_uf_mil_brl, 0.0) AS total_gastos_federais_cgu_uf_mil_brl,
         COALESCE(cgf.total_transferencias_cgu_uf_mil_brl, 0.0) AS total_transferencias_cgu_uf_mil_brl,
         COALESCE(cgf.avg_score_integridade_execucao_cgu_uf, 75.0) AS avg_score_integridade_execucao_cgu_uf,
+        COALESCE(sp.total_servidores_siape_uf, 0) AS total_servidores_siape_uf,
+        COALESCE(sp.folha_mensal_siape_uf_mil_brl, 0.0) AS folha_mensal_siape_uf_mil_brl,
+        COALESCE(sp.avg_score_integridade_siape_uf, 80.0) AS avg_score_integridade_siape_uf,
         COALESCE(m.ano_mes, '2025-03') AS macro_ano_mes_referencia,
         COALESCE(m.selic_meta_fim_mes_pct, 14.25) AS selic_meta_fim_mes_pct,
         COALESCE(m.ipca_acumulado_12m_pct, 5.06) AS ipca_acumulado_12m_pct,
@@ -211,6 +224,7 @@ base AS (
     LEFT JOIN sinesp_uf sn ON t.sigla_uf = sn.sigla_uf
     LEFT JOIN prf_uf pf ON t.sigla_uf = pf.sigla_uf
     LEFT JOIN cgu_gastos_uf cgf ON t.sigla_uf = cgf.sigla_uf
+    LEFT JOIN siape_uf sp ON t.sigla_uf = sp.sigla_uf
     CROSS JOIN macro_latest m
 ),
 

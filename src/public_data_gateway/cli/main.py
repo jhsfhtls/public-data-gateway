@@ -474,6 +474,36 @@ def build_parser() -> argparse.ArgumentParser:
     trp_rk_p.add_argument("--gasto", action="store_true", help="Sort descending by total federal spend (R$ mil)")
     trp_rk_p.add_argument("--json", action="store_true", help="Output in JSON format")
 
+    # CGU / SIAPE Servidores Federais command group
+    siape_p = subparsers.add_parser("servidores-siape", help="Query CGU/SIAPE federal civil servants, payroll, compliance, and governance rankings.")
+    siape_sub = siape_p.add_subparsers(dest="servidores_siape_action", required=True)
+
+    sp_lot_p = siape_sub.add_parser("lotacao", help="Lookup SIAPE federal civil servants by code, agency, legal regime, IBGE, UF, or city.")
+    sp_lot_p.add_argument("termo", help="SIAPE code, agency code, regime, status, IBGE, UF, or municipality name")
+    sp_lot_p.add_argument("--json", action="store_true", help="Output in JSON format")
+
+    sp_fol_p = siape_sub.add_parser("folha", help="Lookup SIAPE monthly average salary, constitutional ceiling, and DAS/FCE extras.")
+    sp_fol_p.add_argument("termo", help="Payroll code, IBGE code, UF, or municipality name")
+    sp_fol_p.add_argument("--json", action="store_true", help="Output in JSON format")
+
+    sp_ac_p = siape_sub.add_parser("acumulo", help="Get municipal exclusive dedication rate, accumulation alerts, and SIAPE integrity.")
+    sp_ac_p.add_argument("id_municipio_or_name", help="7-digit IBGE code or municipality name")
+    sp_ac_p.add_argument("--json", action="store_true", help="Output in JSON format")
+
+    sp_mn_p = siape_sub.add_parser("municipio", help="Get consolidated municipal SIAPE headcount, monthly gross payroll, and DAS share.")
+    sp_mn_p.add_argument("id_municipio_or_name", help="7-digit IBGE code or municipality name")
+    sp_mn_p.add_argument("--json", action="store_true", help="Output in JSON format")
+
+    sp_ft_p = siape_sub.add_parser("features", help="Get Gold CGU/SIAPE civil service governance score and tier.")
+    sp_ft_p.add_argument("id_municipio_or_name", help="7-digit IBGE code or municipality name")
+    sp_ft_p.add_argument("--json", action="store_true", help="Output in JSON format")
+
+    sp_rk_p = siape_sub.add_parser("ranking", help="List municipalities ranked by SIAPE governance score or monthly payroll.")
+    sp_rk_p.add_argument("--limit", type=int, default=10, help="Max municipalities to list")
+    sp_rk_p.add_argument("--uf", type=str, help="Optional 2-letter state filter")
+    sp_rk_p.add_argument("--folha", action="store_true", help="Sort descending by monthly gross SIAPE payroll (R$ mil)")
+    sp_rk_p.add_argument("--json", action="store_true", help="Output in JSON format")
+
     # Subcommand: improbidade (CNJ CNCIAI Improbidade Administrativa)
     imp_p = subparsers.add_parser(
         "improbidade",
@@ -3145,6 +3175,84 @@ def main(argv: Sequence[str] | None = None) -> int:
                     return 0
             except (ValueError, KeyError) as exc:
                 print(f"Erro CGU Transparência: {exc}", file=sys.stderr)
+                return 1
+
+        elif args.command == "servidores-siape":
+            from public_data_gateway.connectors.compliance.cgu_servidores_federais import (
+                CguServidoresFederaisConnector,
+            )
+
+            sp_conn = CguServidoresFederaisConnector()
+            sp_action = getattr(args, "servidores_siape_action", "")
+            try:
+                if sp_action == "lotacao":
+                    rows = sp_conn.get_siape_active_staff(args.termo)
+                    if getattr(args, "json", False):
+                        print(json.dumps(rows, indent=2, ensure_ascii=False, default=str))
+                    else:
+                        print(f"SIAPE Lotação Servidores ({len(rows)}):")
+                        for r in rows:
+                            print(f"  {r.get('cod_lotacao_siape')} | {r.get('nome_municipio')} ({r.get('sigla_uf')}): {r.get('regime_juridico_siape')} | {r.get('qtd_servidores_lotados')} serv")
+                    return 0
+
+                if sp_action == "folha":
+                    rows = sp_conn.get_siape_payroll(args.termo)
+                    if getattr(args, "json", False):
+                        print(json.dumps(rows, indent=2, ensure_ascii=False, default=str))
+                    else:
+                        print(f"SIAPE Folha Pagamento ({len(rows)}):")
+                        for r in rows:
+                            print(f"  {r.get('cod_folha_siape')} | {r.get('nome_municipio')} ({r.get('sigla_uf')}): Média R$ {r.get('remuneracao_media_bruta_brl')}")
+                    return 0
+
+                if sp_action == "acumulo":
+                    res = sp_conn.get_cgu_staff_compliance(args.id_municipio_or_name)
+                    if res is None:
+                        print(f"Integridade SIAPE não encontrada para: {args.id_municipio_or_name}", file=sys.stderr)
+                        return 1
+                    if getattr(args, "json", False):
+                        print(json.dumps(res, indent=2, ensure_ascii=False, default=str))
+                    else:
+                        print(f"CGU/SIAPE Integridade ({res.get('nome_municipio')} - {res.get('sigla_uf')}): {res.get('indice_integridade_siape_pct')}% | Alertas {res.get('alertas_acumulo_ilicito')}")
+                    return 0
+
+                if sp_action == "municipio":
+                    res = sp_conn.get_siape_municipal_summary(args.id_municipio_or_name)
+                    if res is None:
+                        print(f"Resumo SIAPE não encontrado para: {args.id_municipio_or_name}", file=sys.stderr)
+                        return 1
+                    if getattr(args, "json", False):
+                        print(json.dumps(res, indent=2, ensure_ascii=False, default=str))
+                    else:
+                        print(f"SIAPE Município ({res.get('nome_municipio')} - {res.get('sigla_uf')}): {res.get('total_servidores_federais_siape')} serv | Folha R$ {res.get('folha_mensal_bruta_siape_mil_brl')}k")
+                    return 0
+
+                if sp_action == "features":
+                    res = sp_conn.get_siape_features(args.id_municipio_or_name)
+                    if res is None:
+                        print(f"Features SIAPE não encontradas para: {args.id_municipio_or_name}", file=sys.stderr)
+                        return 1
+                    if getattr(args, "json", False):
+                        print(json.dumps(res, indent=2, ensure_ascii=False, default=str))
+                    else:
+                        print(f"CGU/SIAPE Gold ({res.get('nome_municipio')} - {res.get('id_municipio')}): Score {res.get('score_integridade_funcional_siape')} | {res.get('tier_governanca_pessoal_siape')}")
+                    return 0
+
+                if sp_action == "ranking":
+                    ranks = sp_conn.list_top_siape_municipalities(
+                        limit=getattr(args, "limit", 10),
+                        sigla_uf=getattr(args, "uf", None),
+                        sort_by_payroll=getattr(args, "folha", False),
+                    )
+                    if getattr(args, "json", False):
+                        print(json.dumps(ranks, indent=2, ensure_ascii=False, default=str))
+                    else:
+                        print(f"Ranking CGU/SIAPE Governança ({len(ranks)}):")
+                        for idx, r in enumerate(ranks, 1):
+                            print(f"  {idx}. {r.get('nome_municipio')} ({r.get('sigla_uf')}): {r.get('score_integridade_funcional_siape')} | {r.get('tier_governanca_pessoal_siape')}")
+                    return 0
+            except (ValueError, KeyError) as exc:
+                print(f"Erro CGU/SIAPE Servidores: {exc}", file=sys.stderr)
                 return 1
 
         elif args.command == "improbidade":

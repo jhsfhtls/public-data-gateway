@@ -1,0 +1,26 @@
+version: 2
+
+sources:
+  - name: cgu_servidores_federais
+    description: "Tabelas Silver de Servidores Públicos Federais SIAPE, Folha Bruta e Integridade Funcional (CGU / MGI)"
+    meta:
+      agency: "Controladoria-Geral da União (CGU) & MGI / SIAPE"
+      domain: "compliance_servidores_federais_siape"
+      freshness_sla: "Mensal (720h)"
+    tables:
+      - name: siape_servidores_ativos_municipio
+        description: "Contingente de servidores públicos federais por regime jurídico, vínculo, órgão e município UORG"
+        meta:
+          external_location: "data/cgu_servidores_federais/silver/siape_servidores_ativos_municipio.parquet"
+      - name: siape_remuneracao_folha_orgao
+        description: "Remuneração média bruta mensal, incidência de teto constitucional e adicionais DAS/FCE"
+        meta:
+          external_location: "data/cgu_servidores_federais/silver/siape_remuneracao_folha_orgao.parquet"
+      - name: cgu_acumulo_cargos_conflitos
+        description: "Indicadores municipais de dedicação exclusiva, alertas de acúmulo ilícito e integridade funcional"
+        meta:
+          external_location: "data/cgu_servidores_federais/silver/cgu_acumulo_cargos_conflitos.parquet"
+      - name: siape_servidores_resumo_municipal
+        description: "Consolidado municipal de efetivo federal SIAPE, folha bruta mensal e percentual comissionado DAS/FCE"
+        meta:
+          external_location: "data/cgu_servidores_federais/silver/siape_servidores_resumo_municipal.parquet"

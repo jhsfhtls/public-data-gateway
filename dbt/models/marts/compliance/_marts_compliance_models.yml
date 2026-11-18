@@ -284,3 +284,58 @@ models:
       - name: tier_transparencia_gastos_cgu
         description: "Classificação municipal (EXCELENCIA_TRANSPARENCIA_EXECUCAO, EXECUCAO_REGULAR_MONITORADA ou ALERTA_CONCENTRACAO_CONVENIOS)."
         tests: [not_null]
+
+  - name: mart_servidores_federais_siape_brasil
+    description: "Data Mart Gold intra-domínio consolidando efetivo federal SIAPE, folha salarial mensal, DAS/FCE e integridade funcional CGU."
+    columns:
+      - name: id_municipio
+        description: "Código IBGE de 7 dígitos do município (STRING)."
+        tests: [not_null, unique]
+      - name: sigla_uf
+        description: "Sigla de 2 letras da Unidade Federativa (UF)."
+        tests: [not_null]
+      - name: nome_municipio
+        description: "Nome oficial do município."
+        tests: [not_null]
+      - name: regiao
+        description: "Macrorregião geográfica brasileira."
+        tests: [not_null]
+      - name: total_servidores_federais_siape
+        description: "Contingente total de servidores públicos federais lotados no município."
+        tests: [not_null]
+      - name: folha_mensal_bruta_siape_mil_brl
+        description: "Massa salarial bruta mensal do funcionalismo federal no município (R$ mil)."
+        tests: [not_null]
+      - name: remuneracao_media_bruta_brl
+        description: "Remuneração bruta média mensal dos servidores federais no município (BRL)."
+        tests: [not_null]
+      - name: pct_cargos_comissionados_das
+        description: "Participação percentual de funções comissionadas DAS/FCE sobre os vínculos (%)."
+        tests: [not_null]
+      - name: qtd_regimes_lotacao_siape
+        description: "Quantidade de agrupamentos jurídicos SIAPE consolidados na Silver."
+        tests: [not_null]
+      - name: remuneracao_teto_pct
+        description: "Percentual de servidores com vencimentos no teto constitucional (%)."
+        tests: [not_null]
+      - name: adicional_funcao_das_fce_mil_brl
+        description: "Folha mensal de funções de confiança e assessoramento DAS/FCE (R$ mil)."
+        tests: [not_null]
+      - name: servidores_dedicacao_exclusiva_pct
+        description: "Percentual de servidores sob regime regular de dedicação exclusiva (%)."
+        tests: [not_null]
+      - name: alertas_acumulo_ilicito
+        description: "Alertas de possível acúmulo irregular de cargos públicos sob verificação CGU."
+        tests: [not_null]
+      - name: servidores_cedidos_count
+        description: "Total de servidores federais cedidos ou requisitados."
+        tests: [not_null]
+      - name: indice_integridade_siape_pct
+        description: "Índice composto de conformidade e regularidade SIAPE/CGU (%)."
+        tests: [not_null]
+      - name: score_integridade_funcional_siape
+        description: "Score sintético municipal de governança de pessoal e integridade funcional SIAPE (0-100)."
+        tests: [not_null]
+      - name: tier_governanca_pessoal_siape
+        description: "Classificação municipal SIAPE (ALTA_GOVERNANCA_FUNCIONAL_SIAPE, QUADRO_FEDERAL_CONSOLIDADO ou ALERTA_CONCENTRACAO_COMISSIONADOS)."
+        tests: [not_null]
