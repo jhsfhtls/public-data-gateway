@@ -1995,3 +1995,32 @@ sources:
   status: HOMOLOGATED
   freshness_sla_hours: 168
   cron_schedule_expression: 0 5 * * 1
+- source_id: mps_inss_beneficios
+  name: 'MPS / INSS Benefícios: Previdência Social, BPC/LOAS & Arrecadação'
+  agency: Instituto Nacional do Seguro Social (INSS) & Ministério da Previdência Social (MPS)
+  official_url: https://dadosabertos.inss.gov.br
+  segment_id: 04_trabalho_renda
+  segment_name: Trabalho, Emprego & Renda
+  access_mode: LAKEHOUSE_BATCH
+  protocol: HTTP_BULK_ZIP
+  auth_type: NONE
+  canonical_keys:
+  - id_municipio
+  - sigla_uf
+  update_frequency: Mensal (BEPS / Síntese Municipal de Benefícios Emitidos e Concedidos)
+  estimated_volume: ~5.570 municípios com benefícios ativos RGPS/BPC, concessões e GPS (~380 MB)
+  lgpd_tier: PUBLIC_NON_PERSONAL
+  ml_feature_domains:
+  - social_security_payout_injection
+  - contributor_beneficiary_dependency_ratio
+  - bpc_loas_assistance_vulnerability
+  solution_packs:
+  - P01
+  - P02
+  - P03
+  - P06
+  rice_score: 875
+  roadmap_wave: 2
+  status: HOMOLOGATED
+  freshness_sla_hours: 720
+  cron_schedule_expression: 0 6 10 * *

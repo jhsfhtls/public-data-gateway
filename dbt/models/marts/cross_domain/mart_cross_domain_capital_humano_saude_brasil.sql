@@ -36,6 +36,15 @@ emprego AS (
     QUALIFY ROW_NUMBER() OVER (PARTITION BY id_municipio ORDER BY competencia_movimentacao DESC NULLS LAST) = 1
 ),
 
+inss_previdencia AS (
+    SELECT
+        id_municipio,
+        beneficios_inss_emitidos,
+        valor_mensal_beneficios_mil_brl AS valor_mensal_beneficios_inss_mil_brl,
+        score_cobertura_previdenciaria_inss
+    FROM {{ ref('mart_previdencia_social_inss_brasil') }}
+),
+
 joined AS (
     SELECT
         s.id_municipio,
@@ -53,10 +62,14 @@ joined AS (
         COALESCE(e.saldo_movimentacao, 0) AS saldo_emprego_formal,
         COALESCE(e.salario_medio_admissao_reais, 2400.0) AS salario_medio_admissao_reais,
         COALESCE(e.score_aquecimento_mercado_trabalho, 55.0) AS score_aquecimento_mercado_trabalho,
+        COALESCE(p.beneficios_inss_emitidos, 0) AS beneficios_inss_emitidos,
+        COALESCE(p.valor_mensal_beneficios_inss_mil_brl, 0.0) AS valor_mensal_beneficios_inss_mil_brl,
+        COALESCE(p.score_cobertura_previdenciaria_inss, 65.0) AS score_cobertura_previdenciaria_inss,
         s.reference_date
     FROM saude s
     LEFT JOIN ideb i ON s.id_municipio = i.id_municipio
     LEFT JOIN emprego e ON s.id_municipio = e.id_municipio
+    LEFT JOIN inss_previdencia p ON s.id_municipio = p.id_municipio
 ),
 
 scored AS (

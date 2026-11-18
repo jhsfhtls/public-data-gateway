@@ -1325,6 +1325,60 @@ class LaborFacade:
         """Rank municipalities by RAIS formalization score."""
         return self.rais_connector.list_top_formalized_municipalities(limit=limit)
 
+    @property
+    def mps_inss_connector(self) -> Any:
+        if (
+            not hasattr(self, "_mps_inss_connector")
+            or self._mps_inss_connector is None
+        ):
+            from public_data_gateway.connectors.trabalho.mps_inss_beneficios import (
+                MpsInssBeneficiosConnector,
+            )
+
+            self._mps_inss_connector = MpsInssBeneficiosConnector(
+                settings=self._sdk.settings
+            )
+        return self._mps_inss_connector
+
+    def get_inss_issued_benefits(self, termo: str) -> list[dict[str, Any]]:
+        """Lookup INSS active issued benefits by code, species, group, clientele, IBGE, UF, or city."""
+        return self.mps_inss_connector.get_inss_issued_benefits(termo)
+
+    def get_inss_benefit_grants(self, termo: str) -> list[dict[str, Any]]:
+        """Lookup annual INSS benefit grants, denial rates, and concession lead times."""
+        return self.mps_inss_connector.get_inss_benefit_grants(termo)
+
+    def get_mps_social_contributions(
+        self, id_municipio_or_name: str
+    ) -> dict[str, Any] | None:
+        """Retrieve municipal RGPS active contributors, collections, and contributor-to-beneficiary ratio."""
+        return self.mps_inss_connector.get_mps_social_contributions(
+            id_municipio_or_name
+        )
+
+    def get_inss_municipal_summary(
+        self, id_municipio_or_name: str
+    ) -> dict[str, Any] | None:
+        """Retrieve consolidated municipal INSS benefits count, monthly cash injection, and BPC share."""
+        return self.mps_inss_connector.get_inss_municipal_summary(
+            id_municipio_or_name
+        )
+
+    def get_inss_features(self, id_municipio_or_name: str) -> dict[str, Any] | None:
+        """Retrieve Gold MPS/INSS social security coverage score and sustainability tier."""
+        return self.mps_inss_connector.get_inss_features(id_municipio_or_name)
+
+    def list_top_inss_municipalities(
+        self,
+        limit: int = 10,
+        sigla_uf: str | None = None,
+        sort_by_volume: bool = False,
+    ) -> list[dict[str, Any]]:
+        """List municipalities ranked by INSS coverage score or monthly benefit payout volume."""
+        return self.mps_inss_connector.list_top_inss_municipalities(
+            limit=limit, sigla_uf=sigla_uf, sort_by_volume=sort_by_volume
+        )
+
     def employment_summary(
         self, id_municipio: str, competencia: str | None = None
     ) -> dict[str, Any] | None:
@@ -3886,6 +3940,41 @@ class BrazilData:
     def get_top_formalized_municipalities(self, limit: int = 10) -> list[dict[str, Any]]:
         """Consultar ranking de formalização municipal RAIS."""
         return self.labor.rais_top_formalized(limit=limit)
+
+    def get_inss_issued_benefits(self, termo: str) -> list[dict[str, Any]]:
+        """Consultar benefícios ativos emitidos no INSS (RGPS e BPC/LOAS) por código, espécie, IBGE, UF ou município."""
+        return self.labor.get_inss_issued_benefits(termo)
+
+    def get_inss_benefit_grants(self, termo: str) -> list[dict[str, Any]]:
+        """Consultar concessões anuais de benefícios INSS, taxa de indeferimento e tempo médio de concessão."""
+        return self.labor.get_inss_benefit_grants(termo)
+
+    def get_mps_social_contributions(
+        self, id_municipio_or_name: str
+    ) -> dict[str, Any] | None:
+        """Consultar contribuintes ativos, arrecadação previdenciária e razão contribuintes/beneficiários (MPS)."""
+        return self.labor.get_mps_social_contributions(id_municipio_or_name)
+
+    def get_inss_municipal_summary(
+        self, id_municipio_or_name: str
+    ) -> dict[str, Any] | None:
+        """Consultar consolidado municipal de benefícios INSS emitidos, volume financeiro mensal e BPC/LOAS."""
+        return self.labor.get_inss_municipal_summary(id_municipio_or_name)
+
+    def get_inss_features(self, id_municipio_or_name: str) -> dict[str, Any] | None:
+        """Consultar features Gold MPS/INSS de cobertura previdenciária e sustentabilidade RGPS."""
+        return self.labor.get_inss_features(id_municipio_or_name)
+
+    def list_top_inss_municipalities(
+        self,
+        limit: int = 10,
+        sigla_uf: str | None = None,
+        sort_by_volume: bool = False,
+    ) -> list[dict[str, Any]]:
+        """Listar municípios ranqueados por cobertura previdenciária INSS ou maior volume financeiro pago."""
+        return self.labor.list_top_inss_municipalities(
+            limit=limit, sigla_uf=sigla_uf, sort_by_volume=sort_by_volume
+        )
 
     def get_state_labor_profile(self, id_or_sigla_uf: str) -> dict[str, Any] | None:
         """Consultar perfil estadual do mercado de trabalho, taxa de desocupação e renda (PNAD Contínua)."""
