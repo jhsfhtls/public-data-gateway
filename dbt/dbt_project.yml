@@ -60,6 +60,7 @@ model-paths:
   - "../src/public_data_gateway/connectors/ambiental/bcb_sicor/dbt"
   - "../src/public_data_gateway/connectors/ambiental/ibama_fiscalizacao/dbt"
   - "../src/public_data_gateway/connectors/ambiental/ibge_agro_municipal/dbt"
+  - "../src/public_data_gateway/connectors/ambiental/inpe_queimadas_seeg/dbt"
   - "../src/public_data_gateway/connectors/ambiental/inpe_terrabrasilis/dbt"
   - "../src/public_data_gateway/connectors/ambiental/mapbiomas_cobertura/dbt"
   - "../src/public_data_gateway/connectors/ambiental/mapa_zarc/dbt"

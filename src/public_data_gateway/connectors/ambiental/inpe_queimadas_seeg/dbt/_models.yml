@@ -1,0 +1,196 @@
+version: 2
+
+models:
+  - name: stg_inpe_focos_queimadas
+    description: "Staging view tipada dos focos de calor detectados pelo Programa Queimadas INPE."
+    columns:
+      - name: cod_foco_inpe
+        description: "Código identificador único do foco de calor detectado."
+        tests: [not_null, unique]
+      - name: satelite_referencia
+        description: "Satélite orbital detector da ocorrência térmica."
+        tests: [not_null]
+      - name: id_municipio
+        description: "Código IBGE de 7 dígitos do município (STRING)."
+        tests: [not_null]
+      - name: sigla_uf
+        description: "Sigla de 2 letras da Unidade da Federação (UF)."
+        tests: [not_null]
+      - name: nome_municipio
+        description: "Nome oficial do município."
+        tests: [not_null]
+      - name: bioma
+        description: "Bioma brasileiro associado ao foco de calor."
+        tests: [not_null]
+      - name: data_hora_gmt
+        description: "Data e hora UTC da passagem do satélite no formato ISO-8601."
+        tests: [not_null]
+      - name: risco_fogo
+        description: "Índice de Risco de Fogo do INPE na célula observada (0.0 a 1.0)."
+        tests: [not_null]
+      - name: frp_mw
+        description: "Potência Radiativa do Fogo (Fire Radiative Power) em Megawatts (MW)."
+        tests: [not_null]
+      - name: dias_sem_chuva
+        description: "Quantidade de dias consecutivos sem precipitação antes da detecção."
+        tests: [not_null]
+      - name: precipitacao_mm
+        description: "Precipitação observada na data da detecção em milímetros (mm)."
+        tests: [not_null]
+      - name: latitude
+        description: "Latitude WGS84 da detecção térmica."
+        tests: [not_null]
+      - name: longitude
+        description: "Longitude WGS84 da detecção térmica."
+        tests: [not_null]
+
+  - name: stg_seeg_emissoes_gee_setor
+    description: "Staging view tipada do inventário municipal de emissões e remoções GEE (SEEG)."
+    columns:
+      - name: cod_emissao_seeg
+        description: "Identificador determinístico do lançamento setorial municipal SEEG."
+        tests: [not_null, unique]
+      - name: id_municipio
+        description: "Código IBGE de 7 dígitos do município (STRING)."
+        tests: [not_null]
+      - name: sigla_uf
+        description: "Sigla de 2 letras da Unidade da Federação (UF)."
+        tests: [not_null]
+      - name: nome_municipio
+        description: "Nome oficial do município."
+        tests: [not_null]
+      - name: ano_inventario
+        description: "Ano de referência do inventário SEEG de emissões GEE."
+        tests: [not_null]
+      - name: setor_emissao
+        description: "Setor emissor IPCC/SEEG (Mudanca_Uso_Terra_Florestas, Agropecuaria ou Energia)."
+        tests: [not_null]
+      - name: subsetor
+        description: "Subsetor detalhado da fonte ou sumidouro de emissões."
+        tests: [not_null]
+      - name: gas_efeito_estufa
+        description: "Métrica consolidada do gás em carbono equivalente (CO2e_GWP_AR5)."
+        tests: [not_null]
+      - name: emissao_bruta_tco2e
+        description: "Emissão bruta anual em toneladas de CO2 equivalente (tCO2e)."
+        tests: [not_null]
+      - name: remocao_tco2e
+        description: "Remoção anual de carbono por vegetação/solo em tCO2e."
+        tests: [not_null]
+      - name: emissao_liquida_tco2e
+        description: "Balanço líquido de emissões GEE (bruta menos remoção) em tCO2e."
+        tests: [not_null]
+
+  - name: stg_inpe_risco_fogo_mensal
+    description: "Staging view municipal de risco sazonal de fogo, FRP médio e cicatriz queimada (INPE)."
+    columns:
+      - name: id_municipio
+        description: "Código IBGE de 7 dígitos do município (STRING)."
+        tests: [not_null, unique]
+      - name: sigla_uf
+        description: "Sigla da Unidade da Federação (UF)."
+        tests: [not_null]
+      - name: nome_municipio
+        description: "Nome oficial do município."
+        tests: [not_null]
+      - name: bioma
+        description: "Bioma predominante no município."
+        tests: [not_null]
+      - name: risco_fogo_medio_inpe
+        description: "Índice médio de Risco de Fogo no município (0.0 a 1.0)."
+        tests: [not_null]
+      - name: frp_medio_mw
+        description: "Potência Radiativa média dos focos no município (MW)."
+        tests: [not_null]
+      - name: dias_seco_consecutivos_max
+        description: "Pico de dias consecutivos sem precipitação no período seco."
+        tests: [not_null]
+      - name: concentracao_estacao_seca_pct
+        description: "Percentual de focos concentrados no trimestre crítico de seca (%)."
+        tests: [not_null]
+      - name: area_cicatriz_queimada_ha
+        description: "Área acumulada com cicatriz de queimada mapeada no município em hectares (ha)."
+        tests: [not_null]
+
+  - name: stg_queimadas_seeg_resumo_municipal
+    description: "Staging view consolidada por município integrando focos de calor INPE e emissões SEEG."
+    columns:
+      - name: id_municipio
+        description: "Código IBGE de 7 dígitos do município (STRING)."
+        tests: [not_null, unique]
+      - name: sigla_uf
+        description: "Sigla da Unidade da Federação (UF)."
+        tests: [not_null]
+      - name: nome_municipio
+        description: "Nome oficial do município."
+        tests: [not_null]
+      - name: bioma_predominante
+        description: "Bioma predominante no território municipal."
+        tests: [not_null]
+      - name: qtd_focos_calor_inpe
+        description: "Total anual de focos ativos de calor detectados no município (INPE)."
+        tests: [not_null]
+      - name: area_cicatriz_queimada_ha
+        description: "Extensão territorial de cicatrizes de queimadas em hectares (ha)."
+        tests: [not_null]
+      - name: risco_fogo_medio_inpe
+        description: "Índice médio de Risco de Fogo no município (0.0 a 1.0)."
+        tests: [not_null]
+      - name: emissoes_liquidas_tco2e_seeg
+        description: "Emissões líquidas anuais totais de gases de efeito estufa SEEG (tCO2e)."
+        tests: [not_null]
+      - name: participacao_agro_lulucf_pct
+        description: "Participação conjunta dos setores Agropecuária e LULUCF nas emissões (%)."
+        tests: [not_null]
+
+  - name: fct_queimadas_emissoes_gee_municipal
+    description: "Tabela fato municipal integrando focos de calor INPE, severidade FRP, seca e emissões líquidas GEE do SEEG."
+    columns:
+      - name: id_municipio
+        description: "Código IBGE de 7 dígitos do município (chave primária STRING)."
+        tests: [not_null, unique]
+      - name: sigla_uf
+        description: "Sigla de 2 letras da Unidade da Federação (UF)."
+        tests: [not_null]
+      - name: nome_municipio
+        description: "Nome oficial do município."
+        tests: [not_null]
+      - name: bioma_predominante
+        description: "Bioma predominante no território municipal."
+        tests: [not_null]
+      - name: qtd_focos_calor_inpe
+        description: "Total acumulado de focos de calor ativos no município (INPE)."
+        tests: [not_null]
+      - name: area_cicatriz_queimada_ha
+        description: "Área total mapeada como cicatriz de queimada em hectares (ha)."
+        tests: [not_null]
+      - name: risco_fogo_medio_inpe
+        description: "Índice médio municipal de Risco de Fogo (0.0 a 1.0)."
+        tests: [not_null]
+      - name: emissoes_liquidas_tco2e_seeg
+        description: "Emissões líquidas totais municipais de GEE no SEEG em tCO2e."
+        tests: [not_null]
+      - name: participacao_agro_lulucf_pct
+        description: "Percentual das emissões associado a Agropecuária e Mudança de Uso da Terra (%)."
+        tests: [not_null]
+      - name: frp_medio_mw
+        description: "Potência Radiativa média dos focos no município (MW)."
+        tests: [not_null]
+      - name: dias_seco_consecutivos_max
+        description: "Máximo de dias consecutivos sem precipitação no período seco."
+        tests: [not_null]
+      - name: concentracao_estacao_seca_pct
+        description: "Concentração percentual de focos no período seco (%)."
+        tests: [not_null]
+      - name: qtd_focos_amostra_inpe
+        description: "Quantidade de focos detalhados na amostra Silver do conector."
+        tests: [not_null]
+      - name: frp_medio_amostra_mw
+        description: "FRP médio da amostra granular Silver INPE (MW)."
+        tests: [not_null]
+      - name: emissoes_amostra_tco2e
+        description: "Emissões líquidas consolidadas da amostra granular Silver SEEG (tCO2e)."
+        tests: [not_null]
+      - name: remocao_florestal_tco2e
+        description: "Remoção de carbono registrada na amostra granular Silver SEEG (tCO2e)."
+        tests: [not_null]

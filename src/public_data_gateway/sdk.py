@@ -2257,6 +2257,62 @@ class EnvironmentFacade:
             limit=limit, sigla_uf=sigla_uf, sort_by_area=sort_by_area
         )
 
+    @property
+    def inpe_queimadas_seeg_connector(self) -> Any:
+        if (
+            not hasattr(self, "_inpe_queimadas_seeg_connector")
+            or self._inpe_queimadas_seeg_connector is None
+        ):
+            from public_data_gateway.connectors.ambiental.inpe_queimadas_seeg import (
+                InpeQueimadasSeegConnector,
+            )
+
+            self._inpe_queimadas_seeg_connector = InpeQueimadasSeegConnector(
+                settings=self._sdk.settings
+            )
+        return self._inpe_queimadas_seeg_connector
+
+    def get_queimadas_hotspots(self, termo: str) -> list[dict[str, Any]]:
+        """Lookup INPE active fire hotspots by code, satellite, biome, IBGE, UF, or name."""
+        return self.inpe_queimadas_seeg_connector.get_fire_hotspots(termo)
+
+    def get_seeg_emissions(self, termo: str) -> list[dict[str, Any]]:
+        """Lookup SEEG municipal GHG emissions by code, sector, IBGE 7D, UF, or municipality."""
+        return self.inpe_queimadas_seeg_connector.get_seeg_emissions(termo)
+
+    def get_queimadas_fire_risk(
+        self, id_municipio_or_name: str
+    ) -> dict[str, Any] | None:
+        """Retrieve municipal INPE seasonal fire risk, FRP intensity, and burned scar area."""
+        return self.inpe_queimadas_seeg_connector.get_fire_risk(id_municipio_or_name)
+
+    def get_queimadas_seeg_municipal_summary(
+        self, id_municipio_or_name: str
+    ) -> dict[str, Any] | None:
+        """Retrieve consolidated municipal INPE hotspots count and SEEG net GHG emissions."""
+        return self.inpe_queimadas_seeg_connector.get_municipal_summary(
+            id_municipio_or_name
+        )
+
+    def get_queimadas_seeg_features(
+        self, id_municipio_or_name: str
+    ) -> dict[str, Any] | None:
+        """Retrieve Gold INPE Queimadas & SEEG GHG climate resilience and ESG risk features."""
+        return self.inpe_queimadas_seeg_connector.get_queimadas_seeg_features(
+            id_municipio_or_name
+        )
+
+    def list_top_queimadas_seeg_municipalities(
+        self,
+        limit: int = 10,
+        sigla_uf: str | None = None,
+        sort_by_emissions: bool = False,
+    ) -> list[dict[str, Any]]:
+        """List municipalities ranked by climate resilience score or highest GHG emissions."""
+        return self.inpe_queimadas_seeg_connector.list_top_municipalities(
+            limit=limit, sigla_uf=sigla_uf, sort_by_emissions=sort_by_emissions
+        )
+
 
 class MetaportalsFacade:
     """Sub-facade for Metaportals & Aggregator Hubs (Datalake Federado SQL, Dados.gov.br CKAN)."""
@@ -4226,6 +4282,45 @@ class BrazilData:
         """Listar municípios ranqueados por regularização fundiária CAFIR/CNIR ou maior área rural."""
         return self.environment.list_top_cafir_municipalities(
             limit=limit, sigla_uf=sigla_uf, sort_by_area=sort_by_area
+        )
+
+    def get_queimadas_hotspots(self, termo: str) -> list[dict[str, Any]]:
+        """Consultar focos de calor ativos INPE Queimadas por código, satélite, bioma, UF ou município."""
+        return self.environment.get_queimadas_hotspots(termo)
+
+    def get_seeg_emissions(self, termo: str) -> list[dict[str, Any]]:
+        """Consultar inventário municipal de emissões de GEE (SEEG) por setor, UF ou município."""
+        return self.environment.get_seeg_emissions(termo)
+
+    def get_queimadas_fire_risk(
+        self, id_municipio_or_name: str
+    ) -> dict[str, Any] | None:
+        """Consultar índice de risco de fogo INPE, severidade FRP e área de cicatriz queimada."""
+        return self.environment.get_queimadas_fire_risk(id_municipio_or_name)
+
+    def get_queimadas_seeg_municipal_summary(
+        self, id_municipio_or_name: str
+    ) -> dict[str, Any] | None:
+        """Consultar consolidado municipal de focos INPE e emissões líquidas de GEE SEEG (tCO2e)."""
+        return self.environment.get_queimadas_seeg_municipal_summary(
+            id_municipio_or_name
+        )
+
+    def get_queimadas_seeg_features(
+        self, id_municipio_or_name: str
+    ) -> dict[str, Any] | None:
+        """Consultar features Gold de resiliência climática, pressão de incêndios e emissões GEE."""
+        return self.environment.get_queimadas_seeg_features(id_municipio_or_name)
+
+    def list_top_queimadas_seeg_municipalities(
+        self,
+        limit: int = 10,
+        sigla_uf: str | None = None,
+        sort_by_emissions: bool = False,
+    ) -> list[dict[str, Any]]:
+        """Listar municípios ranqueados por resiliência climática INPE/SEEG ou maiores emissões tCO2e."""
+        return self.environment.list_top_queimadas_seeg_municipalities(
+            limit=limit, sigla_uf=sigla_uf, sort_by_emissions=sort_by_emissions
         )
 
     def get_bd_coverage(self, id_municipio: str) -> dict[str, Any]:

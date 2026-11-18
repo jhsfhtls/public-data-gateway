@@ -1,0 +1,26 @@
+version: 2
+
+sources:
+  - name: inpe_queimadas_seeg
+    description: "Tabelas Silver do Programa Queimadas INPE e do Sistema de Estimativas de Emissões de GEE (SEEG)"
+    meta:
+      agency: "Instituto Nacional de Pesquisas Espaciais (INPE) / Observatório do Clima (SEEG)"
+      domain: "ambiental_clima"
+      freshness_sla: "Diária (24h)"
+    tables:
+      - name: inpe_focos_queimadas
+        description: "Focos de calor ativos detectados por satélites de referência INPE com FRP (MW), risco de fogo e dias sem chuva"
+        meta:
+          external_location: "data/inpe_queimadas_seeg/silver/inpe_focos_queimadas.parquet"
+      - name: seeg_emissoes_gee_setor
+        description: "Inventário municipal de emissões e remoções de GEE (tCO2e) por setor no SEEG (LULUCF, Agropecuária, Energia)"
+        meta:
+          external_location: "data/inpe_queimadas_seeg/silver/seeg_emissoes_gee_setor.parquet"
+      - name: inpe_risco_fogo_mensal
+        description: "Indicadores municipais de risco sazonal de fogo, dias consecutivos de seca e área cicatrizada"
+        meta:
+          external_location: "data/inpe_queimadas_seeg/silver/inpe_risco_fogo_mensal.parquet"
+      - name: queimadas_seeg_resumo_municipal
+        description: "Consolidado municipal integrando total de focos INPE, área queimada e emissões líquidas tCO2e SEEG"
+        meta:
+          external_location: "data/inpe_queimadas_seeg/silver/queimadas_seeg_resumo_municipal.parquet"

@@ -1726,3 +1726,33 @@ sources:
   status: HOMOLOGATED
   freshness_sla_hours: 720
   cron_schedule_expression: 0 4 20 * *
+- source_id: inpe_queimadas_seeg
+  name: 'INPE Queimadas & SEEG: Focos de Calor & Emissões de Gases de Efeito Estufa'
+  agency: Instituto Nacional de Pesquisas Espaciais (INPE) / Observatório do Clima (SEEG)
+  official_url: https://dataserver-coids.inpe.br/queimadas/queimadas/focos/csv/diario/Brasil/
+  segment_id: 11_agronegocio_meio_ambiente
+  segment_name: Agronegócio, Terra & Meio Ambiente
+  access_mode: LAKEHOUSE_BATCH
+  protocol: HTTP_BULK_ZIP
+  auth_type: NONE
+  canonical_keys:
+  - id_municipio
+  - sigla_uf
+  update_frequency: Diária (Focos INPE) / Anual (Inventário GEE SEEG)
+  estimated_volume: ~3,5 milhões de focos/ano + série histórica municipal tCO2e (1990-2024)
+  lgpd_tier: PUBLIC_NON_PERSONAL
+  ml_feature_domains:
+  - active_fire_hotspots_frp
+  - burned_area_fire_risk
+  - ghg_emissions_tco2e_seeg
+  solution_packs:
+  - P01
+  - P02
+  - P06
+  - P08
+  - P09
+  rice_score: 895
+  roadmap_wave: 2
+  status: HOMOLOGATED
+  freshness_sla_hours: 24
+  cron_schedule_expression: 0 3 * * *

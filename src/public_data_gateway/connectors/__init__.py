@@ -17,6 +17,7 @@ import public_data_gateway.connectors.ambiental.ana_hidroweb_telemetria  # noqa:
 import public_data_gateway.connectors.ambiental.bcb_sicor  # noqa: F401
 import public_data_gateway.connectors.ambiental.ibama_fiscalizacao  # noqa: F401
 import public_data_gateway.connectors.ambiental.ibge_agro_municipal  # noqa: F401
+import public_data_gateway.connectors.ambiental.inpe_queimadas_seeg  # noqa: F401
 import public_data_gateway.connectors.ambiental.inpe_terrabrasilis  # noqa: F401
 import public_data_gateway.connectors.ambiental.mapa_zarc  # noqa: F401
 import public_data_gateway.connectors.ambiental.mapbiomas_cobertura  # noqa: F401

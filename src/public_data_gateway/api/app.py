@@ -3385,6 +3385,76 @@ def create_app(settings: GatewaySettings | None = None) -> FastAPI:
         conn = RfbCafirConnector(settings=app_settings)
         return conn.list_top_municipalities(limit=limit, sigla_uf=uf, sort_by_area=sort_by_area)
 
+    # INPE Queimadas & SEEG (Focos de Calor & Emissões GEE)
+    @app.get("/api/v1/environment/queimadas/focos/{termo}")
+    async def get_queimadas_focos(termo: str) -> list[dict[str, Any]]:
+        from public_data_gateway.connectors.ambiental.inpe_queimadas_seeg import (
+            InpeQueimadasSeegConnector,
+        )
+
+        conn = InpeQueimadasSeegConnector(settings=app_settings)
+        return conn.get_fire_hotspots(termo)
+
+    @app.get("/api/v1/environment/queimadas/emissoes/{termo}")
+    async def get_queimadas_emissoes(termo: str) -> list[dict[str, Any]]:
+        from public_data_gateway.connectors.ambiental.inpe_queimadas_seeg import (
+            InpeQueimadasSeegConnector,
+        )
+
+        conn = InpeQueimadasSeegConnector(settings=app_settings)
+        return conn.get_seeg_emissions(termo)
+
+    @app.get("/api/v1/environment/queimadas/risco/{id_municipio_or_name}")
+    async def get_queimadas_risco(id_municipio_or_name: str) -> dict[str, Any]:
+        from public_data_gateway.connectors.ambiental.inpe_queimadas_seeg import (
+            InpeQueimadasSeegConnector,
+        )
+
+        conn = InpeQueimadasSeegConnector(settings=app_settings)
+        res = conn.get_fire_risk(id_municipio_or_name)
+        if res is None:
+            raise HTTPException(status_code=404, detail="INPE Queimadas fire risk metrics not found")
+        return res
+
+    @app.get("/api/v1/environment/queimadas/municipio/{id_municipio_or_name}")
+    async def get_queimadas_municipio(id_municipio_or_name: str) -> dict[str, Any]:
+        from public_data_gateway.connectors.ambiental.inpe_queimadas_seeg import (
+            InpeQueimadasSeegConnector,
+        )
+
+        conn = InpeQueimadasSeegConnector(settings=app_settings)
+        res = conn.get_municipal_summary(id_municipio_or_name)
+        if res is None:
+            raise HTTPException(status_code=404, detail="INPE Queimadas/SEEG summary not found")
+        return res
+
+    @app.get("/api/v1/environment/queimadas/features/{id_municipio_or_name}")
+    async def get_queimadas_features(id_municipio_or_name: str) -> dict[str, Any]:
+        from public_data_gateway.connectors.ambiental.inpe_queimadas_seeg import (
+            InpeQueimadasSeegConnector,
+        )
+
+        conn = InpeQueimadasSeegConnector(settings=app_settings)
+        res = conn.get_queimadas_seeg_features(id_municipio_or_name)
+        if res is None:
+            raise HTTPException(status_code=404, detail="INPE Queimadas/SEEG Gold features not found")
+        return res
+
+    @app.get("/api/v1/environment/queimadas/ranking")
+    async def get_queimadas_ranking(
+        limit: int = Query(10, ge=1, le=50, description="Max municipalities to list"),
+        uf: str | None = Query(None, description="Optional 2-letter state filter"),
+        sort_by_emissions: bool = Query(
+            False, description="Sort descending by net SEEG GHG emissions (tCO2e)"
+        ),
+    ) -> list[dict[str, Any]]:
+        from public_data_gateway.connectors.ambiental.inpe_queimadas_seeg import (
+            InpeQueimadasSeegConnector,
+        )
+
+        conn = InpeQueimadasSeegConnector(settings=app_settings)
+        return conn.list_top_municipalities(limit=limit, sigla_uf=uf, sort_by_emissions=sort_by_emissions)
+
     @app.get("/api/v1/metaportals/datalake/top-municipalities")
     async def get_top_bd_municipalities(
         limit: int = Query(10, ge=1, le=50, description="Max municipalities to list"),

@@ -2292,6 +2292,69 @@ class MCPDispatcher:
                                 },
                             },
                             {
+                                "name": "bdg_get_inpe_queimadas_focos",
+                                "description": "Lookup INPE active fire hotspots by hotspot code, satellite (AQUA/NPP-375), biome, IBGE municipality code, UF, or name.",
+                                "inputSchema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "termo": {
+                                            "type": "string",
+                                            "description": "Hotspot code, satellite, biome, IBGE 7-digit code, UF, or municipality name",
+                                        }
+                                    },
+                                    "required": ["termo"],
+                                },
+                            },
+                            {
+                                "name": "bdg_get_seeg_emissoes_gee",
+                                "description": "Lookup SEEG municipal greenhouse gas (GHG) emissions in tCO2e by emission code, sector (Agropecuaria, Energia, LULUCF), IBGE code, or UF.",
+                                "inputSchema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "termo": {
+                                            "type": "string",
+                                            "description": "Emission code, sector, IBGE code, UF, or municipality name",
+                                        }
+                                    },
+                                    "required": ["termo"],
+                                },
+                            },
+                            {
+                                "name": "bdg_get_queimadas_seeg_features",
+                                "description": "Get normalized Gold INPE Queimadas & SEEG GHG climate resilience score, active fire hotspots count, and emissions tier.",
+                                "inputSchema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "id_municipio_or_name": {
+                                            "type": "string",
+                                            "description": "7-digit IBGE municipality code or municipality name",
+                                        }
+                                    },
+                                    "required": ["id_municipio_or_name"],
+                                },
+                            },
+                            {
+                                "name": "bdg_list_top_queimadas_seeg_municipalities",
+                                "description": "List Brazilian municipalities ranked by INPE Queimadas & SEEG climate resilience score or net GHG emissions (tCO2e).",
+                                "inputSchema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "limit": {
+                                            "type": "integer",
+                                            "description": "Maximum rows (default: 10)",
+                                        },
+                                        "sigla_uf": {
+                                            "type": "string",
+                                            "description": "Optional 2-letter state filter (e.g. PA)",
+                                        },
+                                        "sort_by_emissions": {
+                                            "type": "boolean",
+                                            "description": "Set true to rank municipalities by highest net SEEG GHG emissions (tCO2e) first",
+                                        },
+                                    },
+                                },
+                            },
+                            {
                                 "name": "bdg_get_bd_coverage",
                                 "description": "Get official Federated Public Datalake (DuckDB / BigQuery) municipal treated dataset and table coverage metrics.",
                                 "inputSchema": {
@@ -5725,6 +5788,65 @@ class MCPDispatcher:
                     },
                 }
             wrapped = wrap_untrusted_gov_data(result, source_id="rfb_cafir")
+            return {
+                "jsonrpc": "2.0",
+                "id": req_id,
+                "result": {"content": [{"type": "text", "text": wrapped}], "isError": False},
+            }
+
+        if tool_name in {
+            "bdg_get_inpe_queimadas_focos",
+            "bdg_get_seeg_emissoes_gee",
+            "bdg_get_queimadas_seeg_features",
+            "bdg_list_top_queimadas_seeg_municipalities",
+        }:
+            from public_data_gateway.connectors.ambiental.inpe_queimadas_seeg import (
+                InpeQueimadasSeegConnector,
+            )
+
+            connector = InpeQueimadasSeegConnector(settings=self.settings)
+            try:
+                if tool_name == "bdg_get_inpe_queimadas_focos":
+                    result: Any = connector.get_fire_hotspots(str(args.get("termo", "")))
+                elif tool_name == "bdg_get_seeg_emissoes_gee":
+                    result = connector.get_seeg_emissions(str(args.get("termo", "")))
+                elif tool_name == "bdg_get_queimadas_seeg_features":
+                    result = connector.get_queimadas_seeg_features(
+                        str(args.get("id_municipio_or_name", ""))
+                    )
+                else:
+                    result = connector.list_top_municipalities(
+                        limit=int(args.get("limit", 10)),
+                        sigla_uf=args.get("sigla_uf"),
+                        sort_by_emissions=bool(args.get("sort_by_emissions", False)),
+                    )
+            except (ValueError, KeyError) as exc:
+                return {
+                    "jsonrpc": "2.0",
+                    "id": req_id,
+                    "result": {
+                        "content": [
+                            {"type": "text", "text": f"INPE Queimadas/SEEG parameter error: {exc}"}
+                        ],
+                        "isError": True,
+                    },
+                }
+
+            if not result:
+                return {
+                    "jsonrpc": "2.0",
+                    "id": req_id,
+                    "result": {
+                        "content": [
+                            {
+                                "type": "text",
+                                "text": "No INPE Queimadas/SEEG data found for the query.",
+                            }
+                        ],
+                        "isError": True,
+                    },
+                }
+            wrapped = wrap_untrusted_gov_data(result, source_id="inpe_queimadas_seeg")
             return {
                 "jsonrpc": "2.0",
                 "id": req_id,

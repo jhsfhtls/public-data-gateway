@@ -98,6 +98,15 @@ cafir AS (
     FROM {{ ref('mart_cadastro_imoveis_rurais_cafir_brasil') }}
 ),
 
+queimadas AS (
+    SELECT
+        id_municipio,
+        qtd_focos_calor_inpe,
+        emissoes_liquidas_tco2e_seeg,
+        score_resiliencia_climatica_fogo_gee
+    FROM {{ ref('mart_queimadas_emissoes_seeg_brasil') }}
+),
+
 joined AS (
     SELECT
         t.id_municipio,
@@ -138,6 +147,9 @@ joined AS (
         COALESCE(cf.area_total_cafir_ha, 0.0) AS area_total_cafir_ha,
         COALESCE(cf.taxa_vinculacao_cnir_pct, 50.0) AS taxa_vinculacao_cnir_pct,
         COALESCE(cf.score_regularizacao_fundiaria_cafir, 50.0) AS score_regularizacao_fundiaria_cafir,
+        COALESCE(qm.qtd_focos_calor_inpe, 0) AS qtd_focos_calor_inpe,
+        COALESCE(qm.emissoes_liquidas_tco2e_seeg, 0.0) AS emissoes_liquidas_tco2e_seeg,
+        COALESCE(qm.score_resiliencia_climatica_fogo_gee, 65.0) AS score_resiliencia_climatica_fogo_gee,
         t.reference_date
     FROM terra t
     LEFT JOIN sicar s ON t.id_municipio = s.id_municipio
@@ -148,6 +160,7 @@ joined AS (
     LEFT JOIN sicor sc ON t.id_municipio = sc.id_municipio
     LEFT JOIN ibge_agro ag ON t.id_municipio = ag.id_municipio
     LEFT JOIN cafir cf ON t.id_municipio = cf.id_municipio
+    LEFT JOIN queimadas qm ON t.id_municipio = qm.id_municipio
 ),
 
 scored AS (
