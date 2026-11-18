@@ -610,6 +610,39 @@ def build_parser() -> argparse.ArgumentParser:
     cap_rk.add_argument("--uf", type=str, default=None, help="Optional 2-letter UF state filter")
     cap_rk.add_argument("--json", action="store_true", help="Output in JSON format")
 
+    # Subcommand: rfb-arrecadacao (RFB Arrecadação Tributária & Dívida Ativa PGFN)
+    rfb_arr_p = subparsers.add_parser(
+        "rfb-arrecadacao",
+        help="Query RFB federal tax collection blocks, PGFN active debt, FPM transfers, and fiscal capacity rankings.",
+    )
+    rfb_arr_sub = rfb_arr_p.add_subparsers(dest="rfb_arrecadacao_action", required=True)
+
+    rfb_tr_p = rfb_arr_sub.add_parser("tributos", help="Lookup RFB federal tax blocks by code, group, regime, IBGE, UF, or city.")
+    rfb_tr_p.add_argument("termo", help="RFB code, tax group, regime, IBGE code, UF, or municipality name")
+    rfb_tr_p.add_argument("--json", action="store_true", help="Output in JSON format")
+
+    rfb_pg_p = rfb_arr_sub.add_parser("pgfn", help="Lookup PGFN Active Debt stock and credit recovery metrics.")
+    rfb_pg_p.add_argument("termo", help="PGFN code, IBGE code, UF, or municipality name")
+    rfb_pg_p.add_argument("--json", action="store_true", help="Output in JSON format")
+
+    rfb_fp_p = rfb_arr_sub.add_parser("fpm", help="Get municipal FPM, IPI-Export, and Simples Nacional transfers.")
+    rfb_fp_p.add_argument("id_municipio_or_name", help="7-digit IBGE code or municipality name")
+    rfb_fp_p.add_argument("--json", action="store_true", help="Output in JSON format")
+
+    rfb_mn_p = rfb_arr_sub.add_parser("municipio", help="Get consolidated RFB revenue, PJ taxpayers, PGFN, and FPM summary.")
+    rfb_mn_p.add_argument("id_municipio_or_name", help="7-digit IBGE code or municipality name")
+    rfb_mn_p.add_argument("--json", action="store_true", help="Output in JSON format")
+
+    rfb_ft_p = rfb_arr_sub.add_parser("features", help="Get Gold RFB tax collection dynamism score and fiscal capacity tier.")
+    rfb_ft_p.add_argument("id_municipio_or_name", help="7-digit IBGE code or municipality name")
+    rfb_ft_p.add_argument("--json", action="store_true", help="Output in JSON format")
+
+    rfb_rk_p = rfb_arr_sub.add_parser("ranking", help="List municipalities ranked by RFB fiscal dynamism score or total federal revenue.")
+    rfb_rk_p.add_argument("--limit", type=int, default=10, help="Max municipalities to list")
+    rfb_rk_p.add_argument("--uf", type=str, help="Optional 2-letter state filter")
+    rfb_rk_p.add_argument("--revenue", action="store_true", help="Sort descending by annual federal tax revenue (R$ mi)")
+    rfb_rk_p.add_argument("--json", action="store_true", help="Output in JSON format")
+
     # Subcommand: estban (BACEN ESTBAN Municipal Banking Statistics)
     est_p = subparsers.add_parser(
         "estban",
@@ -3806,6 +3839,84 @@ def main(argv: Sequence[str] | None = None) -> int:
                 return 1
             print(json.dumps(out, indent=2, ensure_ascii=False))
             return 0
+
+        elif args.command == "rfb-arrecadacao":
+            from public_data_gateway.connectors.macrofinanceiro.rfb_arrecadacao import (
+                RfbArrecadacaoConnector,
+            )
+
+            rfb_conn = RfbArrecadacaoConnector(settings=settings)
+            rfb_action = getattr(args, "rfb_arrecadacao_action", "")
+            try:
+                if rfb_action == "tributos":
+                    rows = rfb_conn.get_rfb_tax_collection(args.termo)
+                    if getattr(args, "json", False):
+                        print(json.dumps(rows, indent=2, ensure_ascii=False, default=str))
+                    else:
+                        print(f"RFB Arrecadação Tributos ({len(rows)}):")
+                        for r in rows:
+                            print(f"  {r.get('cod_arrecadacao_rfb')} | {r.get('nome_municipio')} ({r.get('sigla_uf')}): {r.get('grupo_tributo_rfb')} | R$ {r.get('arrecadacao_federal_anual_mi_brl')}M")
+                    return 0
+
+                if rfb_action == "pgfn":
+                    rows = rfb_conn.get_pgfn_active_debt(args.termo)
+                    if getattr(args, "json", False):
+                        print(json.dumps(rows, indent=2, ensure_ascii=False, default=str))
+                    else:
+                        print(f"PGFN Dívida Ativa ({len(rows)}):")
+                        for r in rows:
+                            print(f"  {r.get('cod_divida_pgfn')} | {r.get('nome_municipio')} ({r.get('sigla_uf')}): recuperação={r.get('indice_recuperacao_pgfn_pct')}%")
+                    return 0
+
+                if rfb_action == "fpm":
+                    res = rfb_conn.get_rfb_fpm_transfers(args.id_municipio_or_name)
+                    if res is None:
+                        print(f"Dados RFB FPM não encontrados para: {args.id_municipio_or_name}", file=sys.stderr)
+                        return 1
+                    if getattr(args, "json", False):
+                        print(json.dumps(res, indent=2, ensure_ascii=False, default=str))
+                    else:
+                        print(f"RFB FPM ({res.get('nome_municipio')} - {res.get('sigla_uf')}): R$ {res.get('repasses_fpm_anual_mi_brl')}M | Simples R$ {res.get('cota_simples_nacional_munic_mi_brl')}M")
+                    return 0
+
+                if rfb_action == "municipio":
+                    res = rfb_conn.get_rfb_arrecadacao_summary(args.id_municipio_or_name)
+                    if res is None:
+                        print(f"Resumo RFB Arrecadação não encontrado para: {args.id_municipio_or_name}", file=sys.stderr)
+                        return 1
+                    if getattr(args, "json", False):
+                        print(json.dumps(res, indent=2, ensure_ascii=False, default=str))
+                    else:
+                        print(f"RFB Arrecadação Município ({res.get('nome_municipio')} - {res.get('sigla_uf')}): R$ {res.get('arrecadacao_federal_total_mi_brl')}M | PJs={res.get('contribuintes_pj_ativos_municipio')}")
+                    return 0
+
+                if rfb_action == "features":
+                    res = rfb_conn.get_rfb_arrecadacao_features(args.id_municipio_or_name)
+                    if res is None:
+                        print(f"Features RFB Arrecadação não encontradas para: {args.id_municipio_or_name}", file=sys.stderr)
+                        return 1
+                    if getattr(args, "json", False):
+                        print(json.dumps(res, indent=2, ensure_ascii=False, default=str))
+                    else:
+                        print(f"RFB Arrecadação Gold ({res.get('nome_municipio')} - {res.get('id_municipio')}): Score {res.get('score_dinamica_arrecadacao_rfb')} | {res.get('tier_capacidade_fiscal_rfb')}")
+                    return 0
+
+                if rfb_action == "ranking":
+                    ranks = rfb_conn.list_top_rfb_arrecadacao_municipalities(
+                        limit=getattr(args, "limit", 10),
+                        sigla_uf=getattr(args, "uf", None),
+                        sort_by_revenue=getattr(args, "revenue", False),
+                    )
+                    if getattr(args, "json", False):
+                        print(json.dumps(ranks, indent=2, ensure_ascii=False, default=str))
+                    else:
+                        print(f"Ranking RFB Arrecadação ({len(ranks)}):")
+                        for idx, r in enumerate(ranks, 1):
+                            print(f"  {idx}. {r.get('nome_municipio')} ({r.get('sigla_uf')}): {r.get('score_dinamica_arrecadacao_rfb')} | {r.get('tier_capacidade_fiscal_rfb')}")
+                    return 0
+            except (ValueError, KeyError) as exc:
+                print(f"Erro RFB Arrecadação: {exc}", file=sys.stderr)
+                return 1
 
         elif args.command == "estban":
             from public_data_gateway.connectors.macrofinanceiro.bcb_estban import (

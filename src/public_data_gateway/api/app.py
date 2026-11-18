@@ -1935,6 +1935,97 @@ def create_app(settings: GatewaySettings | None = None) -> FastAPI:
             )
         return res
 
+    # 15F. RFB Arrecadação Tributária & Dívida Ativa PGFN
+    @app.get("/api/v1/treasury/rfb-arrecadacao/tributos/{termo}")
+    async def get_rfb_arrecadacao_tributos(termo: str) -> list[dict[str, Any]]:
+        from public_data_gateway.connectors.macrofinanceiro.rfb_arrecadacao import (
+            RfbArrecadacaoConnector,
+        )
+
+        return RfbArrecadacaoConnector(
+            settings=app_settings
+        ).get_rfb_tax_collection(termo)
+
+    @app.get("/api/v1/treasury/rfb-arrecadacao/pgfn/{termo}")
+    async def get_rfb_arrecadacao_pgfn(termo: str) -> list[dict[str, Any]]:
+        from public_data_gateway.connectors.macrofinanceiro.rfb_arrecadacao import (
+            RfbArrecadacaoConnector,
+        )
+
+        return RfbArrecadacaoConnector(
+            settings=app_settings
+        ).get_pgfn_active_debt(termo)
+
+    @app.get("/api/v1/treasury/rfb-arrecadacao/fpm/{id_municipio_or_name}")
+    async def get_rfb_arrecadacao_fpm(
+        id_municipio_or_name: str,
+    ) -> dict[str, Any]:
+        from public_data_gateway.connectors.macrofinanceiro.rfb_arrecadacao import (
+            RfbArrecadacaoConnector,
+        )
+
+        res = RfbArrecadacaoConnector(
+            settings=app_settings
+        ).get_rfb_fpm_transfers(id_municipio_or_name)
+        if res is None:
+            raise HTTPException(
+                status_code=404, detail="RFB FPM transfer data not found"
+            )
+        return res
+
+    @app.get("/api/v1/treasury/rfb-arrecadacao/municipio/{id_municipio_or_name}")
+    async def get_rfb_arrecadacao_municipio(
+        id_municipio_or_name: str,
+    ) -> dict[str, Any]:
+        from public_data_gateway.connectors.macrofinanceiro.rfb_arrecadacao import (
+            RfbArrecadacaoConnector,
+        )
+
+        res = RfbArrecadacaoConnector(
+            settings=app_settings
+        ).get_rfb_arrecadacao_summary(id_municipio_or_name)
+        if res is None:
+            raise HTTPException(
+                status_code=404, detail="RFB Arrecadação municipal summary not found"
+            )
+        return res
+
+    @app.get("/api/v1/treasury/rfb-arrecadacao/features/{id_municipio_or_name}")
+    async def get_rfb_arrecadacao_features(
+        id_municipio_or_name: str,
+    ) -> dict[str, Any]:
+        from public_data_gateway.connectors.macrofinanceiro.rfb_arrecadacao import (
+            RfbArrecadacaoConnector,
+        )
+
+        res = RfbArrecadacaoConnector(
+            settings=app_settings
+        ).get_rfb_arrecadacao_features(id_municipio_or_name)
+        if res is None:
+            raise HTTPException(
+                status_code=404,
+                detail="RFB Arrecadação Gold fiscal features not found",
+            )
+        return res
+
+    @app.get("/api/v1/treasury/rfb-arrecadacao/ranking")
+    async def get_rfb_arrecadacao_ranking(
+        limit: int = Query(10, ge=1, le=50, description="Max municipalities to list"),
+        uf: str | None = Query(None, description="Optional 2-letter state filter"),
+        sort_by_revenue: bool = Query(
+            False, description="Sort descending by annual federal tax revenue (R$ mi)"
+        ),
+    ) -> list[dict[str, Any]]:
+        from public_data_gateway.connectors.macrofinanceiro.rfb_arrecadacao import (
+            RfbArrecadacaoConnector,
+        )
+
+        return RfbArrecadacaoConnector(
+            settings=app_settings
+        ).list_top_rfb_arrecadacao_municipalities(
+            limit=limit, sigla_uf=uf, sort_by_revenue=sort_by_revenue
+        )
+
     # 16. Public Procurement Catalog & Pricing (Compras.gov.br CATMAT/CATSER)
     @app.get("/api/v1/procurement/materials/search")
     async def search_materials(
