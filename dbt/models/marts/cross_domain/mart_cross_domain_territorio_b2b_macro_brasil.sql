@@ -267,6 +267,15 @@ ibge_inst_uf AS (
     FROM {{ ref('mart_ibge_institucional_brasil') }}
     GROUP BY sigla_uf
 ),
+rfb_arr_uf AS (
+    SELECT
+        sigla_uf,
+        SUM(arrecadacao_federal_total_mi_brl) AS arrecadacao_federal_rfb_uf_mi_brl,
+        SUM(contribuintes_pj_ativos_municipio) AS contribuintes_pj_rfb_uf,
+        ROUND(AVG(score_dinamica_arrecadacao_rfb), 2) AS avg_score_arrecadacao_rfb_uf
+    FROM {{ ref('mart_rfb_arrecadacao_brasil') }}
+    GROUP BY sigla_uf
+),
 
 base AS (
     SELECT
@@ -347,6 +356,9 @@ base AS (
         COALESCE(ibi.servidores_estatutarios_munic_uf, 0) AS servidores_estatutarios_munic_uf,
         COALESCE(ibi.avg_despesa_familiar_pof_uf_brl, 5500.0) AS avg_despesa_familiar_pof_uf_brl,
         COALESCE(ibi.avg_score_capacidade_institucional_uf, 75.0) AS avg_score_capacidade_institucional_uf,
+        COALESCE(rfb.arrecadacao_federal_rfb_uf_mi_brl, 0.0) AS arrecadacao_federal_rfb_uf_mi_brl,
+        COALESCE(rfb.contribuintes_pj_rfb_uf, 0) AS contribuintes_pj_rfb_uf,
+        COALESCE(rfb.avg_score_arrecadacao_rfb_uf, 75.0) AS avg_score_arrecadacao_rfb_uf,
         COALESCE(m.ano_mes, '2025-03') AS macro_ano_mes_referencia,
         COALESCE(m.selic_meta_fim_mes_pct, 14.25) AS selic_meta_fim_mes_pct,
         COALESCE(m.ipca_acumulado_12m_pct, 5.06) AS ipca_acumulado_12m_pct,
@@ -378,6 +390,7 @@ base AS (
     LEFT JOIN sus_extra_uf sx ON t.sigla_uf = sx.sigla_uf
     LEFT JOIN educacao_extra_uf ex ON t.sigla_uf = ex.sigla_uf
     LEFT JOIN ibge_inst_uf ibi ON t.sigla_uf = ibi.sigla_uf
+    LEFT JOIN rfb_arr_uf rfb ON t.sigla_uf = rfb.sigla_uf
     CROSS JOIN macro_latest m
 ),
 

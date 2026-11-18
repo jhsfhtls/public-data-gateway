@@ -1196,3 +1196,64 @@ models:
         description: "Classificação municipal SUSEP (HUB_SEGUROS_SOLVENCIA_ALTA, MERCADO_SEGURADOR_CONSOLIDADO ou PENETRACAO_SEGURADORA_EXPANSAO)."
         tests: [not_null]
 
+  - name: mart_rfb_arrecadacao_brasil
+    description: "Mart analítico RFB Arrecadação Tributária & Fiscal (IRPJ, CSLL, IPI, PIS/COFINS, FPM & Dívida Ativa PGFN) com score de dinâmica fiscal e tier municipal."
+    columns:
+      - name: id_municipio
+        description: "Código IBGE de 7 dígitos do município."
+        tests: [not_null, unique]
+      - name: sigla_uf
+        description: "Sigla de 2 letras da Unidade Federativa (UF)."
+        tests: [not_null]
+      - name: nome_municipio
+        description: "Nome oficial do município."
+        tests: [not_null]
+      - name: regiao
+        description: "Macrorregião geográfica brasileira."
+        tests: [not_null]
+      - name: arrecadacao_federal_total_mi_brl
+        description: "Arrecadação anual total de receitas administradas pela RFB vinculada ao município (R$ milhões)."
+        tests: [not_null]
+      - name: contribuintes_pj_ativos_municipio
+        description: "Quantidade de contribuintes Pessoa Jurídica ativos declarantes no município."
+        tests: [not_null]
+      - name: inscritos_divida_ativa_pgfn_mi_brl
+        description: "Estoque de débitos federais inscritos na PGFN associados ao município (R$ milhões)."
+        tests: [not_null]
+      - name: repasses_fpm_anual_mi_brl
+        description: "Repasse anual do Fundo de Participação dos Municípios (R$ milhões)."
+        tests: [not_null]
+      - name: crescimento_real_arrecadacao_pct
+        description: "Taxa de crescimento real anual da arrecadação federal deflacionada pelo IPCA (%)."
+        tests: [not_null]
+      - name: qtd_blocos_arrecadacao_rfb
+        description: "Quantidade de blocos tributários federais avaliados no município."
+        tests: [not_null]
+      - name: soma_blocos_arrecadacao_mi_brl
+        description: "Soma auditada dos blocos tributários RFB no município (R$ milhões)."
+        tests: [not_null]
+      - name: estoque_divida_ativa_uf_mi_brl
+        description: "Estoque acumulado da Dívida Ativa da União PGFN na Unidade Federativa (R$ milhões)."
+        tests: [not_null]
+      - name: devedores_previdenciarios_pj
+        description: "Quantidade de devedores PJ previdenciários inscritos em dívida ativa na UF."
+        tests: [not_null]
+      - name: recuperacao_creditos_anual_mi_brl
+        description: "Montante anual recuperado via cobrança e transação tributária PGFN na UF (R$ milhões)."
+        tests: [not_null]
+      - name: indice_recuperacao_pgfn_pct
+        description: "Taxa percentual de recuperação da carteira cobrável PGFN na UF (%)."
+        tests: [not_null]
+      - name: transferencias_ipi_exportacao_mi_brl
+        description: "Transferências anuais constitucionais de IPI-Exportação (R$ milhões)."
+        tests: [not_null]
+      - name: cota_simples_nacional_munic_mi_brl
+        description: "Arrecadação municipal compartilhada via Simples Nacional (R$ milhões)."
+        tests: [not_null]
+      - name: score_dinamica_arrecadacao_rfb
+        description: "Score sintético municipal de dinâmica de arrecadação RFB e recuperação PGFN (0-100)."
+        tests: [not_null]
+      - name: tier_capacidade_fiscal_rfb
+        description: "Classificação municipal RFB (POLO_ARRECADACAO_ALTA_CONFORMIDADE, BASE_TRIBUTARIA_CONSOLIDADA ou EXPANSAO_BASE_FISCAL_REGIONAL)."
+        tests: [not_null]
+

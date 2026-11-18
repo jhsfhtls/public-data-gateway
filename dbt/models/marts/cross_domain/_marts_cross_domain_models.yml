@@ -235,6 +235,15 @@ models:
       - name: avg_score_capacidade_institucional_uf
         description: "Média estadual do score IBGE de capacidade institucional pública e consumo familiar (MUNIC/ESTADIC/POF, 0-100)."
         tests: [not_null]
+      - name: arrecadacao_federal_rfb_uf_mi_brl
+        description: "Montante anual estadual da arrecadação tributária federal administrada pela RFB (R$ milhões)."
+        tests: [not_null]
+      - name: contribuintes_pj_rfb_uf
+        description: "Quantidade total estadual de contribuintes PJ ativos declarantes na RFB."
+        tests: [not_null]
+      - name: avg_score_arrecadacao_rfb_uf
+        description: "Média estadual do score de dinâmica de arrecadação RFB e recuperação PGFN (0-100)."
+        tests: [not_null]
       - name: macro_ano_mes_referencia
         description: "Competência macroeconômica de referência (YYYY-MM)."
         tests: [not_null]

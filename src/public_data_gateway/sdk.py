@@ -1611,6 +1611,64 @@ class TreasuryFacade:
             limit=limit, sigla_uf=sigla_uf
         )
 
+    @property
+    def rfb_arrecadacao_connector(self) -> Any:
+        if (
+            not hasattr(self, "_rfb_arrecadacao_conn")
+            or self._rfb_arrecadacao_conn is None
+        ):
+            from public_data_gateway.connectors.macrofinanceiro.rfb_arrecadacao import (
+                RfbArrecadacaoConnector,
+            )
+
+            self._rfb_arrecadacao_conn = RfbArrecadacaoConnector(
+                settings=self._sdk.settings
+            )
+        return self._rfb_arrecadacao_conn
+
+    def get_rfb_tax_collection(self, termo: str) -> list[dict[str, Any]]:
+        """Lookup RFB federal tax collection blocks by code, tax group, regime, IBGE, UF, or city."""
+        return self.rfb_arrecadacao_connector.get_rfb_tax_collection(termo)
+
+    def get_pgfn_active_debt(self, termo: str) -> list[dict[str, Any]]:
+        """Lookup PGFN Federal Active Debt stock, debtors, and credit recovery rates."""
+        return self.rfb_arrecadacao_connector.get_pgfn_active_debt(termo)
+
+    def get_rfb_fpm_transfers(
+        self, id_municipio_or_name: str
+    ) -> dict[str, Any] | None:
+        """Retrieve municipal FPM, IPI-Export, Simples Nacional transfers and real tax growth."""
+        return self.rfb_arrecadacao_connector.get_rfb_fpm_transfers(
+            id_municipio_or_name
+        )
+
+    def get_rfb_arrecadacao_summary(
+        self, id_municipio_or_name: str
+    ) -> dict[str, Any] | None:
+        """Retrieve consolidated RFB tax collection, PJ taxpayers, PGFN debt, and FPM summary."""
+        return self.rfb_arrecadacao_connector.get_rfb_arrecadacao_summary(
+            id_municipio_or_name
+        )
+
+    def get_rfb_arrecadacao_features(
+        self, id_municipio_or_name: str
+    ) -> dict[str, Any] | None:
+        """Retrieve Gold RFB tax collection dynamism score and fiscal capacity tier."""
+        return self.rfb_arrecadacao_connector.get_rfb_arrecadacao_features(
+            id_municipio_or_name
+        )
+
+    def list_top_rfb_arrecadacao_municipalities(
+        self,
+        limit: int = 10,
+        sigla_uf: str | None = None,
+        sort_by_revenue: bool = False,
+    ) -> list[dict[str, Any]]:
+        """List municipalities ranked by RFB fiscal dynamism score or total federal revenue."""
+        return self.rfb_arrecadacao_connector.list_top_rfb_arrecadacao_municipalities(
+            limit=limit, sigla_uf=sigla_uf, sort_by_revenue=sort_by_revenue
+        )
+
 
 class SocioeconomicFacade:
     """Socioeconomic, GDP and demographic query interface powered by IBGE SIDRA."""
@@ -4816,6 +4874,43 @@ class BrazilData:
         """Listar municípios ordenados por rating soberano subnacional CAPAG + IFGF."""
         return self.treasury.list_top_capag_municipalities(
             limit=limit, sigla_uf=sigla_uf
+        )
+
+    def get_rfb_tax_collection(self, termo: str) -> list[dict[str, Any]]:
+        """Consultar blocos de arrecadação federal RFB (IRPJ/CSLL, PIS/COFINS, IPI) por município/UF."""
+        return self.treasury.get_rfb_tax_collection(termo)
+
+    def get_pgfn_active_debt(self, termo: str) -> list[dict[str, Any]]:
+        """Consultar estoque estadual PGFN da Dívida Ativa da União e recuperação de créditos."""
+        return self.treasury.get_pgfn_active_debt(termo)
+
+    def get_rfb_fpm_transfers(
+        self, id_municipio_or_name: str
+    ) -> dict[str, Any] | None:
+        """Consultar repasses constitucionais FPM, IPI-Exportação e cota Simples Nacional."""
+        return self.treasury.get_rfb_fpm_transfers(id_municipio_or_name)
+
+    def get_rfb_arrecadacao_summary(
+        self, id_municipio_or_name: str
+    ) -> dict[str, Any] | None:
+        """Consultar consolidado municipal RFB (arrecadação total, contribuintes PJ, PGFN e FPM)."""
+        return self.treasury.get_rfb_arrecadacao_summary(id_municipio_or_name)
+
+    def get_rfb_arrecadacao_features(
+        self, id_municipio_or_name: str
+    ) -> dict[str, Any] | None:
+        """Consultar features Gold de dinâmica tributária RFB e tier de capacidade fiscal."""
+        return self.treasury.get_rfb_arrecadacao_features(id_municipio_or_name)
+
+    def list_top_rfb_arrecadacao_municipalities(
+        self,
+        limit: int = 10,
+        sigla_uf: str | None = None,
+        sort_by_revenue: bool = False,
+    ) -> list[dict[str, Any]]:
+        """Listar municípios ranqueados por dinâmica tributária RFB ou arrecadação federal total."""
+        return self.treasury.list_top_rfb_arrecadacao_municipalities(
+            limit=limit, sigla_uf=sigla_uf, sort_by_revenue=sort_by_revenue
         )
 
     def search_catmat(self, query: str, limit: int = 20) -> list[dict[str, Any]]:

@@ -1,0 +1,26 @@
+version: 2
+
+sources:
+  - name: rfb_arrecadacao
+    description: "Tabelas Silver RFB Arrecadação Tributária & Fiscal (IRPJ, CSLL, IPI, PIS/COFINS, FPM e Dívida Ativa PGFN)"
+    meta:
+      agency: "Receita Federal do Brasil (RFB) & PGFN"
+      domain: "macrofinanceiro_fiscal_rfb"
+      freshness_sla: "Mensal (720h)"
+    tables:
+      - name: rfb_arrecadacao_tributos_federais
+        description: "Blocos de arrecadação tributária federal administrada pela RFB por tributo, regime e regularidade"
+        meta:
+          external_location: "data/rfb_arrecadacao/silver/rfb_arrecadacao_tributos_federais.parquet"
+      - name: rfb_divida_ativa_pgfn_estado
+        description: "Estoque da Dívida Ativa da União (PGFN), devedores previdenciários e recuperação de créditos fiscais"
+        meta:
+          external_location: "data/rfb_arrecadacao/silver/rfb_divida_ativa_pgfn_estado.parquet"
+      - name: rfb_repasses_fpm_royalties
+        description: "Repasses constitucionais FPM, cota Simples Nacional, IPI-Exportação e variação real da arrecadação"
+        meta:
+          external_location: "data/rfb_arrecadacao/silver/rfb_repasses_fpm_royalties.parquet"
+      - name: rfb_arrecadacao_resumo_municipal
+        description: "Consolidado municipal integrando arrecadação federal total, contribuintes PJ, PGFN e repasses FPM"
+        meta:
+          external_location: "data/rfb_arrecadacao/silver/rfb_arrecadacao_resumo_municipal.parquet"
