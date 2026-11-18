@@ -2157,6 +2157,55 @@ class EnvironmentFacade:
             limit=limit, sigla_uf=sigla_uf, sort_by_pronaf=sort_by_pronaf
         )
 
+    @property
+    def ibge_agro_connector(self) -> Any:
+        if not hasattr(self, "_ibge_agro_connector") or self._ibge_agro_connector is None:
+            from public_data_gateway.connectors.ambiental.ibge_agro_municipal import (
+                IbgeAgroMunicipalConnector,
+            )
+
+            self._ibge_agro_connector = IbgeAgroMunicipalConnector(
+                settings=self._sdk.settings
+            )
+        return self._ibge_agro_connector
+
+    def get_agro_pam_crops(self, termo: str) -> list[dict[str, Any]]:
+        """Lookup IBGE PAM agricultural production by IBGE 7D, UF, crop, or municipality."""
+        return self.ibge_agro_connector.get_pam_crops(termo)
+
+    def get_agro_ppm_livestock(self, termo: str) -> list[dict[str, Any]]:
+        """Lookup IBGE PPM livestock herd heads and milk production by IBGE, UF, or species."""
+        return self.ibge_agro_connector.get_ppm_livestock(termo)
+
+    def get_agro_pevs_forestry(
+        self, id_municipio_or_name: str
+    ) -> dict[str, Any] | None:
+        """Retrieve municipal IBGE PEVS planted forest area, timber m³, and forestry value."""
+        return self.ibge_agro_connector.get_pevs_forestry(id_municipio_or_name)
+
+    def get_agro_municipal_summary(
+        self, id_municipio_or_name: str
+    ) -> dict[str, Any] | None:
+        """Retrieve consolidated municipal IBGE PAM/PPM/PEVS agricultural production value."""
+        return self.ibge_agro_connector.get_municipal_summary(id_municipio_or_name)
+
+    def get_agro_features(
+        self, id_municipio_or_name: str
+    ) -> dict[str, Any] | None:
+        """Retrieve Gold IBGE Agro Municipal agricultural power score and vocation features."""
+        return self.ibge_agro_connector.get_agro_features(id_municipio_or_name)
+
+    def list_top_agro_municipalities(
+        self,
+        limit: int = 10,
+        sigla_uf: str | None = None,
+        sort_by_vbp: bool = False,
+    ) -> list[dict[str, Any]]:
+        """List municipalities ranked by IBGE agricultural power score or total VBP value."""
+        return self.ibge_agro_connector.list_top_municipalities(
+            limit=limit, sigla_uf=sigla_uf, sort_by_vbp=sort_by_vbp
+        )
+
 
 class MetaportalsFacade:
     """Sub-facade for Metaportals & Aggregator Hubs (Datalake Federado SQL, Dados.gov.br CKAN)."""
@@ -4050,6 +4099,43 @@ class BrazilData:
         """Listar municípios ranqueados por dinamismo de crédito rural SICOR ou participação PRONAF."""
         return self.environment.list_top_sicor_municipalities(
             limit=limit, sigla_uf=sigla_uf, sort_by_pronaf=sort_by_pronaf
+        )
+
+    def get_agro_pam_crops(self, termo: str) -> list[dict[str, Any]]:
+        """Consultar produção agrícola municipal IBGE PAM (Tabela 5457) por cultura, UF ou município."""
+        return self.environment.get_agro_pam_crops(termo)
+
+    def get_agro_ppm_livestock(self, termo: str) -> list[dict[str, Any]]:
+        """Consultar efetivos pecuários e produção de leite IBGE PPM (Tabela 3939) por espécie ou município."""
+        return self.environment.get_agro_ppm_livestock(termo)
+
+    def get_agro_pevs_forestry(
+        self, id_municipio_or_name: str
+    ) -> dict[str, Any] | None:
+        """Consultar extração vegetal e silvicultura municipal IBGE PEVS (Tabela 289)."""
+        return self.environment.get_agro_pevs_forestry(id_municipio_or_name)
+
+    def get_agro_municipal_summary(
+        self, id_municipio_or_name: str
+    ) -> dict[str, Any] | None:
+        """Consultar consolidado municipal do Valor Bruto da Produção Agropecuária IBGE (PAM/PPM/PEVS)."""
+        return self.environment.get_agro_municipal_summary(id_municipio_or_name)
+
+    def get_agro_features(
+        self, id_municipio_or_name: str
+    ) -> dict[str, Any] | None:
+        """Consultar features Gold de potência agropecuária e vocação produtiva municipal (IBGE)."""
+        return self.environment.get_agro_features(id_municipio_or_name)
+
+    def list_top_agro_municipalities(
+        self,
+        limit: int = 10,
+        sigla_uf: str | None = None,
+        sort_by_vbp: bool = False,
+    ) -> list[dict[str, Any]]:
+        """Listar municípios líderes em produção agropecuária (PAM/PPM/PEVS) ou Valor Bruto (VBP)."""
+        return self.environment.list_top_agro_municipalities(
+            limit=limit, sigla_uf=sigla_uf, sort_by_vbp=sort_by_vbp
         )
 
     def get_bd_coverage(self, id_municipio: str) -> dict[str, Any]:

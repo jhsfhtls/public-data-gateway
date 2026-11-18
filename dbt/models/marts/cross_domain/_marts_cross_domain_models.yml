@@ -206,6 +206,18 @@ models:
       - name: score_dinamismo_credito_rural_sicor
         description: "Score de dinamismo do crédito rural, cobertura PROAGRO e adesão RenovAgro ABC+ no BACEN SICOR (0-100)."
         tests: [not_null]
+      - name: area_colhida_pam_ha
+        description: "Área total colhida das lavouras temporárias e permanentes no município (IBGE PAM) em hectares (ha)."
+        tests: [not_null]
+      - name: efetivo_rebanho_bovino_cabecas
+        description: "Efetivo municipal do rebanho bovino em cabeças (IBGE PPM)."
+        tests: [not_null]
+      - name: valor_bruto_agro_total_mil_brl
+        description: "Valor Bruto da Produção Agropecuária consolidada (PAM + PPM + PEVS) em mil Reais (R$ mil)."
+        tests: [not_null]
+      - name: score_potencia_agropecuaria_ibge
+        description: "Score de potência agropecuária municipal IBGE PAM/PPM/PEVS (0-100)."
+        tests: [not_null]
       - name: reference_date
         description: "Data de referência ISO-8601 (YYYY-MM-DD)."
         tests: [not_null]
