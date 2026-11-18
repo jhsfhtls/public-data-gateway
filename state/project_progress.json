@@ -1,6 +1,6 @@
 {
   "schema_version": "1.0.0",
-  "last_updated": "2026-11-18T14:27:00.000000",
+  "last_updated": "2026-11-18T14:48:00.000000",
   "project_name": "public-data-gateway",
   "architecture": "Hexagonal Medallion Lakehouse (Bronze -> Silver -> Gold / Feature Store)",
   "governance_standards": [
@@ -15,7 +15,7 @@
   "current_macro_phase": "Fase 11.5 - Expansão Completa de Fontes Públicas (Ondas 11.5A a 11.5E — Padrão 11-Gates)",
   "overall_status": "ON_TRACK",
   "active_connector": null,
-  "next_connector": "querido_diario_okbr",
+  "next_connector": "anm_mineracao",
   "structural_phases": [
     {
       "phase_id": "00",
@@ -252,74 +252,74 @@
     }
   ],
   "active_connector_gates": {
-    "target_connector": "ans_saude_suplementar",
-    "target_wave": "11.5D",
+    "target_connector": "querido_diario_okbr",
+    "target_wave": "11.5E",
     "gates": [
       {
         "gate_id": "GATE_01",
         "name": "Contrato Declarativo ODCS v3.1 das N Tabelas da API",
         "status": "PASSED",
-        "criteria": "Schema tipado ODCS-BR-ANS-SAUDE-SUPLEMENTAR-001 (11 colunas), chaves primarias STRING (cod_cobertura_ans, id_municipio 7D, sigla_uf) e regras semanticas para Beneficiarios SIB/ANS, Operadoras IDSS, Sinistralidade DIOPS e Resumo Municipal."
+        "criteria": "Schema tipado ODCS-BR-QUERIDO-DIARIO-OKBR-001 (11 colunas), chaves primarias STRING (cod_ato_diario, id_municipio 7D, sigla_uf) e regras semanticas para Diarios/Licitacoes, Excertos Tematicos NLP, Transparencia Ativa e Resumo Municipal."
       },
       {
         "gate_id": "GATE_02",
         "name": "Ingestao Bronze Isolada (Todas as Tabelas) & Cache WAL",
         "status": "PASSED",
-        "criteria": "Ingestao resiliente do repositorio Dados Abertos ANS PDA (dadosabertos.ans.gov.br/FTP/PDA/) e Portal Institucional ANS (gov.br/ans/pt-br) em data/ans_saude_suplementar/bronze/ com registro de linhagem SHA-256."
+        "criteria": "Ingestao resiliente dos portais oficiais Querido Diario OKBR (queridodiario.ok.org.br) e Open Knowledge Brasil (ok.org.br) em data/querido_diario_okbr/bronze/ com registro de linhagem SHA-256."
       },
       {
         "gate_id": "GATE_03",
         "name": "Sanitizacao de Sentinelas & Nulls",
         "status": "PASSED",
-        "criteria": "Conversao deterministica de sentinelas em NULLs reais e normalizacao de segmentacoes assistenciais ANS, modalidades de contratacao, notas IDSS e razao de sinistralidade DIOPS."
+        "criteria": "Conversao deterministica de sentinelas em NULLs reais e normalizacao de temas normativos (LICITACAO_EDITAL, DISPENSA_INEXIGIBILIDADE), modos de extracao OCR/PDF e indicadores de transparencia."
       },
       {
         "gate_id": "GATE_04",
         "name": "Materializacao Silver Parquet Isolada (Todas as Tabelas)",
         "status": "PASSED",
-        "criteria": "Gravacao ZSTD em data/ans_saude_suplementar/silver/ (ans_beneficiarios_municipio, ans_operadoras_idss_qualidade, ans_sinistralidade_diops_economico, ans_saude_suplementar_resumo_municipal)."
+        "criteria": "Gravacao ZSTD em data/querido_diario_okbr/silver/ (okbr_diarios_licitacoes_dispensas, okbr_diarios_excertos_tematicos, okbr_diarios_transparencia_ativa, okbr_querido_diario_resumo_municipal)."
       },
       {
         "gate_id": "GATE_05",
         "name": "Validacao dos 5 Pilares & Quarentena",
         "status": "PASSED",
-        "criteria": "Aprovacao em Freshness, Volume, Schema, Null Ceiling e Lineage com suporte a desvio para data/ans_saude_suplementar/quarantine/."
+        "criteria": "Aprovacao em Freshness, Volume, Schema, Null Ceiling e Lineage com suporte a desvio para data/querido_diario_okbr/quarantine/."
       },
       {
         "gate_id": "GATE_06",
         "name": "Gold Feature View Isolada & ASOF Join ML",
         "status": "PASSED",
-        "criteria": "Features de cobertura privada, qualidade IDSS e equilibrio DIOPS em data/ans_saude_suplementar/gold/features_ans_saude_suplementar_brasil.parquet."
+        "criteria": "Features de transparencia em diarios oficiais, atos licitatorios e taxa OCR em data/querido_diario_okbr/gold/features_querido_diario_okbr_brasil.parquet."
       },
       {
         "gate_id": "GATE_07",
         "name": "Integracao ao EnrichmentEngine & Marts Cross-Domain",
         "status": "PASSED",
-        "criteria": "Integracao saude-territorio em mart_cross_domain_territorio_b2b_macro_brasil (total_beneficiarios_ans_uf, avg_idss_ans_uf e avg_score_saude_suplementar_ans_uf)."
+        "criteria": "Integracao diarios-territorio em mart_cross_domain_territorio_b2b_macro_brasil (edicoes_diario_oficial_okbr_uf, atos_licitatorios_diario_uf e avg_score_transparencia_diario_uf)."
       },
       {
         "gate_id": "GATE_08",
         "name": "Exposicao Multi-Interface (4 Interfaces)",
         "status": "PASSED",
-        "criteria": "Exposicao simultanea via SDK (BrazilData.health + shortcuts), FastAPI (/api/v1/health/ans-suplementar/*), CLI (bdg ans-suplementar *) e MCP (bdg_get_ans_beneficiarios, bdg_get_ans_idss_qualidade, bdg_get_ans_features, bdg_list_top_ans_municipalities com wrap_untrusted_gov_data)."
+        "criteria": "Exposicao simultanea via SDK (BrazilData.procurement + shortcuts), FastAPI (/api/v1/procurement/querido-diario/*), CLI (bdg querido-diario *) e MCP (bdg_get_querido_diario_licitacoes, bdg_get_querido_diario_excertos, bdg_get_querido_diario_features, bdg_list_top_querido_diario_municipalities com wrap_untrusted_gov_data)."
       },
       {
         "gate_id": "GATE_09",
         "name": "Bateria de Testes Unitarios & Paridade Offline",
         "status": "PASSED",
-        "criteria": "Testes unitarios offline completos em tests/connectors/test_ans_saude_suplementar.py cobrindo 4 tabelas Silver, Gold ML e paridade nas 4 interfaces."
+        "criteria": "Testes unitarios offline completos em tests/connectors/test_querido_diario_okbr.py cobrindo 4 tabelas Silver, Gold ML e paridade nas 4 interfaces."
       },
       {
         "gate_id": "GATE_10",
         "name": "dbt Staging, Marts Intra-Domínio/Cross-Domain & 100% Colunas Documentadas",
         "status": "PASSED",
-        "criteria": "Modelos dbt com source.yml, stg_*, fct_ans_saude_suplementar_municipal, mart intra-dominio mart_ans_saude_suplementar_brasil e cross-domain mart_cross_domain_territorio_b2b_macro_brasil aprovados no dbt test (137/137) e lint_dbt_docs.py (100% cobertura em 644 modelos / 8.723 colunas / 360 fontes)."
+        "criteria": "Modelos dbt com source.yml, stg_*, fct_querido_diario_okbr_municipal, mart intra-dominio mart_querido_diario_okbr_brasil e cross-domain mart_cross_domain_territorio_b2b_macro_brasil aprovados no dbt test (140/140) e lint_dbt_docs.py (100% cobertura em 650 modelos / 8.793 colunas / 364 fontes)."
       },
       {
         "gate_id": "GATE_11",
         "name": "Teste Real de 1 Linha com API ao Vivo (Fail-Hard)",
         "status": "PASSED",
-        "criteria": "Execucao obrigatoria contra Dados Abertos ANS PDA e Portal gov.br/ans validando HTTP 200; falha reprova o pipeline."
+        "criteria": "Execucao obrigatoria contra portal oficial Querido Diario OKBR e ok.org.br validando HTTP 200; falha reprova o pipeline."
       }
     ]
   },
@@ -846,6 +846,12 @@
       "phase_id": "11.5",
       "milestone": "Wave 11.5D (6/6 — FECHAMENTO DA ONDA 11.5D) — Homologação do Conector ans_saude_suplementar (4 Tabelas Silver ANS/DIOPS/IDSS, Mart Intra-Domínio, Mart Cross-Domain Território & Paridade 4 Interfaces)",
       "summary": "Fechamento integral da Wave 11.5D (6/6 conectores concluídos nos 11 Gates) com a homologação de ans_saude_suplementar (ANS Saúde Suplementar: Beneficiários, Operadoras, IDSS & Sinistralidade): contrato ODCS v3.1 (ODCS-BR-ANS-SAUDE-SUPLEMENTAR-001), ingestão Bronze + 4 tabelas Silver ZSTD (ans_beneficiarios_municipio, ans_operadoras_idss_qualidade, ans_sinistralidade_diops_economico, ans_saude_suplementar_resumo_municipal) + Gold ML (features_ans_saude_suplementar_brasil), 4 staging views + fct_ans_saude_suplementar_municipal + mart intra-domínio mart_ans_saude_suplementar_brasil + enriquecimento da mart cross-domain mart_cross_domain_territorio_b2b_macro_brasil (137 testes dbt OK, 100% colunas documentadas no lint_dbt_docs.py com 644 modelos / 8.723 colunas / 360 fontes), paridade em SDK/FastAPI/CLI/MCP, bateria offline e teste live fail-hard contra dadosabertos.ans.gov.br/FTP/PDA/ e gov.br/ans/pt-br."
+    },
+    {
+      "date": "2026-11-18",
+      "phase_id": "11.5",
+      "milestone": "Wave 11.5E (1/4) — Homologação do Conector querido_diario_okbr (4 Tabelas Silver Querido Diário OKBR, Mart Intra-Domínio, Mart Cross-Domain Território & Paridade 4 Interfaces)",
+      "summary": "Abertura da Wave 11.5E (Diferenciais de Mercado & Complementares) com implementação completa nos 11 Gates do conector querido_diario_okbr (Querido Diário / Open Knowledge Brasil: Diários Oficiais Municipais, Licitações & Atos): contrato ODCS v3.1 (ODCS-BR-QUERIDO-DIARIO-OKBR-001), ingestão Bronze + 4 tabelas Silver ZSTD (okbr_diarios_licitacoes_dispensas, okbr_diarios_excertos_tematicos, okbr_diarios_transparencia_ativa, okbr_querido_diario_resumo_municipal) + Gold ML (features_querido_diario_okbr_brasil), 4 staging views + fct_querido_diario_okbr_municipal + mart intra-domínio mart_querido_diario_okbr_brasil + enriquecimento da mart cross-domain mart_cross_domain_territorio_b2b_macro_brasil (140 testes dbt OK, 100% colunas documentadas no lint_dbt_docs.py com 650 modelos / 8.793 colunas / 364 fontes), paridade em SDK/FastAPI/CLI/MCP, bateria offline e teste live fail-hard contra queridodiario.ok.org.br e ok.org.br."
     }
   ]
 }

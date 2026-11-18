@@ -199,6 +199,16 @@ ans_uf AS (
     GROUP BY sigla_uf
 ),
 
+diarios_uf AS (
+    SELECT
+        sigla_uf,
+        SUM(edicoes_indexadas_12m) AS edicoes_diario_oficial_okbr_uf,
+        SUM(qtd_atos_licitatorios_12m) AS atos_licitatorios_diario_uf,
+        ROUND(AVG(score_transparencia_diario_oficial), 2) AS avg_score_transparencia_diario_uf
+    FROM {{ ref('mart_querido_diario_okbr_brasil') }}
+    GROUP BY sigla_uf
+),
+
 base AS (
     SELECT
         t.sigla_uf,
@@ -257,6 +267,9 @@ base AS (
         COALESCE(an.total_beneficiarios_ans_uf, 0) AS total_beneficiarios_ans_uf,
         COALESCE(an.avg_idss_ans_uf, 0.78) AS avg_idss_ans_uf,
         COALESCE(an.avg_score_saude_suplementar_ans_uf, 75.0) AS avg_score_saude_suplementar_ans_uf,
+        COALESCE(qd.edicoes_diario_oficial_okbr_uf, 0) AS edicoes_diario_oficial_okbr_uf,
+        COALESCE(qd.atos_licitatorios_diario_uf, 0) AS atos_licitatorios_diario_uf,
+        COALESCE(qd.avg_score_transparencia_diario_uf, 80.0) AS avg_score_transparencia_diario_uf,
         COALESCE(m.ano_mes, '2025-03') AS macro_ano_mes_referencia,
         COALESCE(m.selic_meta_fim_mes_pct, 14.25) AS selic_meta_fim_mes_pct,
         COALESCE(m.ipca_acumulado_12m_pct, 5.06) AS ipca_acumulado_12m_pct,
@@ -281,6 +294,7 @@ base AS (
     LEFT JOIN bndes_uf bn ON t.sigla_uf = bn.sigla_uf
     LEFT JOIN cvm_extra_uf cvx ON t.sigla_uf = cvx.sigla_uf
     LEFT JOIN ans_uf an ON t.sigla_uf = an.sigla_uf
+    LEFT JOIN diarios_uf qd ON t.sigla_uf = qd.sigla_uf
     CROSS JOIN macro_latest m
 ),
 

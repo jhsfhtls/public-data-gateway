@@ -109,6 +109,36 @@ def build_parser() -> argparse.ArgumentParser:
     pncp_ct_p.add_argument("--limit", type=int, default=10, help="Max rows to return")
     pncp_ct_p.add_argument("--json", action="store_true", help="Output in JSON format")
 
+    # Querido Diário OKBR command group
+    qd_p = subparsers.add_parser("querido-diario", help="Query Querido Diário (OKBR) municipal gazettes, tenders, excerpts, and rankings.")
+    qd_sub = qd_p.add_subparsers(dest="querido_diario_action", required=True)
+
+    qd_lic_p = qd_sub.add_parser("licitacoes", help="Lookup indexed official gazette tenders and dispensations.")
+    qd_lic_p.add_argument("termo", help="Gazette act code, theme, IBGE code, UF, or city")
+    qd_lic_p.add_argument("--json", action="store_true", help="Output in JSON format")
+
+    qd_exc_p = qd_sub.add_parser("excertos", help="Lookup indexed gazette editions, education/health/ESG mentions, and OCR rate.")
+    qd_exc_p.add_argument("termo", help="Excerpt code, IBGE code, UF, or city")
+    qd_exc_p.add_argument("--json", action="store_true", help="Output in JSON format")
+
+    qd_trp_p = qd_sub.add_parser("transparencia", help="Get municipal official gazette archive depth, open format, and regularity.")
+    qd_trp_p.add_argument("id_municipio_or_name", help="7-digit IBGE code or municipality name")
+    qd_trp_p.add_argument("--json", action="store_true", help="Output in JSON format")
+
+    qd_mn_p = qd_sub.add_parser("municipio", help="Get consolidated municipal Querido Diário editions, tenders, and cited values.")
+    qd_mn_p.add_argument("id_municipio_or_name", help="7-digit IBGE code or municipality name")
+    qd_mn_p.add_argument("--json", action="store_true", help="Output in JSON format")
+
+    qd_ft_p = qd_sub.add_parser("features", help="Get Gold Querido Diário official gazette transparency score and maturity tier.")
+    qd_ft_p.add_argument("id_municipio_or_name", help="7-digit IBGE code or municipality name")
+    qd_ft_p.add_argument("--json", action="store_true", help="Output in JSON format")
+
+    qd_rk_p = qd_sub.add_parser("ranking", help="List municipalities ranked by gazette transparency score or cited value.")
+    qd_rk_p.add_argument("--limit", type=int, default=10, help="Max municipalities to list")
+    qd_rk_p.add_argument("--uf", type=str, help="Optional 2-letter state filter")
+    qd_rk_p.add_argument("--volume", action="store_true", help="Sort descending by cited contract values (R$ mil)")
+    qd_rk_p.add_argument("--json", action="store_true", help="Output in JSON format")
+
     # Subcommand: compliance
     comp_parser = subparsers.add_parser(
         "compliance", help="Query sanctions, ineligibility & anti-corruption compliance (CGU CEIS/CNEP/CEPIM)."
@@ -2430,6 +2460,84 @@ def main(argv: Sequence[str] | None = None) -> int:
                             f"R$ {r['valor_global']:,.2f} | {r['razao_social_orgao']}"
                         )
                 return 0
+
+        elif args.command == "querido-diario":
+            from public_data_gateway.connectors.compras_publicas.querido_diario_okbr import (
+                QueridoDiarioOkbrConnector,
+            )
+
+            qd_conn = QueridoDiarioOkbrConnector()
+            qd_action = getattr(args, "querido_diario_action", "")
+            try:
+                if qd_action == "licitacoes":
+                    rows = qd_conn.get_gazette_tenders(args.termo)
+                    if getattr(args, "json", False):
+                        print(json.dumps(rows, indent=2, ensure_ascii=False, default=str))
+                    else:
+                        print(f"Querido Diário Licitações/Atos ({len(rows)}):")
+                        for r in rows:
+                            print(f"  {r.get('cod_ato_diario')} | {r.get('nome_municipio')} ({r.get('sigla_uf')}): {r.get('tema_ato_normativo')} | R$ {r.get('valor_extratos_citados_mil_brl')}k")
+                    return 0
+
+                if qd_action == "excertos":
+                    rows = qd_conn.get_thematic_excerpts(args.termo)
+                    if getattr(args, "json", False):
+                        print(json.dumps(rows, indent=2, ensure_ascii=False, default=str))
+                    else:
+                        print(f"Querido Diário Excertos Temáticos ({len(rows)}):")
+                        for r in rows:
+                            print(f"  {r.get('cod_excerto_qd')} | {r.get('nome_municipio')} ({r.get('sigla_uf')}): {r.get('edicoes_indexadas_12m')} eds | OCR {r.get('taxa_ocr_legivel_pct')}%")
+                    return 0
+
+                if qd_action == "transparencia":
+                    res = qd_conn.get_active_transparency_metrics(args.id_municipio_or_name)
+                    if res is None:
+                        print(f"Transparência Querido Diário não encontrada para: {args.id_municipio_or_name}", file=sys.stderr)
+                        return 1
+                    if getattr(args, "json", False):
+                        print(json.dumps(res, indent=2, ensure_ascii=False, default=str))
+                    else:
+                        print(f"Querido Diário Transparência ({res.get('nome_municipio')} - {res.get('sigla_uf')}): {res.get('indice_transparencia_diario_pct')}% | {res.get('cobertura_historica_anos')} anos")
+                    return 0
+
+                if qd_action == "municipio":
+                    res = qd_conn.get_gazette_summary(args.id_municipio_or_name)
+                    if res is None:
+                        print(f"Resumo Querido Diário não encontrado para: {args.id_municipio_or_name}", file=sys.stderr)
+                        return 1
+                    if getattr(args, "json", False):
+                        print(json.dumps(res, indent=2, ensure_ascii=False, default=str))
+                    else:
+                        print(f"Querido Diário Município ({res.get('nome_municipio')} - {res.get('sigla_uf')}): {res.get('edicoes_indexadas_12m')} eds | {res.get('qtd_atos_licitatorios_12m')} atos")
+                    return 0
+
+                if qd_action == "features":
+                    res = qd_conn.get_gazette_features(args.id_municipio_or_name)
+                    if res is None:
+                        print(f"Features Querido Diário não encontradas para: {args.id_municipio_or_name}", file=sys.stderr)
+                        return 1
+                    if getattr(args, "json", False):
+                        print(json.dumps(res, indent=2, ensure_ascii=False, default=str))
+                    else:
+                        print(f"Querido Diário Gold ({res.get('nome_municipio')} - {res.get('id_municipio')}): Score {res.get('score_transparencia_diario_oficial')} | {res.get('tier_maturidade_diario_oficial')}")
+                    return 0
+
+                if qd_action == "ranking":
+                    ranks = qd_conn.list_top_gazette_municipalities(
+                        limit=getattr(args, "limit", 10),
+                        sigla_uf=getattr(args, "uf", None),
+                        sort_by_volume=getattr(args, "volume", False),
+                    )
+                    if getattr(args, "json", False):
+                        print(json.dumps(ranks, indent=2, ensure_ascii=False, default=str))
+                    else:
+                        print(f"Ranking Querido Diário ({len(ranks)}):")
+                        for idx, r in enumerate(ranks, 1):
+                            print(f"  {idx}. {r.get('nome_municipio')} ({r.get('sigla_uf')}): {r.get('score_transparencia_diario_oficial')} | {r.get('tier_maturidade_diario_oficial')}")
+                    return 0
+            except (ValueError, KeyError) as exc:
+                print(f"Erro Querido Diário OKBR: {exc}", file=sys.stderr)
+                return 1
 
         if args.command == "compliance":
             from public_data_gateway.connectors.compliance.cgu_ceis_cnep.connector import (

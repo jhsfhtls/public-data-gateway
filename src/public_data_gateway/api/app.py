@@ -1832,6 +1832,92 @@ def create_app(settings: GatewaySettings | None = None) -> FastAPI:
             raise HTTPException(status_code=404, detail=f"Supplier not found for CNPJ '{cnpj}'")
         return res
 
+    # 16B. Querido Diário (OKBR) Diários Oficiais Municipais
+    @app.get("/api/v1/procurement/querido-diario/licitacoes/{termo}")
+    async def get_querido_diario_licitacoes(termo: str) -> list[dict[str, Any]]:
+        from public_data_gateway.connectors.compras_publicas.querido_diario_okbr import (
+            QueridoDiarioOkbrConnector,
+        )
+
+        return QueridoDiarioOkbrConnector(settings=app_settings).get_gazette_tenders(termo)
+
+    @app.get("/api/v1/procurement/querido-diario/excertos/{termo}")
+    async def get_querido_diario_excertos(termo: str) -> list[dict[str, Any]]:
+        from public_data_gateway.connectors.compras_publicas.querido_diario_okbr import (
+            QueridoDiarioOkbrConnector,
+        )
+
+        return QueridoDiarioOkbrConnector(settings=app_settings).get_thematic_excerpts(termo)
+
+    @app.get("/api/v1/procurement/querido-diario/transparencia/{id_municipio_or_name}")
+    async def get_querido_diario_transparencia(
+        id_municipio_or_name: str,
+    ) -> dict[str, Any]:
+        from public_data_gateway.connectors.compras_publicas.querido_diario_okbr import (
+            QueridoDiarioOkbrConnector,
+        )
+
+        res = QueridoDiarioOkbrConnector(
+            settings=app_settings
+        ).get_active_transparency_metrics(id_municipio_or_name)
+        if res is None:
+            raise HTTPException(
+                status_code=404, detail="Querido Diário transparency metrics not found"
+            )
+        return res
+
+    @app.get("/api/v1/procurement/querido-diario/municipio/{id_municipio_or_name}")
+    async def get_querido_diario_municipio(
+        id_municipio_or_name: str,
+    ) -> dict[str, Any]:
+        from public_data_gateway.connectors.compras_publicas.querido_diario_okbr import (
+            QueridoDiarioOkbrConnector,
+        )
+
+        res = QueridoDiarioOkbrConnector(settings=app_settings).get_gazette_summary(
+            id_municipio_or_name
+        )
+        if res is None:
+            raise HTTPException(
+                status_code=404, detail="Querido Diário municipal summary not found"
+            )
+        return res
+
+    @app.get("/api/v1/procurement/querido-diario/features/{id_municipio_or_name}")
+    async def get_querido_diario_features_endpoint(
+        id_municipio_or_name: str,
+    ) -> dict[str, Any]:
+        from public_data_gateway.connectors.compras_publicas.querido_diario_okbr import (
+            QueridoDiarioOkbrConnector,
+        )
+
+        res = QueridoDiarioOkbrConnector(settings=app_settings).get_gazette_features(
+            id_municipio_or_name
+        )
+        if res is None:
+            raise HTTPException(
+                status_code=404, detail="Querido Diário Gold features not found"
+            )
+        return res
+
+    @app.get("/api/v1/procurement/querido-diario/ranking")
+    async def get_querido_diario_ranking(
+        limit: int = Query(10, ge=1, le=50, description="Max municipalities to list"),
+        uf: str | None = Query(None, description="Optional 2-letter state filter"),
+        sort_by_volume: bool = Query(
+            False, description="Sort descending by cited contract value in gazettes (R$ mil)"
+        ),
+    ) -> list[dict[str, Any]]:
+        from public_data_gateway.connectors.compras_publicas.querido_diario_okbr import (
+            QueridoDiarioOkbrConnector,
+        )
+
+        return QueridoDiarioOkbrConnector(
+            settings=app_settings
+        ).list_top_gazette_municipalities(
+            limit=limit, sigla_uf=uf, sort_by_volume=sort_by_volume
+        )
+
     @app.get("/api/v1/catmat/{termo}")
     async def get_catmat_quick(
         termo: str,

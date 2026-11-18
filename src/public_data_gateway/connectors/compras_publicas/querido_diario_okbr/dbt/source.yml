@@ -1,0 +1,26 @@
+version: 2
+
+sources:
+  - name: querido_diario_okbr
+    description: "Tabelas Silver de Diários Oficiais Municipais, Licitações, Excertos NLP e Transparência Ativa (OKBR)"
+    meta:
+      agency: "Open Knowledge Brasil (OKBR)"
+      domain: "compras_publicas_querido_diario"
+      freshness_sla: "Semanal (168h)"
+    tables:
+      - name: okbr_diarios_licitacoes_dispensas
+        description: "Extratos mensais de licitações, dispensas e contratos indexados em Diários Oficiais Municipais"
+        meta:
+          external_location: "data/querido_diario_okbr/silver/okbr_diarios_licitacoes_dispensas.parquet"
+      - name: okbr_diarios_excertos_tematicos
+        description: "Edições indexadas 12m, menções temáticas em Educação/Saúde/ESG e taxa de legibilidade OCR"
+        meta:
+          external_location: "data/querido_diario_okbr/silver/okbr_diarios_excertos_tematicos.parquet"
+      - name: okbr_diarios_transparencia_ativa
+        description: "Série histórica em anos, formato aberto TXT/PDF, regularidade de publicação e transparência"
+        meta:
+          external_location: "data/querido_diario_okbr/silver/okbr_diarios_transparencia_ativa.parquet"
+      - name: okbr_querido_diario_resumo_municipal
+        description: "Consolidado municipal de edições, atos licitatórios, valores citados e transparência oficial"
+        meta:
+          external_location: "data/querido_diario_okbr/silver/okbr_querido_diario_resumo_municipal.parquet"
