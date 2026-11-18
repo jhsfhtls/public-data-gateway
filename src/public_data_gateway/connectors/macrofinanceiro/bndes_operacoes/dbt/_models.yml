@@ -1,0 +1,178 @@
+version: 2
+
+models:
+  - name: stg_bndes_operacoes_credito_municipio
+    description: "Staging view tipada das operações de crédito diretas FINEM e indiretas automáticas BNDES por município."
+    columns:
+      - name: cod_operacao_bndes
+        description: "Identificador único do agrupamento municipal de operações BNDES (STRING)."
+        tests: [not_null, unique]
+      - name: modalidade_apoio_bndes
+        description: "Modalidade de apoio financeiro (OPERACAO_DIRETA_FINEM ou OPERACAO_INDIRETA_AUTOMATICA)."
+        tests: [not_null]
+      - name: setor_cnae_fomento
+        description: "Macro-setor CNAE destinatário predominante no município."
+        tests: [not_null]
+      - name: instrumento_financeiro
+        description: "Linha financeira ou fundo BNDES utilizado na contratação."
+        tests: [not_null]
+      - name: id_municipio
+        description: "Código IBGE de 7 dígitos do município (STRING)."
+        tests: [not_null]
+      - name: sigla_uf
+        description: "Sigla de 2 letras da Unidade Federativa (UF)."
+        tests: [not_null]
+      - name: nome_municipio
+        description: "Nome oficial do município."
+        tests: [not_null]
+      - name: regiao
+        description: "Macrorregião geográfica brasileira."
+        tests: [not_null]
+      - name: qtd_operacoes_contratadas
+        description: "Total de operações e subcréditos contratados no agrupamento."
+        tests: [not_null]
+      - name: valor_contratado_bndes_mil_brl
+        description: "Valor contratado pelo BNDES no agrupamento (R$ mil)."
+        tests: [not_null]
+      - name: prazo_medio_amortizacao_meses
+        description: "Prazo médio ponderado de amortização em meses."
+        tests: [not_null]
+
+  - name: stg_bndes_desembolsos_setoriais_uf
+    description: "Staging view tipada de desembolsos anuais BNDES, economia verde e participação de MPMEs."
+    columns:
+      - name: cod_desembolso_bndes
+        description: "Identificador único do registro municipal de desembolso BNDES (STRING)."
+        tests: [not_null, unique]
+      - name: id_municipio
+        description: "Código IBGE de 7 dígitos do município (STRING)."
+        tests: [not_null]
+      - name: sigla_uf
+        description: "Sigla de 2 letras da Unidade Federativa (UF)."
+        tests: [not_null]
+      - name: nome_municipio
+        description: "Nome oficial do município."
+        tests: [not_null]
+      - name: desembolso_anual_mil_brl
+        description: "Volume de desembolsos liberados pelo BNDES no ano de referência (R$ mil)."
+        tests: [not_null]
+      - name: fomento_verde_esg_pct
+        description: "Percentual de desembolsos destinados a economia verde, clima e saneamento (%)."
+        tests: [not_null]
+      - name: mpme_participacao_pct
+        description: "Participação percentual de micro, pequenas e médias empresas nos desembolsos (%)."
+        tests: [not_null]
+      - name: ano_referencia
+        description: "Ano-calendário de referência dos desembolsos BNDES."
+        tests: [not_null]
+
+  - name: stg_bndes_carteira_risco_garantias
+    description: "Staging view tipada de custo TLP/TJLP, inadimplência, FGI garantias e projetos sustentáveis BNDES."
+    columns:
+      - name: id_municipio
+        description: "Código IBGE de 7 dígitos do município (STRING)."
+        tests: [not_null, unique]
+      - name: sigla_uf
+        description: "Sigla de 2 letras da Unidade Federativa (UF)."
+        tests: [not_null]
+      - name: nome_municipio
+        description: "Nome oficial do município."
+        tests: [not_null]
+      - name: juros_medio_tjlp_tlp_aa_pct
+        description: "Taxa média contratual TLP/TJLP equivalente nas operações (% a.a.)."
+        tests: [not_null]
+      - name: inadimplencia_carteira_bndes_pct
+        description: "Taxa de inadimplência observada na carteira de crédito BNDES (%)."
+        tests: [not_null]
+      - name: cobertura_fgi_garantias_pct
+        description: "Percentual de operações amparadas por fundos garantidores FGI/PEAC (%)."
+        tests: [not_null]
+      - name: projetos_sustentaveis_count
+        description: "Quantidade de projetos enquadrados em linhas sustentáveis e descarbonização."
+        tests: [not_null]
+
+  - name: stg_bndes_operacoes_resumo_municipal
+    description: "Staging view tipada do consolidado municipal de crédito e fomento BNDES."
+    columns:
+      - name: id_municipio
+        description: "Código IBGE de 7 dígitos do município (STRING)."
+        tests: [not_null, unique]
+      - name: sigla_uf
+        description: "Sigla de 2 letras da Unidade Federativa (UF)."
+        tests: [not_null]
+      - name: nome_municipio
+        description: "Nome oficial do município."
+        tests: [not_null]
+      - name: regiao
+        description: "Macrorregião geográfica brasileira."
+        tests: [not_null]
+      - name: total_operacoes_bndes
+        description: "Contingente total de operações contratadas no município."
+        tests: [not_null]
+      - name: valor_total_contratado_mil_brl
+        description: "Valor total contratado pelo BNDES no município (R$ mil)."
+        tests: [not_null]
+      - name: desembolso_anual_mil_brl
+        description: "Volume anual desembolsado no município (R$ mil)."
+        tests: [not_null]
+      - name: fomento_verde_esg_pct
+        description: "Percentual da carteira municipal alocado em economia verde/ESG (%)."
+        tests: [not_null]
+      - name: fomento_per_capita_brl
+        description: "Volume contratado de longo prazo equivalente por habitante (BRL)."
+        tests: [not_null]
+
+  - name: fct_bndes_operacoes_fomento_municipal
+    description: "Tabela Fato municipal consolidando operações diretas/indiretas BNDES, desembolsos, MPME, FGI e sustentabilidade."
+    columns:
+      - name: id_municipio
+        description: "Código IBGE de 7 dígitos do município (STRING)."
+        tests: [not_null, unique]
+      - name: sigla_uf
+        description: "Sigla de 2 letras da Unidade Federativa (UF)."
+        tests: [not_null]
+      - name: nome_municipio
+        description: "Nome oficial do município."
+        tests: [not_null]
+      - name: regiao
+        description: "Macrorregião geográfica brasileira."
+        tests: [not_null]
+      - name: total_operacoes_bndes
+        description: "Quantidade total de operações diretas e indiretas no município."
+        tests: [not_null]
+      - name: valor_total_contratado_mil_brl
+        description: "Montante total contratado pelo BNDES no município (R$ mil)."
+        tests: [not_null]
+      - name: desembolso_anual_mil_brl
+        description: "Montante desembolsado anual BNDES no município (R$ mil)."
+        tests: [not_null]
+      - name: fomento_verde_esg_pct
+        description: "Participação de financiamentos verdes e de transição energética (%)."
+        tests: [not_null]
+      - name: fomento_per_capita_brl
+        description: "Valor contratado acumulado por habitante no município (BRL)."
+        tests: [not_null]
+      - name: qtd_modalidades_bndes
+        description: "Quantidade de modalidades contratuais BNDES registradas na Silver."
+        tests: [not_null]
+      - name: prazo_maximo_amortizacao_meses
+        description: "Maior prazo médio de amortização contratado entre modalidades (meses)."
+        tests: [not_null]
+      - name: mpme_participacao_pct
+        description: "Participação percentual de MPMEs nas contratações BNDES (%)."
+        tests: [not_null]
+      - name: ano_referencia
+        description: "Ano de referência dos desembolsos BNDES consolidados."
+        tests: [not_null]
+      - name: juros_medio_tjlp_tlp_aa_pct
+        description: "Taxa média anual de encargos TLP/TJLP aplicada às operações (% a.a.)."
+        tests: [not_null]
+      - name: inadimplencia_carteira_bndes_pct
+        description: "Percentual de inadimplência da carteira BNDES no município (%)."
+        tests: [not_null]
+      - name: cobertura_fgi_garantias_pct
+        description: "Percentual de cobertura garantidora FGI/BNDES no município (%)."
+        tests: [not_null]
+      - name: projetos_sustentaveis_count
+        description: "Total de projetos sustentáveis financiados pelo BNDES."
+        tests: [not_null]

@@ -1,7 +1,7 @@
 <div align="center">
   <h2>Jornada de Implementação — Public Data Gateway</h2>
   <p><i>Painel Vivo de Evolução Arquitetural, Ciclo de Vida de Conectores & Solution Packs Analíticos</i></p>
-  <p><b>Versão:</b> 1.0.0 &nbsp;|&nbsp; <b>Última Atualização:</b> 2026-11-18T13:27:00.000000 &nbsp;|&nbsp; <b>Padrões:</b> ADR-001 • ADR-002 • ADR-003 • ODCS v3.1 • LGPD</p>
+  <p><b>Versão:</b> 1.0.0 &nbsp;|&nbsp; <b>Última Atualização:</b> 2026-11-18T13:45:30.000000 &nbsp;|&nbsp; <b>Padrões:</b> ADR-001 • ADR-002 • ADR-003 • ODCS v3.1 • LGPD</p>
   <hr/>
 </div>
 <br/>
@@ -17,9 +17,9 @@ Este artefato constitui a **Fonte Única da Verdade Operacional (SSOT)** do stat
 - **Macrofase Ativa:** `Fase 11.5 - Expansão Completa de Fontes Públicas (Ondas 11.5A a 11.5E — Padrão 11-Gates)`
 - **Status Geral de Governança:** `🟢 ON_TRACK`
 - **Conector Ativo em Desenvolvimento:** `Nenhum (Transição de Fase / Waves 1..6 Concluídas)`
-- **Próxima Etapa Planejada:** `bndes_operacoes`
+- **Próxima Etapa Planejada:** `cvm_mercado_extra`
 - **Progresso Estrutural das Macrofases:** **15 de 17 Concluídas (88.2%)**
-- **Universo de Fontes Homologadas no Catálogo:** **73 fontes públicas** nos 13 macrosegmentos
+- **Universo de Fontes Homologadas no Catálogo:** **74 fontes públicas** nos 13 macrosegmentos
 
 ```mermaid
 flowchart LR
@@ -56,21 +56,21 @@ flowchart LR
 
 ## 3. Checklist dos 9 Gates de Qualidade do Conector Ativo
 
-Todo conector integrado ao `public-data-gateway` deve percorrer rigorosamente os **9 Gates de Qualidade** antes de ser promovido a `HOMOLOGATED`. O alvo atual do ciclo de vida é o conector `tse_eleicoes` (Wave 11.5D):
+Todo conector integrado ao `public-data-gateway` deve percorrer rigorosamente os **9 Gates de Qualidade** antes de ser promovido a `HOMOLOGATED`. O alvo atual do ciclo de vida é o conector `bndes_operacoes` (Wave 11.5D):
 
 | Gate | Nome do Gate de Homologação | Critério Operacional de Aceite (ODCS v3.1 / ADR-001 / ADR-002) | Status |
 | :---: | :--- | :--- | :---: |
-| **GATE_01** | **Contrato Declarativo ODCS v3.1 das N Tabelas da API** | Schema tipado ODCS-BR-TSE-ELEICOES-DADOS-ABERTOS-001 (11 colunas), chaves primarias STRING (cod_eleicao_tse, id_municipio 7D, sigla_uf) e regras semanticas para Candidaturas/Partidos, Votacao/Comparecimento, Prestacao de Contas e Resumo Municipal. | 🟢 APROVADO |
-| **GATE_02** | **Ingestao Bronze Isolada (Todas as Tabelas) & Cache WAL** | Ingestao resiliente dos portais oficiais TSE Dados Abertos (dadosabertos.tse.jus.br) e API DivulgaCandContas (divulgacandcontas.tse.jus.br) em data/tse_eleicoes/bronze/ com registro de linhagem SHA-256. | 🟢 APROVADO |
-| **GATE_03** | **Sanitizacao de Sentinelas & Nulls** | Conversao deterministica de sentinelas (#NULO#, N/D, -1, -99) em NULLs reais e normalizacao de cargos eletivos, turnos, pluralismo partidario e taxas de aprovacao de contas. | 🟢 APROVADO |
-| **GATE_04** | **Materializacao Silver Parquet Isolada (Todas as Tabelas)** | Gravacao ZSTD em data/tse_eleicoes/silver/ (tse_candidaturas_partidos_municipio, tse_votacao_comparecimento_secao, tse_prestacao_contas_campanha, tse_eleicoes_resumo_municipal). | 🟢 APROVADO |
-| **GATE_05** | **Validacao dos 5 Pilares & Quarentena** | Aprovacao em Freshness, Volume, Schema, Null Ceiling e Lineage com suporte a desvio para data/tse_eleicoes/quarantine/. | 🟢 APROVADO |
-| **GATE_06** | **Gold Feature View Isolada & ASOF Join ML** | Features de participacao eleitoral, custo por eleitor e regularidade de contas em data/tse_eleicoes/gold/features_eleicoes_tse_brasil.parquet. | 🟢 APROVADO |
-| **GATE_07** | **Integracao ao EnrichmentEngine & Marts Cross-Domain** | Integracao eleitoral-territorio em mart_cross_domain_territorio_b2b_macro_brasil (eleitorado_apto_tse_uf, avg_comparecimento_eleitoral_uf_pct e avg_score_integridade_eleitoral_uf). | 🟢 APROVADO |
-| **GATE_08** | **Exposicao Multi-Interface (4 Interfaces)** | Exposicao simultanea via SDK (BrazilData.compliance + shortcuts), FastAPI (/api/v1/compliance/eleicoes-tse/*), CLI (bdg eleicoes-tse *) e MCP (bdg_get_tse_candidaturas, bdg_get_tse_votacao, bdg_get_tse_features, bdg_list_top_tse_municipalities com wrap_untrusted_gov_data). | 🟢 APROVADO |
-| **GATE_09** | **Bateria de Testes Unitarios & Paridade Offline** | Testes unitarios offline completos em tests/connectors/test_tse_eleicoes.py cobrindo 4 tabelas Silver, Gold ML e paridade nas 4 interfaces. | 🟢 APROVADO |
-| **GATE_10** | **dbt Staging, Marts Intra-Domínio/Cross-Domain & 100% Colunas Documentadas** | Modelos dbt com source.yml, stg_*, fct_eleicoes_tse_municipal, mart intra-dominio mart_eleicoes_tse_brasil e cross-domain mart_cross_domain_territorio_b2b_macro_brasil aprovados no dbt test (135/135) e lint_dbt_docs.py (100% cobertura em 626 modelos / 8.505 colunas / 348 fontes). | 🟢 APROVADO |
-| **GATE_11** | **Teste Real de 1 Linha com API ao Vivo (Fail-Hard)** | Execucao obrigatoria contra API oficial TSE DivulgaCandContas e Portal Dados Abertos TSE validando HTTP 200; falha reprova o pipeline. | 🟢 APROVADO |
+| **GATE_01** | **Contrato Declarativo ODCS v3.1 das N Tabelas da API** | Schema tipado ODCS-BR-BNDES-OPERACOES-TRANSPARENCIA-001 (11 colunas), chaves primarias STRING (cod_operacao_bndes, id_municipio 7D, sigla_uf) e regras semanticas para Operacoes Diretas FINEM/Indiretas, Desembolsos Setoriais, Risco/FGI e Resumo Municipal. | 🟢 APROVADO |
+| **GATE_02** | **Ingestao Bronze Isolada (Todas as Tabelas) & Cache WAL** | Ingestao resiliente da API CKAN BNDES (dadosabertos.bndes.gov.br/api/3/action/package_list) e Portal Dados Abertos BNDES (dadosabertos.bndes.gov.br) em data/bndes_operacoes/bronze/ com registro de linhagem SHA-256. | 🟢 APROVADO |
+| **GATE_03** | **Sanitizacao de Sentinelas & Nulls** | Conversao deterministica de sentinelas em NULLs reais e normalizacao de modalidades de apoio BNDES (OPERACAO_DIRETA_FINEM, OPERACAO_INDIRETA_AUTOMATICA), encargos TLP/TJLP e indicadores de fomento verde/MPME. | 🟢 APROVADO |
+| **GATE_04** | **Materializacao Silver Parquet Isolada (Todas as Tabelas)** | Gravacao ZSTD em data/bndes_operacoes/silver/ (bndes_operacoes_credito_municipio, bndes_desembolsos_setoriais_uf, bndes_carteira_risco_garantias, bndes_operacoes_resumo_municipal). | 🟢 APROVADO |
+| **GATE_05** | **Validacao dos 5 Pilares & Quarentena** | Aprovacao em Freshness, Volume, Schema, Null Ceiling e Lineage com suporte a desvio para data/bndes_operacoes/quarantine/. | 🟢 APROVADO |
+| **GATE_06** | **Gold Feature View Isolada & ASOF Join ML** | Features de intensidade de fomento produtivo, economia verde ESG e cobertura FGI em data/bndes_operacoes/gold/features_bndes_operacoes_brasil.parquet. | 🟢 APROVADO |
+| **GATE_07** | **Integracao ao EnrichmentEngine & Marts Cross-Domain** | Integracao fomento-territorio em mart_cross_domain_territorio_b2b_macro_brasil (valor_contratado_bndes_uf_mil_brl, desembolso_anual_bndes_uf_mil_brl e avg_score_fomento_bndes_uf). | 🟢 APROVADO |
+| **GATE_08** | **Exposicao Multi-Interface (4 Interfaces)** | Exposicao simultanea via SDK (BrazilData.banking + shortcuts), FastAPI (/api/v1/banking/bndes-operacoes/*), CLI (bdg bndes-operacoes *) e MCP (bdg_get_bndes_operacoes, bdg_get_bndes_desembolsos, bdg_get_bndes_features, bdg_list_top_bndes_municipalities com wrap_untrusted_gov_data). | 🟢 APROVADO |
+| **GATE_09** | **Bateria de Testes Unitarios & Paridade Offline** | Testes unitarios offline completos em tests/connectors/test_bndes_operacoes.py cobrindo 4 tabelas Silver, Gold ML e paridade nas 4 interfaces. | 🟢 APROVADO |
+| **GATE_10** | **dbt Staging, Marts Intra-Domínio/Cross-Domain & 100% Colunas Documentadas** | Modelos dbt com source.yml, stg_*, fct_bndes_operacoes_fomento_municipal, mart intra-dominio mart_bndes_operacoes_fomento_brasil e cross-domain mart_cross_domain_territorio_b2b_macro_brasil aprovados no dbt test (135/135) e lint_dbt_docs.py (100% cobertura em 632 modelos / 8.579 colunas / 352 fontes). | 🟢 APROVADO |
+| **GATE_11** | **Teste Real de 1 Linha com API ao Vivo (Fail-Hard)** | Execucao obrigatoria contra API CKAN Dados Abertos BNDES e Portal BNDES Transparencia validando HTTP 200; falha reprova o pipeline. | 🟢 APROVADO |
 
 ---
 
@@ -81,7 +81,7 @@ Estatísticas dinâmicas cruzadas diretamente com o catálogo mestre `catalog/so
 | Onda | Foco Estratégico | Total Fontes | RICE Médio | Modos Predominantes | Fontes Âncora | Status da Onda |
 | :---: | :--- | :---: | :---: | :--- | :--- | :---: |
 | **Wave 1** | APIs de Borda & Macroeconomia | 4 | 878 | `FEDERATED_API` | `ibge_localidades`, `brasilapi_core`, `bcb_sgs` (+1) | 🟢 100% Homologada |
-| **Wave 2** | B2B, Compras Públicas & Compliance | 29 | 853 | `FEDERATED_API, LAKEHOUSE_BATCH` | `rfb_cnpj_lakehouse`, `pncp_contratacoes`, `cnj_datajud` (+26) | 🟢 100% Homologada |
+| **Wave 2** | B2B, Compras Públicas & Compliance | 30 | 854 | `FEDERATED_API, LAKEHOUSE_BATCH` | `rfb_cnpj_lakehouse`, `pncp_contratacoes`, `cnj_datajud` (+27) | 🟢 100% Homologada |
 | **Wave 3** | Mercado de Capitais & Finanças Públicas | 9 | 733 | `FEDERATED_API, LAKEHOUSE_BATCH` | `cvm_dfp_itr`, `mdic_comexstat`, `cvm_fundos` (+6) | 🟢 100% Homologada |
 | **Wave 4** | Censo, Trabalho, Logística & Telecom | 10 | 553 | `FEDERATED_API, LAKEHOUSE_BATCH` | `ibge_sidra`, `ibge_pib_municipal`, `ibge_censo2022` (+7) | 🟢 100% Homologada |
 | **Wave 5** | Saúde, Educação & Setor Notarial | 14 | 451 | `FEDERATED_API, LAKEHOUSE_BATCH` | `datasus_cnes`, `datasus_sih`, `inep_censo_escolar` (+11) | 🟢 100% Homologada |
@@ -95,11 +95,11 @@ O `public-data-gateway` organiza suas fontes e marts de dados em **10 Perfis de 
 
 | Pack ID | Nome do Perfil Analítico | Status de Prontidão no Gateway | Fontes Mapeadas que Habilitam o Perfil |
 | :---: | :--- | :--- | :--- |
-| **P01** | **Modern Data Platform & Analytics (Lakehouse)** | 🟢 100% Operacional (49/49 Fontes Homologadas) | `ibge_localidades`, `brasilapi_core`, `bcb_sgs`, `bcb_olinda_ptax` *(+67 fontes)* |
-| **P02** | **IA Agêntica & Automação LLM (MCP & REST)** | 🟢 100% Operacional (49/49 Fontes Homologadas) | `ibge_localidades`, `brasilapi_core`, `bcb_sgs`, `rfb_cnpj_lakehouse` *(+42 fontes)* |
-| **P03** | **Engenharia FullStack & Geolocalização Offline-First** | 🟢 100% Operacional (49/49 Fontes Homologadas) | `ibge_localidades`, `brasilapi_core`, `ibge_censo2022`, `ibge_cnefe` *(+18 fontes)* |
+| **P01** | **Modern Data Platform & Analytics (Lakehouse)** | 🟢 100% Operacional (49/49 Fontes Homologadas) | `ibge_localidades`, `brasilapi_core`, `bcb_sgs`, `bcb_olinda_ptax` *(+68 fontes)* |
+| **P02** | **IA Agêntica & Automação LLM (MCP & REST)** | 🟢 100% Operacional (49/49 Fontes Homologadas) | `ibge_localidades`, `brasilapi_core`, `bcb_sgs`, `rfb_cnpj_lakehouse` *(+43 fontes)* |
+| **P03** | **Engenharia FullStack & Geolocalização Offline-First** | 🟢 100% Operacional (49/49 Fontes Homologadas) | `ibge_localidades`, `brasilapi_core`, `ibge_censo2022`, `ibge_cnefe` *(+19 fontes)* |
 | **P04** | **Automação Inteligente de Onboarding & Compliance KYB** | 🟢 100% Operacional (49/49 Fontes Homologadas) | `brasilapi_core`, `rfb_cnpj_lakehouse`, `pncp_contratacoes`, `comprasgov_catmat` *(+15 fontes)* |
-| **P05** | **FinOps & Séries Macroeconômicas / Deflacionamento** | 🟢 100% Operacional (49/49 Fontes Homologadas) | `bcb_sgs`, `bcb_olinda_ptax`, `cvm_dfp_itr`, `cvm_fundos` *(+17 fontes)* |
+| **P05** | **FinOps & Séries Macroeconômicas / Deflacionamento** | 🟢 100% Operacional (49/49 Fontes Homologadas) | `bcb_sgs`, `bcb_olinda_ptax`, `cvm_dfp_itr`, `cvm_fundos` *(+18 fontes)* |
 | **P06** | **Data Clean Rooms & Benchmarks Anonimizados** | 🟢 100% Operacional (49/49 Fontes Homologadas) | `rfb_cnpj_lakehouse`, `cgu_ceis_cnep`, `cgu_pep`, `inpe_terrabrasilis` *(+20 fontes)* |
 | **P07** | **Due Diligence Corporativa, Sanções & Contencioso (TPRM)** | 🟢 100% Operacional (49/49 Fontes Homologadas) | `cnj_datajud`, `cgu_ceis_cnep`, `cgu_pep`, `tst_cndt` *(+10 fontes)* |
 | **P08** | **Segurança de Pipelines & Auditoria de Viés/Qualidade** | 🟢 100% Operacional (49/49 Fontes Homologadas) | `stn_siconfi`, `pgfn_divida_ativa`, `cnj_improbidade`, `stn_capag` *(+11 fontes)* |

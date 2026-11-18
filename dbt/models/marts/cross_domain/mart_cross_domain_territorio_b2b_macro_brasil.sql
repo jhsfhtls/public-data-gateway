@@ -169,6 +169,16 @@ eleicoes_uf AS (
     GROUP BY sigla_uf
 ),
 
+bndes_uf AS (
+    SELECT
+        sigla_uf,
+        ROUND(SUM(valor_total_contratado_mil_brl), 2) AS valor_contratado_bndes_uf_mil_brl,
+        ROUND(SUM(desembolso_anual_mil_brl), 2) AS desembolso_anual_bndes_uf_mil_brl,
+        ROUND(AVG(score_dinamismo_fomento_bndes), 2) AS avg_score_fomento_bndes_uf
+    FROM {{ ref('mart_bndes_operacoes_fomento_brasil') }}
+    GROUP BY sigla_uf
+),
+
 base AS (
     SELECT
         t.sigla_uf,
@@ -218,6 +228,9 @@ base AS (
         COALESCE(el.eleitorado_apto_tse_uf, 0) AS eleitorado_apto_tse_uf,
         COALESCE(el.avg_comparecimento_eleitoral_uf_pct, 75.0) AS avg_comparecimento_eleitoral_uf_pct,
         COALESCE(el.avg_score_integridade_eleitoral_uf, 80.0) AS avg_score_integridade_eleitoral_uf,
+        COALESCE(bn.valor_contratado_bndes_uf_mil_brl, 0.0) AS valor_contratado_bndes_uf_mil_brl,
+        COALESCE(bn.desembolso_anual_bndes_uf_mil_brl, 0.0) AS desembolso_anual_bndes_uf_mil_brl,
+        COALESCE(bn.avg_score_fomento_bndes_uf, 70.0) AS avg_score_fomento_bndes_uf,
         COALESCE(m.ano_mes, '2025-03') AS macro_ano_mes_referencia,
         COALESCE(m.selic_meta_fim_mes_pct, 14.25) AS selic_meta_fim_mes_pct,
         COALESCE(m.ipca_acumulado_12m_pct, 5.06) AS ipca_acumulado_12m_pct,
@@ -239,6 +252,7 @@ base AS (
     LEFT JOIN cgu_gastos_uf cgf ON t.sigla_uf = cgf.sigla_uf
     LEFT JOIN siape_uf sp ON t.sigla_uf = sp.sigla_uf
     LEFT JOIN eleicoes_uf el ON t.sigla_uf = el.sigla_uf
+    LEFT JOIN bndes_uf bn ON t.sigla_uf = bn.sigla_uf
     CROSS JOIN macro_latest m
 ),
 

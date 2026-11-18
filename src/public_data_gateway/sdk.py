@@ -1205,6 +1205,58 @@ class BankingFacade:
             limit=limit, sigla_uf=sigla_uf
         )
 
+    @property
+    def bndes_connector(self) -> Any:
+        if (
+            not hasattr(self, "_bndes_connector")
+            or self._bndes_connector is None
+        ):
+            from public_data_gateway.connectors.macrofinanceiro.bndes_operacoes import (
+                BndesOperacoesConnector,
+            )
+
+            self._bndes_connector = BndesOperacoesConnector(
+                settings=self._sdk.settings
+            )
+        return self._bndes_connector
+
+    def get_bndes_operations(self, termo: str) -> list[dict[str, Any]]:
+        """Lookup BNDES direct/indirect operations by code, modality, sector, IBGE, UF, or city."""
+        return self.bndes_connector.get_credit_operations(termo)
+
+    def get_bndes_disbursements(self, termo: str) -> list[dict[str, Any]]:
+        """Lookup annual BNDES disbursements, green/ESG share, and MSME participation."""
+        return self.bndes_connector.get_disbursements(termo)
+
+    def get_bndes_portfolio_risk(
+        self, id_municipio_or_name: str
+    ) -> dict[str, Any] | None:
+        """Retrieve BNDES average TLP rate, default share, FGI coverage, and ESG projects."""
+        return self.bndes_connector.get_portfolio_risk(id_municipio_or_name)
+
+    def get_bndes_municipal_summary(
+        self, id_municipio_or_name: str
+    ) -> dict[str, Any] | None:
+        """Retrieve consolidated municipal BNDES operations count and contracted volume."""
+        return self.bndes_connector.get_bndes_summary(id_municipio_or_name)
+
+    def get_bndes_features(
+        self, id_municipio_or_name: str
+    ) -> dict[str, Any] | None:
+        """Retrieve Gold BNDES development financing dynamism score and maturity tier."""
+        return self.bndes_connector.get_bndes_features(id_municipio_or_name)
+
+    def list_top_bndes_municipalities(
+        self,
+        limit: int = 10,
+        sigla_uf: str | None = None,
+        sort_by_volume: bool = False,
+    ) -> list[dict[str, Any]]:
+        """List municipalities ranked by BNDES financing dynamism score or contracted volume."""
+        return self.bndes_connector.list_top_bndes_municipalities(
+            limit=limit, sigla_uf=sigla_uf, sort_by_volume=sort_by_volume
+        )
+
 
 class TreasuryFacade:
     """Public finances, SADIPEM credit operations, CAPAG rating and FPM transfers (STN Tesouro Transparente)."""
@@ -4026,6 +4078,43 @@ class BrazilData:
         """Listar municípios ordenados por capilaridade física de agências bancárias (BACEN)."""
         return self.banking.list_top_bcb_agencia_municipalities(
             limit=limit, sigla_uf=sigla_uf
+        )
+
+    def get_bndes_operations(self, termo: str) -> list[dict[str, Any]]:
+        """Consultar operações diretas FINEM e indiretas BNDES por código, setor, IBGE, UF ou município."""
+        return self.banking.get_bndes_operations(termo)
+
+    def get_bndes_disbursements(self, termo: str) -> list[dict[str, Any]]:
+        """Consultar desembolsos anuais BNDES, economia verde/ESG e participação de MPMEs."""
+        return self.banking.get_bndes_disbursements(termo)
+
+    def get_bndes_portfolio_risk(
+        self, id_municipio_or_name: str
+    ) -> dict[str, Any] | None:
+        """Consultar taxa média TLP/TJLP, inadimplência, cobertura FGI e projetos sustentáveis BNDES."""
+        return self.banking.get_bndes_portfolio_risk(id_municipio_or_name)
+
+    def get_bndes_municipal_summary(
+        self, id_municipio_or_name: str
+    ) -> dict[str, Any] | None:
+        """Consultar consolidado municipal BNDES de operações contratadas, desembolsos e fomento per capita."""
+        return self.banking.get_bndes_municipal_summary(id_municipio_or_name)
+
+    def get_bndes_features(
+        self, id_municipio_or_name: str
+    ) -> dict[str, Any] | None:
+        """Consultar features Gold BNDES de dinamismo de fomento produtivo e tier de maturidade."""
+        return self.banking.get_bndes_features(id_municipio_or_name)
+
+    def list_top_bndes_municipalities(
+        self,
+        limit: int = 10,
+        sigla_uf: str | None = None,
+        sort_by_volume: bool = False,
+    ) -> list[dict[str, Any]]:
+        """Listar municípios ranqueados por dinamismo de fomento BNDES ou volume total contratado."""
+        return self.banking.list_top_bndes_municipalities(
+            limit=limit, sigla_uf=sigla_uf, sort_by_volume=sort_by_volume
         )
 
     def get_municipio_fiscal_profile(self, id_municipio_or_name: str) -> dict[str, Any] | None:
