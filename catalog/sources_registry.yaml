@@ -1425,3 +1425,37 @@ sources:
   status: HOMOLOGATED
   freshness_sla_hours: 2160
   cron_schedule_expression: 0 3 15 */3 *
+- source_id: cnj_improbidade
+  name: 'CNJ: Cadastro Nacional de Condenações por Ato de Improbidade Administrativa (CNCIAI)'
+  agency: Conselho Nacional de Justiça (CNJ)
+  official_url: https://www.cnj.jus.br/improbidade_adm/consultar_requerido.php
+  segment_id: 08_judicial_compliance
+  segment_name: Judicial, Integridade & Compliance
+  access_mode: FEDERATED_API
+  protocol: REST_JSON
+  auth_type: NONE
+  canonical_keys:
+  - cnpj_14
+  - cpf_masked
+  - id_municipio
+  - sigla_uf
+  update_frequency: Diária / Semanal
+  estimated_volume: ~110 mil condenações colegiadas ou transitadas em julgado
+  lgpd_tier: PUBLIC_AGENT_PEP
+  ml_feature_domains:
+  - administrative_improbity_convictions
+  - public_contracting_debarment_judicial
+  - treasury_reimbursement_condemnations
+  solution_packs:
+  - P01
+  - P02
+  - P04
+  - P06
+  - P07
+  - P08
+  - P10
+  rice_score: 905
+  roadmap_wave: 2
+  status: HOMOLOGATED
+  freshness_sla_hours: 168
+  cron_schedule_expression: 0 4 * * 1

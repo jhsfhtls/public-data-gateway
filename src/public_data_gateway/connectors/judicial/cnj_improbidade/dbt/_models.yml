@@ -1,0 +1,175 @@
+version: 2
+
+models:
+  - name: stg_cnciai_condenacoes
+    description: "Staging view das condenações por improbidade administrativa inscritas no CNCIAI/CNJ"
+    columns:
+      - name: id_condenacao
+        description: "Identificador único da condenação CNCIAI"
+        tests: [not_null, unique]
+      - name: numero_processo_cnj
+        description: "Número Único de Processo (NUP/CNJ) da ação judicial"
+        tests: [not_null]
+      - name: documento_requerido
+        description: "CNPJ 14D ou CPF mascarado (LGPD) do requerido condenado"
+        tests: [not_null]
+      - name: tipo_pessoa
+        description: "Categoria do requerido (Pessoa jurídica ou Pessoa física)"
+        tests: [not_null]
+      - name: nome_requerido
+        description: "Razão social ou nome público do condenado"
+        tests: [not_null]
+      - name: esfera_cargo
+        description: "Esfera administrativa afetada (Municipal, Estadual, Federal ou Privada)"
+        tests: [not_null]
+      - name: id_municipio
+        description: "Código IBGE canônico de 7 dígitos do município"
+        tests: [not_null]
+      - name: sigla_uf
+        description: "Sigla de 2 letras da Unidade da Federação"
+        tests: [not_null]
+      - name: tribunal_origem
+        description: "Tribunal sentenciante ou órgão colegiado de origem"
+        tests: [not_null]
+      - name: grau_jurisdicao
+        description: "Situação recursal (Trânsito em Julgado ou Órgão Colegiado)"
+        tests: [not_null]
+      - name: proibicao_contratar_poder_publico
+        description: "Indicador booleano de proibição judicial de contratar com o poder público"
+        tests: [not_null]
+      - name: suspensao_direitos_politicos
+        description: "Indicador booleano de suspensão de direitos políticos"
+        tests: [not_null]
+      - name: valor_ressarcimento_multa_brl
+        description: "Soma cominada de ressarcimento e multa civil em BRL"
+        tests: [not_null]
+      - name: data_transito_julgado
+        description: "Data da decisão condenatória (YYYY-MM-DD)"
+        tests: [not_null]
+
+  - name: stg_cnciai_sancoes_contratar
+    description: "Staging view das sanções judiciais de proibição de contratar com o Poder Público (CNCIAI)"
+    columns:
+      - name: id_condenacao
+        description: "Referência única da condenação CNCIAI"
+        tests: [not_null, unique]
+      - name: documento_requerido
+        description: "CNPJ 14D ou CPF mascarado proibido de contratar"
+        tests: [not_null]
+      - name: nome_requerido
+        description: "Nome ou razão social proibida judicialmente"
+        tests: [not_null]
+      - name: id_municipio
+        description: "Código IBGE canônico de 7 dígitos do município"
+        tests: [not_null]
+      - name: sigla_uf
+        description: "Sigla da Unidade da Federação"
+        tests: [not_null]
+      - name: tribunal_origem
+        description: "Tribunal prolator da sanção de impedimento"
+        tests: [not_null]
+      - name: prazo_proibicao_anos
+        description: "Prazo judicial da proibição de contratar em anos"
+        tests: [not_null]
+      - name: data_fim_vigencia
+        description: "Data prevista de encerramento da sanção (YYYY-MM-DD)"
+        tests: [not_null]
+
+  - name: stg_cnciai_ressarcimento_erario
+    description: "Staging view das condenações pecuniárias de ressarcimento ao erário e multa civil (CNCIAI)"
+    columns:
+      - name: id_condenacao
+        description: "Identificador único da condenação CNCIAI"
+        tests: [not_null, unique]
+      - name: documento_requerido
+        description: "CNPJ 14D ou CPF mascarado condenado"
+        tests: [not_null]
+      - name: nome_requerido
+        description: "Razão social ou nome do condenado"
+        tests: [not_null]
+      - name: id_municipio
+        description: "Código IBGE canônico de 7 dígitos do município"
+        tests: [not_null]
+      - name: sigla_uf
+        description: "Sigla da Unidade da Federação"
+        tests: [not_null]
+      - name: valor_ressarcimento_brl
+        description: "Valor de ressarcimento integral ao erário em BRL"
+        tests: [not_null]
+      - name: valor_multa_civil_brl
+        description: "Valor da multa civil aplicada em BRL"
+        tests: [not_null]
+      - name: total_condenacao_financeira_brl
+        description: "Total financeiro executado da condenação em BRL"
+        tests: [not_null]
+
+  - name: stg_cnciai_resumo_municipal
+    description: "Staging view do consolidado municipal CNCIAI de improbidade administrativa"
+    columns:
+      - name: id_municipio
+        description: "Código IBGE canônico de 7 dígitos do município"
+        tests: [not_null, unique]
+      - name: sigla_uf
+        description: "Sigla da Unidade da Federação"
+        tests: [not_null]
+      - name: nome_municipio
+        description: "Nome oficial do município"
+        tests: [not_null]
+      - name: total_condenacoes_ativas
+        description: "Total de condenações ativas registradas"
+        tests: [not_null]
+      - name: total_proibidos_contratar_pj
+        description: "Quantidade de PJs proibidas de contratar"
+        tests: [not_null]
+      - name: total_suspensao_direitos_politicos
+        description: "Quantidade de condenações com suspensão de direitos políticos"
+        tests: [not_null]
+      - name: valor_total_ressarcimento_multa_brl
+        description: "Soma de ressarcimentos e multas civis no município (BRL)"
+        tests: [not_null]
+      - name: taxa_proibicao_contratar_pct
+        description: "Percentual de condenações com restrição de contratação pública (%)"
+        tests: [not_null]
+
+  - name: fct_improbidade_cnciai_municipal
+    description: "Tabela fato consolidada de condenações CNCIAI/CNJ por ato de improbidade administrativa, proibições de contratar e ressarcimentos ao erário por município"
+    columns:
+      - name: id_municipio
+        description: "Código IBGE canônico de 7 dígitos do município"
+        tests: [not_null, unique]
+      - name: sigla_uf
+        description: "Sigla de 2 letras da Unidade da Federação"
+        tests: [not_null]
+      - name: nome_municipio
+        description: "Nome oficial do município"
+        tests: [not_null]
+      - name: total_condenacoes_ativas
+        description: "Total de condenações ativas no CNCIAI"
+        tests: [not_null]
+      - name: total_proibidos_contratar_pj
+        description: "Total de pessoas jurídicas proibidas de contratar com o poder público"
+        tests: [not_null]
+      - name: total_suspensao_direitos_politicos
+        description: "Total de agentes com suspensão de direitos políticos"
+        tests: [not_null]
+      - name: valor_total_ressarcimento_multa_brl
+        description: "Volume financeiro consolidado de ressarcimentos e multas civis em BRL"
+        tests: [not_null]
+      - name: taxa_proibicao_contratar_pct
+        description: "Percentual de condenações com sanção de proibição de contratar (%)"
+        tests: [not_null]
+      - name: qtd_registros_detalhados_condenacao
+        description: "Contagem de registros individuais de condenação na camada Silver"
+        tests: [not_null]
+      - name: maior_prazo_proibicao_anos
+        description: "Maior prazo vigente de proibição de contratar com o poder público em anos"
+        tests: [not_null]
+      - name: soma_ressarcimento_principal_brl
+        description: "Soma auditada da parcela de ressarcimento integral ao erário em BRL"
+        tests: [not_null]
+      - name: soma_multas_civis_brl
+        description: "Soma auditada das multas civis em BRL"
+        tests: [not_null]
+      - name: soma_auditada_condenacoes_brl
+        description: "Reconciliação monetária auditada das condenações CNCIAI em BRL"
+        tests: [not_null]

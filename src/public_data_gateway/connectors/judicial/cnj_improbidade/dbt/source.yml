@@ -1,0 +1,26 @@
+version: 2
+
+sources:
+  - name: cnj_improbidade
+    description: "Tabelas Silver do CNJ CNCIAI (Condenações, Proibições de Contratar, Ressarcimentos e Resumo Municipal)"
+    meta:
+      agency: "Conselho Nacional de Justiça (CNJ)"
+      domain: "judicial"
+      freshness_sla: "Semanal (168h)"
+    tables:
+      - name: cnciai_condenacoes
+        description: "Condenações inscritas no CNCIAI sob a Lei de Improbidade Administrativa"
+        meta:
+          external_location: "data/cnj_improbidade/silver/cnciai_condenacoes.parquet"
+      - name: cnciai_sancoes_contratar
+        description: "Proibições judiciais ativas de contratar com o Poder Público"
+        meta:
+          external_location: "data/cnj_improbidade/silver/cnciai_sancoes_contratar.parquet"
+      - name: cnciai_ressarcimento_erario
+        description: "Determinações judiciais de ressarcimento ao erário e multa civil"
+        meta:
+          external_location: "data/cnj_improbidade/silver/cnciai_ressarcimento_erario.parquet"
+      - name: cnciai_resumo_municipal
+        description: "Consolidado municipal de condenações e proibições CNCIAI"
+        meta:
+          external_location: "data/cnj_improbidade/silver/cnciai_resumo_municipal.parquet"

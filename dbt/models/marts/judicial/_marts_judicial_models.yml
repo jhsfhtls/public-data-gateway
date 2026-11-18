@@ -289,3 +289,52 @@ models:
         tests:
           - not_null
 
+  - name: mart_improbidade_administrativa_cnciai_brasil
+    description: "Datamart intra-domínio judicial consolidando condenações CNCIAI/CNJ por improbidade administrativa, proibições de contratar com o Poder Público, ressarcimentos ao erário e exposição de risco municipal."
+    columns:
+      - name: id_municipio
+        description: "Código IBGE canônico de 7 dígitos do município."
+        tests:
+          - not_null
+          - unique
+      - name: sigla_uf
+        description: "Sigla de 2 letras da Unidade da Federação."
+        tests:
+          - not_null
+      - name: nome_municipio
+        description: "Nome oficial do município."
+        tests:
+          - not_null
+      - name: total_condenacoes_ativas
+        description: "Quantidade total de condenações ativas registradas no CNCIAI."
+        tests:
+          - not_null
+      - name: total_proibidos_contratar_pj
+        description: "Quantidade de pessoas jurídicas proibidas judicialmente de contratar."
+        tests:
+          - not_null
+      - name: total_suspensao_direitos_politicos
+        description: "Quantidade de condenações com suspensão de direitos políticos."
+        tests:
+          - not_null
+      - name: valor_total_ressarcimento_multa_brl
+        description: "Soma municipal de ressarcimentos integrais ao erário e multas civis em BRL."
+        tests:
+          - not_null
+      - name: taxa_proibicao_contratar_pct
+        description: "Percentual de condenações com proibição judicial de contratar (%)."
+        tests:
+          - not_null
+      - name: maior_prazo_proibicao_anos
+        description: "Maior prazo judicial vigente de impedimento de contratar em anos."
+        tests:
+          - not_null
+      - name: score_exposicao_improbidade_cnciai
+        description: "Score contínuo de exposição judicial por improbidade administrativa CNCIAI (10 a 99)."
+        tests:
+          - not_null
+      - name: classificacao_risco_improbidade
+        description: "Classificação TPRM do risco CNCIAI (ALTA_EXPOSICAO_CNCIAI, MODERADA_EXPOSICAO_CNCIAI, BAIXA_EXPOSICAO_CNCIAI)."
+        tests:
+          - not_null
+

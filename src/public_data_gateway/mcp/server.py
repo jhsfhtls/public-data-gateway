@@ -524,6 +524,50 @@ class MCPDispatcher:
                                 },
                             },
                             {
+                                "name": "bdg_get_cnciai_improbidade_condemnations",
+                                "description": "Query CNJ CNCIAI administrative misconduct condemnations by document, party name, or IBGE code (Tier 1).",
+                                "inputSchema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "documento_or_name": {"type": "string", "description": "CPF/CNPJ (or masked), party name, or 7-digit IBGE code"},
+                                    },
+                                    "required": ["documento_or_name"],
+                                },
+                            },
+                            {
+                                "name": "bdg_get_cnciai_municipal_summary",
+                                "description": "Retrieve municipal consolidated CNJ CNCIAI administrative misconduct summary (Tier 1).",
+                                "inputSchema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "id_municipio_or_name": {"type": "string", "description": "7-digit IBGE code or municipality name"},
+                                    },
+                                    "required": ["id_municipio_or_name"],
+                                },
+                            },
+                            {
+                                "name": "bdg_get_cnciai_risk_features",
+                                "description": "Retrieve Gold CNJ CNCIAI administrative misconduct & contracting debarment risk features (Tier 1).",
+                                "inputSchema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "id_municipio_or_name": {"type": "string", "description": "7-digit IBGE code or municipality name"},
+                                    },
+                                    "required": ["id_municipio_or_name"],
+                                },
+                            },
+                            {
+                                "name": "bdg_list_top_cnciai_municipalities",
+                                "description": "List municipalities ranked by Gold CNJ CNCIAI misconduct risk exposure (Tier 1).",
+                                "inputSchema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "limit": {"type": "integer", "description": "Max municipalities to return (default: 10)"},
+                                        "sigla_uf": {"type": "string", "description": "Optional 2-letter UF state filter"},
+                                    },
+                                },
+                            },
+                            {
                                 "name": "bdg_search_catmat_materials",
                                 "description": "Search materials and catalog descriptions in Compras.gov.br CATMAT/SIASG with PDM, class, and sustainability flags (Tier 1).",
                                 "inputSchema": {
@@ -3235,6 +3279,85 @@ class MCPDispatcher:
                 sigla_uf=args.get("sigla_uf"),
             )
             wrapped = wrap_untrusted_gov_data(rows, source_id="pgfn_divida_ativa")
+            return {
+                "jsonrpc": "2.0",
+                "id": req_id,
+                "result": {"content": [{"type": "text", "text": wrapped}], "isError": False},
+            }
+
+        if tool_name == "bdg_get_cnciai_improbidade_condemnations":
+            from public_data_gateway.connectors.judicial.cnj_improbidade import (
+                CnjImprobidadeConnector,
+            )
+
+            imp_conn = CnjImprobidadeConnector(settings=self.settings)
+            rows = imp_conn.get_condemnations(str(args.get("documento_or_name", "")))
+            wrapped = wrap_untrusted_gov_data(rows, source_id="cnj_improbidade")
+            return {
+                "jsonrpc": "2.0",
+                "id": req_id,
+                "result": {"content": [{"type": "text", "text": wrapped}], "isError": False},
+            }
+
+        if tool_name == "bdg_get_cnciai_municipal_summary":
+            from public_data_gateway.connectors.judicial.cnj_improbidade import (
+                CnjImprobidadeConnector,
+            )
+
+            imp_conn = CnjImprobidadeConnector(settings=self.settings)
+            termo = str(args.get("id_municipio_or_name", ""))
+            summary = imp_conn.get_municipal_summary(termo)
+            if not summary:
+                return {
+                    "jsonrpc": "2.0",
+                    "id": req_id,
+                    "result": {
+                        "content": [{"type": "text", "text": f"CNJ CNCIAI municipal summary not found for '{termo}'"}],
+                        "isError": True,
+                    },
+                }
+            wrapped = wrap_untrusted_gov_data(summary, source_id="cnj_improbidade")
+            return {
+                "jsonrpc": "2.0",
+                "id": req_id,
+                "result": {"content": [{"type": "text", "text": wrapped}], "isError": False},
+            }
+
+        if tool_name == "bdg_get_cnciai_risk_features":
+            from public_data_gateway.connectors.judicial.cnj_improbidade import (
+                CnjImprobidadeConnector,
+            )
+
+            imp_conn = CnjImprobidadeConnector(settings=self.settings)
+            termo = str(args.get("id_municipio_or_name", ""))
+            feat = imp_conn.get_improbidade_features(termo)
+            if not feat:
+                return {
+                    "jsonrpc": "2.0",
+                    "id": req_id,
+                    "result": {
+                        "content": [{"type": "text", "text": f"CNJ CNCIAI risk features not found for '{termo}'"}],
+                        "isError": True,
+                    },
+                }
+            wrapped = wrap_untrusted_gov_data(feat, source_id="cnj_improbidade")
+            return {
+                "jsonrpc": "2.0",
+                "id": req_id,
+                "result": {"content": [{"type": "text", "text": wrapped}], "isError": False},
+            }
+
+        if tool_name == "bdg_list_top_cnciai_municipalities":
+            from public_data_gateway.connectors.judicial.cnj_improbidade import (
+                CnjImprobidadeConnector,
+            )
+
+            imp_conn = CnjImprobidadeConnector(settings=self.settings)
+            rows = imp_conn.list_top_municipalities(
+                limit=int(args.get("limit", 10)),
+                sigla_uf=args.get("sigla_uf"),
+            )
+            wrapped = wrap_untrusted_gov_data(rows, source_id="cnj_improbidade")
             return {
                 "jsonrpc": "2.0",
                 "id": req_id,

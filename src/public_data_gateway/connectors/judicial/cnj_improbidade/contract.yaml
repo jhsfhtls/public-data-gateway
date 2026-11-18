@@ -1,0 +1,232 @@
+contract_id: ODCS-BR-CNJ-IMPROBIDADE-001
+source_id: cnj_improbidade
+version: 1.0.0
+grain: 1 row per CNCIAI administrative improbity conviction/sanction or municipal aggregate
+name: CNJ - Cadastro Nacional de Condenações por Ato de Improbidade Administrativa (CNCIAI)
+agency: Conselho Nacional de Justiça (CNJ)
+official_url: https://www.cnj.jus.br/improbidade_adm/consultar_requerido.php
+segment_id: 08_judicial_compliance
+access_mode: FEDERATED_API
+protocol: REST_JSON
+auth_type: NONE
+update_frequency: Diária / Semanal
+freshness_sla_hours: 168
+cron_schedule_expression: "0 4 * * 1"
+lgpd_legal_basis: public_interest_lai_lei_8429_1992
+min_expected_rows: 10
+primary_keys:
+  - id_condenacao
+  - id_municipio
+  - sigla_uf
+canonical_keys:
+  - cnpj_14
+  - cpf_masked
+  - id_municipio
+  - sigla_uf
+sentinel_values:
+  - -1
+  - -99
+  - N/D
+  - SEM INFORMACAO
+columns:
+  - name: id_condenacao
+    data_type: STRING
+    required: true
+    nullable: false
+    description: Identificador único da condenação registrada no CNCIAI/CNJ
+  - name: numero_processo_cnj
+    data_type: STRING
+    required: true
+    nullable: false
+    description: Número Único de Processo (NUP/CNJ) da ação de improbidade administrativa
+  - name: documento_requerido
+    data_type: STRING
+    required: true
+    nullable: false
+    description: CNPJ de 14 dígitos ou CPF mascarado conforme LGPD
+  - name: tipo_pessoa
+    data_type: STRING
+    required: true
+    nullable: false
+    description: Categoria do condenado (Pessoa jurídica ou Pessoa física)
+  - name: nome_requerido
+    data_type: STRING
+    required: true
+    nullable: false
+    description: Razão social ou nome público do requerido condenado
+  - name: esfera_cargo
+    data_type: STRING
+    required: true
+    nullable: false
+    description: Esfera pública afetada (Municipal, Estadual, Federal ou Privada)
+  - name: id_municipio
+    data_type: STRING
+    required: true
+    nullable: false
+    description: Código IBGE canônico de 7 dígitos do município da comarca/fato
+  - name: sigla_uf
+    data_type: STRING
+    required: true
+    nullable: false
+    description: Sigla de 2 letras da Unidade Federativa
+  - name: tribunal_origem
+    data_type: STRING
+    required: true
+    nullable: false
+    description: Sigla do tribunal sentenciante ou órgão colegiado (ex. TJSP, TJAM, TRF1)
+  - name: grau_jurisdicao
+    data_type: STRING
+    required: true
+    nullable: false
+    description: Status recursal da condenação (Trânsito em Julgado ou Órgão Colegiado)
+  - name: proibicao_contratar_poder_publico
+    data_type: BOOLEAN
+    required: true
+    nullable: false
+    description: Indica vigência de proibição de contratar com o Poder Público ou receber incentivos
+  - name: suspensao_direitos_politicos
+    data_type: BOOLEAN
+    required: true
+    nullable: false
+    description: Indica aplicação de suspensão de direitos políticos ao agente
+  - name: valor_ressarcimento_multa_brl
+    data_type: FLOAT64
+    required: true
+    nullable: false
+    description: Soma de ressarcimento integral ao erário e multa civil cominada em BRL
+  - name: data_transito_julgado
+    data_type: STRING
+    required: true
+    nullable: false
+    description: Data do trânsito em julgado ou acórdão colegiado (YYYY-MM-DD)
+tables:
+  - name: cnciai_condenacoes
+    description: Condenações inscritas no CNCIAI sob a Lei de Improbidade Administrativa
+    layer: silver
+    schema:
+      - name: id_condenacao
+        type: STRING
+        description: Identificador único da condenação CNCIAI
+      - name: numero_processo_cnj
+        type: STRING
+        description: Número Único de Processo CNJ
+      - name: documento_requerido
+        type: STRING
+        description: CNPJ 14D ou CPF mascarado do condenado
+      - name: tipo_pessoa
+        type: STRING
+        description: Pessoa jurídica ou Pessoa física
+      - name: nome_requerido
+        type: STRING
+        description: Razão social ou nome do condenado
+      - name: esfera_cargo
+        type: STRING
+        description: Esfera pública ou privada relacionada
+      - name: id_municipio
+        type: STRING
+        description: Código IBGE canônico de 7 dígitos
+      - name: sigla_uf
+        type: STRING
+        description: Sigla de 2 letras da UF
+      - name: tribunal_origem
+        type: STRING
+        description: Tribunal sentenciante
+      - name: grau_jurisdicao
+        type: STRING
+        description: Trânsito em Julgado ou Órgão Colegiado
+      - name: proibicao_contratar_poder_publico
+        type: BOOLEAN
+        description: Flag de proibição judicial de contratar com o poder público
+      - name: suspensao_direitos_politicos
+        type: BOOLEAN
+        description: Flag de suspensão de direitos políticos
+      - name: valor_ressarcimento_multa_brl
+        type: FLOAT64
+        description: Ressarcimento ao erário e multa civil em BRL
+      - name: data_transito_julgado
+        type: STRING
+        description: Data da decisão definitiva (YYYY-MM-DD)
+  - name: cnciai_sancoes_contratar
+    description: Proibições judiciais ativas de contratar com o Poder Público ou receber incentivos fiscais
+    layer: silver
+    schema:
+      - name: id_condenacao
+        type: STRING
+        description: Referência única da condenação CNCIAI
+      - name: documento_requerido
+        type: STRING
+        description: CNPJ 14D ou CPF mascarado proibido de contratar
+      - name: nome_requerido
+        type: STRING
+        description: Nome ou razão social sancionada judicialmente
+      - name: id_municipio
+        type: STRING
+        description: Código IBGE canônico de 7 dígitos
+      - name: sigla_uf
+        type: STRING
+        description: Sigla da Unidade da Federação
+      - name: tribunal_origem
+        type: STRING
+        description: Tribunal prolator da sanção
+      - name: prazo_proibicao_anos
+        type: INT64
+        description: Prazo cominado de proibição de contratar com o poder público em anos
+      - name: data_fim_vigencia
+        type: STRING
+        description: Data prevista de término da sanção judicial (YYYY-MM-DD)
+  - name: cnciai_ressarcimento_erario
+    description: Determinações judiciais de ressarcimento integral do dano ao erário e multa civil
+    layer: silver
+    schema:
+      - name: id_condenacao
+        type: STRING
+        description: Identificador único da condenação CNCIAI
+      - name: documento_requerido
+        type: STRING
+        description: CNPJ 14D ou CPF mascarado condenado ao ressarcimento
+      - name: nome_requerido
+        type: STRING
+        description: Nome ou razão social do condenado
+      - name: id_municipio
+        type: STRING
+        description: Código IBGE canônico de 7 dígitos
+      - name: sigla_uf
+        type: STRING
+        description: Sigla da Unidade da Federação
+      - name: valor_ressarcimento_brl
+        type: FLOAT64
+        description: Parcela destinada ao ressarcimento do dano ao erário em BRL
+      - name: valor_multa_civil_brl
+        type: FLOAT64
+        description: Parcela relativa à multa civil cominada em BRL
+      - name: total_condenacao_financeira_brl
+        type: FLOAT64
+        description: Valor financeiro total executado em BRL
+  - name: cnciai_resumo_municipal
+    description: Consolidado municipal de condenações CNCIAI, proibições de contratar e ressarcimentos
+    layer: silver
+    schema:
+      - name: id_municipio
+        type: STRING
+        description: Código IBGE canônico de 7 dígitos
+      - name: sigla_uf
+        type: STRING
+        description: Sigla da Unidade da Federação
+      - name: nome_municipio
+        type: STRING
+        description: Nome oficial do município
+      - name: total_condenacoes_ativas
+        type: INT64
+        description: Total de condenações ativas registradas no CNCIAI
+      - name: total_proibidos_contratar_pj
+        type: INT64
+        description: Total de PJs proibidas de contratar com o poder público
+      - name: total_suspensao_direitos_politicos
+        type: INT64
+        description: Total de registros com suspensão de direitos políticos
+      - name: valor_total_ressarcimento_multa_brl
+        type: FLOAT64
+        description: Soma municipal de ressarcimentos ao erário e multas civis em BRL
+      - name: taxa_proibicao_contratar_pct
+        type: FLOAT64
+        description: Percentual de condenações com restrição de contratação pública (%)

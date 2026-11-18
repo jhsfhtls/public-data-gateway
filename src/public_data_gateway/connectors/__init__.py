@@ -61,6 +61,7 @@ import public_data_gateway.connectors.geografico.viacep  # noqa: F401
 import public_data_gateway.connectors.imobiliario.capitais_iptu_itbi  # noqa: F401
 import public_data_gateway.connectors.imobiliario.onr_registro_imoveis  # noqa: F401
 import public_data_gateway.connectors.judicial.cnj_datajud  # noqa: F401
+import public_data_gateway.connectors.judicial.cnj_improbidade  # noqa: F401
 import public_data_gateway.connectors.judicial.cnj_justica_aberta  # noqa: F401
 import public_data_gateway.connectors.judicial.tst_cndt  # noqa: F401
 import public_data_gateway.connectors.macrofinanceiro.alpha_vantage  # noqa: F401

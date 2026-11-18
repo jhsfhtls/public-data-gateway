@@ -18,6 +18,7 @@ model-paths:
   - "../src/public_data_gateway/connectors/compliance/cgu_pep/dbt"
   - "../src/public_data_gateway/connectors/compliance/pgfn_divida_ativa/dbt"
   - "../src/public_data_gateway/connectors/judicial/cnj_datajud/dbt"
+  - "../src/public_data_gateway/connectors/judicial/cnj_improbidade/dbt"
   - "../src/public_data_gateway/connectors/judicial/tst_cndt/dbt"
   - "../src/public_data_gateway/connectors/empresarial/suframa_pim_zfm/dbt"
   - "../src/public_data_gateway/connectors/macrofinanceiro/cvm_dfp_itr/dbt"
