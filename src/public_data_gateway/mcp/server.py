@@ -1909,6 +1909,51 @@ class MCPDispatcher:
                                 },
                             },
                             {
+                                "name": "bdg_get_ans_beneficiarios",
+                                "description": "Lookup ANS private health plan beneficiaries by code, care line, IBGE, UF, or city.",
+                                "inputSchema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "termo": {"type": "string", "description": "ANS code, care segmentation, IBGE 7-digit code, UF, or city"},
+                                    },
+                                    "required": ["termo"],
+                                },
+                            },
+                            {
+                                "name": "bdg_get_ans_idss_qualidade",
+                                "description": "Lookup ANS health operators IDSS quality score, average monthly ticket, and NIP complaints by code, IBGE, UF, or city.",
+                                "inputSchema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "termo": {"type": "string", "description": "IDSS code, IBGE 7-digit code, UF, or municipality name"},
+                                    },
+                                    "required": ["termo"],
+                                },
+                            },
+                            {
+                                "name": "bdg_get_ans_features",
+                                "description": "Get normalized Gold ANS supplementary health market maturity score, private coverage, IDSS, and tier.",
+                                "inputSchema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "id_municipio_or_name": {"type": "string", "description": "7-digit IBGE municipality code or municipality name"},
+                                    },
+                                    "required": ["id_municipio_or_name"],
+                                },
+                            },
+                            {
+                                "name": "bdg_list_top_ans_municipalities",
+                                "description": "List Brazilian municipalities ranked by ANS supplementary health maturity score or active beneficiaries.",
+                                "inputSchema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "limit": {"type": "integer", "description": "Maximum rows (default: 10)"},
+                                        "sigla_uf": {"type": "string", "description": "Optional 2-letter state filter (e.g. SP)"},
+                                        "sort_by_beneficiaries": {"type": "boolean", "description": "Set true to rank municipalities by highest active beneficiaries first"},
+                                    },
+                                },
+                            },
+                            {
                                 "name": "bdg_get_censo_escolar_schools",
                                 "description": "Get municipal active schools inventory, broadband internet, science labs, libraries, and PcD accessibility (INEP Censo Escolar).",
                                 "inputSchema": {
@@ -6259,6 +6304,65 @@ class MCPDispatcher:
                     },
                 }
             wrapped = wrap_untrusted_gov_data(result, source_id="opendatasus_vigilancia")
+            return {
+                "jsonrpc": "2.0",
+                "id": req_id,
+                "result": {"content": [{"type": "text", "text": wrapped}], "isError": False},
+            }
+
+        if tool_name in {
+            "bdg_get_ans_beneficiarios",
+            "bdg_get_ans_idss_qualidade",
+            "bdg_get_ans_features",
+            "bdg_list_top_ans_municipalities",
+        }:
+            from public_data_gateway.connectors.saude.ans_saude_suplementar import (
+                AnsSaudeSuplementarConnector,
+            )
+
+            connector = AnsSaudeSuplementarConnector(settings=self.settings)
+            try:
+                if tool_name == "bdg_get_ans_beneficiarios":
+                    result: Any = connector.get_beneficiaries(str(args.get("termo", "")))
+                elif tool_name == "bdg_get_ans_idss_qualidade":
+                    result = connector.get_operator_quality_idss(str(args.get("termo", "")))
+                elif tool_name == "bdg_get_ans_features":
+                    result = connector.get_ans_features(
+                        str(args.get("id_municipio_or_name", ""))
+                    )
+                else:
+                    result = connector.list_top_ans_municipalities(
+                        limit=int(args.get("limit", 10)),
+                        sigla_uf=args.get("sigla_uf"),
+                        sort_by_beneficiaries=bool(args.get("sort_by_beneficiaries", False)),
+                    )
+            except (ValueError, KeyError) as exc:
+                return {
+                    "jsonrpc": "2.0",
+                    "id": req_id,
+                    "result": {
+                        "content": [
+                            {"type": "text", "text": f"ANS Saúde Suplementar parameter error: {exc}"}
+                        ],
+                        "isError": True,
+                    },
+                }
+
+            if not result:
+                return {
+                    "jsonrpc": "2.0",
+                    "id": req_id,
+                    "result": {
+                        "content": [
+                            {
+                                "type": "text",
+                                "text": "No ANS supplementary health data found for the query.",
+                            }
+                        ],
+                        "isError": True,
+                    },
+                }
+            wrapped = wrap_untrusted_gov_data(result, source_id="ans_saude_suplementar")
             return {
                 "jsonrpc": "2.0",
                 "id": req_id,

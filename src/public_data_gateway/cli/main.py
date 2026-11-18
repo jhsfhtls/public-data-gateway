@@ -1275,6 +1275,36 @@ def build_parser() -> argparse.ArgumentParser:
     vig_rk_p.add_argument("--uf", type=str, help="Optional 2-letter state filter")
     vig_rk_p.add_argument("--json", action="store_true", help="Output in JSON format")
 
+    # ANS Saúde Suplementar command group
+    ans_p = subparsers.add_parser("ans-suplementar", help="Query ANS supplementary health beneficiaries, IDSS quality, DIOPS loss ratio, and rankings.")
+    ans_sub = ans_p.add_subparsers(dest="ans_suplementar_action", required=True)
+
+    ans_bn_p = ans_sub.add_parser("beneficiarios", help="Lookup ANS active private health plan beneficiaries by code, line, IBGE, UF, or city.")
+    ans_bn_p.add_argument("termo", help="ANS code, care line, IBGE code, UF, or municipality name")
+    ans_bn_p.add_argument("--json", action="store_true", help="Output in JSON format")
+
+    ans_id_p = ans_sub.add_parser("idss", help="Lookup ANS operators IDSS weighted score, average ticket, and NIP complaints.")
+    ans_id_p.add_argument("termo", help="IDSS code, IBGE code, UF, or municipality name")
+    ans_id_p.add_argument("--json", action="store_true", help="Output in JSON format")
+
+    ans_dp_p = ans_sub.add_parser("diops", help="Get municipal ANS DIOPS revenue, medical loss ratio, and solvency metrics.")
+    ans_dp_p.add_argument("id_municipio_or_name", help="7-digit IBGE code or municipality name")
+    ans_dp_p.add_argument("--json", action="store_true", help="Output in JSON format")
+
+    ans_mn_p = ans_sub.add_parser("municipio", help="Get consolidated municipal ANS private beneficiaries, coverage, IDSS, and loss ratio.")
+    ans_mn_p.add_argument("id_municipio_or_name", help="7-digit IBGE code or municipality name")
+    ans_mn_p.add_argument("--json", action="store_true", help="Output in JSON format")
+
+    ans_ft_p = ans_sub.add_parser("features", help="Get Gold ANS supplementary health market maturity score and tier.")
+    ans_ft_p.add_argument("id_municipio_or_name", help="7-digit IBGE code or municipality name")
+    ans_ft_p.add_argument("--json", action="store_true", help="Output in JSON format")
+
+    ans_rk_p = ans_sub.add_parser("ranking", help="List municipalities ranked by ANS supplementary health score or beneficiaries.")
+    ans_rk_p.add_argument("--limit", type=int, default=10, help="Max municipalities to list")
+    ans_rk_p.add_argument("--uf", type=str, help="Optional 2-letter state filter")
+    ans_rk_p.add_argument("--beneficiarios", action="store_true", help="Sort descending by active medical+dental beneficiaries")
+    ans_rk_p.add_argument("--json", action="store_true", help="Output in JSON format")
+
     # INEP Censo Escolar (Educação Básica) command group
     ce_p = subparsers.add_parser("censo-escolar", help="Query INEP Censo Escolar schools, enrollments, teachers, flow, and education scores.")
     ce_sub = ce_p.add_subparsers(dest="censo_escolar_action", required=True)
@@ -5161,6 +5191,84 @@ def main(argv: Sequence[str] | None = None) -> int:
                     return 0
             except ValueError as exc:
                 print(f"Erro OpenDataSUS Vigilância: {exc}", file=sys.stderr)
+                return 1
+
+        elif args.command == "ans-suplementar":
+            from public_data_gateway.connectors.saude.ans_saude_suplementar import (
+                AnsSaudeSuplementarConnector,
+            )
+
+            ans_conn = AnsSaudeSuplementarConnector()
+            ans_action = getattr(args, "ans_suplementar_action", "")
+            try:
+                if ans_action == "beneficiarios":
+                    rows = ans_conn.get_beneficiaries(args.termo)
+                    if getattr(args, "json", False):
+                        print(json.dumps(rows, indent=2, ensure_ascii=False, default=str))
+                    else:
+                        print(f"ANS Beneficiários ({len(rows)}):")
+                        for r in rows:
+                            print(f"  {r.get('cod_cobertura_ans')} | {r.get('nome_municipio')} ({r.get('sigla_uf')}): {r.get('segmentacao_assistencial')} | {r.get('beneficiarios_ativos_count')} benef")
+                    return 0
+
+                if ans_action == "idss":
+                    rows = ans_conn.get_operator_quality_idss(args.termo)
+                    if getattr(args, "json", False):
+                        print(json.dumps(rows, indent=2, ensure_ascii=False, default=str))
+                    else:
+                        print(f"ANS Qualidade IDSS ({len(rows)}):")
+                        for r in rows:
+                            print(f"  {r.get('cod_idss_ans')} | {r.get('nome_municipio')} ({r.get('sigla_uf')}): IDSS {r.get('idss_medio_ponderado')} | Ticket R$ {r.get('ticket_medio_mensal_brl')}")
+                    return 0
+
+                if ans_action == "diops":
+                    res = ans_conn.get_diops_loss_ratio(args.id_municipio_or_name)
+                    if res is None:
+                        print(f"Indicadores DIOPS ANS não encontrados para: {args.id_municipio_or_name}", file=sys.stderr)
+                        return 1
+                    if getattr(args, "json", False):
+                        print(json.dumps(res, indent=2, ensure_ascii=False, default=str))
+                    else:
+                        print(f"ANS DIOPS ({res.get('nome_municipio')} - {res.get('sigla_uf')}): Sinistralidade {res.get('sinistralidade_assistencial_pct')}% | Solvência {res.get('indice_solvencia_ans_pct')}%")
+                    return 0
+
+                if ans_action == "municipio":
+                    res = ans_conn.get_ans_summary(args.id_municipio_or_name)
+                    if res is None:
+                        print(f"Resumo ANS não encontrado para: {args.id_municipio_or_name}", file=sys.stderr)
+                        return 1
+                    if getattr(args, "json", False):
+                        print(json.dumps(res, indent=2, ensure_ascii=False, default=str))
+                    else:
+                        print(f"ANS Município ({res.get('nome_municipio')} - {res.get('sigla_uf')}): {res.get('total_beneficiarios_med_odo')} benef | Cobertura {res.get('taxa_cobertura_privada_pct')}%")
+                    return 0
+
+                if ans_action == "features":
+                    res = ans_conn.get_ans_features(args.id_municipio_or_name)
+                    if res is None:
+                        print(f"Features ANS não encontradas para: {args.id_municipio_or_name}", file=sys.stderr)
+                        return 1
+                    if getattr(args, "json", False):
+                        print(json.dumps(res, indent=2, ensure_ascii=False, default=str))
+                    else:
+                        print(f"ANS Gold ({res.get('nome_municipio')} - {res.get('id_municipio')}): Score {res.get('score_maturidade_saude_suplementar_ans')} | {res.get('tier_saude_suplementar_ans')}")
+                    return 0
+
+                if ans_action == "ranking":
+                    ranks = ans_conn.list_top_ans_municipalities(
+                        limit=getattr(args, "limit", 10),
+                        sigla_uf=getattr(args, "uf", None),
+                        sort_by_beneficiaries=getattr(args, "beneficiarios", False),
+                    )
+                    if getattr(args, "json", False):
+                        print(json.dumps(ranks, indent=2, ensure_ascii=False, default=str))
+                    else:
+                        print(f"Ranking ANS Saúde Suplementar ({len(ranks)}):")
+                        for idx, r in enumerate(ranks, 1):
+                            print(f"  {idx}. {r.get('nome_municipio')} ({r.get('sigla_uf')}): {r.get('score_maturidade_saude_suplementar_ans')} | {r.get('tier_saude_suplementar_ans')}")
+                    return 0
+            except (ValueError, KeyError) as exc:
+                print(f"Erro ANS Saúde Suplementar: {exc}", file=sys.stderr)
                 return 1
 
         elif args.command == "censo-escolar":

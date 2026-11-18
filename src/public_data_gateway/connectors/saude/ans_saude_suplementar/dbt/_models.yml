@@ -1,0 +1,172 @@
+version: 2
+
+models:
+  - name: stg_ans_beneficiarios_municipio
+    description: "Staging view tipada de beneficiários ativos SIB/ANS por segmentação assistencial e município."
+    columns:
+      - name: cod_cobertura_ans
+        description: "Identificador único do agrupamento municipal de cobertura privada ANS (STRING)."
+        tests: [not_null, unique]
+      - name: segmentacao_assistencial
+        description: "Segmentação do plano (ASSISTENCIA_MEDICA_HOSPITALAR ou EXCLUSIVAMENTE_ODONTOLOGICO)."
+        tests: [not_null]
+      - name: contratacao_tipo
+        description: "Tipo de contratação predominante (COLETIVO_EMPRESARIAL ou INDIVIDUAL_FAMILIAR)."
+        tests: [not_null]
+      - name: situacao_registro_ans
+        description: "Status regulatório predominante das operadoras atuantes no município."
+        tests: [not_null]
+      - name: id_municipio
+        description: "Código IBGE de 7 dígitos do município (STRING)."
+        tests: [not_null]
+      - name: sigla_uf
+        description: "Sigla de 2 letras da Unidade Federativa (UF)."
+        tests: [not_null]
+      - name: nome_municipio
+        description: "Nome oficial do município."
+        tests: [not_null]
+      - name: regiao
+        description: "Macrorregião geográfica brasileira."
+        tests: [not_null]
+      - name: beneficiarios_ativos_count
+        description: "Quantidade de vínculos ativos de beneficiários SIB/ANS na segmentação."
+        tests: [not_null]
+      - name: taxa_cobertura_privada_pct
+        description: "Percentual populacional coberto pela segmentação na saúde suplementar (%)."
+        tests: [not_null]
+      - name: competencia_ans
+        description: "Competência mensal de referência SIB/ANS (YYYY-MM)."
+        tests: [not_null]
+
+  - name: stg_ans_operadoras_idss_qualidade
+    description: "Staging view tipada do Índice de Desempenho da Saúde Suplementar (IDSS), ticket médio e reclamações NIP."
+    columns:
+      - name: cod_idss_ans
+        description: "Identificador único do registro municipal de qualidade IDSS ANS (STRING)."
+        tests: [not_null, unique]
+      - name: id_municipio
+        description: "Código IBGE de 7 dígitos do município (STRING)."
+        tests: [not_null]
+      - name: sigla_uf
+        description: "Sigla de 2 letras da Unidade Federativa (UF)."
+        tests: [not_null]
+      - name: nome_municipio
+        description: "Nome oficial do município."
+        tests: [not_null]
+      - name: operadoras_atuantes_count
+        description: "Quantidade de operadoras de saúde suplementar com beneficiários ativos no município."
+        tests: [not_null]
+      - name: idss_medio_ponderado
+        description: "Nota média ponderada IDSS (0 a 1) atribuída pela ANS às operadoras atuantes."
+        tests: [not_null]
+      - name: ticket_medio_mensal_brl
+        description: "Contraprestação média mensal estimada por beneficiário no município (BRL)."
+        tests: [not_null]
+      - name: reclamacoes_nip_10k_benef
+        description: "Taxa de Notificações de Investigação Preliminar (NIP) por 10 mil beneficiários."
+        tests: [not_null]
+
+  - name: stg_ans_sinistralidade_diops_economico
+    description: "Staging view tipada de contraprestações, sinistralidade assistencial e solvência DIOPS/ANS."
+    columns:
+      - name: id_municipio
+        description: "Código IBGE de 7 dígitos do município (STRING)."
+        tests: [not_null, unique]
+      - name: sigla_uf
+        description: "Sigla de 2 letras da Unidade Federativa (UF)."
+        tests: [not_null]
+      - name: nome_municipio
+        description: "Nome oficial do município."
+        tests: [not_null]
+      - name: receita_contraprestacoes_mil_brl
+        description: "Receita anual estimada de contraprestações de planos privados (R$ mil)."
+        tests: [not_null]
+      - name: sinistralidade_assistencial_pct
+        description: "Razão entre despesas assistenciais e contraprestações líquidas (%)."
+        tests: [not_null]
+      - name: provisoes_tecnicas_cobertura_pct
+        description: "Percentual de lastro em ativos garantidores sobre provisões técnicas ANS (%)."
+        tests: [not_null]
+      - name: indice_solvencia_ans_pct
+        description: "Razão de solvência patrimonial regulatória apurada via DIOPS (%)."
+        tests: [not_null]
+
+  - name: stg_ans_saude_suplementar_resumo_municipal
+    description: "Staging view tipada do consolidado municipal de cobertura privada, IDSS e sinistralidade ANS."
+    columns:
+      - name: id_municipio
+        description: "Código IBGE de 7 dígitos do município (STRING)."
+        tests: [not_null, unique]
+      - name: sigla_uf
+        description: "Sigla de 2 letras da Unidade Federativa (UF)."
+        tests: [not_null]
+      - name: nome_municipio
+        description: "Nome oficial do município."
+        tests: [not_null]
+      - name: regiao
+        description: "Macrorregião geográfica brasileira."
+        tests: [not_null]
+      - name: total_beneficiarios_med_odo
+        description: "Total consolidado de beneficiários médico-hospitalares e odontológicos ANS."
+        tests: [not_null]
+      - name: taxa_cobertura_privada_pct
+        description: "Percentual de cobertura médico-hospitalar privada sobre a população (%)."
+        tests: [not_null]
+      - name: idss_medio_ponderado
+        description: "Nota média ponderada IDSS (0 a 1) da saúde suplementar no município."
+        tests: [not_null]
+      - name: sinistralidade_assistencial_pct
+        description: "Taxa média de sinistralidade assistencial observada no município (%)."
+        tests: [not_null]
+      - name: receita_contraprestacoes_mil_brl
+        description: "Massa anual de contraprestações privadas na saúde suplementar (R$ mil)."
+        tests: [not_null]
+
+  - name: fct_ans_saude_suplementar_municipal
+    description: "Tabela Fato municipal consolidando cobertura de beneficiários, qualidade IDSS e equilíbrio DIOPS ANS."
+    columns:
+      - name: id_municipio
+        description: "Código IBGE de 7 dígitos do município (STRING)."
+        tests: [not_null, unique]
+      - name: sigla_uf
+        description: "Sigla de 2 letras da Unidade Federativa (UF)."
+        tests: [not_null]
+      - name: nome_municipio
+        description: "Nome oficial do município."
+        tests: [not_null]
+      - name: regiao
+        description: "Macrorregião geográfica brasileira."
+        tests: [not_null]
+      - name: total_beneficiarios_med_odo
+        description: "Soma de vínculos médico-hospitalares e odontológicos no município."
+        tests: [not_null]
+      - name: taxa_cobertura_privada_pct
+        description: "Percentual da população coberta por assistência médica suplementar (%)."
+        tests: [not_null]
+      - name: idss_medio_ponderado
+        description: "Índice IDSS médio ponderado das operadoras atuantes (0 a 1)."
+        tests: [not_null]
+      - name: sinistralidade_assistencial_pct
+        description: "Taxa de sinistralidade assistencial na carteira suplementar (%)."
+        tests: [not_null]
+      - name: receita_contraprestacoes_mil_brl
+        description: "Receita de contraprestações anuais estimadas na praça (R$ mil)."
+        tests: [not_null]
+      - name: qtd_segmentacoes_ans
+        description: "Quantidade de linhas assistenciais ANS consolidadas na Silver."
+        tests: [not_null]
+      - name: operadoras_atuantes_count
+        description: "Total de operadoras ativas com carteiras no município."
+        tests: [not_null]
+      - name: ticket_medio_mensal_brl
+        description: "Mensalidade média por beneficiário no município (BRL)."
+        tests: [not_null]
+      - name: reclamacoes_nip_10k_benef
+        description: "Taxa de demandas assistenciais NIP por 10 mil beneficiários."
+        tests: [not_null]
+      - name: provisoes_tecnicas_cobertura_pct
+        description: "Lastro em garantias financeiras das operadoras sobre provisões (%)."
+        tests: [not_null]
+      - name: indice_solvencia_ans_pct
+        description: "Solvência patrimonial regulatória média DIOPS/ANS (%)."
+        tests: [not_null]
