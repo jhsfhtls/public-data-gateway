@@ -2140,3 +2140,32 @@ sources:
   status: HOMOLOGATED
   freshness_sla_hours: 720
   cron_schedule_expression: 0 6 15 * *
+- source_id: cvm_mercado_extra
+  name: 'CVM Mercado de Capitais Extra: Ofertas RCVM 160, Administradores & Agentes'
+  agency: Comissão de Valores Mobiliários (CVM)
+  official_url: https://dados.cvm.gov.br/
+  segment_id: 02_economico_macrofinanceiro
+  segment_name: Econômico, Monetário & Macrofinanceiro
+  access_mode: LAKEHOUSE_BATCH
+  protocol: REST_JSON
+  auth_type: NONE
+  canonical_keys:
+  - id_municipio
+  - sigla_uf
+  update_frequency: Mensal (Ofertas RCVM 160, Administradores FII & Assessores CVM)
+  estimated_volume: ~5.570 municípios com captações RCVM 160, AUM de gestoras e assessores CVM (~410 MB)
+  lgpd_tier: PUBLIC_NON_PERSONAL
+  ml_feature_domains:
+  - capital_markets_rcvm160_issuance
+  - asset_management_fii_aum
+  - investment_advisor_ecosystem
+  solution_packs:
+  - P01
+  - P02
+  - P03
+  - P05
+  rice_score: 870
+  roadmap_wave: 2
+  status: HOMOLOGATED
+  freshness_sla_hours: 720
+  cron_schedule_expression: 0 7 5 * *

@@ -1071,3 +1071,64 @@ models:
         description: "Classificação municipal BNDES (POLO_ALTO_FOMENTO_BNDES, FOMENTO_PRODUTIVO_CONSOLIDADO ou BAIXA_PENETRACAO_FOMENTO)."
         tests: [not_null]
 
+  - name: mart_cvm_mercado_extra_brasil
+    description: "Data Mart Gold intra-domínio consolidando ofertas públicas RCVM 160, gestoras/administradores FII, assessoria AAI e score de ecossistema de mercado de capitais CVM."
+    columns:
+      - name: id_municipio
+        description: "Código IBGE de 7 dígitos do município (STRING)."
+        tests: [not_null, unique]
+      - name: sigla_uf
+        description: "Sigla de 2 letras da Unidade Federativa (UF)."
+        tests: [not_null]
+      - name: nome_municipio
+        description: "Nome oficial do município."
+        tests: [not_null]
+      - name: regiao
+        description: "Macrorregião geográfica brasileira."
+        tests: [not_null]
+      - name: total_ofertas_rcvm160
+        description: "Total de ofertas públicas distribuídas sob Resolução CVM 160 no município."
+        tests: [not_null]
+      - name: volume_captado_rcvm160_mil_brl
+        description: "Volume financeiro captado via RCVM 160 no município (R$ mil)."
+        tests: [not_null]
+      - name: assessores_investimento_ativos
+        description: "Quantidade de assessores de investimento credenciados na CVM."
+        tests: [not_null]
+      - name: administradores_ativos_count
+        description: "Quantidade de administradores e gestores de recursos regulados CVM."
+        tests: [not_null]
+      - name: captacao_per_capita_brl
+        description: "Volume captado RCVM 160 equivalente por habitante (BRL)."
+        tests: [not_null]
+      - name: qtd_classes_emissao_cvm
+        description: "Quantidade de classes de valores mobiliários consolidadas na Silver."
+        tests: [not_null]
+      - name: prazo_maximo_emissao_anos
+        description: "Maior prazo médio de emissão entre as classes registradas (anos)."
+        tests: [not_null]
+      - name: gestoras_fii_fip_count
+        description: "Quantidade de gestoras atuantes em fundos estruturados FII/FIP."
+        tests: [not_null]
+      - name: patrimonio_administrado_mi_brl
+        description: "Patrimônio líquido administrado por casas sediadas no município (R$ milhões)."
+        tests: [not_null]
+      - name: taxa_conformidade_informes_pct
+        description: "Percentual de regularidade e pontualidade na entrega de informes CVM (%)."
+        tests: [not_null]
+      - name: sociedades_aai_registradas
+        description: "Quantidade de sociedades credenciadas de assessoria AAI."
+        tests: [not_null]
+      - name: analistas_consultores_cvm
+        description: "Contingente de analistas e consultores de valores mobiliários autorizados."
+        tests: [not_null]
+      - name: alertas_sancionatorios_pasm_pct
+        description: "Percentual de participantes com ocorrências em processos sancionadores PASM (%)."
+        tests: [not_null]
+      - name: score_sofisticacao_mercado_cvm
+        description: "Score sintético municipal de sofisticação e integridade do mercado de capitais CVM (0-100)."
+        tests: [not_null]
+      - name: tier_ecossistema_mercado_capitais
+        description: "Classificação municipal CVM (HUB_MERCADO_CAPITAIS_CVM, MERCADO_FINANCEIRO_AVANCADO ou ECOSISTEMA_CAPTACAO_EMERGENTE)."
+        tests: [not_null]
+

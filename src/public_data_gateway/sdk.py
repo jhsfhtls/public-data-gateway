@@ -1003,6 +1003,58 @@ class FinanceFacade:
         """List publicly traded companies registered with CVM."""
         return self.cvm_connector.list_companies(setor=setor, situacao=situacao)
 
+    @property
+    def cvm_extra_connector(self) -> Any:
+        if (
+            not hasattr(self, "_cvm_extra_connector")
+            or self._cvm_extra_connector is None
+        ):
+            from public_data_gateway.connectors.macrofinanceiro.cvm_mercado_extra import (
+                CvmMercadoExtraConnector,
+            )
+
+            self._cvm_extra_connector = CvmMercadoExtraConnector(
+                settings=self._sdk.settings
+            )
+        return self._cvm_extra_connector
+
+    def get_rcvm160_offerings(self, termo: str) -> list[dict[str, Any]]:
+        """Lookup CVM RCVM 160 public offerings by code, security type, rite, IBGE, UF, or city."""
+        return self.cvm_extra_connector.get_rcvm160_offerings(termo)
+
+    def get_fii_administrators(self, termo: str) -> list[dict[str, Any]]:
+        """Lookup CVM portfolio managers, FII/FIP managers, AUM, and regulatory compliance."""
+        return self.cvm_extra_connector.get_fii_administrators(termo)
+
+    def get_investment_advisors(
+        self, id_municipio_or_name: str
+    ) -> dict[str, Any] | None:
+        """Retrieve municipal CVM active investment advisors (AAIs), firms, and PASM risk."""
+        return self.cvm_extra_connector.get_investment_advisors(id_municipio_or_name)
+
+    def get_cvm_extra_summary(
+        self, id_municipio_or_name: str
+    ) -> dict[str, Any] | None:
+        """Retrieve consolidated municipal RCVM 160 capital raised, managers, and AAIs."""
+        return self.cvm_extra_connector.get_cvm_extra_summary(id_municipio_or_name)
+
+    def get_cvm_extra_features(
+        self, id_municipio_or_name: str
+    ) -> dict[str, Any] | None:
+        """Retrieve Gold CVM capital markets sophistication score and ecosystem tier."""
+        return self.cvm_extra_connector.get_cvm_extra_features(id_municipio_or_name)
+
+    def list_top_cvm_extra_municipalities(
+        self,
+        limit: int = 10,
+        sigla_uf: str | None = None,
+        sort_by_volume: bool = False,
+    ) -> list[dict[str, Any]]:
+        """List municipalities ranked by CVM capital markets sophistication score or RCVM 160 volume."""
+        return self.cvm_extra_connector.list_top_cvm_extra_municipalities(
+            limit=limit, sigla_uf=sigla_uf, sort_by_volume=sort_by_volume
+        )
+
 
 class TradeFacade:
     """Foreign trade statistics, export/import flows and trade balance (MDIC Comex Stat)."""
@@ -3955,6 +4007,43 @@ class BrazilData:
     def get_financial_ratios(self, cnpj_or_codigo: str) -> dict[str, Any]:
         """Assess corporate financial health, solvency score, and fundamental ratios from CVM."""
         return self.finance.financial_ratios(cnpj_or_codigo)
+
+    def get_rcvm160_offerings(self, termo: str) -> list[dict[str, Any]]:
+        """Consultar ofertas públicas RCVM 160 na CVM por ativo, rito, código IBGE, UF ou município."""
+        return self.finance.get_rcvm160_offerings(termo)
+
+    def get_fii_administrators(self, termo: str) -> list[dict[str, Any]]:
+        """Consultar administradores de carteiras, gestoras FII/FIP e patrimônio sob gestão na CVM."""
+        return self.finance.get_fii_administrators(termo)
+
+    def get_investment_advisors(
+        self, id_municipio_or_name: str
+    ) -> dict[str, Any] | None:
+        """Consultar assessores de investimento credenciados (AAI), sociedades e alertas PASM CVM."""
+        return self.finance.get_investment_advisors(id_municipio_or_name)
+
+    def get_cvm_extra_summary(
+        self, id_municipio_or_name: str
+    ) -> dict[str, Any] | None:
+        """Consultar consolidado municipal CVM de captações RCVM 160, gestoras e assessoria."""
+        return self.finance.get_cvm_extra_summary(id_municipio_or_name)
+
+    def get_cvm_extra_features(
+        self, id_municipio_or_name: str
+    ) -> dict[str, Any] | None:
+        """Consultar features Gold CVM de sofisticação e ecossistema de mercado de capitais."""
+        return self.finance.get_cvm_extra_features(id_municipio_or_name)
+
+    def list_top_cvm_extra_municipalities(
+        self,
+        limit: int = 10,
+        sigla_uf: str | None = None,
+        sort_by_volume: bool = False,
+    ) -> list[dict[str, Any]]:
+        """Listar municípios ranqueados por ecossistema de mercado de capitais CVM ou volume RCVM 160."""
+        return self.finance.list_top_cvm_extra_municipalities(
+            limit=limit, sigla_uf=sigla_uf, sort_by_volume=sort_by_volume
+        )
 
     def get_municipality_trade(self, id_municipio: str) -> dict[str, Any]:
         """Obter estatísticas de comércio exterior e balança comercial de um município (MDIC)."""

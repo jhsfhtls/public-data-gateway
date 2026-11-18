@@ -1,0 +1,26 @@
+version: 2
+
+sources:
+  - name: cvm_mercado_extra
+    description: "Tabelas Silver de Ofertas Públicas RCVM 160, Administradores de Carteira/FII e Assessores CVM"
+    meta:
+      agency: "Comissão de Valores Mobiliários (CVM)"
+      domain: "macrofinanceiro_cvm_mercado_extra"
+      freshness_sla: "Mensal (720h)"
+    tables:
+      - name: cvm_ofertas_distrib_rcvm160
+        description: "Ofertas públicas distribuídas sob Resolução CVM 160 por valor mobiliário, rito e município"
+        meta:
+          external_location: "data/cvm_mercado_extra/silver/cvm_ofertas_distrib_rcvm160.parquet"
+      - name: cvm_administradores_fii_carteira
+        description: "Administradores e gestoras FII/FIP registrados na CVM, patrimônio administrado e conformidade"
+        meta:
+          external_location: "data/cvm_mercado_extra/silver/cvm_administradores_fii_carteira.parquet"
+      - name: cvm_agentes_autonomos_assessoria
+        description: "Assessores de investimento credenciados, sociedades AAI e alertas sancionatórios PASM CVM"
+        meta:
+          external_location: "data/cvm_mercado_extra/silver/cvm_agentes_autonomos_assessoria.parquet"
+      - name: cvm_mercado_extra_resumo_municipal
+        description: "Consolidado municipal de ofertas RCVM 160, volume captado, gestoras e assessoria CVM"
+        meta:
+          external_location: "data/cvm_mercado_extra/silver/cvm_mercado_extra_resumo_municipal.parquet"

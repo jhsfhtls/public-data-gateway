@@ -1,0 +1,84 @@
+contract_id: ODCS-BR-CVM-MERCADO-EXTRA-RCVM160-001
+source_id: cvm_mercado_extra
+version: 1.0.0
+grain: 1 row per RCVM 160 public offering security class and issuer municipality
+name: "CVM Mercado de Capitais Extra: Ofertas RCVM 160, Administradores & Agentes"
+agency: Comissão de Valores Mobiliários (CVM)
+official_url: https://dados.cvm.gov.br/
+segment_id: 02_economico_macrofinanceiro
+access_mode: LAKEHOUSE_BATCH
+protocol: REST_JSON
+auth_type: NONE
+update_frequency: Mensal (Ofertas Públicas RCVM 160, Carteiras Administradas & Credenciados CVM)
+freshness_sla_hours: 720
+cron_schedule_expression: "0 7 5 * *"
+lgpd_legal_basis: public_interest_lei_6385_1976_cvm_e_rcvm_160_mercado_capitais
+min_expected_rows: 10
+primary_keys:
+  - cod_emissao_rcvm160
+  - id_municipio
+  - sigla_uf
+canonical_keys:
+  - id_municipio
+  - sigla_uf
+sentinel_values:
+  - -1
+  - -99
+  - N/D
+  - SEM INFORMACAO
+columns:
+  - name: cod_emissao_rcvm160
+    data_type: STRING
+    required: true
+    nullable: false
+    description: Identificador único do agrupamento de ofertas públicas RCVM 160 por ativo e município
+  - name: valor_mobiliario_tipo
+    data_type: STRING
+    required: true
+    nullable: false
+    description: Classe do valor mobiliário emitido (DEBENTURE_INCENTIVADA, CRI_CRA_FIDC ou ACAO_EQUITY)
+  - name: rito_registro_cvm
+    data_type: STRING
+    required: true
+    nullable: false
+    description: Rito regulatório de registro da oferta pública CVM (RITO_AUTOMATICO ou RITO_ORDINARIO)
+  - name: situacao_oferta_cvm
+    data_type: STRING
+    required: true
+    nullable: false
+    description: Situação consolidada das distribuições no exercício (REGISTRADA_ENCERRADA ou EM_DISTRIBUICAO)
+  - name: id_municipio
+    data_type: STRING
+    required: true
+    nullable: false
+    description: Código IBGE canônico de 7 dígitos do município sede do emissor/coordenador
+  - name: sigla_uf
+    data_type: STRING
+    required: true
+    nullable: false
+    description: Sigla de 2 letras da Unidade Federativa (UF)
+  - name: nome_municipio
+    data_type: STRING
+    required: true
+    nullable: false
+    description: Nome oficial do município
+  - name: regiao
+    data_type: STRING
+    required: true
+    nullable: false
+    description: Macrorregião geográfica brasileira
+  - name: qtd_ofertas_publicas
+    data_type: INT64
+    required: true
+    nullable: false
+    description: Quantidade de ofertas e séries distribuídas sob a RCVM 160 no agrupamento
+  - name: volume_ofertado_mil_brl
+    data_type: FLOAT64
+    required: true
+    nullable: false
+    description: Volume financeiro captado no agrupamento de ofertas públicas RCVM 160 (R$ mil)
+  - name: prazo_medio_emissao_anos
+    data_type: INT64
+    required: true
+    nullable: false
+    description: Prazo médio ponderado de vencimento dos títulos distribuídos (anos)

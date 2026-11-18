@@ -1,0 +1,178 @@
+version: 2
+
+models:
+  - name: stg_cvm_ofertas_distrib_rcvm160
+    description: "Staging view tipada das ofertas públicas RCVM 160 por classe de valor mobiliário, rito e município."
+    columns:
+      - name: cod_emissao_rcvm160
+        description: "Identificador único do agrupamento municipal de ofertas RCVM 160 (STRING)."
+        tests: [not_null, unique]
+      - name: valor_mobiliario_tipo
+        description: "Classe de ativo emitido sob RCVM 160 (DEBENTURE_INCENTIVADA, CRI_CRA_FIDC ou ACAO_EQUITY)."
+        tests: [not_null]
+      - name: rito_registro_cvm
+        description: "Rito de registro CVM aplicado à emissão (RITO_AUTOMATICO ou RITO_ORDINARIO)."
+        tests: [not_null]
+      - name: situacao_oferta_cvm
+        description: "Estágio consolidado das distribuições públicas no agrupamento."
+        tests: [not_null]
+      - name: id_municipio
+        description: "Código IBGE de 7 dígitos do município (STRING)."
+        tests: [not_null]
+      - name: sigla_uf
+        description: "Sigla de 2 letras da Unidade Federativa (UF)."
+        tests: [not_null]
+      - name: nome_municipio
+        description: "Nome oficial do município."
+        tests: [not_null]
+      - name: regiao
+        description: "Macrorregião geográfica brasileira."
+        tests: [not_null]
+      - name: qtd_ofertas_publicas
+        description: "Quantidade de séries e distribuições RCVM 160 registradas no agrupamento."
+        tests: [not_null]
+      - name: volume_ofertado_mil_brl
+        description: "Volume financeiro captado nas ofertas do agrupamento (R$ mil)."
+        tests: [not_null]
+      - name: prazo_medio_emissao_anos
+        description: "Prazo médio ponderado das emissões em anos."
+        tests: [not_null]
+
+  - name: stg_cvm_administradores_fii_carteira
+    description: "Staging view tipada de administradores de carteiras, gestoras FII/FIP e conformidade regulatória CVM."
+    columns:
+      - name: cod_adm_cvm
+        description: "Identificador único do agrupamento municipal de administradores CVM (STRING)."
+        tests: [not_null, unique]
+      - name: id_municipio
+        description: "Código IBGE de 7 dígitos do município (STRING)."
+        tests: [not_null]
+      - name: sigla_uf
+        description: "Sigla de 2 letras da Unidade Federativa (UF)."
+        tests: [not_null]
+      - name: nome_municipio
+        description: "Nome oficial do município."
+        tests: [not_null]
+      - name: administradores_ativos_count
+        description: "Quantidade de administradores e gestores de recursos ativos com sede no município."
+        tests: [not_null]
+      - name: gestoras_fii_fip_count
+        description: "Quantidade de instituições administradoras/gestoras de FII e FIP no município."
+        tests: [not_null]
+      - name: patrimonio_administrado_mi_brl
+        description: "Patrimônio líquido administrado por casas reguladas com sede no município (R$ milhões)."
+        tests: [not_null]
+      - name: taxa_conformidade_informes_pct
+        description: "Percentual de pontualidade na entrega de informes periódicos CVM (%)."
+        tests: [not_null]
+
+  - name: stg_cvm_agentes_autonomos_assessoria
+    description: "Staging view tipada de assessores de investimento credenciados, sociedades AAI e alertas PASM."
+    columns:
+      - name: id_municipio
+        description: "Código IBGE de 7 dígitos do município (STRING)."
+        tests: [not_null, unique]
+      - name: sigla_uf
+        description: "Sigla de 2 letras da Unidade Federativa (UF)."
+        tests: [not_null]
+      - name: nome_municipio
+        description: "Nome oficial do município."
+        tests: [not_null]
+      - name: assessores_investimento_ativos
+        description: "Quantidade de assessores de investimento pessoa física ativos na CVM."
+        tests: [not_null]
+      - name: sociedades_aai_registradas
+        description: "Total de escritórios e sociedades credenciadas de assessoria AAI."
+        tests: [not_null]
+      - name: analistas_consultores_cvm
+        description: "Contingente de analistas e consultores de valores mobiliários autorizados."
+        tests: [not_null]
+      - name: alertas_sancionatorios_pasm_pct
+        description: "Percentual de participantes com ocorrências ou termos de compromisso em PASM CVM (%)."
+        tests: [not_null]
+
+  - name: stg_cvm_mercado_extra_resumo_municipal
+    description: "Staging view tipada do consolidado municipal de captações RCVM 160 e participantes CVM."
+    columns:
+      - name: id_municipio
+        description: "Código IBGE de 7 dígitos do município (STRING)."
+        tests: [not_null, unique]
+      - name: sigla_uf
+        description: "Sigla de 2 letras da Unidade Federativa (UF)."
+        tests: [not_null]
+      - name: nome_municipio
+        description: "Nome oficial do município."
+        tests: [not_null]
+      - name: regiao
+        description: "Macrorregião geográfica brasileira."
+        tests: [not_null]
+      - name: total_ofertas_rcvm160
+        description: "Total de ofertas RCVM 160 registradas por emissores no município."
+        tests: [not_null]
+      - name: volume_captado_rcvm160_mil_brl
+        description: "Volume financeiro total captado sob RCVM 160 (R$ mil)."
+        tests: [not_null]
+      - name: assessores_investimento_ativos
+        description: "Quantidade de assessores de investimento ativos no município."
+        tests: [not_null]
+      - name: administradores_ativos_count
+        description: "Quantidade de administradores e gestores de carteira regulados CVM."
+        tests: [not_null]
+      - name: captacao_per_capita_brl
+        description: "Volume RCVM 160 captado dividido pela população residente (BRL)."
+        tests: [not_null]
+
+  - name: fct_cvm_mercado_extra_municipal
+    description: "Tabela Fato municipal integrando ofertas RCVM 160, patrimônio administrado FII/FIP, assessores AAI e conformidade CVM."
+    columns:
+      - name: id_municipio
+        description: "Código IBGE de 7 dígitos do município (STRING)."
+        tests: [not_null, unique]
+      - name: sigla_uf
+        description: "Sigla de 2 letras da Unidade Federativa (UF)."
+        tests: [not_null]
+      - name: nome_municipio
+        description: "Nome oficial do município."
+        tests: [not_null]
+      - name: regiao
+        description: "Macrorregião geográfica brasileira."
+        tests: [not_null]
+      - name: total_ofertas_rcvm160
+        description: "Total de ofertas públicas RCVM 160 registradas no município."
+        tests: [not_null]
+      - name: volume_captado_rcvm160_mil_brl
+        description: "Volume total captado sob a Resolução CVM 160 (R$ mil)."
+        tests: [not_null]
+      - name: assessores_investimento_ativos
+        description: "Total de assessores de investimento credenciados no município."
+        tests: [not_null]
+      - name: administradores_ativos_count
+        description: "Total de administradores de carteiras e fundos regulados pela CVM."
+        tests: [not_null]
+      - name: captacao_per_capita_brl
+        description: "Volume RCVM 160 equivalente por habitante (BRL)."
+        tests: [not_null]
+      - name: qtd_classes_emissao_cvm
+        description: "Quantidade de classes de valores mobiliários consolidadas na Silver."
+        tests: [not_null]
+      - name: prazo_maximo_emissao_anos
+        description: "Maior prazo médio de emissão entre as classes registradas (anos)."
+        tests: [not_null]
+      - name: gestoras_fii_fip_count
+        description: "Quantidade de gestoras atuantes em FII e FIP no município."
+        tests: [not_null]
+      - name: patrimonio_administrado_mi_brl
+        description: "Patrimônio sob gestão/administração sediado no município (R$ milhões)."
+        tests: [not_null]
+      - name: taxa_conformidade_informes_pct
+        description: "Índice de regularidade e pontualidade na entrega de informes CVM (%)."
+        tests: [not_null]
+      - name: sociedades_aai_registradas
+        description: "Quantidade de sociedades credenciadas de assessoria AAI."
+        tests: [not_null]
+      - name: analistas_consultores_cvm
+        description: "Total de analistas e consultores de investimentos CVM no município."
+        tests: [not_null]
+      - name: alertas_sancionatorios_pasm_pct
+        description: "Taxa percentual de participantes com processos administrativos CVM (%)."
+        tests: [not_null]

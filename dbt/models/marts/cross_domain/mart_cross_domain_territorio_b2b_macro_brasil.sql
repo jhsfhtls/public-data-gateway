@@ -179,6 +179,16 @@ bndes_uf AS (
     GROUP BY sigla_uf
 ),
 
+cvm_extra_uf AS (
+    SELECT
+        sigla_uf,
+        ROUND(SUM(volume_captado_rcvm160_mil_brl), 2) AS volume_captado_rcvm160_cvm_uf_mil_brl,
+        SUM(assessores_investimento_ativos) AS assessores_investimento_cvm_uf,
+        ROUND(AVG(score_sofisticacao_mercado_cvm), 2) AS avg_score_mercado_capitais_cvm_uf
+    FROM {{ ref('mart_cvm_mercado_extra_brasil') }}
+    GROUP BY sigla_uf
+),
+
 base AS (
     SELECT
         t.sigla_uf,
@@ -231,6 +241,9 @@ base AS (
         COALESCE(bn.valor_contratado_bndes_uf_mil_brl, 0.0) AS valor_contratado_bndes_uf_mil_brl,
         COALESCE(bn.desembolso_anual_bndes_uf_mil_brl, 0.0) AS desembolso_anual_bndes_uf_mil_brl,
         COALESCE(bn.avg_score_fomento_bndes_uf, 70.0) AS avg_score_fomento_bndes_uf,
+        COALESCE(cvx.volume_captado_rcvm160_cvm_uf_mil_brl, 0.0) AS volume_captado_rcvm160_cvm_uf_mil_brl,
+        COALESCE(cvx.assessores_investimento_cvm_uf, 0) AS assessores_investimento_cvm_uf,
+        COALESCE(cvx.avg_score_mercado_capitais_cvm_uf, 75.0) AS avg_score_mercado_capitais_cvm_uf,
         COALESCE(m.ano_mes, '2025-03') AS macro_ano_mes_referencia,
         COALESCE(m.selic_meta_fim_mes_pct, 14.25) AS selic_meta_fim_mes_pct,
         COALESCE(m.ipca_acumulado_12m_pct, 5.06) AS ipca_acumulado_12m_pct,
@@ -253,6 +266,7 @@ base AS (
     LEFT JOIN siape_uf sp ON t.sigla_uf = sp.sigla_uf
     LEFT JOIN eleicoes_uf el ON t.sigla_uf = el.sigla_uf
     LEFT JOIN bndes_uf bn ON t.sigla_uf = bn.sigla_uf
+    LEFT JOIN cvm_extra_uf cvx ON t.sigla_uf = cvx.sigla_uf
     CROSS JOIN macro_latest m
 ),
 
