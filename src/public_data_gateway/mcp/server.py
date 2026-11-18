@@ -568,6 +568,50 @@ class MCPDispatcher:
                                 },
                             },
                             {
+                                "name": "bdg_get_capag_municipal_evaluation",
+                                "description": "Retrieve official STN CAPAG municipal evaluation and ICF quality ranking (Tier 1).",
+                                "inputSchema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "id_municipio_or_name": {"type": "string", "description": "7-digit IBGE code or municipality name"},
+                                    },
+                                    "required": ["id_municipio_or_name"],
+                                },
+                            },
+                            {
+                                "name": "bdg_get_capag_ifgf_gestao_fiscal",
+                                "description": "Retrieve FIRJAN Municipal Fiscal Management Index (IFGF) and sub-indices (Tier 1).",
+                                "inputSchema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "id_municipio_or_name": {"type": "string", "description": "7-digit IBGE code or municipality name"},
+                                    },
+                                    "required": ["id_municipio_or_name"],
+                                },
+                            },
+                            {
+                                "name": "bdg_get_capag_sovereign_features",
+                                "description": "Retrieve Gold CAPAG + IFGF subnational sovereign credit rating and Union guarantee features (Tier 1).",
+                                "inputSchema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "id_municipio_or_name": {"type": "string", "description": "7-digit IBGE code or municipality name"},
+                                    },
+                                    "required": ["id_municipio_or_name"],
+                                },
+                            },
+                            {
+                                "name": "bdg_list_top_capag_municipalities",
+                                "description": "List municipalities ranked by composite CAPAG + IFGF subnational sovereign credit score (Tier 1).",
+                                "inputSchema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "limit": {"type": "integer", "description": "Max municipalities to return (default: 10)"},
+                                        "sigla_uf": {"type": "string", "description": "Optional 2-letter UF state filter"},
+                                    },
+                                },
+                            },
+                            {
                                 "name": "bdg_search_catmat_materials",
                                 "description": "Search materials and catalog descriptions in Compras.gov.br CATMAT/SIASG with PDM, class, and sustainability flags (Tier 1).",
                                 "inputSchema": {
@@ -3358,6 +3402,95 @@ class MCPDispatcher:
                 sigla_uf=args.get("sigla_uf"),
             )
             wrapped = wrap_untrusted_gov_data(rows, source_id="cnj_improbidade")
+            return {
+                "jsonrpc": "2.0",
+                "id": req_id,
+                "result": {"content": [{"type": "text", "text": wrapped}], "isError": False},
+            }
+
+        if tool_name == "bdg_get_capag_municipal_evaluation":
+            from public_data_gateway.connectors.macrofinanceiro.stn_capag import (
+                StnCapagConnector,
+            )
+
+            cap_conn = StnCapagConnector(settings=self.settings)
+            termo = str(args.get("id_municipio_or_name", ""))
+            ev = cap_conn.get_municipal_evaluation(termo)
+            if not ev:
+                return {
+                    "jsonrpc": "2.0",
+                    "id": req_id,
+                    "result": {
+                        "content": [{"type": "text", "text": f"STN CAPAG municipal evaluation not found for '{termo}'"}],
+                        "isError": True,
+                    },
+                }
+            wrapped = wrap_untrusted_gov_data(ev, source_id="stn_capag")
+            return {
+                "jsonrpc": "2.0",
+                "id": req_id,
+                "result": {"content": [{"type": "text", "text": wrapped}], "isError": False},
+            }
+
+        if tool_name == "bdg_get_capag_ifgf_gestao_fiscal":
+            from public_data_gateway.connectors.macrofinanceiro.stn_capag import (
+                StnCapagConnector,
+            )
+
+            cap_conn = StnCapagConnector(settings=self.settings)
+            termo = str(args.get("id_municipio_or_name", ""))
+            ifgf = cap_conn.get_ifgf_index(termo)
+            if not ifgf:
+                return {
+                    "jsonrpc": "2.0",
+                    "id": req_id,
+                    "result": {
+                        "content": [{"type": "text", "text": f"FIRJAN IFGF index not found for '{termo}'"}],
+                        "isError": True,
+                    },
+                }
+            wrapped = wrap_untrusted_gov_data(ifgf, source_id="stn_capag")
+            return {
+                "jsonrpc": "2.0",
+                "id": req_id,
+                "result": {"content": [{"type": "text", "text": wrapped}], "isError": False},
+            }
+
+        if tool_name == "bdg_get_capag_sovereign_features":
+            from public_data_gateway.connectors.macrofinanceiro.stn_capag import (
+                StnCapagConnector,
+            )
+
+            cap_conn = StnCapagConnector(settings=self.settings)
+            termo = str(args.get("id_municipio_or_name", ""))
+            feat = cap_conn.get_capag_features(termo)
+            if not feat:
+                return {
+                    "jsonrpc": "2.0",
+                    "id": req_id,
+                    "result": {
+                        "content": [{"type": "text", "text": f"STN CAPAG sovereign features not found for '{termo}'"}],
+                        "isError": True,
+                    },
+                }
+            wrapped = wrap_untrusted_gov_data(feat, source_id="stn_capag")
+            return {
+                "jsonrpc": "2.0",
+                "id": req_id,
+                "result": {"content": [{"type": "text", "text": wrapped}], "isError": False},
+            }
+
+        if tool_name == "bdg_list_top_capag_municipalities":
+            from public_data_gateway.connectors.macrofinanceiro.stn_capag import (
+                StnCapagConnector,
+            )
+
+            cap_conn = StnCapagConnector(settings=self.settings)
+            rows = cap_conn.list_top_municipalities(
+                limit=int(args.get("limit", 10)),
+                sigla_uf=args.get("sigla_uf"),
+            )
+            wrapped = wrap_untrusted_gov_data(rows, source_id="stn_capag")
             return {
                 "jsonrpc": "2.0",
                 "id": req_id,

@@ -26,6 +26,7 @@ model-paths:
   - "../src/public_data_gateway/connectors/macrofinanceiro/cvm_fundos/dbt"
   - "../src/public_data_gateway/connectors/macrofinanceiro/bcb_ifdata/dbt"
   - "../src/public_data_gateway/connectors/macrofinanceiro/stn_siconfi/dbt"
+  - "../src/public_data_gateway/connectors/macrofinanceiro/stn_capag/dbt"
   - "../src/public_data_gateway/connectors/macrofinanceiro/stn_tesouro_transparente/dbt"
   - "../src/public_data_gateway/connectors/compras_publicas/comprasgov_catmat/dbt"
   - "../src/public_data_gateway/connectors/demografico/ibge_censo2022/dbt"

@@ -1459,3 +1459,35 @@ sources:
   status: HOMOLOGATED
   freshness_sla_hours: 168
   cron_schedule_expression: 0 4 * * 1
+- source_id: stn_capag
+  name: 'STN: Capacidade de Pagamento (CAPAG) Subnacional & Índice FIRJAN de Gestão Fiscal (IFGF)'
+  agency: Secretaria do Tesouro Nacional (STN / Ministério da Fazenda) & FIRJAN
+  official_url: https://www.tesourotransparente.gov.br/temas/estados-e-municipios/capacidade-de-pagamento-capag
+  segment_id: 02_economico_macrofinanceiro
+  segment_name: Econômico, Monetário & Macrofinanceiro
+  access_mode: FEDERATED_API
+  protocol: REST_JSON
+  auth_type: NONE
+  canonical_keys:
+  - id_municipio
+  - sigla_uf
+  update_frequency: Anual / Quadrimestral
+  estimated_volume: ~5.570 municípios + 27 UFs (~150 MB CSV/XLSX histórico)
+  lgpd_tier: PUBLIC_NON_PERSONAL
+  ml_feature_domains:
+  - subnational_sovereign_credit_rating
+  - fiscal_autonomy_ifgf_investment
+  - union_sovereign_guarantee_eligibility
+  solution_packs:
+  - P01
+  - P02
+  - P04
+  - P05
+  - P06
+  - P08
+  - P10
+  rice_score: 915
+  roadmap_wave: 2
+  status: HOMOLOGATED
+  freshness_sla_hours: 720
+  cron_schedule_expression: 0 5 15 * *

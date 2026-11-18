@@ -1,0 +1,226 @@
+version: 2
+
+models:
+  - name: stg_capag_avaliacao_municipal
+    description: "Staging view da avaliação oficial de Capacidade de Pagamento (CAPAG) municipal e Ranking ICF/STN."
+    columns:
+      - name: id_municipio
+        description: "Código IBGE canônico de 7 dígitos do município avaliado."
+        tests: [not_null, unique]
+      - name: sigla_uf
+        description: "Sigla de 2 letras da Unidade Federativa do município."
+        tests: [not_null]
+      - name: nome_municipio
+        description: "Nome oficial do município brasileiro."
+        tests: [not_null]
+      - name: ano_referencia
+        description: "Ano de exercício fiscal de apuração da CAPAG."
+        tests: [not_null]
+      - name: nota_capag_oficial
+        description: "Conceito oficial CAPAG atribuído ao município pela STN (A+, A, B, C ou D)."
+        tests: [not_null]
+      - name: indicador_1_endividamento_dcl_rcl_pct
+        description: "Indicador 1 CAPAG — Razão Dívida Consolidada sobre Receita Corrente Líquida (%)."
+        tests: [not_null]
+      - name: nota_ind_1
+        description: "Conceito obtido no Indicador 1 de Endividamento (A, B ou C)."
+        tests: [not_null]
+      - name: indicador_2_poupanca_corrente_pct
+        description: "Indicador 2 CAPAG — Relação Despesas Correntes sobre Receitas Correntes (%)."
+        tests: [not_null]
+      - name: nota_ind_2
+        description: "Conceito obtido no Indicador 2 de Poupança Corrente (A, B ou C)."
+        tests: [not_null]
+      - name: indicador_3_liquidez_relativa_pct
+        description: "Indicador 3 CAPAG — Relação Obrigações Financeiras sobre Disponibilidade de Caixa Bruta (%)."
+        tests: [not_null]
+      - name: nota_ind_3
+        description: "Conceito obtido no Indicador 3 de Liquidez Relativa (A, B ou C)."
+        tests: [not_null]
+      - name: elegivel_garantia_uniao
+        description: "Indica se o município cumpre os requisitos CAPAG para obtenção de garantia da União."
+        tests: [not_null]
+      - name: qualidade_informacao_ranking_icf
+        description: "Nota de qualidade da informação contábil e fiscal no Ranking ICF/SICONFI (A, B, C ou D)."
+        tests: [not_null]
+
+  - name: stg_capag_avaliacao_estadual
+    description: "Staging view da avaliação oficial CAPAG estadual vinculada aos municípios avaliados."
+    columns:
+      - name: id_municipio
+        description: "Código IBGE canônico de 7 dígitos do município de referência estadual."
+        tests: [not_null, unique]
+      - name: sigla_uf
+        description: "Sigla de 2 letras da Unidade Federativa."
+        tests: [not_null]
+      - name: nome_uf
+        description: "Nome oficial da Unidade Federativa avaliada."
+        tests: [not_null]
+      - name: ano_referencia
+        description: "Exercício fiscal de referência da CAPAG estadual."
+        tests: [not_null]
+      - name: nota_capag_uf
+        description: "Conceito oficial CAPAG atribuído ao governo estadual (A+, A, B, C ou D)."
+        tests: [not_null]
+      - name: indicador_1_endividamento_uf_pct
+        description: "Indicador 1 CAPAG estadual de endividamento DCL/RCL (%)."
+        tests: [not_null]
+      - name: indicador_2_poupanca_corrente_uf_pct
+        description: "Indicador 2 CAPAG estadual de poupança corrente (%)."
+        tests: [not_null]
+      - name: indicador_3_liquidez_uf_pct
+        description: "Indicador 3 CAPAG estadual de liquidez relativa (%)."
+        tests: [not_null]
+      - name: elegivel_garantia_uniao_uf
+        description: "Indica elegibilidade do Estado para obtenção de garantia soberana da União."
+        tests: [not_null]
+      - name: espaco_fiscal_estimado_brl
+        description: "Espaço fiscal anual estimado pelo Tesouro Nacional para contratação estadual com garantia em BRL."
+        tests: [not_null]
+
+  - name: stg_capag_ifgf_gestao_fiscal
+    description: "Staging view do Índice FIRJAN de Gestão Fiscal (IFGF) e subíndices municipais."
+    columns:
+      - name: id_municipio
+        description: "Código IBGE canônico de 7 dígitos do município."
+        tests: [not_null, unique]
+      - name: sigla_uf
+        description: "Sigla de 2 letras da Unidade Federativa."
+        tests: [not_null]
+      - name: nome_municipio
+        description: "Nome oficial do município avaliado no IFGF."
+        tests: [not_null]
+      - name: ano_referencia
+        description: "Ano base de apuração do Índice FIRJAN de Gestão Fiscal."
+        tests: [not_null]
+      - name: ifgf_geral
+        description: "Pontuação composta geral do IFGF (escala normalizada de 0.0 a 1.0)."
+        tests: [not_null]
+      - name: ifgf_autonomia
+        description: "Subíndice IFGF de Autonomia Fiscal (capacidade de financiar a estrutura administrativa, 0.0 a 1.0)."
+        tests: [not_null]
+      - name: ifgf_gastos_pessoal
+        description: "Subíndice IFGF de Gastos com Pessoal frente à receita corrente líquida (0.0 a 1.0)."
+        tests: [not_null]
+      - name: ifgf_liquidez
+        description: "Subíndice IFGF de Liquidez e disponibilidade de caixa para restos a pagar (0.0 a 1.0)."
+        tests: [not_null]
+      - name: ifgf_investimentos
+        description: "Subíndice IFGF de Investimentos públicos em infraestrutura municipal (0.0 a 1.0)."
+        tests: [not_null]
+      - name: conceito_ifgf
+        description: "Classificação executiva FIRJAN de gestão fiscal (GESTAO_EXCELENCIA, BOA_GESTAO_FISCAL, GESTAO_EM_DIFICULDADE)."
+        tests: [not_null]
+
+  - name: stg_capag_garantias_operacoes
+    description: "Staging view do estoque de garantias da União em operações de crédito subnacionais e honras de aval."
+    columns:
+      - name: id_municipio
+        description: "Código IBGE canônico de 7 dígitos do ente garantido."
+        tests: [not_null, unique]
+      - name: sigla_uf
+        description: "Sigla de 2 letras da Unidade Federativa."
+        tests: [not_null]
+      - name: nome_municipio
+        description: "Nome oficial do município contratante com aval da União."
+        tests: [not_null]
+      - name: estoque_garantias_uniao_brl
+        description: "Saldo devedor garantido pela União em operações de crédito do ente em BRL."
+        tests: [not_null]
+      - name: operacoes_contratadas_com_garantia
+        description: "Quantidade de operações de crédito ativas com garantia soberana da União."
+        tests: [not_null]
+      - name: custo_medio_ponderado_aa_pct
+        description: "Custo financeiro médio ponderado das operações garantidas (% ao ano)."
+        tests: [not_null]
+      - name: honras_aval_acumuladas_brl
+        description: "Valor acumulado de honras de aval pagas pela União por inadimplência subnacional em BRL."
+        tests: [not_null]
+      - name: status_adimplencia_garantias
+        description: "Situação de adimplência do município nos contratos garantidos pela União."
+        tests: [not_null]
+
+  - name: fct_capacidade_pagamento_capag_municipal
+    description: "Tabela fato consolidada municipal integrando avaliação CAPAG STN, CAPAG estadual, IFGF FIRJAN e garantias da União."
+    columns:
+      - name: id_municipio
+        description: "Código IBGE canônico de 7 dígitos do município avaliado."
+        tests: [not_null, unique]
+      - name: sigla_uf
+        description: "Sigla de 2 letras da Unidade Federativa."
+        tests: [not_null]
+      - name: nome_municipio
+        description: "Nome oficial do município."
+        tests: [not_null]
+      - name: ano_referencia
+        description: "Ano de exercício fiscal de referência da consolidação."
+        tests: [not_null]
+      - name: nota_capag_oficial
+        description: "Conceito oficial CAPAG municipal atribuído pela STN (A+, A, B, C ou D)."
+        tests: [not_null]
+      - name: indicador_1_endividamento_dcl_rcl_pct
+        description: "Indicador 1 CAPAG de endividamento municipal (%)."
+        tests: [not_null]
+      - name: nota_ind_1
+        description: "Conceito obtido no Indicador 1 CAPAG."
+        tests: [not_null]
+      - name: indicador_2_poupanca_corrente_pct
+        description: "Indicador 2 CAPAG de poupança corrente municipal (%)."
+        tests: [not_null]
+      - name: nota_ind_2
+        description: "Conceito obtido no Indicador 2 CAPAG."
+        tests: [not_null]
+      - name: indicador_3_liquidez_relativa_pct
+        description: "Indicador 3 CAPAG de liquidez relativa municipal (%)."
+        tests: [not_null]
+      - name: nota_ind_3
+        description: "Conceito obtido no Indicador 3 CAPAG."
+        tests: [not_null]
+      - name: elegivel_garantia_uniao
+        description: "Elegibilidade municipal para contratação com garantia da União."
+        tests: [not_null]
+      - name: qualidade_informacao_ranking_icf
+        description: "Conceito de qualidade da informação fiscal no Ranking ICF."
+        tests: [not_null]
+      - name: nota_capag_uf
+        description: "Conceito CAPAG do respectivo Estado federado."
+        tests: [not_null]
+      - name: elegivel_garantia_uniao_uf
+        description: "Elegibilidade do respectivo Estado para garantias da União."
+        tests: [not_null]
+      - name: espaco_fiscal_estimado_brl
+        description: "Espaço fiscal estimado pela STN para operações do Estado em BRL."
+        tests: [not_null]
+      - name: ifgf_geral
+        description: "Índice FIRJAN de Gestão Fiscal consolidado (0.0 a 1.0)."
+        tests: [not_null]
+      - name: ifgf_autonomia
+        description: "Subíndice IFGF de Autonomia Fiscal (0.0 a 1.0)."
+        tests: [not_null]
+      - name: ifgf_gastos_pessoal
+        description: "Subíndice IFGF de Gastos com Pessoal (0.0 a 1.0)."
+        tests: [not_null]
+      - name: ifgf_liquidez
+        description: "Subíndice IFGF de Liquidez Financeira (0.0 a 1.0)."
+        tests: [not_null]
+      - name: ifgf_investimentos
+        description: "Subíndice IFGF de Investimentos Públicos (0.0 a 1.0)."
+        tests: [not_null]
+      - name: conceito_ifgf
+        description: "Faixa classificatória FIRJAN de gestão fiscal municipal."
+        tests: [not_null]
+      - name: estoque_garantias_uniao_brl
+        description: "Saldo garantido pela União para operações do município em BRL."
+        tests: [not_null]
+      - name: operacoes_contratadas_com_garantia
+        description: "Contagem de contratos garantidos pela União."
+        tests: [not_null]
+      - name: custo_medio_ponderado_aa_pct
+        description: "Custo médio ponderado anual das operações garantidas (%)."
+        tests: [not_null]
+      - name: honras_aval_acumuladas_brl
+        description: "Honras de aval acumuladas pela União em BRL."
+        tests: [not_null]
+      - name: status_adimplencia_garantias
+        description: "Situação de adimplência nos contratos com aval da União."
+        tests: [not_null]

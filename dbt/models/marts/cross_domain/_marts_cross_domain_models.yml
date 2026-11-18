@@ -67,6 +67,12 @@ models:
       - name: avg_score_solidez_siconfi_uf
         description: "Média estadual do score composto de solidez contábil e fiscal SICONFI."
         tests: [not_null]
+      - name: avg_ifgf_gestao_fiscal_uf
+        description: "Média estadual do Índice FIRJAN de Gestão Fiscal (IFGF, 0.0 a 1.0)."
+        tests: [not_null]
+      - name: pct_municipios_elegiveis_garantia_capag_uf
+        description: "Percentual de municípios da UF elegíveis à garantia soberana da União pela nota CAPAG (%)."
+        tests: [not_null]
       - name: macro_ano_mes_referencia
         description: "Competência macroeconômica de referência (YYYY-MM)."
         tests: [not_null]
