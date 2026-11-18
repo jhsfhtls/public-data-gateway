@@ -249,6 +249,16 @@ sus_extra_uf AS (
     GROUP BY sigla_uf
 ),
 
+educacao_extra_uf AS (
+    SELECT
+        sigla_uf,
+        SUM(repasses_fundeb_mil_brl) AS repasses_fundeb_uf_mil_brl,
+        SUM(bolsas_pesquisa_cnpq_ativas) AS bolsas_cnpq_ativas_uf,
+        ROUND(AVG(score_capital_humano_mec_extra), 2) AS avg_score_capital_humano_mec_uf
+    FROM {{ ref('mart_inep_mec_extra_brasil') }}
+    GROUP BY sigla_uf
+),
+
 base AS (
     SELECT
         t.sigla_uf,
@@ -322,6 +332,9 @@ base AS (
         COALESCE(sx.producao_ambulatorial_sia_uf, 0) AS producao_ambulatorial_sia_uf,
         COALESCE(sx.notificacoes_sinan_uf, 0) AS notificacoes_sinan_uf,
         COALESCE(sx.avg_score_resolutividade_sus_uf, 75.0) AS avg_score_resolutividade_sus_uf,
+        COALESCE(ex.repasses_fundeb_uf_mil_brl, 0.0) AS repasses_fundeb_uf_mil_brl,
+        COALESCE(ex.bolsas_cnpq_ativas_uf, 0) AS bolsas_cnpq_ativas_uf,
+        COALESCE(ex.avg_score_capital_humano_mec_uf, 75.0) AS avg_score_capital_humano_mec_uf,
         COALESCE(m.ano_mes, '2025-03') AS macro_ano_mes_referencia,
         COALESCE(m.selic_meta_fim_mes_pct, 14.25) AS selic_meta_fim_mes_pct,
         COALESCE(m.ipca_acumulado_12m_pct, 5.06) AS ipca_acumulado_12m_pct,
@@ -351,6 +364,7 @@ base AS (
     LEFT JOIN seguros_uf sg ON t.sigla_uf = sg.sigla_uf
     LEFT JOIN inovacao_pi_uf ip ON t.sigla_uf = ip.sigla_uf
     LEFT JOIN sus_extra_uf sx ON t.sigla_uf = sx.sigla_uf
+    LEFT JOIN educacao_extra_uf ex ON t.sigla_uf = ex.sigla_uf
     CROSS JOIN macro_latest m
 ),
 

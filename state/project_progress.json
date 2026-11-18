@@ -1,6 +1,6 @@
 {
   "schema_version": "1.0.0",
-  "last_updated": "2026-11-18T21:20:00.000000",
+  "last_updated": "2026-11-18T21:44:00.000000",
   "project_name": "public-data-gateway",
   "architecture": "Hexagonal Medallion Lakehouse (Bronze -> Silver -> Gold / Feature Store)",
   "governance_standards": [
@@ -15,7 +15,7 @@
   "current_macro_phase": "Fase 11.5 - Expansão Completa de Fontes Públicas (Ondas 11.5A a 11.5E — Padrão 11-Gates)",
   "overall_status": "ON_TRACK",
   "active_connector": null,
-  "next_connector": "inep_mec_extra",
+  "next_connector": "ibge_institucional",
   "structural_phases": [
     {
       "phase_id": "00",
@@ -252,74 +252,74 @@
     }
   ],
   "active_connector_gates": {
-    "target_connector": "datasus_extra",
+    "target_connector": "inep_mec_extra",
     "target_wave": "11.5E",
     "gates": [
       {
         "gate_id": "GATE_01",
         "name": "Contrato Declarativo ODCS v3.1 das N Tabelas da API",
         "status": "PASSED",
-        "criteria": "Schema tipado ODCS-BR-DATASUS-EXTRA-SIA-SINAN-001 (11 colunas), chaves primarias STRING (cod_atendimento_sia, id_municipio 7D, sigla_uf) e regras semanticas para Producao SIA, Agravos SINAN, Nutricao SISVAN/PNS e Resumo Municipal."
+        "criteria": "Schema tipado ODCS-BR-INEP-MEC-EXTRA-SAEB-FUNDEB-001 (11 colunas), chaves primarias STRING (cod_avaliacao_inep, id_municipio 7D, sigla_uf) e regras semanticas para Proficiencia SAEB, PROUNI/SISU, FUNDEB/CNPq e Resumo Municipal."
       },
       {
         "gate_id": "GATE_02",
         "name": "Ingestao Bronze Isolada (Todas as Tabelas) & Cache WAL",
         "status": "PASSED",
-        "criteria": "Ingestao resiliente dos portais oficiais DATASUS (datasus.saude.gov.br) e Dados Abertos Saude (dadosabertos.saude.gov.br) em data/datasus_extra/bronze/ com registro de linhagem SHA-256."
+        "criteria": "Ingestao resiliente dos portais oficiais INEP Microdados, FNDE (FUNDEB) e CNPq Dados Abertos em data/inep_mec_extra/bronze/ com registro de linhagem SHA-256."
       },
       {
         "gate_id": "GATE_03",
         "name": "Sanitizacao de Sentinelas & Nulls",
         "status": "PASSED",
-        "criteria": "Conversao deterministica de sentinelas em NULLs reais e normalizacao de grupos SIA (ONCOLOGIA_ALTA_COMPLEXIDADE, ATENCAO_BASICA_APAC), agravos SINAN e indicadores nutricionais SISVAN."
+        "criteria": "Conversao deterministica de sentinelas em NULLs reais e normalizacao de etapas SAEB/MEC, programas federais (PROUNI_INTEGRAL, FUNDEB_VAAR) e equidade pedagógica."
       },
       {
         "gate_id": "GATE_04",
         "name": "Materializacao Silver Parquet Isolada (Todas as Tabelas)",
         "status": "PASSED",
-        "criteria": "Gravacao ZSTD em data/datasus_extra/silver/ (datasus_sia_producao_ambulatorial, datasus_sinan_agravos_notificacao, datasus_sisvan_pns_nutricao, datasus_extra_resumo_municipal)."
+        "criteria": "Gravacao ZSTD em data/inep_mec_extra/silver/ (inep_saeb_proficiencia_municipio, mec_prouni_sisu_acesso_superior, fnde_fundeb_cnpq_fomento, inep_mec_extra_resumo_municipal)."
       },
       {
         "gate_id": "GATE_05",
         "name": "Validacao dos 5 Pilares & Quarentena",
         "status": "PASSED",
-        "criteria": "Aprovacao em Freshness, Volume, Schema, Null Ceiling e Lineage com suporte a desvio para data/datasus_extra/quarantine/."
+        "criteria": "Aprovacao em Freshness, Volume, Schema, Null Ceiling e Lineage com suporte a desvio para data/inep_mec_extra/quarantine/."
       },
       {
         "gate_id": "GATE_06",
         "name": "Gold Feature View Isolada & ASOF Join ML",
         "status": "PASSED",
-        "criteria": "Features de resolutividade ambulatorial SUS, cobertura SISVAN e encerramento oportuno SINAN em data/datasus_extra/gold/features_datasus_extra_brasil.parquet."
+        "criteria": "Features de capital humano INEP/MEC, proficiencia SAEB e fomento CNPq em data/inep_mec_extra/gold/features_inep_mec_extra_brasil.parquet."
       },
       {
         "gate_id": "GATE_07",
         "name": "Integracao ao EnrichmentEngine & Marts Cross-Domain",
         "status": "PASSED",
-        "criteria": "Integracao saude-territorio em mart_cross_domain_territorio_b2b_macro_brasil (producao_ambulatorial_sia_uf, notificacoes_sinan_uf e avg_score_resolutividade_sus_uf)."
+        "criteria": "Integracao educacao-territorio em mart_cross_domain_territorio_b2b_macro_brasil (repasses_fundeb_uf_mil_brl, bolsas_cnpq_ativas_uf e avg_score_capital_humano_mec_uf)."
       },
       {
         "gate_id": "GATE_08",
         "name": "Exposicao Multi-Interface (4 Interfaces)",
         "status": "PASSED",
-        "criteria": "Exposicao simultanea via SDK (BrazilData.health + shortcuts), FastAPI (/api/v1/health/datasus-extra/*), CLI (bdg datasus-extra *) e MCP (bdg_get_datasus_sia_production, bdg_get_datasus_sinan_notifications, bdg_get_datasus_extra_features, bdg_list_top_datasus_extra_municipalities com wrap_untrusted_gov_data)."
+        "criteria": "Exposicao simultanea via SDK (BrazilData.education + shortcuts), FastAPI (/api/v1/education/inep-mec-extra/*), CLI (bdg inep-mec-extra *) e MCP (bdg_get_inep_saeb_proficiency, bdg_get_mec_prouni_sisu_access, bdg_get_inep_mec_extra_features, bdg_list_top_inep_mec_extra_municipalities com wrap_untrusted_gov_data)."
       },
       {
         "gate_id": "GATE_09",
         "name": "Bateria de Testes Unitarios & Paridade Offline",
         "status": "PASSED",
-        "criteria": "Testes unitarios offline completos em tests/connectors/test_datasus_extra.py cobrindo 4 tabelas Silver, Gold ML e paridade nas 4 interfaces."
+        "criteria": "Testes unitarios offline completos em tests/connectors/test_inep_mec_extra.py cobrindo 4 tabelas Silver, Gold ML e paridade nas 4 interfaces."
       },
       {
         "gate_id": "GATE_10",
         "name": "dbt Staging, Marts Intra-Domínio/Cross-Domain & 100% Colunas Documentadas",
         "status": "PASSED",
-        "criteria": "Modelos dbt com source.yml, stg_*, fct_datasus_extra_municipal, mart intra-dominio mart_datasus_extra_brasil e cross-domain mart_cross_domain_territorio_b2b_macro_brasil aprovados no dbt test (2.050/2.050) e lint_dbt_docs.py (100% cobertura em 674 modelos / 9.092 colunas / 380 fontes)."
+        "criteria": "Modelos dbt com source.yml, stg_*, fct_inep_mec_extra_municipal, mart intra-dominio mart_inep_mec_extra_brasil e cross-domain mart_cross_domain_territorio_b2b_macro_brasil aprovados no dbt test (2.132/2.132) e lint_dbt_docs.py (100% cobertura em 680 modelos / 9.168 colunas / 384 fontes)."
       },
       {
         "gate_id": "GATE_11",
         "name": "Teste Real de 1 Linha com API ao Vivo (Fail-Hard)",
         "status": "PASSED",
-        "criteria": "Execucao obrigatoria contra portais oficiais DATASUS e Dados Abertos Saude validando HTTP 200; falha reprova o pipeline."
+        "criteria": "Execucao obrigatoria contra portais oficiais INEP Microdados, FNDE (FUNDEB) e CNPq Dados Abertos validando HTTP 200; falha reprova o pipeline."
       }
     ]
   },
@@ -876,6 +876,12 @@
       "phase_id": "11.5",
       "milestone": "Wave 11.5E Extensão (1/5) — Homologação do Conector datasus_extra (4 Tabelas Silver DATASUS SIA/SINAN/SISVAN/PNS, Mart Intra-Domínio, Mart Cross-Domain Território & Paridade 4 Interfaces)",
       "summary": "Implementação completa nos 11 Gates da extensão datasus_extra (DATASUS Complementar — SIA, SINAN, SISVAN & PNS): contrato ODCS v3.1 (ODCS-BR-DATASUS-EXTRA-SIA-SINAN-001), ingestão Bronze + 4 tabelas Silver ZSTD (datasus_sia_producao_ambulatorial, datasus_sinan_agravos_notificacao, datasus_sisvan_pns_nutricao, datasus_extra_resumo_municipal) + Gold ML (features_datasus_extra_brasil), 4 staging views + fct_datasus_extra_municipal + mart intra-domínio mart_datasus_extra_brasil + enriquecimento da mart cross-domain mart_cross_domain_territorio_b2b_macro_brasil (2.050 testes dbt OK na linhagem, 100% colunas documentadas no lint_dbt_docs.py com 674 modelos / 9.092 colunas / 380 fontes), paridade em SDK/FastAPI/CLI/MCP, bateria offline e teste live fail-hard contra datasus.saude.gov.br e dadosabertos.saude.gov.br."
+    },
+    {
+      "date": "2026-11-18",
+      "phase_id": "11.5",
+      "milestone": "Wave 11.5E Extensão (2/5) — Homologação do Conector inep_mec_extra (4 Tabelas Silver SAEB/PROUNI/SISU/FUNDEB/CNPq, Mart Intra-Domínio, Mart Cross-Domain Território & Paridade 4 Interfaces)",
+      "summary": "Implementação completa nos 11 Gates da extensão inep_mec_extra (INEP/MEC Complementar — SAEB, PROUNI, SISU, FUNDEB & CNPq): contrato ODCS v3.1 (ODCS-BR-INEP-MEC-EXTRA-SAEB-FUNDEB-001), ingestão Bronze + 4 tabelas Silver ZSTD (inep_saeb_proficiencia_municipio, mec_prouni_sisu_acesso_superior, fnde_fundeb_cnpq_fomento, inep_mec_extra_resumo_municipal) + Gold ML (features_inep_mec_extra_brasil), 4 staging views + fct_inep_mec_extra_municipal + mart intra-domínio mart_inep_mec_extra_brasil + enriquecimento da mart cross-domain mart_cross_domain_territorio_b2b_macro_brasil (2.132 testes dbt OK na linhagem, 100% colunas documentadas no lint_dbt_docs.py com 680 modelos / 9.168 colunas / 384 fontes), paridade em SDK/FastAPI/CLI/MCP, bateria offline e teste live fail-hard contra gov.br/inep (microdados), gov.br/fnde (dados-abertos) e gov.br/cnpq (dados-abertos)."
     }
   ]
 }

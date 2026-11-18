@@ -2429,6 +2429,51 @@ class MCPDispatcher:
                                 },
                             },
                             {
+                                "name": "bdg_get_inep_saeb_proficiency",
+                                "description": "Lookup INEP SAEB proficiency scores and MEC/FUNDEB programs by evaluation code, stage, program, IBGE, UF, or city.",
+                                "inputSchema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "termo": {"type": "string", "description": "SAEB code, education stage, program, IBGE code, UF, or city"},
+                                    },
+                                    "required": ["termo"],
+                                },
+                            },
+                            {
+                                "name": "bdg_get_mec_prouni_sisu_access",
+                                "description": "Lookup MEC PROUNI scholarships, SISU public-university seats, and mean cutoff scores by IBGE, UF, or city.",
+                                "inputSchema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "termo": {"type": "string", "description": "Access code, IBGE code, UF, or municipality name"},
+                                    },
+                                    "required": ["termo"],
+                                },
+                            },
+                            {
+                                "name": "bdg_get_inep_mec_extra_features",
+                                "description": "Get normalized Gold INEP/MEC Extra human-capital ecosystem score, SAEB proficiency, FUNDEB transfers, and CNPq R&D tier.",
+                                "inputSchema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "id_municipio_or_name": {"type": "string", "description": "7-digit IBGE municipality code or municipality name"},
+                                    },
+                                    "required": ["id_municipio_or_name"],
+                                },
+                            },
+                            {
+                                "name": "bdg_list_top_inep_mec_extra_municipalities",
+                                "description": "List Brazilian municipalities ranked by INEP/MEC human-capital ecosystem score or annual FUNDEB transfers (R$ mil).",
+                                "inputSchema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "limit": {"type": "integer", "description": "Maximum rows (default: 10)"},
+                                        "sigla_uf": {"type": "string", "description": "Optional 2-letter state filter (e.g. SP)"},
+                                        "sort_by_fundeb": {"type": "boolean", "description": "Set true to rank municipalities by highest annual FUNDEB transfers first"},
+                                    },
+                                },
+                            },
+                            {
                                 "name": "bdg_get_terrabrasilis_prodes_deforestation",
                                 "description": "Get official municipal INPE TerraBrasilis PRODES annual deforestation increment, accumulated deforestation, and remaining forest cover.",
                                 "inputSchema": {
@@ -7137,6 +7182,69 @@ class MCPDispatcher:
                     },
                 }
             wrapped = wrap_untrusted_gov_data(result, source_id="capes_sucupira")
+            return {
+                "jsonrpc": "2.0",
+                "id": req_id,
+                "result": {"content": [{"type": "text", "text": wrapped}], "isError": False},
+            }
+
+        if tool_name in {
+            "bdg_get_inep_saeb_proficiency",
+            "bdg_get_mec_prouni_sisu_access",
+            "bdg_get_inep_mec_extra_features",
+            "bdg_list_top_inep_mec_extra_municipalities",
+        }:
+            from public_data_gateway.connectors.educacao.inep_mec_extra import (
+                InepMecExtraConnector,
+            )
+
+            connector = InepMecExtraConnector(settings=self.settings)
+            try:
+                if tool_name == "bdg_get_inep_saeb_proficiency":
+                    result: Any = connector.get_inep_saeb_proficiency(
+                        str(args.get("termo", ""))
+                    )
+                elif tool_name == "bdg_get_mec_prouni_sisu_access":
+                    result = connector.get_mec_prouni_sisu_access(
+                        str(args.get("termo", ""))
+                    )
+                elif tool_name == "bdg_get_inep_mec_extra_features":
+                    result = connector.get_inep_mec_extra_features(
+                        str(args.get("id_municipio_or_name", ""))
+                    )
+                else:
+                    result = connector.list_top_inep_mec_extra_municipalities(
+                        limit=int(args.get("limit", 10)),
+                        sigla_uf=args.get("sigla_uf"),
+                        sort_by_fundeb=bool(args.get("sort_by_fundeb", False)),
+                    )
+            except (ValueError, KeyError) as exc:
+                return {
+                    "jsonrpc": "2.0",
+                    "id": req_id,
+                    "result": {
+                        "content": [
+                            {"type": "text", "text": f"INEP/MEC Extra parameter error: {exc}"}
+                        ],
+                        "isError": True,
+                    },
+                }
+
+            if not result:
+                return {
+                    "jsonrpc": "2.0",
+                    "id": req_id,
+                    "result": {
+                        "content": [
+                            {
+                                "type": "text",
+                                "text": "No INEP/MEC Extra education data found for the query.",
+                            }
+                        ],
+                        "isError": True,
+                    },
+                }
+            wrapped = wrap_untrusted_gov_data(result, source_id="inep_mec_extra")
             return {
                 "jsonrpc": "2.0",
                 "id": req_id,
