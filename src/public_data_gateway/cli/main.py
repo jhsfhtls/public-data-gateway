@@ -1665,6 +1665,36 @@ def build_parser() -> argparse.ArgumentParser:
     des_rk_p.add_argument("--prejuizos", action="store_true", help="Sort descending by accumulated economic damages (R$ mil)")
     des_rk_p.add_argument("--json", action="store_true", help="Output in JSON format")
 
+    # MME / ONS Energia (Sistema Interligado Nacional & Segurança Energética) command group
+    se_p = subparsers.add_parser("sistema-eletrico", help="Query MME/ONS National Interconnected System generation, load balance, grid security, and rankings.")
+    se_sub = se_p.add_subparsers(dest="sistema_eletrico_action", required=True)
+
+    se_ger_p = se_sub.add_parser("geracao", help="Lookup SIN power plants by ONS code, CEG, source, subsystem, IBGE, UF, or city.")
+    se_ger_p.add_argument("termo", help="ONS code, CEG code, generation source, subsystem, IBGE, UF, or city")
+    se_ger_p.add_argument("--json", action="store_true", help="Output in JSON format")
+
+    se_bal_p = se_sub.add_parser("balanco", help="Lookup ONS subsystem load balance, stored energy EAR (%), and CMO.")
+    se_bal_p.add_argument("termo", help="Balance code, subsystem, IBGE, UF, or municipality name")
+    se_bal_p.add_argument("--json", action="store_true", help="Output in JSON format")
+
+    se_red_p = se_sub.add_parser("rede", help="Get municipal MME/ONS high-voltage substations, DEC continuity, and SIN availability.")
+    se_red_p.add_argument("id_municipio_or_name", help="7-digit IBGE code or municipality name")
+    se_red_p.add_argument("--json", action="store_true", help="Output in JSON format")
+
+    se_mun_p = se_sub.add_parser("municipio", help="Get consolidated municipal SIN installed MW, renewable share, and energy load.")
+    se_mun_p.add_argument("id_municipio_or_name", help="7-digit IBGE code or municipality name")
+    se_mun_p.add_argument("--json", action="store_true", help="Output in JSON format")
+
+    se_ft_p = se_sub.add_parser("features", help="Get Gold MME/ONS energy security score and SIN dispatch tier.")
+    se_ft_p.add_argument("id_municipio_or_name", help="7-digit IBGE code or municipality name")
+    se_ft_p.add_argument("--json", action="store_true", help="Output in JSON format")
+
+    se_rk_p = se_sub.add_parser("ranking", help="List municipalities ranked by MME/ONS energy security score or renewable share.")
+    se_rk_p.add_argument("--limit", type=int, default=10, help="Max municipalities to list")
+    se_rk_p.add_argument("--uf", type=str, help="Optional 2-letter state filter")
+    se_rk_p.add_argument("--renovavel", action="store_true", help="Sort descending by renewable generation share (%)")
+    se_rk_p.add_argument("--json", action="store_true", help="Output in JSON format")
+
     # Datalake Público Federado (DuckDB / BigQuery) command group
     bd_p = subparsers.add_parser("datalake", help="Query Federated Public Datalake (DuckDB / BigQuery) coverage, thematic datasets, governance, SQL efficiency, and rankings.")
     bd_sub = bd_p.add_subparsers(dest="datalake_action", required=True)
@@ -5911,6 +5941,84 @@ def main(argv: Sequence[str] | None = None) -> int:
                     return 0
             except (ValueError, KeyError) as exc:
                 print(f"Erro SEDEC Desastres: {exc}", file=sys.stderr)
+                return 1
+
+        elif args.command == "sistema-eletrico":
+            from public_data_gateway.connectors.ambiental.mme_ons_energia import (
+                MmeOnsEnergiaConnector,
+            )
+
+            se_conn = MmeOnsEnergiaConnector()
+            se_action = getattr(args, "sistema_eletrico_action", "")
+            try:
+                if se_action == "geracao":
+                    rows = se_conn.get_ons_generation_capacity(args.termo)
+                    if getattr(args, "json", False):
+                        print(json.dumps(rows, indent=2, ensure_ascii=False, default=str))
+                    else:
+                        print(f"ONS Capacidade Geração SIN ({len(rows)}):")
+                        for r in rows:
+                            print(f"  {r.get('cod_usina_ons')} | {r.get('nome_municipio')} ({r.get('sigla_uf')}): {r.get('fonte_geracao_sin')} | {r.get('capacidade_instalada_mw')} MW")
+                    return 0
+
+                if se_action == "balanco":
+                    rows = se_conn.get_ons_load_balance(args.termo)
+                    if getattr(args, "json", False):
+                        print(json.dumps(rows, indent=2, ensure_ascii=False, default=str))
+                    else:
+                        print(f"ONS Balanço Carga & EAR ({len(rows)}):")
+                        for r in rows:
+                            print(f"  {r.get('cod_balanco_ons')} | {r.get('nome_municipio')} ({r.get('sigla_uf')}): Carga {r.get('carga_energia_mwmed')} MWmed | EAR {r.get('ear_energia_armazenada_pct')}%")
+                    return 0
+
+                if se_action == "rede":
+                    res = se_conn.get_mme_grid_security(args.id_municipio_or_name)
+                    if res is None:
+                        print(f"Rede elétrica MME/ONS não encontrada para: {args.id_municipio_or_name}", file=sys.stderr)
+                        return 1
+                    if getattr(args, "json", False):
+                        print(json.dumps(res, indent=2, ensure_ascii=False, default=str))
+                    else:
+                        print(f"MME/ONS Rede ({res.get('nome_municipio')} - {res.get('sigla_uf')}): Subestações {res.get('subestacoes_alta_tensao')} | Disp {res.get('disponibilidade_rede_sin_pct')}%")
+                    return 0
+
+                if se_action == "municipio":
+                    res = se_conn.get_ons_municipal_summary(args.id_municipio_or_name)
+                    if res is None:
+                        print(f"Resumo ONS não encontrado para: {args.id_municipio_or_name}", file=sys.stderr)
+                        return 1
+                    if getattr(args, "json", False):
+                        print(json.dumps(res, indent=2, ensure_ascii=False, default=str))
+                    else:
+                        print(f"ONS Energia Município ({res.get('nome_municipio')} - {res.get('sigla_uf')}): Pot {res.get('potencia_instalada_sin_mw')} MW | Renov {res.get('geracao_renovavel_sin_pct')}%")
+                    return 0
+
+                if se_action == "features":
+                    res = se_conn.get_ons_features(args.id_municipio_or_name)
+                    if res is None:
+                        print(f"Features MME/ONS não encontradas para: {args.id_municipio_or_name}", file=sys.stderr)
+                        return 1
+                    if getattr(args, "json", False):
+                        print(json.dumps(res, indent=2, ensure_ascii=False, default=str))
+                    else:
+                        print(f"MME/ONS Energia Gold ({res.get('nome_municipio')} - {res.get('id_municipio')}): Score {res.get('score_seguranca_energetica_ons')} | {res.get('tier_seguranca_energetica_sin')}")
+                    return 0
+
+                if se_action == "ranking":
+                    ranks = se_conn.list_top_ons_energy_municipalities(
+                        limit=getattr(args, "limit", 10),
+                        sigla_uf=getattr(args, "uf", None),
+                        sort_by_renewable=getattr(args, "renovavel", False),
+                    )
+                    if getattr(args, "json", False):
+                        print(json.dumps(ranks, indent=2, ensure_ascii=False, default=str))
+                    else:
+                        print(f"Ranking MME/ONS Segurança Energética ({len(ranks)}):")
+                        for idx, r in enumerate(ranks, 1):
+                            print(f"  {idx}. {r.get('nome_municipio')} ({r.get('sigla_uf')}): {r.get('score_seguranca_energetica_ons')} | {r.get('tier_seguranca_energetica_sin')}")
+                    return 0
+            except (ValueError, KeyError) as exc:
+                print(f"Erro MME/ONS Energia: {exc}", file=sys.stderr)
                 return 1
 
         elif args.command == "datalake":

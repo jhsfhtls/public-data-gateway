@@ -857,3 +857,64 @@ models:
       - name: tier_vulnerabilidade_climatica_s2id
         description: "Classificação de risco municipal S2ID/CEMADEN (BAIXA_VULNERABILIDADE_DESASTRES, RISCO_HIDROCLIMATICO_MODERADO ou ALTA_RECORRENCIA_CALAMIDADES)."
         tests: [not_null]
+
+  - name: mart_seguranca_energetica_ons_brasil
+    description: "Data Mart Gold municipal consolidando capacidade instalada no Sistema Interligado Nacional (ONS/MME), geração renovável, EAR, CMO e score de segurança energética."
+    columns:
+      - name: id_municipio
+        description: "Código IBGE de 7 dígitos do município (STRING)."
+        tests: [not_null, unique]
+      - name: sigla_uf
+        description: "Sigla da Unidade da Federação (UF)."
+        tests: [not_null]
+      - name: nome_municipio
+        description: "Nome oficial do município."
+        tests: [not_null]
+      - name: regiao
+        description: "Macrorregião geográfica brasileira."
+        tests: [not_null]
+      - name: subsistema_sin
+        description: "Subsistema geoelétrico do Sistema Interligado Nacional."
+        tests: [not_null]
+      - name: potencia_instalada_sin_mw
+        description: "Potência total instalada sincronizada no SIN vinculada ao município (MW)."
+        tests: [not_null]
+      - name: geracao_renovavel_sin_pct
+        description: "Percentual de fontes renováveis na geração verificada do município (%)."
+        tests: [not_null]
+      - name: carga_energia_mwmed
+        description: "Demanda média de carga elétrica em MWmed."
+        tests: [not_null]
+      - name: fator_capacidade_renovavel_pct
+        description: "Fator médio de capacidade das usinas renováveis (%)."
+        tests: [not_null]
+      - name: qtd_complexos_geracao_ons
+        description: "Quantidade de complexos geradores consolidados na camada Silver ONS."
+        tests: [not_null]
+      - name: geracao_verificada_total_mwmed
+        description: "Geração elétrica média verificada total nos complexos do município (MWmed)."
+        tests: [not_null]
+      - name: ear_energia_armazenada_pct
+        description: "Percentual de Energia Armazenada (EAR) nos reservatórios do subsistema (%)."
+        tests: [not_null]
+      - name: cmo_medio_brl_mwh
+        description: "Custo Marginal de Operação médio do subsistema (BRL/MWh)."
+        tests: [not_null]
+      - name: subestacoes_alta_tensao
+        description: "Quantidade de subestações de alta tensão atendendo o município."
+        tests: [not_null]
+      - name: linhas_transmissao_km
+        description: "Extensão da malha de linhas de transmissão vinculadas ao polo regional (km)."
+        tests: [not_null]
+      - name: indice_continuidade_dec_horas
+        description: "Duração Equivalente de Interrupção por Unidade Consumidora (DEC em horas/ano)."
+        tests: [not_null]
+      - name: disponibilidade_rede_sin_pct
+        description: "Disponibilidade operacional média da rede de transmissão SIN (%)."
+        tests: [not_null]
+      - name: score_seguranca_energetica_ons
+        description: "Score sintético municipal de segurança energética, renováveis e resiliência elétrica no SIN (0-100)."
+        tests: [not_null]
+      - name: tier_seguranca_energetica_sin
+        description: "Classificação municipal SIN (ALTA_SEGURANCA_ENERGETICA_SIN, SISTEMA_INTERLIGADO_ESTAVEL ou VULNERABILIDADE_DESPACHO_ENERGETICO)."
+        tests: [not_null]

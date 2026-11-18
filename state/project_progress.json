@@ -1,6 +1,6 @@
 {
   "schema_version": "1.0.0",
-  "last_updated": "2026-11-18T11:20:00.000000",
+  "last_updated": "2026-11-18T11:50:00.000000",
   "project_name": "public-data-gateway",
   "architecture": "Hexagonal Medallion Lakehouse (Bronze -> Silver -> Gold / Feature Store)",
   "governance_standards": [
@@ -15,7 +15,7 @@
   "current_macro_phase": "Fase 11.5 - Expansão Completa de Fontes Públicas (Ondas 11.5A a 11.5E — Padrão 11-Gates)",
   "overall_status": "ON_TRACK",
   "active_connector": null,
-  "next_connector": "mme_ons_energia",
+  "next_connector": "mps_inss_beneficios",
   "structural_phases": [
     {
       "phase_id": "00",
@@ -252,74 +252,74 @@
     }
   ],
   "active_connector_gates": {
-    "target_connector": "prf_acidentes",
+    "target_connector": "mme_ons_energia",
     "target_wave": "11.5C",
     "gates": [
       {
         "gate_id": "GATE_01",
         "name": "Contrato Declarativo ODCS v3.1 das N Tabelas da API",
         "status": "PASSED",
-        "criteria": "Schema tipado, chaves primarias STRING (cod_sinistro_prf, cod_corredor_prf, id_municipio 7D, sigla_uf) e regras semanticas para Sinistros PRF BRs, Corredores Logisticos, Causas/Alcoolemia e Resumo Municipal."
+        "criteria": "Schema tipado, chaves primarias STRING (cod_usina_ons, cod_balanco_ons, id_municipio 7D, sigla_uf) e regras semanticas para Capacidade Geracao SIN, Balanco Carga/EAR/CMO, Rede Basica MME e Resumo Municipal."
       },
       {
         "gate_id": "GATE_02",
         "name": "Ingestao Bronze Isolada (Todas as Tabelas) & Cache WAL",
         "status": "PASSED",
-        "criteria": "Ingestao resiliente dos portais oficiais PRF Dados Abertos (gov.br/prf) em data/prf_acidentes/bronze/ com registro de linhagem SHA-256."
+        "criteria": "Ingestao resiliente da API CKAN oficial do ONS (dados.ons.org.br) e Portal MME (gov.br/mme) em data/mme_ons_energia/bronze/ com registro de linhagem SHA-256."
       },
       {
         "gate_id": "GATE_03",
         "name": "Sanitizacao de Sentinelas & Nulls",
         "status": "PASSED",
-        "criteria": "Conversao deterministica de sentinelas em NULLs reais e normalizacao de rodovias federais (BR-116, BR-040, BR-101), gravidade e taxas de letalidade (%)."
+        "criteria": "Conversao deterministica de sentinelas em NULLs reais e normalizacao de subsistemas SIN (SUDESTE_CENTRO_OESTE, SUL, NORDESTE, NORTE), fontes renovaveis e Custo Marginal de Operacao."
       },
       {
         "gate_id": "GATE_04",
         "name": "Materializacao Silver Parquet Isolada (Todas as Tabelas)",
         "status": "PASSED",
-        "criteria": "Gravacao ZSTD em data/prf_acidentes/silver/ (prf_sinistros_rodovias_br, prf_corredores_logisticos_trechos, prf_perfil_causas_condicoes, prf_sinistralidade_resumo_municipal)."
+        "criteria": "Gravacao ZSTD em data/mme_ons_energia/silver/ (ons_capacidade_geracao_municipio, ons_balanco_carga_subsistema_uf, mme_intercambio_seguranca_energetica, ons_energia_resumo_municipal)."
       },
       {
         "gate_id": "GATE_05",
         "name": "Validacao dos 5 Pilares & Quarentena",
         "status": "PASSED",
-        "criteria": "Aprovacao em Freshness, Volume, Schema, Null Ceiling e Lineage com suporte a desvio para data/prf_acidentes/quarantine/."
+        "criteria": "Aprovacao em Freshness, Volume, Schema, Null Ceiling e Lineage com suporte a desvio para data/mme_ons_energia/quarantine/."
       },
       {
         "gate_id": "GATE_06",
         "name": "Gold Feature View Isolada & ASOF Join ML",
         "status": "PASSED",
-        "criteria": "Features de seguranca viaria e sinistralidade de carga pesada em data/prf_acidentes/gold/features_sinistralidade_rodoviaria_prf.parquet."
+        "criteria": "Features de seguranca energetica SIN e despacho renovavel em data/mme_ons_energia/gold/features_seguranca_energetica_ons.parquet."
       },
       {
         "gate_id": "GATE_07",
         "name": "Integracao ao EnrichmentEngine & Marts Cross-Domain",
         "status": "PASSED",
-        "criteria": "Integracao seguranca-viaria-territorio em mart_cross_domain_territorio_b2b_macro_brasil (total_sinistros_prf_uf, total_obitos_rodovias_prf_uf e avg_score_seguranca_viaria_prf_uf)."
+        "criteria": "Integracao energia-ESG em mart_cross_domain_esg_agro_infra_brasil (potencia_instalada_sin_mw, geracao_renovavel_sin_pct e score_seguranca_energetica_ons)."
       },
       {
         "gate_id": "GATE_08",
         "name": "Exposicao Multi-Interface (4 Interfaces)",
         "status": "PASSED",
-        "criteria": "Exposicao simultanea via SDK (BrazilData.geo + shortcuts), FastAPI (/api/v1/geo/rodovias-prf/*), CLI (bdg rodovias *) e MCP (bdg_*_prf_* com wrap_untrusted_gov_data)."
+        "criteria": "Exposicao simultanea via SDK (BrazilData.environment + shortcuts), FastAPI (/api/v1/environment/sistema-eletrico/*), CLI (bdg sistema-eletrico *) e MCP (bdg_*_mme_ons_* com wrap_untrusted_gov_data)."
       },
       {
         "gate_id": "GATE_09",
         "name": "Bateria de Testes Unitarios & Paridade Offline",
         "status": "PASSED",
-        "criteria": "Testes unitarios offline completos em tests/connectors/test_prf_acidentes.py cobrindo 4 tabelas Silver, Gold ML e paridade nas 4 interfaces."
+        "criteria": "Testes unitarios offline completos em tests/connectors/test_mme_ons_energia.py cobrindo 4 tabelas Silver, Gold ML e paridade nas 4 interfaces."
       },
       {
         "gate_id": "GATE_10",
         "name": "dbt Staging, Marts Intra-Domínio/Cross-Domain & 100% Colunas Documentadas",
         "status": "PASSED",
-        "criteria": "Modelos dbt com source.yml, stg_*, fct_sinistros_rodoviarios_prf_municipal, mart intra-dominio mart_sinistralidade_rodoviaria_prf_brasil e cross-domain mart_cross_domain_territorio_b2b_macro_brasil aprovados no dbt test (124/124) e lint_dbt_docs.py (100% cobertura)."
+        "criteria": "Modelos dbt com source.yml, stg_*, fct_energia_eletrica_mme_ons_municipal, mart intra-dominio mart_seguranca_energetica_ons_brasil e cross-domain mart_cross_domain_esg_agro_infra_brasil aprovados no dbt test (138/138) e lint_dbt_docs.py (100% cobertura)."
       },
       {
         "gate_id": "GATE_11",
         "name": "Teste Real de 1 Linha com API ao Vivo (Fail-Hard)",
         "status": "PASSED",
-        "criteria": "Execucao obrigatoria contra portais oficiais PRF Dados Abertos e Dados Abertos Acidentes (gov.br/prf) validando HTTP 200; falha reprova o pipeline."
+        "criteria": "Execucao obrigatoria contra API CKAN dados.ons.org.br e portal gov.br/mme validando HTTP 200; falha reprova o pipeline."
       }
     ]
   },
@@ -798,6 +798,12 @@
       "phase_id": "11.5",
       "milestone": "Wave 11.5C (4/6) — Homologação do Conector prf_acidentes (4 Tabelas Silver PRF BRs/Corredores, Mart Intra-Domínio, Mart Cross-Domain Território & Paridade 4 Interfaces)",
       "summary": "Implementação completa nos 11 Gates do conector prf_acidentes (Polícia Rodoviária Federal Dados Abertos): contrato ODCS v3.1, ingestão Bronze + 4 tabelas Silver ZSTD (prf_sinistros_rodovias_br, prf_corredores_logisticos_trechos, prf_perfil_causas_condicoes, prf_sinistralidade_resumo_municipal) + Gold ML (features_sinistralidade_rodoviaria_prf), 4 staging views + fct_sinistros_rodoviarios_prf_municipal + mart intra-domínio mart_sinistralidade_rodoviaria_prf_brasil + enriquecimento da mart cross-domain mart_cross_domain_territorio_b2b_macro_brasil (124 testes dbt OK, 100% colunas documentadas no lint_dbt_docs.py com 596 modelos / 8.141 colunas), paridade em SDK/FastAPI/CLI/MCP, bateria offline e teste live fail-hard contra gov.br/prf Dados Abertos."
+    },
+    {
+      "date": "2026-11-18",
+      "phase_id": "11.5",
+      "milestone": "Wave 11.5C (5/6) — Homologação do Conector mme_ons_energia (4 Tabelas Silver SIN/ONS, Mart Intra-Domínio, Mart Cross-Domain ESG & Paridade 4 Interfaces)",
+      "summary": "Implementação completa nos 11 Gates do conector mme_ons_energia (ONS / MME Sistema Interligado Nacional): contrato ODCS v3.1, ingestão Bronze + 4 tabelas Silver ZSTD (ons_capacidade_geracao_municipio, ons_balanco_carga_subsistema_uf, mme_intercambio_seguranca_energetica, ons_energia_resumo_municipal) + Gold ML (features_seguranca_energetica_ons), 4 staging views + fct_energia_eletrica_mme_ons_municipal + mart intra-domínio mart_seguranca_energetica_ons_brasil + enriquecimento da mart cross-domain mart_cross_domain_esg_agro_infra_brasil (138 testes dbt OK, 100% colunas documentadas no lint_dbt_docs.py com 602 modelos / 8.216 colunas), paridade em SDK/FastAPI/CLI/MCP, bateria offline e teste live fail-hard contra API CKAN dados.ons.org.br e gov.br/mme."
     }
   ]
 }

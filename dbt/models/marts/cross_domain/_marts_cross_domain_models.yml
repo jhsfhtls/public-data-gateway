@@ -302,6 +302,15 @@ models:
       - name: score_resiliencia_desastres_sedec
         description: "Score municipal de resiliência climática frente a desastres e calamidades SEDEC/CEMADEN (0-100)."
         tests: [not_null]
+      - name: potencia_instalada_sin_mw
+        description: "Potência instalada conectada ao Sistema Interligado Nacional ONS/MME no município (MW)."
+        tests: [not_null]
+      - name: geracao_renovavel_sin_pct
+        description: "Participação percentual de geração elétrica renovável verificada no SIN (%)."
+        tests: [not_null]
+      - name: score_seguranca_energetica_ons
+        description: "Score municipal de segurança energética e despacho renovável MME/ONS no SIN (0-100)."
+        tests: [not_null]
       - name: reference_date
         description: "Data de referência ISO-8601 (YYYY-MM-DD)."
         tests: [not_null]
