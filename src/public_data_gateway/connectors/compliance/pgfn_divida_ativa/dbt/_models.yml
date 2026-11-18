@@ -1,0 +1,187 @@
+version: 2
+
+models:
+  - name: stg_pgfn_inscricoes_gerais
+    description: "Staging view de inscrições em Dívida Ativa Geral/Tributária da PGFN"
+    columns:
+      - name: numero_inscricao
+        description: "Número identificador único da inscrição PGFN"
+        tests: [not_null, unique]
+      - name: documento_devedor
+        description: "CNPJ de 14 dígitos ou CPF mascarado (LGPD)"
+        tests: [not_null]
+      - name: tipo_pessoa
+        description: "Natureza do contribuinte (Pessoa jurídica ou Pessoa física)"
+        tests: [not_null]
+      - name: nome_devedor
+        description: "Razão social ou nome público do contribuinte devedor"
+        tests: [not_null]
+      - name: id_municipio
+        description: "Código IBGE canônico de 7 dígitos do município"
+        tests: [not_null]
+      - name: sigla_uf
+        description: "Sigla de 2 letras da Unidade da Federação"
+        tests: [not_null]
+      - name: unidade_responsavel
+        description: "Unidade da PGFN responsável pela cobrança"
+        tests: [not_null]
+      - name: situacao_inscricao
+        description: "Situação processual da inscrição PGFN"
+        tests: [not_null]
+      - name: indicador_ajuizado
+        description: "Flag booleano de execução fiscal ajuizada"
+        tests: [not_null]
+      - name: valor_consolidado_brl
+        description: "Valor consolidado do crédito inscrito em BRL"
+        tests: [not_null]
+      - name: ano_trimestre_ref
+        description: "Trimestre de referência da carga PGFN"
+        tests: [not_null]
+
+  - name: stg_pgfn_divida_previdenciaria
+    description: "Staging view de débitos previdenciários (INSS/RFB) inscritos na PGFN"
+    columns:
+      - name: numero_inscricao
+        description: "Número identificador único da inscrição previdenciária"
+        tests: [not_null, unique]
+      - name: documento_devedor
+        description: "CNPJ 14D ou CPF mascarado do contribuinte"
+        tests: [not_null]
+      - name: nome_devedor
+        description: "Razão social ou nome do devedor"
+        tests: [not_null]
+      - name: id_municipio
+        description: "Código IBGE canônico de 7 dígitos do município"
+        tests: [not_null]
+      - name: sigla_uf
+        description: "Sigla da Unidade da Federação"
+        tests: [not_null]
+      - name: situacao_inscricao
+        description: "Situação cadastral da inscrição previdenciária"
+        tests: [not_null]
+      - name: indicador_ajuizado
+        description: "Flag de execução judicial ajuizada"
+        tests: [not_null]
+      - name: valor_consolidado_brl
+        description: "Valor consolidado da inscrição previdenciária em BRL"
+        tests: [not_null]
+      - name: ano_trimestre_ref
+        description: "Trimestre de referência da carga"
+        tests: [not_null]
+
+  - name: stg_pgfn_divida_fgts
+    description: "Staging view de débitos de FGTS inscritos em Dívida Ativa (PGFN/Caixa)"
+    columns:
+      - name: numero_inscricao
+        description: "Número identificador único da inscrição FGTS"
+        tests: [not_null, unique]
+      - name: documento_devedor
+        description: "CNPJ 14D ou CPF mascarado do empregador devedor"
+        tests: [not_null]
+      - name: nome_devedor
+        description: "Razão social ou nome do empregador"
+        tests: [not_null]
+      - name: id_municipio
+        description: "Código IBGE canônico de 7 dígitos do município"
+        tests: [not_null]
+      - name: sigla_uf
+        description: "Sigla da Unidade da Federação"
+        tests: [not_null]
+      - name: situacao_inscricao
+        description: "Situação processual do débito de FGTS"
+        tests: [not_null]
+      - name: indicador_ajuizado
+        description: "Flag booleano de execução fiscal ajuizada"
+        tests: [not_null]
+      - name: valor_consolidado_brl
+        description: "Valor consolidado do débito FGTS em BRL"
+        tests: [not_null]
+      - name: ano_trimestre_ref
+        description: "Trimestre de referência da carga PGFN"
+        tests: [not_null]
+
+  - name: stg_pgfn_resumo_municipal
+    description: "Staging view de consolidado municipal de Dívida Ativa PGFN"
+    columns:
+      - name: id_municipio
+        description: "Código IBGE canônico de 7 dígitos do município"
+        tests: [not_null, unique]
+      - name: sigla_uf
+        description: "Sigla da Unidade da Federação"
+        tests: [not_null]
+      - name: nome_municipio
+        description: "Nome oficial do município"
+        tests: [not_null]
+      - name: ano_trimestre_ref
+        description: "Competência trimestral consolidada"
+        tests: [not_null]
+      - name: total_inscricoes_ativas
+        description: "Total de inscrições ativas monitoradas no município"
+        tests: [not_null]
+      - name: total_devedores_pj
+        description: "Quantidade de empresas (PJ) inscritas no recorte"
+        tests: [not_null]
+      - name: valor_total_geral_brl
+        description: "Estoque de Dívida Ativa não-previdenciária (geral) em BRL"
+        tests: [not_null]
+      - name: valor_total_previdenciario_brl
+        description: "Estoque de Dívida Ativa previdenciária em BRL"
+        tests: [not_null]
+      - name: valor_total_fgts_brl
+        description: "Estoque de Dívida Ativa de FGTS em BRL"
+        tests: [not_null]
+      - name: valor_total_consolidado_brl
+        description: "Soma total do estoque de Dívida Ativa PGFN no município em BRL"
+        tests: [not_null]
+      - name: taxa_ajuizamento_pct
+        description: "Percentual de inscrições com execução fiscal ajuizada (%)"
+        tests: [not_null]
+
+  - name: fct_divida_ativa_pgfn_municipal
+    description: "Tabela fato consolidada de Dívida Ativa da União, Previdenciária e FGTS da PGFN por município"
+    columns:
+      - name: id_municipio
+        description: "Código IBGE canônico de 7 dígitos do município"
+        tests: [not_null, unique]
+      - name: sigla_uf
+        description: "Sigla de 2 letras da Unidade da Federação"
+        tests: [not_null]
+      - name: nome_municipio
+        description: "Nome oficial do município"
+        tests: [not_null]
+      - name: ano_trimestre_ref
+        description: "Competência trimestral PGFN"
+        tests: [not_null]
+      - name: total_inscricoes_ativas
+        description: "Total de inscrições ativas em DAU e FGTS"
+        tests: [not_null]
+      - name: total_devedores_pj
+        description: "Quantidade de CNPJs devedores no recorte municipal"
+        tests: [not_null]
+      - name: valor_total_geral_brl
+        description: "Valor total de débitos gerais não-previdenciários em BRL"
+        tests: [not_null]
+      - name: valor_total_previdenciario_brl
+        description: "Valor total de débitos previdenciários em BRL"
+        tests: [not_null]
+      - name: valor_total_fgts_brl
+        description: "Valor total de débitos de FGTS em BRL"
+        tests: [not_null]
+      - name: valor_total_consolidado_brl
+        description: "Estoque financeiro total consolidado em Dívida Ativa no município (BRL)"
+        tests: [not_null]
+      - name: taxa_ajuizamento_pct
+        description: "Taxa de inscrições sob cobrança judicial ajuizada (%)"
+        tests: [not_null]
+      - name: qtd_inscricoes_gerais_amostra
+        description: "Quantidade de registros detalhados de Dívida Geral na camada Silver"
+        tests: [not_null]
+      - name: qtd_inscricoes_prev_amostra
+        description: "Quantidade de registros detalhados de Dívida Previdenciária na camada Silver"
+        tests: [not_null]
+      - name: qtd_inscricoes_fgts_amostra
+        description: "Quantidade de registros detalhados de Dívida FGTS na camada Silver"
+        tests: [not_null]
+      - name: soma_auditada_amostra_brl
+        description: "Reconciliação financeira auditada entre as 3 tabelas detalhadas da PGFN em BRL"
+        tests: [not_null]

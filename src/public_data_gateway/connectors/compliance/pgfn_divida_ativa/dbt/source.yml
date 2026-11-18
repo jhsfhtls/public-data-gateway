@@ -1,0 +1,26 @@
+version: 2
+
+sources:
+  - name: pgfn_divida_ativa
+    description: "Tabelas Silver da PGFN (Dívida Ativa Geral, Previdenciária, FGTS e Resumo Municipal)"
+    meta:
+      agency: "Procuradoria-Geral da Fazenda Nacional (PGFN)"
+      domain: "compliance"
+      freshness_sla: "Trimestral (2160h)"
+    tables:
+      - name: pgfn_inscricoes_gerais
+        description: "Inscrições em Dívida Ativa Não-Previdenciária (Geral/Tributária)"
+        meta:
+          external_location: "data/pgfn_divida_ativa/silver/pgfn_inscricoes_gerais.parquet"
+      - name: pgfn_divida_previdenciaria
+        description: "Inscrições de débitos previdenciários (INSS/RFB) em Dívida Ativa da União"
+        meta:
+          external_location: "data/pgfn_divida_ativa/silver/pgfn_divida_previdenciaria.parquet"
+      - name: pgfn_divida_fgts
+        description: "Inscrições de débitos de FGTS administrados pela PGFN/Caixa"
+        meta:
+          external_location: "data/pgfn_divida_ativa/silver/pgfn_divida_fgts.parquet"
+      - name: pgfn_resumo_municipal
+        description: "Consolidado municipal do estoque de Dívida Ativa PGFN"
+        meta:
+          external_location: "data/pgfn_divida_ativa/silver/pgfn_resumo_municipal.parquet"

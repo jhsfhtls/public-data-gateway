@@ -54,6 +54,14 @@ bgp_summary AS (
 b2b_summary AS (
     SELECT COUNT(*) AS total_perfis_b2b
     FROM {{ ref('dim_company_enrich_perfis_b2b') }}
+),
+pgfn_uf AS (
+    SELECT
+        sigla_uf,
+        SUM(total_inscricoes_ativas) AS total_inscricoes_pgfn_uf,
+        ROUND(SUM(valor_total_consolidado_brl), 2) AS valor_divida_ativa_pgfn_uf_brl
+    FROM {{ ref('mart_divida_ativa_pgfn_brasil') }}
+    GROUP BY sigla_uf
 )
 SELECT
     u.sigla_uf,
@@ -69,7 +77,9 @@ SELECT
     rd.total_rdap_dominios_br,
     gl.total_gleif_entidades,
     bg.total_bgp_ips_monitorados,
-    b2.total_perfis_b2b
+    b2.total_perfis_b2b,
+    COALESCE(pg.total_inscricoes_pgfn_uf, 0) AS total_inscricoes_pgfn_uf,
+    COALESCE(pg.valor_divida_ativa_pgfn_uf_brl, 0.0) AS valor_divida_ativa_pgfn_uf_brl
 FROM uf_base u
 LEFT JOIN cnpj_minha_receita mr ON u.sigla_uf = mr.sigla_uf
 LEFT JOIN cnpj_cnpja cn ON u.sigla_uf = cn.sigla_uf
@@ -77,6 +87,7 @@ LEFT JOIN cnpj_receitaws rw ON u.sigla_uf = rw.sigla_uf
 LEFT JOIN cep_viacep vc ON u.sigla_uf = vc.sigla_uf
 LEFT JOIN cep_opencep oc ON u.sigla_uf = oc.sigla_uf
 LEFT JOIN geo_nominatim nm ON u.sigla_uf = nm.sigla_uf
+LEFT JOIN pgfn_uf pg ON u.sigla_uf = pg.sigla_uf
 CROSS JOIN rdap_summary rd
 CROSS JOIN gleif_summary gl
 CROSS JOIN bgp_summary bg

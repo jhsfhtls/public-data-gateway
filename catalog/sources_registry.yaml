@@ -1391,3 +1391,37 @@ sources:
   status: HOMOLOGATED
   freshness_sla_hours: 720
   cron_schedule_expression: 0 4 10 * *
+- source_id: pgfn_divida_ativa
+  name: 'PGFN: Créditos Inscritos em Dívida Ativa da União e do FGTS (Dados Abertos)'
+  agency: Procuradoria-Geral da Fazenda Nacional (PGFN / Ministério da Fazenda)
+  official_url: https://dadosabertos.pgfn.gov.br/
+  segment_id: 08_judicial_compliance
+  segment_name: Judicial, Integridade & Compliance
+  access_mode: LAKEHOUSE_BATCH
+  protocol: HTTP_BULK_ZIP
+  auth_type: NONE
+  canonical_keys:
+  - cnpj_14
+  - cpf_masked
+  - id_municipio
+  - sigla_uf
+  update_frequency: Trimestral
+  estimated_volume: ~12 milhões de inscrições ativas (~4 GB ZIP CSV)
+  lgpd_tier: PUBLIC_CORPORATE_QSA
+  ml_feature_domains:
+  - tax_debt_default_risk
+  - fgts_previdenciario_delinquency
+  - judicial_execution_ajuizamento
+  solution_packs:
+  - P01
+  - P02
+  - P04
+  - P06
+  - P07
+  - P08
+  - P10
+  rice_score: 920
+  roadmap_wave: 2
+  status: HOMOLOGATED
+  freshness_sla_hours: 2160
+  cron_schedule_expression: 0 3 15 */3 *

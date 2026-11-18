@@ -108,3 +108,60 @@ models:
         description: "Quantidade distinta de titulares com mandato ou carência regulatória ativa."
         tests:
           - not_null
+
+  - name: mart_divida_ativa_pgfn_brasil
+    description: "Datamart intra-domínio de compliance fiscal consolidando créditos inscritos em Dívida Ativa da União (Geral, Previdenciária e FGTS), taxa de ajuizamento judicial e risco de inadimplência PGFN por município."
+    columns:
+      - name: id_municipio
+        description: "Código IBGE canônico de 7 dígitos do município"
+        tests:
+          - not_null
+          - unique
+      - name: sigla_uf
+        description: "Sigla de 2 letras da Unidade da Federação"
+        tests:
+          - not_null
+      - name: nome_municipio
+        description: "Nome oficial do município"
+        tests:
+          - not_null
+      - name: ano_trimestre_ref
+        description: "Competência trimestral de referência da base aberta PGFN"
+        tests:
+          - not_null
+      - name: total_inscricoes_ativas
+        description: "Quantidade consolidada de inscrições ativas em DAU e FGTS"
+        tests:
+          - not_null
+      - name: total_devedores_pj
+        description: "Total de pessoas jurídicas devedoras no estrato municipal"
+        tests:
+          - not_null
+      - name: valor_total_geral_brl
+        description: "Estoque financeiro de débitos gerais não-previdenciários em BRL"
+        tests:
+          - not_null
+      - name: valor_total_previdenciario_brl
+        description: "Estoque financeiro de débitos previdenciários INSS/RFB em BRL"
+        tests:
+          - not_null
+      - name: valor_total_fgts_brl
+        description: "Estoque financeiro de débitos de FGTS em BRL"
+        tests:
+          - not_null
+      - name: valor_total_consolidado_brl
+        description: "Estoque total consolidado inscrito em Dívida Ativa no município em BRL"
+        tests:
+          - not_null
+      - name: taxa_ajuizamento_pct
+        description: "Percentual de créditos sob execução fiscal judicial ajuizada (%)"
+        tests:
+          - not_null
+      - name: score_risco_inadimplencia_fiscal
+        description: "Score contínuo de exposição e risco de inadimplência fiscal perante a PGFN (10 a 99)"
+        tests:
+          - not_null
+      - name: classificacao_risco_pgfn
+        description: "Classificação qualitativa de risco fiscal PGFN (ALTO_RISCO_EXPOSICAO_PGFN, RISCO_MODERADO_PGFN, BAIXO_RISCO_PGFN)"
+        tests:
+          - not_null

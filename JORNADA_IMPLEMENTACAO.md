@@ -1,7 +1,7 @@
 <div align="center">
   <h2>Jornada de Implementação — Public Data Gateway</h2>
   <p><i>Painel Vivo de Evolução Arquitetural, Ciclo de Vida de Conectores & Solution Packs Analíticos</i></p>
-  <p><b>Versão:</b> 1.0.0 &nbsp;|&nbsp; <b>Última Atualização:</b> 2026-11-17T21:45:00.000000 &nbsp;|&nbsp; <b>Padrões:</b> ADR-001 • ADR-002 • ADR-003 • ODCS v3.1 • LGPD</p>
+  <p><b>Versão:</b> 1.0.0 &nbsp;|&nbsp; <b>Última Atualização:</b> 2026-11-17T22:05:00.000000 &nbsp;|&nbsp; <b>Padrões:</b> ADR-001 • ADR-002 • ADR-003 • ODCS v3.1 • LGPD</p>
   <hr/>
 </div>
 <br/>
@@ -17,9 +17,9 @@ Este artefato constitui a **Fonte Única da Verdade Operacional (SSOT)** do stat
 - **Macrofase Ativa:** `Fase 11.5 - Expansão Completa de Fontes Públicas (Ondas 11.5A a 11.5E — Padrão 11-Gates)`
 - **Status Geral de Governança:** `🟢 ON_TRACK`
 - **Conector Ativo em Desenvolvimento:** `Nenhum (Transição de Fase / Waves 1..6 Concluídas)`
-- **Próxima Etapa Planejada:** `pgfn_divida_ativa`
+- **Próxima Etapa Planejada:** `cnj_improbidade`
 - **Progresso Estrutural das Macrofases:** **15 de 17 Concluídas (88.2%)**
-- **Universo de Fontes Homologadas no Catálogo:** **50 fontes públicas** nos 13 macrosegmentos
+- **Universo de Fontes Homologadas no Catálogo:** **51 fontes públicas** nos 13 macrosegmentos
 
 ```mermaid
 flowchart LR
@@ -56,21 +56,21 @@ flowchart LR
 
 ## 3. Checklist dos 9 Gates de Qualidade do Conector Ativo
 
-Todo conector integrado ao `public-data-gateway` deve percorrer rigorosamente os **9 Gates de Qualidade** antes de ser promovido a `HOMOLOGATED`. O alvo atual do ciclo de vida é o conector `stn_siconfi` (Wave 11.5A):
+Todo conector integrado ao `public-data-gateway` deve percorrer rigorosamente os **9 Gates de Qualidade** antes de ser promovido a `HOMOLOGATED`. O alvo atual do ciclo de vida é o conector `pgfn_divida_ativa` (Wave 11.5A):
 
 | Gate | Nome do Gate de Homologação | Critério Operacional de Aceite (ODCS v3.1 / ADR-001 / ADR-002) | Status |
 | :---: | :--- | :--- | :---: |
-| **GATE_01** | **Contrato Declarativo ODCS v3.1 das N Tabelas da API** | Schema tipado, chaves primarias STRING (id_municipio 7D, sigla_uf, codigo_conta) e regras semanticas para entes, extratos de entregas, DCA, RREO e RGF do SICONFI. | 🟢 APROVADO |
-| **GATE_02** | **Ingestao Bronze Isolada (Todas as Tabelas) & Cache WAL** | Ingestao resiliente da API REST apidatalake.tesouro.gov.br/ords/siconfi/tt/ em data/stn_siconfi/bronze/ com cache SQLite WAL. | 🟢 APROVADO |
-| **GATE_03** | **Sanitizacao de Sentinelas & Nulls** | Conversao deterministica de valores ausentes/sentinelas fiscais em NULLs reais e normalizacao de contas contabeis. | 🟢 APROVADO |
-| **GATE_04** | **Materializacao Silver Parquet Isolada (Todas as Tabelas)** | Gravacao de tabelas normalizadas (siconfi_entes, siconfi_dca, siconfi_rreo, siconfi_rgf, siconfi_extratos) em data/stn_siconfi/silver/ com SHA-256. | 🟢 APROVADO |
-| **GATE_05** | **Validacao dos 5 Pilares & Quarentena** | Aprovacao em Freshness, Volume, Schema, Null Ceiling e Lineage; desvio para data/stn_siconfi/quarantine/ se violado. | 🟢 APROVADO |
-| **GATE_06** | **Gold Feature View Isolada & ASOF Join ML** | Features fiscais municipais/estaduais (receita corrente liquida, despesa com pessoal %, endividamento, superavit) em data/stn_siconfi/gold/features_fiscais_siconfi.parquet. | 🟢 APROVADO |
-| **GATE_07** | **Integracao ao EnrichmentEngine & Marts Cross-Domain** | Disponibilizacao para enriquecimento fiscal municipal respeitando o Client Path Shield e integracao obrigatoria as marts cross-domain (dbt/models/marts/cross_domain/ + CrossDomainService). | 🟢 APROVADO |
-| **GATE_08** | **Exposicao Multi-Interface (4 Interfaces)** | Exposicao simultanea via SDK (BrazilData.treasury / siconfi), FastAPI (/api/v1/treasury/siconfi/*), CLI (bdg treasury siconfi *) e Servidor MCP (bdg_* com wrap_untrusted_gov_data). | 🟢 APROVADO |
-| **GATE_09** | **Bateria de Testes Unitarios & Paridade Offline** | Testes unitarios offline completos com fixtures reais cobrindo extracao, 5 Pilares, quarentena, Gold ML e paridade nas 4 interfaces. | 🟢 APROVADO |
-| **GATE_10** | **dbt Staging, Marts Intra-Domínio/Cross-Domain & 100% Colunas Documentadas** | Modelos dbt com source.yml proprio, stg_*, dim_*/fct_*, mart intra-domínio dedicada (dbt/models/marts/macrofinanceiro/mart_contabilidade_fiscal_siconfi.sql) + cruzamento em marts cross-domain, dbt test verde e 100% de colunas documentadas no lint_dbt_docs.py. | 🟢 APROVADO |
-| **GATE_11** | **Teste Real de 1 Linha com API ao Vivo (Fail-Hard)** | Execucao obrigatoria contra endpoint ao vivo apidatalake.tesouro.gov.br/ords/siconfi/tt/entes limitado a registro real; falha reprova o pipeline. | 🟢 APROVADO |
+| **GATE_01** | **Contrato Declarativo ODCS v3.1 das N Tabelas da API** | Schema tipado, chaves primarias STRING (numero_inscricao, cnpj_14/cpf_masked, id_municipio 7D, sigla_uf) e regras semanticas para DAU Geral, Previdenciaria, FGTS e Resumo Municipal PGFN. | 🟢 APROVADO |
+| **GATE_02** | **Ingestao Bronze Isolada (Todas as Tabelas) & Cache WAL** | Ingestao resiliente da base PGFN Dados Abertos (dadosabertos.pgfn.gov.br) em data/pgfn_divida_ativa/bronze/ com registro de linhagem. | 🟢 APROVADO |
+| **GATE_03** | **Sanitizacao de Sentinelas & Nulls** | Conversao deterministica de sentinelas em NULLs reais e preservacao da mascara LGPD de CPF. | 🟢 APROVADO |
+| **GATE_04** | **Materializacao Silver Parquet Isolada (Todas as Tabelas)** | Gravacao ZSTD em data/pgfn_divida_ativa/silver/ (pgfn_inscricoes_gerais, pgfn_divida_previdenciaria, pgfn_divida_fgts, pgfn_resumo_municipal). | 🟢 APROVADO |
+| **GATE_05** | **Validacao dos 5 Pilares & Quarentena** | Aprovacao em Freshness, Volume, Schema, Null Ceiling e Lineage com suporte a desvio para data/pgfn_divida_ativa/quarantine/. | 🟢 APROVADO |
+| **GATE_06** | **Gold Feature View Isolada & ASOF Join ML** | Features de risco de inadimplencia fiscal, FGTS e ajuizamento judicial em data/pgfn_divida_ativa/gold/features_risco_divida_ativa_pgfn.parquet. | 🟢 APROVADO |
+| **GATE_07** | **Integracao ao EnrichmentEngine & Marts Cross-Domain** | Integracao ao compliance corporativo respeitando o Client Path Shield e cruzamento obrigatorio em mart_cross_domain_kyc_antifraude_brasil. | 🟢 APROVADO |
+| **GATE_08** | **Exposicao Multi-Interface (4 Interfaces)** | Exposicao simultanea via SDK (BrazilData.compliance + shortcuts), FastAPI (/api/v1/compliance/pgfn/*), CLI (bdg pgfn *) e MCP (bdg_get_pgfn_* com wrap_untrusted_gov_data). | 🟢 APROVADO |
+| **GATE_09** | **Bateria de Testes Unitarios & Paridade Offline** | Testes unitarios offline completos em tests/connectors/test_pgfn_divida_ativa.py cobrindo 4 tabelas Silver, Gold ML e paridade nas 4 interfaces. | 🟢 APROVADO |
+| **GATE_10** | **dbt Staging, Marts Intra-Domínio/Cross-Domain & 100% Colunas Documentadas** | Modelos dbt com source.yml, stg_*, fct_divida_ativa_pgfn_municipal, mart intra-dominio mart_divida_ativa_pgfn_brasil e cross-domain mart_cross_domain_kyc_antifraude_brasil aprovados no dbt test (91/91) e lint_dbt_docs.py (100% cobertura). | 🟢 APROVADO |
+| **GATE_11** | **Teste Real de 1 Linha com API ao Vivo (Fail-Hard)** | Execucao obrigatoria contra repositorio oficial dadosabertos.pgfn.gov.br validando diretorios trimestrais; falha reprova o pipeline. | 🟢 APROVADO |
 
 ---
 
@@ -81,7 +81,7 @@ Estatísticas dinâmicas cruzadas diretamente com o catálogo mestre `catalog/so
 | Onda | Foco Estratégico | Total Fontes | RICE Médio | Modos Predominantes | Fontes Âncora | Status da Onda |
 | :---: | :--- | :---: | :---: | :--- | :--- | :---: |
 | **Wave 1** | APIs de Borda & Macroeconomia | 4 | 878 | `FEDERATED_API` | `ibge_localidades`, `brasilapi_core`, `bcb_sgs` (+1) | 🟢 100% Homologada |
-| **Wave 2** | B2B, Compras Públicas & Compliance | 8 | 744 | `FEDERATED_API, LAKEHOUSE_BATCH` | `rfb_cnpj_lakehouse`, `pncp_contratacoes`, `cnj_datajud` (+5) | 🟢 100% Homologada |
+| **Wave 2** | B2B, Compras Públicas & Compliance | 9 | 763 | `FEDERATED_API, LAKEHOUSE_BATCH` | `rfb_cnpj_lakehouse`, `pncp_contratacoes`, `cnj_datajud` (+6) | 🟢 100% Homologada |
 | **Wave 3** | Mercado de Capitais & Finanças Públicas | 7 | 683 | `FEDERATED_API, LAKEHOUSE_BATCH` | `cvm_dfp_itr`, `mdic_comexstat`, `cvm_fundos` (+4) | 🟢 100% Homologada |
 | **Wave 4** | Censo, Trabalho, Logística & Telecom | 10 | 553 | `FEDERATED_API, LAKEHOUSE_BATCH` | `ibge_sidra`, `ibge_pib_municipal`, `ibge_censo2022` (+7) | 🟢 100% Homologada |
 | **Wave 5** | Saúde, Educação & Setor Notarial | 14 | 451 | `FEDERATED_API, LAKEHOUSE_BATCH` | `datasus_cnes`, `datasus_sih`, `inep_censo_escolar` (+11) | 🟢 100% Homologada |
@@ -95,16 +95,16 @@ O `public-data-gateway` organiza suas fontes e marts de dados em **10 Perfis de 
 
 | Pack ID | Nome do Perfil Analítico | Status de Prontidão no Gateway | Fontes Mapeadas que Habilitam o Perfil |
 | :---: | :--- | :--- | :--- |
-| **P01** | **Modern Data Platform & Analytics (Lakehouse)** | 🟢 100% Operacional (49/49 Fontes Homologadas) | `ibge_localidades`, `brasilapi_core`, `bcb_sgs`, `bcb_olinda_ptax` *(+46 fontes)* |
-| **P02** | **IA Agêntica & Automação LLM (MCP & REST)** | 🟢 100% Operacional (49/49 Fontes Homologadas) | `ibge_localidades`, `brasilapi_core`, `bcb_sgs`, `rfb_cnpj_lakehouse` *(+23 fontes)* |
+| **P01** | **Modern Data Platform & Analytics (Lakehouse)** | 🟢 100% Operacional (49/49 Fontes Homologadas) | `ibge_localidades`, `brasilapi_core`, `bcb_sgs`, `bcb_olinda_ptax` *(+47 fontes)* |
+| **P02** | **IA Agêntica & Automação LLM (MCP & REST)** | 🟢 100% Operacional (49/49 Fontes Homologadas) | `ibge_localidades`, `brasilapi_core`, `bcb_sgs`, `rfb_cnpj_lakehouse` *(+24 fontes)* |
 | **P03** | **Engenharia FullStack & Geolocalização Offline-First** | 🟢 100% Operacional (49/49 Fontes Homologadas) | `ibge_localidades`, `brasilapi_core`, `ibge_censo2022`, `ibge_cnefe` *(+5 fontes)* |
-| **P04** | **Automação Inteligente de Onboarding & Compliance KYB** | 🟢 100% Operacional (49/49 Fontes Homologadas) | `brasilapi_core`, `rfb_cnpj_lakehouse`, `pncp_contratacoes`, `comprasgov_catmat` *(+4 fontes)* |
+| **P04** | **Automação Inteligente de Onboarding & Compliance KYB** | 🟢 100% Operacional (49/49 Fontes Homologadas) | `brasilapi_core`, `rfb_cnpj_lakehouse`, `pncp_contratacoes`, `comprasgov_catmat` *(+5 fontes)* |
 | **P05** | **FinOps & Séries Macroeconômicas / Deflacionamento** | 🟢 100% Operacional (49/49 Fontes Homologadas) | `bcb_sgs`, `bcb_olinda_ptax`, `cvm_dfp_itr`, `cvm_fundos` *(+4 fontes)* |
-| **P06** | **Data Clean Rooms & Benchmarks Anonimizados** | 🟢 100% Operacional (49/49 Fontes Homologadas) | `rfb_cnpj_lakehouse`, `cgu_ceis_cnep`, `cgu_pep`, `inpe_terrabrasilis` *(+4 fontes)* |
-| **P07** | **Due Diligence Corporativa, Sanções & Contencioso (TPRM)** | 🟢 100% Operacional (49/49 Fontes Homologadas) | `cnj_datajud`, `cgu_ceis_cnep`, `cgu_pep`, `tst_cndt` *(+1 fontes)* |
-| **P08** | **Segurança de Pipelines & Auditoria de Viés/Qualidade** | 🟢 100% Operacional (49/49 Fontes Homologadas) | `stn_siconfi` |
+| **P06** | **Data Clean Rooms & Benchmarks Anonimizados** | 🟢 100% Operacional (49/49 Fontes Homologadas) | `rfb_cnpj_lakehouse`, `cgu_ceis_cnep`, `cgu_pep`, `inpe_terrabrasilis` *(+5 fontes)* |
+| **P07** | **Due Diligence Corporativa, Sanções & Contencioso (TPRM)** | 🟢 100% Operacional (49/49 Fontes Homologadas) | `cnj_datajud`, `cgu_ceis_cnep`, `cgu_pep`, `tst_cndt` *(+2 fontes)* |
+| **P08** | **Segurança de Pipelines & Auditoria de Viés/Qualidade** | 🟢 100% Operacional (49/49 Fontes Homologadas) | `stn_siconfi`, `pgfn_divida_ativa` |
 | **P09** | **Inteligência Industrial, Energia, Agro & Meio Ambiente** | 🟢 100% Operacional (49/49 Fontes Homologadas) | `suframa_pim_zfm`, `anatel_mosaico`, `antt_malha_transporte`, `inpe_terrabrasilis` *(+4 fontes)* |
-| **P10** | **Observabilidade de Dados, Contratos ODCS & Confiabilidade SRE** | 🟢 100% Operacional (49/49 Fontes Homologadas) | `stn_siconfi` |
+| **P10** | **Observabilidade de Dados, Contratos ODCS & Confiabilidade SRE** | 🟢 100% Operacional (49/49 Fontes Homologadas) | `stn_siconfi`, `pgfn_divida_ativa` |
 
 ---
 

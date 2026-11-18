@@ -391,6 +391,29 @@ def build_parser() -> argparse.ArgumentParser:
     sic_rk.add_argument("--uf", type=str, default=None, help="Optional 2-letter UF state filter")
     sic_rk.add_argument("--json", action="store_true", help="Output in JSON format")
 
+    # Subcommand: pgfn (PGFN Dívida Ativa da União & FGTS)
+    pgfn_p = subparsers.add_parser(
+        "pgfn",
+        help="Query PGFN Dívida Ativa da União (general, previdenciário, FGTS) and municipal risk features.",
+    )
+    pgfn_sub = pgfn_p.add_subparsers(dest="pgfn_action", required=True)
+
+    for act_name, act_help in [
+        ("debtor", "Query active PGFN DAU inscriptions by CNPJ, CPF, debtor name, or IBGE code."),
+        ("previdenciario", "Query PGFN Social Security debts by IBGE code, UF, or CNPJ."),
+        ("fgts", "Query PGFN FGTS active debts by IBGE code, UF, or CNPJ."),
+        ("municipio", "Query municipal consolidated PGFN debt summary."),
+        ("features", "Query Gold PGFN tax default & judicial execution risk features."),
+    ]:
+        sp = pgfn_sub.add_parser(act_name, help=act_help)
+        sp.add_argument("termo", type=str, help="CNPJ, CPF, IBGE 7-digit code, or municipality name")
+        sp.add_argument("--json", action="store_true", help="Output in JSON format")
+
+    pgfn_rk = pgfn_sub.add_parser("ranking", help="List municipalities ranked by consolidated PGFN active debt.")
+    pgfn_rk.add_argument("--limit", type=int, default=10, help="Max municipalities to list")
+    pgfn_rk.add_argument("--uf", type=str, default=None, help="Optional 2-letter UF state filter")
+    pgfn_rk.add_argument("--json", action="store_true", help="Output in JSON format")
+
     # Subcommand: procurement (Compras.gov.br CATMAT/CATSER & Preços)
     proc_p = subparsers.add_parser(
         "procurement", help="Query Compras.gov.br CATMAT/CATSER catalogs and procurement price benchmarks."
@@ -2373,6 +2396,34 @@ def main(argv: Sequence[str] | None = None) -> int:
                 print(json.dumps(out, indent=2, ensure_ascii=False))
             else:
                 print(json.dumps(out, indent=2, ensure_ascii=False))
+            return 0
+
+        elif args.command == "pgfn":
+            from public_data_gateway.connectors.compliance.pgfn_divida_ativa import (
+                PgfnDividaAtivaConnector,
+            )
+
+            pgfn_conn = PgfnDividaAtivaConnector(settings=settings)
+            pgfn_action = getattr(args, "pgfn_action", None)
+            if pgfn_action == "debtor":
+                out = pgfn_conn.get_debtor_inscriptions(args.termo)
+            elif pgfn_action == "previdenciario":
+                out = pgfn_conn.get_previdenciario_debts(args.termo)
+            elif pgfn_action == "fgts":
+                out = pgfn_conn.get_fgts_debts(args.termo)
+            elif pgfn_action == "municipio":
+                out = pgfn_conn.get_municipal_summary(args.termo)
+            elif pgfn_action == "features":
+                out = pgfn_conn.get_pgfn_features(args.termo)
+            elif pgfn_action == "ranking":
+                out = pgfn_conn.list_top_municipalities(limit=args.limit, sigla_uf=args.uf)
+            else:
+                out = None
+
+            if not out:
+                print(f"No PGFN records found for action '{pgfn_action}'", file=sys.stderr)
+                return 1
+            print(json.dumps(out, indent=2, ensure_ascii=False))
             return 0
 
         elif args.command in {"procurement", "catmat"}:
