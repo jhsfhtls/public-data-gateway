@@ -3312,6 +3312,79 @@ def create_app(settings: GatewaySettings | None = None) -> FastAPI:
         conn = IbgeAgroMunicipalConnector(settings=app_settings)
         return conn.list_top_municipalities(limit=limit, sigla_uf=uf, sort_by_vbp=sort_by_vbp)
 
+    # RFB CAFIR / CIB / CNIR (Cadastro de Imóveis Rurais)
+    @app.get("/api/v1/environment/cafir/imoveis/{termo}")
+    async def get_cafir_imoveis(termo: str) -> list[dict[str, Any]]:
+        from public_data_gateway.connectors.ambiental.rfb_cafir import (
+            RfbCafirConnector,
+        )
+
+        conn = RfbCafirConnector(settings=app_settings)
+        return conn.get_rural_properties(termo)
+
+    @app.get("/api/v1/environment/cafir/cnir/{id_municipio_or_name}")
+    async def get_cafir_cnir(id_municipio_or_name: str) -> dict[str, Any]:
+        from public_data_gateway.connectors.ambiental.rfb_cafir import (
+            RfbCafirConnector,
+        )
+
+        conn = RfbCafirConnector(settings=app_settings)
+        res = conn.get_cnir_linkage(id_municipio_or_name)
+        if res is None:
+            raise HTTPException(status_code=404, detail="RFB CAFIR CNIR linkage metrics not found")
+        return res
+
+    @app.get("/api/v1/environment/cafir/concentracao/{id_municipio_or_name}")
+    async def get_cafir_concentracao(id_municipio_or_name: str) -> dict[str, Any]:
+        from public_data_gateway.connectors.ambiental.rfb_cafir import (
+            RfbCafirConnector,
+        )
+
+        conn = RfbCafirConnector(settings=app_settings)
+        res = conn.get_land_concentration(id_municipio_or_name)
+        if res is None:
+            raise HTTPException(status_code=404, detail="RFB CAFIR land concentration metrics not found")
+        return res
+
+    @app.get("/api/v1/environment/cafir/municipio/{id_municipio_or_name}")
+    async def get_cafir_municipio(id_municipio_or_name: str) -> dict[str, Any]:
+        from public_data_gateway.connectors.ambiental.rfb_cafir import (
+            RfbCafirConnector,
+        )
+
+        conn = RfbCafirConnector(settings=app_settings)
+        res = conn.get_municipal_summary(id_municipio_or_name)
+        if res is None:
+            raise HTTPException(status_code=404, detail="RFB CAFIR municipal summary not found")
+        return res
+
+    @app.get("/api/v1/environment/cafir/features/{id_municipio_or_name}")
+    async def get_cafir_features(id_municipio_or_name: str) -> dict[str, Any]:
+        from public_data_gateway.connectors.ambiental.rfb_cafir import (
+            RfbCafirConnector,
+        )
+
+        conn = RfbCafirConnector(settings=app_settings)
+        res = conn.get_cafir_features(id_municipio_or_name)
+        if res is None:
+            raise HTTPException(status_code=404, detail="RFB CAFIR Gold features not found")
+        return res
+
+    @app.get("/api/v1/environment/cafir/ranking")
+    async def get_cafir_ranking(
+        limit: int = Query(10, ge=1, le=50, description="Max municipalities to list"),
+        uf: str | None = Query(None, description="Optional 2-letter state filter"),
+        sort_by_area: bool = Query(
+            False, description="Sort descending by total registered rural area (ha)"
+        ),
+    ) -> list[dict[str, Any]]:
+        from public_data_gateway.connectors.ambiental.rfb_cafir import (
+            RfbCafirConnector,
+        )
+
+        conn = RfbCafirConnector(settings=app_settings)
+        return conn.list_top_municipalities(limit=limit, sigla_uf=uf, sort_by_area=sort_by_area)
+
     @app.get("/api/v1/metaportals/datalake/top-municipalities")
     async def get_top_bd_municipalities(
         limit: int = Query(10, ge=1, le=50, description="Max municipalities to list"),

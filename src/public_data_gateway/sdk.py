@@ -2206,6 +2206,57 @@ class EnvironmentFacade:
             limit=limit, sigla_uf=sigla_uf, sort_by_vbp=sort_by_vbp
         )
 
+    @property
+    def rfb_cafir_connector(self) -> Any:
+        if not hasattr(self, "_rfb_cafir_connector") or self._rfb_cafir_connector is None:
+            from public_data_gateway.connectors.ambiental.rfb_cafir import (
+                RfbCafirConnector,
+            )
+
+            self._rfb_cafir_connector = RfbCafirConnector(
+                settings=self._sdk.settings
+            )
+        return self._rfb_cafir_connector
+
+    def get_cafir_rural_properties(self, termo: str) -> list[dict[str, Any]]:
+        """Lookup RFB CAFIR rural properties by NIRF/CIB, SNCR, CNPJ/CPF, IBGE, UF, or name."""
+        return self.rfb_cafir_connector.get_rural_properties(termo)
+
+    def get_cafir_cnir_linkage(
+        self, id_municipio_or_name: str
+    ) -> dict[str, Any] | None:
+        """Retrieve municipal CAFIR-CNIR-SIGEF linkage and integration readiness."""
+        return self.rfb_cafir_connector.get_cnir_linkage(id_municipio_or_name)
+
+    def get_cafir_land_concentration(
+        self, id_municipio_or_name: str
+    ) -> dict[str, Any] | None:
+        """Retrieve municipal agrarian land concentration Gini and fiscal module distribution."""
+        return self.rfb_cafir_connector.get_land_concentration(id_municipio_or_name)
+
+    def get_cafir_municipal_summary(
+        self, id_municipio_or_name: str
+    ) -> dict[str, Any] | None:
+        """Retrieve consolidated municipal RFB CAFIR rural property counts, area, and VTN."""
+        return self.rfb_cafir_connector.get_municipal_summary(id_municipio_or_name)
+
+    def get_cafir_features(
+        self, id_municipio_or_name: str
+    ) -> dict[str, Any] | None:
+        """Retrieve Gold RFB CAFIR rural land regularization and CNIR structure features."""
+        return self.rfb_cafir_connector.get_cafir_features(id_municipio_or_name)
+
+    def list_top_cafir_municipalities(
+        self,
+        limit: int = 10,
+        sigla_uf: str | None = None,
+        sort_by_area: bool = False,
+    ) -> list[dict[str, Any]]:
+        """List municipalities ranked by Gold CAFIR regularization score or total rural area."""
+        return self.rfb_cafir_connector.list_top_municipalities(
+            limit=limit, sigla_uf=sigla_uf, sort_by_area=sort_by_area
+        )
+
 
 class MetaportalsFacade:
     """Sub-facade for Metaportals & Aggregator Hubs (Datalake Federado SQL, Dados.gov.br CKAN)."""
@@ -4136,6 +4187,45 @@ class BrazilData:
         """Listar municípios líderes em produção agropecuária (PAM/PPM/PEVS) ou Valor Bruto (VBP)."""
         return self.environment.list_top_agro_municipalities(
             limit=limit, sigla_uf=sigla_uf, sort_by_vbp=sort_by_vbp
+        )
+
+    def get_cafir_rural_properties(self, termo: str) -> list[dict[str, Any]]:
+        """Consultar imóveis rurais registrados no RFB CAFIR/CIB por NIRF, SNCR, CNPJ/CPF ou município."""
+        return self.environment.get_cafir_rural_properties(termo)
+
+    def get_cafir_cnir_linkage(
+        self, id_municipio_or_name: str
+    ) -> dict[str, Any] | None:
+        """Consultar vinculação CAFIR-CNIR/INCRA, georreferenciamento SIGEF e paridade CAR no município."""
+        return self.environment.get_cafir_cnir_linkage(id_municipio_or_name)
+
+    def get_cafir_land_concentration(
+        self, id_municipio_or_name: str
+    ) -> dict[str, Any] | None:
+        """Consultar índice de Gini fundiário e distribuição de área por módulo fiscal (CAFIR/RFB)."""
+        return self.environment.get_cafir_land_concentration(id_municipio_or_name)
+
+    def get_cafir_municipal_summary(
+        self, id_municipio_or_name: str
+    ) -> dict[str, Any] | None:
+        """Consultar consolidado municipal de imóveis rurais, área total e VTN estimado (CAFIR/RFB)."""
+        return self.environment.get_cafir_municipal_summary(id_municipio_or_name)
+
+    def get_cafir_features(
+        self, id_municipio_or_name: str
+    ) -> dict[str, Any] | None:
+        """Consultar features Gold de regularização fundiária CAFIR/CNIR e risco cadastral rural."""
+        return self.environment.get_cafir_features(id_municipio_or_name)
+
+    def list_top_cafir_municipalities(
+        self,
+        limit: int = 10,
+        sigla_uf: str | None = None,
+        sort_by_area: bool = False,
+    ) -> list[dict[str, Any]]:
+        """Listar municípios ranqueados por regularização fundiária CAFIR/CNIR ou maior área rural."""
+        return self.environment.list_top_cafir_municipalities(
+            limit=limit, sigla_uf=sigla_uf, sort_by_area=sort_by_area
         )
 
     def get_bd_coverage(self, id_municipio: str) -> dict[str, Any]:

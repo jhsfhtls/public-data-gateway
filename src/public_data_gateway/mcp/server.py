@@ -2229,6 +2229,69 @@ class MCPDispatcher:
                                 },
                             },
                             {
+                                "name": "bdg_get_rfb_cafir_properties",
+                                "description": "Lookup RFB CAFIR/CIB rural properties by NIRF/CIB code, INCRA SNCR, CNPJ/CPF, IBGE municipality code, UF, or property/owner name.",
+                                "inputSchema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "termo": {
+                                            "type": "string",
+                                            "description": "NIRF/CIB, SNCR code, CNPJ, IBGE 7-digit code, UF, or property/owner name",
+                                        }
+                                    },
+                                    "required": ["termo"],
+                                },
+                            },
+                            {
+                                "name": "bdg_get_rfb_cafir_cnir_linkage",
+                                "description": "Get municipal RFB CAFIR-CNIR/INCRA linkage rate, SIGEF georeferencing share, and CIB-CAR consistency.",
+                                "inputSchema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "id_municipio_or_name": {
+                                            "type": "string",
+                                            "description": "7-digit IBGE municipality code or municipality name",
+                                        }
+                                    },
+                                    "required": ["id_municipio_or_name"],
+                                },
+                            },
+                            {
+                                "name": "bdg_get_rfb_cafir_land_features",
+                                "description": "Get normalized Gold RFB CAFIR rural land regularization score, CNIR rate, agrarian Gini index, and structure tier.",
+                                "inputSchema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "id_municipio_or_name": {
+                                            "type": "string",
+                                            "description": "7-digit IBGE municipality code or municipality name",
+                                        }
+                                    },
+                                    "required": ["id_municipio_or_name"],
+                                },
+                            },
+                            {
+                                "name": "bdg_list_top_rfb_cafir_municipalities",
+                                "description": "List Brazilian municipalities ranked by RFB CAFIR/CNIR land regularization score or registered rural area.",
+                                "inputSchema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "limit": {
+                                            "type": "integer",
+                                            "description": "Maximum rows (default: 10)",
+                                        },
+                                        "sigla_uf": {
+                                            "type": "string",
+                                            "description": "Optional 2-letter state filter (e.g. PR)",
+                                        },
+                                        "sort_by_area": {
+                                            "type": "boolean",
+                                            "description": "Set true to rank municipalities by highest total registered rural area (ha) first",
+                                        },
+                                    },
+                                },
+                            },
+                            {
                                 "name": "bdg_get_bd_coverage",
                                 "description": "Get official Federated Public Datalake (DuckDB / BigQuery) municipal treated dataset and table coverage metrics.",
                                 "inputSchema": {
@@ -5601,6 +5664,67 @@ class MCPDispatcher:
                     },
                 }
             wrapped = wrap_untrusted_gov_data(result, source_id="ibge_agro_municipal")
+            return {
+                "jsonrpc": "2.0",
+                "id": req_id,
+                "result": {"content": [{"type": "text", "text": wrapped}], "isError": False},
+            }
+
+        if tool_name in {
+            "bdg_get_rfb_cafir_properties",
+            "bdg_get_rfb_cafir_cnir_linkage",
+            "bdg_get_rfb_cafir_land_features",
+            "bdg_list_top_rfb_cafir_municipalities",
+        }:
+            from public_data_gateway.connectors.ambiental.rfb_cafir import (
+                RfbCafirConnector,
+            )
+
+            connector = RfbCafirConnector(settings=self.settings)
+            try:
+                if tool_name == "bdg_get_rfb_cafir_properties":
+                    result: Any = connector.get_rural_properties(str(args.get("termo", "")))
+                elif tool_name == "bdg_get_rfb_cafir_cnir_linkage":
+                    result = connector.get_cnir_linkage(
+                        str(args.get("id_municipio_or_name", ""))
+                    )
+                elif tool_name == "bdg_get_rfb_cafir_land_features":
+                    result = connector.get_cafir_features(
+                        str(args.get("id_municipio_or_name", ""))
+                    )
+                else:
+                    result = connector.list_top_municipalities(
+                        limit=int(args.get("limit", 10)),
+                        sigla_uf=args.get("sigla_uf"),
+                        sort_by_area=bool(args.get("sort_by_area", False)),
+                    )
+            except (ValueError, KeyError) as exc:
+                return {
+                    "jsonrpc": "2.0",
+                    "id": req_id,
+                    "result": {
+                        "content": [
+                            {"type": "text", "text": f"RFB CAFIR parameter error: {exc}"}
+                        ],
+                        "isError": True,
+                    },
+                }
+
+            if not result:
+                return {
+                    "jsonrpc": "2.0",
+                    "id": req_id,
+                    "result": {
+                        "content": [
+                            {
+                                "type": "text",
+                                "text": "No RFB CAFIR data found for the query.",
+                            }
+                        ],
+                        "isError": True,
+                    },
+                }
+            wrapped = wrap_untrusted_gov_data(result, source_id="rfb_cafir")
             return {
                 "jsonrpc": "2.0",
                 "id": req_id,

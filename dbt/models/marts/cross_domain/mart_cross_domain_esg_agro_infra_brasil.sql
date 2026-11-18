@@ -88,6 +88,16 @@ ibge_agro AS (
     FROM {{ ref('mart_producao_agropecuaria_ibge_brasil') }}
 ),
 
+cafir AS (
+    SELECT
+        id_municipio,
+        qtd_imoveis_cafir,
+        area_total_cafir_ha,
+        taxa_vinculacao_cnir_pct,
+        score_regularizacao_fundiaria_cafir
+    FROM {{ ref('mart_cadastro_imoveis_rurais_cafir_brasil') }}
+),
+
 joined AS (
     SELECT
         t.id_municipio,
@@ -124,6 +134,10 @@ joined AS (
         COALESCE(ag.efetivo_rebanho_bovino_cabecas, 0) AS efetivo_rebanho_bovino_cabecas,
         COALESCE(ag.valor_bruto_agro_total_mil_brl, 0.0) AS valor_bruto_agro_total_mil_brl,
         COALESCE(ag.score_potencia_agropecuaria_ibge, 45.0) AS score_potencia_agropecuaria_ibge,
+        COALESCE(cf.qtd_imoveis_cafir, 0) AS qtd_imoveis_cafir,
+        COALESCE(cf.area_total_cafir_ha, 0.0) AS area_total_cafir_ha,
+        COALESCE(cf.taxa_vinculacao_cnir_pct, 50.0) AS taxa_vinculacao_cnir_pct,
+        COALESCE(cf.score_regularizacao_fundiaria_cafir, 50.0) AS score_regularizacao_fundiaria_cafir,
         t.reference_date
     FROM terra t
     LEFT JOIN sicar s ON t.id_municipio = s.id_municipio
@@ -133,6 +147,7 @@ joined AS (
     LEFT JOIN ibama ib ON t.id_municipio = ib.id_municipio
     LEFT JOIN sicor sc ON t.id_municipio = sc.id_municipio
     LEFT JOIN ibge_agro ag ON t.id_municipio = ag.id_municipio
+    LEFT JOIN cafir cf ON t.id_municipio = cf.id_municipio
 ),
 
 scored AS (

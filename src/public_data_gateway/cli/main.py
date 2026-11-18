@@ -1395,6 +1395,36 @@ def build_parser() -> argparse.ArgumentParser:
     agro_rk_p.add_argument("--vbp", action="store_true", help="Sort descending by gross VBP value")
     agro_rk_p.add_argument("--json", action="store_true", help="Output in JSON format")
 
+    # RFB CAFIR / CIB / CNIR (Cadastro de Imóveis Rurais) command group
+    cafir_p = subparsers.add_parser("cafir", help="Query RFB CAFIR/CIB rural properties, CNIR linkage, agrarian Gini, and rankings.")
+    cafir_sub = cafir_p.add_subparsers(dest="cafir_action", required=True)
+
+    cafir_imv_p = cafir_sub.add_parser("imoveis", help="Lookup RFB CAFIR rural properties by NIRF/CIB, SNCR, CNPJ/CPF, IBGE, UF, or name.")
+    cafir_imv_p.add_argument("termo", help="NIRF/CIB, SNCR, CNPJ, IBGE code, UF, or property/owner name")
+    cafir_imv_p.add_argument("--json", action="store_true", help="Output in JSON format")
+
+    cafir_cnir_p = cafir_sub.add_parser("cnir", help="Get municipal CAFIR-CNIR linkage, SIGEF georeferencing, and CAR parity metrics.")
+    cafir_cnir_p.add_argument("id_municipio_or_name", help="7-digit IBGE code or municipality name")
+    cafir_cnir_p.add_argument("--json", action="store_true", help="Output in JSON format")
+
+    cafir_conc_p = cafir_sub.add_parser("concentracao", help="Get municipal agrarian land concentration Gini and fiscal module shares.")
+    cafir_conc_p.add_argument("id_municipio_or_name", help="7-digit IBGE code or municipality name")
+    cafir_conc_p.add_argument("--json", action="store_true", help="Output in JSON format")
+
+    cafir_mun_p = cafir_sub.add_parser("municipio", help="Get consolidated municipal RFB CAFIR rural properties, area, and VTN.")
+    cafir_mun_p.add_argument("id_municipio_or_name", help="7-digit IBGE code or municipality name")
+    cafir_mun_p.add_argument("--json", action="store_true", help="Output in JSON format")
+
+    cafir_ft_p = cafir_sub.add_parser("features", help="Get Gold RFB CAFIR rural land regularization score and CNIR tier.")
+    cafir_ft_p.add_argument("id_municipio_or_name", help="7-digit IBGE code or municipality name")
+    cafir_ft_p.add_argument("--json", action="store_true", help="Output in JSON format")
+
+    cafir_rk_p = cafir_sub.add_parser("ranking", help="List municipalities ranked by CAFIR regularization score or total rural area.")
+    cafir_rk_p.add_argument("--limit", type=int, default=10, help="Max municipalities to list")
+    cafir_rk_p.add_argument("--uf", type=str, help="Optional 2-letter state filter")
+    cafir_rk_p.add_argument("--area", action="store_true", help="Sort descending by total registered rural area (ha)")
+    cafir_rk_p.add_argument("--json", action="store_true", help="Output in JSON format")
+
     # Datalake Público Federado (DuckDB / BigQuery) command group
     bd_p = subparsers.add_parser("datalake", help="Query Federated Public Datalake (DuckDB / BigQuery) coverage, thematic datasets, governance, SQL efficiency, and rankings.")
     bd_sub = bd_p.add_subparsers(dest="datalake_action", required=True)
@@ -4940,6 +4970,85 @@ def main(argv: Sequence[str] | None = None) -> int:
                     return 0
             except (ValueError, KeyError) as exc:
                 print(f"Erro IBGE Agro: {exc}", file=sys.stderr)
+                return 1
+
+        elif args.command == "cafir":
+            from public_data_gateway.connectors.ambiental.rfb_cafir import (
+                RfbCafirConnector,
+            )
+
+            cafir_conn = RfbCafirConnector()
+            cafir_action = getattr(args, "cafir_action", "")
+            try:
+                if cafir_action == "imoveis":
+                    rows = cafir_conn.get_rural_properties(args.termo)
+                    if getattr(args, "json", False):
+                        print(json.dumps(rows, indent=2, ensure_ascii=False, default=str))
+                    else:
+                        print(f"RFB CAFIR Imóveis ({len(rows)}):")
+                        for r in rows:
+                            print(f"  NIRF {r.get('nirf_cib')} | {r.get('nome_municipio')} ({r.get('sigla_uf')}): {r.get('nome_imovel_rural')} - {r.get('area_total_ha')} ha")
+                    return 0
+
+                if cafir_action == "cnir":
+                    res = cafir_conn.get_cnir_linkage(args.id_municipio_or_name)
+                    if res is None:
+                        print(f"Dados CNIR/CAFIR não encontrados para: {args.id_municipio_or_name}", file=sys.stderr)
+                        return 1
+                    if getattr(args, "json", False):
+                        print(json.dumps(res, indent=2, ensure_ascii=False, default=str))
+                    else:
+                        print(f"RFB CAFIR CNIR ({res.get('nome_municipio')} - {res.get('sigla_uf')}): CNIR {res.get('taxa_vinculacao_cnir_pct')}% | SIGEF {res.get('taxa_georreferenciamento_sigef_pct')}%")
+                    return 0
+
+                if cafir_action == "concentracao":
+                    res = cafir_conn.get_land_concentration(args.id_municipio_or_name)
+                    if res is None:
+                        print(f"Dados fundiários CAFIR não encontrados para: {args.id_municipio_or_name}", file=sys.stderr)
+                        return 1
+                    if getattr(args, "json", False):
+                        print(json.dumps(res, indent=2, ensure_ascii=False, default=str))
+                    else:
+                        print(f"RFB CAFIR Gini ({res.get('nome_municipio')} - {res.get('sigla_uf')}): Gini {res.get('indice_gini_fundiario_cafir')} | Grandes {res.get('area_grandes_imoveis_acima_15mf_pct')}%")
+                    return 0
+
+                if cafir_action == "municipio":
+                    res = cafir_conn.get_municipal_summary(args.id_municipio_or_name)
+                    if res is None:
+                        print(f"Resumo CAFIR não encontrado para: {args.id_municipio_or_name}", file=sys.stderr)
+                        return 1
+                    if getattr(args, "json", False):
+                        print(json.dumps(res, indent=2, ensure_ascii=False, default=str))
+                    else:
+                        print(f"RFB CAFIR Município ({res.get('nome_municipio')} - {res.get('sigla_uf')}): {res.get('qtd_imoveis_cafir')} imóveis | {res.get('area_total_cafir_ha')} ha")
+                    return 0
+
+                if cafir_action == "features":
+                    res = cafir_conn.get_cafir_features(args.id_municipio_or_name)
+                    if res is None:
+                        print(f"Features CAFIR não encontradas para: {args.id_municipio_or_name}", file=sys.stderr)
+                        return 1
+                    if getattr(args, "json", False):
+                        print(json.dumps(res, indent=2, ensure_ascii=False, default=str))
+                    else:
+                        print(f"RFB CAFIR Gold ({res.get('nome_municipio')} - {res.get('id_municipio')}): Score {res.get('score_regularizacao_fundiaria_cafir')} | {res.get('classificacao_estrutura_fundiaria_cafir')}")
+                    return 0
+
+                if cafir_action == "ranking":
+                    ranks = cafir_conn.list_top_municipalities(
+                        limit=getattr(args, "limit", 10),
+                        sigla_uf=getattr(args, "uf", None),
+                        sort_by_area=getattr(args, "area", False),
+                    )
+                    if getattr(args, "json", False):
+                        print(json.dumps(ranks, indent=2, ensure_ascii=False, default=str))
+                    else:
+                        print(f"Ranking RFB CAFIR ({len(ranks)}):")
+                        for idx, r in enumerate(ranks, 1):
+                            print(f"  {idx}. {r.get('nome_municipio')} ({r.get('sigla_uf')}): {r.get('score_regularizacao_fundiaria_cafir')} | {r.get('classificacao_estrutura_fundiaria_cafir')}")
+                    return 0
+            except (ValueError, KeyError) as exc:
+                print(f"Erro RFB CAFIR: {exc}", file=sys.stderr)
                 return 1
 
         elif args.command == "datalake":
