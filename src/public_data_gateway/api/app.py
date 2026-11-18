@@ -1919,6 +1919,76 @@ def create_app(settings: GatewaySettings | None = None) -> FastAPI:
         conn = AnttMalhaTransporteConnector(settings=app_settings)
         return conn.get_highway_corridors(id_municipio)
 
+    # SENATRAN Frota de Veículos (RENAVAM & Eletrificação)
+    @app.get("/api/v1/geo/frota/tipos/{termo}")
+    async def get_frota_tipos(termo: str) -> list[dict[str, Any]]:
+        from public_data_gateway.connectors.geografico.senatran_frota import (
+            SenatranFrotaConnector,
+        )
+
+        conn = SenatranFrotaConnector(settings=app_settings)
+        return conn.get_fleet_by_type(termo)
+
+    @app.get("/api/v1/geo/frota/propulsao/{termo}")
+    async def get_frota_propulsao(termo: str) -> list[dict[str, Any]]:
+        from public_data_gateway.connectors.geografico.senatran_frota import (
+            SenatranFrotaConnector,
+        )
+
+        conn = SenatranFrotaConnector(settings=app_settings)
+        return conn.get_fleet_propulsion_ev(termo)
+
+    @app.get("/api/v1/geo/frota/idade/{id_municipio_or_name}")
+    async def get_frota_idade(id_municipio_or_name: str) -> dict[str, Any]:
+        from public_data_gateway.connectors.geografico.senatran_frota import (
+            SenatranFrotaConnector,
+        )
+
+        conn = SenatranFrotaConnector(settings=app_settings)
+        res = conn.get_fleet_age_renewal(id_municipio_or_name)
+        if res is None:
+            raise HTTPException(status_code=404, detail="SENATRAN fleet age metrics not found")
+        return res
+
+    @app.get("/api/v1/geo/frota/municipio/{id_municipio_or_name}")
+    async def get_frota_municipio(id_municipio_or_name: str) -> dict[str, Any]:
+        from public_data_gateway.connectors.geografico.senatran_frota import (
+            SenatranFrotaConnector,
+        )
+
+        conn = SenatranFrotaConnector(settings=app_settings)
+        res = conn.get_fleet_municipal_summary(id_municipio_or_name)
+        if res is None:
+            raise HTTPException(status_code=404, detail="SENATRAN municipal fleet summary not found")
+        return res
+
+    @app.get("/api/v1/geo/frota/features/{id_municipio_or_name}")
+    async def get_frota_features(id_municipio_or_name: str) -> dict[str, Any]:
+        from public_data_gateway.connectors.geografico.senatran_frota import (
+            SenatranFrotaConnector,
+        )
+
+        conn = SenatranFrotaConnector(settings=app_settings)
+        res = conn.get_fleet_features(id_municipio_or_name)
+        if res is None:
+            raise HTTPException(status_code=404, detail="SENATRAN Gold fleet features not found")
+        return res
+
+    @app.get("/api/v1/geo/frota/ranking")
+    async def get_frota_ranking(
+        limit: int = Query(10, ge=1, le=50, description="Max municipalities to list"),
+        uf: str | None = Query(None, description="Optional 2-letter state filter"),
+        sort_by_ev: bool = Query(
+            False, description="Sort descending by electrified BEV/PHEV/HEV fleet"
+        ),
+    ) -> list[dict[str, Any]]:
+        from public_data_gateway.connectors.geografico.senatran_frota import (
+            SenatranFrotaConnector,
+        )
+
+        conn = SenatranFrotaConnector(settings=app_settings)
+        return conn.list_top_fleet_municipalities(limit=limit, sigla_uf=uf, sort_by_ev=sort_by_ev)
+
     @app.get("/api/v1/health-public/cnes/top-hubs")
     async def get_top_health_hubs(
         limit: int = Query(10, ge=1, le=50, description="Max municipalities to list"),

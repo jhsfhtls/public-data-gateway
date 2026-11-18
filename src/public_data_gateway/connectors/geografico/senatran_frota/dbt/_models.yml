@@ -1,0 +1,169 @@
+version: 2
+
+models:
+  - name: stg_senatran_frota_tipo_municipio
+    description: "Staging view tipada da frota ativa municipal RENAVAM por categoria de veículo (SENATRAN)."
+    columns:
+      - name: cod_frota_tipo
+        description: "Código identificador único categoria-município na estatística SENATRAN (STRING)."
+        tests: [not_null, unique]
+      - name: id_municipio
+        description: "Código IBGE de 7 dígitos do município (STRING)."
+        tests: [not_null]
+      - name: sigla_uf
+        description: "Sigla de 2 letras da Unidade Federativa (UF)."
+        tests: [not_null]
+      - name: nome_municipio
+        description: "Nome oficial do município."
+        tests: [not_null]
+      - name: tipo_veiculo
+        description: "Tipo veicular RENAVAM (AUTOMOVEL, MOTOCICLETA ou CAMINHAO_PESADO)."
+        tests: [not_null]
+      - name: qtd_veiculos_ativos
+        description: "Quantidade ativa de veículos licenciados na categoria."
+        tests: [not_null]
+      - name: participacao_frota_pct
+        description: "Percentual da categoria sobre a frota total do município (%)."
+        tests: [not_null]
+      - name: ano_referencia
+        description: "Ano de referência do fechamento estatístico SENATRAN."
+        tests: [not_null]
+
+  - name: stg_senatran_frota_combustivel_ev
+    description: "Staging view tipada da matriz energética da frota municipal (Flex e eletrificados BEV/PHEV/HEV)."
+    columns:
+      - name: cod_frota_comb
+        description: "Código composto matriz-município no SENATRAN (STRING)."
+        tests: [not_null, unique]
+      - name: id_municipio
+        description: "Código IBGE de 7 dígitos do município (STRING)."
+        tests: [not_null]
+      - name: sigla_uf
+        description: "Sigla de 2 letras da Unidade Federativa (UF)."
+        tests: [not_null]
+      - name: nome_municipio
+        description: "Nome oficial do município."
+        tests: [not_null]
+      - name: matriz_propulsao
+        description: "Matriz de propulsão energética (ELETRICO_BEV_HIBRIDO_PHEV ou FLEX_ETANOL_GASOLINA)."
+        tests: [not_null]
+      - name: qtd_veiculos
+        description: "Quantidade de veículos licenciados na matriz energética."
+        tests: [not_null]
+      - name: participacao_eletrificados_pct
+        description: "Fatia de veículos eletrificados (BEV/PHEV/HEV) na frota municipal (%)."
+        tests: [not_null]
+      - name: ano_referencia
+        description: "Ano de referência do levantamento SENATRAN."
+        tests: [not_null]
+
+  - name: stg_senatran_idade_renovacao_frota
+    description: "Staging view tipada de envelhecimento da frota, motorização per capita e emplacamentos anuais."
+    columns:
+      - name: id_municipio
+        description: "Código IBGE de 7 dígitos do município (STRING)."
+        tests: [not_null, unique]
+      - name: sigla_uf
+        description: "Sigla de 2 letras da Unidade Federativa (UF)."
+        tests: [not_null]
+      - name: nome_municipio
+        description: "Nome oficial do município."
+        tests: [not_null]
+      - name: idade_media_frota_anos
+        description: "Idade média ponderada da frota circulante no município em anos."
+        tests: [not_null]
+      - name: participacao_frota_0a5_anos_pct
+        description: "Percentual de veículos com até 5 anos de fabricação na frota municipal (%)."
+        tests: [not_null]
+      - name: taxa_motorizacao_100hab
+        description: "Taxa de motorização medida em veículos ativos por 100 habitantes."
+        tests: [not_null]
+      - name: veiculos_novos_emplacados_ano
+        description: "Quantidade anual de primeiros emplacamentos registrados no município."
+        tests: [not_null]
+
+  - name: stg_senatran_frota_resumo_municipal
+    description: "Staging view tipada do consolidado municipal da frota total RENAVAM, pesados e eletrificados."
+    columns:
+      - name: id_municipio
+        description: "Código IBGE de 7 dígitos do município (STRING)."
+        tests: [not_null, unique]
+      - name: sigla_uf
+        description: "Sigla de 2 letras da Unidade Federativa (UF)."
+        tests: [not_null]
+      - name: nome_municipio
+        description: "Nome oficial do município."
+        tests: [not_null]
+      - name: regiao
+        description: "Macrorregião geográfica oficial do município."
+        tests: [not_null]
+      - name: frota_total_veiculos
+        description: "Total acumulado de veículos ativos no município (RENAVAM)."
+        tests: [not_null]
+      - name: qtd_automoveis
+        description: "Quantidade de automóveis de passeio licenciados no município."
+        tests: [not_null]
+      - name: qtd_motocicletas
+        description: "Quantidade de motocicletas e ciclomotores licenciados no município."
+        tests: [not_null]
+      - name: qtd_caminhoes_utilitarios
+        description: "Quantidade de caminhões pesados e utilitários comerciais de carga."
+        tests: [not_null]
+      - name: qtd_eletrificados_bevs_hevs
+        description: "Quantidade de veículos eletrificados (BEV, PHEV e HEV) ativos no município."
+        tests: [not_null]
+      - name: veiculos_novos_emplacados_ano
+        description: "Emplacamentos anuais de veículos novos no município."
+        tests: [not_null]
+
+  - name: fct_frota_veiculos_senatran_municipal
+    description: "Tabela Fato municipal unificando frota RENAVAM, veículos de carga, eletrificação EV e idade da frota."
+    columns:
+      - name: id_municipio
+        description: "Código IBGE de 7 dígitos do município (STRING)."
+        tests: [not_null, unique]
+      - name: sigla_uf
+        description: "Sigla de 2 letras da Unidade Federativa (UF)."
+        tests: [not_null]
+      - name: nome_municipio
+        description: "Nome oficial do município."
+        tests: [not_null]
+      - name: regiao
+        description: "Macrorregião geográfica do município."
+        tests: [not_null]
+      - name: frota_total_veiculos
+        description: "Total de veículos licenciados ativos no município."
+        tests: [not_null]
+      - name: qtd_automoveis
+        description: "Total de automóveis ativos na frota municipal."
+        tests: [not_null]
+      - name: qtd_motocicletas
+        description: "Total de motocicletas na frota municipal."
+        tests: [not_null]
+      - name: qtd_caminhoes_utilitarios
+        description: "Total de caminhões e utilitários comerciais de carga."
+        tests: [not_null]
+      - name: qtd_eletrificados_bevs_hevs
+        description: "Total de veículos elétricos e híbridos (BEV/PHEV/HEV)."
+        tests: [not_null]
+      - name: veiculos_novos_emplacados_ano
+        description: "Novos veículos licenciados no último exercício anual."
+        tests: [not_null]
+      - name: participacao_eletrificados_pct
+        description: "Participação percentual de eletrificados sobre a frota total (%)."
+        tests: [not_null]
+      - name: idade_media_frota_anos
+        description: "Idade média da frota circulante no município em anos."
+        tests: [not_null]
+      - name: participacao_frota_0a5_anos_pct
+        description: "Percentual de veículos novos (0 a 5 anos) na frota municipal (%)."
+        tests: [not_null]
+      - name: taxa_motorizacao_100hab
+        description: "Taxa de veículos ativos por grupo de 100 habitantes."
+        tests: [not_null]
+      - name: participacao_caminhoes_pct
+        description: "Participação percentual da frota pesada comercial no município (%)."
+        tests: [not_null]
+      - name: qtd_categorias_frota
+        description: "Quantidade de categorias RENAVAM amostradas para o município."
+        tests: [not_null]

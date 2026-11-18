@@ -91,6 +91,15 @@ models:
       - name: area_construida_cno_uf_m2
         description: "Área total construída registrada no RFB CNO na UF em metros quadrados (m²)."
         tests: [not_null]
+      - name: qtd_veiculos_frota_uf
+        description: "Quantidade agregada de veículos ativos na frota circulante RENAVAM/SENATRAN na UF."
+        tests: [not_null]
+      - name: frota_eletrificados_hibridos_uf
+        description: "Quantidade total de veículos eletrificados (BEV/PHEV/HEV) licenciados na UF."
+        tests: [not_null]
+      - name: avg_score_modernizacao_frota_uf
+        description: "Média estadual do score de modernização da frota e eletrificação SENATRAN (0-100)."
+        tests: [not_null]
       - name: macro_ano_mes_referencia
         description: "Competência macroeconômica de referência (YYYY-MM)."
         tests: [not_null]
