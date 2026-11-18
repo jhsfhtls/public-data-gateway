@@ -16,6 +16,7 @@ model-paths:
   - "../src/public_data_gateway/connectors/compras_publicas/pncp_contratacoes/dbt"
   - "../src/public_data_gateway/connectors/compliance/cgu_ceis_cnep/dbt"
   - "../src/public_data_gateway/connectors/compliance/cgu_pep/dbt"
+  - "../src/public_data_gateway/connectors/compliance/pgfn_divida_ativa/dbt"
   - "../src/public_data_gateway/connectors/judicial/cnj_datajud/dbt"
   - "../src/public_data_gateway/connectors/judicial/tst_cndt/dbt"
   - "../src/public_data_gateway/connectors/empresarial/suframa_pim_zfm/dbt"

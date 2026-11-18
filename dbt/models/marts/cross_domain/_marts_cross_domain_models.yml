@@ -520,6 +520,12 @@ models:
       - name: total_perfis_b2b
         description: "Total de perfis corporativos B2B indexados."
         tests: [not_null]
+      - name: total_inscricoes_pgfn_uf
+        description: "Total de inscrições ativas monitoradas em Dívida Ativa da União e FGTS (PGFN) na UF."
+        tests: [not_null]
+      - name: valor_divida_ativa_pgfn_uf_brl
+        description: "Valor total consolidado do estoque de Dívida Ativa PGFN na UF em Reais (BRL)."
+        tests: [not_null]
 
   - name: mart_cross_domain_global_pesquisa_brasil
     description: "Visao cross-domain estadual integrando Feature Store B2B com os 3 conectores Medallion Globais e Pesquisa do Bloco 4: REST Countries ISO-3166, OpenAlex e GDELT Doc 2.0 (Wave 10.5D)."

@@ -346,6 +346,44 @@ class ComplianceFacade:
         conn = CGUPEPConnector(settings=self._sdk.settings)
         return conn.list_pep(uf=uf, sigla_funcao=sigla_funcao, ativos_only=ativos_only, limit=limit)
 
+    @property
+    def pgfn_connector(self) -> Any:
+        if not hasattr(self, "_pgfn_conn") or self._pgfn_conn is None:
+            from public_data_gateway.connectors.compliance.pgfn_divida_ativa import (
+                PgfnDividaAtivaConnector,
+            )
+
+            self._pgfn_conn = PgfnDividaAtivaConnector(settings=self._sdk.settings)
+        return self._pgfn_conn
+
+    def get_pgfn_debtor(self, documento_or_name: str) -> list[dict[str, Any]]:
+        """Lookup active PGFN DAU inscriptions by CNPJ/CPF digits, name, or IBGE municipality."""
+        return self.pgfn_connector.get_debtor_inscriptions(documento_or_name)
+
+    def get_pgfn_previdenciario(self, id_municipio_or_doc: str) -> list[dict[str, Any]]:
+        """Lookup PGFN Social Security debts by IBGE municipality, UF, or CNPJ digits."""
+        return self.pgfn_connector.get_previdenciario_debts(id_municipio_or_doc)
+
+    def get_pgfn_fgts(self, id_municipio_or_doc: str) -> list[dict[str, Any]]:
+        """Lookup PGFN FGTS active debts by IBGE municipality, UF, or CNPJ digits."""
+        return self.pgfn_connector.get_fgts_debts(id_municipio_or_doc)
+
+    def get_pgfn_municipal_summary(self, id_municipio_or_name: str) -> dict[str, Any] | None:
+        """Retrieve municipal consolidated PGFN debt summary."""
+        return self.pgfn_connector.get_municipal_summary(id_municipio_or_name)
+
+    def get_pgfn_features(self, id_municipio_or_name: str) -> dict[str, Any] | None:
+        """Retrieve Gold PGFN tax default & judicial execution risk features."""
+        return self.pgfn_connector.get_pgfn_features(id_municipio_or_name)
+
+    def list_top_pgfn_municipalities(
+        self, limit: int = 10, sigla_uf: str | None = None
+    ) -> list[dict[str, Any]]:
+        """List municipalities ranked by consolidated PGFN active debt volume."""
+        return self.pgfn_connector.list_top_municipalities(
+            limit=limit, sigla_uf=sigla_uf
+        )
+
 
 class JudicialFacade:
     """Judicial proceedings, procedural metadata and litigation risk interface (CNJ DataJud)."""
@@ -2392,6 +2430,34 @@ class BrazilData:
     def get_pep_status(self, cpf_or_name: str) -> dict[str, Any]:
         """Check whether a person (CPF or Name) is registered as Politically Exposed Person (PEP)."""
         return self.compliance.pep_status(cpf_or_name)
+
+    def get_pgfn_debtor(self, documento_or_name: str) -> list[dict[str, Any]]:
+        """Consultar inscrições ativas em Dívida Ativa da União por CNPJ, CPF ou município (PGFN)."""
+        return self.compliance.get_pgfn_debtor(documento_or_name)
+
+    def get_pgfn_previdenciario(self, id_municipio_or_doc: str) -> list[dict[str, Any]]:
+        """Consultar débitos previdenciários inscritos em Dívida Ativa da União (PGFN)."""
+        return self.compliance.get_pgfn_previdenciario(id_municipio_or_doc)
+
+    def get_pgfn_fgts(self, id_municipio_or_doc: str) -> list[dict[str, Any]]:
+        """Consultar débitos de FGTS inscritos perante a PGFN/Caixa."""
+        return self.compliance.get_pgfn_fgts(id_municipio_or_doc)
+
+    def get_pgfn_municipal_summary(self, id_municipio_or_name: str) -> dict[str, Any] | None:
+        """Consultar consolidado municipal do estoque de Dívida Ativa e FGTS (PGFN)."""
+        return self.compliance.get_pgfn_municipal_summary(id_municipio_or_name)
+
+    def get_pgfn_features(self, id_municipio_or_name: str) -> dict[str, Any] | None:
+        """Consultar features Gold de risco de inadimplência fiscal e ajuizamento (PGFN)."""
+        return self.compliance.get_pgfn_features(id_municipio_or_name)
+
+    def list_top_pgfn_municipalities(
+        self, limit: int = 10, sigla_uf: str | None = None
+    ) -> list[dict[str, Any]]:
+        """Listar municípios por estoque consolidado de Dívida Ativa da União e FGTS (PGFN)."""
+        return self.compliance.list_top_pgfn_municipalities(
+            limit=limit, sigla_uf=sigla_uf
+        )
 
     def get_litigation_risk(self, cnpj_or_cpf: str) -> dict[str, Any]:
         """Assess corporate or individual litigation risk profile across all courts (CNJ DataJud)."""

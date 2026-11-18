@@ -1,6 +1,6 @@
 {
   "schema_version": "1.0.0",
-  "last_updated": "2026-11-17T21:45:00.000000",
+  "last_updated": "2026-11-17T22:05:00.000000",
   "project_name": "public-data-gateway",
   "architecture": "Hexagonal Medallion Lakehouse (Bronze -> Silver -> Gold / Feature Store)",
   "governance_standards": [
@@ -15,7 +15,7 @@
   "current_macro_phase": "Fase 11.5 - Expansão Completa de Fontes Públicas (Ondas 11.5A a 11.5E — Padrão 11-Gates)",
   "overall_status": "ON_TRACK",
   "active_connector": null,
-  "next_connector": "pgfn_divida_ativa",
+  "next_connector": "cnj_improbidade",
   "structural_phases": [
     {
       "phase_id": "00",
@@ -252,74 +252,74 @@
     }
   ],
   "active_connector_gates": {
-    "target_connector": "stn_siconfi",
+    "target_connector": "pgfn_divida_ativa",
     "target_wave": "11.5A",
     "gates": [
       {
         "gate_id": "GATE_01",
         "name": "Contrato Declarativo ODCS v3.1 das N Tabelas da API",
         "status": "PASSED",
-        "criteria": "Schema tipado, chaves primarias STRING (id_municipio 7D, sigla_uf, codigo_conta) e regras semanticas para entes, extratos de entregas, DCA, RREO e RGF do SICONFI."
+        "criteria": "Schema tipado, chaves primarias STRING (numero_inscricao, cnpj_14/cpf_masked, id_municipio 7D, sigla_uf) e regras semanticas para DAU Geral, Previdenciaria, FGTS e Resumo Municipal PGFN."
       },
       {
         "gate_id": "GATE_02",
         "name": "Ingestao Bronze Isolada (Todas as Tabelas) & Cache WAL",
         "status": "PASSED",
-        "criteria": "Ingestao resiliente da API REST apidatalake.tesouro.gov.br/ords/siconfi/tt/ em data/stn_siconfi/bronze/ com cache SQLite WAL."
+        "criteria": "Ingestao resiliente da base PGFN Dados Abertos (dadosabertos.pgfn.gov.br) em data/pgfn_divida_ativa/bronze/ com registro de linhagem."
       },
       {
         "gate_id": "GATE_03",
         "name": "Sanitizacao de Sentinelas & Nulls",
         "status": "PASSED",
-        "criteria": "Conversao deterministica de valores ausentes/sentinelas fiscais em NULLs reais e normalizacao de contas contabeis."
+        "criteria": "Conversao deterministica de sentinelas em NULLs reais e preservacao da mascara LGPD de CPF."
       },
       {
         "gate_id": "GATE_04",
         "name": "Materializacao Silver Parquet Isolada (Todas as Tabelas)",
         "status": "PASSED",
-        "criteria": "Gravacao de tabelas normalizadas (siconfi_entes, siconfi_dca, siconfi_rreo, siconfi_rgf, siconfi_extratos) em data/stn_siconfi/silver/ com SHA-256."
+        "criteria": "Gravacao ZSTD em data/pgfn_divida_ativa/silver/ (pgfn_inscricoes_gerais, pgfn_divida_previdenciaria, pgfn_divida_fgts, pgfn_resumo_municipal)."
       },
       {
         "gate_id": "GATE_05",
         "name": "Validacao dos 5 Pilares & Quarentena",
         "status": "PASSED",
-        "criteria": "Aprovacao em Freshness, Volume, Schema, Null Ceiling e Lineage; desvio para data/stn_siconfi/quarantine/ se violado."
+        "criteria": "Aprovacao em Freshness, Volume, Schema, Null Ceiling e Lineage com suporte a desvio para data/pgfn_divida_ativa/quarantine/."
       },
       {
         "gate_id": "GATE_06",
         "name": "Gold Feature View Isolada & ASOF Join ML",
         "status": "PASSED",
-        "criteria": "Features fiscais municipais/estaduais (receita corrente liquida, despesa com pessoal %, endividamento, superavit) em data/stn_siconfi/gold/features_fiscais_siconfi.parquet."
+        "criteria": "Features de risco de inadimplencia fiscal, FGTS e ajuizamento judicial em data/pgfn_divida_ativa/gold/features_risco_divida_ativa_pgfn.parquet."
       },
       {
         "gate_id": "GATE_07",
         "name": "Integracao ao EnrichmentEngine & Marts Cross-Domain",
         "status": "PASSED",
-        "criteria": "Disponibilizacao para enriquecimento fiscal municipal respeitando o Client Path Shield e integracao obrigatoria as marts cross-domain (dbt/models/marts/cross_domain/ + CrossDomainService)."
+        "criteria": "Integracao ao compliance corporativo respeitando o Client Path Shield e cruzamento obrigatorio em mart_cross_domain_kyc_antifraude_brasil."
       },
       {
         "gate_id": "GATE_08",
         "name": "Exposicao Multi-Interface (4 Interfaces)",
         "status": "PASSED",
-        "criteria": "Exposicao simultanea via SDK (BrazilData.treasury / siconfi), FastAPI (/api/v1/treasury/siconfi/*), CLI (bdg treasury siconfi *) e Servidor MCP (bdg_* com wrap_untrusted_gov_data)."
+        "criteria": "Exposicao simultanea via SDK (BrazilData.compliance + shortcuts), FastAPI (/api/v1/compliance/pgfn/*), CLI (bdg pgfn *) e MCP (bdg_get_pgfn_* com wrap_untrusted_gov_data)."
       },
       {
         "gate_id": "GATE_09",
         "name": "Bateria de Testes Unitarios & Paridade Offline",
         "status": "PASSED",
-        "criteria": "Testes unitarios offline completos com fixtures reais cobrindo extracao, 5 Pilares, quarentena, Gold ML e paridade nas 4 interfaces."
+        "criteria": "Testes unitarios offline completos em tests/connectors/test_pgfn_divida_ativa.py cobrindo 4 tabelas Silver, Gold ML e paridade nas 4 interfaces."
       },
       {
         "gate_id": "GATE_10",
         "name": "dbt Staging, Marts Intra-Domínio/Cross-Domain & 100% Colunas Documentadas",
         "status": "PASSED",
-        "criteria": "Modelos dbt com source.yml proprio, stg_*, dim_*/fct_*, mart intra-domínio dedicada (dbt/models/marts/macrofinanceiro/mart_contabilidade_fiscal_siconfi.sql) + cruzamento em marts cross-domain, dbt test verde e 100% de colunas documentadas no lint_dbt_docs.py."
+        "criteria": "Modelos dbt com source.yml, stg_*, fct_divida_ativa_pgfn_municipal, mart intra-dominio mart_divida_ativa_pgfn_brasil e cross-domain mart_cross_domain_kyc_antifraude_brasil aprovados no dbt test (91/91) e lint_dbt_docs.py (100% cobertura)."
       },
       {
         "gate_id": "GATE_11",
         "name": "Teste Real de 1 Linha com API ao Vivo (Fail-Hard)",
         "status": "PASSED",
-        "criteria": "Execucao obrigatoria contra endpoint ao vivo apidatalake.tesouro.gov.br/ords/siconfi/tt/entes limitado a registro real; falha reprova o pipeline."
+        "criteria": "Execucao obrigatoria contra repositorio oficial dadosabertos.pgfn.gov.br validando diretorios trimestrais; falha reprova o pipeline."
       }
     ]
   },
@@ -690,6 +690,12 @@
       "phase_id": "11.5",
       "milestone": "Wave 11.5A — Homologação do Conector stn_siconfi (5 Tabelas Silver, Mart Intra-Domínio, Mart Cross-Domain & Paridade 4 Interfaces)",
       "summary": "Implementação completa nos 11 Gates do conector stn_siconfi (STN SICONFI/Finbra): contrato ODCS v3.1, ingestão Bronze + 5 tabelas Silver ZSTD (siconfi_entes, siconfi_dca_balanco, siconfi_rreo_execucao, siconfi_rgf_limites, siconfi_extratos_entregas) + Gold ML (features_contabilidade_fiscal_siconfi), 5 staging views + fct_contabilidade_siconfi_municipal + mart intra-domínio mart_contabilidade_fiscal_siconfi + enriquecimento da mart cross-domain mart_cross_domain_territorio_b2b_macro_brasil (145 testes dbt OK, 100% colunas documentadas no lint_dbt_docs.py), paridade em SDK/FastAPI/CLI/MCP, bateria offline e teste live fail-hard contra apidatalake.tesouro.gov.br/ords/siconfi/tt/entes."
+    },
+    {
+      "date": "2026-11-17",
+      "phase_id": "11.5",
+      "milestone": "Wave 11.5A — Homologação do Conector pgfn_divida_ativa (4 Tabelas Silver, Mart Intra-Domínio, Mart Cross-Domain KYC & Paridade 4 Interfaces)",
+      "summary": "Implementação completa nos 11 Gates do conector pgfn_divida_ativa (PGFN Dívida Ativa Geral, Previdenciária e FGTS): contrato ODCS v3.1, ingestão Bronze + 4 tabelas Silver ZSTD + Gold ML (features_risco_divida_ativa_pgfn), 4 staging views + fct_divida_ativa_pgfn_municipal + mart intra-domínio mart_divida_ativa_pgfn_brasil + enriquecimento da mart cross-domain mart_cross_domain_kyc_antifraude_brasil (91 testes dbt OK, 100% colunas documentadas no lint_dbt_docs.py), paridade em SDK/FastAPI/CLI/MCP, bateria offline e teste live fail-hard contra dadosabertos.pgfn.gov.br."
     }
   ]
 }

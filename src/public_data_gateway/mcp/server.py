@@ -480,6 +480,50 @@ class MCPDispatcher:
                                 },
                             },
                             {
+                                "name": "bdg_get_pgfn_debtor_inscriptions",
+                                "description": "Lookup active PGFN Dívida Ativa da União inscriptions by CNPJ, masked CPF, debtor name, or IBGE municipality code (Tier 1).",
+                                "inputSchema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "documento_or_name": {"type": "string", "description": "CNPJ, debtor name, or 7-digit IBGE municipality code"},
+                                    },
+                                    "required": ["documento_or_name"],
+                                },
+                            },
+                            {
+                                "name": "bdg_get_pgfn_municipal_summary",
+                                "description": "Retrieve consolidated municipal PGFN active debt summary across general, previdenciário, and FGTS stocks (Tier 1).",
+                                "inputSchema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "id_municipio_or_name": {"type": "string", "description": "IBGE 7-digit municipality code or name (e.g. 1302603 or Manaus)"},
+                                    },
+                                    "required": ["id_municipio_or_name"],
+                                },
+                            },
+                            {
+                                "name": "bdg_get_pgfn_risk_features",
+                                "description": "Retrieve Gold PGFN tax default risk score, judicial execution rate, and exposure tier for a municipality (Tier 1).",
+                                "inputSchema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "id_municipio_or_name": {"type": "string", "description": "IBGE 7-digit municipality code or name (e.g. 3509502 or Campinas)"},
+                                    },
+                                    "required": ["id_municipio_or_name"],
+                                },
+                            },
+                            {
+                                "name": "bdg_list_top_pgfn_municipalities",
+                                "description": "List municipalities ranked by consolidated PGFN active debt & FGTS volume (Tier 1).",
+                                "inputSchema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "limit": {"type": "integer", "description": "Max municipalities to return (default: 10)"},
+                                        "sigla_uf": {"type": "string", "description": "Optional 2-letter UF state filter"},
+                                    },
+                                },
+                            },
+                            {
                                 "name": "bdg_search_catmat_materials",
                                 "description": "Search materials and catalog descriptions in Compras.gov.br CATMAT/SIASG with PDM, class, and sustainability flags (Tier 1).",
                                 "inputSchema": {
@@ -3112,6 +3156,85 @@ class MCPDispatcher:
                 sigla_uf=args.get("sigla_uf"),
             )
             wrapped = wrap_untrusted_gov_data(rows, source_id="stn_siconfi")
+            return {
+                "jsonrpc": "2.0",
+                "id": req_id,
+                "result": {"content": [{"type": "text", "text": wrapped}], "isError": False},
+            }
+
+        if tool_name == "bdg_get_pgfn_debtor_inscriptions":
+            from public_data_gateway.connectors.compliance.pgfn_divida_ativa import (
+                PgfnDividaAtivaConnector,
+            )
+
+            pgfn_conn = PgfnDividaAtivaConnector(settings=self.settings)
+            rows = pgfn_conn.get_debtor_inscriptions(str(args.get("documento_or_name", "")))
+            wrapped = wrap_untrusted_gov_data(rows, source_id="pgfn_divida_ativa")
+            return {
+                "jsonrpc": "2.0",
+                "id": req_id,
+                "result": {"content": [{"type": "text", "text": wrapped}], "isError": False},
+            }
+
+        if tool_name == "bdg_get_pgfn_municipal_summary":
+            from public_data_gateway.connectors.compliance.pgfn_divida_ativa import (
+                PgfnDividaAtivaConnector,
+            )
+
+            pgfn_conn = PgfnDividaAtivaConnector(settings=self.settings)
+            termo = str(args.get("id_municipio_or_name", ""))
+            summary = pgfn_conn.get_municipal_summary(termo)
+            if not summary:
+                return {
+                    "jsonrpc": "2.0",
+                    "id": req_id,
+                    "result": {
+                        "content": [{"type": "text", "text": f"PGFN municipal summary not found for '{termo}'"}],
+                        "isError": True,
+                    },
+                }
+            wrapped = wrap_untrusted_gov_data(summary, source_id="pgfn_divida_ativa")
+            return {
+                "jsonrpc": "2.0",
+                "id": req_id,
+                "result": {"content": [{"type": "text", "text": wrapped}], "isError": False},
+            }
+
+        if tool_name == "bdg_get_pgfn_risk_features":
+            from public_data_gateway.connectors.compliance.pgfn_divida_ativa import (
+                PgfnDividaAtivaConnector,
+            )
+
+            pgfn_conn = PgfnDividaAtivaConnector(settings=self.settings)
+            termo = str(args.get("id_municipio_or_name", ""))
+            feat = pgfn_conn.get_pgfn_features(termo)
+            if not feat:
+                return {
+                    "jsonrpc": "2.0",
+                    "id": req_id,
+                    "result": {
+                        "content": [{"type": "text", "text": f"PGFN risk features not found for '{termo}'"}],
+                        "isError": True,
+                    },
+                }
+            wrapped = wrap_untrusted_gov_data(feat, source_id="pgfn_divida_ativa")
+            return {
+                "jsonrpc": "2.0",
+                "id": req_id,
+                "result": {"content": [{"type": "text", "text": wrapped}], "isError": False},
+            }
+
+        if tool_name == "bdg_list_top_pgfn_municipalities":
+            from public_data_gateway.connectors.compliance.pgfn_divida_ativa import (
+                PgfnDividaAtivaConnector,
+            )
+
+            pgfn_conn = PgfnDividaAtivaConnector(settings=self.settings)
+            rows = pgfn_conn.list_top_municipalities(
+                limit=int(args.get("limit", 10)),
+                sigla_uf=args.get("sigla_uf"),
+            )
+            wrapped = wrap_untrusted_gov_data(rows, source_id="pgfn_divida_ativa")
             return {
                 "jsonrpc": "2.0",
                 "id": req_id,

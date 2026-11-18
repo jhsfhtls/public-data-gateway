@@ -1,0 +1,223 @@
+contract_id: ODCS-BR-PGFN-DIVIDA-001
+source_id: pgfn_divida_ativa
+version: 1.0.0
+grain: 1 row per PGFN active debt inscription (General, Social Security, or FGTS) or municipal aggregate
+name: Procuradoria-Geral da Fazenda Nacional - Dívida Ativa da União e FGTS
+agency: Procuradoria-Geral da Fazenda Nacional (PGFN / Ministério da Fazenda)
+official_url: https://dadosabertos.pgfn.gov.br/
+segment_id: 08_judicial_compliance
+access_mode: LAKEHOUSE_BATCH
+protocol: HTTP_BULK_ZIP
+auth_type: NONE
+update_frequency: Trimestral
+freshness_sla_hours: 2160
+cron_schedule_expression: "0 3 15 */3 *"
+lgpd_legal_basis: public_interest_lai_art_198_ctn
+min_expected_rows: 10
+primary_keys:
+  - numero_inscricao
+  - id_municipio
+  - sigla_uf
+canonical_keys:
+  - cnpj_14
+  - cpf_masked
+  - id_municipio
+  - sigla_uf
+sentinel_values:
+  - -1
+  - -99
+  - N/D
+  - SEM INFORMACAO
+columns:
+  - name: numero_inscricao
+    data_type: STRING
+    required: true
+    nullable: false
+    description: Número único identificador da inscrição em Dívida Ativa da União
+  - name: documento_devedor
+    data_type: STRING
+    required: true
+    nullable: false
+    description: CNPJ de 14 dígitos ou CPF mascarado conforme LGPD/Art. 198 CTN
+  - name: tipo_pessoa
+    data_type: STRING
+    required: true
+    nullable: false
+    description: Natureza jurídica do devedor (Pessoa jurídica ou Pessoa física)
+  - name: nome_devedor
+    data_type: STRING
+    required: true
+    nullable: false
+    description: Razão social ou nome público do contribuinte inscrito
+  - name: id_municipio
+    data_type: STRING
+    required: true
+    nullable: false
+    description: Código IBGE canônico de 7 dígitos do município do devedor
+  - name: sigla_uf
+    data_type: STRING
+    required: true
+    nullable: false
+    description: Sigla da Unidade Federativa de 2 caracteres
+  - name: unidade_responsavel
+    data_type: STRING
+    required: true
+    nullable: false
+    description: Procuradoria da Fazenda Nacional responsável pela cobrança
+  - name: situacao_inscricao
+    data_type: STRING
+    required: true
+    nullable: false
+    description: Situação cadastral da inscrição (Em cobrança, Parcelado, Em garantia)
+  - name: indicador_ajuizado
+    data_type: BOOLEAN
+    required: true
+    nullable: false
+    description: Indica se o crédito já foi ajuizado em execução fiscal
+  - name: valor_consolidado_brl
+    data_type: FLOAT64
+    required: true
+    nullable: false
+    description: Valor consolidado do débito inscrito em Reais (BRL)
+  - name: ano_trimestre_ref
+    data_type: STRING
+    required: true
+    nullable: false
+    description: Trimestre oficial de referência da carga PGFN (ex. 2025_trimestre_02)
+tables:
+  - name: pgfn_inscricoes_gerais
+    description: Créditos inscritos em Dívida Ativa Não-Previdenciária (Geral/Tributária)
+    layer: silver
+    schema:
+      - name: numero_inscricao
+        type: STRING
+        description: Número único da inscrição em Dívida Ativa
+      - name: documento_devedor
+        type: STRING
+        description: CNPJ 14D ou CPF mascarado (LGPD)
+      - name: tipo_pessoa
+        type: STRING
+        description: Tipo de contribuinte (Pessoa jurídica ou Pessoa física)
+      - name: nome_devedor
+        type: STRING
+        description: Razão social ou nome do devedor inscrito
+      - name: id_municipio
+        type: STRING
+        description: Código IBGE canônico de 7 dígitos
+      - name: sigla_uf
+        type: STRING
+        description: Sigla de 2 letras da UF
+      - name: unidade_responsavel
+        type: STRING
+        description: Procuradoria responsável pela cobrança
+      - name: situacao_inscricao
+        type: STRING
+        description: Situação processual da inscrição PGFN
+      - name: indicador_ajuizado
+        type: BOOLEAN
+        description: Flag booleano de execução fiscal ajuizada
+      - name: valor_consolidado_brl
+        type: FLOAT64
+        description: Montante consolidado da inscrição em BRL
+      - name: ano_trimestre_ref
+        type: STRING
+        description: Competência trimestral dos dados abertos
+  - name: pgfn_divida_previdenciaria
+    description: Débitos Previdenciários (INSS/RFB) inscritos em Dívida Ativa da União
+    layer: silver
+    schema:
+      - name: numero_inscricao
+        type: STRING
+        description: Número único da inscrição previdenciária
+      - name: documento_devedor
+        type: STRING
+        description: CNPJ 14D ou CPF mascarado do devedor
+      - name: nome_devedor
+        type: STRING
+        description: Razão social ou nome público do contribuinte
+      - name: id_municipio
+        type: STRING
+        description: Código IBGE canônico de 7 dígitos
+      - name: sigla_uf
+        type: STRING
+        description: Sigla da Unidade da Federação
+      - name: situacao_inscricao
+        type: STRING
+        description: Situação da inscrição previdenciária
+      - name: indicador_ajuizado
+        type: BOOLEAN
+        description: Indica se há execução fiscal ajuizada
+      - name: valor_consolidado_brl
+        type: FLOAT64
+        description: Valor consolidado do débito previdenciário em BRL
+      - name: ano_trimestre_ref
+        type: STRING
+        description: Competência trimestral de referência
+  - name: pgfn_divida_fgts
+    description: Débitos de FGTS inscritos em Dívida Ativa perante a PGFN/Caixa
+    layer: silver
+    schema:
+      - name: numero_inscricao
+        type: STRING
+        description: Número único da inscrição FGTS
+      - name: documento_devedor
+        type: STRING
+        description: CNPJ 14D ou CPF mascarado do empregador devedor
+      - name: nome_devedor
+        type: STRING
+        description: Razão social ou nome do devedor FGTS
+      - name: id_municipio
+        type: STRING
+        description: Código IBGE canônico de 7 dígitos
+      - name: sigla_uf
+        type: STRING
+        description: Sigla da Unidade da Federação
+      - name: situacao_inscricao
+        type: STRING
+        description: Situação cadastral do crédito de FGTS
+      - name: indicador_ajuizado
+        type: BOOLEAN
+        description: Flag de execução judicial ajuizada
+      - name: valor_consolidado_brl
+        type: FLOAT64
+        description: Valor consolidado do débito FGTS em BRL
+      - name: ano_trimestre_ref
+        type: STRING
+        description: Competência trimestral de referência
+  - name: pgfn_resumo_municipal
+    description: Consolidado municipal do estoque de Dívida Ativa PGFN, previdenciária e FGTS
+    layer: silver
+    schema:
+      - name: id_municipio
+        type: STRING
+        description: Código IBGE canônico de 7 dígitos
+      - name: sigla_uf
+        type: STRING
+        description: Sigla da Unidade da Federação
+      - name: nome_municipio
+        type: STRING
+        description: Nome oficial do município
+      - name: ano_trimestre_ref
+        type: STRING
+        description: Competência trimestral consolidada
+      - name: total_inscricoes_ativas
+        type: INT64
+        description: Quantidade de inscrições ativas em DAU e FGTS
+      - name: total_devedores_pj
+        type: INT64
+        description: Quantidade distinta de CNPJs devedores no recorte
+      - name: valor_total_geral_brl
+        type: FLOAT64
+        description: Soma dos débitos não-previdenciários (gerais) em BRL
+      - name: valor_total_previdenciario_brl
+        type: FLOAT64
+        description: Soma dos débitos previdenciários em BRL
+      - name: valor_total_fgts_brl
+        type: FLOAT64
+        description: Soma dos débitos de FGTS em BRL
+      - name: valor_total_consolidado_brl
+        type: FLOAT64
+        description: Estoque total consolidado de Dívida Ativa no município em BRL
+      - name: taxa_ajuizamento_pct
+        type: FLOAT64
+        description: Percentual de inscrições com execução fiscal ajuizada (%)

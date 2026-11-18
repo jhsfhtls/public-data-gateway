@@ -780,6 +780,78 @@ def create_app(settings: GatewaySettings | None = None) -> FastAPI:
             limit=limit, sigla_uf=uf
         )
 
+    # 15C. PGFN Dívida Ativa da União & FGTS (Compliance & Risco Fiscal)
+    @app.get("/api/v1/compliance/pgfn/debtor/{documento_or_name}")
+    async def get_pgfn_debtor(documento_or_name: str) -> list[dict[str, Any]]:
+        from public_data_gateway.connectors.compliance.pgfn_divida_ativa import (
+            PgfnDividaAtivaConnector,
+        )
+
+        return PgfnDividaAtivaConnector(settings=app_settings).get_debtor_inscriptions(
+            documento_or_name
+        )
+
+    @app.get("/api/v1/compliance/pgfn/previdenciario/{termo}")
+    async def get_pgfn_previdenciario(termo: str) -> list[dict[str, Any]]:
+        from public_data_gateway.connectors.compliance.pgfn_divida_ativa import (
+            PgfnDividaAtivaConnector,
+        )
+
+        return PgfnDividaAtivaConnector(settings=app_settings).get_previdenciario_debts(termo)
+
+    @app.get("/api/v1/compliance/pgfn/fgts/{termo}")
+    async def get_pgfn_fgts(termo: str) -> list[dict[str, Any]]:
+        from public_data_gateway.connectors.compliance.pgfn_divida_ativa import (
+            PgfnDividaAtivaConnector,
+        )
+
+        return PgfnDividaAtivaConnector(settings=app_settings).get_fgts_debts(termo)
+
+    @app.get("/api/v1/compliance/pgfn/municipio/{id_municipio_or_name}")
+    async def get_pgfn_municipio(id_municipio_or_name: str) -> dict[str, Any]:
+        from public_data_gateway.connectors.compliance.pgfn_divida_ativa import (
+            PgfnDividaAtivaConnector,
+        )
+
+        res = PgfnDividaAtivaConnector(settings=app_settings).get_municipal_summary(
+            id_municipio_or_name
+        )
+        if not res:
+            raise HTTPException(
+                status_code=404,
+                detail=f"PGFN summary not found for '{id_municipio_or_name}'",
+            )
+        return res
+
+    @app.get("/api/v1/compliance/pgfn/features/{id_municipio_or_name}")
+    async def get_pgfn_features(id_municipio_or_name: str) -> dict[str, Any]:
+        from public_data_gateway.connectors.compliance.pgfn_divida_ativa import (
+            PgfnDividaAtivaConnector,
+        )
+
+        res = PgfnDividaAtivaConnector(settings=app_settings).get_pgfn_features(
+            id_municipio_or_name
+        )
+        if not res:
+            raise HTTPException(
+                status_code=404,
+                detail=f"PGFN fiscal risk features not found for '{id_municipio_or_name}'",
+            )
+        return res
+
+    @app.get("/api/v1/compliance/pgfn/ranking")
+    async def get_pgfn_ranking(
+        limit: int = Query(10, ge=1, le=50, description="Max municipalities to return"),
+        uf: str | None = Query(None, description="Optional 2-letter UF state filter"),
+    ) -> list[dict[str, Any]]:
+        from public_data_gateway.connectors.compliance.pgfn_divida_ativa import (
+            PgfnDividaAtivaConnector,
+        )
+
+        return PgfnDividaAtivaConnector(settings=app_settings).list_top_municipalities(
+            limit=limit, sigla_uf=uf
+        )
+
     # 16. Public Procurement Catalog & Pricing (Compras.gov.br CATMAT/CATSER)
     @app.get("/api/v1/procurement/materials/search")
     async def search_materials(
