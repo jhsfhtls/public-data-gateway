@@ -3102,6 +3102,76 @@ def create_app(settings: GatewaySettings | None = None) -> FastAPI:
         except (ValueError, KeyError) as exc:
             raise HTTPException(status_code=400, detail=str(exc)) from exc
 
+    # IBAMA SIFISC (Autos de Infração, Embargos & Fiscalização Ambiental)
+    @app.get("/api/v1/environment/ibama/autos/{termo}")
+    async def get_ibama_autos(termo: str) -> list[dict[str, Any]]:
+        from public_data_gateway.connectors.ambiental.ibama_fiscalizacao import (
+            IbamaFiscalizacaoConnector,
+        )
+
+        conn = IbamaFiscalizacaoConnector(settings=app_settings)
+        return conn.get_infractions(termo)
+
+    @app.get("/api/v1/environment/ibama/embargos/{termo}")
+    async def get_ibama_embargos(termo: str) -> list[dict[str, Any]]:
+        from public_data_gateway.connectors.ambiental.ibama_fiscalizacao import (
+            IbamaFiscalizacaoConnector,
+        )
+
+        conn = IbamaFiscalizacaoConnector(settings=app_settings)
+        return conn.get_embargoes(termo)
+
+    @app.get("/api/v1/environment/ibama/multas/{id_municipio_or_name}")
+    async def get_ibama_multas(id_municipio_or_name: str) -> dict[str, Any]:
+        from public_data_gateway.connectors.ambiental.ibama_fiscalizacao import (
+            IbamaFiscalizacaoConnector,
+        )
+
+        conn = IbamaFiscalizacaoConnector(settings=app_settings)
+        res = conn.get_fines_judgment(id_municipio_or_name)
+        if res is None:
+            raise HTTPException(status_code=404, detail="IBAMA fines judgment summary not found")
+        return res
+
+    @app.get("/api/v1/environment/ibama/municipio/{id_municipio_or_name}")
+    async def get_ibama_municipio(id_municipio_or_name: str) -> dict[str, Any]:
+        from public_data_gateway.connectors.ambiental.ibama_fiscalizacao import (
+            IbamaFiscalizacaoConnector,
+        )
+
+        conn = IbamaFiscalizacaoConnector(settings=app_settings)
+        res = conn.get_municipal_summary(id_municipio_or_name)
+        if res is None:
+            raise HTTPException(status_code=404, detail="IBAMA municipal summary not found")
+        return res
+
+    @app.get("/api/v1/environment/ibama/features/{id_municipio_or_name}")
+    async def get_ibama_features(id_municipio_or_name: str) -> dict[str, Any]:
+        from public_data_gateway.connectors.ambiental.ibama_fiscalizacao import (
+            IbamaFiscalizacaoConnector,
+        )
+
+        conn = IbamaFiscalizacaoConnector(settings=app_settings)
+        res = conn.get_ibama_features(id_municipio_or_name)
+        if res is None:
+            raise HTTPException(status_code=404, detail="IBAMA Gold features not found")
+        return res
+
+    @app.get("/api/v1/environment/ibama/ranking")
+    async def get_ibama_ranking(
+        limit: int = Query(10, ge=1, le=50, description="Max municipalities to list"),
+        uf: str | None = Query(None, description="Optional 2-letter state filter"),
+        sort_by_risk: bool = Query(
+            False, description="Sort ascending by compliance score (highest embargo risk first)"
+        ),
+    ) -> list[dict[str, Any]]:
+        from public_data_gateway.connectors.ambiental.ibama_fiscalizacao import (
+            IbamaFiscalizacaoConnector,
+        )
+
+        conn = IbamaFiscalizacaoConnector(settings=app_settings)
+        return conn.list_top_municipalities(limit=limit, sigla_uf=uf, sort_by_risk=sort_by_risk)
+
     @app.get("/api/v1/metaportals/datalake/top-municipalities")
     async def get_top_bd_municipalities(
         limit: int = Query(10, ge=1, le=50, description="Max municipalities to list"),

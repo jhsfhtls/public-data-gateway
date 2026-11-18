@@ -56,6 +56,17 @@ telecom AS (
     QUALIFY ROW_NUMBER() OVER (PARTITION BY id_municipio ORDER BY reference_date DESC NULLS LAST) = 1
 ),
 
+ibama AS (
+    SELECT
+        id_municipio,
+        qtd_autos_infracao_ibama,
+        qtd_embargos_ativos_ibama,
+        area_embargada_ibama_ha,
+        valor_multas_ibama_brl,
+        score_conformidade_ibama
+    FROM {{ ref('mart_fiscalizacao_embargos_ibama_brasil') }}
+),
+
 joined AS (
     SELECT
         t.id_municipio,
@@ -78,12 +89,18 @@ joined AS (
         COALESCE(tel.populacao_coberta_5g_pct, 0.0) AS populacao_coberta_5g_pct,
         COALESCE(tel.participacao_fibra_ftth_pct, 0.0) AS participacao_fibra_ftth_pct,
         COALESCE(tel.score_conectividade_digital, 60.0) AS score_conectividade_digital,
+        COALESCE(ib.qtd_autos_infracao_ibama, 0) AS qtd_autos_infracao_ibama,
+        COALESCE(ib.qtd_embargos_ativos_ibama, 0) AS qtd_embargos_ativos_ibama,
+        COALESCE(ib.area_embargada_ibama_ha, 0.0) AS area_embargada_ibama_ha,
+        COALESCE(ib.valor_multas_ibama_brl, 0.0) AS valor_multas_ibama_brl,
+        COALESCE(ib.score_conformidade_ibama, 70.0) AS score_conformidade_ibama,
         t.reference_date
     FROM terra t
     LEFT JOIN sicar s ON t.id_municipio = s.id_municipio
     LEFT JOIN zarc z ON t.id_municipio = z.id_municipio
     LEFT JOIN hidro h ON t.id_municipio = h.id_municipio
     LEFT JOIN telecom tel ON t.id_municipio = tel.id_municipio
+    LEFT JOIN ibama ib ON t.id_municipio = ib.id_municipio
 ),
 
 scored AS (

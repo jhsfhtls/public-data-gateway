@@ -176,6 +176,21 @@ models:
       - name: score_conectividade_digital
         description: "Score composto de conectividade digital ANATEL (0-100)."
         tests: [not_null]
+      - name: qtd_autos_infracao_ibama
+        description: "Quantidade acumulada de autos de infração ambiental lavrados pelo IBAMA no município."
+        tests: [not_null]
+      - name: qtd_embargos_ativos_ibama
+        description: "Quantidade vigente de termos de embargo ambientais IBAMA ativos no município."
+        tests: [not_null]
+      - name: area_embargada_ibama_ha
+        description: "Área territorial acumulada sob embargo ambiental do IBAMA no município em hectares (ha)."
+        tests: [not_null]
+      - name: valor_multas_ibama_brl
+        description: "Montante consolidado de multas ambientais aplicadas pelo IBAMA no município em Reais (BRL)."
+        tests: [not_null]
+      - name: score_conformidade_ibama
+        description: "Score de conformidade regulatória e baixa pressão de embargos IBAMA/EUDR no município (0-100)."
+        tests: [not_null]
       - name: reference_date
         description: "Data de referência ISO-8601 (YYYY-MM-DD)."
         tests: [not_null]
