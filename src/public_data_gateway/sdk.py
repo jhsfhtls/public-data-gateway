@@ -1966,6 +1966,58 @@ class HealthFacade:
             limit=limit, sigla_uf=sigla_uf
         )
 
+    @property
+    def ans_connector(self) -> Any:
+        if (
+            not hasattr(self, "_ans_connector")
+            or self._ans_connector is None
+        ):
+            from public_data_gateway.connectors.saude.ans_saude_suplementar import (
+                AnsSaudeSuplementarConnector,
+            )
+
+            self._ans_connector = AnsSaudeSuplementarConnector(
+                settings=self._sdk.settings
+            )
+        return self._ans_connector
+
+    def get_ans_beneficiaries(self, termo: str) -> list[dict[str, Any]]:
+        """Lookup ANS private health plan beneficiaries by code, care line, IBGE, UF, or city."""
+        return self.ans_connector.get_beneficiaries(termo)
+
+    def get_ans_operator_quality(self, termo: str) -> list[dict[str, Any]]:
+        """Lookup ANS operators IDSS quality score, average ticket, and NIP complaints."""
+        return self.ans_connector.get_operator_quality_idss(termo)
+
+    def get_ans_diops_loss_ratio(
+        self, id_municipio_or_name: str
+    ) -> dict[str, Any] | None:
+        """Retrieve ANS DIOPS revenue, medical loss ratio (sinistralidade), and solvency ratio."""
+        return self.ans_connector.get_diops_loss_ratio(id_municipio_or_name)
+
+    def get_ans_municipal_summary(
+        self, id_municipio_or_name: str
+    ) -> dict[str, Any] | None:
+        """Retrieve consolidated municipal ANS private beneficiaries, coverage, IDSS, and loss ratio."""
+        return self.ans_connector.get_ans_summary(id_municipio_or_name)
+
+    def get_ans_features(
+        self, id_municipio_or_name: str
+    ) -> dict[str, Any] | None:
+        """Retrieve Gold ANS supplementary health market maturity score and tier."""
+        return self.ans_connector.get_ans_features(id_municipio_or_name)
+
+    def list_top_ans_municipalities(
+        self,
+        limit: int = 10,
+        sigla_uf: str | None = None,
+        sort_by_beneficiaries: bool = False,
+    ) -> list[dict[str, Any]]:
+        """List municipalities ranked by ANS supplementary health score or total beneficiaries."""
+        return self.ans_connector.list_top_ans_municipalities(
+            limit=limit, sigla_uf=sigla_uf, sort_by_beneficiaries=sort_by_beneficiaries
+        )
+
 
 class EducationFacade:
     """Unified developer facade for basic education, school infrastructure, and INEP Censo Escolar analytics."""
@@ -4811,6 +4863,43 @@ class BrazilData:
         """Listar municípios líderes em score de vigilância epidemiológica e imunização OpenDataSUS."""
         return self.health.list_top_vigilancia_surveillance_municipalities(
             limit=limit, sigla_uf=sigla_uf
+        )
+
+    def get_ans_beneficiaries(self, termo: str) -> list[dict[str, Any]]:
+        """Consultar beneficiários ativos SIB/ANS de planos privados por segmentação, IBGE, UF ou município."""
+        return self.health.get_ans_beneficiaries(termo)
+
+    def get_ans_operator_quality(self, termo: str) -> list[dict[str, Any]]:
+        """Consultar notas IDSS de operadoras ANS, ticket médio mensal e reclamações NIP."""
+        return self.health.get_ans_operator_quality(termo)
+
+    def get_ans_diops_loss_ratio(
+        self, id_municipio_or_name: str
+    ) -> dict[str, Any] | None:
+        """Consultar receita de contraprestações, sinistralidade assistencial e solvência DIOPS/ANS."""
+        return self.health.get_ans_diops_loss_ratio(id_municipio_or_name)
+
+    def get_ans_municipal_summary(
+        self, id_municipio_or_name: str
+    ) -> dict[str, Any] | None:
+        """Consultar consolidado municipal ANS de beneficiários médico-odontológicos, cobertura e IDSS."""
+        return self.health.get_ans_municipal_summary(id_municipio_or_name)
+
+    def get_ans_features(
+        self, id_municipio_or_name: str
+    ) -> dict[str, Any] | None:
+        """Consultar features Gold ANS de maturidade do mercado suplementar de saúde."""
+        return self.health.get_ans_features(id_municipio_or_name)
+
+    def list_top_ans_municipalities(
+        self,
+        limit: int = 10,
+        sigla_uf: str | None = None,
+        sort_by_beneficiaries: bool = False,
+    ) -> list[dict[str, Any]]:
+        """Listar municípios ranqueados por maturidade de saúde suplementar ANS ou total de beneficiários."""
+        return self.health.list_top_ans_municipalities(
+            limit=limit, sigla_uf=sigla_uf, sort_by_beneficiaries=sort_by_beneficiaries
         )
 
     def get_censo_escolar_infrastructure(self, id_municipio: str) -> dict[str, Any]:

@@ -938,3 +938,58 @@ models:
         description: "Timestamp ISO-8601 UTC da geração."
         tests:
           - not_null
+
+  - name: mart_ans_saude_suplementar_brasil
+    description: "Data Mart Gold intra-domínio consolidando cobertura privada SIB/ANS, índice de qualidade IDSS de operadoras, sinistralidade DIOPS e maturidade de saúde suplementar municipal."
+    columns:
+      - name: id_municipio
+        description: "Código IBGE de 7 dígitos do município (STRING)."
+        tests: [not_null, unique]
+      - name: sigla_uf
+        description: "Sigla de 2 letras da Unidade Federativa (UF)."
+        tests: [not_null]
+      - name: nome_municipio
+        description: "Nome oficial do município."
+        tests: [not_null]
+      - name: regiao
+        description: "Macrorregião geográfica brasileira."
+        tests: [not_null]
+      - name: total_beneficiarios_med_odo
+        description: "Total consolidado de beneficiários médico-hospitalares e odontológicos ANS."
+        tests: [not_null]
+      - name: taxa_cobertura_privada_pct
+        description: "Percentual populacional municipal coberto por planos privados de saúde (%)."
+        tests: [not_null]
+      - name: idss_medio_ponderado
+        description: "Nota média ponderada IDSS (0 a 1) atribuída pela ANS às operadoras atuantes."
+        tests: [not_null]
+      - name: sinistralidade_assistencial_pct
+        description: "Taxa média de sinistralidade assistencial na carteira privada (%)."
+        tests: [not_null]
+      - name: receita_contraprestacoes_mil_brl
+        description: "Receita anual estimada de contraprestações privadas na praça (R$ mil)."
+        tests: [not_null]
+      - name: qtd_segmentacoes_ans
+        description: "Quantidade de segmentações assistenciais ANS consolidadas na Silver."
+        tests: [not_null]
+      - name: operadoras_atuantes_count
+        description: "Total de operadoras ativas com carteiras de saúde no município."
+        tests: [not_null]
+      - name: ticket_medio_mensal_brl
+        description: "Contraprestação mensal média por beneficiário (BRL)."
+        tests: [not_null]
+      - name: reclamacoes_nip_10k_benef
+        description: "Taxa de demandas assistenciais NIP por 10 mil beneficiários."
+        tests: [not_null]
+      - name: provisoes_tecnicas_cobertura_pct
+        description: "Lastro em ativos garantidores sobre provisões técnicas ANS (%)."
+        tests: [not_null]
+      - name: indice_solvencia_ans_pct
+        description: "Índice de solvência patrimonial regulatória DIOPS/ANS (%)."
+        tests: [not_null]
+      - name: score_maturidade_saude_suplementar_ans
+        description: "Score sintético municipal de maturidade, qualidade IDSS e equilíbrio de saúde suplementar ANS (0-100)."
+        tests: [not_null]
+      - name: tier_saude_suplementar_ans
+        description: "Classificação municipal ANS (POLO_ALTA_COBERTURA_ANS, MERCADO_SUPLEMENTAR_EQUILIBRADO ou BAIXA_PENETRACAO_PRIVADA)."
+        tests: [not_null]

@@ -189,6 +189,16 @@ cvm_extra_uf AS (
     GROUP BY sigla_uf
 ),
 
+ans_uf AS (
+    SELECT
+        sigla_uf,
+        SUM(total_beneficiarios_med_odo) AS total_beneficiarios_ans_uf,
+        ROUND(AVG(idss_medio_ponderado), 3) AS avg_idss_ans_uf,
+        ROUND(AVG(score_maturidade_saude_suplementar_ans), 2) AS avg_score_saude_suplementar_ans_uf
+    FROM {{ ref('mart_ans_saude_suplementar_brasil') }}
+    GROUP BY sigla_uf
+),
+
 base AS (
     SELECT
         t.sigla_uf,
@@ -244,6 +254,9 @@ base AS (
         COALESCE(cvx.volume_captado_rcvm160_cvm_uf_mil_brl, 0.0) AS volume_captado_rcvm160_cvm_uf_mil_brl,
         COALESCE(cvx.assessores_investimento_cvm_uf, 0) AS assessores_investimento_cvm_uf,
         COALESCE(cvx.avg_score_mercado_capitais_cvm_uf, 75.0) AS avg_score_mercado_capitais_cvm_uf,
+        COALESCE(an.total_beneficiarios_ans_uf, 0) AS total_beneficiarios_ans_uf,
+        COALESCE(an.avg_idss_ans_uf, 0.78) AS avg_idss_ans_uf,
+        COALESCE(an.avg_score_saude_suplementar_ans_uf, 75.0) AS avg_score_saude_suplementar_ans_uf,
         COALESCE(m.ano_mes, '2025-03') AS macro_ano_mes_referencia,
         COALESCE(m.selic_meta_fim_mes_pct, 14.25) AS selic_meta_fim_mes_pct,
         COALESCE(m.ipca_acumulado_12m_pct, 5.06) AS ipca_acumulado_12m_pct,
@@ -267,6 +280,7 @@ base AS (
     LEFT JOIN eleicoes_uf el ON t.sigla_uf = el.sigla_uf
     LEFT JOIN bndes_uf bn ON t.sigla_uf = bn.sigla_uf
     LEFT JOIN cvm_extra_uf cvx ON t.sigla_uf = cvx.sigla_uf
+    LEFT JOIN ans_uf an ON t.sigla_uf = an.sigla_uf
     CROSS JOIN macro_latest m
 ),
 

@@ -3011,6 +3011,86 @@ def create_app(settings: GatewaySettings | None = None) -> FastAPI:
         except ValueError as exc:
             raise HTTPException(status_code=400, detail=str(exc)) from exc
 
+    # 15J. ANS Saúde Suplementar (Beneficiários, Operadoras, IDSS & Sinistralidade)
+    @app.get("/api/v1/health/ans-suplementar/beneficiarios/{termo}")
+    async def get_ans_beneficiarios(termo: str) -> list[dict[str, Any]]:
+        from public_data_gateway.connectors.saude.ans_saude_suplementar import (
+            AnsSaudeSuplementarConnector,
+        )
+
+        return AnsSaudeSuplementarConnector(settings=app_settings).get_beneficiaries(termo)
+
+    @app.get("/api/v1/health/ans-suplementar/idss/{termo}")
+    async def get_ans_idss(termo: str) -> list[dict[str, Any]]:
+        from public_data_gateway.connectors.saude.ans_saude_suplementar import (
+            AnsSaudeSuplementarConnector,
+        )
+
+        return AnsSaudeSuplementarConnector(settings=app_settings).get_operator_quality_idss(termo)
+
+    @app.get("/api/v1/health/ans-suplementar/diops/{id_municipio_or_name}")
+    async def get_ans_diops(id_municipio_or_name: str) -> dict[str, Any]:
+        from public_data_gateway.connectors.saude.ans_saude_suplementar import (
+            AnsSaudeSuplementarConnector,
+        )
+
+        res = AnsSaudeSuplementarConnector(settings=app_settings).get_diops_loss_ratio(
+            id_municipio_or_name
+        )
+        if res is None:
+            raise HTTPException(
+                status_code=404, detail="ANS DIOPS loss ratio metrics not found"
+            )
+        return res
+
+    @app.get("/api/v1/health/ans-suplementar/municipio/{id_municipio_or_name}")
+    async def get_ans_municipio(id_municipio_or_name: str) -> dict[str, Any]:
+        from public_data_gateway.connectors.saude.ans_saude_suplementar import (
+            AnsSaudeSuplementarConnector,
+        )
+
+        res = AnsSaudeSuplementarConnector(settings=app_settings).get_ans_summary(
+            id_municipio_or_name
+        )
+        if res is None:
+            raise HTTPException(
+                status_code=404, detail="ANS municipal summary not found"
+            )
+        return res
+
+    @app.get("/api/v1/health/ans-suplementar/features/{id_municipio_or_name}")
+    async def get_ans_features_endpoint(id_municipio_or_name: str) -> dict[str, Any]:
+        from public_data_gateway.connectors.saude.ans_saude_suplementar import (
+            AnsSaudeSuplementarConnector,
+        )
+
+        res = AnsSaudeSuplementarConnector(settings=app_settings).get_ans_features(
+            id_municipio_or_name
+        )
+        if res is None:
+            raise HTTPException(
+                status_code=404, detail="ANS Gold supplementary health features not found"
+            )
+        return res
+
+    @app.get("/api/v1/health/ans-suplementar/ranking")
+    async def get_ans_ranking(
+        limit: int = Query(10, ge=1, le=50, description="Max municipalities to list"),
+        uf: str | None = Query(None, description="Optional 2-letter state filter"),
+        sort_by_beneficiaries: bool = Query(
+            False, description="Sort descending by active medical+dental beneficiaries"
+        ),
+    ) -> list[dict[str, Any]]:
+        from public_data_gateway.connectors.saude.ans_saude_suplementar import (
+            AnsSaudeSuplementarConnector,
+        )
+
+        return AnsSaudeSuplementarConnector(
+            settings=app_settings
+        ).list_top_ans_municipalities(
+            limit=limit, sigla_uf=uf, sort_by_beneficiaries=sort_by_beneficiaries
+        )
+
     @app.get("/api/v1/education/censo-escolar/top-municipalities")
     async def get_top_censo_escolar_municipalities(
         limit: int = Query(10, ge=1, le=50, description="Max municipalities to list"),

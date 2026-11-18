@@ -2169,3 +2169,32 @@ sources:
   status: HOMOLOGATED
   freshness_sla_hours: 720
   cron_schedule_expression: 0 7 5 * *
+- source_id: ans_saude_suplementar
+  name: 'ANS Saúde Suplementar: Beneficiários, Operadoras, IDSS & Sinistralidade'
+  agency: Agência Nacional de Saúde Suplementar (ANS)
+  official_url: https://dadosabertos.ans.gov.br/FTP/PDA/
+  segment_id: 06_saude_publica
+  segment_name: Saúde Pública & Epidemiologia
+  access_mode: LAKEHOUSE_BATCH
+  protocol: HTTP_BULK_ZIP
+  auth_type: NONE
+  canonical_keys:
+  - id_municipio
+  - sigla_uf
+  update_frequency: Mensal (SIB Beneficiários) & Trimestral (DIOPS & IDSS)
+  estimated_volume: ~5.570 municípios com vínculos ativos de planos privados, IDSS e sinistralidade (~490 MB)
+  lgpd_tier: ANONYMIZED_MICRODATA
+  ml_feature_domains:
+  - supplementary_health_coverage
+  - health_operator_idss_quality
+  - diops_medical_loss_solvency
+  solution_packs:
+  - P01
+  - P03
+  - P05
+  - P06
+  rice_score: 885
+  roadmap_wave: 2
+  status: HOMOLOGATED
+  freshness_sla_hours: 720
+  cron_schedule_expression: 0 8 10 * *

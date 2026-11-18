@@ -163,6 +163,15 @@ models:
       - name: avg_score_mercado_capitais_cvm_uf
         description: "Média estadual do score de sofisticação e conformidade do mercado de capitais CVM (0-100)."
         tests: [not_null]
+      - name: total_beneficiarios_ans_uf
+        description: "Contingente total estadual de beneficiários ativos em planos médico-hospitalares e odontológicos ANS."
+        tests: [not_null]
+      - name: avg_idss_ans_uf
+        description: "Média estadual ponderada do Índice de Desempenho da Saúde Suplementar (IDSS/ANS, 0-1)."
+        tests: [not_null]
+      - name: avg_score_saude_suplementar_ans_uf
+        description: "Média estadual do score de maturidade, qualidade IDSS e equilíbrio de saúde suplementar ANS (0-100)."
+        tests: [not_null]
       - name: macro_ano_mes_referencia
         description: "Competência macroeconômica de referência (YYYY-MM)."
         tests: [not_null]

@@ -1,0 +1,26 @@
+version: 2
+
+sources:
+  - name: ans_saude_suplementar
+    description: "Tabelas Silver de Beneficiários SIB, Qualidade IDSS de Operadoras e Sinistralidade DIOPS (ANS)"
+    meta:
+      agency: "Agência Nacional de Saúde Suplementar (ANS)"
+      domain: "saude_ans_suplementar"
+      freshness_sla: "Mensal / Trimestral (720h)"
+    tables:
+      - name: ans_beneficiarios_municipio
+        description: "Vínculos ativos SIB/ANS por segmentação assistencial, contratação e município"
+        meta:
+          external_location: "data/ans_saude_suplementar/silver/ans_beneficiarios_municipio.parquet"
+      - name: ans_operadoras_idss_qualidade
+        description: "Índice de Desempenho da Saúde Suplementar (IDSS), operadoras atuantes e NIP por município"
+        meta:
+          external_location: "data/ans_saude_suplementar/silver/ans_operadoras_idss_qualidade.parquet"
+      - name: ans_sinistralidade_diops_economico
+        description: "Contraprestações, sinistralidade assistencial e cobertura de provisões técnicas DIOPS/ANS"
+        meta:
+          external_location: "data/ans_saude_suplementar/silver/ans_sinistralidade_diops_economico.parquet"
+      - name: ans_saude_suplementar_resumo_municipal
+        description: "Consolidado municipal de beneficiários médico-odontológicos, cobertura privada, IDSS e sinistralidade"
+        meta:
+          external_location: "data/ans_saude_suplementar/silver/ans_saude_suplementar_resumo_municipal.parquet"
