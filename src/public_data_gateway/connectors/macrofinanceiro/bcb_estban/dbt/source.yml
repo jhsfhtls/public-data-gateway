@@ -1,0 +1,26 @@
+version: 2
+
+sources:
+  - name: bcb_estban
+    description: "Tabelas Silver da Estatística Bancária Mensal por Município do Banco Central (ESTBAN COSIF)"
+    meta:
+      agency: "Banco Central do Brasil (BACEN)"
+      domain: "macrofinanceiro"
+      freshness_sla: "Mensal (720h)"
+    tables:
+      - name: estban_balancete_municipal
+        description: "Balancete COSIF agregado mensal por município (agências, ativos, crédito total, depósitos e HHI)"
+        meta:
+          external_location: "data/bcb_estban/silver/estban_balancete_municipal.parquet"
+      - name: estban_carteira_credito_setorial
+        description: "Carteira de crédito por modalidade setorial (empréstimos, agropecuário rural, imobiliário e PCLD)"
+        meta:
+          external_location: "data/bcb_estban/silver/estban_carteira_credito_setorial.parquet"
+      - name: estban_captacoes_depositos
+        description: "Captações bancárias municipais por instrumento (à vista, poupança, a prazo CDB/RDB e governos)"
+        meta:
+          external_location: "data/bcb_estban/silver/estban_captacoes_depositos.parquet"
+      - name: estban_instituicoes_municipio
+        description: "Atuação por instituição financeira e participação no mercado bancário local"
+        meta:
+          external_location: "data/bcb_estban/silver/estban_instituicoes_municipio.parquet"

@@ -636,6 +636,104 @@ def create_app(settings: GatewaySettings | None = None) -> FastAPI:
             )
         return res
 
+    # 14B. BACEN ESTBAN (Estatística Bancária Mensal por Município)
+    @app.get("/api/v1/banking/estban/balancete/{id_municipio_or_name}")
+    async def get_estban_balancete(
+        id_municipio_or_name: str,
+    ) -> dict[str, Any]:
+        from public_data_gateway.connectors.macrofinanceiro.bcb_estban import (
+            BcbEstbanConnector,
+        )
+
+        res = BcbEstbanConnector(settings=app_settings).get_municipal_balance(
+            id_municipio_or_name
+        )
+        if not res:
+            raise HTTPException(
+                status_code=404,
+                detail=f"BACEN ESTBAN balance not found for '{id_municipio_or_name}'",
+            )
+        return res
+
+    @app.get("/api/v1/banking/estban/credito/{id_municipio_or_name}")
+    async def get_estban_credito(
+        id_municipio_or_name: str,
+    ) -> dict[str, Any]:
+        from public_data_gateway.connectors.macrofinanceiro.bcb_estban import (
+            BcbEstbanConnector,
+        )
+
+        res = BcbEstbanConnector(settings=app_settings).get_credit_portfolio(
+            id_municipio_or_name
+        )
+        if not res:
+            raise HTTPException(
+                status_code=404,
+                detail=f"BACEN ESTBAN credit portfolio not found for '{id_municipio_or_name}'",
+            )
+        return res
+
+    @app.get("/api/v1/banking/estban/depositos/{id_municipio_or_name}")
+    async def get_estban_depositos(
+        id_municipio_or_name: str,
+    ) -> dict[str, Any]:
+        from public_data_gateway.connectors.macrofinanceiro.bcb_estban import (
+            BcbEstbanConnector,
+        )
+
+        res = BcbEstbanConnector(settings=app_settings).get_deposit_funding(
+            id_municipio_or_name
+        )
+        if not res:
+            raise HTTPException(
+                status_code=404,
+                detail=f"BACEN ESTBAN deposit funding not found for '{id_municipio_or_name}'",
+            )
+        return res
+
+    @app.get("/api/v1/banking/estban/instituicoes/{id_municipio_or_cnpj}")
+    async def get_estban_instituicoes(
+        id_municipio_or_cnpj: str,
+    ) -> list[dict[str, Any]]:
+        from public_data_gateway.connectors.macrofinanceiro.bcb_estban import (
+            BcbEstbanConnector,
+        )
+
+        return BcbEstbanConnector(settings=app_settings).get_local_institutions(
+            id_municipio_or_cnpj
+        )
+
+    @app.get("/api/v1/banking/estban/features/{id_municipio_or_name}")
+    async def get_estban_features(
+        id_municipio_or_name: str,
+    ) -> dict[str, Any]:
+        from public_data_gateway.connectors.macrofinanceiro.bcb_estban import (
+            BcbEstbanConnector,
+        )
+
+        res = BcbEstbanConnector(settings=app_settings).get_estban_features(
+            id_municipio_or_name
+        )
+        if not res:
+            raise HTTPException(
+                status_code=404,
+                detail=f"BACEN ESTBAN Gold features not found for '{id_municipio_or_name}'",
+            )
+        return res
+
+    @app.get("/api/v1/banking/estban/ranking")
+    async def get_estban_ranking(
+        limit: int = Query(10, ge=1, le=50, description="Max municipalities to return"),
+        uf: str | None = Query(None, description="Optional 2-letter UF state filter"),
+    ) -> list[dict[str, Any]]:
+        from public_data_gateway.connectors.macrofinanceiro.bcb_estban import (
+            BcbEstbanConnector,
+        )
+
+        return BcbEstbanConnector(settings=app_settings).list_top_municipalities(
+            limit=limit, sigla_uf=uf
+        )
+
     @app.get("/api/v1/treasury/profile/{id_municipio_or_name}")
     @app.get("/api/v1/sadipem/profile/{id_municipio_or_name}")
     async def get_treasury_profile(id_municipio_or_name: str) -> dict[str, Any]:

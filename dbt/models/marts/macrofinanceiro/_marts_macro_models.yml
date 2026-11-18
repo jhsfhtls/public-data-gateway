@@ -820,3 +820,112 @@ models:
         tests:
           - not_null
 
+  - name: mart_estatistica_bancaria_estban_brasil
+    description: "Datamart executivo intra-domínio da Estatística Bancária Mensal por Município (ESTBAN COSIF) com crédito setorial, captações, liquidez e profundidade bancária local."
+    columns:
+      - name: id_municipio
+        description: "Código IBGE canônico de 7 dígitos do município."
+        tests:
+          - not_null
+          - unique
+      - name: sigla_uf
+        description: "Sigla de 2 letras da Unidade Federativa."
+        tests:
+          - not_null
+      - name: nome_municipio
+        description: "Nome oficial do município."
+        tests:
+          - not_null
+      - name: data_base_yyyymm
+        description: "Data-base mensal de competência COSIF (YYYYMM)."
+        tests:
+          - not_null
+      - name: qtd_instituicoes_atuantes
+        description: "Quantidade de instituições financeiras com agências atuantes no município."
+        tests:
+          - not_null
+      - name: qtd_agencias_ativas
+        description: "Quantidade total de agências bancárias ativas."
+        tests:
+          - not_null
+      - name: ativo_total_agencias_brl
+        description: "Ativo total consolidado das agências municipais em BRL."
+        tests:
+          - not_null
+      - name: operacoes_credito_total_brl
+        description: "Saldo total da carteira de crédito concedida no município em BRL."
+        tests:
+          - not_null
+      - name: depositos_totais_brl
+        description: "Volume total de depósitos captados no município em BRL."
+        tests:
+          - not_null
+      - name: relacao_credito_deposito_pct
+        description: "Relação crédito sobre depósitos locais (%)."
+        tests:
+          - not_null
+      - name: indice_concentracao_hhi_local
+        description: "Índice Herfindahl-Hirschman (HHI) de concentração bancária local."
+        tests:
+          - not_null
+      - name: emprestimos_titulos_descontados_brl
+        description: "Saldo em empréstimos e títulos descontados em BRL."
+        tests:
+          - not_null
+      - name: financiamentos_gerais_brl
+        description: "Saldo em financiamentos gerais em BRL."
+        tests:
+          - not_null
+      - name: financiamento_agropecuario_rural_brl
+        description: "Saldo em financiamentos rurais e agropecuários em BRL."
+        tests:
+          - not_null
+      - name: financiamento_imobiliario_habitacional_brl
+        description: "Saldo em financiamentos imobiliários e habitacionais em BRL."
+        tests:
+          - not_null
+      - name: provisao_credito_liquidacao_duvidosa_brl
+        description: "Provisão para créditos de liquidação duvidosa (PCLD) em BRL."
+        tests:
+          - not_null
+      - name: taxa_provisao_inadimplencia_pct
+        description: "Percentual de provisão PCLD sobre a carteira de crédito (%)."
+        tests:
+          - not_null
+      - name: depositos_vista_brl
+        description: "Saldo em depósitos à vista nas agências municipais em BRL."
+        tests:
+          - not_null
+      - name: depositos_poupanca_brl
+        description: "Saldo em caderneta de poupança nas agências municipais em BRL."
+        tests:
+          - not_null
+      - name: depositos_prazo_cdb_rdb_brl
+        description: "Saldo em depósitos a prazo CDB/RDB nas agências municipais em BRL."
+        tests:
+          - not_null
+      - name: depositos_governo_publico_brl
+        description: "Saldo em depósitos governamentais nas agências municipais em BRL."
+        tests:
+          - not_null
+      - name: liquidez_imediata_caixa_brl
+        description: "Disponibilidades de caixa imediata das agências locais em BRL."
+        tests:
+          - not_null
+      - name: qtd_bancos_lideres_amostra
+        description: "Quantidade de bancos líderes detalhados na amostra ESTBAN do município."
+        tests:
+          - not_null
+      - name: top2_concentracao_credito_pct
+        description: "Share acumulado dos dois principais bancos no crédito local (%)."
+        tests:
+          - not_null
+      - name: score_profundidade_bancaria_estban
+        description: "Score composto de profundidade bancária e liquidez financeira municipal (10 a 99)."
+        tests:
+          - not_null
+      - name: classificacao_mercado_bancario_local
+        description: "Tier executivo do mercado bancário local (POLO_FINANCEIRO_ALTA_LIQUIDEZ, MERCADO_BANCARIO_CONSOLIDADO, MERCADO_BANCARIO_EM_EXPANSAO)."
+        tests:
+          - not_null
+

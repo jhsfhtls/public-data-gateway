@@ -82,6 +82,15 @@ capag_uf AS (
     GROUP BY sigla_uf
 ),
 
+estban_uf AS (
+    SELECT
+        sigla_uf,
+        ROUND(SUM(operacoes_credito_total_brl), 2) AS volume_credito_bancario_estban_uf_brl,
+        ROUND(SUM(depositos_totais_brl), 2) AS volume_depositos_estban_uf_brl
+    FROM {{ ref('mart_estatistica_bancaria_estban_brasil') }}
+    GROUP BY sigla_uf
+),
+
 base AS (
     SELECT
         t.sigla_uf,
@@ -107,6 +116,8 @@ base AS (
         COALESCE(sf.avg_score_solidez_siconfi_uf, 65.0) AS avg_score_solidez_siconfi_uf,
         COALESCE(cg.avg_ifgf_gestao_fiscal_uf, 0.0) AS avg_ifgf_gestao_fiscal_uf,
         COALESCE(cg.pct_municipios_elegiveis_garantia_capag_uf, 0.0) AS pct_municipios_elegiveis_garantia_capag_uf,
+        COALESCE(eb.volume_credito_bancario_estban_uf_brl, 0.0) AS volume_credito_bancario_estban_uf_brl,
+        COALESCE(eb.volume_depositos_estban_uf_brl, 0.0) AS volume_depositos_estban_uf_brl,
         COALESCE(m.ano_mes, '2025-03') AS macro_ano_mes_referencia,
         COALESCE(m.selic_meta_fim_mes_pct, 14.25) AS selic_meta_fim_mes_pct,
         COALESCE(m.ipca_acumulado_12m_pct, 5.06) AS ipca_acumulado_12m_pct,
@@ -119,6 +130,7 @@ base AS (
     LEFT JOIN compliance_uf s ON t.sigla_uf = s.sigla_uf
     LEFT JOIN siconfi_uf sf ON t.sigla_uf = sf.sigla_uf
     LEFT JOIN capag_uf cg ON t.sigla_uf = cg.sigla_uf
+    LEFT JOIN estban_uf eb ON t.sigla_uf = eb.sigla_uf
     CROSS JOIN macro_latest m
 ),
 

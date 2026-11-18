@@ -66,6 +66,7 @@ import public_data_gateway.connectors.judicial.cnj_justica_aberta  # noqa: F401
 import public_data_gateway.connectors.judicial.tst_cndt  # noqa: F401
 import public_data_gateway.connectors.macrofinanceiro.alpha_vantage  # noqa: F401
 import public_data_gateway.connectors.macrofinanceiro.awesomeapi_fx  # noqa: F401
+import public_data_gateway.connectors.macrofinanceiro.bcb_estban  # noqa: F401
 import public_data_gateway.connectors.macrofinanceiro.bcb_ifdata  # noqa: F401
 import public_data_gateway.connectors.macrofinanceiro.bcb_olinda_ptax  # noqa: F401
 import public_data_gateway.connectors.macrofinanceiro.bcb_sgs  # noqa: F401

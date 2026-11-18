@@ -73,6 +73,12 @@ models:
       - name: pct_municipios_elegiveis_garantia_capag_uf
         description: "Percentual de municípios da UF elegíveis à garantia soberana da União pela nota CAPAG (%)."
         tests: [not_null]
+      - name: volume_credito_bancario_estban_uf_brl
+        description: "Volume agregado de operações de crédito bancário municipal ESTBAN na UF em BRL."
+        tests: [not_null]
+      - name: volume_depositos_estban_uf_brl
+        description: "Volume agregado de depósitos bancários municipais ESTBAN captados na UF em BRL."
+        tests: [not_null]
       - name: macro_ano_mes_referencia
         description: "Competência macroeconômica de referência (YYYY-MM)."
         tests: [not_null]

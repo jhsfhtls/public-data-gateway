@@ -733,6 +733,54 @@ class BankingFacade:
         """Retrieve pre-computed Gold feature vector and banking solidity score (0-100) for an institution."""
         return self.banking_connector.get_bank_solidity(cnpj)
 
+    @property
+    def estban_connector(self) -> Any:
+        if not hasattr(self, "_estban_conn") or self._estban_conn is None:
+            from public_data_gateway.connectors.macrofinanceiro.bcb_estban import (
+                BcbEstbanConnector,
+            )
+
+            self._estban_conn = BcbEstbanConnector(settings=self._sdk.settings)
+        return self._estban_conn
+
+    def get_estban_municipal_balance(
+        self, id_municipio_or_name: str
+    ) -> dict[str, Any] | None:
+        """Retrieve monthly BACEN ESTBAN banking balance sheet for a municipality."""
+        return self.estban_connector.get_municipal_balance(id_municipio_or_name)
+
+    def get_estban_credit_portfolio(
+        self, id_municipio_or_name: str
+    ) -> dict[str, Any] | None:
+        """Retrieve municipal sectoral credit portfolio (rural, real estate, PCLD) from ESTBAN."""
+        return self.estban_connector.get_credit_portfolio(id_municipio_or_name)
+
+    def get_estban_deposit_funding(
+        self, id_municipio_or_name: str
+    ) -> dict[str, Any] | None:
+        """Retrieve municipal deposit funding breakdown (demand, savings, term, public) from ESTBAN."""
+        return self.estban_connector.get_deposit_funding(id_municipio_or_name)
+
+    def get_estban_local_institutions(
+        self, id_municipio_or_cnpj: str
+    ) -> list[dict[str, Any]]:
+        """Retrieve financial institutions operating locally via ESTBAN."""
+        return self.estban_connector.get_local_institutions(id_municipio_or_cnpj)
+
+    def get_estban_features(
+        self, id_municipio_or_name: str
+    ) -> dict[str, Any] | None:
+        """Retrieve Gold BACEN ESTBAN local banking depth and liquidity features."""
+        return self.estban_connector.get_estban_features(id_municipio_or_name)
+
+    def list_top_estban_municipalities(
+        self, limit: int = 10, sigla_uf: str | None = None
+    ) -> list[dict[str, Any]]:
+        """List municipalities ranked by Gold BACEN ESTBAN banking depth score."""
+        return self.estban_connector.list_top_municipalities(
+            limit=limit, sigla_uf=sigla_uf
+        )
+
 
 class TreasuryFacade:
     """Public finances, SADIPEM credit operations, CAPAG rating and FPM transfers (STN Tesouro Transparente)."""
@@ -2721,6 +2769,44 @@ class BrazilData:
     def get_bank_solidity(self, cnpj: str) -> dict[str, Any] | None:
         """Consultar features Gold e score contínuo de solidez prudencial (0 a 100) de uma instituição bancária (BACEN)."""
         return self.banking.get_bank_solidity(cnpj)
+
+    def get_estban_municipal_balance(
+        self, id_municipio_or_name: str
+    ) -> dict[str, Any] | None:
+        """Consultar balancete bancário mensal ESTBAN COSIF de um município (BACEN)."""
+        return self.banking.get_estban_municipal_balance(id_municipio_or_name)
+
+    def get_estban_credit_portfolio(
+        self, id_municipio_or_name: str
+    ) -> dict[str, Any] | None:
+        """Consultar carteira setorial de crédito municipal (rural, imobiliário, PCLD) no ESTBAN."""
+        return self.banking.get_estban_credit_portfolio(id_municipio_or_name)
+
+    def get_estban_deposit_funding(
+        self, id_municipio_or_name: str
+    ) -> dict[str, Any] | None:
+        """Consultar captações e depósitos bancários municipais no ESTBAN (BACEN)."""
+        return self.banking.get_estban_deposit_funding(id_municipio_or_name)
+
+    def get_estban_local_institutions(
+        self, id_municipio_or_cnpj: str
+    ) -> list[dict[str, Any]]:
+        """Consultar instituições financeiras atuantes por município no ESTBAN (BACEN)."""
+        return self.banking.get_estban_local_institutions(id_municipio_or_cnpj)
+
+    def get_estban_features(
+        self, id_municipio_or_name: str
+    ) -> dict[str, Any] | None:
+        """Consultar features Gold de profundidade bancária e liquidez municipal (ESTBAN)."""
+        return self.banking.get_estban_features(id_municipio_or_name)
+
+    def list_top_estban_municipalities(
+        self, limit: int = 10, sigla_uf: str | None = None
+    ) -> list[dict[str, Any]]:
+        """Listar municípios líderes em profundidade e liquidez bancária no ESTBAN (BACEN)."""
+        return self.banking.list_top_estban_municipalities(
+            limit=limit, sigla_uf=sigla_uf
+        )
 
     def get_municipio_fiscal_profile(self, id_municipio_or_name: str) -> dict[str, Any] | None:
         """Consultar saúde fiscal consolidada, classificação CAPAG e endividamento de um município (STN)."""

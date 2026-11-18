@@ -460,6 +460,29 @@ def build_parser() -> argparse.ArgumentParser:
     cap_rk.add_argument("--uf", type=str, default=None, help="Optional 2-letter UF state filter")
     cap_rk.add_argument("--json", action="store_true", help="Output in JSON format")
 
+    # Subcommand: estban (BACEN ESTBAN Municipal Banking Statistics)
+    est_p = subparsers.add_parser(
+        "estban",
+        help="Query BACEN ESTBAN monthly municipal banking balances, credit portfolios, deposits, and Gold depth features.",
+    )
+    est_sub = est_p.add_subparsers(dest="estban_action", required=True)
+
+    for act_name, act_help in [
+        ("balancete", "Query municipal aggregated ESTBAN COSIF balance sheet."),
+        ("credito", "Query municipal sectoral credit portfolio (rural, real estate, PCLD)."),
+        ("depositos", "Query municipal banking deposit funding breakdown."),
+        ("instituicoes", "Query financial institutions operating locally by IBGE code or CNPJ."),
+        ("features", "Query Gold BACEN ESTBAN banking depth and liquidity features."),
+    ]:
+        sp = est_sub.add_parser(act_name, help=act_help)
+        sp.add_argument("termo", type=str, help="IBGE 7-digit code, CNPJ, UF, or municipality/institution name")
+        sp.add_argument("--json", action="store_true", help="Output in JSON format")
+
+    est_rk = est_sub.add_parser("ranking", help="List municipalities ranked by Gold BACEN ESTBAN banking depth score.")
+    est_rk.add_argument("--limit", type=int, default=10, help="Max municipalities to list")
+    est_rk.add_argument("--uf", type=str, default=None, help="Optional 2-letter UF state filter")
+    est_rk.add_argument("--json", action="store_true", help="Output in JSON format")
+
     # Subcommand: procurement (Compras.gov.br CATMAT/CATSER & Preços)
     proc_p = subparsers.add_parser(
         "procurement", help="Query Compras.gov.br CATMAT/CATSER catalogs and procurement price benchmarks."
@@ -2532,6 +2555,39 @@ def main(argv: Sequence[str] | None = None) -> int:
             if not out:
                 print(
                     f"No STN CAPAG records found for action '{cap_action}'",
+                    file=sys.stderr,
+                )
+                return 1
+            print(json.dumps(out, indent=2, ensure_ascii=False))
+            return 0
+
+        elif args.command == "estban":
+            from public_data_gateway.connectors.macrofinanceiro.bcb_estban import (
+                BcbEstbanConnector,
+            )
+
+            est_conn = BcbEstbanConnector(settings=settings)
+            est_action = getattr(args, "estban_action", None)
+            if est_action == "balancete":
+                out = est_conn.get_municipal_balance(args.termo)
+            elif est_action == "credito":
+                out = est_conn.get_credit_portfolio(args.termo)
+            elif est_action == "depositos":
+                out = est_conn.get_deposit_funding(args.termo)
+            elif est_action == "instituicoes":
+                out = est_conn.get_local_institutions(args.termo)
+            elif est_action == "features":
+                out = est_conn.get_estban_features(args.termo)
+            elif est_action == "ranking":
+                out = est_conn.list_top_municipalities(
+                    limit=args.limit, sigla_uf=args.uf
+                )
+            else:
+                out = None
+
+            if not out:
+                print(
+                    f"No BACEN ESTBAN records found for action '{est_action}'",
                     file=sys.stderr,
                 )
                 return 1
