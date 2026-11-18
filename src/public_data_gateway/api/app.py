@@ -678,6 +678,19 @@ def create_app(settings: GatewaySettings | None = None) -> FastAPI:
         conn = StnTesouroTransparenteConnector(settings=app_settings)
         return conn.get_fpm_transfers(id_municipio, ano=ano)
 
+    @app.get("/api/v1/treasury/capag/ranking")
+    async def get_capag_ranking(
+        limit: int = Query(10, ge=1, le=50, description="Max municipalities to return"),
+        uf: str | None = Query(None, description="Optional 2-letter UF state filter"),
+    ) -> list[dict[str, Any]]:
+        from public_data_gateway.connectors.macrofinanceiro.stn_capag import (
+            StnCapagConnector,
+        )
+
+        return StnCapagConnector(settings=app_settings).list_top_municipalities(
+            limit=limit, sigla_uf=uf
+        )
+
     @app.get("/api/v1/treasury/capag/{id_municipio}")
     @app.get("/api/v1/sadipem/capag/{id_municipio}")
     async def get_capag_rating(id_municipio: str) -> dict[str, Any]:
@@ -937,6 +950,77 @@ def create_app(settings: GatewaySettings | None = None) -> FastAPI:
         return CnjImprobidadeConnector(settings=app_settings).list_top_municipalities(
             limit=limit, sigla_uf=uf
         )
+
+    # 15E. STN CAPAG & FIRJAN IFGF (Capacidade de Pagamento Subnacional)
+    @app.get("/api/v1/treasury/capag/municipio/{id_municipio_or_name}")
+    async def get_capag_municipio(id_municipio_or_name: str) -> dict[str, Any]:
+        from public_data_gateway.connectors.macrofinanceiro.stn_capag import (
+            StnCapagConnector,
+        )
+
+        res = StnCapagConnector(settings=app_settings).get_municipal_evaluation(
+            id_municipio_or_name
+        )
+        if not res:
+            raise HTTPException(
+                status_code=404,
+                detail=f"STN CAPAG municipal evaluation not found for '{id_municipio_or_name}'",
+            )
+        return res
+
+    @app.get("/api/v1/treasury/capag/estado/{sigla_uf_or_id}")
+    async def get_capag_estado(sigla_uf_or_id: str) -> list[dict[str, Any]]:
+        from public_data_gateway.connectors.macrofinanceiro.stn_capag import (
+            StnCapagConnector,
+        )
+
+        return StnCapagConnector(settings=app_settings).get_state_evaluation(
+            sigla_uf_or_id
+        )
+
+    @app.get("/api/v1/treasury/capag/ifgf/{id_municipio_or_name}")
+    async def get_capag_ifgf(id_municipio_or_name: str) -> dict[str, Any]:
+        from public_data_gateway.connectors.macrofinanceiro.stn_capag import (
+            StnCapagConnector,
+        )
+
+        res = StnCapagConnector(settings=app_settings).get_ifgf_index(
+            id_municipio_or_name
+        )
+        if not res:
+            raise HTTPException(
+                status_code=404,
+                detail=f"FIRJAN IFGF index not found for '{id_municipio_or_name}'",
+            )
+        return res
+
+    @app.get("/api/v1/treasury/capag/garantias/{id_municipio_or_name}")
+    async def get_capag_garantias(
+        id_municipio_or_name: str,
+    ) -> list[dict[str, Any]]:
+        from public_data_gateway.connectors.macrofinanceiro.stn_capag import (
+            StnCapagConnector,
+        )
+
+        return StnCapagConnector(settings=app_settings).get_sovereign_guarantees(
+            id_municipio_or_name
+        )
+
+    @app.get("/api/v1/treasury/capag/features/{id_municipio_or_name}")
+    async def get_capag_features(id_municipio_or_name: str) -> dict[str, Any]:
+        from public_data_gateway.connectors.macrofinanceiro.stn_capag import (
+            StnCapagConnector,
+        )
+
+        res = StnCapagConnector(settings=app_settings).get_capag_features(
+            id_municipio_or_name
+        )
+        if not res:
+            raise HTTPException(
+                status_code=404,
+                detail=f"STN CAPAG Gold features not found for '{id_municipio_or_name}'",
+            )
+        return res
 
     # 16. Public Procurement Catalog & Pricing (Compras.gov.br CATMAT/CATSER)
     @app.get("/api/v1/procurement/materials/search")

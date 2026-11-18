@@ -1,0 +1,94 @@
+contract_id: ODCS-BR-STN-CAPAG-001
+source_id: stn_capag
+version: 1.0.0
+grain: 1 row per Brazilian municipality/state per fiscal exercise CAPAG & IFGF assessment
+name: "STN: Capacidade de Pagamento (CAPAG) Subnacional & Índice FIRJAN de Gestão Fiscal (IFGF)"
+agency: Secretaria do Tesouro Nacional (STN / Ministério da Fazenda) & FIRJAN
+official_url: https://www.tesourotransparente.gov.br/ckan/api/3/action/package_search?q=capag
+segment_id: 02_economico_macrofinanceiro
+access_mode: FEDERATED_API
+protocol: REST_JSON
+auth_type: NONE
+update_frequency: Anual / Quadrimestral
+freshness_sla_hours: 720
+cron_schedule_expression: "0 5 15 * *"
+lgpd_legal_basis: public_interest_lai_portaria_stn_1583_2023
+min_expected_rows: 10
+primary_keys:
+  - id_municipio
+  - sigla_uf
+  - ano_referencia
+canonical_keys:
+  - id_municipio
+  - sigla_uf
+sentinel_values:
+  - -1
+  - -99
+  - N/D
+  - SEM INFORMACAO
+columns:
+  - name: id_municipio
+    data_type: STRING
+    required: true
+    nullable: false
+    description: Código IBGE canônico de 7 dígitos do município avaliado na CAPAG
+  - name: sigla_uf
+    data_type: STRING
+    required: true
+    nullable: false
+    description: Sigla de 2 letras da Unidade Federativa do município
+  - name: nome_municipio
+    data_type: STRING
+    required: true
+    nullable: false
+    description: Nome oficial do município brasileiro avaliado
+  - name: ano_referencia
+    data_type: INT64
+    required: true
+    nullable: false
+    description: Exercício fiscal de referência da avaliação oficial CAPAG
+  - name: nota_capag_oficial
+    data_type: STRING
+    required: true
+    nullable: false
+    description: Nota consolidada de Capacidade de Pagamento CAPAG atribuída pela STN (A+, A, B, C ou D)
+  - name: indicador_1_endividamento_dcl_rcl_pct
+    data_type: FLOAT64
+    required: true
+    nullable: false
+    description: Indicador 1 CAPAG — Razão entre Dívida Consolidada Líquida (ou DC) e Receita Corrente Líquida (%)
+  - name: nota_ind_1
+    data_type: STRING
+    required: true
+    nullable: false
+    description: Conceito parcial obtido no Indicador 1 de Endividamento (A, B ou C)
+  - name: indicador_2_poupanca_corrente_pct
+    data_type: FLOAT64
+    required: true
+    nullable: false
+    description: Indicador 2 CAPAG — Relação entre Despesas Correntes e Receitas Correntes ajustadas (%)
+  - name: nota_ind_2
+    data_type: STRING
+    required: true
+    nullable: false
+    description: Conceito parcial obtido no Indicador 2 de Poupança Corrente (A, B ou C)
+  - name: indicador_3_liquidez_relativa_pct
+    data_type: FLOAT64
+    required: true
+    nullable: false
+    description: Indicador 3 CAPAG — Relação entre Obrigações Financeiras e Disponibilidade de Caixa Bruta (%)
+  - name: nota_ind_3
+    data_type: STRING
+    required: true
+    nullable: false
+    description: Conceito parcial obtido no Indicador 3 de Liquidez Relativa (A, B ou C)
+  - name: elegivel_garantia_uniao
+    data_type: BOOLEAN
+    required: true
+    nullable: false
+    description: Indica se o ente é elegível à concessão de garantia soberana da União em operações de crédito
+  - name: qualidade_informacao_ranking_icf
+    data_type: STRING
+    required: true
+    nullable: false
+    description: Conceito no Ranking da Qualidade da Informação Contábil e Fiscal ICF/SICONFI (A, B, C ou D)

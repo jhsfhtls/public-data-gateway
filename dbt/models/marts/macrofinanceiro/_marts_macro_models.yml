@@ -699,3 +699,124 @@ models:
         tests:
           - not_null
 
+  - name: mart_capacidade_pagamento_capag_ifgf_brasil
+    description: "Datamart executivo intra-domínio consolidando Capacidade de Pagamento (CAPAG STN), Ranking ICF, Índice FIRJAN de Gestão Fiscal (IFGF) e garantias soberanas da União por município."
+    columns:
+      - name: id_municipio
+        description: "Código IBGE canônico de 7 dígitos do município."
+        tests:
+          - not_null
+          - unique
+      - name: sigla_uf
+        description: "Sigla de 2 letras da Unidade Federativa."
+        tests:
+          - not_null
+      - name: nome_municipio
+        description: "Nome oficial do município avaliado."
+        tests:
+          - not_null
+      - name: ano_referencia
+        description: "Exercício fiscal de referência da avaliação CAPAG/IFGF."
+        tests:
+          - not_null
+      - name: nota_capag_oficial
+        description: "Nota oficial CAPAG atribuída pela Secretaria do Tesouro Nacional (A+, A, B, C ou D)."
+        tests:
+          - not_null
+      - name: indicador_1_endividamento_dcl_rcl_pct
+        description: "Indicador 1 CAPAG de endividamento líquido sobre RCL (%)."
+        tests:
+          - not_null
+      - name: nota_ind_1
+        description: "Conceito obtido no Indicador 1 CAPAG (A, B ou C)."
+        tests:
+          - not_null
+      - name: indicador_2_poupanca_corrente_pct
+        description: "Indicador 2 CAPAG de poupança corrente (%)."
+        tests:
+          - not_null
+      - name: nota_ind_2
+        description: "Conceito obtido no Indicador 2 CAPAG (A, B ou C)."
+        tests:
+          - not_null
+      - name: indicador_3_liquidez_relativa_pct
+        description: "Indicador 3 CAPAG de liquidez relativa (%)."
+        tests:
+          - not_null
+      - name: nota_ind_3
+        description: "Conceito obtido no Indicador 3 CAPAG (A, B ou C)."
+        tests:
+          - not_null
+      - name: elegivel_garantia_uniao
+        description: "Elegibilidade oficial do município para obtenção de garantia da União em crédito."
+        tests:
+          - not_null
+      - name: qualidade_informacao_ranking_icf
+        description: "Conceito de qualidade contábil e fiscal no Ranking ICF/SICONFI."
+        tests:
+          - not_null
+      - name: nota_capag_uf
+        description: "Nota CAPAG oficial do respectivo Estado federado."
+        tests:
+          - not_null
+      - name: elegivel_garantia_uniao_uf
+        description: "Elegibilidade do respectivo Estado para garantias da União."
+        tests:
+          - not_null
+      - name: espaco_fiscal_estimado_brl
+        description: "Espaço fiscal anual estimado pela STN para operações estaduais em BRL."
+        tests:
+          - not_null
+      - name: ifgf_geral
+        description: "Pontuação composta geral do Índice FIRJAN de Gestão Fiscal (0.0 a 1.0)."
+        tests:
+          - not_null
+      - name: ifgf_autonomia
+        description: "Subíndice IFGF de Autonomia Fiscal (0.0 a 1.0)."
+        tests:
+          - not_null
+      - name: ifgf_gastos_pessoal
+        description: "Subíndice IFGF de Gastos com Pessoal (0.0 a 1.0)."
+        tests:
+          - not_null
+      - name: ifgf_liquidez
+        description: "Subíndice IFGF de Liquidez Financeira (0.0 a 1.0)."
+        tests:
+          - not_null
+      - name: ifgf_investimentos
+        description: "Subíndice IFGF de Investimentos Públicos (0.0 a 1.0)."
+        tests:
+          - not_null
+      - name: conceito_ifgf
+        description: "Classificação FIRJAN da gestão fiscal municipal."
+        tests:
+          - not_null
+      - name: estoque_garantias_uniao_brl
+        description: "Saldo garantido pela União em operações de crédito do município em BRL."
+        tests:
+          - not_null
+      - name: operacoes_contratadas_com_garantia
+        description: "Quantidade de operações de crédito ativas com garantia da União."
+        tests:
+          - not_null
+      - name: custo_medio_ponderado_aa_pct
+        description: "Custo médio ponderado anual das operações garantidas (%)."
+        tests:
+          - not_null
+      - name: honras_aval_acumuladas_brl
+        description: "Valor acumulado de honras de aval pagas pela União por inadimplência subnacional em BRL."
+        tests:
+          - not_null
+      - name: status_adimplencia_garantias
+        description: "Situação de adimplência nos contratos com garantia soberana da União."
+        tests:
+          - not_null
+      - name: score_risco_soberano_subnacional
+        description: "Score composto de crédito soberano subnacional ponderando CAPAG STN e IFGF FIRJAN (10 a 99)."
+        tests:
+          - not_null
+      - name: classificacao_rating_subnacional
+        description: "Classificação executiva de rating subnacional (GRAU_INVESTIMENTO_GARANTIA_UNIAO, CAPACIDADE_MODERADA_OBSERVACAO, ALTO_RISCO_RESTRICAO_GARANTIA)."
+        tests:
+          - not_null
+

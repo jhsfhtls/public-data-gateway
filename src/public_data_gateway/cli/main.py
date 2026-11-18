@@ -437,6 +437,29 @@ def build_parser() -> argparse.ArgumentParser:
     imp_rk.add_argument("--uf", type=str, default=None, help="Optional 2-letter UF state filter")
     imp_rk.add_argument("--json", action="store_true", help="Output in JSON format")
 
+    # Subcommand: capag (STN CAPAG + FIRJAN IFGF)
+    cap_p = subparsers.add_parser(
+        "capag",
+        help="Query STN CAPAG sovereign payment capacity, FIRJAN IFGF, Union guarantees, and Gold rating features.",
+    )
+    cap_sub = cap_p.add_subparsers(dest="capag_action", required=True)
+
+    for act_name, act_help in [
+        ("municipio", "Query municipal official STN CAPAG evaluation and ICF ranking."),
+        ("estado", "Query state official STN CAPAG evaluation by UF or IBGE code."),
+        ("ifgf", "Query FIRJAN Municipal Fiscal Management Index (IFGF) components."),
+        ("garantias", "Query Union sovereign guarantee stocks and credit operations."),
+        ("features", "Query Gold CAPAG + IFGF subnational sovereign credit rating features."),
+    ]:
+        sp = cap_sub.add_parser(act_name, help=act_help)
+        sp.add_argument("termo", type=str, help="IBGE 7-digit code, 2-letter UF, or municipality/state name")
+        sp.add_argument("--json", action="store_true", help="Output in JSON format")
+
+    cap_rk = cap_sub.add_parser("ranking", help="List municipalities ranked by composite CAPAG + IFGF sovereign rating.")
+    cap_rk.add_argument("--limit", type=int, default=10, help="Max municipalities to list")
+    cap_rk.add_argument("--uf", type=str, default=None, help="Optional 2-letter UF state filter")
+    cap_rk.add_argument("--json", action="store_true", help="Output in JSON format")
+
     # Subcommand: procurement (Compras.gov.br CATMAT/CATSER & Preços)
     proc_p = subparsers.add_parser(
         "procurement", help="Query Compras.gov.br CATMAT/CATSER catalogs and procurement price benchmarks."
@@ -2476,6 +2499,39 @@ def main(argv: Sequence[str] | None = None) -> int:
             if not out:
                 print(
                     f"No CNJ CNCIAI records found for action '{imp_action}'",
+                    file=sys.stderr,
+                )
+                return 1
+            print(json.dumps(out, indent=2, ensure_ascii=False))
+            return 0
+
+        elif args.command == "capag":
+            from public_data_gateway.connectors.macrofinanceiro.stn_capag import (
+                StnCapagConnector,
+            )
+
+            cap_conn = StnCapagConnector(settings=settings)
+            cap_action = getattr(args, "capag_action", None)
+            if cap_action == "municipio":
+                out = cap_conn.get_municipal_evaluation(args.termo)
+            elif cap_action == "estado":
+                out = cap_conn.get_state_evaluation(args.termo)
+            elif cap_action == "ifgf":
+                out = cap_conn.get_ifgf_index(args.termo)
+            elif cap_action == "garantias":
+                out = cap_conn.get_sovereign_guarantees(args.termo)
+            elif cap_action == "features":
+                out = cap_conn.get_capag_features(args.termo)
+            elif cap_action == "ranking":
+                out = cap_conn.list_top_municipalities(
+                    limit=args.limit, sigla_uf=args.uf
+                )
+            else:
+                out = None
+
+            if not out:
+                print(
+                    f"No STN CAPAG records found for action '{cap_action}'",
                     file=sys.stderr,
                 )
                 return 1

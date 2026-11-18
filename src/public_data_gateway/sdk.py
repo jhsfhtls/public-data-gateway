@@ -821,6 +821,58 @@ class TreasuryFacade:
             limit=limit, sigla_uf=sigla_uf
         )
 
+    @property
+    def capag_ifgf_connector(self) -> Any:
+        if not hasattr(self, "_capag_ifgf_conn") or self._capag_ifgf_conn is None:
+            from public_data_gateway.connectors.macrofinanceiro.stn_capag import (
+                StnCapagConnector,
+            )
+
+            self._capag_ifgf_conn = StnCapagConnector(settings=self._sdk.settings)
+        return self._capag_ifgf_conn
+
+    def get_capag_municipal_evaluation(
+        self, id_municipio_or_name: str
+    ) -> dict[str, Any] | None:
+        """Retrieve official STN CAPAG municipal evaluation and ICF ranking."""
+        return self.capag_ifgf_connector.get_municipal_evaluation(
+            id_municipio_or_name
+        )
+
+    def get_capag_state_evaluation(
+        self, sigla_uf_or_id: str
+    ) -> list[dict[str, Any]]:
+        """Retrieve official STN CAPAG state evaluation and fiscal space."""
+        return self.capag_ifgf_connector.get_state_evaluation(sigla_uf_or_id)
+
+    def get_capag_ifgf_index(
+        self, id_municipio_or_name: str
+    ) -> dict[str, Any] | None:
+        """Retrieve FIRJAN Municipal Fiscal Management Index (IFGF) components."""
+        return self.capag_ifgf_connector.get_ifgf_index(id_municipio_or_name)
+
+    def get_capag_sovereign_guarantees(
+        self, id_municipio_or_name: str
+    ) -> list[dict[str, Any]]:
+        """Retrieve Union sovereign guarantee stock and credit operations."""
+        return self.capag_ifgf_connector.get_sovereign_guarantees(
+            id_municipio_or_name
+        )
+
+    def get_capag_features(
+        self, id_municipio_or_name: str
+    ) -> dict[str, Any] | None:
+        """Retrieve Gold subnational sovereign credit rating and CAPAG/IFGF features."""
+        return self.capag_ifgf_connector.get_capag_features(id_municipio_or_name)
+
+    def list_top_capag_municipalities(
+        self, limit: int = 10, sigla_uf: str | None = None
+    ) -> list[dict[str, Any]]:
+        """List municipalities ranked by composite CAPAG + IFGF sovereign credit score."""
+        return self.capag_ifgf_connector.list_top_municipalities(
+            limit=limit, sigla_uf=sigla_uf
+        )
+
 
 class SocioeconomicFacade:
     """Socioeconomic, GDP and demographic query interface powered by IBGE SIDRA."""
@@ -2727,6 +2779,46 @@ class BrazilData:
     ) -> list[dict[str, Any]]:
         """Listar municípios líderes em solidez contábil e fiscal no SICONFI (STN)."""
         return self.treasury.list_top_siconfi_municipalities(
+            limit=limit, sigla_uf=sigla_uf
+        )
+
+    def get_capag_municipal_evaluation(
+        self, id_municipio_or_name: str
+    ) -> dict[str, Any] | None:
+        """Consultar avaliação oficial CAPAG municipal e Ranking ICF (STN)."""
+        return self.treasury.get_capag_municipal_evaluation(
+            id_municipio_or_name
+        )
+
+    def get_capag_state_evaluation(
+        self, sigla_uf_or_id: str
+    ) -> list[dict[str, Any]]:
+        """Consultar avaliação oficial CAPAG estadual e espaço fiscal (STN)."""
+        return self.treasury.get_capag_state_evaluation(sigla_uf_or_id)
+
+    def get_capag_ifgf_index(
+        self, id_municipio_or_name: str
+    ) -> dict[str, Any] | None:
+        """Consultar Índice FIRJAN de Gestão Fiscal (IFGF) e subíndices municipais."""
+        return self.treasury.get_capag_ifgf_index(id_municipio_or_name)
+
+    def get_capag_sovereign_guarantees(
+        self, id_municipio_or_name: str
+    ) -> list[dict[str, Any]]:
+        """Consultar estoque de garantias da União em operações de crédito subnacionais."""
+        return self.treasury.get_capag_sovereign_guarantees(id_municipio_or_name)
+
+    def get_capag_features(
+        self, id_municipio_or_name: str
+    ) -> dict[str, Any] | None:
+        """Consultar features Gold de crédito soberano subnacional CAPAG + IFGF."""
+        return self.treasury.get_capag_features(id_municipio_or_name)
+
+    def list_top_capag_municipalities(
+        self, limit: int = 10, sigla_uf: str | None = None
+    ) -> list[dict[str, Any]]:
+        """Listar municípios ordenados por rating soberano subnacional CAPAG + IFGF."""
+        return self.treasury.list_top_capag_municipalities(
             limit=limit, sigla_uf=sigla_uf
         )
 
