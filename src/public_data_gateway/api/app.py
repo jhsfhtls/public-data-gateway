@@ -4639,6 +4639,86 @@ def create_app(settings: GatewaySettings | None = None) -> FastAPI:
             limit=limit, sigla_uf=uf, sort_by_renewable=sort_by_renewable
         )
 
+    @app.get("/api/v1/environment/anm-mineracao/processos/{termo}")
+    async def get_anm_processos(termo: str) -> list[dict[str, Any]]:
+        from public_data_gateway.connectors.ambiental.anm_mineracao import (
+            AnmMineracaoConnector,
+        )
+
+        conn = AnmMineracaoConnector(settings=app_settings)
+        return conn.get_anm_sigmine_processes(termo)
+
+    @app.get("/api/v1/environment/anm-mineracao/cfem/{termo}")
+    async def get_anm_cfem(termo: str) -> list[dict[str, Any]]:
+        from public_data_gateway.connectors.ambiental.anm_mineracao import (
+            AnmMineracaoConnector,
+        )
+
+        conn = AnmMineracaoConnector(settings=app_settings)
+        return conn.get_anm_cfem_royalties(termo)
+
+    @app.get("/api/v1/environment/anm-mineracao/barragens/{id_municipio_or_name}")
+    async def get_anm_barragens(id_municipio_or_name: str) -> dict[str, Any]:
+        from public_data_gateway.connectors.ambiental.anm_mineracao import (
+            AnmMineracaoConnector,
+        )
+
+        conn = AnmMineracaoConnector(settings=app_settings)
+        res = conn.get_anm_sigbm_barragens(id_municipio_or_name)
+        if res is None:
+            raise HTTPException(
+                status_code=404,
+                detail=f"ANM SIGBM dams not found for {id_municipio_or_name}",
+            )
+        return res
+
+    @app.get("/api/v1/environment/anm-mineracao/municipio/{id_municipio_or_name}")
+    async def get_anm_municipio(id_municipio_or_name: str) -> dict[str, Any]:
+        from public_data_gateway.connectors.ambiental.anm_mineracao import (
+            AnmMineracaoConnector,
+        )
+
+        conn = AnmMineracaoConnector(settings=app_settings)
+        res = conn.get_anm_municipal_summary(id_municipio_or_name)
+        if res is None:
+            raise HTTPException(
+                status_code=404,
+                detail=f"ANM municipal summary not found for {id_municipio_or_name}",
+            )
+        return res
+
+    @app.get("/api/v1/environment/anm-mineracao/features/{id_municipio_or_name}")
+    async def get_anm_features(id_municipio_or_name: str) -> dict[str, Any]:
+        from public_data_gateway.connectors.ambiental.anm_mineracao import (
+            AnmMineracaoConnector,
+        )
+
+        conn = AnmMineracaoConnector(settings=app_settings)
+        res = conn.get_anm_features(id_municipio_or_name)
+        if res is None:
+            raise HTTPException(
+                status_code=404,
+                detail=f"ANM features not found for {id_municipio_or_name}",
+            )
+        return res
+
+    @app.get("/api/v1/environment/anm-mineracao/ranking")
+    async def get_anm_ranking(
+        limit: int = Query(10, ge=1, le=50, description="Max municipalities to list"),
+        uf: str | None = Query(None, description="Optional 2-letter state filter"),
+        sort_by_cfem: bool = Query(
+            False, description="Sort descending by annual CFEM royalty collection"
+        ),
+    ) -> list[dict[str, Any]]:
+        from public_data_gateway.connectors.ambiental.anm_mineracao import (
+            AnmMineracaoConnector,
+        )
+
+        conn = AnmMineracaoConnector(settings=app_settings)
+        return conn.list_top_anm_municipalities(
+            limit=limit, sigla_uf=uf, sort_by_cfem=sort_by_cfem
+        )
+
     @app.get("/api/v1/metaportals/datalake/top-municipalities")
     async def get_top_bd_municipalities(
         limit: int = Query(10, ge=1, le=50, description="Max municipalities to list"),

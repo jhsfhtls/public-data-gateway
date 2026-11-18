@@ -209,6 +209,16 @@ diarios_uf AS (
     GROUP BY sigla_uf
 ),
 
+mineracao_uf AS (
+    SELECT
+        sigla_uf,
+        SUM(arrecadacao_cfem_total_mil_brl) AS arrecadacao_cfem_anm_uf_mil_brl,
+        SUM(processos_ativos_sigmine) AS processos_ativos_anm_uf,
+        ROUND(AVG(score_maturidade_mineral_esg), 2) AS avg_score_mineracao_esg_uf
+    FROM {{ ref('mart_anm_mineracao_brasil') }}
+    GROUP BY sigla_uf
+),
+
 base AS (
     SELECT
         t.sigla_uf,
@@ -270,6 +280,9 @@ base AS (
         COALESCE(qd.edicoes_diario_oficial_okbr_uf, 0) AS edicoes_diario_oficial_okbr_uf,
         COALESCE(qd.atos_licitatorios_diario_uf, 0) AS atos_licitatorios_diario_uf,
         COALESCE(qd.avg_score_transparencia_diario_uf, 80.0) AS avg_score_transparencia_diario_uf,
+        COALESCE(mn.arrecadacao_cfem_anm_uf_mil_brl, 0.0) AS arrecadacao_cfem_anm_uf_mil_brl,
+        COALESCE(mn.processos_ativos_anm_uf, 0) AS processos_ativos_anm_uf,
+        COALESCE(mn.avg_score_mineracao_esg_uf, 75.0) AS avg_score_mineracao_esg_uf,
         COALESCE(m.ano_mes, '2025-03') AS macro_ano_mes_referencia,
         COALESCE(m.selic_meta_fim_mes_pct, 14.25) AS selic_meta_fim_mes_pct,
         COALESCE(m.ipca_acumulado_12m_pct, 5.06) AS ipca_acumulado_12m_pct,
@@ -295,6 +308,7 @@ base AS (
     LEFT JOIN cvm_extra_uf cvx ON t.sigla_uf = cvx.sigla_uf
     LEFT JOIN ans_uf an ON t.sigla_uf = an.sigla_uf
     LEFT JOIN diarios_uf qd ON t.sigla_uf = qd.sigla_uf
+    LEFT JOIN mineracao_uf mn ON t.sigla_uf = mn.sigla_uf
     CROSS JOIN macro_latest m
 ),
 

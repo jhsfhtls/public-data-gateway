@@ -2227,3 +2227,32 @@ sources:
   status: HOMOLOGATED
   freshness_sla_hours: 168
   cron_schedule_expression: 0 9 * * *
+- source_id: anm_mineracao
+  name: "ANM Mineração (SIGMINE & CFEM): Processos Minerários, Lavra & Royalties"
+  agency: Agência Nacional de Mineração (ANM)
+  official_url: https://www.gov.br/anm/pt-br/acesso-a-informacao/dados-abertos
+  segment_id: 11_agronegocio_meio_ambiente
+  segment_name: Agronegócio, Terra & Meio Ambiente
+  access_mode: LAKEHOUSE_BATCH
+  protocol: HTTP_BULK_ZIP
+  auth_type: NONE
+  canonical_keys:
+  - id_municipio
+  - sigla_uf
+  update_frequency: Semanal (SIGMINE/SIGBM) / Mensal (CFEM)
+  estimated_volume: ~5.570 municípios com processos minerários SIGMINE, arrecadação CFEM e barragens SIGBM (~520 MB)
+  lgpd_tier: PUBLIC_NON_PERSONAL
+  ml_feature_domains:
+  - mining_titles_sigmine
+  - mineral_royalties_cfem
+  - tailings_dam_esg_sigbm
+  solution_packs:
+  - P01
+  - P02
+  - P04
+  - P08
+  rice_score: 910
+  roadmap_wave: 2
+  status: HOMOLOGATED
+  freshness_sla_hours: 168
+  cron_schedule_expression: 0 6 * * 1

@@ -3219,6 +3219,69 @@ class MCPDispatcher:
                                 },
                             },
                             {
+                                "name": "bdg_get_anm_sigmine_processes",
+                                "description": "Lookup ANM SIGMINE mining processes by ANM process code, mineral substance, phase, IBGE code, UF, or municipality name.",
+                                "inputSchema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "termo": {
+                                            "type": "string",
+                                            "description": "ANM process code, mineral substance (e.g. FERRO), IBGE code, UF, or municipality name",
+                                        }
+                                    },
+                                    "required": ["termo"],
+                                },
+                            },
+                            {
+                                "name": "bdg_get_anm_cfem_royalties",
+                                "description": "Lookup ANM CFEM mineral royalty collections by guide code, main substance, IBGE code, UF, or municipality name.",
+                                "inputSchema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "termo": {
+                                            "type": "string",
+                                            "description": "CFEM guide code, mineral substance, IBGE code, UF, or municipality name",
+                                        }
+                                    },
+                                    "required": ["termo"],
+                                },
+                            },
+                            {
+                                "name": "bdg_get_anm_features",
+                                "description": "Get Gold ANM mineral ESG maturity score, CFEM revenue, SIGBM dam conformity, and sustainable mining tier.",
+                                "inputSchema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "id_municipio_or_name": {
+                                            "type": "string",
+                                            "description": "7-digit IBGE code or municipality name",
+                                        }
+                                    },
+                                    "required": ["id_municipio_or_name"],
+                                },
+                            },
+                            {
+                                "name": "bdg_list_top_anm_municipalities",
+                                "description": "List Brazilian municipalities ranked by ANM mineral ESG maturity score or annual CFEM royalty collections.",
+                                "inputSchema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "limit": {
+                                            "type": "integer",
+                                            "description": "Maximum rows (default: 10)",
+                                        },
+                                        "sigla_uf": {
+                                            "type": "string",
+                                            "description": "Optional 2-letter state filter (e.g. MG)",
+                                        },
+                                        "sort_by_cfem": {
+                                            "type": "boolean",
+                                            "description": "Set true to rank municipalities by highest annual CFEM royalties first",
+                                        },
+                                    },
+                                },
+                            },
+                            {
                                 "name": "bdg_get_bd_coverage",
                                 "description": "Get official Federated Public Datalake (DuckDB / BigQuery) municipal treated dataset and table coverage metrics.",
                                 "inputSchema": {
@@ -7665,6 +7728,50 @@ class MCPDispatcher:
                     },
                 }
             wrapped = wrap_untrusted_gov_data(result, source_id="mme_ons_energia")
+            return {
+                "jsonrpc": "2.0",
+                "id": req_id,
+                "result": {"content": [{"type": "text", "text": wrapped}], "isError": False},
+            }
+
+        if tool_name in {
+            "bdg_get_anm_sigmine_processes",
+            "bdg_get_anm_cfem_royalties",
+            "bdg_get_anm_features",
+            "bdg_list_top_anm_municipalities",
+        }:
+            from public_data_gateway.connectors.ambiental.anm_mineracao import (
+                AnmMineracaoConnector,
+            )
+
+            anm_conn = AnmMineracaoConnector(settings=self.settings)
+            if tool_name == "bdg_get_anm_sigmine_processes":
+                result: Any = anm_conn.get_anm_sigmine_processes(args["termo"])
+            elif tool_name == "bdg_get_anm_cfem_royalties":
+                result = anm_conn.get_anm_cfem_royalties(args["termo"])
+            elif tool_name == "bdg_get_anm_features":
+                result = anm_conn.get_anm_features(args["id_municipio_or_name"])
+            else:
+                result = anm_conn.list_top_anm_municipalities(
+                    limit=args.get("limit", 10),
+                    sigla_uf=args.get("sigla_uf"),
+                    sort_by_cfem=bool(args.get("sort_by_cfem", False)),
+                )
+            if result is None:
+                return {
+                    "jsonrpc": "2.0",
+                    "id": req_id,
+                    "result": {
+                        "content": [
+                            {
+                                "type": "text",
+                                "text": "No ANM mining data found for the query.",
+                            }
+                        ],
+                        "isError": True,
+                    },
+                }
+            wrapped = wrap_untrusted_gov_data(result, source_id="anm_mineracao")
             return {
                 "jsonrpc": "2.0",
                 "id": req_id,

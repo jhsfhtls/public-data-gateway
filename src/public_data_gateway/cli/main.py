@@ -1935,6 +1935,36 @@ def build_parser() -> argparse.ArgumentParser:
     se_rk_p.add_argument("--renovavel", action="store_true", help="Sort descending by renewable generation share (%)")
     se_rk_p.add_argument("--json", action="store_true", help="Output in JSON format")
 
+    # ANM Mineração (SIGMINE, CFEM Royalties & SIGBM Barragens) command group
+    anm_p = subparsers.add_parser("anm-mineracao", help="Query ANM SIGMINE mining titles, CFEM royalties, SIGBM dams, and ESG rankings.")
+    anm_sub = anm_p.add_subparsers(dest="anm_mineracao_action", required=True)
+
+    anm_proc_p = anm_sub.add_parser("processos", help="Lookup SIGMINE mining processes by ANM code, substance, phase, IBGE, UF, or city.")
+    anm_proc_p.add_argument("termo", help="ANM process code, substance, phase, IBGE, UF, or municipality name")
+    anm_proc_p.add_argument("--json", action="store_true", help="Output in JSON format")
+
+    anm_cfem_p = anm_sub.add_parser("cfem", help="Lookup CFEM mineral royalty collections by guide, substance, IBGE, UF, or city.")
+    anm_cfem_p.add_argument("termo", help="CFEM guide code, mineral substance, IBGE, UF, or municipality name")
+    anm_cfem_p.add_argument("--json", action="store_true", help="Output in JSON format")
+
+    anm_bar_p = anm_sub.add_parser("barragens", help="Get municipal SIGBM mining-dam inventory, PAEBM alerts, and ESG conformity.")
+    anm_bar_p.add_argument("id_municipio_or_name", help="7-digit IBGE code or municipality name")
+    anm_bar_p.add_argument("--json", action="store_true", help="Output in JSON format")
+
+    anm_mun_p = anm_sub.add_parser("municipio", help="Get consolidated municipal ANM active processes, titled area, and CFEM revenue.")
+    anm_mun_p.add_argument("id_municipio_or_name", help="7-digit IBGE code or municipality name")
+    anm_mun_p.add_argument("--json", action="store_true", help="Output in JSON format")
+
+    anm_ft_p = anm_sub.add_parser("features", help="Get Gold ANM mineral ESG maturity score and sustainable mining tier.")
+    anm_ft_p.add_argument("id_municipio_or_name", help="7-digit IBGE code or municipality name")
+    anm_ft_p.add_argument("--json", action="store_true", help="Output in JSON format")
+
+    anm_rk_p = anm_sub.add_parser("ranking", help="List municipalities ranked by ANM mineral ESG maturity score or CFEM royalties.")
+    anm_rk_p.add_argument("--limit", type=int, default=10, help="Max municipalities to list")
+    anm_rk_p.add_argument("--uf", type=str, help="Optional 2-letter state filter")
+    anm_rk_p.add_argument("--cfem", action="store_true", help="Sort descending by annual CFEM royalty collection")
+    anm_rk_p.add_argument("--json", action="store_true", help="Output in JSON format")
+
     # Datalake Público Federado (DuckDB / BigQuery) command group
     bd_p = subparsers.add_parser("datalake", help="Query Federated Public Datalake (DuckDB / BigQuery) coverage, thematic datasets, governance, SQL efficiency, and rankings.")
     bd_sub = bd_p.add_subparsers(dest="datalake_action", required=True)
@@ -6883,6 +6913,84 @@ def main(argv: Sequence[str] | None = None) -> int:
                     return 0
             except (ValueError, KeyError) as exc:
                 print(f"Erro MME/ONS Energia: {exc}", file=sys.stderr)
+                return 1
+
+        elif args.command == "anm-mineracao":
+            from public_data_gateway.connectors.ambiental.anm_mineracao import (
+                AnmMineracaoConnector,
+            )
+
+            anm_conn = AnmMineracaoConnector()
+            anm_action = getattr(args, "anm_mineracao_action", "")
+            try:
+                if anm_action == "processos":
+                    rows = anm_conn.get_anm_sigmine_processes(args.termo)
+                    if getattr(args, "json", False):
+                        print(json.dumps(rows, indent=2, ensure_ascii=False, default=str))
+                    else:
+                        print(f"ANM SIGMINE Processos ({len(rows)}):")
+                        for r in rows:
+                            print(f"  {r.get('cod_processo_anm')} | {r.get('nome_municipio')} ({r.get('sigla_uf')}): {r.get('substancia_mineral')} | {r.get('fase_processo_sigmine')}")
+                    return 0
+
+                if anm_action == "cfem":
+                    rows = anm_conn.get_anm_cfem_royalties(args.termo)
+                    if getattr(args, "json", False):
+                        print(json.dumps(rows, indent=2, ensure_ascii=False, default=str))
+                    else:
+                        print(f"ANM CFEM Royalties ({len(rows)}):")
+                        for r in rows:
+                            print(f"  {r.get('cod_guia_cfem')} | {r.get('nome_municipio')} ({r.get('sigla_uf')}): {r.get('substancia_principal')} | R$ {r.get('arrecadacao_cfem_municipio_mil_brl')} mil")
+                    return 0
+
+                if anm_action == "barragens":
+                    res = anm_conn.get_anm_sigbm_barragens(args.id_municipio_or_name)
+                    if res is None:
+                        print(f"Barragens SIGBM/ANM não encontradas para: {args.id_municipio_or_name}", file=sys.stderr)
+                        return 1
+                    if getattr(args, "json", False):
+                        print(json.dumps(res, indent=2, ensure_ascii=False, default=str))
+                    else:
+                        print(f"ANM SIGBM ({res.get('nome_municipio')} - {res.get('sigla_uf')}): {res.get('qtd_barragens_sigbm')} barragens | Conf {res.get('indice_conformidade_sigbm_pct')}%")
+                    return 0
+
+                if anm_action == "municipio":
+                    res = anm_conn.get_anm_municipal_summary(args.id_municipio_or_name)
+                    if res is None:
+                        print(f"Resumo ANM não encontrado para: {args.id_municipio_or_name}", file=sys.stderr)
+                        return 1
+                    if getattr(args, "json", False):
+                        print(json.dumps(res, indent=2, ensure_ascii=False, default=str))
+                    else:
+                        print(f"ANM Município ({res.get('nome_municipio')} - {res.get('sigla_uf')}): {res.get('processos_ativos_sigmine')} processos | CFEM R$ {res.get('arrecadacao_cfem_total_mil_brl')} mil")
+                    return 0
+
+                if anm_action == "features":
+                    res = anm_conn.get_anm_features(args.id_municipio_or_name)
+                    if res is None:
+                        print(f"Features ANM não encontradas para: {args.id_municipio_or_name}", file=sys.stderr)
+                        return 1
+                    if getattr(args, "json", False):
+                        print(json.dumps(res, indent=2, ensure_ascii=False, default=str))
+                    else:
+                        print(f"ANM Mineração Gold ({res.get('nome_municipio')} - {res.get('id_municipio')}): Score {res.get('score_maturidade_mineral_esg')} | {res.get('tier_mineracao_sustentavel_anm')}")
+                    return 0
+
+                if anm_action == "ranking":
+                    ranks = anm_conn.list_top_anm_municipalities(
+                        limit=getattr(args, "limit", 10),
+                        sigla_uf=getattr(args, "uf", None),
+                        sort_by_cfem=getattr(args, "cfem", False),
+                    )
+                    if getattr(args, "json", False):
+                        print(json.dumps(ranks, indent=2, ensure_ascii=False, default=str))
+                    else:
+                        print(f"Ranking ANM Mineração ESG ({len(ranks)}):")
+                        for idx, r in enumerate(ranks, 1):
+                            print(f"  {idx}. {r.get('nome_municipio')} ({r.get('sigla_uf')}): {r.get('score_maturidade_mineral_esg')} | CFEM R$ {r.get('arrecadacao_cfem_total_mil_brl')} mil")
+                    return 0
+            except (ValueError, KeyError) as exc:
+                print(f"Erro ANM Mineração: {exc}", file=sys.stderr)
                 return 1
 
         elif args.command == "datalake":

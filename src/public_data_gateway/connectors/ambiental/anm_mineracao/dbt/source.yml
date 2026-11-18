@@ -1,0 +1,26 @@
+version: 2
+
+sources:
+  - name: anm_mineracao
+    description: "Tabelas Silver da Agência Nacional de Mineração (ANM): SIGMINE Processos Minerários, CFEM Royalties e SIGBM Barragens"
+    meta:
+      agency: "Agência Nacional de Mineração (ANM)"
+      domain: "ambiental_mineracao_sigmine_cfem"
+      freshness_sla: "Semanal (168h)"
+    tables:
+      - name: anm_sigmine_processos_municipio
+        description: "Processos minerários georreferenciados no SIGMINE por substância mineral, fase de outorga e município"
+        meta:
+          external_location: "data/anm_mineracao/silver/anm_sigmine_processos_municipio.parquet"
+      - name: anm_cfem_arrecadacao_royalties
+        description: "Arrecadação municipal anual de royalties da Compensação Financeira pela Exploração Mineral (CFEM)"
+        meta:
+          external_location: "data/anm_mineracao/silver/anm_cfem_arrecadacao_royalties.parquet"
+      - name: anm_sigbm_barragens_risco_esg
+        description: "Inventário e conformidade PAEBM das barragens de rejeitos registradas no SIGBM/ANM"
+        meta:
+          external_location: "data/anm_mineracao/silver/anm_sigbm_barragens_risco_esg.parquet"
+      - name: anm_mineracao_resumo_municipal
+        description: "Consolidado municipal de processos ativos, área titulada (ha), arrecadação CFEM e minerais críticos"
+        meta:
+          external_location: "data/anm_mineracao/silver/anm_mineracao_resumo_municipal.parquet"
