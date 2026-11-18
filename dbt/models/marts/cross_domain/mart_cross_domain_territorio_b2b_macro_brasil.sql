@@ -139,6 +139,16 @@ prf_uf AS (
     GROUP BY sigla_uf
 ),
 
+cgu_gastos_uf AS (
+    SELECT
+        sigla_uf,
+        ROUND(SUM(total_gastos_federais_mil_brl), 2) AS total_gastos_federais_cgu_uf_mil_brl,
+        ROUND(SUM(total_transferencias_mil_brl), 2) AS total_transferencias_cgu_uf_mil_brl,
+        ROUND(AVG(score_integridade_execucao_cgu), 2) AS avg_score_integridade_execucao_cgu_uf
+    FROM {{ ref('mart_transparencia_gastos_cgu_brasil') }}
+    GROUP BY sigla_uf
+),
+
 base AS (
     SELECT
         t.sigla_uf,
@@ -179,6 +189,9 @@ base AS (
         COALESCE(pf.total_sinistros_prf_uf, 0) AS total_sinistros_prf_uf,
         COALESCE(pf.total_obitos_rodovias_prf_uf, 0) AS total_obitos_rodovias_prf_uf,
         COALESCE(pf.avg_score_seguranca_viaria_prf_uf, 65.0) AS avg_score_seguranca_viaria_prf_uf,
+        COALESCE(cgf.total_gastos_federais_cgu_uf_mil_brl, 0.0) AS total_gastos_federais_cgu_uf_mil_brl,
+        COALESCE(cgf.total_transferencias_cgu_uf_mil_brl, 0.0) AS total_transferencias_cgu_uf_mil_brl,
+        COALESCE(cgf.avg_score_integridade_execucao_cgu_uf, 75.0) AS avg_score_integridade_execucao_cgu_uf,
         COALESCE(m.ano_mes, '2025-03') AS macro_ano_mes_referencia,
         COALESCE(m.selic_meta_fim_mes_pct, 14.25) AS selic_meta_fim_mes_pct,
         COALESCE(m.ipca_acumulado_12m_pct, 5.06) AS ipca_acumulado_12m_pct,
@@ -197,6 +210,7 @@ base AS (
     LEFT JOIN frota_uf fr ON t.sigla_uf = fr.sigla_uf
     LEFT JOIN sinesp_uf sn ON t.sigla_uf = sn.sigla_uf
     LEFT JOIN prf_uf pf ON t.sigla_uf = pf.sigla_uf
+    LEFT JOIN cgu_gastos_uf cgf ON t.sigla_uf = cgf.sigla_uf
     CROSS JOIN macro_latest m
 ),
 

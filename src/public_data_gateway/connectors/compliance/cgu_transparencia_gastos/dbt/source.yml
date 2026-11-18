@@ -1,0 +1,26 @@
+version: 2
+
+sources:
+  - name: cgu_transparencia_gastos
+    description: "Tabelas Silver de Despesas Públicas, Transferências Constitucionais, Convênios e Emendas CGU Portal da Transparência"
+    meta:
+      agency: "Controladoria-Geral da União (CGU) / Portal da Transparência"
+      domain: "compliance_transparencia_gastos_federais"
+      freshness_sla: "Semanal (168h)"
+    tables:
+      - name: cgu_gastos_diretos_orgaos
+        description: "Execução financeira federal por órgão superior SIAFI, função orçamentária, modalidade e município"
+        meta:
+          external_location: "data/cgu_transparencia_gastos/silver/cgu_gastos_diretos_orgaos.parquet"
+      - name: cgu_transferencias_constitucionais_fpm
+        description: "Repasses constitucionais e legais federais (FPM, FUNDEB e SUS) e grau de dependência municipal"
+        meta:
+          external_location: "data/cgu_transparencia_gastos/silver/cgu_transferencias_constitucionais_fpm.parquet"
+      - name: cgu_emendas_convenios_municipio
+        description: "Convênios ativos, emendas parlamentares pagas, adimplência de prestação de contas e gastos CPGF"
+        meta:
+          external_location: "data/cgu_transparencia_gastos/silver/cgu_emendas_convenios_municipio.parquet"
+      - name: cgu_transparencia_resumo_municipal
+        description: "Consolidado municipal anual de gastos federais, transferências, taxa de execução orçamentária e gasto per capita"
+        meta:
+          external_location: "data/cgu_transparencia_gastos/silver/cgu_transparencia_resumo_municipal.parquet"

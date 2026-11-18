@@ -35,6 +35,7 @@ import public_data_gateway.connectors.compliance.bgpview_ip_intel  # noqa: F401
 import public_data_gateway.connectors.compliance.camara_senado_dados_abertos  # noqa: F401
 import public_data_gateway.connectors.compliance.cgu_ceis_cnep  # noqa: F401
 import public_data_gateway.connectors.compliance.cgu_pep  # noqa: F401
+import public_data_gateway.connectors.compliance.cgu_transparencia_gastos  # noqa: F401
 import public_data_gateway.connectors.compliance.pgfn_divida_ativa  # noqa: F401
 import public_data_gateway.connectors.compliance.rdap_registro_br  # noqa: F401
 import public_data_gateway.connectors.compliance.sinesp_seguranca  # noqa: F401

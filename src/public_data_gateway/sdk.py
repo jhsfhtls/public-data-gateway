@@ -550,6 +550,64 @@ class ComplianceFacade:
             sort_by_cargo_theft=sort_by_cargo_theft,
         )
 
+    @property
+    def cgu_gastos_connector(self) -> Any:
+        if (
+            not hasattr(self, "_cgu_gastos_connector")
+            or self._cgu_gastos_connector is None
+        ):
+            from public_data_gateway.connectors.compliance.cgu_transparencia_gastos import (
+                CguTransparenciaGastosConnector,
+            )
+
+            self._cgu_gastos_connector = CguTransparenciaGastosConnector(
+                settings=self._sdk.settings
+            )
+        return self._cgu_gastos_connector
+
+    def get_cgu_direct_expenses(self, termo: str) -> list[dict[str, Any]]:
+        """Lookup CGU federal expenses by code, SIAFI agency, function, modality, IBGE, UF, or city."""
+        return self.cgu_gastos_connector.get_cgu_direct_expenses(termo)
+
+    def get_cgu_constitutional_transfers(self, termo: str) -> list[dict[str, Any]]:
+        """Lookup federal FPM, FUNDEB, and SUS transfers by code, IBGE, UF, or city."""
+        return self.cgu_gastos_connector.get_cgu_constitutional_transfers(termo)
+
+    def get_cgu_amendments_covenants(
+        self, id_municipio_or_name: str
+    ) -> dict[str, Any] | None:
+        """Retrieve municipal active federal covenants, parliamentary amendments, accountability, and CPGF spend."""
+        return self.cgu_gastos_connector.get_cgu_amendments_covenants(
+            id_municipio_or_name
+        )
+
+    def get_cgu_expenses_summary(
+        self, id_municipio_or_name: str
+    ) -> dict[str, Any] | None:
+        """Retrieve consolidated municipal federal spend, transfers, budget execution, and per capita BRL."""
+        return self.cgu_gastos_connector.get_cgu_expenses_summary(
+            id_municipio_or_name
+        )
+
+    def get_cgu_expenses_features(
+        self, id_municipio_or_name: str
+    ) -> dict[str, Any] | None:
+        """Retrieve Gold CGU spending execution integrity score and transparency tier."""
+        return self.cgu_gastos_connector.get_cgu_expenses_features(
+            id_municipio_or_name
+        )
+
+    def list_top_cgu_transparency_municipalities(
+        self,
+        limit: int = 10,
+        sigla_uf: str | None = None,
+        sort_by_spending: bool = False,
+    ) -> list[dict[str, Any]]:
+        """List municipalities ranked by CGU execution integrity score or total federal spend."""
+        return self.cgu_gastos_connector.list_top_cgu_transparency_municipalities(
+            limit=limit, sigla_uf=sigla_uf, sort_by_spending=sort_by_spending
+        )
+
 
 class JudicialFacade:
     """Judicial proceedings, procedural metadata and litigation risk interface (CNJ DataJud)."""
@@ -3497,6 +3555,43 @@ class BrazilData:
             limit=limit,
             sigla_uf=sigla_uf,
             sort_by_cargo_theft=sort_by_cargo_theft,
+        )
+
+    def get_cgu_direct_expenses(self, termo: str) -> list[dict[str, Any]]:
+        """Consultar gastos diretos e transferências federais CGU por código, órgão SIAFI, IBGE, UF ou cidade."""
+        return self.compliance.get_cgu_direct_expenses(termo)
+
+    def get_cgu_constitutional_transfers(self, termo: str) -> list[dict[str, Any]]:
+        """Consultar transferências constitucionais FPM, FUNDEB e SUS no Portal da Transparência por IBGE, UF ou cidade."""
+        return self.compliance.get_cgu_constitutional_transfers(termo)
+
+    def get_cgu_amendments_covenants(
+        self, id_municipio_or_name: str
+    ) -> dict[str, Any] | None:
+        """Consultar convênios ativos, emendas parlamentares, prestação de contas e CPGF no município (CGU)."""
+        return self.compliance.get_cgu_amendments_covenants(id_municipio_or_name)
+
+    def get_cgu_expenses_summary(
+        self, id_municipio_or_name: str
+    ) -> dict[str, Any] | None:
+        """Consultar consolidado municipal de gastos públicos federais, execução orçamentária e gasto per capita."""
+        return self.compliance.get_cgu_expenses_summary(id_municipio_or_name)
+
+    def get_cgu_expenses_features(
+        self, id_municipio_or_name: str
+    ) -> dict[str, Any] | None:
+        """Consultar features Gold CGU de integridade fiscal, execução orçamentária e transparência."""
+        return self.compliance.get_cgu_expenses_features(id_municipio_or_name)
+
+    def list_top_cgu_transparency_municipalities(
+        self,
+        limit: int = 10,
+        sigla_uf: str | None = None,
+        sort_by_spending: bool = False,
+    ) -> list[dict[str, Any]]:
+        """Listar municípios ranqueados por integridade de execução CGU ou volume de gastos federais."""
+        return self.compliance.list_top_cgu_transparency_municipalities(
+            limit=limit, sigla_uf=sigla_uf, sort_by_spending=sort_by_spending
         )
 
     def get_litigation_risk(self, cnpj_or_cpf: str) -> dict[str, Any]:

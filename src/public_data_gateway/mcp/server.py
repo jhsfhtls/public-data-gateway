@@ -569,6 +569,51 @@ class MCPDispatcher:
                                 },
                             },
                             {
+                                "name": "bdg_get_cgu_gastos_diretos",
+                                "description": "Lookup CGU federal expenses and direct execution by code, SIAFI agency, function, modality, IBGE, UF, or city.",
+                                "inputSchema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "termo": {"type": "string", "description": "CGU expense code, SIAFI agency, function, modality, IBGE 7-digit code, UF, or municipality name"},
+                                    },
+                                    "required": ["termo"],
+                                },
+                            },
+                            {
+                                "name": "bdg_get_cgu_transferencias_fpm",
+                                "description": "Lookup federal FPM, FUNDEB, and SUS transfers and fiscal dependency share by code, IBGE, UF, or city.",
+                                "inputSchema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "termo": {"type": "string", "description": "Transfer code, IBGE 7-digit code, UF, or municipality name"},
+                                    },
+                                    "required": ["termo"],
+                                },
+                            },
+                            {
+                                "name": "bdg_get_cgu_transparencia_features",
+                                "description": "Get normalized Gold CGU federal spending execution integrity score, transfers, and transparency tier.",
+                                "inputSchema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "id_municipio_or_name": {"type": "string", "description": "7-digit IBGE municipality code or municipality name"},
+                                    },
+                                    "required": ["id_municipio_or_name"],
+                                },
+                            },
+                            {
+                                "name": "bdg_list_top_cgu_transparencia_municipalities",
+                                "description": "List Brazilian municipalities ranked by CGU execution integrity score or total federal spending (R$ mil).",
+                                "inputSchema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "limit": {"type": "integer", "description": "Maximum rows (default: 10)"},
+                                        "sigla_uf": {"type": "string", "description": "Optional 2-letter state filter (e.g. SP)"},
+                                        "sort_by_spending": {"type": "boolean", "description": "Set true to rank municipalities by highest total federal spend first"},
+                                    },
+                                },
+                            },
+                            {
                                 "name": "bdg_get_cnciai_improbidade_condemnations",
                                 "description": "Query CNJ CNCIAI administrative misconduct condemnations by document, party name, or IBGE code (Tier 1).",
                                 "inputSchema": {
@@ -4378,6 +4423,69 @@ class MCPDispatcher:
                     },
                 }
             wrapped = wrap_untrusted_gov_data(result, source_id="sinesp_seguranca")
+            return {
+                "jsonrpc": "2.0",
+                "id": req_id,
+                "result": {"content": [{"type": "text", "text": wrapped}], "isError": False},
+            }
+
+        if tool_name in {
+            "bdg_get_cgu_gastos_diretos",
+            "bdg_get_cgu_transferencias_fpm",
+            "bdg_get_cgu_transparencia_features",
+            "bdg_list_top_cgu_transparencia_municipalities",
+        }:
+            from public_data_gateway.connectors.compliance.cgu_transparencia_gastos import (
+                CguTransparenciaGastosConnector,
+            )
+
+            connector = CguTransparenciaGastosConnector(settings=self.settings)
+            try:
+                if tool_name == "bdg_get_cgu_gastos_diretos":
+                    result: Any = connector.get_cgu_direct_expenses(
+                        str(args.get("termo", ""))
+                    )
+                elif tool_name == "bdg_get_cgu_transferencias_fpm":
+                    result = connector.get_cgu_constitutional_transfers(
+                        str(args.get("termo", ""))
+                    )
+                elif tool_name == "bdg_get_cgu_transparencia_features":
+                    result = connector.get_cgu_expenses_features(
+                        str(args.get("id_municipio_or_name", ""))
+                    )
+                else:
+                    result = connector.list_top_cgu_transparency_municipalities(
+                        limit=int(args.get("limit", 10)),
+                        sigla_uf=args.get("sigla_uf"),
+                        sort_by_spending=bool(args.get("sort_by_spending", False)),
+                    )
+            except (ValueError, KeyError) as exc:
+                return {
+                    "jsonrpc": "2.0",
+                    "id": req_id,
+                    "result": {
+                        "content": [
+                            {"type": "text", "text": f"CGU Transparência parameter error: {exc}"}
+                        ],
+                        "isError": True,
+                    },
+                }
+
+            if not result:
+                return {
+                    "jsonrpc": "2.0",
+                    "id": req_id,
+                    "result": {
+                        "content": [
+                            {
+                                "type": "text",
+                                "text": "No CGU Portal da Transparência data found for the query.",
+                            }
+                        ],
+                        "isError": True,
+                    },
+                }
+            wrapped = wrap_untrusted_gov_data(result, source_id="cgu_transparencia_gastos")
             return {
                 "jsonrpc": "2.0",
                 "id": req_id,

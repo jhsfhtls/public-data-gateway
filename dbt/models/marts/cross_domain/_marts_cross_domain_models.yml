@@ -118,6 +118,15 @@ models:
       - name: avg_score_seguranca_viaria_prf_uf
         description: "Média estadual do score de segurança viária em rodovias federais PRF (0-100)."
         tests: [not_null]
+      - name: total_gastos_federais_cgu_uf_mil_brl
+        description: "Volume total estadual de gastos diretos e transferências federais CGU Portal da Transparência (R$ mil)."
+        tests: [not_null]
+      - name: total_transferencias_cgu_uf_mil_brl
+        description: "Montante estadual de transferências constitucionais FPM/FUNDEB/SUS CGU (R$ mil)."
+        tests: [not_null]
+      - name: avg_score_integridade_execucao_cgu_uf
+        description: "Média estadual do score de integridade na execução fiscal e convênios CGU (0-100)."
+        tests: [not_null]
       - name: macro_ano_mes_referencia
         description: "Competência macroeconômica de referência (YYYY-MM)."
         tests: [not_null]

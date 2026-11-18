@@ -444,6 +444,36 @@ def build_parser() -> argparse.ArgumentParser:
     seg_rk_p.add_argument("--roubo-carga", action="store_true", help="Sort descending by cargo theft rate per 100k hab")
     seg_rk_p.add_argument("--json", action="store_true", help="Output in JSON format")
 
+    # CGU Portal da Transparência (Gastos Diretos, Transferências & Convênios) command group
+    trp_p = subparsers.add_parser("transparencia", help="Query CGU Portal da Transparência federal expenses, transfers, amendments, and execution integrity rankings.")
+    trp_sub = trp_p.add_subparsers(dest="transparencia_action", required=True)
+
+    trp_dp_p = trp_sub.add_parser("despesas", help="Lookup CGU federal expenses by code, SIAFI agency, function, modality, IBGE, UF, or city.")
+    trp_dp_p.add_argument("termo", help="CGU code, SIAFI agency, function, modality, IBGE, UF, or municipality name")
+    trp_dp_p.add_argument("--json", action="store_true", help="Output in JSON format")
+
+    trp_tf_p = trp_sub.add_parser("transferencias", help="Lookup federal FPM, FUNDEB, and SUS transfers by code, IBGE, UF, or city.")
+    trp_tf_p.add_argument("termo", help="Transfer code, IBGE code, UF, or municipality name")
+    trp_tf_p.add_argument("--json", action="store_true", help="Output in JSON format")
+
+    trp_em_p = trp_sub.add_parser("emendas", help="Get municipal active federal covenants, parliamentary amendments, accountability, and CPGF spend.")
+    trp_em_p.add_argument("id_municipio_or_name", help="7-digit IBGE code or municipality name")
+    trp_em_p.add_argument("--json", action="store_true", help="Output in JSON format")
+
+    trp_mn_p = trp_sub.add_parser("municipio", help="Get consolidated municipal federal spend, transfers, execution rate, and per capita BRL.")
+    trp_mn_p.add_argument("id_municipio_or_name", help="7-digit IBGE code or municipality name")
+    trp_mn_p.add_argument("--json", action="store_true", help="Output in JSON format")
+
+    trp_ft_p = trp_sub.add_parser("features", help="Get Gold CGU spending execution integrity score and transparency tier.")
+    trp_ft_p.add_argument("id_municipio_or_name", help="7-digit IBGE code or municipality name")
+    trp_ft_p.add_argument("--json", action="store_true", help="Output in JSON format")
+
+    trp_rk_p = trp_sub.add_parser("ranking", help="List municipalities ranked by CGU execution integrity score or total federal spend.")
+    trp_rk_p.add_argument("--limit", type=int, default=10, help="Max municipalities to list")
+    trp_rk_p.add_argument("--uf", type=str, help="Optional 2-letter state filter")
+    trp_rk_p.add_argument("--gasto", action="store_true", help="Sort descending by total federal spend (R$ mil)")
+    trp_rk_p.add_argument("--json", action="store_true", help="Output in JSON format")
+
     # Subcommand: improbidade (CNJ CNCIAI Improbidade Administrativa)
     imp_p = subparsers.add_parser(
         "improbidade",
@@ -3037,6 +3067,84 @@ def main(argv: Sequence[str] | None = None) -> int:
                     return 0
             except (ValueError, KeyError) as exc:
                 print(f"Erro SINESP Segurança: {exc}", file=sys.stderr)
+                return 1
+
+        elif args.command == "transparencia":
+            from public_data_gateway.connectors.compliance.cgu_transparencia_gastos import (
+                CguTransparenciaGastosConnector,
+            )
+
+            trp_conn = CguTransparenciaGastosConnector()
+            trp_action = getattr(args, "transparencia_action", "")
+            try:
+                if trp_action == "despesas":
+                    rows = trp_conn.get_cgu_direct_expenses(args.termo)
+                    if getattr(args, "json", False):
+                        print(json.dumps(rows, indent=2, ensure_ascii=False, default=str))
+                    else:
+                        print(f"CGU Despesas Federais ({len(rows)}):")
+                        for r in rows:
+                            print(f"  {r.get('cod_despesa_cgu')} | {r.get('nome_municipio')} ({r.get('sigla_uf')}): {r.get('modalidade_gasto_federal')} | R$ {r.get('valor_pago_mil_brl')}k")
+                    return 0
+
+                if trp_action == "transferencias":
+                    rows = trp_conn.get_cgu_constitutional_transfers(args.termo)
+                    if getattr(args, "json", False):
+                        print(json.dumps(rows, indent=2, ensure_ascii=False, default=str))
+                    else:
+                        print(f"CGU Transferências Constitucionais ({len(rows)}):")
+                        for r in rows:
+                            print(f"  {r.get('cod_transf_cgu')} | {r.get('nome_municipio')} ({r.get('sigla_uf')}): FPM/FUNDEB R$ {r.get('repasse_fpm_fundeb_mil_brl')}k | Dep {r.get('dependencia_repasses_federais_pct')}%")
+                    return 0
+
+                if trp_action == "emendas":
+                    res = trp_conn.get_cgu_amendments_covenants(args.id_municipio_or_name)
+                    if res is None:
+                        print(f"Convênios/emendas CGU não encontrados para: {args.id_municipio_or_name}", file=sys.stderr)
+                        return 1
+                    if getattr(args, "json", False):
+                        print(json.dumps(res, indent=2, ensure_ascii=False, default=str))
+                    else:
+                        print(f"CGU Convênios & Emendas ({res.get('nome_municipio')} - {res.get('sigla_uf')}): Ativos {res.get('qtd_convenios_ativos')} | Adimplência {res.get('adimplencia_prestacao_contas_pct')}%")
+                    return 0
+
+                if trp_action == "municipio":
+                    res = trp_conn.get_cgu_expenses_summary(args.id_municipio_or_name)
+                    if res is None:
+                        print(f"Resumo CGU não encontrado para: {args.id_municipio_or_name}", file=sys.stderr)
+                        return 1
+                    if getattr(args, "json", False):
+                        print(json.dumps(res, indent=2, ensure_ascii=False, default=str))
+                    else:
+                        print(f"CGU Gastos Município ({res.get('nome_municipio')} - {res.get('sigla_uf')}): Total R$ {res.get('total_gastos_federais_mil_brl')}k | Exec {res.get('taxa_execucao_orcamentaria_pct')}%")
+                    return 0
+
+                if trp_action == "features":
+                    res = trp_conn.get_cgu_expenses_features(args.id_municipio_or_name)
+                    if res is None:
+                        print(f"Features CGU não encontradas para: {args.id_municipio_or_name}", file=sys.stderr)
+                        return 1
+                    if getattr(args, "json", False):
+                        print(json.dumps(res, indent=2, ensure_ascii=False, default=str))
+                    else:
+                        print(f"CGU Transparência Gold ({res.get('nome_municipio')} - {res.get('id_municipio')}): Score {res.get('score_integridade_execucao_cgu')} | {res.get('tier_transparencia_gastos_cgu')}")
+                    return 0
+
+                if trp_action == "ranking":
+                    ranks = trp_conn.list_top_cgu_transparency_municipalities(
+                        limit=getattr(args, "limit", 10),
+                        sigla_uf=getattr(args, "uf", None),
+                        sort_by_spending=getattr(args, "gasto", False),
+                    )
+                    if getattr(args, "json", False):
+                        print(json.dumps(ranks, indent=2, ensure_ascii=False, default=str))
+                    else:
+                        print(f"Ranking CGU Transparência Fiscal ({len(ranks)}):")
+                        for idx, r in enumerate(ranks, 1):
+                            print(f"  {idx}. {r.get('nome_municipio')} ({r.get('sigla_uf')}): {r.get('score_integridade_execucao_cgu')} | {r.get('tier_transparencia_gastos_cgu')}")
+                    return 0
+            except (ValueError, KeyError) as exc:
+                print(f"Erro CGU Transparência: {exc}", file=sys.stderr)
                 return 1
 
         elif args.command == "improbidade":

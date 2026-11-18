@@ -2024,3 +2024,32 @@ sources:
   status: HOMOLOGATED
   freshness_sla_hours: 720
   cron_schedule_expression: 0 6 10 * *
+- source_id: cgu_transparencia_gastos
+  name: 'CGU Portal da Transparência: Gastos Diretos, Transferências & Convênios'
+  agency: Controladoria-Geral da União (CGU) / Portal da Transparência do Governo Federal
+  official_url: https://portaldatransparencia.gov.br/despesas
+  segment_id: 08_judicial_compliance
+  segment_name: Judicial, Integridade & Compliance
+  access_mode: LAKEHOUSE_BATCH
+  protocol: HTTP_BULK_ZIP
+  auth_type: NONE
+  canonical_keys:
+  - id_municipio
+  - sigla_uf
+  update_frequency: Diária (SIAFI Gastos Diretos & CPGF) / Mensal (Transferências & Emendas)
+  estimated_volume: ~5.570 municípios com despesas diretas, FPM/FUNDEB/SUS e convênios (~620 MB)
+  lgpd_tier: PUBLIC_NON_PERSONAL
+  ml_feature_domains:
+  - federal_budget_execution_integrity
+  - constitutional_transfers_fpm_dependency
+  - parliamentary_amendments_covenants_risk
+  solution_packs:
+  - P01
+  - P03
+  - P04
+  - P07
+  rice_score: 900
+  roadmap_wave: 2
+  status: HOMOLOGATED
+  freshness_sla_hours: 168
+  cron_schedule_expression: 0 4 * * *
