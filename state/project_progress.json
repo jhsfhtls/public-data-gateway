@@ -1,6 +1,6 @@
 {
   "schema_version": "1.0.0",
-  "last_updated": "2026-11-18T00:10:00.000000",
+  "last_updated": "2026-11-18T08:05:00.000000",
   "project_name": "public-data-gateway",
   "architecture": "Hexagonal Medallion Lakehouse (Bronze -> Silver -> Gold / Feature Store)",
   "governance_standards": [
@@ -15,7 +15,7 @@
   "current_macro_phase": "Fase 11.5 - Expansão Completa de Fontes Públicas (Ondas 11.5A a 11.5E — Padrão 11-Gates)",
   "overall_status": "ON_TRACK",
   "active_connector": null,
-  "next_connector": "bcb_sicor",
+  "next_connector": "ibge_agro_municipal",
   "structural_phases": [
     {
       "phase_id": "00",
@@ -252,74 +252,74 @@
     }
   ],
   "active_connector_gates": {
-    "target_connector": "ibama_fiscalizacao",
+    "target_connector": "bcb_sicor",
     "target_wave": "11.5B",
     "gates": [
       {
         "gate_id": "GATE_01",
         "name": "Contrato Declarativo ODCS v3.1 das N Tabelas da API",
         "status": "PASSED",
-        "criteria": "Schema tipado, chaves primarias STRING (num_auto_infracao, cnpj_14/cpf_masked, id_municipio 7D, sigla_uf) e regras semanticas para Autos de Infracao, Termos de Embargo, Julgamentos de Multas e Resumo Municipal IBAMA SIFISC."
+        "criteria": "Schema tipado, chaves primarias STRING (cod_operacao_sicor, id_municipio 7D, sigla_uf) e regras semanticas para Custeio, Investimento, Cobertura PRONAF/PROAGRO e Resumo Municipal BACEN SICOR."
       },
       {
         "gate_id": "GATE_02",
         "name": "Ingestao Bronze Isolada (Todas as Tabelas) & Cache WAL",
         "status": "PASSED",
-        "criteria": "Ingestao resiliente da fonte oficial IBAMA Dados Abertos CKAN SIFISC (dadosabertos.ibama.gov.br) em data/ibama_fiscalizacao/bronze/ com registro de linhagem SHA-256."
+        "criteria": "Ingestao resiliente da API oficial BACEN Olinda SICOR OData v2 (olinda.bcb.gov.br/olinda/servico/SICOR/versao/v2/odata/) em data/bcb_sicor/bronze/ com registro de linhagem SHA-256."
       },
       {
         "gate_id": "GATE_03",
         "name": "Sanitizacao de Sentinelas & Nulls",
         "status": "PASSED",
-        "criteria": "Conversao deterministica de sentinelas em NULLs reais e preservacao da mascara LGPD de CPF de autuados pessoa fisica."
+        "criteria": "Conversao deterministica de sentinelas em NULLs reais conforme ODCS v3.1."
       },
       {
         "gate_id": "GATE_04",
         "name": "Materializacao Silver Parquet Isolada (Todas as Tabelas)",
         "status": "PASSED",
-        "criteria": "Gravacao ZSTD em data/ibama_fiscalizacao/silver/ (ibama_autos_infracao, ibama_termos_embargo, ibama_julgamentos_multas, ibama_resumo_municipal)."
+        "criteria": "Gravacao ZSTD em data/bcb_sicor/silver/ (sicor_custeio_municipio_produto, sicor_investimento_municipio_produto, sicor_pronaf_proagro_cobertura, sicor_resumo_municipal)."
       },
       {
         "gate_id": "GATE_05",
         "name": "Validacao dos 5 Pilares & Quarentena",
         "status": "PASSED",
-        "criteria": "Aprovacao em Freshness, Volume, Schema, Null Ceiling e Lineage com suporte a desvio para data/ibama_fiscalizacao/quarantine/."
+        "criteria": "Aprovacao em Freshness, Volume, Schema, Null Ceiling e Lineage com suporte a desvio para data/bcb_sicor/quarantine/."
       },
       {
         "gate_id": "GATE_06",
         "name": "Gold Feature View Isolada & ASOF Join ML",
         "status": "PASSED",
-        "criteria": "Features de conformidade ambiental e pressao de embargos ESG/EUDR em data/ibama_fiscalizacao/gold/features_risco_ambiental_ibama.parquet."
+        "criteria": "Features de dinamismo do credito rural, PRONAF, PROAGRO e RenovAgro ABC+ em data/bcb_sicor/gold/features_credito_rural_sicor.parquet."
       },
       {
         "gate_id": "GATE_07",
         "name": "Integracao ao EnrichmentEngine & Marts Cross-Domain",
         "status": "PASSED",
-        "criteria": "Integracao ao compliance ESG/EUDR e enriquecimento territorial em mart_cross_domain_esg_agro_infra_brasil."
+        "criteria": "Integracao agro-ESG em mart_cross_domain_esg_agro_infra_brasil (contratos, volume BRL, PROAGRO, ABC+ e score SICOR)."
       },
       {
         "gate_id": "GATE_08",
         "name": "Exposicao Multi-Interface (4 Interfaces)",
         "status": "PASSED",
-        "criteria": "Exposicao simultanea via SDK (BrazilData.environment + shortcuts), FastAPI (/api/v1/environment/ibama/*), CLI (bdg ibama *) e MCP (bdg_*_ibama_* com wrap_untrusted_gov_data)."
+        "criteria": "Exposicao simultanea via SDK (BrazilData.environment + shortcuts), FastAPI (/api/v1/environment/sicor/*), CLI (bdg sicor *) e MCP (bdg_*_bcb_sicor_* com wrap_untrusted_gov_data)."
       },
       {
         "gate_id": "GATE_09",
         "name": "Bateria de Testes Unitarios & Paridade Offline",
         "status": "PASSED",
-        "criteria": "Testes unitarios offline completos em tests/connectors/test_ibama_fiscalizacao.py cobrindo 4 tabelas Silver, Gold ML e paridade nas 4 interfaces."
+        "criteria": "Testes unitarios offline completos em tests/connectors/test_bcb_sicor.py cobrindo 4 tabelas Silver, Gold ML e paridade nas 4 interfaces."
       },
       {
         "gate_id": "GATE_10",
         "name": "dbt Staging, Marts Intra-Domínio/Cross-Domain & 100% Colunas Documentadas",
         "status": "PASSED",
-        "criteria": "Modelos dbt com source.yml, stg_*, fct_fiscalizacao_embargos_ibama_municipal, mart intra-dominio mart_fiscalizacao_embargos_ibama_brasil e cross-domain mart_cross_domain_esg_agro_infra_brasil aprovados no dbt test (114/114) e lint_dbt_docs.py (100% cobertura)."
+        "criteria": "Modelos dbt com source.yml, stg_*, fct_credito_rural_sicor_municipal, mart intra-dominio mart_credito_rural_proagro_sicor_brasil e cross-domain mart_cross_domain_esg_agro_infra_brasil aprovados no dbt test (123/123) e lint_dbt_docs.py (100% cobertura)."
       },
       {
         "gate_id": "GATE_11",
         "name": "Teste Real de 1 Linha com API ao Vivo (Fail-Hard)",
         "status": "PASSED",
-        "criteria": "Execucao obrigatoria contra portal oficial IBAMA Dados Abertos CKAN SIFISC (dadosabertos.ibama.gov.br/api/3/action/package_show) validando HTTP 200; falha reprova o pipeline."
+        "criteria": "Execucao obrigatoria contra API oficial BACEN Olinda SICOR OData v2 (CusteioMunicipioProduto e InvestMunicipioProduto) validando HTTP 200; falha reprova o pipeline."
       }
     ]
   },
@@ -732,6 +732,12 @@
       "phase_id": "11.5",
       "milestone": "Wave 11.5B (1/8) — Homologação do Conector ibama_fiscalizacao (4 Tabelas Silver, Mart Intra-Domínio, Mart Cross-Domain ESG & Paridade 4 Interfaces)",
       "summary": "Implementação completa nos 11 Gates do conector ibama_fiscalizacao (IBAMA SIFISC Autos de Infração e Termos de Embargo): contrato ODCS v3.1, ingestão Bronze + 4 tabelas Silver ZSTD (ibama_autos_infracao, ibama_termos_embargo, ibama_julgamentos_multas, ibama_resumo_municipal) + Gold ML (features_risco_ambiental_ibama), 4 staging views + fct_fiscalizacao_embargos_ibama_municipal + mart intra-domínio mart_fiscalizacao_embargos_ibama_brasil + enriquecimento da mart cross-domain mart_cross_domain_esg_agro_infra_brasil (114 testes dbt OK, 100% colunas documentadas no lint_dbt_docs.py com 530 modelos / 7.301 colunas), paridade em SDK/FastAPI/CLI/MCP, bateria offline e teste live fail-hard contra dadosabertos.ibama.gov.br/api/3/action/package_show."
+    },
+    {
+      "date": "2026-11-18",
+      "phase_id": "11.5",
+      "milestone": "Wave 11.5B (2/8) — Homologação do Conector bcb_sicor (4 Tabelas Silver, Mart Intra-Domínio Crédito Rural/Proagro, Mart Cross-Domain ESG & Paridade 4 Interfaces)",
+      "summary": "Implementação completa nos 11 Gates do conector bcb_sicor (BACEN SICOR Crédito Rural & Proagro via Olinda OData v2): contrato ODCS v3.1, ingestão Bronze + 4 tabelas Silver ZSTD (sicor_custeio_municipio_produto, sicor_investimento_municipio_produto, sicor_pronaf_proagro_cobertura, sicor_resumo_municipal) + Gold ML (features_credito_rural_sicor), 4 staging views + fct_credito_rural_sicor_municipal + mart intra-domínio mart_credito_rural_proagro_sicor_brasil + enriquecimento da mart cross-domain mart_cross_domain_esg_agro_infra_brasil (123 testes dbt OK, 100% colunas documentadas no lint_dbt_docs.py com 536 modelos / 7.389 colunas), paridade em SDK/FastAPI/CLI/MCP, bateria offline e teste live fail-hard contra olinda.bcb.gov.br SICOR OData v2."
     }
   ]
 }

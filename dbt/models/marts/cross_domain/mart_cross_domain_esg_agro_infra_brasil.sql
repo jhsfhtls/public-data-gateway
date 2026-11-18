@@ -67,6 +67,17 @@ ibama AS (
     FROM {{ ref('mart_fiscalizacao_embargos_ibama_brasil') }}
 ),
 
+sicor AS (
+    SELECT
+        id_municipio,
+        qtd_contratos_sicor,
+        valor_total_sicor_brl,
+        cobertura_proagro_sicor_pct,
+        participacao_abc_renovagro_pct,
+        score_dinamismo_credito_rural_sicor
+    FROM {{ ref('mart_credito_rural_proagro_sicor_brasil') }}
+),
+
 joined AS (
     SELECT
         t.id_municipio,
@@ -94,6 +105,11 @@ joined AS (
         COALESCE(ib.area_embargada_ibama_ha, 0.0) AS area_embargada_ibama_ha,
         COALESCE(ib.valor_multas_ibama_brl, 0.0) AS valor_multas_ibama_brl,
         COALESCE(ib.score_conformidade_ibama, 70.0) AS score_conformidade_ibama,
+        COALESCE(sc.qtd_contratos_sicor, 0) AS qtd_contratos_sicor,
+        COALESCE(sc.valor_total_sicor_brl, 0.0) AS valor_total_sicor_brl,
+        COALESCE(sc.cobertura_proagro_sicor_pct, 0.0) AS cobertura_proagro_sicor_pct,
+        COALESCE(sc.participacao_abc_renovagro_pct, 0.0) AS participacao_abc_renovagro_pct,
+        COALESCE(sc.score_dinamismo_credito_rural_sicor, 50.0) AS score_dinamismo_credito_rural_sicor,
         t.reference_date
     FROM terra t
     LEFT JOIN sicar s ON t.id_municipio = s.id_municipio
@@ -101,6 +117,7 @@ joined AS (
     LEFT JOIN hidro h ON t.id_municipio = h.id_municipio
     LEFT JOIN telecom tel ON t.id_municipio = tel.id_municipio
     LEFT JOIN ibama ib ON t.id_municipio = ib.id_municipio
+    LEFT JOIN sicor sc ON t.id_municipio = sc.id_municipio
 ),
 
 scored AS (

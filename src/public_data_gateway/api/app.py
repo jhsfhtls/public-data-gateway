@@ -3172,6 +3172,76 @@ def create_app(settings: GatewaySettings | None = None) -> FastAPI:
         conn = IbamaFiscalizacaoConnector(settings=app_settings)
         return conn.list_top_municipalities(limit=limit, sigla_uf=uf, sort_by_risk=sort_by_risk)
 
+    # BACEN SICOR (Crédito Rural, Custeio, Investimento & Proagro)
+    @app.get("/api/v1/environment/sicor/custeio/{termo}")
+    async def get_sicor_custeio(termo: str) -> list[dict[str, Any]]:
+        from public_data_gateway.connectors.ambiental.bcb_sicor import (
+            BcbSicorConnector,
+        )
+
+        conn = BcbSicorConnector(settings=app_settings)
+        return conn.get_custeio(termo)
+
+    @app.get("/api/v1/environment/sicor/investimento/{termo}")
+    async def get_sicor_investimento(termo: str) -> list[dict[str, Any]]:
+        from public_data_gateway.connectors.ambiental.bcb_sicor import (
+            BcbSicorConnector,
+        )
+
+        conn = BcbSicorConnector(settings=app_settings)
+        return conn.get_investimento(termo)
+
+    @app.get("/api/v1/environment/sicor/pronaf-proagro/{id_municipio_or_name}")
+    async def get_sicor_pronaf_proagro(id_municipio_or_name: str) -> dict[str, Any]:
+        from public_data_gateway.connectors.ambiental.bcb_sicor import (
+            BcbSicorConnector,
+        )
+
+        conn = BcbSicorConnector(settings=app_settings)
+        res = conn.get_pronaf_proagro(id_municipio_or_name)
+        if res is None:
+            raise HTTPException(status_code=404, detail="BACEN SICOR Pronaf/Proagro metrics not found")
+        return res
+
+    @app.get("/api/v1/environment/sicor/municipio/{id_municipio_or_name}")
+    async def get_sicor_municipio(id_municipio_or_name: str) -> dict[str, Any]:
+        from public_data_gateway.connectors.ambiental.bcb_sicor import (
+            BcbSicorConnector,
+        )
+
+        conn = BcbSicorConnector(settings=app_settings)
+        res = conn.get_municipal_summary(id_municipio_or_name)
+        if res is None:
+            raise HTTPException(status_code=404, detail="BACEN SICOR municipal summary not found")
+        return res
+
+    @app.get("/api/v1/environment/sicor/features/{id_municipio_or_name}")
+    async def get_sicor_features(id_municipio_or_name: str) -> dict[str, Any]:
+        from public_data_gateway.connectors.ambiental.bcb_sicor import (
+            BcbSicorConnector,
+        )
+
+        conn = BcbSicorConnector(settings=app_settings)
+        res = conn.get_sicor_features(id_municipio_or_name)
+        if res is None:
+            raise HTTPException(status_code=404, detail="BACEN SICOR Gold features not found")
+        return res
+
+    @app.get("/api/v1/environment/sicor/ranking")
+    async def get_sicor_ranking(
+        limit: int = Query(10, ge=1, le=50, description="Max municipalities to list"),
+        uf: str | None = Query(None, description="Optional 2-letter state filter"),
+        sort_by_pronaf: bool = Query(
+            False, description="Sort descending by Pronaf smallholder credit share"
+        ),
+    ) -> list[dict[str, Any]]:
+        from public_data_gateway.connectors.ambiental.bcb_sicor import (
+            BcbSicorConnector,
+        )
+
+        conn = BcbSicorConnector(settings=app_settings)
+        return conn.list_top_municipalities(limit=limit, sigla_uf=uf, sort_by_pronaf=sort_by_pronaf)
+
     @app.get("/api/v1/metaportals/datalake/top-municipalities")
     async def get_top_bd_municipalities(
         limit: int = Query(10, ge=1, le=50, description="Max municipalities to list"),

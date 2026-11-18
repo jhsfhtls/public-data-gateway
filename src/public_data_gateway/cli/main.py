@@ -1335,6 +1335,36 @@ def build_parser() -> argparse.ArgumentParser:
     ibama_rk_p.add_argument("--risco", action="store_true", help="Sort by highest embargo risk first")
     ibama_rk_p.add_argument("--json", action="store_true", help="Output in JSON format")
 
+    # BACEN SICOR (Crédito Rural, Custeio, Investimento & Proagro) command group
+    sicor_p = subparsers.add_parser("sicor", help="Query BACEN SICOR rural credit (custeio, investimento), Pronaf/Proagro, RenovAgro ABC+, and rankings.")
+    sicor_sub = sicor_p.add_subparsers(dest="sicor_action", required=True)
+
+    sicor_cus_p = sicor_sub.add_parser("custeio", help="Lookup SICOR rural operating credit (custeio) by IBGE code, UF, crop, or program.")
+    sicor_cus_p.add_argument("termo", help="IBGE code, UF, product, program, or municipality name")
+    sicor_cus_p.add_argument("--json", action="store_true", help="Output in JSON format")
+
+    sicor_inv_p = sicor_sub.add_parser("investimento", help="Lookup SICOR rural investment credit (RenovAgro ABC+, Pronaf Mais Alimentos).")
+    sicor_inv_p.add_argument("termo", help="IBGE code, UF, product, program, or municipality name")
+    sicor_inv_p.add_argument("--json", action="store_true", help="Output in JSON format")
+
+    sicor_pp_p = sicor_sub.add_parser("pronaf-proagro", help="Get municipal Pronaf share, Proagro coverage, RenovAgro ABC+, and Res. BCB 140 rate.")
+    sicor_pp_p.add_argument("id_municipio_or_name", help="7-digit IBGE code or municipality name")
+    sicor_pp_p.add_argument("--json", action="store_true", help="Output in JSON format")
+
+    sicor_mun_p = sicor_sub.add_parser("municipio", help="Get consolidated municipal BACEN SICOR contracts and rural credit totals.")
+    sicor_mun_p.add_argument("id_municipio_or_name", help="7-digit IBGE code or municipality name")
+    sicor_mun_p.add_argument("--json", action="store_true", help="Output in JSON format")
+
+    sicor_ft_p = sicor_sub.add_parser("features", help="Get Gold BACEN SICOR rural credit dynamism and ESG sustainability features.")
+    sicor_ft_p.add_argument("id_municipio_or_name", help="7-digit IBGE code or municipality name")
+    sicor_ft_p.add_argument("--json", action="store_true", help="Output in JSON format")
+
+    sicor_rk_p = sicor_sub.add_parser("ranking", help="List municipalities ranked by BACEN SICOR score or Pronaf smallholder share.")
+    sicor_rk_p.add_argument("--limit", type=int, default=10, help="Max municipalities to list")
+    sicor_rk_p.add_argument("--uf", type=str, help="Optional 2-letter state filter")
+    sicor_rk_p.add_argument("--pronaf", action="store_true", help="Sort by highest Pronaf share first")
+    sicor_rk_p.add_argument("--json", action="store_true", help="Output in JSON format")
+
     # Datalake Público Federado (DuckDB / BigQuery) command group
     bd_p = subparsers.add_parser("datalake", help="Query Federated Public Datalake (DuckDB / BigQuery) coverage, thematic datasets, governance, SQL efficiency, and rankings.")
     bd_sub = bd_p.add_subparsers(dest="datalake_action", required=True)
@@ -4724,6 +4754,84 @@ def main(argv: Sequence[str] | None = None) -> int:
                     return 0
             except (ValueError, KeyError) as exc:
                 print(f"Erro IBAMA: {exc}", file=sys.stderr)
+                return 1
+
+        elif args.command == "sicor":
+            from public_data_gateway.connectors.ambiental.bcb_sicor import (
+                BcbSicorConnector,
+            )
+
+            sicor_conn = BcbSicorConnector()
+            sicor_action = getattr(args, "sicor_action", "")
+            try:
+                if sicor_action == "custeio":
+                    rows = sicor_conn.get_custeio(args.termo)
+                    if getattr(args, "json", False):
+                        print(json.dumps(rows, indent=2, ensure_ascii=False, default=str))
+                    else:
+                        print(f"BACEN SICOR Custeio ({len(rows)}):")
+                        for r in rows:
+                            print(f"  {r.get('cod_operacao_sicor')} | {r.get('nome_municipio')} ({r.get('sigla_uf')}): {r.get('nome_produto')} - R$ {r.get('valor_custeio_brl')}")
+                    return 0
+
+                if sicor_action == "investimento":
+                    rows = sicor_conn.get_investimento(args.termo)
+                    if getattr(args, "json", False):
+                        print(json.dumps(rows, indent=2, ensure_ascii=False, default=str))
+                    else:
+                        print(f"BACEN SICOR Investimento ({len(rows)}):")
+                        for r in rows:
+                            print(f"  {r.get('cod_investimento_sicor')} | {r.get('nome_municipio')} ({r.get('sigla_uf')}): {r.get('nome_programa')} - R$ {r.get('valor_investimento_brl')}")
+                    return 0
+
+                if sicor_action == "pronaf-proagro":
+                    res = sicor_conn.get_pronaf_proagro(args.id_municipio_or_name)
+                    if res is None:
+                        print(f"Dados PRONAF/PROAGRO SICOR não encontrados para: {args.id_municipio_or_name}", file=sys.stderr)
+                        return 1
+                    if getattr(args, "json", False):
+                        print(json.dumps(res, indent=2, ensure_ascii=False, default=str))
+                    else:
+                        print(f"BACEN SICOR PRONAF/PROAGRO ({res.get('nome_municipio')} - {res.get('sigla_uf')}): PRONAF {res.get('participacao_pronaf_pct')}% | PROAGRO {res.get('cobertura_proagro_sicor_pct')}%")
+                    return 0
+
+                if sicor_action == "municipio":
+                    res = sicor_conn.get_municipal_summary(args.id_municipio_or_name)
+                    if res is None:
+                        print(f"Resumo BACEN SICOR não encontrado para: {args.id_municipio_or_name}", file=sys.stderr)
+                        return 1
+                    if getattr(args, "json", False):
+                        print(json.dumps(res, indent=2, ensure_ascii=False, default=str))
+                    else:
+                        print(f"BACEN SICOR Município ({res.get('nome_municipio')} - {res.get('sigla_uf')}): {res.get('qtd_contratos_sicor')} contratos | R$ {res.get('valor_total_sicor_brl')}")
+                    return 0
+
+                if sicor_action == "features":
+                    res = sicor_conn.get_sicor_features(args.id_municipio_or_name)
+                    if res is None:
+                        print(f"Features BACEN SICOR não encontradas para: {args.id_municipio_or_name}", file=sys.stderr)
+                        return 1
+                    if getattr(args, "json", False):
+                        print(json.dumps(res, indent=2, ensure_ascii=False, default=str))
+                    else:
+                        print(f"BACEN SICOR Gold ({res.get('nome_municipio')} - {res.get('id_municipio')}): Score {res.get('score_dinamismo_credito_rural_sicor')} | {res.get('classificacao_credito_rural_sicor')}")
+                    return 0
+
+                if sicor_action == "ranking":
+                    ranks = sicor_conn.list_top_municipalities(
+                        limit=getattr(args, "limit", 10),
+                        sigla_uf=getattr(args, "uf", None),
+                        sort_by_pronaf=getattr(args, "pronaf", False),
+                    )
+                    if getattr(args, "json", False):
+                        print(json.dumps(ranks, indent=2, ensure_ascii=False, default=str))
+                    else:
+                        print(f"Ranking BACEN SICOR ({len(ranks)}):")
+                        for idx, r in enumerate(ranks, 1):
+                            print(f"  {idx}. {r.get('nome_municipio')} ({r.get('sigla_uf')}): {r.get('score_dinamismo_credito_rural_sicor')} | {r.get('classificacao_credito_rural_sicor')}")
+                    return 0
+            except (ValueError, KeyError) as exc:
+                print(f"Erro BACEN SICOR: {exc}", file=sys.stderr)
                 return 1
 
         elif args.command == "datalake":
