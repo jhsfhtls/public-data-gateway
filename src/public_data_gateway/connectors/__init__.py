@@ -55,6 +55,7 @@ import public_data_gateway.connectors.educacao.inep_censo_escolar  # noqa: F401
 import public_data_gateway.connectors.educacao.inep_censo_superior  # noqa: F401
 import public_data_gateway.connectors.educacao.inep_enem  # noqa: F401
 import public_data_gateway.connectors.educacao.inep_ideb  # noqa: F401
+import public_data_gateway.connectors.educacao.inep_mec_extra  # noqa: F401
 import public_data_gateway.connectors.educacao.openalex_api  # noqa: F401
 import public_data_gateway.connectors.empresarial.cnpja_open  # noqa: F401
 import public_data_gateway.connectors.empresarial.company_enrich_apollo_bdc  # noqa: F401

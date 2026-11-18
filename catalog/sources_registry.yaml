@@ -2343,3 +2343,32 @@ sources:
   status: HOMOLOGATED
   freshness_sla_hours: 720
   cron_schedule_expression: 0 4 12 * *
+- source_id: inep_mec_extra
+  name: "INEP/MEC Complementar (SAEB, PROUNI, SISU, FUNDEB & CNPq): Proficiência, Acesso & Fomento"
+  agency: INEP / FNDE / Ministério da Educação (MEC) & CNPq
+  official_url: https://www.gov.br/inep/pt-br/acesso-a-informacao/dados-abertos/microdados
+  segment_id: 07_educacao_capital_humano
+  segment_name: Educação, Ciência & Capital Humano
+  access_mode: LAKEHOUSE_BATCH
+  protocol: HTTP_BULK_ZIP
+  auth_type: NONE
+  canonical_keys:
+  - id_municipio
+  - sigla_uf
+  update_frequency: Bienal (SAEB) / Semestral (PROUNI/SISU) / Mensal (FUNDEB/CNPq)
+  estimated_volume: ~5.570 municípios com proficiência SAEB, bolsas PROUNI, vagas SISU, FUNDEB e bolsas CNPq (~560 MB)
+  lgpd_tier: ANONYMIZED_MICRODATA
+  ml_feature_domains:
+  - saeb_proficiency_equity
+  - prouni_sisu_higher_ed_access
+  - fundeb_cnpq_research_funding
+  solution_packs:
+  - P01
+  - P03
+  - P07
+  - P09
+  rice_score: 885
+  roadmap_wave: 2
+  status: HOMOLOGATED
+  freshness_sla_hours: 720
+  cron_schedule_expression: 0 5 18 * *

@@ -56,6 +56,7 @@ model-paths:
   - "../src/public_data_gateway/connectors/educacao/inep_ideb/dbt"
   - "../src/public_data_gateway/connectors/educacao/inep_enem/dbt"
   - "../src/public_data_gateway/connectors/educacao/capes_sucupira/dbt"
+  - "../src/public_data_gateway/connectors/educacao/inep_mec_extra/dbt"
   - "../src/public_data_gateway/connectors/judicial/cnj_justica_aberta/dbt"
   - "../src/public_data_gateway/connectors/imobiliario/onr_registro_imoveis/dbt"
   - "../src/public_data_gateway/connectors/imobiliario/capitais_iptu_itbi/dbt"

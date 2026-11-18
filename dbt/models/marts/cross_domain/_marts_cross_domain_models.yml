@@ -217,6 +217,15 @@ models:
       - name: avg_score_resolutividade_sus_uf
         description: "Média estadual do score de resolutividade ambulatorial SUS, vigilância SINAN e cobertura SISVAN (0-100)."
         tests: [not_null]
+      - name: repasses_fundeb_uf_mil_brl
+        description: "Montante anual estadual de repasses do FUNDEB destinados à educação básica (R$ mil)."
+        tests: [not_null]
+      - name: bolsas_cnpq_ativas_uf
+        description: "Quantidade total estadual de bolsas de pesquisa e produtividade científica CNPq ativas."
+        tests: [not_null]
+      - name: avg_score_capital_humano_mec_uf
+        description: "Média estadual do score de capital humano INEP/MEC (SAEB, PROUNI/SISU e fomento CNPq, 0-100)."
+        tests: [not_null]
       - name: macro_ano_mes_referencia
         description: "Competência macroeconômica de referência (YYYY-MM)."
         tests: [not_null]

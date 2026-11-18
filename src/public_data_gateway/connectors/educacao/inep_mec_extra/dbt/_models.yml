@@ -1,0 +1,181 @@
+version: 2
+
+models:
+  - name: stg_inep_saeb_proficiencia_municipio
+    description: "Staging view tipada da proficiência SAEB, equidade VAAR e programas federais INEP/MEC por município."
+    columns:
+      - name: cod_avaliacao_inep
+        description: "Identificador único da etapa avaliada no SAEB/MEC no município (STRING)."
+        tests: [not_null, unique]
+      - name: etapa_saeb_mec
+        description: "Etapa de ensino avaliada (ENSINO_FUNDAMENTAL_ANOS_FINAIS, ENSINO_SUPERIOR_PROUNI_SISU)."
+        tests: [not_null]
+      - name: programa_acesso_fomento
+        description: "Programa de financiamento ou acesso educacional vinculado (FUNDEB_VAAR, PROUNI_INTEGRAL)."
+        tests: [not_null]
+      - name: situacao_equidade_saeb
+        description: "Classificação pedagógica e de equidade SAEB/VAAR (NIVEL_ADEQUADO_SAEB, EM_EVOLUCAO_PEDAGOGICA, PRIORIDADE_VAAR_EQUIDADE)."
+        tests: [not_null]
+      - name: id_municipio
+        description: "Código IBGE de 7 dígitos do município (STRING)."
+        tests: [not_null]
+      - name: sigla_uf
+        description: "Sigla de 2 letras da Unidade Federativa (UF)."
+        tests: [not_null]
+      - name: nome_municipio
+        description: "Nome oficial do município."
+        tests: [not_null]
+      - name: regiao
+        description: "Macrorregião geográfica brasileira."
+        tests: [not_null]
+      - name: proficiencia_media_saeb_lp_mat
+        description: "Proficiência média consolidada SAEB em Língua Portuguesa e Matemática (escala 0-500)."
+        tests: [not_null]
+      - name: bolsas_prouni_sisu_12m
+        description: "Quantidade anual de bolsas PROUNI e ingressantes SISU vinculados ao ciclo."
+        tests: [not_null]
+      - name: repasses_fundeb_cnpq_mil_brl
+        description: "Montante anual de transferências FUNDEB e fomento científico CNPq (R$ mil)."
+        tests: [not_null]
+
+  - name: stg_mec_prouni_sisu_acesso_superior
+    description: "Staging view tipada do acesso ao ensino superior via bolsas PROUNI e vagas ofertadas no SISU/MEC."
+    columns:
+      - name: cod_acesso_mec
+        description: "Identificador único municipal de acesso PROUNI/SISU no MEC (STRING)."
+        tests: [not_null, unique]
+      - name: id_municipio
+        description: "Código IBGE de 7 dígitos do município (STRING)."
+        tests: [not_null]
+      - name: sigla_uf
+        description: "Sigla de 2 letras da Unidade Federativa (UF)."
+        tests: [not_null]
+      - name: nome_municipio
+        description: "Nome oficial do município."
+        tests: [not_null]
+      - name: bolsas_prouni_ativas
+        description: "Quantidade de bolsas PROUNI integrais e parciais ativas no município."
+        tests: [not_null]
+      - name: vagas_ofertadas_sisu
+        description: "Quantidade anual de vagas ofertadas em instituições públicas via SISU."
+        tests: [not_null]
+      - name: nota_corte_media_sisu
+        description: "Nota média de corte ponderada nas seleções SISU no município (escala ENEM)."
+        tests: [not_null]
+      - name: taxa_ocupacao_vagas_pct
+        description: "Percentual de preenchimento e ocupação das vagas ofertadas PROUNI/SISU (%)."
+        tests: [not_null]
+
+  - name: stg_fnde_fundeb_cnpq_fomento
+    description: "Staging view tipada dos repasses FNDE/FUNDEB, gasto por aluno e bolsas de pesquisa CNPq."
+    columns:
+      - name: id_municipio
+        description: "Código IBGE de 7 dígitos do município (STRING)."
+        tests: [not_null, unique]
+      - name: sigla_uf
+        description: "Sigla de 2 letras da Unidade Federativa (UF)."
+        tests: [not_null]
+      - name: nome_municipio
+        description: "Nome oficial do município."
+        tests: [not_null]
+      - name: repasses_fundeb_anual_mil_brl
+        description: "Volume anual total de repasses do FUNDEB destinados à educação básica local (R$ mil)."
+        tests: [not_null]
+      - name: investimento_aluno_ano_fundeb_brl
+        description: "Valor anual médio investido por aluno matriculado sob parâmetros FUNDEB (BRL)."
+        tests: [not_null]
+      - name: bolsas_pesquisa_cnpq_ativas
+        description: "Quantidade de bolsas de pesquisa e produtividade científica CNPq ativas no município."
+        tests: [not_null]
+      - name: projetos_ct_cnpq_vigentes
+        description: "Quantidade de projetos de Ciência e Tecnologia fomentados pelo CNPq em vigência."
+        tests: [not_null]
+
+  - name: stg_inep_mec_extra_resumo_municipal
+    description: "Staging view tipada do consolidado municipal SAEB, PROUNI/SISU, FUNDEB e densidade científica CNPq."
+    columns:
+      - name: id_municipio
+        description: "Código IBGE de 7 dígitos do município (STRING)."
+        tests: [not_null, unique]
+      - name: sigla_uf
+        description: "Sigla de 2 letras da Unidade Federativa (UF)."
+        tests: [not_null]
+      - name: nome_municipio
+        description: "Nome oficial do município."
+        tests: [not_null]
+      - name: regiao
+        description: "Macrorregião geográfica brasileira."
+        tests: [not_null]
+      - name: proficiencia_saeb_matematica
+        description: "Pontuação média municipal na avaliação SAEB de Matemática."
+        tests: [not_null]
+      - name: proficiencia_saeb_linguagens
+        description: "Pontuação média municipal na avaliação SAEB de Língua Portuguesa."
+        tests: [not_null]
+      - name: beneficiarios_prouni_sisu_total
+        description: "Total de estudantes beneficiados por bolsas PROUNI ou vagas SISU no ciclo anual."
+        tests: [not_null]
+      - name: repasses_fundeb_mil_brl
+        description: "Volume anual consolidado de repasses FUNDEB ao município (R$ mil)."
+        tests: [not_null]
+      - name: bolsas_cnpq_100k_hab
+        description: "Densidade de bolsas de pesquisa CNPq por 100 mil habitantes."
+        tests: [not_null]
+
+  - name: fct_inep_mec_extra_municipal
+    description: "Fato intermediária municipal integrando SAEB/INEP, acesso PROUNI/SISU, financiamento FUNDEB e fomento CNPq."
+    columns:
+      - name: id_municipio
+        description: "Código IBGE de 7 dígitos do município (STRING)."
+        tests: [not_null, unique]
+      - name: sigla_uf
+        description: "Sigla de 2 letras da Unidade Federativa (UF)."
+        tests: [not_null]
+      - name: nome_municipio
+        description: "Nome oficial do município."
+        tests: [not_null]
+      - name: regiao
+        description: "Macrorregião geográfica brasileira."
+        tests: [not_null]
+      - name: proficiencia_saeb_matematica
+        description: "Proficiência média municipal SAEB em Matemática."
+        tests: [not_null]
+      - name: proficiencia_saeb_linguagens
+        description: "Proficiência média municipal SAEB em Língua Portuguesa."
+        tests: [not_null]
+      - name: beneficiarios_prouni_sisu_total
+        description: "Contingente total de ingressantes e bolsistas PROUNI/SISU no ano."
+        tests: [not_null]
+      - name: repasses_fundeb_mil_brl
+        description: "Montante anual de transferências FUNDEB vinculadas ao município (R$ mil)."
+        tests: [not_null]
+      - name: bolsas_cnpq_100k_hab
+        description: "Densidade de bolsas CNPq por 100 mil habitantes."
+        tests: [not_null]
+      - name: qtd_etapas_avaliadas_inep
+        description: "Quantidade de etapas educacionais consolidadas na camada Silver."
+        tests: [not_null]
+      - name: media_geral_saeb_lp_mat
+        description: "Média composta SAEB de Língua Portuguesa e Matemática."
+        tests: [not_null]
+      - name: bolsas_prouni_ativas
+        description: "Total de bolsas PROUNI ativas em IES no município."
+        tests: [not_null]
+      - name: vagas_ofertadas_sisu
+        description: "Total anual de vagas ofertadas via SISU no município."
+        tests: [not_null]
+      - name: nota_corte_media_sisu
+        description: "Nota média de corte nas chamadas regulares do SISU."
+        tests: [not_null]
+      - name: taxa_ocupacao_vagas_pct
+        description: "Percentual médio de ocupação das vagas PROUNI/SISU (%)."
+        tests: [not_null]
+      - name: investimento_aluno_ano_fundeb_brl
+        description: "Gasto educacional anual médio por aluno FUNDEB (BRL)."
+        tests: [not_null]
+      - name: bolsas_pesquisa_cnpq_ativas
+        description: "Total de bolsas CNPq ativas no município."
+        tests: [not_null]
+      - name: projetos_ct_cnpq_vigentes
+        description: "Total de projetos de pesquisa científica CNPq vigentes."
+        tests: [not_null]

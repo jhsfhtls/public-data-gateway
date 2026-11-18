@@ -3795,6 +3795,89 @@ def create_app(settings: GatewaySettings | None = None) -> FastAPI:
         except ValueError as exc:
             raise HTTPException(status_code=400, detail=str(exc)) from exc
 
+    @app.get("/api/v1/education/inep-mec-extra/saeb/{termo}")
+    async def get_inep_mec_saeb(termo: str) -> list[dict[str, Any]]:
+        from public_data_gateway.connectors.educacao.inep_mec_extra import (
+            InepMecExtraConnector,
+        )
+
+        return InepMecExtraConnector(settings=app_settings).get_inep_saeb_proficiency(
+            termo
+        )
+
+    @app.get("/api/v1/education/inep-mec-extra/prouni-sisu/{termo}")
+    async def get_inep_mec_prouni_sisu(termo: str) -> list[dict[str, Any]]:
+        from public_data_gateway.connectors.educacao.inep_mec_extra import (
+            InepMecExtraConnector,
+        )
+
+        return InepMecExtraConnector(settings=app_settings).get_mec_prouni_sisu_access(
+            termo
+        )
+
+    @app.get("/api/v1/education/inep-mec-extra/fnde-cnpq/{id_municipio_or_name}")
+    async def get_inep_mec_fnde_cnpq(id_municipio_or_name: str) -> dict[str, Any]:
+        from public_data_gateway.connectors.educacao.inep_mec_extra import (
+            InepMecExtraConnector,
+        )
+
+        res = InepMecExtraConnector(settings=app_settings).get_fnde_fundeb_cnpq_funding(
+            id_municipio_or_name
+        )
+        if res is None:
+            raise HTTPException(
+                status_code=404, detail="FUNDEB/CNPq funding data not found"
+            )
+        return res
+
+    @app.get("/api/v1/education/inep-mec-extra/municipio/{id_municipio_or_name}")
+    async def get_inep_mec_extra_municipio(id_municipio_or_name: str) -> dict[str, Any]:
+        from public_data_gateway.connectors.educacao.inep_mec_extra import (
+            InepMecExtraConnector,
+        )
+
+        res = InepMecExtraConnector(settings=app_settings).get_inep_mec_extra_summary(
+            id_municipio_or_name
+        )
+        if res is None:
+            raise HTTPException(
+                status_code=404, detail="INEP/MEC Extra municipal summary not found"
+            )
+        return res
+
+    @app.get("/api/v1/education/inep-mec-extra/features/{id_municipio_or_name}")
+    async def get_inep_mec_extra_features(id_municipio_or_name: str) -> dict[str, Any]:
+        from public_data_gateway.connectors.educacao.inep_mec_extra import (
+            InepMecExtraConnector,
+        )
+
+        res = InepMecExtraConnector(settings=app_settings).get_inep_mec_extra_features(
+            id_municipio_or_name
+        )
+        if res is None:
+            raise HTTPException(
+                status_code=404, detail="INEP/MEC Extra Gold human capital features not found"
+            )
+        return res
+
+    @app.get("/api/v1/education/inep-mec-extra/ranking")
+    async def get_inep_mec_extra_ranking(
+        limit: int = Query(10, ge=1, le=50, description="Max municipalities to list"),
+        uf: str | None = Query(None, description="Optional 2-letter state filter"),
+        sort_by_fundeb: bool = Query(
+            False, description="Sort descending by annual FUNDEB transfers (R$ mil)"
+        ),
+    ) -> list[dict[str, Any]]:
+        from public_data_gateway.connectors.educacao.inep_mec_extra import (
+            InepMecExtraConnector,
+        )
+
+        return InepMecExtraConnector(
+            settings=app_settings
+        ).list_top_inep_mec_extra_municipalities(
+            limit=limit, sigla_uf=uf, sort_by_fundeb=sort_by_fundeb
+        )
+
     @app.get("/api/v1/environment/terrabrasilis/top-municipalities")
     async def get_top_terrabrasilis_municipalities(
         limit: int = Query(10, ge=1, le=50, description="Max municipalities to list"),

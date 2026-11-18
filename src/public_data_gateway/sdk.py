@@ -2469,6 +2469,64 @@ class EducationFacade:
             limit=limit, sigla_uf=sigla_uf
         )
 
+    @property
+    def inep_mec_extra_connector(self) -> Any:
+        if (
+            not hasattr(self, "_inep_mec_extra_connector")
+            or self._inep_mec_extra_connector is None
+        ):
+            from public_data_gateway.connectors.educacao.inep_mec_extra import (
+                InepMecExtraConnector,
+            )
+
+            self._inep_mec_extra_connector = InepMecExtraConnector(
+                settings=self._sdk.settings
+            )
+        return self._inep_mec_extra_connector
+
+    def get_inep_saeb_proficiency(self, termo: str) -> list[dict[str, Any]]:
+        """Lookup INEP SAEB proficiency & MEC track indicators by code, stage, program, IBGE, UF, or city."""
+        return self.inep_mec_extra_connector.get_inep_saeb_proficiency(termo)
+
+    def get_mec_prouni_sisu_access(self, termo: str) -> list[dict[str, Any]]:
+        """Lookup MEC PROUNI scholarships and SISU public-university cutoff scores & seats."""
+        return self.inep_mec_extra_connector.get_mec_prouni_sisu_access(termo)
+
+    def get_fnde_fundeb_cnpq_funding(
+        self, id_municipio_or_name: str
+    ) -> dict[str, Any] | None:
+        """Retrieve municipal FNDE FUNDEB transfers per student and active CNPq R&D grants."""
+        return self.inep_mec_extra_connector.get_fnde_fundeb_cnpq_funding(
+            id_municipio_or_name
+        )
+
+    def get_inep_mec_extra_summary(
+        self, id_municipio_or_name: str
+    ) -> dict[str, Any] | None:
+        """Retrieve consolidated municipal SAEB math/reading, PROUNI/SISU access, FUNDEB, and CNPq density."""
+        return self.inep_mec_extra_connector.get_inep_mec_extra_summary(
+            id_municipio_or_name
+        )
+
+    def get_inep_mec_extra_features(
+        self, id_municipio_or_name: str
+    ) -> dict[str, Any] | None:
+        """Retrieve Gold INEP/MEC Extra human-capital ecosystem score and tier."""
+        return self.inep_mec_extra_connector.get_inep_mec_extra_features(
+            id_municipio_or_name
+        )
+
+    def list_top_inep_mec_extra_municipalities(
+        self,
+        limit: int = 10,
+        sigla_uf: str | None = None,
+        sort_by_fundeb: bool = False,
+    ) -> list[dict[str, Any]]:
+        """List municipalities ranked by INEP/MEC human-capital ecosystem score or FUNDEB transfers."""
+        return self.inep_mec_extra_connector.list_top_inep_mec_extra_municipalities(
+            limit=limit, sigla_uf=sigla_uf, sort_by_fundeb=sort_by_fundeb
+        )
+
 
 class RealEstateFacade:
     """Electronic real estate registry, property transactions, credit guarantees & SERP efficiency (ONR/SREI)."""
@@ -5481,6 +5539,43 @@ class BrazilData:
         """Listar municípios líderes no ecossistema de pós-graduação stricto sensu no Brasil (CAPES Sucupira)."""
         return self.education.list_top_sucupira_municipalities(
             limit=limit, sigla_uf=sigla_uf
+        )
+
+    def get_inep_saeb_proficiency(self, termo: str) -> list[dict[str, Any]]:
+        """Consultar proficiência SAEB e programas federais INEP/MEC por código, etapa, IBGE, UF ou cidade."""
+        return self.education.get_inep_saeb_proficiency(termo)
+
+    def get_mec_prouni_sisu_access(self, termo: str) -> list[dict[str, Any]]:
+        """Consultar bolsas PROUNI ativas, vagas SISU e notas de corte médias por município ou UF."""
+        return self.education.get_mec_prouni_sisu_access(termo)
+
+    def get_fnde_fundeb_cnpq_funding(
+        self, id_municipio_or_name: str
+    ) -> dict[str, Any] | None:
+        """Consultar transferências FNDE/FUNDEB por aluno e bolsas de pesquisa CNPq ativas no município."""
+        return self.education.get_fnde_fundeb_cnpq_funding(id_municipio_or_name)
+
+    def get_inep_mec_extra_summary(
+        self, id_municipio_or_name: str
+    ) -> dict[str, Any] | None:
+        """Consultar consolidado municipal INEP/MEC de SAEB, PROUNI/SISU, FUNDEB e bolsas CNPq."""
+        return self.education.get_inep_mec_extra_summary(id_municipio_or_name)
+
+    def get_inep_mec_extra_features(
+        self, id_municipio_or_name: str
+    ) -> dict[str, Any] | None:
+        """Consultar features Gold INEP/MEC Extra de capital humano, SAEB e fomento educacional."""
+        return self.education.get_inep_mec_extra_features(id_municipio_or_name)
+
+    def list_top_inep_mec_extra_municipalities(
+        self,
+        limit: int = 10,
+        sigla_uf: str | None = None,
+        sort_by_fundeb: bool = False,
+    ) -> list[dict[str, Any]]:
+        """Listar municípios ranqueados por capital humano INEP/MEC ou volume de repasses FUNDEB."""
+        return self.education.list_top_inep_mec_extra_municipalities(
+            limit=limit, sigla_uf=sigla_uf, sort_by_fundeb=sort_by_fundeb
         )
 
     def get_onr_property_registry(self, id_municipio: str) -> dict[str, Any]:

@@ -1575,6 +1575,36 @@ def build_parser() -> argparse.ArgumentParser:
     suc_rk_p.add_argument("--uf", type=str, help="Optional 2-letter state filter")
     suc_rk_p.add_argument("--json", action="store_true", help="Output in JSON format")
 
+    # INEP/MEC Extra (SAEB, PROUNI, SISU, FUNDEB & CNPq) command group
+    ime_p = subparsers.add_parser("inep-mec-extra", help="Query INEP SAEB proficiency, MEC PROUNI/SISU access, FUNDEB funding, CNPq grants, and human capital rankings.")
+    ime_sub = ime_p.add_subparsers(dest="inep_mec_extra_action", required=True)
+
+    ime_sb_p = ime_sub.add_parser("saeb", help="Lookup INEP SAEB proficiency & MEC tracks by code, stage, program, IBGE, UF, or city.")
+    ime_sb_p.add_argument("termo", help="Evaluation code, stage, program, IBGE code, UF, or municipality name")
+    ime_sb_p.add_argument("--json", action="store_true", help="Output in JSON format")
+
+    ime_pr_p = ime_sub.add_parser("prouni-sisu", help="Lookup MEC PROUNI scholarships, SISU seats, and cutoff scores.")
+    ime_pr_p.add_argument("termo", help="Access code, IBGE code, UF, or municipality name")
+    ime_pr_p.add_argument("--json", action="store_true", help="Output in JSON format")
+
+    ime_fn_p = ime_sub.add_parser("fnde-cnpq", help="Get municipal FNDE FUNDEB transfers per student and CNPq R&D grants.")
+    ime_fn_p.add_argument("id_municipio_or_name", help="7-digit IBGE code or municipality name")
+    ime_fn_p.add_argument("--json", action="store_true", help="Output in JSON format")
+
+    ime_mn_p = ime_sub.add_parser("municipio", help="Get consolidated municipal SAEB, PROUNI/SISU access, FUNDEB, and CNPq density.")
+    ime_mn_p.add_argument("id_municipio_or_name", help="7-digit IBGE code or municipality name")
+    ime_mn_p.add_argument("--json", action="store_true", help="Output in JSON format")
+
+    ime_ft_p = ime_sub.add_parser("features", help="Get Gold INEP/MEC Extra human-capital ecosystem score and tier.")
+    ime_ft_p.add_argument("id_municipio_or_name", help="7-digit IBGE code or municipality name")
+    ime_ft_p.add_argument("--json", action="store_true", help="Output in JSON format")
+
+    ime_rk_p = ime_sub.add_parser("ranking", help="List municipalities ranked by INEP/MEC human-capital score or FUNDEB transfers.")
+    ime_rk_p.add_argument("--limit", type=int, default=10, help="Max municipalities to list")
+    ime_rk_p.add_argument("--uf", type=str, help="Optional 2-letter state filter")
+    ime_rk_p.add_argument("--fundeb", action="store_true", help="Sort descending by annual FUNDEB transfers (R$ mil)")
+    ime_rk_p.add_argument("--json", action="store_true", help="Output in JSON format")
+
     # INPE TerraBrasilis (DETER & PRODES) command group
     tb_p = subparsers.add_parser("terrabrasilis", help="Query INPE TerraBrasilis PRODES deforestation, DETER alerts, land cover, ESG governance, and rankings.")
     tb_sub = tb_p.add_subparsers(dest="terrabrasilis_action", required=True)
@@ -6098,6 +6128,84 @@ def main(argv: Sequence[str] | None = None) -> int:
                     return 0
             except ValueError as exc:
                 print(f"Erro CAPES Sucupira: {exc}", file=sys.stderr)
+                return 1
+
+        elif args.command == "inep-mec-extra":
+            from public_data_gateway.connectors.educacao.inep_mec_extra import (
+                InepMecExtraConnector,
+            )
+
+            ime_conn = InepMecExtraConnector()
+            ime_action = getattr(args, "inep_mec_extra_action", "")
+            try:
+                if ime_action == "saeb":
+                    rows = ime_conn.get_inep_saeb_proficiency(args.termo)
+                    if getattr(args, "json", False):
+                        print(json.dumps(rows, indent=2, ensure_ascii=False, default=str))
+                    else:
+                        print(f"INEP SAEB Proficiência ({len(rows)}):")
+                        for r in rows:
+                            print(f"  {r.get('cod_avaliacao_inep')} | {r.get('nome_municipio')} ({r.get('sigla_uf')}): {r.get('etapa_saeb_mec')} | {r.get('proficiencia_media_saeb_lp_mat')}")
+                    return 0
+
+                if ime_action == "prouni-sisu":
+                    rows = ime_conn.get_mec_prouni_sisu_access(args.termo)
+                    if getattr(args, "json", False):
+                        print(json.dumps(rows, indent=2, ensure_ascii=False, default=str))
+                    else:
+                        print(f"MEC PROUNI & SISU ({len(rows)}):")
+                        for r in rows:
+                            print(f"  {r.get('cod_acesso_mec')} | {r.get('nome_municipio')} ({r.get('sigla_uf')}): PROUNI {r.get('bolsas_prouni_ativas')} | SISU {r.get('vagas_ofertadas_sisu')}")
+                    return 0
+
+                if ime_action == "fnde-cnpq":
+                    res = ime_conn.get_fnde_fundeb_cnpq_funding(args.id_municipio_or_name)
+                    if res is None:
+                        print(f"Dados FUNDEB/CNPq não encontrados para: {args.id_municipio_or_name}", file=sys.stderr)
+                        return 1
+                    if getattr(args, "json", False):
+                        print(json.dumps(res, indent=2, ensure_ascii=False, default=str))
+                    else:
+                        print(f"FNDE FUNDEB & CNPq ({res.get('nome_municipio')} - {res.get('sigla_uf')}): R$ {res.get('repasses_fundeb_anual_mil_brl')}k | CNPq {res.get('bolsas_pesquisa_cnpq_ativas')} bolsas")
+                    return 0
+
+                if ime_action == "municipio":
+                    res = ime_conn.get_inep_mec_extra_summary(args.id_municipio_or_name)
+                    if res is None:
+                        print(f"Resumo INEP/MEC Extra não encontrado para: {args.id_municipio_or_name}", file=sys.stderr)
+                        return 1
+                    if getattr(args, "json", False):
+                        print(json.dumps(res, indent=2, ensure_ascii=False, default=str))
+                    else:
+                        print(f"INEP/MEC Município ({res.get('nome_municipio')} - {res.get('sigla_uf')}): Mat {res.get('proficiencia_saeb_matematica')} | Benef {res.get('beneficiarios_prouni_sisu_total')}")
+                    return 0
+
+                if ime_action == "features":
+                    res = ime_conn.get_inep_mec_extra_features(args.id_municipio_or_name)
+                    if res is None:
+                        print(f"Features INEP/MEC Extra não encontradas para: {args.id_municipio_or_name}", file=sys.stderr)
+                        return 1
+                    if getattr(args, "json", False):
+                        print(json.dumps(res, indent=2, ensure_ascii=False, default=str))
+                    else:
+                        print(f"INEP/MEC Extra Gold ({res.get('nome_municipio')} - {res.get('id_municipio')}): Score {res.get('score_capital_humano_mec_extra')} | {res.get('tier_ecossistema_educacional_mec')}")
+                    return 0
+
+                if ime_action == "ranking":
+                    ranks = ime_conn.list_top_inep_mec_extra_municipalities(
+                        limit=getattr(args, "limit", 10),
+                        sigla_uf=getattr(args, "uf", None),
+                        sort_by_fundeb=getattr(args, "fundeb", False),
+                    )
+                    if getattr(args, "json", False):
+                        print(json.dumps(ranks, indent=2, ensure_ascii=False, default=str))
+                    else:
+                        print(f"Ranking INEP/MEC Extra ({len(ranks)}):")
+                        for idx, r in enumerate(ranks, 1):
+                            print(f"  {idx}. {r.get('nome_municipio')} ({r.get('sigla_uf')}): {r.get('score_capital_humano_mec_extra')} | {r.get('tier_ecossistema_educacional_mec')}")
+                    return 0
+            except (ValueError, KeyError) as exc:
+                print(f"Erro INEP/MEC Extra: {exc}", file=sys.stderr)
                 return 1
 
         elif args.command == "terrabrasilis":
