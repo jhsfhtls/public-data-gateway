@@ -223,3 +223,64 @@ models:
       - name: tier_risco_seguranca_territorial
         description: "Tier municipal de segurança (ALTA_SEGURANCA_TERRITORIAL, RISCO_SEGURANCA_MODERADO ou ZONA_CRITICA_SEGURANCA_PATRIMONIAL)."
         tests: [not_null]
+
+  - name: mart_transparencia_gastos_cgu_brasil
+    description: "Data Mart Gold intra-domínio consolidando gastos diretos federais, transferências constitucionais FPM/SUS, emendas, convênios e score de integridade CGU."
+    columns:
+      - name: id_municipio
+        description: "Código IBGE de 7 dígitos do município (STRING)."
+        tests: [not_null, unique]
+      - name: sigla_uf
+        description: "Sigla de 2 letras da Unidade Federativa (UF)."
+        tests: [not_null]
+      - name: nome_municipio
+        description: "Nome oficial do município."
+        tests: [not_null]
+      - name: regiao
+        description: "Macrorregião geográfica brasileira."
+        tests: [not_null]
+      - name: total_gastos_federais_mil_brl
+        description: "Total consolidado de recursos federais executados e transferidos ao município (R$ mil)."
+        tests: [not_null]
+      - name: total_transferencias_mil_brl
+        description: "Total anual de transferências federais constitucionais e legais (R$ mil)."
+        tests: [not_null]
+      - name: taxa_execucao_orcamentaria_pct
+        description: "Percentual efetivamente pago em relação ao orçamento empenhado (%)."
+        tests: [not_null]
+      - name: gasto_federal_per_capita_brl
+        description: "Gasto público federal equivalente por habitante no município (BRL)."
+        tests: [not_null]
+      - name: qtd_modalidades_despesa_cgu
+        description: "Quantidade de modalidades de despesa agregadas na camada Silver CGU."
+        tests: [not_null]
+      - name: total_empenhado_cgu_mil_brl
+        description: "Valor total empenhado nas modalidades federais do município (R$ mil)."
+        tests: [not_null]
+      - name: repasse_fpm_fundeb_mil_brl
+        description: "Montante anual recebido via FPM e FUNDEB (R$ mil)."
+        tests: [not_null]
+      - name: repasse_sus_assistencia_mil_brl
+        description: "Montante anual recebido via repasses SUS e Assistência Social (R$ mil)."
+        tests: [not_null]
+      - name: dependencia_repasses_federais_pct
+        description: "Grau percentual de dependência das receitas municipais em relação à União (%)."
+        tests: [not_null]
+      - name: qtd_convenios_ativos
+        description: "Total de convênios federais ativos no município."
+        tests: [not_null]
+      - name: emendas_parlamentares_pagas_mil_brl
+        description: "Volume pago anual de emendas parlamentares federais no município (R$ mil)."
+        tests: [not_null]
+      - name: adimplencia_prestacao_contas_pct
+        description: "Percentual de regularidade na prestação de contas de convênios junto à União (%)."
+        tests: [not_null]
+      - name: uso_cpgf_cartao_mil_brl
+        description: "Despesas realizadas via Cartão de Pagamento do Governo Federal no município (R$ mil)."
+        tests: [not_null]
+      - name: score_integridade_execucao_cgu
+        description: "Score sintético municipal de eficiência de execução e integridade na prestação de contas CGU (0-100)."
+        tests: [not_null]
+      - name: tier_transparencia_gastos_cgu
+        description: "Classificação municipal (EXCELENCIA_TRANSPARENCIA_EXECUCAO, EXECUCAO_REGULAR_MONITORADA ou ALERTA_CONCENTRACAO_CONVENIOS)."
+        tests: [not_null]

@@ -1211,6 +1211,88 @@ def create_app(settings: GatewaySettings | None = None) -> FastAPI:
             limit=limit, sigla_uf=uf, sort_by_cargo_theft=sort_by_cargo_theft
         )
 
+    # 15E. CGU Portal da Transparência (Gastos Diretos, Transferências & Convênios)
+    @app.get("/api/v1/compliance/transparencia-gastos/despesas/{termo}")
+    async def get_transparencia_despesas(termo: str) -> list[dict[str, Any]]:
+        from public_data_gateway.connectors.compliance.cgu_transparencia_gastos import (
+            CguTransparenciaGastosConnector,
+        )
+
+        return CguTransparenciaGastosConnector(settings=app_settings).get_cgu_direct_expenses(termo)
+
+    @app.get("/api/v1/compliance/transparencia-gastos/transferencias/{termo}")
+    async def get_transparencia_transferencias(termo: str) -> list[dict[str, Any]]:
+        from public_data_gateway.connectors.compliance.cgu_transparencia_gastos import (
+            CguTransparenciaGastosConnector,
+        )
+
+        return CguTransparenciaGastosConnector(
+            settings=app_settings
+        ).get_cgu_constitutional_transfers(termo)
+
+    @app.get("/api/v1/compliance/transparencia-gastos/emendas/{id_municipio_or_name}")
+    async def get_transparencia_emendas(id_municipio_or_name: str) -> dict[str, Any]:
+        from public_data_gateway.connectors.compliance.cgu_transparencia_gastos import (
+            CguTransparenciaGastosConnector,
+        )
+
+        res = CguTransparenciaGastosConnector(
+            settings=app_settings
+        ).get_cgu_amendments_covenants(id_municipio_or_name)
+        if res is None:
+            raise HTTPException(
+                status_code=404, detail="CGU amendments/covenants metrics not found"
+            )
+        return res
+
+    @app.get("/api/v1/compliance/transparencia-gastos/municipio/{id_municipio_or_name}")
+    async def get_transparencia_municipio(id_municipio_or_name: str) -> dict[str, Any]:
+        from public_data_gateway.connectors.compliance.cgu_transparencia_gastos import (
+            CguTransparenciaGastosConnector,
+        )
+
+        res = CguTransparenciaGastosConnector(settings=app_settings).get_cgu_expenses_summary(
+            id_municipio_or_name
+        )
+        if res is None:
+            raise HTTPException(
+                status_code=404, detail="CGU municipal spending summary not found"
+            )
+        return res
+
+    @app.get("/api/v1/compliance/transparencia-gastos/features/{id_municipio_or_name}")
+    async def get_transparencia_features(id_municipio_or_name: str) -> dict[str, Any]:
+        from public_data_gateway.connectors.compliance.cgu_transparencia_gastos import (
+            CguTransparenciaGastosConnector,
+        )
+
+        res = CguTransparenciaGastosConnector(settings=app_settings).get_cgu_expenses_features(
+            id_municipio_or_name
+        )
+        if res is None:
+            raise HTTPException(
+                status_code=404, detail="CGU Gold spending transparency features not found"
+            )
+        return res
+
+    @app.get("/api/v1/compliance/transparencia-gastos/ranking")
+    async def get_transparencia_ranking(
+        limit: int = Query(10, ge=1, le=50, description="Max municipalities to list"),
+        uf: str | None = Query(None, description="Optional 2-letter state filter"),
+        sort_by_spending: bool = Query(
+            False, description="Sort descending by total federal spend (R$ mil)"
+        ),
+    ) -> list[dict[str, Any]]:
+        from public_data_gateway.connectors.compliance.cgu_transparencia_gastos import (
+            CguTransparenciaGastosConnector,
+        )
+
+        return CguTransparenciaGastosConnector(
+            settings=app_settings
+        ).list_top_cgu_transparency_municipalities(
+            limit=limit, sigla_uf=uf, sort_by_spending=sort_by_spending
+        )
+
     # 15D. CNJ Improbidade Administrativa (CNCIAI)
     @app.get("/api/v1/judicial/improbidade/condenacoes/{documento_or_name}")
     async def get_improbidade_condenacoes(

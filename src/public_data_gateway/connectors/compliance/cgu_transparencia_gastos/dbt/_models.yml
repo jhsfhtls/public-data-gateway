@@ -1,0 +1,175 @@
+version: 2
+
+models:
+  - name: stg_cgu_gastos_diretos_orgaos
+    description: "Staging view tipada de execução financeira federal CGU por órgão superior SIAFI, modalidade e município."
+    columns:
+      - name: cod_despesa_cgu
+        description: "Código identificador único do registro municipal de gasto federal CGU (STRING)."
+        tests: [not_null, unique]
+      - name: orgao_superior_codigo
+        description: "Código SIAFI do órgão federal executor ou repassador."
+        tests: [not_null]
+      - name: funcao_orcamentaria
+        description: "Função orçamentária da despesa (SAUDE_EDUCACAO, INFRAESTRUTURA_DESENVOLVIMENTO ou ADMINISTRACAO_SEGURANCA)."
+        tests: [not_null]
+      - name: modalidade_gasto_federal
+        description: "Modalidade financeira (TRANSFERENCIA_CONSTITUCIONAL, CONVENIO_REPASSE ou EXECUCAO_DIRETA_CPGF)."
+        tests: [not_null]
+      - name: id_municipio
+        description: "Código IBGE de 7 dígitos do município (STRING)."
+        tests: [not_null]
+      - name: sigla_uf
+        description: "Sigla de 2 letras da Unidade Federativa (UF)."
+        tests: [not_null]
+      - name: nome_municipio
+        description: "Nome oficial do município."
+        tests: [not_null]
+      - name: regiao
+        description: "Macrorregião geográfica brasileira."
+        tests: [not_null]
+      - name: valor_empenhado_mil_brl
+        description: "Dotação anual empenhada na modalidade no município (R$ mil)."
+        tests: [not_null]
+      - name: valor_pago_mil_brl
+        description: "Montante efetivamente pago e liquidado no exercício (R$ mil)."
+        tests: [not_null]
+      - name: ano_exercicio
+        description: "Exercício financeiro anual federal."
+        tests: [not_null]
+
+  - name: stg_cgu_transferencias_constitucionais_fpm
+    description: "Staging view tipada das transferências federais FPM/FUNDEB/SUS e dependência fiscal no Portal da Transparência."
+    columns:
+      - name: cod_transf_cgu
+        description: "Código identificador único do registro de transferências federais CGU (STRING)."
+        tests: [not_null, unique]
+      - name: id_municipio
+        description: "Código IBGE de 7 dígitos do município (STRING)."
+        tests: [not_null]
+      - name: sigla_uf
+        description: "Sigla de 2 letras da Unidade Federativa (UF)."
+        tests: [not_null]
+      - name: nome_municipio
+        description: "Nome oficial do município."
+        tests: [not_null]
+      - name: repasse_fpm_fundeb_mil_brl
+        description: "Volume anual de transferências constitucionais FPM e FUNDEB recebidas (R$ mil)."
+        tests: [not_null]
+      - name: repasse_sus_assistencia_mil_brl
+        description: "Volume anual de repasses fundo-a-fundo SUS e Assistência Social (R$ mil)."
+        tests: [not_null]
+      - name: dependencia_repasses_federais_pct
+        description: "Grau percentual de dependência orçamentária em relação a transferências federais (%)."
+        tests: [not_null]
+      - name: ano_exercicio
+        description: "Exercício anual de apuração CGU."
+        tests: [not_null]
+
+  - name: stg_cgu_emendas_convenios_municipio
+    description: "Staging view tipada de convênios ativos, emendas parlamentares, adimplência de contas e gastos CPGF."
+    columns:
+      - name: id_municipio
+        description: "Código IBGE de 7 dígitos do município (STRING)."
+        tests: [not_null, unique]
+      - name: sigla_uf
+        description: "Sigla de 2 letras da Unidade Federativa (UF)."
+        tests: [not_null]
+      - name: nome_municipio
+        description: "Nome oficial do município."
+        tests: [not_null]
+      - name: qtd_convenios_ativos
+        description: "Quantidade de instrumentos e convênios federais ativos no município."
+        tests: [not_null]
+      - name: emendas_parlamentares_pagas_mil_brl
+        description: "Volume anual pago em emendas parlamentares federais no município (R$ mil)."
+        tests: [not_null]
+      - name: adimplencia_prestacao_contas_pct
+        description: "Percentual de convênios com prestação de contas regular e adimplente (%)."
+        tests: [not_null]
+      - name: uso_cpgf_cartao_mil_brl
+        description: "Volume de despesas executadas via Cartão de Pagamento do Governo Federal no polo (R$ mil)."
+        tests: [not_null]
+
+  - name: stg_cgu_transparencia_resumo_municipal
+    description: "Staging view tipada do consolidado municipal de gastos públicos federais e execução orçamentária CGU."
+    columns:
+      - name: id_municipio
+        description: "Código IBGE de 7 dígitos do município (STRING)."
+        tests: [not_null, unique]
+      - name: sigla_uf
+        description: "Sigla de 2 letras da Unidade Federativa (UF)."
+        tests: [not_null]
+      - name: nome_municipio
+        description: "Nome oficial do município."
+        tests: [not_null]
+      - name: regiao
+        description: "Macrorregião geográfica brasileira."
+        tests: [not_null]
+      - name: total_gastos_federais_mil_brl
+        description: "Total consolidado de recursos federais executados ou transferidos ao município (R$ mil)."
+        tests: [not_null]
+      - name: total_transferencias_mil_brl
+        description: "Parcela composta por transferências constitucionais, legais e voluntárias (R$ mil)."
+        tests: [not_null]
+      - name: taxa_execucao_orcamentaria_pct
+        description: "Razão financeira entre valor pago e valor empenhado no exercício (%)."
+        tests: [not_null]
+      - name: gasto_federal_per_capita_brl
+        description: "Volume anual de gasto público federal equivalente por habitante (BRL)."
+        tests: [not_null]
+
+  - name: fct_gastos_publicos_cgu_municipal
+    description: "Fato Silver municipal consolidando gastos diretos SIAFI, transferências FPM/SUS, emendas, convênios e CPGF no Portal da Transparência CGU."
+    columns:
+      - name: id_municipio
+        description: "Código IBGE de 7 dígitos do município (STRING)."
+        tests: [not_null, unique]
+      - name: sigla_uf
+        description: "Sigla de 2 letras da Unidade Federativa (UF)."
+        tests: [not_null]
+      - name: nome_municipio
+        description: "Nome oficial do município."
+        tests: [not_null]
+      - name: regiao
+        description: "Macrorregião geográfica brasileira."
+        tests: [not_null]
+      - name: total_gastos_federais_mil_brl
+        description: "Montante anual total de gastos diretos e transferências federais no município (R$ mil)."
+        tests: [not_null]
+      - name: total_transferencias_mil_brl
+        description: "Total de transferências constitucionais e legais para o município (R$ mil)."
+        tests: [not_null]
+      - name: taxa_execucao_orcamentaria_pct
+        description: "Percentual liquidado/pago em relação aos valores empenhados no exercício (%)."
+        tests: [not_null]
+      - name: gasto_federal_per_capita_brl
+        description: "Gasto federal anual equivalente por habitante do município (BRL)."
+        tests: [not_null]
+      - name: qtd_modalidades_despesa_cgu
+        description: "Quantidade de modalidades de despesa consolidadas na camada Silver CGU."
+        tests: [not_null]
+      - name: total_empenhado_cgu_mil_brl
+        description: "Total consolidado empenhado nas modalidades federais do município (R$ mil)."
+        tests: [not_null]
+      - name: repasse_fpm_fundeb_mil_brl
+        description: "Repasses anuais acumulados de FPM e FUNDEB recebidos pelo município (R$ mil)."
+        tests: [not_null]
+      - name: repasse_sus_assistencia_mil_brl
+        description: "Repasses anuais acumulados fundo-a-fundo de Saúde e Assistência Social (R$ mil)."
+        tests: [not_null]
+      - name: dependencia_repasses_federais_pct
+        description: "Dependência percentual da receita municipal face às transferências federais (%)."
+        tests: [not_null]
+      - name: qtd_convenios_ativos
+        description: "Quantidade de convênios e contratos de repasse ativos."
+        tests: [not_null]
+      - name: emendas_parlamentares_pagas_mil_brl
+        description: "Volume anual pago em emendas parlamentares destinadas ao município (R$ mil)."
+        tests: [not_null]
+      - name: adimplencia_prestacao_contas_pct
+        description: "Percentual de convênios adimplentes na prestação de contas junto à União (%)."
+        tests: [not_null]
+      - name: uso_cpgf_cartao_mil_brl
+        description: "Gastos executados com Cartão de Pagamento do Governo Federal no município (R$ mil)."
+        tests: [not_null]
