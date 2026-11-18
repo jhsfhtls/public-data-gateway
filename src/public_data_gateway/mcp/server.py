@@ -524,6 +524,51 @@ class MCPDispatcher:
                                 },
                             },
                             {
+                                "name": "bdg_get_sinesp_ocorrencias",
+                                "description": "Lookup SINESP-VDE criminal occurrences (cargo theft, vehicle theft, fraud) by code, crime type, IBGE code, UF, or municipality.",
+                                "inputSchema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "termo": {"type": "string", "description": "Occurrence code, crime type, IBGE 7-digit code, UF, or municipality name"},
+                                    },
+                                    "required": ["termo"],
+                                },
+                            },
+                            {
+                                "name": "bdg_get_sinesp_vitimas_mvi",
+                                "description": "Lookup SINESP/FBSP intentional violent deaths (MVI) and police clearance rates by code, IBGE code, UF, or municipality.",
+                                "inputSchema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "termo": {"type": "string", "description": "MVI code, IBGE code, UF, or municipality name"},
+                                    },
+                                    "required": ["termo"],
+                                },
+                            },
+                            {
+                                "name": "bdg_get_sinesp_seguranca_features",
+                                "description": "Get normalized Gold SINESP/FBSP public safety score, MVI rate, cargo theft exposure, and territorial security tier.",
+                                "inputSchema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "id_municipio_or_name": {"type": "string", "description": "7-digit IBGE municipality code or municipality name"},
+                                    },
+                                    "required": ["id_municipio_or_name"],
+                                },
+                            },
+                            {
+                                "name": "bdg_list_top_sinesp_seguranca_municipalities",
+                                "description": "List Brazilian municipalities ranked by SINESP/FBSP public safety score or logistics cargo theft rate.",
+                                "inputSchema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "limit": {"type": "integer", "description": "Maximum rows (default: 10)"},
+                                        "sigla_uf": {"type": "string", "description": "Optional 2-letter state filter (e.g. SP)"},
+                                        "sort_by_cargo_theft": {"type": "boolean", "description": "Set true to rank municipalities by highest freight cargo theft per 100k hab first"},
+                                    },
+                                },
+                            },
+                            {
                                 "name": "bdg_get_cnciai_improbidade_condemnations",
                                 "description": "Query CNJ CNCIAI administrative misconduct condemnations by document, party name, or IBGE code (Tier 1).",
                                 "inputSchema": {
@@ -4022,6 +4067,65 @@ class MCPDispatcher:
                 sigla_uf=args.get("sigla_uf"),
             )
             wrapped = wrap_untrusted_gov_data(rows, source_id="pgfn_divida_ativa")
+            return {
+                "jsonrpc": "2.0",
+                "id": req_id,
+                "result": {"content": [{"type": "text", "text": wrapped}], "isError": False},
+            }
+
+        if tool_name in {
+            "bdg_get_sinesp_ocorrencias",
+            "bdg_get_sinesp_vitimas_mvi",
+            "bdg_get_sinesp_seguranca_features",
+            "bdg_list_top_sinesp_seguranca_municipalities",
+        }:
+            from public_data_gateway.connectors.compliance.sinesp_seguranca import (
+                SinespSegurancaConnector,
+            )
+
+            connector = SinespSegurancaConnector(settings=self.settings)
+            try:
+                if tool_name == "bdg_get_sinesp_ocorrencias":
+                    result: Any = connector.get_sinesp_crimes(str(args.get("termo", "")))
+                elif tool_name == "bdg_get_sinesp_vitimas_mvi":
+                    result = connector.get_sinesp_mvi_victims(str(args.get("termo", "")))
+                elif tool_name == "bdg_get_sinesp_seguranca_features":
+                    result = connector.get_sinesp_features(
+                        str(args.get("id_municipio_or_name", ""))
+                    )
+                else:
+                    result = connector.list_top_safest_sinesp_municipalities(
+                        limit=int(args.get("limit", 10)),
+                        sigla_uf=args.get("sigla_uf"),
+                        sort_by_cargo_theft=bool(args.get("sort_by_cargo_theft", False)),
+                    )
+            except (ValueError, KeyError) as exc:
+                return {
+                    "jsonrpc": "2.0",
+                    "id": req_id,
+                    "result": {
+                        "content": [
+                            {"type": "text", "text": f"SINESP Seguranca parameter error: {exc}"}
+                        ],
+                        "isError": True,
+                    },
+                }
+
+            if not result:
+                return {
+                    "jsonrpc": "2.0",
+                    "id": req_id,
+                    "result": {
+                        "content": [
+                            {
+                                "type": "text",
+                                "text": "No SINESP public safety data found for the query.",
+                            }
+                        ],
+                        "isError": True,
+                    },
+                }
+            wrapped = wrap_untrusted_gov_data(result, source_id="sinesp_seguranca")
             return {
                 "jsonrpc": "2.0",
                 "id": req_id,

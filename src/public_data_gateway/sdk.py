@@ -438,6 +438,64 @@ class ComplianceFacade:
             limit=limit, sigla_uf=sigla_uf
         )
 
+    @property
+    def sinesp_connector(self) -> Any:
+        if (
+            not hasattr(self, "_sinesp_connector")
+            or self._sinesp_connector is None
+        ):
+            from public_data_gateway.connectors.compliance.sinesp_seguranca import (
+                SinespSegurancaConnector,
+            )
+
+            self._sinesp_connector = SinespSegurancaConnector(
+                settings=self._sdk.settings
+            )
+        return self._sinesp_connector
+
+    def get_sinesp_crimes(self, termo: str) -> list[dict[str, Any]]:
+        """Lookup SINESP criminal offenses by code, crime type, IBGE 7D, UF, or city."""
+        return self.sinesp_connector.get_sinesp_crimes(termo)
+
+    def get_sinesp_mvi_victims(self, termo: str) -> list[dict[str, Any]]:
+        """Lookup SINESP/FBSP intentional violent deaths (MVI) by code, IBGE 7D, UF, or city."""
+        return self.sinesp_connector.get_sinesp_mvi_victims(termo)
+
+    def get_sinesp_security_capacity(
+        self, id_municipio_or_name: str
+    ) -> dict[str, Any] | None:
+        """Retrieve municipal police stations, guard, and security spending per capita."""
+        return self.sinesp_connector.get_sinesp_security_capacity(
+            id_municipio_or_name
+        )
+
+    def get_sinesp_municipal_summary(
+        self, id_municipio_or_name: str
+    ) -> dict[str, Any] | None:
+        """Retrieve consolidated municipal SINESP violent death and freight theft metrics."""
+        return self.sinesp_connector.get_sinesp_municipal_summary(
+            id_municipio_or_name
+        )
+
+    def get_sinesp_features(
+        self, id_municipio_or_name: str
+    ) -> dict[str, Any] | None:
+        """Retrieve Gold SINESP/FBSP public safety score and territorial security tier."""
+        return self.sinesp_connector.get_sinesp_features(id_municipio_or_name)
+
+    def list_top_safest_sinesp_municipalities(
+        self,
+        limit: int = 10,
+        sigla_uf: str | None = None,
+        sort_by_cargo_theft: bool = False,
+    ) -> list[dict[str, Any]]:
+        """List municipalities ranked by public safety score or cargo theft rate."""
+        return self.sinesp_connector.list_top_safest_sinesp_municipalities(
+            limit=limit,
+            sigla_uf=sigla_uf,
+            sort_by_cargo_theft=sort_by_cargo_theft,
+        )
+
 
 class JudicialFacade:
     """Judicial proceedings, procedural metadata and litigation risk interface (CNJ DataJud)."""
@@ -3184,6 +3242,45 @@ class BrazilData:
         """Listar municípios por estoque consolidado de Dívida Ativa da União e FGTS (PGFN)."""
         return self.compliance.list_top_pgfn_municipalities(
             limit=limit, sigla_uf=sigla_uf
+        )
+
+    def get_sinesp_crimes(self, termo: str) -> list[dict[str, Any]]:
+        """Consultar ocorrências criminais municipais SINESP-VDE (roubo de carga, veículos e estelionato)."""
+        return self.compliance.get_sinesp_crimes(termo)
+
+    def get_sinesp_mvi_victims(self, termo: str) -> list[dict[str, Any]]:
+        """Consultar indicadores municipais de Mortes Violentas Intencionais (MVI) e elucidação SINESP/FBSP."""
+        return self.compliance.get_sinesp_mvi_victims(termo)
+
+    def get_sinesp_security_capacity(
+        self, id_municipio_or_name: str
+    ) -> dict[str, Any] | None:
+        """Consultar delegacias, guarda municipal, efetivo policial e investimento per capita (SINESP)."""
+        return self.compliance.get_sinesp_security_capacity(id_municipio_or_name)
+
+    def get_sinesp_municipal_summary(
+        self, id_municipio_or_name: str
+    ) -> dict[str, Any] | None:
+        """Consultar consolidado municipal de risco criminal, MVI e roubo de cargas SINESP/FBSP."""
+        return self.compliance.get_sinesp_municipal_summary(id_municipio_or_name)
+
+    def get_sinesp_features(
+        self, id_municipio_or_name: str
+    ) -> dict[str, Any] | None:
+        """Consultar features Gold de segurança pública e tier de risco patrimonial (SINESP/FBSP)."""
+        return self.compliance.get_sinesp_features(id_municipio_or_name)
+
+    def list_top_safest_sinesp_municipalities(
+        self,
+        limit: int = 10,
+        sigla_uf: str | None = None,
+        sort_by_cargo_theft: bool = False,
+    ) -> list[dict[str, Any]]:
+        """Listar municípios ranqueados por segurança pública SINESP/FBSP ou taxa de roubo de carga."""
+        return self.compliance.list_top_safest_sinesp_municipalities(
+            limit=limit,
+            sigla_uf=sigla_uf,
+            sort_by_cargo_theft=sort_by_cargo_theft,
         )
 
     def get_litigation_risk(self, cnpj_or_cpf: str) -> dict[str, Any]:

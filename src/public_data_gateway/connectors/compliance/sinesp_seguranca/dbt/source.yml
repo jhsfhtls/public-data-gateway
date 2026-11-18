@@ -1,0 +1,26 @@
+version: 2
+
+sources:
+  - name: sinesp_seguranca
+    description: "Tabelas Silver do Sistema Nacional de Informações de Segurança Pública (SINESP-VDE / MJSP & Anuário FBSP)"
+    meta:
+      agency: "Ministério da Justiça e Segurança Pública (SINESP) & FBSP"
+      domain: "compliance_seguranca_publica"
+      freshness_sla: "Mensal / Anual (720h)"
+    tables:
+      - name: sinesp_ocorrencias_municipais
+        description: "Ocorrências criminais municipais SINESP-VDE por tipificação (roubo de carga, veículos e estelionato)"
+        meta:
+          external_location: "data/sinesp_seguranca/silver/sinesp_ocorrencias_municipais.parquet"
+      - name: sinesp_vitimizacao_mvi_uf
+        description: "Indicadores municipais de Mortes Violentas Intencionais (MVI) e taxa de elucidação de inquéritos"
+        meta:
+          external_location: "data/sinesp_seguranca/silver/sinesp_vitimizacao_mvi_uf.parquet"
+      - name: sinesp_capacidade_seguranca
+        description: "Infraestrutura municipal de segurança pública, delegacias, guarda municipal e efetivo por 100 mil hab."
+        meta:
+          external_location: "data/sinesp_seguranca/silver/sinesp_capacidade_seguranca.parquet"
+      - name: sinesp_seguranca_resumo_municipal
+        description: "Consolidado municipal de taxas de criminalidade violenta (MVI) e risco patrimonial/logístico"
+        meta:
+          external_location: "data/sinesp_seguranca/silver/sinesp_seguranca_resumo_municipal.parquet"

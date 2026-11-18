@@ -165,3 +165,61 @@ models:
         description: "Classificação qualitativa de risco fiscal PGFN (ALTO_RISCO_EXPOSICAO_PGFN, RISCO_MODERADO_PGFN, BAIXO_RISCO_PGFN)"
         tests:
           - not_null
+
+  - name: mart_seguranca_publica_sinesp_brasil
+    description: "Data Mart Gold intra-domínio consolidando ocorrências criminais SINESP-VDE, Mortes Violentas Intencionais (MVI/FBSP), roubo de cargas e efetivo policial."
+    columns:
+      - name: id_municipio
+        description: "Código IBGE de 7 dígitos do município (STRING)."
+        tests: [not_null, unique]
+      - name: sigla_uf
+        description: "Sigla de 2 letras da Unidade Federativa (UF)."
+        tests: [not_null]
+      - name: nome_municipio
+        description: "Nome oficial do município."
+        tests: [not_null]
+      - name: regiao
+        description: "Macrorregião geográfica do município."
+        tests: [not_null]
+      - name: taxa_mvi_por_100k_hab
+        description: "Taxa de Mortes Violentas Intencionais por 100 mil habitantes (SINESP/FBSP)."
+        tests: [not_null]
+      - name: taxa_roubo_carga_100k_hab
+        description: "Taxa municipal de roubo de carga logística por 100 mil habitantes."
+        tests: [not_null]
+      - name: taxa_furto_roubo_veiculo_100k_hab
+        description: "Taxa de roubo e furto de veículos por 100 mil habitantes."
+        tests: [not_null]
+      - name: taxa_estelionato_100k_hab
+        description: "Taxa de estelionato e fraudes registradas por 100 mil habitantes."
+        tests: [not_null]
+      - name: investimento_seguranca_per_capita_brl
+        description: "Investimento anual per capita em segurança pública (BRL/hab)."
+        tests: [not_null]
+      - name: total_vitimas_mvi
+        description: "Contagem absoluta de vítimas de Mortes Violentas Intencionais no município."
+        tests: [not_null]
+      - name: taxa_elucidacao_inqueritos_pct
+        description: "Percentual de elucidação de inquéritos de homicídio e MVI (%)."
+        tests: [not_null]
+      - name: qtd_delegacias_unidades
+        description: "Quantidade de delegacias e unidades policiais ativas."
+        tests: [not_null]
+      - name: possui_guarda_municipal_ativa
+        description: "Existência de Guarda Civil Municipal estruturada no município."
+        tests: [not_null]
+      - name: efetivo_seguranca_100k_hab
+        description: "Efetivo de forças de segurança por 100 mil habitantes."
+        tests: [not_null]
+      - name: qtd_tipos_crime_amostra
+        description: "Quantidade de tipificações criminais presentes na amostra SINESP."
+        tests: [not_null]
+      - name: qtd_ocorrencias_amostra_sinesp
+        description: "Soma de ocorrências criminais registradas na amostra SINESP-VDE."
+        tests: [not_null]
+      - name: score_seguranca_publica_sinesp
+        description: "Score sintético municipal de segurança pública e baixa exposição patrimonial/MVI (0-100)."
+        tests: [not_null]
+      - name: tier_risco_seguranca_territorial
+        description: "Tier municipal de segurança (ALTA_SEGURANCA_TERRITORIAL, RISCO_SEGURANCA_MODERADO ou ZONA_CRITICA_SEGURANCA_PATRIMONIAL)."
+        tests: [not_null]

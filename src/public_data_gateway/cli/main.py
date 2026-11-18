@@ -414,6 +414,36 @@ def build_parser() -> argparse.ArgumentParser:
     pgfn_rk.add_argument("--uf", type=str, default=None, help="Optional 2-letter UF state filter")
     pgfn_rk.add_argument("--json", action="store_true", help="Output in JSON format")
 
+    # SINESP / MJSP & FBSP Segurança Pública command group
+    seg_p = subparsers.add_parser("seguranca", help="Query SINESP/FBSP municipal crime rates, MVI victims, security capacity, and safety rankings.")
+    seg_sub = seg_p.add_subparsers(dest="seguranca_action", required=True)
+
+    seg_oc_p = seg_sub.add_parser("ocorrencias", help="Lookup SINESP criminal occurrences by code, crime type, IBGE, UF, or city.")
+    seg_oc_p.add_argument("termo", help="Occurrence code, crime type, IBGE code, UF, or municipality name")
+    seg_oc_p.add_argument("--json", action="store_true", help="Output in JSON format")
+
+    seg_mv_p = seg_sub.add_parser("vitimas", help="Lookup SINESP/FBSP intentional violent deaths (MVI) by code, IBGE, UF, or city.")
+    seg_mv_p.add_argument("termo", help="MVI code, IBGE code, UF, or municipality name")
+    seg_mv_p.add_argument("--json", action="store_true", help="Output in JSON format")
+
+    seg_cp_p = seg_sub.add_parser("capacidade", help="Get municipal police stations, municipal guard, and security capex per capita.")
+    seg_cp_p.add_argument("id_municipio_or_name", help="7-digit IBGE code or municipality name")
+    seg_cp_p.add_argument("--json", action="store_true", help="Output in JSON format")
+
+    seg_mun_p = seg_sub.add_parser("municipio", help="Get consolidated municipal SINESP violent death and freight cargo theft summary.")
+    seg_mun_p.add_argument("id_municipio_or_name", help="7-digit IBGE code or municipality name")
+    seg_mun_p.add_argument("--json", action="store_true", help="Output in JSON format")
+
+    seg_ft_p = seg_sub.add_parser("features", help="Get Gold SINESP public safety score and territorial risk tier.")
+    seg_ft_p.add_argument("id_municipio_or_name", help="7-digit IBGE code or municipality name")
+    seg_ft_p.add_argument("--json", action="store_true", help="Output in JSON format")
+
+    seg_rk_p = seg_sub.add_parser("ranking", help="List municipalities ranked by public safety score or cargo theft exposure.")
+    seg_rk_p.add_argument("--limit", type=int, default=10, help="Max municipalities to list")
+    seg_rk_p.add_argument("--uf", type=str, help="Optional 2-letter state filter")
+    seg_rk_p.add_argument("--roubo-carga", action="store_true", help="Sort descending by cargo theft rate per 100k hab")
+    seg_rk_p.add_argument("--json", action="store_true", help="Output in JSON format")
+
     # Subcommand: improbidade (CNJ CNCIAI Improbidade Administrativa)
     imp_p = subparsers.add_parser(
         "improbidade",
@@ -2810,6 +2840,84 @@ def main(argv: Sequence[str] | None = None) -> int:
                 return 1
             print(json.dumps(out, indent=2, ensure_ascii=False))
             return 0
+
+        elif args.command == "seguranca":
+            from public_data_gateway.connectors.compliance.sinesp_seguranca import (
+                SinespSegurancaConnector,
+            )
+
+            seg_conn = SinespSegurancaConnector(settings=settings)
+            seg_action = getattr(args, "seguranca_action", "")
+            try:
+                if seg_action == "ocorrencias":
+                    rows = seg_conn.get_sinesp_crimes(args.termo)
+                    if getattr(args, "json", False):
+                        print(json.dumps(rows, indent=2, ensure_ascii=False, default=str))
+                    else:
+                        print(f"SINESP Ocorrências ({len(rows)}):")
+                        for r in rows:
+                            print(f"  {r.get('cod_ocorrencia_sinesp')} | {r.get('nome_municipio')} ({r.get('sigla_uf')}): {r.get('tipo_crime')} = {r.get('taxa_por_100k_hab')}/100k")
+                    return 0
+
+                if seg_action == "vitimas":
+                    rows = seg_conn.get_sinesp_mvi_victims(args.termo)
+                    if getattr(args, "json", False):
+                        print(json.dumps(rows, indent=2, ensure_ascii=False, default=str))
+                    else:
+                        print(f"SINESP MVI Vítimas ({len(rows)}):")
+                        for r in rows:
+                            print(f"  {r.get('cod_vitimizacao_mvi')} | {r.get('nome_municipio')} ({r.get('sigla_uf')}): MVI {r.get('taxa_mvi_por_100k_hab')}/100k")
+                    return 0
+
+                if seg_action == "capacidade":
+                    res = seg_conn.get_sinesp_security_capacity(args.id_municipio_or_name)
+                    if res is None:
+                        print(f"Capacidade SINESP não encontrada para: {args.id_municipio_or_name}", file=sys.stderr)
+                        return 1
+                    if getattr(args, "json", False):
+                        print(json.dumps(res, indent=2, ensure_ascii=False, default=str))
+                    else:
+                        print(f"SINESP Capacidade ({res.get('nome_municipio')} - {res.get('sigla_uf')}): {res.get('qtd_delegacias_unidades')} delegacias | Efetivo {res.get('efetivo_seguranca_100k_hab')}/100k")
+                    return 0
+
+                if seg_action == "municipio":
+                    res = seg_conn.get_sinesp_municipal_summary(args.id_municipio_or_name)
+                    if res is None:
+                        print(f"Resumo SINESP não encontrado para: {args.id_municipio_or_name}", file=sys.stderr)
+                        return 1
+                    if getattr(args, "json", False):
+                        print(json.dumps(res, indent=2, ensure_ascii=False, default=str))
+                    else:
+                        print(f"SINESP Segurança Município ({res.get('nome_municipio')} - {res.get('sigla_uf')}): MVI {res.get('taxa_mvi_por_100k_hab')} | Carga {res.get('taxa_roubo_carga_100k_hab')}")
+                    return 0
+
+                if seg_action == "features":
+                    res = seg_conn.get_sinesp_features(args.id_municipio_or_name)
+                    if res is None:
+                        print(f"Features SINESP não encontradas para: {args.id_municipio_or_name}", file=sys.stderr)
+                        return 1
+                    if getattr(args, "json", False):
+                        print(json.dumps(res, indent=2, ensure_ascii=False, default=str))
+                    else:
+                        print(f"SINESP Gold ({res.get('nome_municipio')} - {res.get('id_municipio')}): Score {res.get('score_seguranca_publica_sinesp')} | {res.get('tier_risco_seguranca_territorial')}")
+                    return 0
+
+                if seg_action == "ranking":
+                    ranks = seg_conn.list_top_safest_sinesp_municipalities(
+                        limit=getattr(args, "limit", 10),
+                        sigla_uf=getattr(args, "uf", None),
+                        sort_by_cargo_theft=getattr(args, "roubo_carga", False),
+                    )
+                    if getattr(args, "json", False):
+                        print(json.dumps(ranks, indent=2, ensure_ascii=False, default=str))
+                    else:
+                        print(f"Ranking SINESP Segurança ({len(ranks)}):")
+                        for idx, r in enumerate(ranks, 1):
+                            print(f"  {idx}. {r.get('nome_municipio')} ({r.get('sigla_uf')}): {r.get('score_seguranca_publica_sinesp')} | {r.get('tier_risco_seguranca_territorial')}")
+                    return 0
+            except (ValueError, KeyError) as exc:
+                print(f"Erro SINESP Segurança: {exc}", file=sys.stderr)
+                return 1
 
         elif args.command == "improbidade":
             from public_data_gateway.connectors.judicial.cnj_improbidade import (

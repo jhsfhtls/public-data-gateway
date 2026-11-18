@@ -1,6 +1,6 @@
 {
   "schema_version": "1.0.0",
-  "last_updated": "2026-11-18T10:13:30.000000",
+  "last_updated": "2026-11-18T10:30:00.000000",
   "project_name": "public-data-gateway",
   "architecture": "Hexagonal Medallion Lakehouse (Bronze -> Silver -> Gold / Feature Store)",
   "governance_standards": [
@@ -15,7 +15,7 @@
   "current_macro_phase": "Fase 11.5 - Expansão Completa de Fontes Públicas (Ondas 11.5A a 11.5E — Padrão 11-Gates)",
   "overall_status": "ON_TRACK",
   "active_connector": null,
-  "next_connector": "sinesp_seguranca",
+  "next_connector": "sedec_desastres",
   "structural_phases": [
     {
       "phase_id": "00",
@@ -252,74 +252,74 @@
     }
   ],
   "active_connector_gates": {
-    "target_connector": "senatran_frota",
+    "target_connector": "sinesp_seguranca",
     "target_wave": "11.5C",
     "gates": [
       {
         "gate_id": "GATE_01",
         "name": "Contrato Declarativo ODCS v3.1 das N Tabelas da API",
         "status": "PASSED",
-        "criteria": "Schema tipado, chaves primarias STRING (cod_frota_tipo, cod_frota_comb, id_municipio 7D, sigla_uf) e regras semanticas para Frota RENAVAM por Tipo, Propulsao Eletrificada EV/HEV, Idade/Renovacao e Resumo Municipal."
+        "criteria": "Schema tipado, chaves primarias STRING (cod_ocorrencia_sinesp, cod_vitimizacao_mvi, id_municipio 7D, sigla_uf) e regras semanticas para Ocorrencias SINESP-VDE, Vitimizacao MVI/FBSP, Capacidade Policial e Resumo Municipal."
       },
       {
         "gate_id": "GATE_02",
         "name": "Ingestao Bronze Isolada (Todas as Tabelas) & Cache WAL",
         "status": "PASSED",
-        "criteria": "Ingestao resiliente dos portais oficiais SENATRAN/Ministerio dos Transportes (gov.br/transportes) em data/senatran_frota/bronze/ com registro de linhagem SHA-256."
+        "criteria": "Ingestao resiliente dos portais oficiais SINESP MJSP (gov.br/mj) e Anuario FBSP (forumseguranca.org.br) em data/sinesp_seguranca/bronze/ com registro de linhagem SHA-256."
       },
       {
         "gate_id": "GATE_03",
         "name": "Sanitizacao de Sentinelas & Nulls",
         "status": "PASSED",
-        "criteria": "Conversao deterministica de sentinelas em NULLs reais e normalizacao de categorias veiculares RENAVAM, propulsao EV/Flex/Diesel e taxas de motorizacao."
+        "criteria": "Conversao deterministica de sentinelas em NULLs reais e normalizacao de tipificacoes criminais (ROUBO_CARGA_LOGISTICA, ROUBO_FURTO_VEICULO, ESTELIONATO_FRAUDE) e taxas por 100 mil hab."
       },
       {
         "gate_id": "GATE_04",
         "name": "Materializacao Silver Parquet Isolada (Todas as Tabelas)",
         "status": "PASSED",
-        "criteria": "Gravacao ZSTD em data/senatran_frota/silver/ (senatran_frota_tipo_municipio, senatran_frota_combustivel_ev, senatran_idade_renovacao_frota, senatran_frota_resumo_municipal)."
+        "criteria": "Gravacao ZSTD em data/sinesp_seguranca/silver/ (sinesp_ocorrencias_municipais, sinesp_vitimizacao_mvi_uf, sinesp_capacidade_seguranca, sinesp_seguranca_resumo_municipal)."
       },
       {
         "gate_id": "GATE_05",
         "name": "Validacao dos 5 Pilares & Quarentena",
         "status": "PASSED",
-        "criteria": "Aprovacao em Freshness, Volume, Schema, Null Ceiling e Lineage com suporte a desvio para data/senatran_frota/quarantine/."
+        "criteria": "Aprovacao em Freshness, Volume, Schema, Null Ceiling e Lineage com suporte a desvio para data/sinesp_seguranca/quarantine/."
       },
       {
         "gate_id": "GATE_06",
         "name": "Gold Feature View Isolada & ASOF Join ML",
         "status": "PASSED",
-        "criteria": "Features de modernizacao da frota e eletrificacao EV em data/senatran_frota/gold/features_mobilidade_frota_senatran.parquet."
+        "criteria": "Features de risco de seguranca publica e sinistralidade patrimonial em data/sinesp_seguranca/gold/features_risco_seguranca_sinesp.parquet."
       },
       {
         "gate_id": "GATE_07",
         "name": "Integracao ao EnrichmentEngine & Marts Cross-Domain",
         "status": "PASSED",
-        "criteria": "Integracao mobilidade-territorio em mart_cross_domain_territorio_b2b_macro_brasil (qtd_veiculos_frota_uf, frota_eletrificados_hibridos_uf e avg_score_modernizacao_frota_uf)."
+        "criteria": "Integracao seguranca-territorio em mart_cross_domain_territorio_b2b_macro_brasil (mvi_por_100k_hab_sinesp, roubo_carga_por_100k_hab_sinesp e avg_score_seguranca_publica_uf)."
       },
       {
         "gate_id": "GATE_08",
         "name": "Exposicao Multi-Interface (4 Interfaces)",
         "status": "PASSED",
-        "criteria": "Exposicao simultanea via SDK (BrazilData.geo + shortcuts), FastAPI (/api/v1/geo/frota/*), CLI (bdg frota *) e MCP (bdg_*_senatran_frota_* com wrap_untrusted_gov_data)."
+        "criteria": "Exposicao simultanea via SDK (BrazilData.compliance + shortcuts), FastAPI (/api/v1/compliance/seguranca/*), CLI (bdg seguranca *) e MCP (bdg_*_sinesp_* com wrap_untrusted_gov_data)."
       },
       {
         "gate_id": "GATE_09",
         "name": "Bateria de Testes Unitarios & Paridade Offline",
         "status": "PASSED",
-        "criteria": "Testes unitarios offline completos em tests/connectors/test_senatran_frota.py cobrindo 4 tabelas Silver, Gold ML e paridade nas 4 interfaces."
+        "criteria": "Testes unitarios offline completos em tests/connectors/test_sinesp_seguranca.py cobrindo 4 tabelas Silver, Gold ML e paridade nas 4 interfaces."
       },
       {
         "gate_id": "GATE_10",
         "name": "dbt Staging, Marts Intra-Domínio/Cross-Domain & 100% Colunas Documentadas",
         "status": "PASSED",
-        "criteria": "Modelos dbt com source.yml, stg_*, fct_frota_veiculos_senatran_municipal, mart intra-dominio mart_frota_mobilidade_senatran_brasil e cross-domain mart_cross_domain_territorio_b2b_macro_brasil aprovados no dbt test (113/113) e lint_dbt_docs.py (100% cobertura)."
+        "criteria": "Modelos dbt com source.yml, stg_*, fct_seguranca_publica_sinesp_municipal, mart intra-dominio mart_seguranca_publica_sinesp_brasil e cross-domain mart_cross_domain_territorio_b2b_macro_brasil aprovados no dbt test (115/115) e lint_dbt_docs.py (100% cobertura)."
       },
       {
         "gate_id": "GATE_11",
         "name": "Teste Real de 1 Linha com API ao Vivo (Fail-Hard)",
         "status": "PASSED",
-        "criteria": "Execucao obrigatoria contra portais oficiais SENATRAN Estatisticas de Frota e Frota 2025 (gov.br/transportes) validando HTTP 200; falha reprova o pipeline."
+        "criteria": "Execucao obrigatoria contra portais oficiais SINESP MJSP e Anuario Brasileiro de Seguranca Publica (FBSP) validando HTTP 200; falha reprova o pipeline."
       }
     ]
   },
@@ -780,6 +780,12 @@
       "phase_id": "11.5",
       "milestone": "Wave 11.5C (1/6) — Homologação do Conector senatran_frota (4 Tabelas Silver SENATRAN RENAVAM, Mart Intra-Domínio, Mart Cross-Domain Território & Paridade 4 Interfaces)",
       "summary": "Abertura da Wave 11.5C (Mobilidade, Segurança, Clima & Previdência) com implementação completa nos 11 Gates do conector senatran_frota (SENATRAN Frota de Veículos RENAVAM & Eletrificação BEV/HEV): contrato ODCS v3.1, ingestão Bronze + 4 tabelas Silver ZSTD (senatran_frota_tipo_municipio, senatran_frota_combustivel_ev, senatran_idade_renovacao_frota, senatran_frota_resumo_municipal) + Gold ML (features_mobilidade_frota_senatran), 4 staging views + fct_frota_veiculos_senatran_municipal + mart intra-domínio mart_frota_mobilidade_senatran_brasil + enriquecimento da mart cross-domain mart_cross_domain_territorio_b2b_macro_brasil (113 testes dbt OK, 100% colunas documentadas no lint_dbt_docs.py com 578 modelos / 7.925 colunas), paridade em SDK/FastAPI/CLI/MCP, bateria offline e teste live fail-hard contra gov.br/transportes SENATRAN."
+    },
+    {
+      "date": "2026-11-18",
+      "phase_id": "11.5",
+      "milestone": "Wave 11.5C (2/6) — Homologação do Conector sinesp_seguranca (4 Tabelas Silver SINESP-VDE/FBSP, Mart Intra-Domínio, Mart Cross-Domain Território & Paridade 4 Interfaces)",
+      "summary": "Implementação completa nos 11 Gates do conector sinesp_seguranca (SINESP/MJSP & Fórum Brasileiro de Segurança Pública FBSP): contrato ODCS v3.1, ingestão Bronze + 4 tabelas Silver ZSTD (sinesp_ocorrencias_municipais, sinesp_vitimizacao_mvi_uf, sinesp_capacidade_seguranca, sinesp_seguranca_resumo_municipal) + Gold ML (features_risco_seguranca_sinesp), 4 staging views + fct_seguranca_publica_sinesp_municipal + mart intra-domínio mart_seguranca_publica_sinesp_brasil + enriquecimento da mart cross-domain mart_cross_domain_territorio_b2b_macro_brasil (115 testes dbt OK, 100% colunas documentadas no lint_dbt_docs.py com 584 modelos / 7.994 colunas), paridade em SDK/FastAPI/CLI/MCP, bateria offline e teste live fail-hard contra gov.br/mj SINESP e forumseguranca.org.br."
     }
   ]
 }
