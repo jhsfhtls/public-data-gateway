@@ -612,6 +612,50 @@ class MCPDispatcher:
                                 },
                             },
                             {
+                                "name": "bdg_get_estban_municipal_balance",
+                                "description": "Retrieve monthly BACEN ESTBAN COSIF municipal banking balance sheet (Tier 1).",
+                                "inputSchema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "id_municipio_or_name": {"type": "string", "description": "7-digit IBGE code or municipality name"},
+                                    },
+                                    "required": ["id_municipio_or_name"],
+                                },
+                            },
+                            {
+                                "name": "bdg_get_estban_credit_portfolio",
+                                "description": "Retrieve municipal sectoral credit portfolio (rural, real estate, PCLD) from BACEN ESTBAN (Tier 1).",
+                                "inputSchema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "id_municipio_or_name": {"type": "string", "description": "7-digit IBGE code or municipality name"},
+                                    },
+                                    "required": ["id_municipio_or_name"],
+                                },
+                            },
+                            {
+                                "name": "bdg_get_estban_liquidity_features",
+                                "description": "Retrieve Gold BACEN ESTBAN local banking depth and credit/deposit liquidity features (Tier 1).",
+                                "inputSchema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "id_municipio_or_name": {"type": "string", "description": "7-digit IBGE code or municipality name"},
+                                    },
+                                    "required": ["id_municipio_or_name"],
+                                },
+                            },
+                            {
+                                "name": "bdg_list_top_estban_municipalities",
+                                "description": "List municipalities ranked by Gold BACEN ESTBAN local banking depth score (Tier 1).",
+                                "inputSchema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "limit": {"type": "integer", "description": "Max municipalities to return (default: 10)"},
+                                        "sigla_uf": {"type": "string", "description": "Optional 2-letter UF state filter"},
+                                    },
+                                },
+                            },
+                            {
                                 "name": "bdg_search_catmat_materials",
                                 "description": "Search materials and catalog descriptions in Compras.gov.br CATMAT/SIASG with PDM, class, and sustainability flags (Tier 1).",
                                 "inputSchema": {
@@ -3491,6 +3535,95 @@ class MCPDispatcher:
                 sigla_uf=args.get("sigla_uf"),
             )
             wrapped = wrap_untrusted_gov_data(rows, source_id="stn_capag")
+            return {
+                "jsonrpc": "2.0",
+                "id": req_id,
+                "result": {"content": [{"type": "text", "text": wrapped}], "isError": False},
+            }
+
+        if tool_name == "bdg_get_estban_municipal_balance":
+            from public_data_gateway.connectors.macrofinanceiro.bcb_estban import (
+                BcbEstbanConnector,
+            )
+
+            est_conn = BcbEstbanConnector(settings=self.settings)
+            termo = str(args.get("id_municipio_or_name", ""))
+            bal = est_conn.get_municipal_balance(termo)
+            if not bal:
+                return {
+                    "jsonrpc": "2.0",
+                    "id": req_id,
+                    "result": {
+                        "content": [{"type": "text", "text": f"BACEN ESTBAN balance not found for '{termo}'"}],
+                        "isError": True,
+                    },
+                }
+            wrapped = wrap_untrusted_gov_data(bal, source_id="bcb_estban")
+            return {
+                "jsonrpc": "2.0",
+                "id": req_id,
+                "result": {"content": [{"type": "text", "text": wrapped}], "isError": False},
+            }
+
+        if tool_name == "bdg_get_estban_credit_portfolio":
+            from public_data_gateway.connectors.macrofinanceiro.bcb_estban import (
+                BcbEstbanConnector,
+            )
+
+            est_conn = BcbEstbanConnector(settings=self.settings)
+            termo = str(args.get("id_municipio_or_name", ""))
+            port = est_conn.get_credit_portfolio(termo)
+            if not port:
+                return {
+                    "jsonrpc": "2.0",
+                    "id": req_id,
+                    "result": {
+                        "content": [{"type": "text", "text": f"BACEN ESTBAN credit portfolio not found for '{termo}'"}],
+                        "isError": True,
+                    },
+                }
+            wrapped = wrap_untrusted_gov_data(port, source_id="bcb_estban")
+            return {
+                "jsonrpc": "2.0",
+                "id": req_id,
+                "result": {"content": [{"type": "text", "text": wrapped}], "isError": False},
+            }
+
+        if tool_name == "bdg_get_estban_liquidity_features":
+            from public_data_gateway.connectors.macrofinanceiro.bcb_estban import (
+                BcbEstbanConnector,
+            )
+
+            est_conn = BcbEstbanConnector(settings=self.settings)
+            termo = str(args.get("id_municipio_or_name", ""))
+            feat = est_conn.get_estban_features(termo)
+            if not feat:
+                return {
+                    "jsonrpc": "2.0",
+                    "id": req_id,
+                    "result": {
+                        "content": [{"type": "text", "text": f"BACEN ESTBAN features not found for '{termo}'"}],
+                        "isError": True,
+                    },
+                }
+            wrapped = wrap_untrusted_gov_data(feat, source_id="bcb_estban")
+            return {
+                "jsonrpc": "2.0",
+                "id": req_id,
+                "result": {"content": [{"type": "text", "text": wrapped}], "isError": False},
+            }
+
+        if tool_name == "bdg_list_top_estban_municipalities":
+            from public_data_gateway.connectors.macrofinanceiro.bcb_estban import (
+                BcbEstbanConnector,
+            )
+
+            est_conn = BcbEstbanConnector(settings=self.settings)
+            rows = est_conn.list_top_municipalities(
+                limit=int(args.get("limit", 10)),
+                sigla_uf=args.get("sigla_uf"),
+            )
+            wrapped = wrap_untrusted_gov_data(rows, source_id="bcb_estban")
             return {
                 "jsonrpc": "2.0",
                 "id": req_id,

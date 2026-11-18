@@ -24,6 +24,7 @@ model-paths:
   - "../src/public_data_gateway/connectors/macrofinanceiro/cvm_dfp_itr/dbt"
   - "../src/public_data_gateway/connectors/comercio_exterior/mdic_comexstat/dbt"
   - "../src/public_data_gateway/connectors/macrofinanceiro/cvm_fundos/dbt"
+  - "../src/public_data_gateway/connectors/macrofinanceiro/bcb_estban/dbt"
   - "../src/public_data_gateway/connectors/macrofinanceiro/bcb_ifdata/dbt"
   - "../src/public_data_gateway/connectors/macrofinanceiro/stn_siconfi/dbt"
   - "../src/public_data_gateway/connectors/macrofinanceiro/stn_capag/dbt"

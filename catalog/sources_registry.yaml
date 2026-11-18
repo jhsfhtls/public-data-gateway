@@ -1491,3 +1491,36 @@ sources:
   status: HOMOLOGATED
   freshness_sla_hours: 720
   cron_schedule_expression: 0 5 15 * *
+- source_id: bcb_estban
+  name: 'Banco Central: Estatística Bancária Mensal por Município (ESTBAN COSIF)'
+  agency: Banco Central do Brasil (BACEN)
+  official_url: https://www.bcb.gov.br/estatisticas/estatisticabancariamunicipios
+  segment_id: 02_economico_macrofinanceiro
+  segment_name: Econômico, Monetário & Macrofinanceiro
+  access_mode: LAKEHOUSE_BATCH
+  protocol: HTTP_BULK_ZIP
+  auth_type: NONE
+  canonical_keys:
+  - id_municipio
+  - sigla_uf
+  - cnpj_14
+  update_frequency: Mensal
+  estimated_volume: ~5.570 municípios x agências bancárias (~800 MB CSV/ZIP histórico)
+  lgpd_tier: PUBLIC_NON_PERSONAL
+  ml_feature_domains:
+  - municipal_credit_deposit_depth
+  - rural_real_estate_financing_flows
+  - local_banking_concentration_hhi
+  solution_packs:
+  - P01
+  - P02
+  - P03
+  - P05
+  - P06
+  - P08
+  - P10
+  rice_score: 910
+  roadmap_wave: 3
+  status: HOMOLOGATED
+  freshness_sla_hours: 720
+  cron_schedule_expression: 0 6 20 * *
