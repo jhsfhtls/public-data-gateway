@@ -613,3 +613,67 @@ models:
       - name: classificacao_risco_climatico_queimadas
         description: "Tier municipal de risco climático e emissões (BAIXO_RISCO_FOGO_GEE, ALERTA_FOGO_EMISSOES_MODERADAS ou CRITICO_QUEIMADAS_EMISSOES_GEE)."
         tests: [not_null]
+
+  - name: mart_geracao_distribuida_aneel_brasil
+    description: "Data Mart Gold intra-domínio consolidando empreendimentos MMGD ANEEL, potência instalada solar/bioenergia, geração estimada e SLAs da distribuidora."
+    columns:
+      - name: id_municipio
+        description: "Código IBGE de 7 dígitos do município (STRING)."
+        tests: [not_null, unique]
+      - name: sigla_uf
+        description: "Sigla de 2 letras da Unidade Federativa (UF)."
+        tests: [not_null]
+      - name: nome_municipio
+        description: "Nome oficial do município."
+        tests: [not_null]
+      - name: distribuidora_principal
+        description: "Principal concessionária distribuidora atuante no município."
+        tests: [not_null]
+      - name: qtd_usinas_mmgd
+        description: "Quantidade total de usinas MMGD homologadas no município."
+        tests: [not_null]
+      - name: potencia_instalada_total_kw
+        description: "Potência total instalada em Geração Distribuída no município (kW)."
+        tests: [not_null]
+      - name: potencia_solar_ufv_kw
+        description: "Potência instalada em solar fotovoltaica (UFV) no município em kW."
+        tests: [not_null]
+      - name: potencia_rural_agro_kw
+        description: "Potência instalada em unidades consumidoras da classe Rural/Agro (kW)."
+        tests: [not_null]
+      - name: ucs_com_credito_energia
+        description: "Unidades consumidoras beneficiárias de créditos de energia MMGD."
+        tests: [not_null]
+      - name: participacao_solar_pct
+        description: "Percentual de participação solar fotovoltaica na capacidade MMGD municipal (%)."
+        tests: [not_null]
+      - name: prazo_medio_vistoria_dias
+        description: "Prazo médio de vistoria pela concessionária para conexão MMGD (dias)."
+        tests: [not_null]
+      - name: taxa_aprovacao_parecer_pct
+        description: "Taxa média de aprovação de pareceres de acesso pela distribuidora (%)."
+        tests: [not_null]
+      - name: inversao_fluxo_critica_pct
+        description: "Percentual de pontos de rede sob alerta de inversão de fluxo (%)."
+        tests: [not_null]
+      - name: ucs_beneficiarias_total
+        description: "Total de UCs beneficiárias conectadas à distribuidora local."
+        tests: [not_null]
+      - name: geracao_estimada_mwh_ano
+        description: "Geração renovável anual estimada em MWh/ano no município."
+        tests: [not_null]
+      - name: potencia_bioenergia_kw
+        description: "Potência instalada em biogás e biomassa agroindustrial na amostra (kW)."
+        tests: [not_null]
+      - name: qtd_empreendimentos_amostra_mmgd
+        description: "Quantidade de empreendimentos na amostra granular Silver ANEEL."
+        tests: [not_null]
+      - name: potencia_amostra_kw
+        description: "Potência somada da amostra granular Silver de usinas (kW)."
+        tests: [not_null]
+      - name: score_transicao_energetica_mmgd
+        description: "Score sintético municipal de transição energética e adoção MMGD (0-100)."
+        tests: [not_null]
+      - name: tier_maturidade_solar_mmgd
+        description: "Tier municipal de maturidade solar e renovável (POLO_SOLAR_MMGD_AVANCADO, EXPANSAO_RENOVAVEL_CONSOLIDADA ou TRANSICAO_MMGD_EMERGENTE)."
+        tests: [not_null]

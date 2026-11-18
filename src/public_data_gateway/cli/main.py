@@ -1455,6 +1455,36 @@ def build_parser() -> argparse.ArgumentParser:
     qm_rk_p.add_argument("--emissoes", action="store_true", help="Sort descending by net SEEG GHG emissions (tCO2e)")
     qm_rk_p.add_argument("--json", action="store_true", help="Output in JSON format")
 
+    # ANEEL Geração Distribuída (MMGD) command group
+    mmgd_p = subparsers.add_parser("mmgd", help="Query ANEEL distributed generation plants, renewable sources, utility SLAs, and solar transition rankings.")
+    mmgd_sub = mmgd_p.add_subparsers(dest="mmgd_action", required=True)
+
+    mmgd_emp_p = mmgd_sub.add_parser("empreendimentos", help="Lookup ANEEL MMGD plants by code, source, class, utility, IBGE, UF, or city.")
+    mmgd_emp_p.add_argument("termo", help="Plant code, source type, consumption class, utility, IBGE code, UF, or municipality name")
+    mmgd_emp_p.add_argument("--json", action="store_true", help="Output in JSON format")
+
+    mmgd_fnt_p = mmgd_sub.add_parser("fontes", help="Lookup ANEEL MMGD installed capacity by renewable source, IBGE code, or UF.")
+    mmgd_fnt_p.add_argument("termo", help="Source code, renewable source, IBGE code, UF, or municipality name")
+    mmgd_fnt_p.add_argument("--json", action="store_true", help="Output in JSON format")
+
+    mmgd_dst_p = mmgd_sub.add_parser("distribuidora", help="Get municipal electricity distribution utility inspection SLA and reverse-flow indicators.")
+    mmgd_dst_p.add_argument("id_municipio_or_name", help="7-digit IBGE code, municipality name, or utility name")
+    mmgd_dst_p.add_argument("--json", action="store_true", help="Output in JSON format")
+
+    mmgd_mun_p = mmgd_sub.add_parser("municipio", help="Get consolidated municipal ANEEL MMGD plants count, installed kW, and rural share.")
+    mmgd_mun_p.add_argument("id_municipio_or_name", help="7-digit IBGE code or municipality name")
+    mmgd_mun_p.add_argument("--json", action="store_true", help="Output in JSON format")
+
+    mmgd_ft_p = mmgd_sub.add_parser("features", help="Get Gold ANEEL MMGD energy transition score and solar maturity tier.")
+    mmgd_ft_p.add_argument("id_municipio_or_name", help="7-digit IBGE code or municipality name")
+    mmgd_ft_p.add_argument("--json", action="store_true", help="Output in JSON format")
+
+    mmgd_rk_p = mmgd_sub.add_parser("ranking", help="List municipalities ranked by MMGD energy transition score or total installed kW.")
+    mmgd_rk_p.add_argument("--limit", type=int, default=10, help="Max municipalities to list")
+    mmgd_rk_p.add_argument("--uf", type=str, help="Optional 2-letter state filter")
+    mmgd_rk_p.add_argument("--potencia", action="store_true", help="Sort descending by total installed MMGD power (kW)")
+    mmgd_rk_p.add_argument("--json", action="store_true", help="Output in JSON format")
+
     # Datalake Público Federado (DuckDB / BigQuery) command group
     bd_p = subparsers.add_parser("datalake", help="Query Federated Public Datalake (DuckDB / BigQuery) coverage, thematic datasets, governance, SQL efficiency, and rankings.")
     bd_sub = bd_p.add_subparsers(dest="datalake_action", required=True)
@@ -5157,6 +5187,84 @@ def main(argv: Sequence[str] | None = None) -> int:
                     return 0
             except (ValueError, KeyError) as exc:
                 print(f"Erro Queimadas/SEEG: {exc}", file=sys.stderr)
+                return 1
+
+        elif args.command == "mmgd":
+            from public_data_gateway.connectors.ambiental.aneel_geracao_distribuida import (
+                AneelGeracaoDistribuidaConnector,
+            )
+
+            mmgd_conn = AneelGeracaoDistribuidaConnector()
+            mmgd_action = getattr(args, "mmgd_action", "")
+            try:
+                if mmgd_action == "empreendimentos":
+                    rows = mmgd_conn.get_mmgd_plants(args.termo)
+                    if getattr(args, "json", False):
+                        print(json.dumps(rows, indent=2, ensure_ascii=False, default=str))
+                    else:
+                        print(f"ANEEL MMGD Empreendimentos ({len(rows)}):")
+                        for r in rows:
+                            print(f"  {r.get('cod_empreendimento_mmgd')} | {r.get('nome_municipio')} ({r.get('sigla_uf')}): {r.get('sig_tipo_geracao')} | {r.get('potencia_instalada_kw')} kW")
+                    return 0
+
+                if mmgd_action == "fontes":
+                    rows = mmgd_conn.get_mmgd_sources_by_municipality(args.termo)
+                    if getattr(args, "json", False):
+                        print(json.dumps(rows, indent=2, ensure_ascii=False, default=str))
+                    else:
+                        print(f"ANEEL MMGD Fontes ({len(rows)}):")
+                        for r in rows:
+                            print(f"  {r.get('cod_fonte_municipio')} | {r.get('nome_municipio')} ({r.get('sigla_uf')}): {r.get('fonte_geracao')} - {r.get('potencia_instalada_kw')} kW")
+                    return 0
+
+                if mmgd_action == "distribuidora":
+                    res = mmgd_conn.get_mmgd_utility_grid(args.id_municipio_or_name)
+                    if res is None:
+                        print(f"Indicadores da distribuidora não encontrados para: {args.id_municipio_or_name}", file=sys.stderr)
+                        return 1
+                    if getattr(args, "json", False):
+                        print(json.dumps(res, indent=2, ensure_ascii=False, default=str))
+                    else:
+                        print(f"ANEEL MMGD Rede ({res.get('distribuidora_principal')} - {res.get('nome_municipio')}): Vistoria {res.get('prazo_medio_vistoria_dias')}d | Inversão {res.get('inversao_fluxo_critica_pct')}%")
+                    return 0
+
+                if mmgd_action == "municipio":
+                    res = mmgd_conn.get_mmgd_municipal_summary(args.id_municipio_or_name)
+                    if res is None:
+                        print(f"Resumo MMGD não encontrado para: {args.id_municipio_or_name}", file=sys.stderr)
+                        return 1
+                    if getattr(args, "json", False):
+                        print(json.dumps(res, indent=2, ensure_ascii=False, default=str))
+                    else:
+                        print(f"ANEEL MMGD Município ({res.get('nome_municipio')} - {res.get('sigla_uf')}): {res.get('qtd_usinas_mmgd')} usinas | {res.get('potencia_instalada_total_kw')} kW")
+                    return 0
+
+                if mmgd_action == "features":
+                    res = mmgd_conn.get_mmgd_features(args.id_municipio_or_name)
+                    if res is None:
+                        print(f"Features ANEEL MMGD não encontradas para: {args.id_municipio_or_name}", file=sys.stderr)
+                        return 1
+                    if getattr(args, "json", False):
+                        print(json.dumps(res, indent=2, ensure_ascii=False, default=str))
+                    else:
+                        print(f"ANEEL MMGD Gold ({res.get('nome_municipio')} - {res.get('id_municipio')}): Score {res.get('score_transicao_energetica_mmgd')} | {res.get('tier_maturidade_solar_mmgd')}")
+                    return 0
+
+                if mmgd_action == "ranking":
+                    ranks = mmgd_conn.list_top_mmgd_municipalities(
+                        limit=getattr(args, "limit", 10),
+                        sigla_uf=getattr(args, "uf", None),
+                        sort_by_power=getattr(args, "potencia", False),
+                    )
+                    if getattr(args, "json", False):
+                        print(json.dumps(ranks, indent=2, ensure_ascii=False, default=str))
+                    else:
+                        print(f"Ranking ANEEL MMGD ({len(ranks)}):")
+                        for idx, r in enumerate(ranks, 1):
+                            print(f"  {idx}. {r.get('nome_municipio')} ({r.get('sigla_uf')}): {r.get('score_transicao_energetica_mmgd')} | {r.get('tier_maturidade_solar_mmgd')}")
+                    return 0
+            except (ValueError, KeyError) as exc:
+                print(f"Erro ANEEL MMGD: {exc}", file=sys.stderr)
                 return 1
 
         elif args.command == "datalake":

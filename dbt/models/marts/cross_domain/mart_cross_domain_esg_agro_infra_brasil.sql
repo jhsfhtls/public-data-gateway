@@ -107,6 +107,15 @@ queimadas AS (
     FROM {{ ref('mart_queimadas_emissoes_seeg_brasil') }}
 ),
 
+aneel_mmgd AS (
+    SELECT
+        id_municipio,
+        qtd_usinas_mmgd AS qtd_usinas_mmgd_aneel,
+        potencia_instalada_total_kw AS potencia_instalada_mmgd_kw,
+        score_transicao_energetica_mmgd
+    FROM {{ ref('mart_geracao_distribuida_aneel_brasil') }}
+),
+
 joined AS (
     SELECT
         t.id_municipio,
@@ -150,6 +159,9 @@ joined AS (
         COALESCE(qm.qtd_focos_calor_inpe, 0) AS qtd_focos_calor_inpe,
         COALESCE(qm.emissoes_liquidas_tco2e_seeg, 0.0) AS emissoes_liquidas_tco2e_seeg,
         COALESCE(qm.score_resiliencia_climatica_fogo_gee, 65.0) AS score_resiliencia_climatica_fogo_gee,
+        COALESCE(an.qtd_usinas_mmgd_aneel, 0) AS qtd_usinas_mmgd_aneel,
+        COALESCE(an.potencia_instalada_mmgd_kw, 0.0) AS potencia_instalada_mmgd_kw,
+        COALESCE(an.score_transicao_energetica_mmgd, 60.0) AS score_transicao_energetica_mmgd,
         t.reference_date
     FROM terra t
     LEFT JOIN sicar s ON t.id_municipio = s.id_municipio
@@ -161,6 +173,7 @@ joined AS (
     LEFT JOIN ibge_agro ag ON t.id_municipio = ag.id_municipio
     LEFT JOIN cafir cf ON t.id_municipio = cf.id_municipio
     LEFT JOIN queimadas qm ON t.id_municipio = qm.id_municipio
+    LEFT JOIN aneel_mmgd an ON t.id_municipio = an.id_municipio
 ),
 
 scored AS (

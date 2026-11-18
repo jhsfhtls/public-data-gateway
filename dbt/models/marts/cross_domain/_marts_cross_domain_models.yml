@@ -239,6 +239,15 @@ models:
       - name: score_resiliencia_climatica_fogo_gee
         description: "Score municipal de resiliência climática e baixa pressão de incêndios e emissões GEE (0-100)."
         tests: [not_null]
+      - name: qtd_usinas_mmgd_aneel
+        description: "Quantidade acumulada de usinas e sistemas de geração distribuída MMGD homologados na ANEEL no município."
+        tests: [not_null]
+      - name: potencia_instalada_mmgd_kw
+        description: "Potência total instalada em Micro e Minigeração Distribuída (MMGD) no município em kW."
+        tests: [not_null]
+      - name: score_transicao_energetica_mmgd
+        description: "Score municipal de transição energética e capacidade solar/renovável MMGD na ANEEL (0-100)."
+        tests: [not_null]
       - name: reference_date
         description: "Data de referência ISO-8601 (YYYY-MM-DD)."
         tests: [not_null]
