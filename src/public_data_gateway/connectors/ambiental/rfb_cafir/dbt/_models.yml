@@ -1,0 +1,181 @@
+version: 2
+
+models:
+  - name: stg_rfb_cafir_imoveis_rurais
+    description: "Staging view tipada do cadastro de imóveis rurais CAFIR/CIB da Receita Federal."
+    columns:
+      - name: nirf_cib
+        description: "Número do Imóvel na Receita Federal (NIRF / CIB) de 8 dígitos."
+        tests: [not_null, unique]
+      - name: codigo_incra_sncr
+        description: "Código de 13 dígitos do imóvel rural no SNCR/INCRA."
+        tests: [not_null]
+      - name: documento_titular
+        description: "CNPJ de 14 dígitos ou CPF mascarado LGPD do titular declarante."
+        tests: [not_null]
+      - name: nome_titular
+        description: "Razão social ou nome público do titular declarante no CAFIR."
+        tests: [not_null]
+      - name: nome_imovel_rural
+        description: "Denominação oficial da propriedade rural declarada."
+        tests: [not_null]
+      - name: situacao_cafir
+        description: "Status de regularização no CAFIR/CNIR."
+        tests: [not_null]
+      - name: forma_exploracao
+        description: "Destinação econômica predominante declarada no ITR."
+        tests: [not_null]
+      - name: area_total_ha
+        description: "Área total declarada do imóvel rural em hectares (ha)."
+        tests: [not_null]
+      - name: id_municipio
+        description: "Código IBGE canônico de 7 dígitos do município (STRING)."
+        tests: [not_null]
+      - name: sigla_uf
+        description: "Sigla de 2 letras da Unidade Federativa (UF)."
+        tests: [not_null]
+      - name: nome_municipio
+        description: "Nome oficial do município."
+        tests: [not_null]
+      - name: data_atualizacao
+        description: "Data da última atualização cadastral no formato ISO-8601."
+        tests: [not_null]
+
+  - name: stg_rfb_cafir_vinculos_cnir
+    description: "Staging view municipal de vinculação CAFIR-CNIR, georreferenciamento SIGEF e paridade CAR."
+    columns:
+      - name: id_municipio
+        description: "Código IBGE de 7 dígitos do município (STRING)."
+        tests: [not_null, unique]
+      - name: sigla_uf
+        description: "Sigla da Unidade da Federação (UF)."
+        tests: [not_null]
+      - name: nome_municipio
+        description: "Nome oficial do município."
+        tests: [not_null]
+      - name: taxa_vinculacao_cnir_pct
+        description: "Percentual de imóveis CAFIR com vinculação ativa ao SNCR/CNIR (%)."
+        tests: [not_null]
+      - name: taxa_georreferenciamento_sigef_pct
+        description: "Percentual de imóveis certificados com georreferenciamento SIGEF/INCRA (%)."
+        tests: [not_null]
+      - name: paridade_cib_car_pct
+        description: "Taxa de consistência cadastral entre CIB/CAFIR e CAR/SICAR (%)."
+        tests: [not_null]
+      - name: imoveis_pendentes_vinculacao_cnt
+        description: "Quantidade estimada de imóveis CAFIR pendentes de vinculação CNIR."
+        tests: [not_null]
+
+  - name: stg_rfb_cafir_concentracao_fundiaria
+    description: "Staging view municipal de concentração fundiária (Gini) e perfil de módulos fiscais no CAFIR."
+    columns:
+      - name: id_municipio
+        description: "Código IBGE de 7 dígitos do município (STRING)."
+        tests: [not_null, unique]
+      - name: sigla_uf
+        description: "Sigla da Unidade da Federação (UF)."
+        tests: [not_null]
+      - name: nome_municipio
+        description: "Nome oficial do município."
+        tests: [not_null]
+      - name: indice_gini_fundiario_cafir
+        description: "Índice de Gini fundiário calculado sobre a distribuição de área rural CAFIR (0 a 1)."
+        tests: [not_null]
+      - name: area_pequenos_imoveis_ate_4mf_pct
+        description: "Participação percentual da área em pequenas propriedades até 4 módulos fiscais (%)."
+        tests: [not_null]
+      - name: area_medios_imoveis_4a15mf_pct
+        description: "Participação percentual da área em médias propriedades de 4 a 15 módulos fiscais (%)."
+        tests: [not_null]
+      - name: area_grandes_imoveis_acima_15mf_pct
+        description: "Participação percentual da área em grandes propriedades acima de 15 módulos fiscais (%)."
+        tests: [not_null]
+
+  - name: stg_rfb_cafir_resumo_municipal
+    description: "Staging view consolidada por município de imóveis rurais, área total e VTN estimado no CAFIR."
+    columns:
+      - name: id_municipio
+        description: "Código IBGE de 7 dígitos do município (STRING)."
+        tests: [not_null, unique]
+      - name: sigla_uf
+        description: "Sigla da Unidade da Federação (UF)."
+        tests: [not_null]
+      - name: nome_municipio
+        description: "Nome oficial do município."
+        tests: [not_null]
+      - name: bioma_predominante
+        description: "Bioma predominante no território municipal."
+        tests: [not_null]
+      - name: qtd_imoveis_cafir
+        description: "Quantidade total de imóveis rurais ativos cadastrados no CAFIR."
+        tests: [not_null]
+      - name: area_total_cafir_ha
+        description: "Área total consolidada dos imóveis rurais CAFIR no município (ha)."
+        tests: [not_null]
+      - name: area_media_imovel_cafir_ha
+        description: "Área média por imóvel rural cadastrado no CAFIR em hectares (ha)."
+        tests: [not_null]
+      - name: taxa_vinculacao_cnir_pct
+        description: "Taxa de vinculação cadastral CAFIR-CNIR no município (%)."
+        tests: [not_null]
+      - name: vtn_medio_estimado_brl_ha
+        description: "Valor da Terra Nua (VTN) médio referencial ITR no município em R$/ha."
+        tests: [not_null]
+
+  - name: fct_imoveis_rurais_cafir_municipal
+    description: "Tabela fato municipal integrando estoque de imóveis rurais CAFIR, vinculação CNIR/SIGEF, Gini fundiário e VTN ITR."
+    columns:
+      - name: id_municipio
+        description: "Código IBGE de 7 dígitos do município (chave primária STRING)."
+        tests: [not_null, unique]
+      - name: sigla_uf
+        description: "Sigla de 2 letras da Unidade da Federação (UF)."
+        tests: [not_null]
+      - name: nome_municipio
+        description: "Nome oficial do município."
+        tests: [not_null]
+      - name: bioma_predominante
+        description: "Bioma predominante no território municipal."
+        tests: [not_null]
+      - name: qtd_imoveis_cafir
+        description: "Quantidade total de imóveis rurais ativos no CAFIR."
+        tests: [not_null]
+      - name: area_total_cafir_ha
+        description: "Área rural total declarada no CAFIR em hectares (ha)."
+        tests: [not_null]
+      - name: area_media_imovel_cafir_ha
+        description: "Área média dos imóveis rurais no município (ha)."
+        tests: [not_null]
+      - name: vtn_medio_estimado_brl_ha
+        description: "Valor da Terra Nua médio estimado no município (R$/ha)."
+        tests: [not_null]
+      - name: taxa_vinculacao_cnir_pct
+        description: "Percentual de imóveis integrados ao CNIR (%)."
+        tests: [not_null]
+      - name: taxa_georreferenciamento_sigef_pct
+        description: "Percentual de imóveis certificados no SIGEF (%)."
+        tests: [not_null]
+      - name: paridade_cib_car_pct
+        description: "Consistência cadastral CIB/CAR (%)."
+        tests: [not_null]
+      - name: imoveis_pendentes_vinculacao_cnt
+        description: "Quantidade estimada de imóveis pendentes de integração CNIR."
+        tests: [not_null]
+      - name: indice_gini_fundiario_cafir
+        description: "Índice de Gini fundiário do município (0 a 1)."
+        tests: [not_null]
+      - name: area_pequenos_imoveis_ate_4mf_pct
+        description: "Participação da área rural em pequenos imóveis até 4 MF (%)."
+        tests: [not_null]
+      - name: area_medios_imoveis_4a15mf_pct
+        description: "Participação da área rural em médios imóveis 4-15 MF (%)."
+        tests: [not_null]
+      - name: area_grandes_imoveis_acima_15mf_pct
+        description: "Participação da área rural em grandes imóveis acima de 15 MF (%)."
+        tests: [not_null]
+      - name: qtd_imoveis_amostra_cafir
+        description: "Quantidade de imóveis detalhados na amostra Silver do conector."
+        tests: [not_null]
+      - name: area_media_amostra_ha
+        description: "Área média dos imóveis na amostra Silver em hectares (ha)."
+        tests: [not_null]

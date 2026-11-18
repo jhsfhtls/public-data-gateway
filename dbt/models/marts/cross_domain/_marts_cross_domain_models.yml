@@ -218,6 +218,18 @@ models:
       - name: score_potencia_agropecuaria_ibge
         description: "Score de potência agropecuária municipal IBGE PAM/PPM/PEVS (0-100)."
         tests: [not_null]
+      - name: qtd_imoveis_cafir
+        description: "Quantidade total de imóveis rurais registrados no CAFIR/RFB no município."
+        tests: [not_null]
+      - name: area_total_cafir_ha
+        description: "Área territorial consolidada dos imóveis rurais declarados no CAFIR em hectares (ha)."
+        tests: [not_null]
+      - name: taxa_vinculacao_cnir_pct
+        description: "Percentual de imóveis CAFIR com vinculação cadastral ativa ao CNIR/INCRA (%)."
+        tests: [not_null]
+      - name: score_regularizacao_fundiaria_cafir
+        description: "Score de regularização fundiária CAFIR/CNIR/SIGEF no município (0-100)."
+        tests: [not_null]
       - name: reference_date
         description: "Data de referência ISO-8601 (YYYY-MM-DD)."
         tests: [not_null]

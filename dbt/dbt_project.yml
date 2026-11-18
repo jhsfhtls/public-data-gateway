@@ -76,6 +76,7 @@ model-paths:
   - "../src/public_data_gateway/connectors/agregadores/upgini_adapter/dbt"
   - "../src/public_data_gateway/connectors/ambiental/nasa_power/dbt"
   - "../src/public_data_gateway/connectors/ambiental/open_meteo/dbt"
+  - "../src/public_data_gateway/connectors/ambiental/rfb_cafir/dbt"
   - "../src/public_data_gateway/connectors/geografico/open_elevation/dbt"
   - "../src/public_data_gateway/connectors/geografico/osrm_routing/dbt"
   - "../src/public_data_gateway/connectors/geografico/overpass_osm/dbt"
