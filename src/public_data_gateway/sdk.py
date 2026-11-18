@@ -3175,6 +3175,60 @@ class EnvironmentFacade:
             limit=limit, sigla_uf=sigla_uf, sort_by_renewable=sort_by_renewable
         )
 
+    @property
+    def anm_mineracao_connector(self) -> Any:
+        if (
+            not hasattr(self, "_anm_mineracao_connector")
+            or self._anm_mineracao_connector is None
+        ):
+            from public_data_gateway.connectors.ambiental.anm_mineracao import (
+                AnmMineracaoConnector,
+            )
+
+            self._anm_mineracao_connector = AnmMineracaoConnector(
+                settings=self._sdk.settings
+            )
+        return self._anm_mineracao_connector
+
+    def get_anm_sigmine_processes(self, termo: str) -> list[dict[str, Any]]:
+        """Lookup SIGMINE mining processes by ANM code, substance, phase, IBGE, UF, or city."""
+        return self.anm_mineracao_connector.get_anm_sigmine_processes(termo)
+
+    def get_anm_cfem_royalties(self, termo: str) -> list[dict[str, Any]]:
+        """Lookup CFEM mineral royalty collections by guide code, substance, IBGE, UF, or city."""
+        return self.anm_mineracao_connector.get_anm_cfem_royalties(termo)
+
+    def get_anm_sigbm_barragens(
+        self, id_municipio_or_name: str
+    ) -> dict[str, Any] | None:
+        """Get municipal SIGBM mining-dam inventory, PAEBM alerts, and ESG conformity."""
+        return self.anm_mineracao_connector.get_anm_sigbm_barragens(
+            id_municipio_or_name
+        )
+
+    def get_anm_municipal_summary(
+        self, id_municipio_or_name: str
+    ) -> dict[str, Any] | None:
+        """Get consolidated municipal ANM active titles, titled hectares, and CFEM revenue."""
+        return self.anm_mineracao_connector.get_anm_municipal_summary(
+            id_municipio_or_name
+        )
+
+    def get_anm_features(self, id_municipio_or_name: str) -> dict[str, Any] | None:
+        """Get Gold ANM mineral ESG maturity score and sustainable mining tier."""
+        return self.anm_mineracao_connector.get_anm_features(id_municipio_or_name)
+
+    def list_top_anm_municipalities(
+        self,
+        limit: int = 10,
+        sigla_uf: str | None = None,
+        sort_by_cfem: bool = False,
+    ) -> list[dict[str, Any]]:
+        """List municipalities ranked by ANM mineral ESG maturity score or CFEM royalties."""
+        return self.anm_mineracao_connector.list_top_anm_municipalities(
+            limit=limit, sigla_uf=sigla_uf, sort_by_cfem=sort_by_cfem
+        )
+
 
 class MetaportalsFacade:
     """Sub-facade for Metaportals & Aggregator Hubs (Datalake Federado SQL, Dados.gov.br CKAN)."""
@@ -5763,6 +5817,41 @@ class BrazilData:
         """Listar municípios ranqueados por segurança energética MME/ONS ou participação renovável SIN (%)."""
         return self.environment.list_top_ons_energy_municipalities(
             limit=limit, sigla_uf=sigla_uf, sort_by_renewable=sort_by_renewable
+        )
+
+    def get_anm_sigmine_processes(self, termo: str) -> list[dict[str, Any]]:
+        """Consultar processos minerários SIGMINE/ANM por número, substância, fase, IBGE, UF ou município."""
+        return self.environment.get_anm_sigmine_processes(termo)
+
+    def get_anm_cfem_royalties(self, termo: str) -> list[dict[str, Any]]:
+        """Consultar arrecadação municipal de royalties CFEM/ANM por guia, substância, IBGE, UF ou cidade."""
+        return self.environment.get_anm_cfem_royalties(termo)
+
+    def get_anm_sigbm_barragens(
+        self, id_municipio_or_name: str
+    ) -> dict[str, Any] | None:
+        """Consultar inventário SIGBM/ANM de barragens de rejeitos, alertas PAEBM e índice de conformidade."""
+        return self.environment.get_anm_sigbm_barragens(id_municipio_or_name)
+
+    def get_anm_municipal_summary(
+        self, id_municipio_or_name: str
+    ) -> dict[str, Any] | None:
+        """Consultar consolidado municipal de títulos minerários ANM, área titulada (ha) e CFEM."""
+        return self.environment.get_anm_municipal_summary(id_municipio_or_name)
+
+    def get_anm_features(self, id_municipio_or_name: str) -> dict[str, Any] | None:
+        """Consultar features Gold ANM de maturidade mineral ESG e classificação de mineração sustentável."""
+        return self.environment.get_anm_features(id_municipio_or_name)
+
+    def list_top_anm_municipalities(
+        self,
+        limit: int = 10,
+        sigla_uf: str | None = None,
+        sort_by_cfem: bool = False,
+    ) -> list[dict[str, Any]]:
+        """Listar municípios ranqueados por maturidade mineral ESG ou arrecadação CFEM ANM."""
+        return self.environment.list_top_anm_municipalities(
+            limit=limit, sigla_uf=sigla_uf, sort_by_cfem=sort_by_cfem
         )
 
     def get_bd_coverage(self, id_municipio: str) -> dict[str, Any]:

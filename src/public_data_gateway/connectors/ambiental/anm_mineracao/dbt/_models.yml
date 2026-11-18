@@ -1,0 +1,181 @@
+version: 2
+
+models:
+  - name: stg_anm_sigmine_processos_municipio
+    description: "Staging view tipada dos processos minerários poligonais SIGMINE/ANM por substância e município."
+    columns:
+      - name: cod_processo_anm
+        description: "Número identificador único do processo minerário no SIGMINE/ANM (STRING)."
+        tests: [not_null, unique]
+      - name: substancia_mineral
+        description: "Substância mineral principal vinculada ao processo minerário."
+        tests: [not_null]
+      - name: fase_processo_sigmine
+        description: "Fase processual do título minerário (CONCESSAO_LAVRA, AUTORIZACAO_PESQUISA, LICENCIAMENTO)."
+        tests: [not_null]
+      - name: situacao_barragem_sigbm
+        description: "Situação de segurança e conformidade PAEBM no SIGBM associada ao empreendimento."
+        tests: [not_null]
+      - name: id_municipio
+        description: "Código IBGE de 7 dígitos do município (STRING)."
+        tests: [not_null]
+      - name: sigla_uf
+        description: "Sigla de 2 letras da Unidade Federativa (UF)."
+        tests: [not_null]
+      - name: nome_municipio
+        description: "Nome oficial do município."
+        tests: [not_null]
+      - name: regiao
+        description: "Macrorregião geográfica brasileira."
+        tests: [not_null]
+      - name: area_titulada_hectares
+        description: "Área poligonal titulada do processo minerário em hectares (ha)."
+        tests: [not_null]
+      - name: arrecadacao_cfem_anual_mil_brl
+        description: "Arrecadação anual estimada de CFEM vinculada ao processo minerário (R$ mil)."
+        tests: [not_null]
+      - name: ano_referencia
+        description: "Ano-calendário de referência da base SIGMINE/ANM."
+        tests: [not_null]
+
+  - name: stg_anm_cfem_arrecadacao_royalties
+    description: "Staging view tipada da arrecadação municipal de royalties CFEM e valor da operação mineral na ANM."
+    columns:
+      - name: cod_guia_cfem
+        description: "Identificador único do consolidado municipal de guias CFEM (STRING)."
+        tests: [not_null, unique]
+      - name: id_municipio
+        description: "Código IBGE de 7 dígitos do município (STRING)."
+        tests: [not_null]
+      - name: sigla_uf
+        description: "Sigla de 2 letras da Unidade Federativa (UF)."
+        tests: [not_null]
+      - name: nome_municipio
+        description: "Nome oficial do município."
+        tests: [not_null]
+      - name: substancia_principal
+        description: "Substância mineral de maior representatividade na arrecadação CFEM local."
+        tests: [not_null]
+      - name: valor_operacao_mineral_mil_brl
+        description: "Valor bruto declarado das operações comerciais de bens minerais (R$ mil)."
+        tests: [not_null]
+      - name: arrecadacao_cfem_municipio_mil_brl
+        description: "Total recolhido em royalties CFEM atribuído ao município (R$ mil)."
+        tests: [not_null]
+      - name: aliquota_media_cfem_pct
+        description: "Alíquota efetiva média incidente da CFEM sobre o faturamento mineral (%)."
+        tests: [not_null]
+      - name: ano_referencia
+        description: "Ano-calendário de competência da arrecadação CFEM."
+        tests: [not_null]
+
+  - name: stg_anm_sigbm_barragens_risco_esg
+    description: "Staging view tipada do inventário de barragens de mineração SIGBM/ANM e indicadores de risco PAEBM."
+    columns:
+      - name: id_municipio
+        description: "Código IBGE de 7 dígitos do município (STRING)."
+        tests: [not_null, unique]
+      - name: sigla_uf
+        description: "Sigla de 2 letras da Unidade Federativa (UF)."
+        tests: [not_null]
+      - name: nome_municipio
+        description: "Nome oficial do município."
+        tests: [not_null]
+      - name: qtd_barragens_sigbm
+        description: "Quantidade total de barragens de rejeitos cadastradas no SIGBM no município."
+        tests: [not_null]
+      - name: barragens_paebm_emergencia
+        description: "Quantidade de estruturas em nível de alerta ou emergência no PAEBM/ANM."
+        tests: [not_null]
+      - name: indice_conformidade_sigbm_pct
+        description: "Índice municipal de conformidade e Declaração de Condição de Estabilidade (DCE) SIGBM (%)."
+        tests: [not_null]
+      - name: nivel_dano_potencial_associado
+        description: "Classificação predominante de Dano Potencial Associado (DPA) no SIGBM."
+        tests: [not_null]
+
+  - name: stg_anm_mineracao_resumo_municipal
+    description: "Staging view tipada do consolidado municipal de títulos minerários SIGMINE, área titulada e minerais críticos."
+    columns:
+      - name: id_municipio
+        description: "Código IBGE de 7 dígitos do município (STRING)."
+        tests: [not_null, unique]
+      - name: sigla_uf
+        description: "Sigla de 2 letras da Unidade Federativa (UF)."
+        tests: [not_null]
+      - name: nome_municipio
+        description: "Nome oficial do município."
+        tests: [not_null]
+      - name: regiao
+        description: "Macrorregião geográfica brasileira."
+        tests: [not_null]
+      - name: processos_ativos_sigmine
+        description: "Quantidade total de processos minerários ativos no município no SIGMINE/ANM."
+        tests: [not_null]
+      - name: area_total_titulada_ha
+        description: "Área total coberta por poligonais minerárias ativas em hectares (ha)."
+        tests: [not_null]
+      - name: arrecadacao_cfem_total_mil_brl
+        description: "Arrecadação anual consolidada de royalties CFEM no município (R$ mil)."
+        tests: [not_null]
+      - name: indice_conformidade_sigbm_pct
+        description: "Índice de conformidade ESG e estabilidade de barragens SIGBM (%)."
+        tests: [not_null]
+      - name: participacao_substancias_criticas_pct
+        description: "Participação percentual de minerais críticos e estratégicos para transição energética (%)."
+        tests: [not_null]
+
+  - name: fct_anm_mineracao_municipal
+    description: "Fato intermediária municipal integrando processos SIGMINE, arrecadação CFEM e conformidade de barragens SIGBM/ANM."
+    columns:
+      - name: id_municipio
+        description: "Código IBGE de 7 dígitos do município (STRING)."
+        tests: [not_null, unique]
+      - name: sigla_uf
+        description: "Sigla de 2 letras da Unidade Federativa (UF)."
+        tests: [not_null]
+      - name: nome_municipio
+        description: "Nome oficial do município."
+        tests: [not_null]
+      - name: regiao
+        description: "Macrorregião geográfica brasileira."
+        tests: [not_null]
+      - name: processos_ativos_sigmine
+        description: "Total de processos minerários ativos no município no SIGMINE."
+        tests: [not_null]
+      - name: area_total_titulada_ha
+        description: "Área total titulada em poligonais minerárias (ha)."
+        tests: [not_null]
+      - name: arrecadacao_cfem_total_mil_brl
+        description: "Arrecadação anual consolidada de royalties CFEM (R$ mil)."
+        tests: [not_null]
+      - name: indice_conformidade_sigbm_pct
+        description: "Índice municipal de conformidade de barragens SIGBM (%)."
+        tests: [not_null]
+      - name: participacao_substancias_criticas_pct
+        description: "Participação percentual de minerais críticos e estratégicos (%)."
+        tests: [not_null]
+      - name: qtd_registros_amostra_sigmine
+        description: "Quantidade de registros de processos detalhados na camada Silver SIGMINE."
+        tests: [not_null]
+      - name: cfem_amostra_processos_mil_brl
+        description: "Soma da arrecadação CFEM associada aos processos principais SIGMINE (R$ mil)."
+        tests: [not_null]
+      - name: substancia_principal
+        description: "Substância mineral dominante na receita CFEM municipal."
+        tests: [not_null]
+      - name: valor_operacao_mineral_mil_brl
+        description: "Valor econômico das operações comerciais minerais declaradas à ANM (R$ mil)."
+        tests: [not_null]
+      - name: aliquota_media_cfem_pct
+        description: "Alíquota efetiva média da CFEM incidente sobre a produção local (%)."
+        tests: [not_null]
+      - name: qtd_barragens_sigbm
+        description: "Quantidade total de barragens de rejeitos cadastradas no SIGBM."
+        tests: [not_null]
+      - name: barragens_paebm_emergencia
+        description: "Quantidade de barragens em nível de alerta ou emergência no PAEBM."
+        tests: [not_null]
+      - name: nivel_dano_potencial_associado
+        description: "Classificação predominante de Dano Potencial Associado (DPA) SIGBM."
+        tests: [not_null]

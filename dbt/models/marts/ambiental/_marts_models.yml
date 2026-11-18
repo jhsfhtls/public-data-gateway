@@ -918,3 +918,64 @@ models:
       - name: tier_seguranca_energetica_sin
         description: "Classificação municipal SIN (ALTA_SEGURANCA_ENERGETICA_SIN, SISTEMA_INTERLIGADO_ESTAVEL ou VULNERABILIDADE_DESPACHO_ENERGETICO)."
         tests: [not_null]
+
+  - name: mart_anm_mineracao_brasil
+    description: "Data Mart Gold municipal consolidando processos minerários SIGMINE/ANM, arrecadação de royalties CFEM, barragens SIGBM e score de maturidade mineral ESG."
+    columns:
+      - name: id_municipio
+        description: "Código IBGE de 7 dígitos do município (STRING)."
+        tests: [not_null, unique]
+      - name: sigla_uf
+        description: "Sigla da Unidade da Federação (UF)."
+        tests: [not_null]
+      - name: nome_municipio
+        description: "Nome oficial do município."
+        tests: [not_null]
+      - name: regiao
+        description: "Macrorregião geográfica brasileira."
+        tests: [not_null]
+      - name: processos_ativos_sigmine
+        description: "Quantidade de processos minerários ativos no SIGMINE/ANM."
+        tests: [not_null]
+      - name: area_total_titulada_ha
+        description: "Área total titulada em poligonais minerárias (ha)."
+        tests: [not_null]
+      - name: arrecadacao_cfem_total_mil_brl
+        description: "Arrecadação anual consolidada de royalties CFEM (R$ mil)."
+        tests: [not_null]
+      - name: indice_conformidade_sigbm_pct
+        description: "Índice municipal de conformidade e estabilidade de barragens SIGBM (%)."
+        tests: [not_null]
+      - name: participacao_substancias_criticas_pct
+        description: "Participação percentual de minerais críticos e estratégicos (%)."
+        tests: [not_null]
+      - name: qtd_registros_amostra_sigmine
+        description: "Quantidade de registros detalhados de processos na camada Silver SIGMINE."
+        tests: [not_null]
+      - name: cfem_amostra_processos_mil_brl
+        description: "Soma de arrecadação CFEM dos processos principais no SIGMINE (R$ mil)."
+        tests: [not_null]
+      - name: substancia_principal
+        description: "Substância mineral dominante na arrecadação CFEM municipal."
+        tests: [not_null]
+      - name: valor_operacao_mineral_mil_brl
+        description: "Valor bruto declarado das operações comerciais minerais à ANM (R$ mil)."
+        tests: [not_null]
+      - name: aliquota_media_cfem_pct
+        description: "Alíquota média efetiva incidente da CFEM (%)."
+        tests: [not_null]
+      - name: qtd_barragens_sigbm
+        description: "Quantidade total de barragens de rejeitos registradas no SIGBM."
+        tests: [not_null]
+      - name: barragens_paebm_emergencia
+        description: "Quantidade de barragens em alerta ou emergência PAEBM."
+        tests: [not_null]
+      - name: nivel_dano_potencial_associado
+        description: "Classificação predominante de Dano Potencial Associado (DPA) no SIGBM."
+        tests: [not_null]
+      - name: score_maturidade_mineral_esg
+        description: "Score sintético municipal de maturidade mineral ESG e conformidade SIGBM (0-100)."
+        tests: [not_null]
+      - name: tier_mineracao_sustentavel_anm
+        description: "Classificação municipal de mineração sustentável (POLO_MINERAL_ESG_CONFORME, ATIVIDADE_EXTRATIVA_REGULAR ou ALERTA_FISCALIZACAO_BARRAGENS)."
+        tests: [not_null]

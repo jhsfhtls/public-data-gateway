@@ -61,6 +61,7 @@ model-paths:
   - "../src/public_data_gateway/connectors/imobiliario/capitais_iptu_itbi/dbt"
   - "../src/public_data_gateway/connectors/ambiental/ana_hidroweb_telemetria/dbt"
   - "../src/public_data_gateway/connectors/ambiental/aneel_geracao_distribuida/dbt"
+  - "../src/public_data_gateway/connectors/ambiental/anm_mineracao/dbt"
   - "../src/public_data_gateway/connectors/ambiental/anp_combustiveis/dbt"
   - "../src/public_data_gateway/connectors/ambiental/bcb_sicor/dbt"
   - "../src/public_data_gateway/connectors/ambiental/ibama_fiscalizacao/dbt"
