@@ -993,3 +993,67 @@ models:
       - name: tier_saude_suplementar_ans
         description: "Classificação municipal ANS (POLO_ALTA_COBERTURA_ANS, MERCADO_SUPLEMENTAR_EQUILIBRADO ou BAIXA_PENETRACAO_PRIVADA)."
         tests: [not_null]
+
+  - name: mart_datasus_extra_brasil
+    description: "Data Mart Gold intra-domínio consolidando produção ambulatorial SIA/SUS, vigilância epidemiológica SINAN, cobertura nutricional SISVAN/PNS e score de resolutividade SUS."
+    columns:
+      - name: id_municipio
+        description: "Código IBGE de 7 dígitos do município (STRING)."
+        tests: [not_null, unique]
+      - name: sigla_uf
+        description: "Sigla de 2 letras da Unidade Federativa (UF)."
+        tests: [not_null]
+      - name: nome_municipio
+        description: "Nome oficial do município."
+        tests: [not_null]
+      - name: regiao
+        description: "Macrorregião geográfica brasileira."
+        tests: [not_null]
+      - name: producao_sia_total_12m
+        description: "Volume total anual de atendimentos ambulatoriais aprovados no SIA/SUS."
+        tests: [not_null]
+      - name: notificacoes_sinan_total_12m
+        description: "Total anual de agravos compulsórios notificados no SINAN."
+        tests: [not_null]
+      - name: valor_sia_aprovado_mil_brl
+        description: "Montante financeiro anual aprovado pelo SUS em procedimentos SIA (R$ mil)."
+        tests: [not_null]
+      - name: cobertura_sisvan_pct
+        description: "Cobertura nutricional na Atenção Primária SISVAN (%)."
+        tests: [not_null]
+      - name: atendimentos_sia_per_capita
+        description: "Quantidade média anual de atendimentos ambulatoriais SIA/SUS por habitante."
+        tests: [not_null]
+      - name: qtd_linhas_procedimento_sia
+        description: "Quantidade de grupos de procedimento SIA consolidados na camada Silver."
+        tests: [not_null]
+      - name: valor_amostra_sia_mil_brl
+        description: "Soma do valor aprovado nos grupos principais SIA/SUS (R$ mil)."
+        tests: [not_null]
+      - name: notificacoes_dengue_12m
+        description: "Total anual de casos notificados de dengue e arboviroses no SINAN."
+        tests: [not_null]
+      - name: notificacoes_respiratorias_12m
+        description: "Total anual de notificações de Síndrome Respiratória Aguda Grave (SRAG)."
+        tests: [not_null]
+      - name: taxa_incidencia_100k_hab
+        description: "Taxa de incidência de agravos notificados por 100 mil habitantes."
+        tests: [not_null]
+      - name: oportunidade_encerramento_pct
+        description: "Percentual de notificações SINAN encerradas dentro do prazo regulamentar (%)."
+        tests: [not_null]
+      - name: prevalencia_obesidade_adulto_pns_pct
+        description: "Prevalência estimada de obesidade adulta com base na Pesquisa Nacional de Saúde (%)."
+        tests: [not_null]
+      - name: acompanhamento_condicoes_cronicas_pct
+        description: "Percentual de acompanhamento de condições crônicas na Atenção Primária (%)."
+        tests: [not_null]
+      - name: inseguranca_alimentar_grave_pct
+        description: "Estimativa percentual de domicílios em situação de insegurança alimentar grave (%)."
+        tests: [not_null]
+      - name: score_resolutividade_sus_datasus
+        description: "Score sintético municipal de resolutividade ambulatorial SUS, vigilância SINAN e cobertura SISVAN (0-100)."
+        tests: [not_null]
+      - name: tier_capacidade_ambulatorial_sus
+        description: "Classificação municipal SUS (POLO_ALTA_RESOLUTIVIDADE_SUS, REDE_AMBULATORIAL_CONSOLIDADA ou VULNERABILIDADE_VIGILANCIA_SUS)."
+        tests: [not_null]

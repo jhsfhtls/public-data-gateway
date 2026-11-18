@@ -2180,6 +2180,64 @@ class HealthFacade:
             limit=limit, sigla_uf=sigla_uf, sort_by_beneficiaries=sort_by_beneficiaries
         )
 
+    @property
+    def datasus_extra_connector(self) -> Any:
+        if (
+            not hasattr(self, "_datasus_extra_connector")
+            or self._datasus_extra_connector is None
+        ):
+            from public_data_gateway.connectors.saude.datasus_extra import (
+                DatasusExtraConnector,
+            )
+
+            self._datasus_extra_connector = DatasusExtraConnector(
+                settings=self._sdk.settings
+            )
+        return self._datasus_extra_connector
+
+    def get_datasus_sia_production(self, termo: str) -> list[dict[str, Any]]:
+        """Lookup DATASUS SIA outpatient production by code, procedure, disease, IBGE, UF, or city."""
+        return self.datasus_extra_connector.get_datasus_sia_production(termo)
+
+    def get_datasus_sinan_notifications(self, termo: str) -> list[dict[str, Any]]:
+        """Lookup DATASUS SINAN notifiable disease counts and timeliness rate."""
+        return self.datasus_extra_connector.get_datasus_sinan_notifications(termo)
+
+    def get_datasus_sisvan_nutrition(
+        self, id_municipio_or_name: str
+    ) -> dict[str, Any] | None:
+        """Retrieve municipal SISVAN/PNS nutritional surveillance and chronic condition coverage."""
+        return self.datasus_extra_connector.get_datasus_sisvan_nutrition(
+            id_municipio_or_name
+        )
+
+    def get_datasus_extra_summary(
+        self, id_municipio_or_name: str
+    ) -> dict[str, Any] | None:
+        """Retrieve consolidated municipal DATASUS SIA volume, SINAN notifications, and SISVAN coverage."""
+        return self.datasus_extra_connector.get_datasus_extra_summary(
+            id_municipio_or_name
+        )
+
+    def get_datasus_extra_features(
+        self, id_municipio_or_name: str
+    ) -> dict[str, Any] | None:
+        """Retrieve Gold DATASUS Extra SUS ambulatory resolutivity score and tier."""
+        return self.datasus_extra_connector.get_datasus_extra_features(
+            id_municipio_or_name
+        )
+
+    def list_top_datasus_extra_municipalities(
+        self,
+        limit: int = 10,
+        sigla_uf: str | None = None,
+        sort_by_sia: bool = False,
+    ) -> list[dict[str, Any]]:
+        """List municipalities ranked by SUS ambulatory resolutivity score or SIA production volume."""
+        return self.datasus_extra_connector.list_top_datasus_extra_municipalities(
+            limit=limit, sigla_uf=sigla_uf, sort_by_sia=sort_by_sia
+        )
+
 
 class EducationFacade:
     """Unified developer facade for basic education, school infrastructure, and INEP Censo Escolar analytics."""
@@ -5223,6 +5281,43 @@ class BrazilData:
         """Listar municípios ranqueados por maturidade de saúde suplementar ANS ou total de beneficiários."""
         return self.health.list_top_ans_municipalities(
             limit=limit, sigla_uf=sigla_uf, sort_by_beneficiaries=sort_by_beneficiaries
+        )
+
+    def get_datasus_sia_production(self, termo: str) -> list[dict[str, Any]]:
+        """Consultar produção ambulatorial SIA/SUS por código, procedimento, agravo, IBGE, UF ou cidade."""
+        return self.health.get_datasus_sia_production(termo)
+
+    def get_datasus_sinan_notifications(self, termo: str) -> list[dict[str, Any]]:
+        """Consultar notificações epidemiológicas compulsórias SINAN e oportunidade de encerramento."""
+        return self.health.get_datasus_sinan_notifications(termo)
+
+    def get_datasus_sisvan_nutrition(
+        self, id_municipio_or_name: str
+    ) -> dict[str, Any] | None:
+        """Consultar cobertura nutricional SISVAN e indicadores de obesidade/crônicas PNS."""
+        return self.health.get_datasus_sisvan_nutrition(id_municipio_or_name)
+
+    def get_datasus_extra_summary(
+        self, id_municipio_or_name: str
+    ) -> dict[str, Any] | None:
+        """Consultar consolidado municipal DATASUS de produção SIA/SUS, agravos SINAN e cobertura SISVAN."""
+        return self.health.get_datasus_extra_summary(id_municipio_or_name)
+
+    def get_datasus_extra_features(
+        self, id_municipio_or_name: str
+    ) -> dict[str, Any] | None:
+        """Consultar features Gold DATASUS Extra de resolutividade ambulatorial e vigilância SUS."""
+        return self.health.get_datasus_extra_features(id_municipio_or_name)
+
+    def list_top_datasus_extra_municipalities(
+        self,
+        limit: int = 10,
+        sigla_uf: str | None = None,
+        sort_by_sia: bool = False,
+    ) -> list[dict[str, Any]]:
+        """Listar municípios ranqueados por resolutividade ambulatorial SUS ou volume de atendimentos SIA."""
+        return self.health.list_top_datasus_extra_municipalities(
+            limit=limit, sigla_uf=sigla_uf, sort_by_sia=sort_by_sia
         )
 
     def get_censo_escolar_infrastructure(self, id_municipio: str) -> dict[str, Any]:

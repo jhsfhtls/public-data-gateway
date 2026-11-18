@@ -2314,3 +2314,32 @@ sources:
   status: HOMOLOGATED
   freshness_sla_hours: 168
   cron_schedule_expression: 0 7 * * 2
+- source_id: datasus_extra
+  name: "DATASUS Complementar (SIA, SINAN, SISVAN & PNS): Produção Ambulatorial, Agravos & Nutrição"
+  agency: Departamento de Informática do SUS (DATASUS / Ministério da Saúde)
+  official_url: https://datasus.saude.gov.br/
+  segment_id: 06_saude_publica
+  segment_name: Saúde Pública & Epidemiologia
+  access_mode: LAKEHOUSE_BATCH
+  protocol: HTTP_BULK_ZIP
+  auth_type: NONE
+  canonical_keys:
+  - id_municipio
+  - sigla_uf
+  update_frequency: Mensal (SIA/SISVAN) / Semanal (SINAN) / Periódica (PNS)
+  estimated_volume: ~5.570 municípios com atendimentos ambulatoriais SIA/SUS, agravos SINAN e nutrição SISVAN (~710 MB)
+  lgpd_tier: ANONYMIZED_MICRODATA
+  ml_feature_domains:
+  - ambulatory_care_sia_production
+  - notifiable_diseases_sinan
+  - primary_care_nutrition_sisvan
+  solution_packs:
+  - P01
+  - P05
+  - P06
+  - P08
+  rice_score: 890
+  roadmap_wave: 2
+  status: HOMOLOGATED
+  freshness_sla_hours: 720
+  cron_schedule_expression: 0 4 12 * *

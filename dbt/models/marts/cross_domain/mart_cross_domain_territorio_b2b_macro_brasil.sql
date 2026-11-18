@@ -239,6 +239,16 @@ inovacao_pi_uf AS (
     GROUP BY sigla_uf
 ),
 
+sus_extra_uf AS (
+    SELECT
+        sigla_uf,
+        SUM(producao_sia_total_12m) AS producao_ambulatorial_sia_uf,
+        SUM(notificacoes_sinan_total_12m) AS notificacoes_sinan_uf,
+        ROUND(AVG(score_resolutividade_sus_datasus), 2) AS avg_score_resolutividade_sus_uf
+    FROM {{ ref('mart_datasus_extra_brasil') }}
+    GROUP BY sigla_uf
+),
+
 base AS (
     SELECT
         t.sigla_uf,
@@ -309,6 +319,9 @@ base AS (
         COALESCE(ip.patentes_depositadas_inpi_uf, 0) AS patentes_depositadas_inpi_uf,
         COALESCE(ip.registros_software_inpi_uf, 0) AS registros_software_inpi_uf,
         COALESCE(ip.avg_score_inovacao_pi_uf, 70.0) AS avg_score_inovacao_pi_uf,
+        COALESCE(sx.producao_ambulatorial_sia_uf, 0) AS producao_ambulatorial_sia_uf,
+        COALESCE(sx.notificacoes_sinan_uf, 0) AS notificacoes_sinan_uf,
+        COALESCE(sx.avg_score_resolutividade_sus_uf, 75.0) AS avg_score_resolutividade_sus_uf,
         COALESCE(m.ano_mes, '2025-03') AS macro_ano_mes_referencia,
         COALESCE(m.selic_meta_fim_mes_pct, 14.25) AS selic_meta_fim_mes_pct,
         COALESCE(m.ipca_acumulado_12m_pct, 5.06) AS ipca_acumulado_12m_pct,
@@ -337,6 +350,7 @@ base AS (
     LEFT JOIN mineracao_uf mn ON t.sigla_uf = mn.sigla_uf
     LEFT JOIN seguros_uf sg ON t.sigla_uf = sg.sigla_uf
     LEFT JOIN inovacao_pi_uf ip ON t.sigla_uf = ip.sigla_uf
+    LEFT JOIN sus_extra_uf sx ON t.sigla_uf = sx.sigla_uf
     CROSS JOIN macro_latest m
 ),
 

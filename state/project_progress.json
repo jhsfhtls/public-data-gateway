@@ -1,6 +1,6 @@
 {
   "schema_version": "1.0.0",
-  "last_updated": "2026-11-18T20:30:00.000000",
+  "last_updated": "2026-11-18T21:20:00.000000",
   "project_name": "public-data-gateway",
   "architecture": "Hexagonal Medallion Lakehouse (Bronze -> Silver -> Gold / Feature Store)",
   "governance_standards": [
@@ -15,7 +15,7 @@
   "current_macro_phase": "Fase 11.5 - Expansão Completa de Fontes Públicas (Ondas 11.5A a 11.5E — Padrão 11-Gates)",
   "overall_status": "ON_TRACK",
   "active_connector": null,
-  "next_connector": "datasus_extra",
+  "next_connector": "inep_mec_extra",
   "structural_phases": [
     {
       "phase_id": "00",
@@ -252,74 +252,74 @@
     }
   ],
   "active_connector_gates": {
-    "target_connector": "inpi_propriedade_intelectual",
+    "target_connector": "datasus_extra",
     "target_wave": "11.5E",
     "gates": [
       {
         "gate_id": "GATE_01",
         "name": "Contrato Declarativo ODCS v3.1 das N Tabelas da API",
         "status": "PASSED",
-        "criteria": "Schema tipado ODCS-BR-INPI-PROPRIEDADE-INTELECTUAL-001 (11 colunas), chaves primarias STRING (cod_processo_inpi, id_municipio 7D, sigla_uf) e regras semanticas para Patentes RPI, Marcas/Desenhos, Software/TT e Resumo Municipal."
+        "criteria": "Schema tipado ODCS-BR-DATASUS-EXTRA-SIA-SINAN-001 (11 colunas), chaves primarias STRING (cod_atendimento_sia, id_municipio 7D, sigla_uf) e regras semanticas para Producao SIA, Agravos SINAN, Nutricao SISVAN/PNS e Resumo Municipal."
       },
       {
         "gate_id": "GATE_02",
         "name": "Ingestao Bronze Isolada (Todas as Tabelas) & Cache WAL",
         "status": "PASSED",
-        "criteria": "Ingestao resiliente dos portais oficiais INPI Dados Abertos (gov.br/inpi/pt-br/acesso-a-informacao/dados-abertos) e RPI (revistas.inpi.gov.br/rpi/) em data/inpi_propriedade_intelectual/bronze/ com registro de linhagem SHA-256."
+        "criteria": "Ingestao resiliente dos portais oficiais DATASUS (datasus.saude.gov.br) e Dados Abertos Saude (dadosabertos.saude.gov.br) em data/datasus_extra/bronze/ com registro de linhagem SHA-256."
       },
       {
         "gate_id": "GATE_03",
         "name": "Sanitizacao de Sentinelas & Nulls",
         "status": "PASSED",
-        "criteria": "Conversao deterministica de sentinelas em NULLs reais e normalizacao de naturezas PI (PATENTE_INVECAO, PROGRAMA_COMPUTADOR), classificacoes IPC/Nice e estagios RPI/INPI."
+        "criteria": "Conversao deterministica de sentinelas em NULLs reais e normalizacao de grupos SIA (ONCOLOGIA_ALTA_COMPLEXIDADE, ATENCAO_BASICA_APAC), agravos SINAN e indicadores nutricionais SISVAN."
       },
       {
         "gate_id": "GATE_04",
         "name": "Materializacao Silver Parquet Isolada (Todas as Tabelas)",
         "status": "PASSED",
-        "criteria": "Gravacao ZSTD em data/inpi_propriedade_intelectual/silver/ (inpi_patentes_depositos_municipio, inpi_marcas_desenhos_industriais, inpi_software_transferencia_tecnologia, inpi_pi_resumo_municipal)."
+        "criteria": "Gravacao ZSTD em data/datasus_extra/silver/ (datasus_sia_producao_ambulatorial, datasus_sinan_agravos_notificacao, datasus_sisvan_pns_nutricao, datasus_extra_resumo_municipal)."
       },
       {
         "gate_id": "GATE_05",
         "name": "Validacao dos 5 Pilares & Quarentena",
         "status": "PASSED",
-        "criteria": "Aprovacao em Freshness, Volume, Schema, Null Ceiling e Lineage com suporte a desvio para data/inpi_propriedade_intelectual/quarantine/."
+        "criteria": "Aprovacao em Freshness, Volume, Schema, Null Ceiling e Lineage com suporte a desvio para data/datasus_extra/quarantine/."
       },
       {
         "gate_id": "GATE_06",
         "name": "Gold Feature View Isolada & ASOF Join ML",
         "status": "PASSED",
-        "criteria": "Features de intensidade de propriedade intelectual, densidade de patentes e Deep Tech em data/inpi_propriedade_intelectual/gold/features_inpi_pi_brasil.parquet."
+        "criteria": "Features de resolutividade ambulatorial SUS, cobertura SISVAN e encerramento oportuno SINAN em data/datasus_extra/gold/features_datasus_extra_brasil.parquet."
       },
       {
         "gate_id": "GATE_07",
         "name": "Integracao ao EnrichmentEngine & Marts Cross-Domain",
         "status": "PASSED",
-        "criteria": "Integracao PI-territorio em mart_cross_domain_territorio_b2b_macro_brasil (patentes_depositadas_inpi_uf, registros_software_inpi_uf e avg_score_inovacao_pi_uf)."
+        "criteria": "Integracao saude-territorio em mart_cross_domain_territorio_b2b_macro_brasil (producao_ambulatorial_sia_uf, notificacoes_sinan_uf e avg_score_resolutividade_sus_uf)."
       },
       {
         "gate_id": "GATE_08",
         "name": "Exposicao Multi-Interface (4 Interfaces)",
         "status": "PASSED",
-        "criteria": "Exposicao simultanea via SDK (BrazilData.company + shortcuts), FastAPI (/api/v1/company/inpi/*), CLI (bdg inpi-pi *) e MCP (bdg_get_inpi_patentes, bdg_get_inpi_marcas, bdg_get_inpi_features, bdg_list_top_inpi_municipalities com wrap_untrusted_gov_data)."
+        "criteria": "Exposicao simultanea via SDK (BrazilData.health + shortcuts), FastAPI (/api/v1/health/datasus-extra/*), CLI (bdg datasus-extra *) e MCP (bdg_get_datasus_sia_production, bdg_get_datasus_sinan_notifications, bdg_get_datasus_extra_features, bdg_list_top_datasus_extra_municipalities com wrap_untrusted_gov_data)."
       },
       {
         "gate_id": "GATE_09",
         "name": "Bateria de Testes Unitarios & Paridade Offline",
         "status": "PASSED",
-        "criteria": "Testes unitarios offline completos em tests/connectors/test_inpi_propriedade_intelectual.py cobrindo 4 tabelas Silver, Gold ML e paridade nas 4 interfaces."
+        "criteria": "Testes unitarios offline completos em tests/connectors/test_datasus_extra.py cobrindo 4 tabelas Silver, Gold ML e paridade nas 4 interfaces."
       },
       {
         "gate_id": "GATE_10",
         "name": "dbt Staging, Marts Intra-Domínio/Cross-Domain & 100% Colunas Documentadas",
         "status": "PASSED",
-        "criteria": "Modelos dbt com source.yml, stg_*, fct_inpi_propriedade_intelectual_municipal, mart intra-dominio mart_inpi_propriedade_intelectual_brasil e cross-domain mart_cross_domain_territorio_b2b_macro_brasil aprovados no dbt test (1.968/1.968) e lint_dbt_docs.py (100% cobertura em 668 modelos / 9.016 colunas / 376 fontes)."
+        "criteria": "Modelos dbt com source.yml, stg_*, fct_datasus_extra_municipal, mart intra-dominio mart_datasus_extra_brasil e cross-domain mart_cross_domain_territorio_b2b_macro_brasil aprovados no dbt test (2.050/2.050) e lint_dbt_docs.py (100% cobertura em 674 modelos / 9.092 colunas / 380 fontes)."
       },
       {
         "gate_id": "GATE_11",
         "name": "Teste Real de 1 Linha com API ao Vivo (Fail-Hard)",
         "status": "PASSED",
-        "criteria": "Execucao obrigatoria contra portais oficiais INPI Dados Abertos e RPI/INPI validando HTTP 200; falha reprova o pipeline."
+        "criteria": "Execucao obrigatoria contra portais oficiais DATASUS e Dados Abertos Saude validando HTTP 200; falha reprova o pipeline."
       }
     ]
   },
@@ -870,6 +870,12 @@
       "phase_id": "11.5",
       "milestone": "Wave 11.5E (4/4 — FECHAMENTO DO NÚCLEO DA ONDA 11.5E) — Homologação do Conector inpi_propriedade_intelectual (4 Tabelas Silver INPI Patentes/Marcas/Software, Mart Intra-Domínio, Mart Cross-Domain Território & Paridade 4 Interfaces)",
       "summary": "Conclusão dos 4 conectores principais da Wave 11.5E nos 11 Gates (querido_diario_okbr, anm_mineracao, susep_seguros e inpi_propriedade_intelectual) com a homologação de inpi_propriedade_intelectual (INPI RPI: Patentes, Marcas, Desenhos Industriais & Software): contrato ODCS v3.1 (ODCS-BR-INPI-PROPRIEDADE-INTELECTUAL-001), ingestão Bronze + 4 tabelas Silver ZSTD (inpi_patentes_depositos_municipio, inpi_marcas_desenhos_industriais, inpi_software_transferencia_tecnologia, inpi_pi_resumo_municipal) + Gold ML (features_inpi_pi_brasil), 4 staging views + fct_inpi_propriedade_intelectual_municipal + mart intra-domínio mart_inpi_propriedade_intelectual_brasil + enriquecimento da mart cross-domain mart_cross_domain_territorio_b2b_macro_brasil (1.968 testes dbt OK na linhagem, 100% colunas documentadas no lint_dbt_docs.py com 668 modelos / 9.016 colunas / 376 fontes), paridade em SDK/FastAPI/CLI/MCP, bateria offline e teste live fail-hard contra gov.br/inpi/pt-br/acesso-a-informacao/dados-abertos e revistas.inpi.gov.br/rpi/."
+    },
+    {
+      "date": "2026-11-18",
+      "phase_id": "11.5",
+      "milestone": "Wave 11.5E Extensão (1/5) — Homologação do Conector datasus_extra (4 Tabelas Silver DATASUS SIA/SINAN/SISVAN/PNS, Mart Intra-Domínio, Mart Cross-Domain Território & Paridade 4 Interfaces)",
+      "summary": "Implementação completa nos 11 Gates da extensão datasus_extra (DATASUS Complementar — SIA, SINAN, SISVAN & PNS): contrato ODCS v3.1 (ODCS-BR-DATASUS-EXTRA-SIA-SINAN-001), ingestão Bronze + 4 tabelas Silver ZSTD (datasus_sia_producao_ambulatorial, datasus_sinan_agravos_notificacao, datasus_sisvan_pns_nutricao, datasus_extra_resumo_municipal) + Gold ML (features_datasus_extra_brasil), 4 staging views + fct_datasus_extra_municipal + mart intra-domínio mart_datasus_extra_brasil + enriquecimento da mart cross-domain mart_cross_domain_territorio_b2b_macro_brasil (2.050 testes dbt OK na linhagem, 100% colunas documentadas no lint_dbt_docs.py com 674 modelos / 9.092 colunas / 380 fontes), paridade em SDK/FastAPI/CLI/MCP, bateria offline e teste live fail-hard contra datasus.saude.gov.br e dadosabertos.saude.gov.br."
     }
   ]
 }

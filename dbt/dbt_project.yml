@@ -85,6 +85,7 @@ model-paths:
   - "../src/public_data_gateway/connectors/macrofinanceiro/susep_seguros/dbt"
   - "../src/public_data_gateway/connectors/macrofinanceiro/world_bank_v2/dbt"
   - "../src/public_data_gateway/connectors/saude/ans_saude_suplementar/dbt"
+  - "../src/public_data_gateway/connectors/saude/datasus_extra/dbt"
   - "../src/public_data_gateway/connectors/saude/who_gho_odata/dbt"
   - "../src/public_data_gateway/connectors/agregadores/huggingface_inference/dbt"
   - "../src/public_data_gateway/connectors/agregadores/nasa_youtube_open_ml/dbt"

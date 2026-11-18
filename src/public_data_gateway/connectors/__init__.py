@@ -105,6 +105,7 @@ import public_data_gateway.connectors.macrofinanceiro.world_bank_v2  # noqa: F40
 import public_data_gateway.connectors.saude.ans_saude_suplementar  # noqa: F401
 import public_data_gateway.connectors.saude.anvisa_cmed  # noqa: F401
 import public_data_gateway.connectors.saude.datasus_cnes  # noqa: F401
+import public_data_gateway.connectors.saude.datasus_extra  # noqa: F401
 import public_data_gateway.connectors.saude.datasus_sih  # noqa: F401
 import public_data_gateway.connectors.saude.datasus_sim  # noqa: F401
 import public_data_gateway.connectors.saude.datasus_sinasc  # noqa: F401

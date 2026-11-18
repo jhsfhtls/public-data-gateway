@@ -1,0 +1,181 @@
+version: 2
+
+models:
+  - name: stg_datasus_sia_producao_ambulatorial
+    description: "Staging view tipada da produção ambulatorial aprovada no SIA/SUS, repasses APAC e agravos associados."
+    columns:
+      - name: cod_atendimento_sia
+        description: "Identificador único do agrupamento municipal de produção ambulatorial SIA/SUS (STRING)."
+        tests: [not_null, unique]
+      - name: grupo_procedimento_sia
+        description: "Grupo de procedimento ambulatorial SIA/SUS (ONCOLOGIA_ALTA_COMPLEXIDADE, ATENCAO_BASICA_APAC, DIAGNOSTICO_IMAGEM)."
+        tests: [not_null]
+      - name: agravo_notificacao_sinan
+        description: "Agravo epidemiológico predominante monitorado no SINAN associado ao atendimento."
+        tests: [not_null]
+      - name: situacao_vigilancia_sus
+        description: "Classificação operacional de resposta e cobertura SUS (COBERTURA_ADEQUADA, EXPANSAO_AMBULATORIAL, ALERTA_EPIDEMIOLOGICO)."
+        tests: [not_null]
+      - name: id_municipio
+        description: "Código IBGE de 7 dígitos do município (STRING)."
+        tests: [not_null]
+      - name: sigla_uf
+        description: "Sigla de 2 letras da Unidade Federativa (UF)."
+        tests: [not_null]
+      - name: nome_municipio
+        description: "Nome oficial do município."
+        tests: [not_null]
+      - name: regiao
+        description: "Macrorregião geográfica brasileira."
+        tests: [not_null]
+      - name: producao_ambulatorial_sia_12m
+        description: "Total de procedimentos e atendimentos ambulatoriais SIA/SUS aprovados em 12 meses."
+        tests: [not_null]
+      - name: notificacoes_sinan_12m
+        description: "Quantidade de notificações epidemiológicas registradas no SINAN em 12 meses."
+        tests: [not_null]
+      - name: valor_aprovado_sia_mil_brl
+        description: "Valor financeiro aprovado no SIA/SUS pelo Ministério da Saúde (R$ mil)."
+        tests: [not_null]
+
+  - name: stg_datasus_sinan_agravos_notificacao
+    description: "Staging view tipada das notificações de arboviroses, síndromes respiratórias SRAG e oportunidade de encerramento SINAN."
+    columns:
+      - name: cod_sinan_id
+        description: "Identificador único consolidado municipal de vigilância SINAN (STRING)."
+        tests: [not_null, unique]
+      - name: id_municipio
+        description: "Código IBGE de 7 dígitos do município (STRING)."
+        tests: [not_null]
+      - name: sigla_uf
+        description: "Sigla de 2 letras da Unidade Federativa (UF)."
+        tests: [not_null]
+      - name: nome_municipio
+        description: "Nome oficial do município."
+        tests: [not_null]
+      - name: notificacoes_dengue_12m
+        description: "Total anual de casos notificados de dengue e arboviroses no SINAN."
+        tests: [not_null]
+      - name: notificacoes_respiratorias_12m
+        description: "Total anual de notificações de Síndrome Respiratória Aguda Grave (SRAG)."
+        tests: [not_null]
+      - name: taxa_incidencia_100k_hab
+        description: "Taxa de incidência de agravos notificados por 100 mil habitantes no município."
+        tests: [not_null]
+      - name: oportunidade_encerramento_pct
+        description: "Percentual de investigações epidemiológicas encerradas dentro do prazo regulamentar no SINAN (%)."
+        tests: [not_null]
+
+  - name: stg_datasus_sisvan_pns_nutricao
+    description: "Staging view tipada da vigilância alimentar SISVAN e indicadores crônicos/nutricionais da Pesquisa Nacional de Saúde (PNS)."
+    columns:
+      - name: id_municipio
+        description: "Código IBGE de 7 dígitos do município (STRING)."
+        tests: [not_null, unique]
+      - name: sigla_uf
+        description: "Sigla de 2 letras da Unidade Federativa (UF)."
+        tests: [not_null]
+      - name: nome_municipio
+        description: "Nome oficial do município."
+        tests: [not_null]
+      - name: cobertura_sisvan_atencao_basica_pct
+        description: "Cobertura de registro antropométrico e nutricional SISVAN na Atenção Primária (%)."
+        tests: [not_null]
+      - name: prevalencia_obesidade_adulto_pns_pct
+        description: "Prevalência estimada de obesidade adulta com base na Pesquisa Nacional de Saúde (PNS %)."
+        tests: [not_null]
+      - name: acompanhamento_condicoes_cronicas_pct
+        description: "Percentual de acompanhamento longitudinal de hipertensão e diabetes na Atenção Básica (%)."
+        tests: [not_null]
+      - name: inseguranca_alimentar_grave_pct
+        description: "Estimativa percentual de domicílios em situação de insegurança alimentar grave (%)."
+        tests: [not_null]
+
+  - name: stg_datasus_extra_resumo_municipal
+    description: "Staging view tipada do consolidado municipal de produção ambulatorial SIA/SUS, vigilância SINAN e nutrição SISVAN."
+    columns:
+      - name: id_municipio
+        description: "Código IBGE de 7 dígitos do município (STRING)."
+        tests: [not_null, unique]
+      - name: sigla_uf
+        description: "Sigla de 2 letras da Unidade Federativa (UF)."
+        tests: [not_null]
+      - name: nome_municipio
+        description: "Nome oficial do município."
+        tests: [not_null]
+      - name: regiao
+        description: "Macrorregião geográfica brasileira."
+        tests: [not_null]
+      - name: producao_sia_total_12m
+        description: "Volume total anual de procedimentos aprovados no SIA/SUS no município."
+        tests: [not_null]
+      - name: notificacoes_sinan_total_12m
+        description: "Total anual de agravos compulsórios notificados no SINAN no município."
+        tests: [not_null]
+      - name: valor_sia_aprovado_mil_brl
+        description: "Valor total aprovado de procedimentos ambulatoriais SIA/SUS em 12 meses (R$ mil)."
+        tests: [not_null]
+      - name: cobertura_sisvan_pct
+        description: "Taxa de cobertura nutricional na Atenção Básica SISVAN (%)."
+        tests: [not_null]
+      - name: atendimentos_sia_per_capita
+        description: "Quantidade média anual de atendimentos ambulatoriais SIA/SUS por habitante."
+        tests: [not_null]
+
+  - name: fct_datasus_extra_municipal
+    description: "Fato intermediária municipal integrando produção ambulatorial SIA/SUS, notificações SINAN e vigilância nutricional SISVAN/PNS."
+    columns:
+      - name: id_municipio
+        description: "Código IBGE de 7 dígitos do município (STRING)."
+        tests: [not_null, unique]
+      - name: sigla_uf
+        description: "Sigla de 2 letras da Unidade Federativa (UF)."
+        tests: [not_null]
+      - name: nome_municipio
+        description: "Nome oficial do município."
+        tests: [not_null]
+      - name: regiao
+        description: "Macrorregião geográfica brasileira."
+        tests: [not_null]
+      - name: producao_sia_total_12m
+        description: "Volume total anual de atendimentos ambulatoriais aprovados no SIA/SUS."
+        tests: [not_null]
+      - name: notificacoes_sinan_total_12m
+        description: "Total anual de agravos notificados no SINAN."
+        tests: [not_null]
+      - name: valor_sia_aprovado_mil_brl
+        description: "Montante anual aprovado pelo SUS em procedimentos ambulatoriais SIA (R$ mil)."
+        tests: [not_null]
+      - name: cobertura_sisvan_pct
+        description: "Taxa percentual de cobertura nutricional SISVAN na Atenção Primária (%)."
+        tests: [not_null]
+      - name: atendimentos_sia_per_capita
+        description: "Atendimentos ambulatoriais médios anuais por habitante no município."
+        tests: [not_null]
+      - name: qtd_linhas_procedimento_sia
+        description: "Quantidade de grupos de procedimento SIA consolidados na camada Silver."
+        tests: [not_null]
+      - name: valor_amostra_sia_mil_brl
+        description: "Soma do valor aprovado SIA nos grupos de procedimentos principais (R$ mil)."
+        tests: [not_null]
+      - name: notificacoes_dengue_12m
+        description: "Notificações anuais de dengue e arboviroses registradas no SINAN."
+        tests: [not_null]
+      - name: notificacoes_respiratorias_12m
+        description: "Notificações anuais de síndromes respiratórias agudas (SRAG)."
+        tests: [not_null]
+      - name: taxa_incidencia_100k_hab
+        description: "Taxa de incidência de agravos notificados por 100 mil habitantes."
+        tests: [not_null]
+      - name: oportunidade_encerramento_pct
+        description: "Taxa de encerramento oportuno das notificações SINAN (%)."
+        tests: [not_null]
+      - name: prevalencia_obesidade_adulto_pns_pct
+        description: "Prevalência de obesidade adulta estimada na Pesquisa Nacional de Saúde (%)."
+        tests: [not_null]
+      - name: acompanhamento_condicoes_cronicas_pct
+        description: "Cobertura de acompanhamento de doenças crônicas não transmissíveis na Atenção Básica (%)."
+        tests: [not_null]
+      - name: inseguranca_alimentar_grave_pct
+        description: "Prevalência estimada de insegurança alimentar grave na população (%)."
+        tests: [not_null]
