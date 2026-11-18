@@ -882,6 +882,51 @@ class MCPDispatcher:
                                 },
                             },
                             {
+                                "name": "bdg_get_susep_premios_ramo",
+                                "description": "Lookup SUSEP direct insurance premiums and loss ratios by SUSEP code, branch, IBGE, UF, or municipality.",
+                                "inputSchema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "termo": {"type": "string", "description": "SUSEP code, insurance branch (e.g. VIDA_PESSOAS), IBGE code, UF, or municipality name"},
+                                    },
+                                    "required": ["termo"],
+                                },
+                            },
+                            {
+                                "name": "bdg_get_susep_previdencia_vgbl",
+                                "description": "Lookup SUSEP VGBL/PGBL open supplementary pension contributions and technical provisions.",
+                                "inputSchema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "termo": {"type": "string", "description": "Pension record code, IBGE code, UF, or municipality name"},
+                                    },
+                                    "required": ["termo"],
+                                },
+                            },
+                            {
+                                "name": "bdg_get_susep_features",
+                                "description": "Get normalized Gold SUSEP insurance market maturity score, issued premiums, and solvency tier.",
+                                "inputSchema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "id_municipio_or_name": {"type": "string", "description": "7-digit IBGE municipality code or municipality name"},
+                                    },
+                                    "required": ["id_municipio_or_name"],
+                                },
+                            },
+                            {
+                                "name": "bdg_list_top_susep_municipalities",
+                                "description": "List Brazilian municipalities ranked by SUSEP insurance maturity score or annual issued premiums (R$ mil).",
+                                "inputSchema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "limit": {"type": "integer", "description": "Maximum rows (default: 10)"},
+                                        "sigla_uf": {"type": "string", "description": "Optional 2-letter state filter (e.g. SP)"},
+                                        "sort_by_premios": {"type": "boolean", "description": "Set true to rank municipalities by highest issued premiums first"},
+                                    },
+                                },
+                            },
+                            {
                                 "name": "bdg_get_estban_municipal_balance",
                                 "description": "Retrieve monthly BACEN ESTBAN COSIF municipal banking balance sheet (Tier 1).",
                                 "inputSchema": {
@@ -5225,6 +5270,65 @@ class MCPDispatcher:
                     },
                 }
             wrapped = wrap_untrusted_gov_data(result, source_id="cvm_mercado_extra")
+            return {
+                "jsonrpc": "2.0",
+                "id": req_id,
+                "result": {"content": [{"type": "text", "text": wrapped}], "isError": False},
+            }
+
+        if tool_name in {
+            "bdg_get_susep_premios_ramo",
+            "bdg_get_susep_previdencia_vgbl",
+            "bdg_get_susep_features",
+            "bdg_list_top_susep_municipalities",
+        }:
+            from public_data_gateway.connectors.macrofinanceiro.susep_seguros import (
+                SusepSegurosConnector,
+            )
+
+            connector = SusepSegurosConnector(settings=self.settings)
+            try:
+                if tool_name == "bdg_get_susep_premios_ramo":
+                    result: Any = connector.get_susep_premios_ramo(str(args.get("termo", "")))
+                elif tool_name == "bdg_get_susep_previdencia_vgbl":
+                    result = connector.get_susep_previdencia_vgbl(str(args.get("termo", "")))
+                elif tool_name == "bdg_get_susep_features":
+                    result = connector.get_susep_features(
+                        str(args.get("id_municipio_or_name", ""))
+                    )
+                else:
+                    result = connector.list_top_susep_municipalities(
+                        limit=int(args.get("limit", 10)),
+                        sigla_uf=args.get("sigla_uf"),
+                        sort_by_premios=bool(args.get("sort_by_premios", False)),
+                    )
+            except (ValueError, KeyError) as exc:
+                return {
+                    "jsonrpc": "2.0",
+                    "id": req_id,
+                    "result": {
+                        "content": [
+                            {"type": "text", "text": f"SUSEP Seguros parameter error: {exc}"}
+                        ],
+                        "isError": True,
+                    },
+                }
+
+            if not result:
+                return {
+                    "jsonrpc": "2.0",
+                    "id": req_id,
+                    "result": {
+                        "content": [
+                            {
+                                "type": "text",
+                                "text": "No SUSEP insurance data found for the query.",
+                            }
+                        ],
+                        "isError": True,
+                    },
+                }
+            wrapped = wrap_untrusted_gov_data(result, source_id="susep_seguros")
             return {
                 "jsonrpc": "2.0",
                 "id": req_id,

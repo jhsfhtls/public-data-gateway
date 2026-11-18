@@ -190,6 +190,15 @@ models:
       - name: avg_score_mineracao_esg_uf
         description: "Média estadual do score de maturidade mineral ESG e conformidade de barragens SIGBM/ANM (0-100)."
         tests: [not_null]
+      - name: premios_seguros_susep_uf_mil_brl
+        description: "Volume anual estadual de prêmios diretos emitidos em seguros privados SUSEP/SES (R$ mil)."
+        tests: [not_null]
+      - name: corretoras_ativas_susep_uf
+        description: "Quantidade total estadual de corretores e corretoras de seguros ativos registrados na SUSEP."
+        tests: [not_null]
+      - name: avg_score_maturidade_seguros_uf
+        description: "Média estadual do score de maturidade do mercado segurador e solvência SUSEP (0-100)."
+        tests: [not_null]
       - name: macro_ano_mes_referencia
         description: "Competência macroeconômica de referência (YYYY-MM)."
         tests: [not_null]

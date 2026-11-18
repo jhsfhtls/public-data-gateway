@@ -716,6 +716,36 @@ def build_parser() -> argparse.ArgumentParser:
     cvmx_rk_p.add_argument("--volume", action="store_true", help="Sort descending by RCVM 160 volume (R$ mil)")
     cvmx_rk_p.add_argument("--json", action="store_true", help="Output in JSON format")
 
+    # SUSEP Seguros (Prêmios, Sinistros, VGBL/PGBL & Solvência) command group
+    sus_p = subparsers.add_parser("susep-seguros", help="Query SUSEP insurance premiums, claims, VGBL/PGBL pension reserves, brokers, and rankings.")
+    sus_sub = sus_p.add_subparsers(dest="susep_seguros_action", required=True)
+
+    sus_pr_p = sus_sub.add_parser("premios", help="Lookup SUSEP direct premiums & loss ratios by code, branch, IBGE, UF, or city.")
+    sus_pr_p.add_argument("termo", help="SUSEP code, insurance branch, IBGE code, UF, or municipality name")
+    sus_pr_p.add_argument("--json", action="store_true", help="Output in JSON format")
+
+    sus_pv_p = sus_sub.add_parser("previdencia", help="Lookup SUSEP VGBL/PGBL pension contributions and technical provisions.")
+    sus_pv_p.add_argument("termo", help="Pension record code, IBGE code, UF, or municipality name")
+    sus_pv_p.add_argument("--json", action="store_true", help="Output in JSON format")
+
+    sus_cr_p = sus_sub.add_parser("corretoras", help="Get municipal SUSEP active insurance brokers and solvency index.")
+    sus_cr_p.add_argument("id_municipio_or_name", help="7-digit IBGE code or municipality name")
+    sus_cr_p.add_argument("--json", action="store_true", help="Output in JSON format")
+
+    sus_mn_p = sus_sub.add_parser("municipio", help="Get consolidated municipal SUSEP premiums, claims, and per-capita spend.")
+    sus_mn_p.add_argument("id_municipio_or_name", help="7-digit IBGE code or municipality name")
+    sus_mn_p.add_argument("--json", action="store_true", help="Output in JSON format")
+
+    sus_ft_p = sus_sub.add_parser("features", help="Get Gold SUSEP insurance market maturity score and solvency tier.")
+    sus_ft_p.add_argument("id_municipio_or_name", help="7-digit IBGE code or municipality name")
+    sus_ft_p.add_argument("--json", action="store_true", help="Output in JSON format")
+
+    sus_rk_p = sus_sub.add_parser("ranking", help="List municipalities ranked by SUSEP insurance maturity or issued premiums.")
+    sus_rk_p.add_argument("--limit", type=int, default=10, help="Max municipalities to list")
+    sus_rk_p.add_argument("--uf", type=str, help="Optional 2-letter state filter")
+    sus_rk_p.add_argument("--premios", action="store_true", help="Sort descending by issued insurance premiums (R$ mil)")
+    sus_rk_p.add_argument("--json", action="store_true", help="Output in JSON format")
+
     # Subcommand: cno (RFB Cadastro Nacional de Obras)
     cno_p = subparsers.add_parser(
         "cno",
@@ -3877,6 +3907,84 @@ def main(argv: Sequence[str] | None = None) -> int:
                     return 0
             except (ValueError, KeyError) as exc:
                 print(f"Erro CVM Extra: {exc}", file=sys.stderr)
+                return 1
+
+        elif args.command == "susep-seguros":
+            from public_data_gateway.connectors.macrofinanceiro.susep_seguros import (
+                SusepSegurosConnector,
+            )
+
+            sus_conn = SusepSegurosConnector()
+            sus_action = getattr(args, "susep_seguros_action", "")
+            try:
+                if sus_action == "premios":
+                    rows = sus_conn.get_susep_premios_ramo(args.termo)
+                    if getattr(args, "json", False):
+                        print(json.dumps(rows, indent=2, ensure_ascii=False, default=str))
+                    else:
+                        print(f"SUSEP Prêmios & Sinistros ({len(rows)}):")
+                        for r in rows:
+                            print(f"  {r.get('cod_registro_susep')} | {r.get('nome_municipio')} ({r.get('sigla_uf')}): {r.get('grupo_ramo_seguro')} | R$ {r.get('premio_direto_anual_mil_brl')}k")
+                    return 0
+
+                if sus_action == "previdencia":
+                    rows = sus_conn.get_susep_previdencia_vgbl(args.termo)
+                    if getattr(args, "json", False):
+                        print(json.dumps(rows, indent=2, ensure_ascii=False, default=str))
+                    else:
+                        print(f"SUSEP Previdência VGBL/PGBL ({len(rows)}):")
+                        for r in rows:
+                            print(f"  {r.get('cod_prev_susep')} | {r.get('nome_municipio')} ({r.get('sigla_uf')}): R$ {r.get('contribuicoes_previdencia_mil_brl')}k | VGBL {r.get('participacao_vgbl_pct')}%")
+                    return 0
+
+                if sus_action == "corretoras":
+                    res = sus_conn.get_susep_corretoras_solvencia(args.id_municipio_or_name)
+                    if res is None:
+                        print(f"Corretoras SUSEP não encontradas para: {args.id_municipio_or_name}", file=sys.stderr)
+                        return 1
+                    if getattr(args, "json", False):
+                        print(json.dumps(res, indent=2, ensure_ascii=False, default=str))
+                    else:
+                        print(f"SUSEP Corretoras & Solvência ({res.get('nome_municipio')} - {res.get('sigla_uf')}): {res.get('corretoras_ativas_susep')} corretoras | Solvência {res.get('indice_solvencia_regulatoria_pct')}%")
+                    return 0
+
+                if sus_action == "municipio":
+                    res = sus_conn.get_susep_municipal_summary(args.id_municipio_or_name)
+                    if res is None:
+                        print(f"Resumo SUSEP não encontrado para: {args.id_municipio_or_name}", file=sys.stderr)
+                        return 1
+                    if getattr(args, "json", False):
+                        print(json.dumps(res, indent=2, ensure_ascii=False, default=str))
+                    else:
+                        print(f"SUSEP Município ({res.get('nome_municipio')} - {res.get('sigla_uf')}): Prêmios R$ {res.get('premios_emitidos_total_mil_brl')}k | Sinistralidade {res.get('taxa_sinistralidade_media_pct')}%")
+                    return 0
+
+                if sus_action == "features":
+                    res = sus_conn.get_susep_features(args.id_municipio_or_name)
+                    if res is None:
+                        print(f"Features SUSEP não encontradas para: {args.id_municipio_or_name}", file=sys.stderr)
+                        return 1
+                    if getattr(args, "json", False):
+                        print(json.dumps(res, indent=2, ensure_ascii=False, default=str))
+                    else:
+                        print(f"SUSEP Gold ({res.get('nome_municipio')} - {res.get('id_municipio')}): Score {res.get('score_maturidade_seguros_susep')} | {res.get('tier_mercado_segurador_susep')}")
+                    return 0
+
+                if sus_action == "ranking":
+                    ranks = sus_conn.list_top_susep_municipalities(
+                        limit=getattr(args, "limit", 10),
+                        sigla_uf=getattr(args, "uf", None),
+                        sort_by_premios=getattr(args, "premios", False),
+                    )
+                    if getattr(args, "json", False):
+                        print(json.dumps(ranks, indent=2, ensure_ascii=False, default=str))
+                    else:
+                        print(f"Ranking SUSEP Mercado Segurador ({len(ranks)}):")
+                        for idx, r in enumerate(ranks, 1):
+                            print(f"  {idx}. {r.get('nome_municipio')} ({r.get('sigla_uf')}): {r.get('score_maturidade_seguros_susep')} | {r.get('tier_mercado_segurador_susep')}")
+                    return 0
+            except (ValueError, KeyError) as exc:
+                print(f"Erro SUSEP Seguros: {exc}", file=sys.stderr)
                 return 1
 
         elif args.command == "cno":

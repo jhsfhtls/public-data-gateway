@@ -654,6 +654,85 @@ def create_app(settings: GatewaySettings | None = None) -> FastAPI:
             limit=limit, sigla_uf=uf, sort_by_volume=sort_by_volume
         )
 
+    @app.get("/api/v1/finance/susep-seguros/premios/{termo}")
+    async def get_susep_premios(termo: str) -> list[dict[str, Any]]:
+        from public_data_gateway.connectors.macrofinanceiro.susep_seguros import (
+            SusepSegurosConnector,
+        )
+
+        return SusepSegurosConnector(settings=app_settings).get_susep_premios_ramo(termo)
+
+    @app.get("/api/v1/finance/susep-seguros/previdencia/{termo}")
+    async def get_susep_previdencia(termo: str) -> list[dict[str, Any]]:
+        from public_data_gateway.connectors.macrofinanceiro.susep_seguros import (
+            SusepSegurosConnector,
+        )
+
+        return SusepSegurosConnector(settings=app_settings).get_susep_previdencia_vgbl(termo)
+
+    @app.get("/api/v1/finance/susep-seguros/corretoras/{id_municipio_or_name}")
+    async def get_susep_corretoras(id_municipio_or_name: str) -> dict[str, Any]:
+        from public_data_gateway.connectors.macrofinanceiro.susep_seguros import (
+            SusepSegurosConnector,
+        )
+
+        res = SusepSegurosConnector(settings=app_settings).get_susep_corretoras_solvencia(
+            id_municipio_or_name
+        )
+        if res is None:
+            raise HTTPException(
+                status_code=404, detail="SUSEP insurance brokers and solvency not found"
+            )
+        return res
+
+    @app.get("/api/v1/finance/susep-seguros/municipio/{id_municipio_or_name}")
+    async def get_susep_municipio(id_municipio_or_name: str) -> dict[str, Any]:
+        from public_data_gateway.connectors.macrofinanceiro.susep_seguros import (
+            SusepSegurosConnector,
+        )
+
+        res = SusepSegurosConnector(settings=app_settings).get_susep_municipal_summary(
+            id_municipio_or_name
+        )
+        if res is None:
+            raise HTTPException(
+                status_code=404, detail="SUSEP insurance municipal summary not found"
+            )
+        return res
+
+    @app.get("/api/v1/finance/susep-seguros/features/{id_municipio_or_name}")
+    async def get_susep_features_endpoint(id_municipio_or_name: str) -> dict[str, Any]:
+        from public_data_gateway.connectors.macrofinanceiro.susep_seguros import (
+            SusepSegurosConnector,
+        )
+
+        res = SusepSegurosConnector(settings=app_settings).get_susep_features(
+            id_municipio_or_name
+        )
+        if res is None:
+            raise HTTPException(
+                status_code=404, detail="SUSEP Gold insurance market features not found"
+            )
+        return res
+
+    @app.get("/api/v1/finance/susep-seguros/ranking")
+    async def get_susep_ranking(
+        limit: int = Query(10, ge=1, le=50, description="Max municipalities to list"),
+        uf: str | None = Query(None, description="Optional 2-letter state filter"),
+        sort_by_premios: bool = Query(
+            False, description="Sort descending by annual issued insurance premiums (R$ mil)"
+        ),
+    ) -> list[dict[str, Any]]:
+        from public_data_gateway.connectors.macrofinanceiro.susep_seguros import (
+            SusepSegurosConnector,
+        )
+
+        return SusepSegurosConnector(
+            settings=app_settings
+        ).list_top_susep_municipalities(
+            limit=limit, sigla_uf=uf, sort_by_premios=sort_by_premios
+        )
+
     # 12. Foreign Trade & Trade Balance (MDIC Comex Stat)
     @app.get("/api/v1/trade/balance")
     @app.get("/api/v1/comex/balance")
