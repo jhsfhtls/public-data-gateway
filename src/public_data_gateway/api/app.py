@@ -1618,6 +1618,97 @@ def create_app(settings: GatewaySettings | None = None) -> FastAPI:
             limit=limit, sigla_uf=uf, sort_by_spending=sort_by_spending
         )
 
+    # 15E-bis. CGU Benefícios ao Cidadão (Bolsa Família, BPC, Seguro-Defeso & Garantia-Safra)
+    @app.get("/api/v1/compliance/beneficios-cidadao/bolsa-familia/{termo}")
+    async def get_cgu_beneficios_bolsa_familia(termo: str) -> list[dict[str, Any]]:
+        from public_data_gateway.connectors.compliance.cgu_beneficios_cidadao import (
+            CguBeneficiosCidadaoConnector,
+        )
+
+        return CguBeneficiosCidadaoConnector(
+            settings=app_settings
+        ).get_cgu_bolsa_familia_payments(termo)
+
+    @app.get("/api/v1/compliance/beneficios-cidadao/bpc/{termo}")
+    async def get_cgu_beneficios_bpc(termo: str) -> list[dict[str, Any]]:
+        from public_data_gateway.connectors.compliance.cgu_beneficios_cidadao import (
+            CguBeneficiosCidadaoConnector,
+        )
+
+        return CguBeneficiosCidadaoConnector(
+            settings=app_settings
+        ).get_cgu_bpc_loas_benefits(termo)
+
+    @app.get("/api/v1/compliance/beneficios-cidadao/defeso-safra/{id_municipio_or_name}")
+    async def get_cgu_beneficios_defeso_safra(
+        id_municipio_or_name: str,
+    ) -> dict[str, Any]:
+        from public_data_gateway.connectors.compliance.cgu_beneficios_cidadao import (
+            CguBeneficiosCidadaoConnector,
+        )
+
+        res = CguBeneficiosCidadaoConnector(
+            settings=app_settings
+        ).get_cgu_defeso_safra_aid(id_municipio_or_name)
+        if res is None:
+            raise HTTPException(
+                status_code=404, detail="CGU Seguro-Defeso/Safra data not found"
+            )
+        return res
+
+    @app.get("/api/v1/compliance/beneficios-cidadao/municipio/{id_municipio_or_name}")
+    async def get_cgu_beneficios_municipio(
+        id_municipio_or_name: str,
+    ) -> dict[str, Any]:
+        from public_data_gateway.connectors.compliance.cgu_beneficios_cidadao import (
+            CguBeneficiosCidadaoConnector,
+        )
+
+        res = CguBeneficiosCidadaoConnector(
+            settings=app_settings
+        ).get_cgu_beneficios_summary(id_municipio_or_name)
+        if res is None:
+            raise HTTPException(
+                status_code=404, detail="CGU Benefícios municipal summary not found"
+            )
+        return res
+
+    @app.get("/api/v1/compliance/beneficios-cidadao/features/{id_municipio_or_name}")
+    async def get_cgu_beneficios_features(
+        id_municipio_or_name: str,
+    ) -> dict[str, Any]:
+        from public_data_gateway.connectors.compliance.cgu_beneficios_cidadao import (
+            CguBeneficiosCidadaoConnector,
+        )
+
+        res = CguBeneficiosCidadaoConnector(
+            settings=app_settings
+        ).get_cgu_beneficios_features(id_municipio_or_name)
+        if res is None:
+            raise HTTPException(
+                status_code=404,
+                detail="CGU Benefícios Gold social protection features not found",
+            )
+        return res
+
+    @app.get("/api/v1/compliance/beneficios-cidadao/ranking")
+    async def get_cgu_beneficios_ranking(
+        limit: int = Query(10, ge=1, le=50, description="Max municipalities to list"),
+        uf: str | None = Query(None, description="Optional 2-letter state filter"),
+        sort_by_volume: bool = Query(
+            False, description="Sort descending by monthly social transfer volume (R$ mil)"
+        ),
+    ) -> list[dict[str, Any]]:
+        from public_data_gateway.connectors.compliance.cgu_beneficios_cidadao import (
+            CguBeneficiosCidadaoConnector,
+        )
+
+        return CguBeneficiosCidadaoConnector(
+            settings=app_settings
+        ).list_top_cgu_beneficios_municipalities(
+            limit=limit, sigla_uf=uf, sort_by_volume=sort_by_volume
+        )
+
     # 15F. CGU / SIAPE Servidores Federais (Funcionalismo, Folha & Acúmulos)
     @app.get("/api/v1/compliance/servidores-siape/lotacao/{termo}")
     async def get_servidores_siape_lotacao(termo: str) -> list[dict[str, Any]]:

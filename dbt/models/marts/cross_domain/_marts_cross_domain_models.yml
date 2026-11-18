@@ -244,6 +244,15 @@ models:
       - name: avg_score_arrecadacao_rfb_uf
         description: "Média estadual do score de dinâmica de arrecadação RFB e recuperação PGFN (0-100)."
         tests: [not_null]
+      - name: volume_transferencias_sociais_cgu_uf_mil_brl
+        description: "Volume mensal estadual consolidado de transferências sociais CGU ao cidadão (Bolsa Família/BPC/Defeso, R$ mil)."
+        tests: [not_null]
+      - name: familias_bolsa_familia_uf
+        description: "Quantidade total estadual de famílias atendidas pelo Novo Bolsa Família na UF."
+        tests: [not_null]
+      - name: avg_score_protecao_social_cgu_uf
+        description: "Média estadual do score de eficácia de proteção social e integridade CadÚnico CGU (0-100)."
+        tests: [not_null]
       - name: macro_ano_mes_referencia
         description: "Competência macroeconômica de referência (YYYY-MM)."
         tests: [not_null]

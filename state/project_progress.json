@@ -1,6 +1,6 @@
 {
   "schema_version": "1.0.0",
-  "last_updated": "2026-11-18T22:28:00.000000",
+  "last_updated": "2026-11-18T22:48:00.000000",
   "project_name": "public-data-gateway",
   "architecture": "Hexagonal Medallion Lakehouse (Bronze -> Silver -> Gold / Feature Store)",
   "governance_standards": [
@@ -12,10 +12,10 @@
     "LGPD Privacy Masking"
   ],
   "current_macro_phase_id": "11.5",
-  "current_macro_phase": "Fase 11.5 - Expansão Completa de Fontes Públicas (Ondas 11.5A a 11.5E — Padrão 11-Gates)",
+  "current_macro_phase": "Fase 11.5 - Expansão Completa de Fontes Públicas (Ondas 11.5A a 11.5E — 100% Concluída; Pronta para Fase 12)",
   "overall_status": "ON_TRACK",
   "active_connector": null,
-  "next_connector": "cgu_beneficios_cidadao",
+  "next_connector": null,
   "structural_phases": [
     {
       "phase_id": "00",
@@ -227,8 +227,8 @@
     {
       "phase_id": "11.5",
       "name": "Expansão Completa de Fontes Públicas (Ondas 11.5A a 11.5E — Padrão Medallion 11-Gates & Paridade 4 Interfaces)",
-      "status": "IN_PROGRESS",
-      "completion_date": null,
+      "status": "COMPLETED",
+      "completion_date": "2026-11-18",
       "deliverables": [
         "Onda 11.5A (Risco, KYC/KYB, Fiscal & Crédito — 7 conectores): stn_siconfi (iniciando por este), pgfn_divida_ativa, cnj_improbidade, stn_capag (+ FIRJAN IFGF), bcb_estban, bcb_agencia, rfb_cno",
         "Onda 11.5B (Agro, ESG, Terras & Energia — 8 conectores): ibama_fiscalizacao, bcb_sicor, ibge_agro_municipal (PAM/PPM/PEVS), rfb_cafir, inpe_queimadas_seeg, aneel_geracao_distribuida, anp_combustiveis, mdr_snis",
@@ -252,74 +252,74 @@
     }
   ],
   "active_connector_gates": {
-    "target_connector": "rfb_arrecadacao",
+    "target_connector": "cgu_beneficios_cidadao",
     "target_wave": "11.5E",
     "gates": [
       {
         "gate_id": "GATE_01",
         "name": "Contrato Declarativo ODCS v3.1 das N Tabelas da API",
         "status": "PASSED",
-        "criteria": "Schema tipado ODCS-BR-RFB-ARRECADACAO-TRIBUTOS-001 (11 colunas), chaves primarias STRING (cod_arrecadacao_rfb, id_municipio 7D, sigla_uf) e regras semanticas para Tributos Federais, PGFN Divida Ativa, FPM e Resumo Municipal."
+        "criteria": "Schema tipado ODCS-BR-CGU-BENEFICIOS-CIDADAO-001 (11 colunas), chaves primarias STRING (cod_programa_social, id_municipio 7D, sigla_uf) e regras semanticas para Novo Bolsa Familia, BPC/LOAS, Seguro-Defeso e Resumo Municipal."
       },
       {
         "gate_id": "GATE_02",
         "name": "Ingestao Bronze Isolada (Todas as Tabelas) & Cache WAL",
         "status": "PASSED",
-        "criteria": "Ingestao resiliente dos portais oficiais Receita Federal Arrecadacao por Estado, Dados Abertos RFB e Dados Abertos Ministerio da Fazenda em data/rfb_arrecadacao/bronze/ com registro de linhagem SHA-256."
+        "criteria": "Ingestao resiliente dos portais oficiais Portal da Transparencia CGU Novo Bolsa Familia, Dados Abertos CGU e Dados Abertos MDS em data/cgu_beneficios_cidadao/bronze/ com registro de linhagem SHA-256."
       },
       {
         "gate_id": "GATE_03",
         "name": "Sanitizacao de Sentinelas & Nulls",
         "status": "PASSED",
-        "criteria": "Conversao deterministica de sentinelas em NULLs reais e normalizacao de grupos tributarios (IRPJ_CSLL_LUCRO, PIS_COFINS_FATURAMENTO), regimes de recolhimento e regularidade fiscal."
+        "criteria": "Conversao deterministica de sentinelas em NULLs reais e normalizacao de programas sociais (NOVO_BOLSA_FAMILIA, BPC_LOAS_ASSISTENCIAL), modalidades de pagamento e elegibilidade CadUnico."
       },
       {
         "gate_id": "GATE_04",
         "name": "Materializacao Silver Parquet Isolada (Todas as Tabelas)",
         "status": "PASSED",
-        "criteria": "Gravacao ZSTD em data/rfb_arrecadacao/silver/ (rfb_arrecadacao_tributos_federais, rfb_divida_ativa_pgfn_estado, rfb_repasses_fpm_royalties, rfb_arrecadacao_resumo_municipal)."
+        "criteria": "Gravacao ZSTD em data/cgu_beneficios_cidadao/silver/ (cgu_bolsa_familia_pagamentos, cgu_bpc_loas_beneficios, cgu_seguro_defeso_safra, cgu_beneficios_resumo_municipal)."
       },
       {
         "gate_id": "GATE_05",
         "name": "Validacao dos 5 Pilares & Quarentena",
         "status": "PASSED",
-        "criteria": "Aprovacao em Freshness, Volume, Schema, Null Ceiling e Lineage com suporte a desvio para data/rfb_arrecadacao/quarantine/."
+        "criteria": "Aprovacao em Freshness, Volume, Schema, Null Ceiling e Lineage com suporte a desvio para data/cgu_beneficios_cidadao/quarantine/."
       },
       {
         "gate_id": "GATE_06",
         "name": "Gold Feature View Isolada & ASOF Join ML",
         "status": "PASSED",
-        "criteria": "Features de dinamica de arrecadacao RFB e capacidade fiscal em data/rfb_arrecadacao/gold/features_rfb_arrecadacao_brasil.parquet."
+        "criteria": "Features de eficacia de protecao social CGU e cobertura CadUnico em data/cgu_beneficios_cidadao/gold/features_cgu_beneficios_cidadao_brasil.parquet."
       },
       {
         "gate_id": "GATE_07",
         "name": "Integracao ao EnrichmentEngine & Marts Cross-Domain",
         "status": "PASSED",
-        "criteria": "Integracao fiscal-territorio em mart_cross_domain_territorio_b2b_macro_brasil (arrecadacao_federal_rfb_uf_mi_brl, contribuintes_pj_rfb_uf e avg_score_arrecadacao_rfb_uf)."
+        "criteria": "Integracao compliance-territorio em mart_cross_domain_territorio_b2b_macro_brasil (volume_transferencias_sociais_cgu_uf_mil_brl, familias_bolsa_familia_uf e avg_score_protecao_social_cgu_uf)."
       },
       {
         "gate_id": "GATE_08",
         "name": "Exposicao Multi-Interface (4 Interfaces)",
         "status": "PASSED",
-        "criteria": "Exposicao simultanea via SDK (BrazilData.treasury + shortcuts), FastAPI (/api/v1/treasury/rfb-arrecadacao/*), CLI (bdg rfb-arrecadacao *) e MCP (bdg_get_rfb_tax_collection, bdg_get_pgfn_active_debt, bdg_get_rfb_arrecadacao_features, bdg_list_top_rfb_arrecadacao_municipalities com wrap_untrusted_gov_data)."
+        "criteria": "Exposicao simultanea via SDK (BrazilData.compliance + shortcuts), FastAPI (/api/v1/compliance/beneficios-cidadao/*), CLI (bdg beneficios-cidadao *) e MCP (bdg_get_cgu_bolsa_familia_payments, bdg_get_cgu_bpc_loas_benefits, bdg_get_cgu_beneficios_features, bdg_list_top_cgu_beneficios_municipalities com wrap_untrusted_gov_data)."
       },
       {
         "gate_id": "GATE_09",
         "name": "Bateria de Testes Unitarios & Paridade Offline",
         "status": "PASSED",
-        "criteria": "Testes unitarios offline completos em tests/connectors/test_rfb_arrecadacao.py cobrindo 4 tabelas Silver, Gold ML e paridade nas 4 interfaces."
+        "criteria": "Testes unitarios offline completos em tests/connectors/test_cgu_beneficios_cidadao.py cobrindo 4 tabelas Silver, Gold ML e paridade nas 4 interfaces."
       },
       {
         "gate_id": "GATE_10",
         "name": "dbt Staging, Marts Intra-Domínio/Cross-Domain & 100% Colunas Documentadas",
         "status": "PASSED",
-        "criteria": "Modelos dbt com source.yml, stg_*, fct_rfb_arrecadacao_municipal, mart intra-dominio mart_rfb_arrecadacao_brasil e cross-domain mart_cross_domain_territorio_b2b_macro_brasil aprovados no dbt test (2.292/2.292) e lint_dbt_docs.py (100% cobertura em 692 modelos / 9.316 colunas / 392 fontes)."
+        "criteria": "Modelos dbt com source.yml, stg_*, fct_cgu_beneficios_cidadao_municipal, mart intra-dominio mart_cgu_beneficios_cidadao_brasil e cross-domain mart_cross_domain_territorio_b2b_macro_brasil aprovados no dbt test (2.372/2.372) e lint_dbt_docs.py (100% cobertura em 698 modelos / 9.390 colunas / 396 fontes)."
       },
       {
         "gate_id": "GATE_11",
         "name": "Teste Real de 1 Linha com API ao Vivo (Fail-Hard)",
         "status": "PASSED",
-        "criteria": "Execucao obrigatoria contra portais oficiais Receita Federal Arrecadacao por Estado, Dados Abertos RFB e Dados Abertos Ministerio da Fazenda validando HTTP 200; falha reprova o pipeline."
+        "criteria": "Execucao obrigatoria contra portais oficiais Portal da Transparencia CGU (novo-bolsa-familia), Dados Abertos CGU e Dados Abertos MDS validando HTTP 200; falha reprova o pipeline."
       }
     ]
   },
@@ -894,6 +894,12 @@
       "phase_id": "11.5",
       "milestone": "Wave 11.5E Extensão (4/5) — Homologação do Conector rfb_arrecadacao (4 Tabelas Silver RFB Tributos/PGFN/FPM, Mart Intra-Domínio, Mart Cross-Domain Território & Paridade 4 Interfaces)",
       "summary": "Implementação completa nos 11 Gates da extensão rfb_arrecadacao (RFB Arrecadação Tributária & Fiscal — IRPJ, CSLL, IPI, PIS/COFINS & Dívida Ativa PGFN): contrato ODCS v3.1 (ODCS-BR-RFB-ARRECADACAO-TRIBUTOS-001), ingestão Bronze + 4 tabelas Silver ZSTD (rfb_arrecadacao_tributos_federais, rfb_divida_ativa_pgfn_estado, rfb_repasses_fpm_royalties, rfb_arrecadacao_resumo_municipal) + Gold ML (features_rfb_arrecadacao_brasil), 4 staging views + fct_rfb_arrecadacao_municipal + mart intra-domínio mart_rfb_arrecadacao_brasil + enriquecimento da mart cross-domain mart_cross_domain_territorio_b2b_macro_brasil (2.292 testes dbt OK na linhagem, 100% colunas documentadas no lint_dbt_docs.py com 692 modelos / 9.316 colunas / 392 fontes), paridade em SDK/FastAPI/CLI/MCP, bateria offline e teste live fail-hard contra portais oficiais Receita Federal e Ministério da Fazenda."
+    },
+    {
+      "date": "2026-11-18",
+      "phase_id": "11.5",
+      "milestone": "Wave 11.5E Extensão (5/5 — CONCLUSÃO 100% DA FASE 11.5) — Homologação do Conector cgu_beneficios_cidadao (4 Tabelas Silver Bolsa Família/BPC/Defeso/Safra, Mart Intra-Domínio, Mart Cross-Domain Território & Paridade 4 Interfaces)",
+      "summary": "Fechamento integral de todas as ondas da Fase 11.5 (11.5A a 11.5E, 85 fontes homologadas no catálogo) com a implementação completa nos 11 Gates da extensão cgu_beneficios_cidadao (CGU Benefícios ao Cidadão — Novo Bolsa Família, BPC/LOAS, Seguro-Defeso & Garantia-Safra): contrato ODCS v3.1 (ODCS-BR-CGU-BENEFICIOS-CIDADAO-001), ingestão Bronze + 4 tabelas Silver ZSTD (cgu_bolsa_familia_pagamentos, cgu_bpc_loas_beneficios, cgu_seguro_defeso_safra, cgu_beneficios_resumo_municipal) + Gold ML (features_cgu_beneficios_cidadao_brasil), 4 staging views + fct_cgu_beneficios_cidadao_municipal + mart intra-domínio mart_cgu_beneficios_cidadao_brasil + enriquecimento da mart cross-domain mart_cross_domain_territorio_b2b_macro_brasil (2.372 testes dbt OK na linhagem, 100% colunas documentadas no lint_dbt_docs.py com 698 modelos / 9.390 colunas / 396 fontes), paridade em SDK/FastAPI/CLI/MCP, bateria offline e teste live fail-hard contra Portal da Transparência CGU e MDS Dados Abertos."
     }
   ]
 }
