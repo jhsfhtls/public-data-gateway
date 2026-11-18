@@ -3927,6 +3927,78 @@ def create_app(settings: GatewaySettings | None = None) -> FastAPI:
             limit=limit, sigla_uf=uf, sort_by_damages=sort_by_damages
         )
 
+    # MME / ONS Energia (Sistema Interligado Nacional & Segurança Energética)
+    @app.get("/api/v1/environment/sistema-eletrico/geracao/{termo}")
+    async def get_sistema_eletrico_geracao(termo: str) -> list[dict[str, Any]]:
+        from public_data_gateway.connectors.ambiental.mme_ons_energia import (
+            MmeOnsEnergiaConnector,
+        )
+
+        conn = MmeOnsEnergiaConnector(settings=app_settings)
+        return conn.get_ons_generation_capacity(termo)
+
+    @app.get("/api/v1/environment/sistema-eletrico/balanco/{termo}")
+    async def get_sistema_eletrico_balanco(termo: str) -> list[dict[str, Any]]:
+        from public_data_gateway.connectors.ambiental.mme_ons_energia import (
+            MmeOnsEnergiaConnector,
+        )
+
+        conn = MmeOnsEnergiaConnector(settings=app_settings)
+        return conn.get_ons_load_balance(termo)
+
+    @app.get("/api/v1/environment/sistema-eletrico/rede/{id_municipio_or_name}")
+    async def get_sistema_eletrico_rede(id_municipio_or_name: str) -> dict[str, Any]:
+        from public_data_gateway.connectors.ambiental.mme_ons_energia import (
+            MmeOnsEnergiaConnector,
+        )
+
+        conn = MmeOnsEnergiaConnector(settings=app_settings)
+        res = conn.get_mme_grid_security(id_municipio_or_name)
+        if res is None:
+            raise HTTPException(status_code=404, detail="MME/ONS grid security metrics not found")
+        return res
+
+    @app.get("/api/v1/environment/sistema-eletrico/municipio/{id_municipio_or_name}")
+    async def get_sistema_eletrico_municipio(id_municipio_or_name: str) -> dict[str, Any]:
+        from public_data_gateway.connectors.ambiental.mme_ons_energia import (
+            MmeOnsEnergiaConnector,
+        )
+
+        conn = MmeOnsEnergiaConnector(settings=app_settings)
+        res = conn.get_ons_municipal_summary(id_municipio_or_name)
+        if res is None:
+            raise HTTPException(status_code=404, detail="ONS municipal summary not found")
+        return res
+
+    @app.get("/api/v1/environment/sistema-eletrico/features/{id_municipio_or_name}")
+    async def get_sistema_eletrico_features(id_municipio_or_name: str) -> dict[str, Any]:
+        from public_data_gateway.connectors.ambiental.mme_ons_energia import (
+            MmeOnsEnergiaConnector,
+        )
+
+        conn = MmeOnsEnergiaConnector(settings=app_settings)
+        res = conn.get_ons_features(id_municipio_or_name)
+        if res is None:
+            raise HTTPException(status_code=404, detail="ONS Gold energy security features not found")
+        return res
+
+    @app.get("/api/v1/environment/sistema-eletrico/ranking")
+    async def get_sistema_eletrico_ranking(
+        limit: int = Query(10, ge=1, le=50, description="Max municipalities to list"),
+        uf: str | None = Query(None, description="Optional 2-letter state filter"),
+        sort_by_renewable: bool = Query(
+            False, description="Sort descending by renewable generation share (%)"
+        ),
+    ) -> list[dict[str, Any]]:
+        from public_data_gateway.connectors.ambiental.mme_ons_energia import (
+            MmeOnsEnergiaConnector,
+        )
+
+        conn = MmeOnsEnergiaConnector(settings=app_settings)
+        return conn.list_top_ons_energy_municipalities(
+            limit=limit, sigla_uf=uf, sort_by_renewable=sort_by_renewable
+        )
+
     @app.get("/api/v1/metaportals/datalake/top-municipalities")
     async def get_top_bd_municipalities(
         limit: int = Query(10, ge=1, le=50, description="Max municipalities to list"),

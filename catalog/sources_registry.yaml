@@ -1966,3 +1966,32 @@ sources:
   status: HOMOLOGATED
   freshness_sla_hours: 720
   cron_schedule_expression: 0 6 15 * *
+- source_id: mme_ons_energia
+  name: 'MME / ONS Energia: Sistema Interligado Nacional, Balanço & Segurança Energética'
+  agency: Operador Nacional do Sistema Elétrico (ONS) & Ministério de Minas e Energia (MME)
+  official_url: https://dados.ons.org.br
+  segment_id: 11_agronegocio_meio_ambiente
+  segment_name: Agronegócio, Meio Ambiente & Clima
+  access_mode: LAKEHOUSE_BATCH
+  protocol: HTTP_BULK_ZIP
+  auth_type: NONE
+  canonical_keys:
+  - id_municipio
+  - sigla_uf
+  update_frequency: Diária (Operação SIN / Carga & EAR) / Mensal (Capacidade Instalada)
+  estimated_volume: ~5.570 municípios com capacidade instalada SIN, subsistemas e renováveis (~290 MB)
+  lgpd_tier: PUBLIC_NON_PERSONAL
+  ml_feature_domains:
+  - sin_grid_energy_security_score
+  - renewable_power_generation_share
+  - marginal_operating_cost_cmo_brl
+  solution_packs:
+  - P02
+  - P05
+  - P06
+  - P08
+  rice_score: 880
+  roadmap_wave: 2
+  status: HOMOLOGATED
+  freshness_sla_hours: 168
+  cron_schedule_expression: 0 5 * * 1

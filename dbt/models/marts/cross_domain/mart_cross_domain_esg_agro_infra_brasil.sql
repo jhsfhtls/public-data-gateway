@@ -143,6 +143,15 @@ sedec_desastres AS (
     FROM {{ ref('mart_desastres_defesa_civil_sedec_brasil') }}
 ),
 
+ons_energia AS (
+    SELECT
+        id_municipio,
+        potencia_instalada_sin_mw,
+        geracao_renovavel_sin_pct,
+        score_seguranca_energetica_ons
+    FROM {{ ref('mart_seguranca_energetica_ons_brasil') }}
+),
+
 joined AS (
     SELECT
         t.id_municipio,
@@ -198,6 +207,9 @@ joined AS (
         COALESCE(sd.qtd_desastres_s2id_5a, 0) AS qtd_desastres_s2id_5a,
         COALESCE(sd.prejuizos_desastres_mil_brl, 0.0) AS prejuizos_desastres_mil_brl,
         COALESCE(sd.score_resiliencia_desastres_sedec, 70.0) AS score_resiliencia_desastres_sedec,
+        COALESCE(onse.potencia_instalada_sin_mw, 0.0) AS potencia_instalada_sin_mw,
+        COALESCE(onse.geracao_renovavel_sin_pct, 80.0) AS geracao_renovavel_sin_pct,
+        COALESCE(onse.score_seguranca_energetica_ons, 75.0) AS score_seguranca_energetica_ons,
         t.reference_date
     FROM terra t
     LEFT JOIN sicar s ON t.id_municipio = s.id_municipio
@@ -213,6 +225,7 @@ joined AS (
     LEFT JOIN anp_comb anp ON t.id_municipio = anp.id_municipio
     LEFT JOIN snis_saneamento sn ON t.id_municipio = sn.id_municipio
     LEFT JOIN sedec_desastres sd ON t.id_municipio = sd.id_municipio
+    LEFT JOIN ons_energia onse ON t.id_municipio = onse.id_municipio
 ),
 
 scored AS (

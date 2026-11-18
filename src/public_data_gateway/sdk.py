@@ -2695,6 +2695,60 @@ class EnvironmentFacade:
             limit=limit, sigla_uf=sigla_uf, sort_by_damages=sort_by_damages
         )
 
+    @property
+    def mme_ons_energia_connector(self) -> Any:
+        if (
+            not hasattr(self, "_mme_ons_energia_connector")
+            or self._mme_ons_energia_connector is None
+        ):
+            from public_data_gateway.connectors.ambiental.mme_ons_energia import (
+                MmeOnsEnergiaConnector,
+            )
+
+            self._mme_ons_energia_connector = MmeOnsEnergiaConnector(
+                settings=self._sdk.settings
+            )
+        return self._mme_ons_energia_connector
+
+    def get_ons_generation_capacity(self, termo: str) -> list[dict[str, Any]]:
+        """Lookup SIN power plants by ONS code, CEG, source, subsystem, IBGE, UF, or city."""
+        return self.mme_ons_energia_connector.get_ons_generation_capacity(termo)
+
+    def get_ons_load_balance(self, termo: str) -> list[dict[str, Any]]:
+        """Lookup ONS subsystem energy load, stored energy EAR (%), and CMO by code, subsystem, IBGE, UF, or city."""
+        return self.mme_ons_energia_connector.get_ons_load_balance(termo)
+
+    def get_mme_grid_security(
+        self, id_municipio_or_name: str
+    ) -> dict[str, Any] | None:
+        """Retrieve municipal MME/ONS high-voltage substations, DEC continuity, and SIN availability."""
+        return self.mme_ons_energia_connector.get_mme_grid_security(
+            id_municipio_or_name
+        )
+
+    def get_ons_municipal_summary(
+        self, id_municipio_or_name: str
+    ) -> dict[str, Any] | None:
+        """Retrieve consolidated municipal SIN installed MW, renewable share, and energy load."""
+        return self.mme_ons_energia_connector.get_ons_municipal_summary(
+            id_municipio_or_name
+        )
+
+    def get_ons_features(self, id_municipio_or_name: str) -> dict[str, Any] | None:
+        """Retrieve Gold MME/ONS energy security score and SIN dispatch tier."""
+        return self.mme_ons_energia_connector.get_ons_features(id_municipio_or_name)
+
+    def list_top_ons_energy_municipalities(
+        self,
+        limit: int = 10,
+        sigla_uf: str | None = None,
+        sort_by_renewable: bool = False,
+    ) -> list[dict[str, Any]]:
+        """List municipalities ranked by MME/ONS energy security score or renewable share (%)."""
+        return self.mme_ons_energia_connector.list_top_ons_energy_municipalities(
+            limit=limit, sigla_uf=sigla_uf, sort_by_renewable=sort_by_renewable
+        )
+
 
 class MetaportalsFacade:
     """Sub-facade for Metaportals & Aggregator Hubs (Datalake Federado SQL, Dados.gov.br CKAN)."""
@@ -4958,6 +5012,41 @@ class BrazilData:
         """Listar municípios ranqueados por resiliência a desastres SEDEC ou maiores prejuízos econômicos."""
         return self.environment.list_top_resilient_sedec_municipalities(
             limit=limit, sigla_uf=sigla_uf, sort_by_damages=sort_by_damages
+        )
+
+    def get_ons_generation_capacity(self, termo: str) -> list[dict[str, Any]]:
+        """Consultar usinas e capacidade instalada no Sistema Interligado Nacional ONS por código, CEG, fonte, IBGE, UF ou cidade."""
+        return self.environment.get_ons_generation_capacity(termo)
+
+    def get_ons_load_balance(self, termo: str) -> list[dict[str, Any]]:
+        """Consultar balanço de carga elétrica, energia armazenada EAR (%) e CMO ONS por código, subsistema, IBGE, UF ou cidade."""
+        return self.environment.get_ons_load_balance(termo)
+
+    def get_mme_grid_security(
+        self, id_municipio_or_name: str
+    ) -> dict[str, Any] | None:
+        """Consultar subestações de alta tensão MME/ONS, continuidade DEC e disponibilidade da rede SIN."""
+        return self.environment.get_mme_grid_security(id_municipio_or_name)
+
+    def get_ons_municipal_summary(
+        self, id_municipio_or_name: str
+    ) -> dict[str, Any] | None:
+        """Consultar consolidado municipal de potência SIN, geração renovável e demanda média."""
+        return self.environment.get_ons_municipal_summary(id_municipio_or_name)
+
+    def get_ons_features(self, id_municipio_or_name: str) -> dict[str, Any] | None:
+        """Consultar features Gold MME/ONS de segurança energética e tier de despacho renovável SIN."""
+        return self.environment.get_ons_features(id_municipio_or_name)
+
+    def list_top_ons_energy_municipalities(
+        self,
+        limit: int = 10,
+        sigla_uf: str | None = None,
+        sort_by_renewable: bool = False,
+    ) -> list[dict[str, Any]]:
+        """Listar municípios ranqueados por segurança energética MME/ONS ou participação renovável SIN (%)."""
+        return self.environment.list_top_ons_energy_municipalities(
+            limit=limit, sigla_uf=sigla_uf, sort_by_renewable=sort_by_renewable
         )
 
     def get_bd_coverage(self, id_municipio: str) -> dict[str, Any]:

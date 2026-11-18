@@ -1,0 +1,181 @@
+version: 2
+
+models:
+  - name: stg_ons_capacidade_geracao_municipio
+    description: "Staging view tipada das usinas e conjuntos geradores sincronizados no Sistema Interligado Nacional (ONS)."
+    columns:
+      - name: cod_usina_ons
+        description: "Identificador único da usina no cadastro operacional do ONS (STRING)."
+        tests: [not_null, unique]
+      - name: ceg_aneel
+        description: "Código Único de Empreendimento de Geração (CEG ANEEL)."
+        tests: [not_null]
+      - name: nome_usina_ons
+        description: "Nome oficial da usina ou complexo gerador no SIN."
+        tests: [not_null]
+      - name: fonte_geracao_sin
+        description: "Fonte energética primária (HIDROELETRICA, EOLICA, SOLAR_FOTOVOLTAICA, TERMICA_BIOMASSA)."
+        tests: [not_null]
+      - name: subsistema_sin
+        description: "Subsistema elétrico do SIN (SUDESTE_CENTRO_OESTE, SUL, NORDESTE ou NORTE)."
+        tests: [not_null]
+      - name: id_municipio
+        description: "Código IBGE de 7 dígitos do município (STRING)."
+        tests: [not_null]
+      - name: sigla_uf
+        description: "Sigla de 2 letras da Unidade Federativa (UF)."
+        tests: [not_null]
+      - name: nome_municipio
+        description: "Nome oficial do município."
+        tests: [not_null]
+      - name: regiao
+        description: "Macrorregião geográfica brasileira."
+        tests: [not_null]
+      - name: capacidade_instalada_mw
+        description: "Capacidade instalada sincronizada da usina em megawatts (MW)."
+        tests: [not_null]
+      - name: geracao_media_verificada_mwmed
+        description: "Geração média anual verificada pelo ONS em megawatts médios (MWmed)."
+        tests: [not_null]
+
+  - name: stg_ons_balanco_carga_subsistema_uf
+    description: "Staging view tipada do balanço energético, carga elétrica, EAR (%) e Custo Marginal de Operação (CMO) no SIN."
+    columns:
+      - name: cod_balanco_ons
+        description: "Identificador único do registro de balanço energético municipal ONS (STRING)."
+        tests: [not_null, unique]
+      - name: id_municipio
+        description: "Código IBGE de 7 dígitos do município (STRING)."
+        tests: [not_null]
+      - name: sigla_uf
+        description: "Sigla de 2 letras da Unidade Federativa (UF)."
+        tests: [not_null]
+      - name: nome_municipio
+        description: "Nome oficial do município."
+        tests: [not_null]
+      - name: subsistema_sin
+        description: "Subsistema geoelétrico do Sistema Interligado Nacional."
+        tests: [not_null]
+      - name: carga_energia_mwmed
+        description: "Carga média de demanda elétrica no município/subsistema em MWmed."
+        tests: [not_null]
+      - name: ear_energia_armazenada_pct
+        description: "Percentual de Energia Armazenada (EAR) nos reservatórios do subsistema (%)."
+        tests: [not_null]
+      - name: fator_capacidade_renovavel_pct
+        description: "Fator médio de capacidade das usinas renováveis despachadas (%)."
+        tests: [not_null]
+      - name: cmo_medio_brl_mwh
+        description: "Custo Marginal de Operação médio anual do subsistema (BRL/MWh)."
+        tests: [not_null]
+
+  - name: stg_mme_intercambio_seguranca_energetica
+    description: "Staging view tipada de infraestrutura de transmissão básica, subestações, DEC e confiabilidade elétrica MME/ONS."
+    columns:
+      - name: id_municipio
+        description: "Código IBGE de 7 dígitos do município (STRING)."
+        tests: [not_null, unique]
+      - name: sigla_uf
+        description: "Sigla de 2 letras da Unidade Federativa (UF)."
+        tests: [not_null]
+      - name: nome_municipio
+        description: "Nome oficial do município."
+        tests: [not_null]
+      - name: subestacoes_alta_tensao
+        description: "Quantidade de subestações de alta tensão atendendo o polo municipal."
+        tests: [not_null]
+      - name: linhas_transmissao_km
+        description: "Extensão equivalente de linhas da Rede Básica associadas ao nó regional (km)."
+        tests: [not_null]
+      - name: indice_continuidade_dec_horas
+        description: "Duração Equivalente de Interrupção por Unidade Consumidora anual (DEC em horas)."
+        tests: [not_null]
+      - name: disponibilidade_rede_sin_pct
+        description: "Percentual de disponibilidade operacional das linhas e subestações SIN (%)."
+        tests: [not_null]
+
+  - name: stg_ons_energia_resumo_municipal
+    description: "Staging view tipada do consolidado municipal de capacidade instalada SIN, matriz renovável e demanda."
+    columns:
+      - name: id_municipio
+        description: "Código IBGE de 7 dígitos do município (STRING)."
+        tests: [not_null, unique]
+      - name: sigla_uf
+        description: "Sigla de 2 letras da Unidade Federativa (UF)."
+        tests: [not_null]
+      - name: nome_municipio
+        description: "Nome oficial do município."
+        tests: [not_null]
+      - name: regiao
+        description: "Macrorregião geográfica brasileira."
+        tests: [not_null]
+      - name: subsistema_sin
+        description: "Subsistema do Sistema Interligado Nacional correspondente."
+        tests: [not_null]
+      - name: potencia_instalada_sin_mw
+        description: "Capacidade total instalada vinculada ao município no SIN (MW)."
+        tests: [not_null]
+      - name: geracao_renovavel_sin_pct
+        description: "Participação de fontes renováveis na geração verificada do polo (%)."
+        tests: [not_null]
+      - name: carga_energia_mwmed
+        description: "Carga elétrica demandada média em MWmed."
+        tests: [not_null]
+      - name: fator_capacidade_renovavel_pct
+        description: "Fator de capacidade renovável médio verificado (%)."
+        tests: [not_null]
+
+  - name: fct_energia_eletrica_mme_ons_municipal
+    description: "Fato Silver municipal consolidando geração centralizada ONS, energia armazenada (EAR), CMO, subestações e disponibilidade do SIN."
+    columns:
+      - name: id_municipio
+        description: "Código IBGE de 7 dígitos do município (STRING)."
+        tests: [not_null, unique]
+      - name: sigla_uf
+        description: "Sigla de 2 letras da Unidade Federativa (UF)."
+        tests: [not_null]
+      - name: nome_municipio
+        description: "Nome oficial do município."
+        tests: [not_null]
+      - name: regiao
+        description: "Macrorregião geográfica brasileira."
+        tests: [not_null]
+      - name: subsistema_sin
+        description: "Subsistema geoelétrico do SIN (SUDESTE_CENTRO_OESTE, SUL, NORDESTE ou NORTE)."
+        tests: [not_null]
+      - name: potencia_instalada_sin_mw
+        description: "Capacidade total instalada conectada ao SIN no município (MW)."
+        tests: [not_null]
+      - name: geracao_renovavel_sin_pct
+        description: "Participação percentual de geração renovável limpa na matriz do polo (%)."
+        tests: [not_null]
+      - name: carga_energia_mwmed
+        description: "Carga média demandada de energia elétrica (MWmed)."
+        tests: [not_null]
+      - name: fator_capacidade_renovavel_pct
+        description: "Fator médio de capacidade de geração renovável (%)."
+        tests: [not_null]
+      - name: qtd_complexos_geracao_ons
+        description: "Quantidade de complexos geradores SIN consolidados na camada Silver."
+        tests: [not_null]
+      - name: geracao_verificada_total_mwmed
+        description: "Soma da geração elétrica média verificada nos complexos municipais (MWmed)."
+        tests: [not_null]
+      - name: ear_energia_armazenada_pct
+        description: "Energia Armazenada (EAR) média dos reservatórios equivalentes do subsistema (%)."
+        tests: [not_null]
+      - name: cmo_medio_brl_mwh
+        description: "Custo Marginal de Operação médio do subsistema no horizonte anual (BRL/MWh)."
+        tests: [not_null]
+      - name: subestacoes_alta_tensao
+        description: "Quantidade de subestações de transmissão em alta tensão no polo."
+        tests: [not_null]
+      - name: linhas_transmissao_km
+        description: "Extensão em km das linhas da Rede Básica associadas."
+        tests: [not_null]
+      - name: indice_continuidade_dec_horas
+        description: "Indicador médio anual de duração de interrupções elétricas (DEC em horas)."
+        tests: [not_null]
+      - name: disponibilidade_rede_sin_pct
+        description: "Disponibilidade operacional média da rede de transmissão SIN (%)."
+        tests: [not_null]

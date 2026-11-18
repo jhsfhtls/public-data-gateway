@@ -2778,6 +2778,69 @@ class MCPDispatcher:
                                 },
                             },
                             {
+                                "name": "bdg_get_mme_ons_geracao_sin",
+                                "description": "Lookup National Interconnected System (SIN) power plants by ONS code, CEG, source, subsystem, IBGE, UF, or city.",
+                                "inputSchema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "termo": {
+                                            "type": "string",
+                                            "description": "ONS code, CEG, energy source, subsystem, IBGE 7-digit code, UF, or municipality name",
+                                        }
+                                    },
+                                    "required": ["termo"],
+                                },
+                            },
+                            {
+                                "name": "bdg_get_mme_ons_balanco_carga",
+                                "description": "Lookup ONS subsystem electrical load (MWmed), reservoir stored energy EAR (%), and CMO by code, subsystem, IBGE, UF, or city.",
+                                "inputSchema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "termo": {
+                                            "type": "string",
+                                            "description": "Balance code, subsystem, IBGE 7-digit code, UF, or municipality name",
+                                        }
+                                    },
+                                    "required": ["termo"],
+                                },
+                            },
+                            {
+                                "name": "bdg_get_mme_ons_features",
+                                "description": "Get normalized Gold MME/ONS energy security score, installed SIN MW, renewable share, and grid tier.",
+                                "inputSchema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "id_municipio_or_name": {
+                                            "type": "string",
+                                            "description": "7-digit IBGE municipality code or municipality name",
+                                        }
+                                    },
+                                    "required": ["id_municipio_or_name"],
+                                },
+                            },
+                            {
+                                "name": "bdg_list_top_mme_ons_municipalities",
+                                "description": "List Brazilian municipalities ranked by MME/ONS energy security score or SIN renewable generation share (%).",
+                                "inputSchema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "limit": {
+                                            "type": "integer",
+                                            "description": "Maximum rows (default: 10)",
+                                        },
+                                        "sigla_uf": {
+                                            "type": "string",
+                                            "description": "Optional 2-letter state filter (e.g. CE)",
+                                        },
+                                        "sort_by_renewable": {
+                                            "type": "boolean",
+                                            "description": "Set true to rank municipalities by highest renewable generation share (%) first",
+                                        },
+                                    },
+                                },
+                            },
+                            {
                                 "name": "bdg_get_bd_coverage",
                                 "description": "Get official Federated Public Datalake (DuckDB / BigQuery) municipal treated dataset and table coverage metrics.",
                                 "inputSchema": {
@@ -6683,6 +6746,67 @@ class MCPDispatcher:
                     },
                 }
             wrapped = wrap_untrusted_gov_data(result, source_id="sedec_desastres")
+            return {
+                "jsonrpc": "2.0",
+                "id": req_id,
+                "result": {"content": [{"type": "text", "text": wrapped}], "isError": False},
+            }
+
+        if tool_name in {
+            "bdg_get_mme_ons_geracao_sin",
+            "bdg_get_mme_ons_balanco_carga",
+            "bdg_get_mme_ons_features",
+            "bdg_list_top_mme_ons_municipalities",
+        }:
+            from public_data_gateway.connectors.ambiental.mme_ons_energia import (
+                MmeOnsEnergiaConnector,
+            )
+
+            connector = MmeOnsEnergiaConnector(settings=self.settings)
+            try:
+                if tool_name == "bdg_get_mme_ons_geracao_sin":
+                    result: Any = connector.get_ons_generation_capacity(
+                        str(args.get("termo", ""))
+                    )
+                elif tool_name == "bdg_get_mme_ons_balanco_carga":
+                    result = connector.get_ons_load_balance(str(args.get("termo", "")))
+                elif tool_name == "bdg_get_mme_ons_features":
+                    result = connector.get_ons_features(
+                        str(args.get("id_municipio_or_name", ""))
+                    )
+                else:
+                    result = connector.list_top_ons_energy_municipalities(
+                        limit=int(args.get("limit", 10)),
+                        sigla_uf=args.get("sigla_uf"),
+                        sort_by_renewable=bool(args.get("sort_by_renewable", False)),
+                    )
+            except (ValueError, KeyError) as exc:
+                return {
+                    "jsonrpc": "2.0",
+                    "id": req_id,
+                    "result": {
+                        "content": [
+                            {"type": "text", "text": f"MME/ONS Energia parameter error: {exc}"}
+                        ],
+                        "isError": True,
+                    },
+                }
+
+            if not result:
+                return {
+                    "jsonrpc": "2.0",
+                    "id": req_id,
+                    "result": {
+                        "content": [
+                            {
+                                "type": "text",
+                                "text": "No MME/ONS energy data found for the query.",
+                            }
+                        ],
+                        "isError": True,
+                    },
+                }
+            wrapped = wrap_untrusted_gov_data(result, source_id="mme_ons_energia")
             return {
                 "jsonrpc": "2.0",
                 "id": req_id,
