@@ -3455,6 +3455,76 @@ def create_app(settings: GatewaySettings | None = None) -> FastAPI:
         conn = InpeQueimadasSeegConnector(settings=app_settings)
         return conn.list_top_municipalities(limit=limit, sigla_uf=uf, sort_by_emissions=sort_by_emissions)
 
+    # ANEEL Geração Distribuída (MMGD)
+    @app.get("/api/v1/environment/mmgd/empreendimentos/{termo}")
+    async def get_mmgd_empreendimentos(termo: str) -> list[dict[str, Any]]:
+        from public_data_gateway.connectors.ambiental.aneel_geracao_distribuida import (
+            AneelGeracaoDistribuidaConnector,
+        )
+
+        conn = AneelGeracaoDistribuidaConnector(settings=app_settings)
+        return conn.get_mmgd_plants(termo)
+
+    @app.get("/api/v1/environment/mmgd/fontes/{termo}")
+    async def get_mmgd_fontes(termo: str) -> list[dict[str, Any]]:
+        from public_data_gateway.connectors.ambiental.aneel_geracao_distribuida import (
+            AneelGeracaoDistribuidaConnector,
+        )
+
+        conn = AneelGeracaoDistribuidaConnector(settings=app_settings)
+        return conn.get_mmgd_sources_by_municipality(termo)
+
+    @app.get("/api/v1/environment/mmgd/distribuidora/{id_municipio_or_name}")
+    async def get_mmgd_distribuidora(id_municipio_or_name: str) -> dict[str, Any]:
+        from public_data_gateway.connectors.ambiental.aneel_geracao_distribuida import (
+            AneelGeracaoDistribuidaConnector,
+        )
+
+        conn = AneelGeracaoDistribuidaConnector(settings=app_settings)
+        res = conn.get_mmgd_utility_grid(id_municipio_or_name)
+        if res is None:
+            raise HTTPException(status_code=404, detail="ANEEL MMGD utility grid metrics not found")
+        return res
+
+    @app.get("/api/v1/environment/mmgd/municipio/{id_municipio_or_name}")
+    async def get_mmgd_municipio(id_municipio_or_name: str) -> dict[str, Any]:
+        from public_data_gateway.connectors.ambiental.aneel_geracao_distribuida import (
+            AneelGeracaoDistribuidaConnector,
+        )
+
+        conn = AneelGeracaoDistribuidaConnector(settings=app_settings)
+        res = conn.get_mmgd_municipal_summary(id_municipio_or_name)
+        if res is None:
+            raise HTTPException(status_code=404, detail="ANEEL MMGD municipal summary not found")
+        return res
+
+    @app.get("/api/v1/environment/mmgd/features/{id_municipio_or_name}")
+    async def get_mmgd_features(id_municipio_or_name: str) -> dict[str, Any]:
+        from public_data_gateway.connectors.ambiental.aneel_geracao_distribuida import (
+            AneelGeracaoDistribuidaConnector,
+        )
+
+        conn = AneelGeracaoDistribuidaConnector(settings=app_settings)
+        res = conn.get_mmgd_features(id_municipio_or_name)
+        if res is None:
+            raise HTTPException(status_code=404, detail="ANEEL MMGD Gold features not found")
+        return res
+
+    @app.get("/api/v1/environment/mmgd/ranking")
+    async def get_mmgd_ranking(
+        limit: int = Query(10, ge=1, le=50, description="Max municipalities to list"),
+        uf: str | None = Query(None, description="Optional 2-letter state filter"),
+        sort_by_power: bool = Query(
+            False, description="Sort descending by total installed MMGD power (kW)"
+        ),
+    ) -> list[dict[str, Any]]:
+        from public_data_gateway.connectors.ambiental.aneel_geracao_distribuida import (
+            AneelGeracaoDistribuidaConnector,
+        )
+
+        conn = AneelGeracaoDistribuidaConnector(settings=app_settings)
+        return conn.list_top_mmgd_municipalities(limit=limit, sigla_uf=uf, sort_by_power=sort_by_power)
+
     @app.get("/api/v1/metaportals/datalake/top-municipalities")
     async def get_top_bd_municipalities(
         limit: int = Query(10, ge=1, le=50, description="Max municipalities to list"),

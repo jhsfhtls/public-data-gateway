@@ -2313,6 +2313,60 @@ class EnvironmentFacade:
             limit=limit, sigla_uf=sigla_uf, sort_by_emissions=sort_by_emissions
         )
 
+    @property
+    def aneel_gd_connector(self) -> Any:
+        if (
+            not hasattr(self, "_aneel_gd_connector")
+            or self._aneel_gd_connector is None
+        ):
+            from public_data_gateway.connectors.ambiental.aneel_geracao_distribuida import (
+                AneelGeracaoDistribuidaConnector,
+            )
+
+            self._aneel_gd_connector = AneelGeracaoDistribuidaConnector(
+                settings=self._sdk.settings
+            )
+        return self._aneel_gd_connector
+
+    def get_mmgd_plants(self, termo: str) -> list[dict[str, Any]]:
+        """Lookup ANEEL MMGD plants by code, generation type, class, utility, IBGE, or UF."""
+        return self.aneel_gd_connector.get_mmgd_plants(termo)
+
+    def get_mmgd_sources_by_municipality(self, termo: str) -> list[dict[str, Any]]:
+        """Lookup ANEEL MMGD installed capacity by renewable source, IBGE 7D, UF, or city."""
+        return self.aneel_gd_connector.get_mmgd_sources_by_municipality(termo)
+
+    def get_mmgd_utility_grid(
+        self, id_municipio_or_name: str
+    ) -> dict[str, Any] | None:
+        """Retrieve municipal distribution utility SLA and reverse-flow metrics."""
+        return self.aneel_gd_connector.get_mmgd_utility_grid(id_municipio_or_name)
+
+    def get_mmgd_municipal_summary(
+        self, id_municipio_or_name: str
+    ) -> dict[str, Any] | None:
+        """Retrieve consolidated municipal ANEEL MMGD installed kW and rural solar share."""
+        return self.aneel_gd_connector.get_mmgd_municipal_summary(
+            id_municipio_or_name
+        )
+
+    def get_mmgd_features(
+        self, id_municipio_or_name: str
+    ) -> dict[str, Any] | None:
+        """Retrieve Gold ANEEL MMGD energy transition score and solar maturity tier."""
+        return self.aneel_gd_connector.get_mmgd_features(id_municipio_or_name)
+
+    def list_top_mmgd_municipalities(
+        self,
+        limit: int = 10,
+        sigla_uf: str | None = None,
+        sort_by_power: bool = False,
+    ) -> list[dict[str, Any]]:
+        """List municipalities ranked by MMGD energy transition score or total kW."""
+        return self.aneel_gd_connector.list_top_mmgd_municipalities(
+            limit=limit, sigla_uf=sigla_uf, sort_by_power=sort_by_power
+        )
+
 
 class MetaportalsFacade:
     """Sub-facade for Metaportals & Aggregator Hubs (Datalake Federado SQL, Dados.gov.br CKAN)."""
@@ -4321,6 +4375,43 @@ class BrazilData:
         """Listar municípios ranqueados por resiliência climática INPE/SEEG ou maiores emissões tCO2e."""
         return self.environment.list_top_queimadas_seeg_municipalities(
             limit=limit, sigla_uf=sigla_uf, sort_by_emissions=sort_by_emissions
+        )
+
+    def get_mmgd_plants(self, termo: str) -> list[dict[str, Any]]:
+        """Consultar usinas e empreendimentos de Geração Distribuída (ANEEL MMGD) por código, fonte, distribuidora ou município."""
+        return self.environment.get_mmgd_plants(termo)
+
+    def get_mmgd_sources_by_municipality(self, termo: str) -> list[dict[str, Any]]:
+        """Consultar potência instalada MMGD por fonte renovável (Solar UFV, Biogás/Biomassa) e município."""
+        return self.environment.get_mmgd_sources_by_municipality(termo)
+
+    def get_mmgd_utility_grid(
+        self, id_municipio_or_name: str
+    ) -> dict[str, Any] | None:
+        """Consultar indicadores da distribuidora elétrica (prazo de vistoria e inversão de fluxo MMGD)."""
+        return self.environment.get_mmgd_utility_grid(id_municipio_or_name)
+
+    def get_mmgd_municipal_summary(
+        self, id_municipio_or_name: str
+    ) -> dict[str, Any] | None:
+        """Consultar consolidado municipal de usinas MMGD ANEEL, potência total (kW) e fração rural."""
+        return self.environment.get_mmgd_municipal_summary(id_municipio_or_name)
+
+    def get_mmgd_features(
+        self, id_municipio_or_name: str
+    ) -> dict[str, Any] | None:
+        """Consultar features Gold de transição energética MMGD e tier solar municipal (ANEEL)."""
+        return self.environment.get_mmgd_features(id_municipio_or_name)
+
+    def list_top_mmgd_municipalities(
+        self,
+        limit: int = 10,
+        sigla_uf: str | None = None,
+        sort_by_power: bool = False,
+    ) -> list[dict[str, Any]]:
+        """Listar municípios ranqueados por score de transição energética MMGD ou maior potência instalada (kW)."""
+        return self.environment.list_top_mmgd_municipalities(
+            limit=limit, sigla_uf=sigla_uf, sort_by_power=sort_by_power
         )
 
     def get_bd_coverage(self, id_municipio: str) -> dict[str, Any]:

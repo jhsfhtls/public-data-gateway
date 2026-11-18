@@ -1,0 +1,26 @@
+version: 2
+
+sources:
+  - name: aneel_geracao_distribuida
+    description: "Tabelas Silver da Agência Nacional de Energia Elétrica (ANEEL) para Micro e Minigeração Distribuída (MMGD)"
+    meta:
+      agency: "Agência Nacional de Energia Elétrica (ANEEL)"
+      domain: "ambiental_energia_renovavel"
+      freshness_sla: "Semanal (168h)"
+    tables:
+      - name: aneel_empreendimentos_mmgd
+        description: "Empreendimentos e unidades consumidoras com Micro e Minigeração Distribuída homologados (Lei nº 14.300/2022)"
+        meta:
+          external_location: "data/aneel_geracao_distribuida/silver/aneel_empreendimentos_mmgd.parquet"
+      - name: aneel_geracao_fonte_municipio
+        description: "Potência instalada (kW) e geração anual estimada (MWh) por fonte renovável (Solar Fotovoltaica, Biogás/Biomassa) e município"
+        meta:
+          external_location: "data/aneel_geracao_distribuida/silver/aneel_geracao_fonte_municipio.parquet"
+      - name: aneel_distribuidoras_rede_mmgd
+        description: "Indicadores regulatórios das distribuidoras de energia elétrica por município (prazo de vistoria, aprovação e inversão de fluxo)"
+        meta:
+          external_location: "data/aneel_geracao_distribuida/silver/aneel_distribuidoras_rede_mmgd.parquet"
+      - name: aneel_mmgd_resumo_municipal
+        description: "Consolidado municipal de quantidade de usinas MMGD, potência solar, potência rural agro e UCs beneficiárias"
+        meta:
+          external_location: "data/aneel_geracao_distribuida/silver/aneel_mmgd_resumo_municipal.parquet"

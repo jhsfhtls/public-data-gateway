@@ -2355,6 +2355,69 @@ class MCPDispatcher:
                                 },
                             },
                             {
+                                "name": "bdg_get_aneel_mmgd_empreendimentos",
+                                "description": "Lookup ANEEL distributed generation (MMGD) plants by plant code, source (UFV, UTE), class (Rural, Comercial), utility, IBGE code, or UF.",
+                                "inputSchema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "termo": {
+                                            "type": "string",
+                                            "description": "Plant code, generation type, class, utility name, IBGE 7-digit code, UF, or municipality name",
+                                        }
+                                    },
+                                    "required": ["termo"],
+                                },
+                            },
+                            {
+                                "name": "bdg_get_aneel_mmgd_fontes",
+                                "description": "Lookup ANEEL MMGD installed capacity (kW) and annual estimated MWh generation by renewable source and municipality.",
+                                "inputSchema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "termo": {
+                                            "type": "string",
+                                            "description": "Source key, renewable source name, IBGE code, UF, or municipality name",
+                                        }
+                                    },
+                                    "required": ["termo"],
+                                },
+                            },
+                            {
+                                "name": "bdg_get_aneel_mmgd_features",
+                                "description": "Get normalized Gold ANEEL MMGD energy transition score, installed solar/rural kW, and maturity tier.",
+                                "inputSchema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "id_municipio_or_name": {
+                                            "type": "string",
+                                            "description": "7-digit IBGE municipality code or municipality name",
+                                        }
+                                    },
+                                    "required": ["id_municipio_or_name"],
+                                },
+                            },
+                            {
+                                "name": "bdg_list_top_aneel_mmgd_municipalities",
+                                "description": "List Brazilian municipalities ranked by ANEEL MMGD energy transition score or total installed kW.",
+                                "inputSchema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "limit": {
+                                            "type": "integer",
+                                            "description": "Maximum rows (default: 10)",
+                                        },
+                                        "sigla_uf": {
+                                            "type": "string",
+                                            "description": "Optional 2-letter state filter (e.g. MT)",
+                                        },
+                                        "sort_by_power": {
+                                            "type": "boolean",
+                                            "description": "Set true to rank municipalities by highest total installed MMGD power (kW) first",
+                                        },
+                                    },
+                                },
+                            },
+                            {
                                 "name": "bdg_get_bd_coverage",
                                 "description": "Get official Federated Public Datalake (DuckDB / BigQuery) municipal treated dataset and table coverage metrics.",
                                 "inputSchema": {
@@ -5847,6 +5910,67 @@ class MCPDispatcher:
                     },
                 }
             wrapped = wrap_untrusted_gov_data(result, source_id="inpe_queimadas_seeg")
+            return {
+                "jsonrpc": "2.0",
+                "id": req_id,
+                "result": {"content": [{"type": "text", "text": wrapped}], "isError": False},
+            }
+
+        if tool_name in {
+            "bdg_get_aneel_mmgd_empreendimentos",
+            "bdg_get_aneel_mmgd_fontes",
+            "bdg_get_aneel_mmgd_features",
+            "bdg_list_top_aneel_mmgd_municipalities",
+        }:
+            from public_data_gateway.connectors.ambiental.aneel_geracao_distribuida import (
+                AneelGeracaoDistribuidaConnector,
+            )
+
+            connector = AneelGeracaoDistribuidaConnector(settings=self.settings)
+            try:
+                if tool_name == "bdg_get_aneel_mmgd_empreendimentos":
+                    result: Any = connector.get_mmgd_plants(str(args.get("termo", "")))
+                elif tool_name == "bdg_get_aneel_mmgd_fontes":
+                    result = connector.get_mmgd_sources_by_municipality(
+                        str(args.get("termo", ""))
+                    )
+                elif tool_name == "bdg_get_aneel_mmgd_features":
+                    result = connector.get_mmgd_features(
+                        str(args.get("id_municipio_or_name", ""))
+                    )
+                else:
+                    result = connector.list_top_mmgd_municipalities(
+                        limit=int(args.get("limit", 10)),
+                        sigla_uf=args.get("sigla_uf"),
+                        sort_by_power=bool(args.get("sort_by_power", False)),
+                    )
+            except (ValueError, KeyError) as exc:
+                return {
+                    "jsonrpc": "2.0",
+                    "id": req_id,
+                    "result": {
+                        "content": [
+                            {"type": "text", "text": f"ANEEL MMGD parameter error: {exc}"}
+                        ],
+                        "isError": True,
+                    },
+                }
+
+            if not result:
+                return {
+                    "jsonrpc": "2.0",
+                    "id": req_id,
+                    "result": {
+                        "content": [
+                            {
+                                "type": "text",
+                                "text": "No ANEEL MMGD data found for the query.",
+                            }
+                        ],
+                        "isError": True,
+                    },
+                }
+            wrapped = wrap_untrusted_gov_data(result, source_id="aneel_geracao_distribuida")
             return {
                 "jsonrpc": "2.0",
                 "id": req_id,

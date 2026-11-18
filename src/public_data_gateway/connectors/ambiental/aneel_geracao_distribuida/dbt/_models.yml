@@ -1,0 +1,196 @@
+version: 2
+
+models:
+  - name: stg_aneel_empreendimentos_mmgd
+    description: "Staging view tipada dos empreendimentos e usinas de Micro e Minigeração Distribuída (MMGD ANEEL)."
+    columns:
+      - name: cod_empreendimento_mmgd
+        description: "Código identificador único do empreendimento MMGD na ANEEL (STRING)."
+        tests: [not_null, unique]
+      - name: sig_tipo_geracao
+        description: "Sigla da tecnologia de geração (UFV, UTE, EOL ou CGH)."
+        tests: [not_null]
+      - name: classe_consumo
+        description: "Classe tarifária atendida (Comercial, Rural, Residencial ou Industrial)."
+        tests: [not_null]
+      - name: modalidade_mmgd
+        description: "Modalidade de compensação regulatória da Lei nº 14.300/2022."
+        tests: [not_null]
+      - name: distribuidora
+        description: "Concessionária ou permissionária distribuidora de energia elétrica."
+        tests: [not_null]
+      - name: id_municipio
+        description: "Código IBGE de 7 dígitos do município (STRING)."
+        tests: [not_null]
+      - name: sigla_uf
+        description: "Sigla de 2 letras da Unidade Federativa (UF)."
+        tests: [not_null]
+      - name: nome_municipio
+        description: "Nome oficial do município."
+        tests: [not_null]
+      - name: potencia_instalada_kw
+        description: "Potência instalada homologada na unidade geradora em kW."
+        tests: [not_null]
+      - name: qtd_modulos_instalados
+        description: "Quantidade de módulos ou unidades geradoras na planta."
+        tests: [not_null]
+      - name: qtd_unidades_beneficiarias
+        description: "Quantidade de unidades consumidoras beneficiárias vinculadas."
+        tests: [not_null]
+      - name: data_conexao
+        description: "Data oficial de conexão à rede distribuidora (ISO-8601)."
+        tests: [not_null]
+      - name: tipo_titular
+        description: "Tipo de pessoa do titular mascarado conforme LGPD (PF ou PJ)."
+        tests: [not_null]
+
+  - name: stg_aneel_geracao_fonte_municipio
+    description: "Staging view tipada da potência instalada e geração estimada por fonte renovável e município."
+    columns:
+      - name: cod_fonte_municipio
+        description: "Chave composta fonte-município ANEEL (STRING)."
+        tests: [not_null, unique]
+      - name: id_municipio
+        description: "Código IBGE de 7 dígitos do município (STRING)."
+        tests: [not_null]
+      - name: sigla_uf
+        description: "Sigla de 2 letras da Unidade Federativa (UF)."
+        tests: [not_null]
+      - name: nome_municipio
+        description: "Nome oficial do município."
+        tests: [not_null]
+      - name: fonte_geracao
+        description: "Fonte renovável agregada (Solar_Fotovoltaica ou Biogas_Biomassa_Agro)."
+        tests: [not_null]
+      - name: qtd_conexoes_mmgd
+        description: "Quantidade total de conexões homologadas da fonte no município."
+        tests: [not_null]
+      - name: potencia_instalada_kw
+        description: "Potência instalada agregada da fonte no município em kW."
+        tests: [not_null]
+      - name: participacao_potencia_pct
+        description: "Participação percentual da fonte na potência MMGD municipal (%)."
+        tests: [not_null]
+      - name: geracao_estimada_mwh_ano
+        description: "Geração anual estimada em MWh/ano pela capacidade instalada da fonte."
+        tests: [not_null]
+
+  - name: stg_aneel_distribuidoras_rede_mmgd
+    description: "Staging view tipada dos indicadores operacionais das distribuidoras para conexão MMGD."
+    columns:
+      - name: id_municipio
+        description: "Código IBGE de 7 dígitos do município (STRING)."
+        tests: [not_null, unique]
+      - name: sigla_uf
+        description: "Sigla de 2 letras da Unidade Federativa (UF)."
+        tests: [not_null]
+      - name: nome_municipio
+        description: "Nome oficial do município."
+        tests: [not_null]
+      - name: distribuidora_principal
+        description: "Principal concessionária distribuidora atuante no município."
+        tests: [not_null]
+      - name: prazo_medio_vistoria_dias
+        description: "Prazo médio de vistoria e conexão pela distribuidora em dias."
+        tests: [not_null]
+      - name: taxa_aprovacao_parecer_pct
+        description: "Percentual de pareceres de acesso aprovados sem pendência crítica (%)."
+        tests: [not_null]
+      - name: inversao_fluxo_critica_pct
+        description: "Percentual de alimentadores ou subestações com alerta de inversão de fluxo (%)."
+        tests: [not_null]
+      - name: ucs_beneficiarias_total
+        description: "Total de unidades consumidoras que recebem créditos MMGD na distribuidora."
+        tests: [not_null]
+
+  - name: stg_aneel_mmgd_resumo_municipal
+    description: "Staging view tipada do consolidado municipal de capacidade e unidades de Geração Distribuída."
+    columns:
+      - name: id_municipio
+        description: "Código IBGE de 7 dígitos do município (STRING)."
+        tests: [not_null, unique]
+      - name: sigla_uf
+        description: "Sigla de 2 letras da Unidade Federativa (UF)."
+        tests: [not_null]
+      - name: nome_municipio
+        description: "Nome oficial do município."
+        tests: [not_null]
+      - name: distribuidora_principal
+        description: "Principal distribuidora de energia atuante no município."
+        tests: [not_null]
+      - name: qtd_usinas_mmgd
+        description: "Total de usinas e sistemas MMGD ativos no município."
+        tests: [not_null]
+      - name: potencia_instalada_total_kw
+        description: "Potência total instalada em Geração Distribuída no município (kW)."
+        tests: [not_null]
+      - name: potencia_solar_ufv_kw
+        description: "Potência instalada exclusivamente em solar fotovoltaica (UFV) em kW."
+        tests: [not_null]
+      - name: potencia_rural_agro_kw
+        description: "Potência instalada em unidades consumidoras da classe Rural/Agro (kW)."
+        tests: [not_null]
+      - name: ucs_com_credito_energia
+        description: "Total de unidades consumidoras beneficiadas com compensação de energia."
+        tests: [not_null]
+      - name: participacao_solar_pct
+        description: "Participação da fonte solar fotovoltaica na potência MMGD municipal (%)."
+        tests: [not_null]
+
+  - name: fct_geracao_distribuida_aneel_municipal
+    description: "Tabela Fato municipal unificando capacidade MMGD, fontes renováveis, classe rural e SLAs da distribuidora."
+    columns:
+      - name: id_municipio
+        description: "Código IBGE de 7 dígitos do município (STRING)."
+        tests: [not_null, unique]
+      - name: sigla_uf
+        description: "Sigla de 2 letras da Unidade Federativa (UF)."
+        tests: [not_null]
+      - name: nome_municipio
+        description: "Nome oficial do município."
+        tests: [not_null]
+      - name: distribuidora_principal
+        description: "Distribuidora de energia predominante no município."
+        tests: [not_null]
+      - name: qtd_usinas_mmgd
+        description: "Quantidade total de empreendimentos MMGD homologados no município."
+        tests: [not_null]
+      - name: potencia_instalada_total_kw
+        description: "Potência instalada acumulada de MMGD no município (kW)."
+        tests: [not_null]
+      - name: potencia_solar_ufv_kw
+        description: "Potência instalada solar fotovoltaica no município (kW)."
+        tests: [not_null]
+      - name: potencia_rural_agro_kw
+        description: "Potência MMGD instalada no segmento Rural/Agro (kW)."
+        tests: [not_null]
+      - name: ucs_com_credito_energia
+        description: "Unidades consumidoras participantes de compensação de energia."
+        tests: [not_null]
+      - name: participacao_solar_pct
+        description: "Fatia solar fotovoltaica sobre o total instalado municipal (%)."
+        tests: [not_null]
+      - name: prazo_medio_vistoria_dias
+        description: "Prazo médio de vistoria para liberação MMGD em dias."
+        tests: [not_null]
+      - name: taxa_aprovacao_parecer_pct
+        description: "Taxa de aprovação de pareceres de acesso MMGD (%)."
+        tests: [not_null]
+      - name: inversao_fluxo_critica_pct
+        description: "Percentual de solicitações sob restrição de inversão de fluxo (%)."
+        tests: [not_null]
+      - name: ucs_beneficiarias_total
+        description: "Total de unidades beneficiárias vinculadas às concessionárias locais."
+        tests: [not_null]
+      - name: geracao_estimada_mwh_ano
+        description: "Estimativa de geração anual renovável MMGD no município (MWh/ano)."
+        tests: [not_null]
+      - name: potencia_bioenergia_kw
+        description: "Potência instalada em biogás e biomassa agroindustrial na amostra (kW)."
+        tests: [not_null]
+      - name: qtd_empreendimentos_amostra_mmgd
+        description: "Quantidade de usinas na amostra granular Silver de empreendimentos."
+        tests: [not_null]
+      - name: potencia_amostra_kw
+        description: "Potência somada das usinas na amostra granular Silver (kW)."
+        tests: [not_null]

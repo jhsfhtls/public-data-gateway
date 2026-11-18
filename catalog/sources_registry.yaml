@@ -1756,3 +1756,34 @@ sources:
   status: HOMOLOGATED
   freshness_sla_hours: 24
   cron_schedule_expression: 0 3 * * *
+- source_id: aneel_geracao_distribuida
+  name: 'ANEEL Geração Distribuída: Empreendimentos MMGD & Transição Solar'
+  agency: Agência Nacional de Energia Elétrica (ANEEL)
+  official_url: https://dadosabertos.aneel.gov.br/dataset/relacao-de-empreendimentos-de-geracao-distribuida
+  segment_id: 11_agronegocio_meio_ambiente
+  segment_name: Agronegócio, Terra & Meio Ambiente
+  access_mode: LAKEHOUSE_BATCH
+  protocol: HTTP_BULK_ZIP
+  auth_type: NONE
+  canonical_keys:
+  - id_municipio
+  - sigla_uf
+  update_frequency: Semanal (Empreendimentos MMGD SIGA/SISGD)
+  estimated_volume: ~3,2 milhões de unidades geradoras MMGD e créditos de compensação (~1,8 GB)
+  lgpd_tier: PUBLIC_NON_PERSONAL
+  ml_feature_domains:
+  - distributed_solar_mmgd_capacity
+  - renewable_energy_transition_agro
+  - grid_reverse_flow_utilities
+  solution_packs:
+  - P01
+  - P02
+  - P05
+  - P06
+  - P08
+  - P09
+  rice_score: 905
+  roadmap_wave: 2
+  status: HOMOLOGATED
+  freshness_sla_hours: 168
+  cron_schedule_expression: 0 4 * * 1
