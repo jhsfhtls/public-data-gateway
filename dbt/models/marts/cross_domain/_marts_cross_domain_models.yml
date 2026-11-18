@@ -230,6 +230,15 @@ models:
       - name: score_regularizacao_fundiaria_cafir
         description: "Score de regularização fundiária CAFIR/CNIR/SIGEF no município (0-100)."
         tests: [not_null]
+      - name: qtd_focos_calor_inpe
+        description: "Quantidade total acumulada de focos de calor detectados no município (INPE Queimadas)."
+        tests: [not_null]
+      - name: emissoes_liquidas_tco2e_seeg
+        description: "Emissões líquidas anuais de gases de efeito estufa SEEG no município (tCO2e)."
+        tests: [not_null]
+      - name: score_resiliencia_climatica_fogo_gee
+        description: "Score municipal de resiliência climática e baixa pressão de incêndios e emissões GEE (0-100)."
+        tests: [not_null]
       - name: reference_date
         description: "Data de referência ISO-8601 (YYYY-MM-DD)."
         tests: [not_null]

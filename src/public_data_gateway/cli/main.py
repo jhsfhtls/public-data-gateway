@@ -1425,6 +1425,36 @@ def build_parser() -> argparse.ArgumentParser:
     cafir_rk_p.add_argument("--area", action="store_true", help="Sort descending by total registered rural area (ha)")
     cafir_rk_p.add_argument("--json", action="store_true", help="Output in JSON format")
 
+    # INPE Queimadas & SEEG (Focos de Calor & Emissões GEE) command group
+    qm_p = subparsers.add_parser("queimadas", help="Query INPE active fire hotspots, seasonal fire risk, SEEG GHG emissions, and climate rankings.")
+    qm_sub = qm_p.add_subparsers(dest="queimadas_action", required=True)
+
+    qm_fc_p = qm_sub.add_parser("focos", help="Lookup INPE active fire hotspots by code, satellite, biome, IBGE, UF, or name.")
+    qm_fc_p.add_argument("termo", help="Hotspot code, satellite, biome, IBGE code, UF, or municipality name")
+    qm_fc_p.add_argument("--json", action="store_true", help="Output in JSON format")
+
+    qm_em_p = qm_sub.add_parser("emissoes", help="Lookup SEEG municipal GHG emissions by code, sector, IBGE code, or UF.")
+    qm_em_p.add_argument("termo", help="Emission code, sector, IBGE code, UF, or municipality name")
+    qm_em_p.add_argument("--json", action="store_true", help="Output in JSON format")
+
+    qm_rk_m = qm_sub.add_parser("risco", help="Get municipal INPE seasonal fire risk, FRP intensity, and burned scar area.")
+    qm_rk_m.add_argument("id_municipio_or_name", help="7-digit IBGE code or municipality name")
+    qm_rk_m.add_argument("--json", action="store_true", help="Output in JSON format")
+
+    qm_mun_p = qm_sub.add_parser("municipio", help="Get consolidated municipal INPE hotspots count and SEEG net GHG emissions.")
+    qm_mun_p.add_argument("id_municipio_or_name", help="7-digit IBGE code or municipality name")
+    qm_mun_p.add_argument("--json", action="store_true", help="Output in JSON format")
+
+    qm_ft_p = qm_sub.add_parser("features", help="Get Gold INPE Queimadas & SEEG climate resilience score and risk tier.")
+    qm_ft_p.add_argument("id_municipio_or_name", help="7-digit IBGE code or municipality name")
+    qm_ft_p.add_argument("--json", action="store_true", help="Output in JSON format")
+
+    qm_rk_p = qm_sub.add_parser("ranking", help="List municipalities ranked by climate resilience score or net GHG emissions.")
+    qm_rk_p.add_argument("--limit", type=int, default=10, help="Max municipalities to list")
+    qm_rk_p.add_argument("--uf", type=str, help="Optional 2-letter state filter")
+    qm_rk_p.add_argument("--emissoes", action="store_true", help="Sort descending by net SEEG GHG emissions (tCO2e)")
+    qm_rk_p.add_argument("--json", action="store_true", help="Output in JSON format")
+
     # Datalake Público Federado (DuckDB / BigQuery) command group
     bd_p = subparsers.add_parser("datalake", help="Query Federated Public Datalake (DuckDB / BigQuery) coverage, thematic datasets, governance, SQL efficiency, and rankings.")
     bd_sub = bd_p.add_subparsers(dest="datalake_action", required=True)
@@ -5049,6 +5079,84 @@ def main(argv: Sequence[str] | None = None) -> int:
                     return 0
             except (ValueError, KeyError) as exc:
                 print(f"Erro RFB CAFIR: {exc}", file=sys.stderr)
+                return 1
+
+        elif args.command == "queimadas":
+            from public_data_gateway.connectors.ambiental.inpe_queimadas_seeg import (
+                InpeQueimadasSeegConnector,
+            )
+
+            qm_conn = InpeQueimadasSeegConnector()
+            qm_action = getattr(args, "queimadas_action", "")
+            try:
+                if qm_action == "focos":
+                    rows = qm_conn.get_fire_hotspots(args.termo)
+                    if getattr(args, "json", False):
+                        print(json.dumps(rows, indent=2, ensure_ascii=False, default=str))
+                    else:
+                        print(f"INPE Focos ({len(rows)}):")
+                        for r in rows:
+                            print(f"  {r.get('cod_foco_inpe')} | {r.get('nome_municipio')} ({r.get('sigla_uf')}): Risco {r.get('risco_fogo')} | FRP {r.get('frp_mw')} MW")
+                    return 0
+
+                if qm_action == "emissoes":
+                    rows = qm_conn.get_seeg_emissions(args.termo)
+                    if getattr(args, "json", False):
+                        print(json.dumps(rows, indent=2, ensure_ascii=False, default=str))
+                    else:
+                        print(f"SEEG Emissões GEE ({len(rows)}):")
+                        for r in rows:
+                            print(f"  {r.get('cod_emissao_seeg')} | {r.get('nome_municipio')} ({r.get('sigla_uf')}): {r.get('setor_emissao')} - {r.get('emissao_liquida_tco2e')} tCO2e")
+                    return 0
+
+                if qm_action == "risco":
+                    res = qm_conn.get_fire_risk(args.id_municipio_or_name)
+                    if res is None:
+                        print(f"Risco de fogo não encontrado para: {args.id_municipio_or_name}", file=sys.stderr)
+                        return 1
+                    if getattr(args, "json", False):
+                        print(json.dumps(res, indent=2, ensure_ascii=False, default=str))
+                    else:
+                        print(f"INPE Risco Fogo ({res.get('nome_municipio')} - {res.get('sigla_uf')}): Risco {res.get('risco_fogo_medio_inpe')} | FRP {res.get('frp_medio_mw')} MW")
+                    return 0
+
+                if qm_action == "municipio":
+                    res = qm_conn.get_municipal_summary(args.id_municipio_or_name)
+                    if res is None:
+                        print(f"Resumo Queimadas/SEEG não encontrado para: {args.id_municipio_or_name}", file=sys.stderr)
+                        return 1
+                    if getattr(args, "json", False):
+                        print(json.dumps(res, indent=2, ensure_ascii=False, default=str))
+                    else:
+                        print(f"Queimadas/SEEG Município ({res.get('nome_municipio')} - {res.get('sigla_uf')}): {res.get('qtd_focos_calor_inpe')} focos | {res.get('emissoes_liquidas_tco2e_seeg')} tCO2e")
+                    return 0
+
+                if qm_action == "features":
+                    res = qm_conn.get_queimadas_seeg_features(args.id_municipio_or_name)
+                    if res is None:
+                        print(f"Features Queimadas/SEEG não encontradas para: {args.id_municipio_or_name}", file=sys.stderr)
+                        return 1
+                    if getattr(args, "json", False):
+                        print(json.dumps(res, indent=2, ensure_ascii=False, default=str))
+                    else:
+                        print(f"Queimadas/SEEG Gold ({res.get('nome_municipio')} - {res.get('id_municipio')}): Score {res.get('score_resiliencia_climatica_fogo_gee')} | {res.get('classificacao_risco_climatico_queimadas')}")
+                    return 0
+
+                if qm_action == "ranking":
+                    ranks = qm_conn.list_top_municipalities(
+                        limit=getattr(args, "limit", 10),
+                        sigla_uf=getattr(args, "uf", None),
+                        sort_by_emissions=getattr(args, "emissoes", False),
+                    )
+                    if getattr(args, "json", False):
+                        print(json.dumps(ranks, indent=2, ensure_ascii=False, default=str))
+                    else:
+                        print(f"Ranking Queimadas/SEEG ({len(ranks)}):")
+                        for idx, r in enumerate(ranks, 1):
+                            print(f"  {idx}. {r.get('nome_municipio')} ({r.get('sigla_uf')}): {r.get('score_resiliencia_climatica_fogo_gee')} | {r.get('classificacao_risco_climatico_queimadas')}")
+                    return 0
+            except (ValueError, KeyError) as exc:
+                print(f"Erro Queimadas/SEEG: {exc}", file=sys.stderr)
                 return 1
 
         elif args.command == "datalake":

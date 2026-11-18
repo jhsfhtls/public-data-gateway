@@ -555,3 +555,61 @@ models:
       - name: classificacao_estrutura_fundiaria_cafir
         description: "Tier municipal de regularização fundiária CNIR (ESTRUTURA_CNIR_REGULARIZADA, CONSOLIDACAO_CADASTRAL_PARCIAL ou BAIXA_VINCULACAO_CNIR_CAFIR)."
         tests: [not_null]
+
+  - name: mart_queimadas_emissoes_seeg_brasil
+    description: "Data Mart Gold intra-domínio consolidando focos de calor INPE Queimadas, severidade térmica FRP e emissões líquidas GEE do SEEG por município."
+    columns:
+      - name: id_municipio
+        description: "Código IBGE de 7 dígitos do município (STRING)."
+        tests: [not_null, unique]
+      - name: sigla_uf
+        description: "Sigla de 2 letras da Unidade da Federação (UF)."
+        tests: [not_null]
+      - name: nome_municipio
+        description: "Nome oficial do município."
+        tests: [not_null]
+      - name: bioma_predominante
+        description: "Bioma predominante no território municipal."
+        tests: [not_null]
+      - name: qtd_focos_calor_inpe
+        description: "Total acumulado de focos de calor ativos detectados no município (INPE)."
+        tests: [not_null]
+      - name: area_cicatriz_queimada_ha
+        description: "Área total com cicatriz de queimada mapeada no município em hectares (ha)."
+        tests: [not_null]
+      - name: risco_fogo_medio_inpe
+        description: "Índice médio municipal de Risco de Fogo do INPE (0.0 a 1.0)."
+        tests: [not_null]
+      - name: emissoes_liquidas_tco2e_seeg
+        description: "Emissões líquidas totais municipais de GEE no SEEG (tCO2e)."
+        tests: [not_null]
+      - name: participacao_agro_lulucf_pct
+        description: "Percentual das emissões associado a Agropecuária e Mudança de Uso da Terra (%)."
+        tests: [not_null]
+      - name: frp_medio_mw
+        description: "Potência Radiativa média dos focos de calor no município (MW)."
+        tests: [not_null]
+      - name: dias_seco_consecutivos_max
+        description: "Pico de dias consecutivos sem precipitação no período seco."
+        tests: [not_null]
+      - name: concentracao_estacao_seca_pct
+        description: "Percentual de focos concentrados no trimestre crítico de seca (%)."
+        tests: [not_null]
+      - name: qtd_focos_amostra_inpe
+        description: "Quantidade de focos na amostra granular Silver INPE."
+        tests: [not_null]
+      - name: frp_medio_amostra_mw
+        description: "FRP médio dos focos na amostra granular Silver INPE (MW)."
+        tests: [not_null]
+      - name: emissoes_amostra_tco2e
+        description: "Emissões líquidas somadas na amostra granular Silver SEEG (tCO2e)."
+        tests: [not_null]
+      - name: remocao_florestal_tco2e
+        description: "Remoção de carbono registrada na amostra granular Silver SEEG (tCO2e)."
+        tests: [not_null]
+      - name: score_resiliencia_climatica_fogo_gee
+        description: "Score sintético municipal de resiliência climática e baixa pressão de queimadas/GEE (0-100)."
+        tests: [not_null]
+      - name: classificacao_risco_climatico_queimadas
+        description: "Tier municipal de risco climático e emissões (BAIXO_RISCO_FOGO_GEE, ALERTA_FOGO_EMISSOES_MODERADAS ou CRITICO_QUEIMADAS_EMISSOES_GEE)."
+        tests: [not_null]

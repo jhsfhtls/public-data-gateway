@@ -1,6 +1,6 @@
 {
   "schema_version": "1.0.0",
-  "last_updated": "2026-11-18T08:40:00.000000",
+  "last_updated": "2026-11-18T09:00:00.000000",
   "project_name": "public-data-gateway",
   "architecture": "Hexagonal Medallion Lakehouse (Bronze -> Silver -> Gold / Feature Store)",
   "governance_standards": [
@@ -15,7 +15,7 @@
   "current_macro_phase": "Fase 11.5 - Expansão Completa de Fontes Públicas (Ondas 11.5A a 11.5E — Padrão 11-Gates)",
   "overall_status": "ON_TRACK",
   "active_connector": null,
-  "next_connector": "inpe_queimadas_seeg",
+  "next_connector": "aneel_geracao_distribuida",
   "structural_phases": [
     {
       "phase_id": "00",
@@ -252,74 +252,74 @@
     }
   ],
   "active_connector_gates": {
-    "target_connector": "rfb_cafir",
+    "target_connector": "inpe_queimadas_seeg",
     "target_wave": "11.5B",
     "gates": [
       {
         "gate_id": "GATE_01",
         "name": "Contrato Declarativo ODCS v3.1 das N Tabelas da API",
         "status": "PASSED",
-        "criteria": "Schema tipado, chaves primarias STRING (nirf_cib, codigo_incra_sncr, cnpj_14/cpf_masked, id_municipio 7D, sigla_uf) e regras semanticas para Imoveis Rurais CAFIR, Vinculos CNIR/SNCR, Concentracao Fundiaria e Resumo Municipal."
+        "criteria": "Schema tipado, chaves primarias STRING (cod_foco_inpe, cod_emissao_seeg, id_municipio 7D, sigla_uf, ano_referencia) e regras semanticas para Focos de Calor INPE, Emissoes SEEG por Setor, Risco de Fogo Mensal e Resumo Municipal."
       },
       {
         "gate_id": "GATE_02",
         "name": "Ingestao Bronze Isolada (Todas as Tabelas) & Cache WAL",
         "status": "PASSED",
-        "criteria": "Ingestao resiliente da fonte oficial RFB ITR/CAFIR e INCRA CNIR (gov.br/receitafederal/.../itr) em data/rfb_cafir/bronze/ com registro de linhagem SHA-256."
+        "criteria": "Ingestao resiliente das fontes oficiais INPE Queimadas (dataserver-coids.inpe.br) e SEEG (seeg.eco.br) em data/inpe_queimadas_seeg/bronze/ com registro de linhagem SHA-256."
       },
       {
         "gate_id": "GATE_03",
         "name": "Sanitizacao de Sentinelas & Nulls",
         "status": "PASSED",
-        "criteria": "Conversao deterministica de sentinelas em NULLs reais e preservacao da mascara LGPD de CPF de titulares pessoa fisica."
+        "criteria": "Conversao deterministica de sentinelas em NULLs reais e normalizacao de satelite, bioma, gas de efeito estufa e categorias de risco de fogo."
       },
       {
         "gate_id": "GATE_04",
         "name": "Materializacao Silver Parquet Isolada (Todas as Tabelas)",
         "status": "PASSED",
-        "criteria": "Gravacao ZSTD em data/rfb_cafir/silver/ (cafir_imoveis_rurais, cafir_vinculos_cnir_sncr, cafir_concentracao_fundiaria, cafir_resumo_municipal)."
+        "criteria": "Gravacao ZSTD em data/inpe_queimadas_seeg/silver/ (inpe_focos_queimadas, seeg_emissoes_gee_setor, inpe_risco_fogo_mensal, queimadas_seeg_resumo_municipal)."
       },
       {
         "gate_id": "GATE_05",
         "name": "Validacao dos 5 Pilares & Quarentena",
         "status": "PASSED",
-        "criteria": "Aprovacao em Freshness, Volume, Schema, Null Ceiling e Lineage com suporte a desvio para data/rfb_cafir/quarantine/."
+        "criteria": "Aprovacao em Freshness, Volume, Schema, Null Ceiling e Lineage com suporte a desvio para data/inpe_queimadas_seeg/quarantine/."
       },
       {
         "gate_id": "GATE_06",
         "name": "Gold Feature View Isolada & ASOF Join ML",
         "status": "PASSED",
-        "criteria": "Features de regularizacao fundiaria CAFIR/CNIR e Gini agrario em data/rfb_cafir/gold/features_fundiario_cafir.parquet."
+        "criteria": "Features climaticas e de inventario GEE em data/inpe_queimadas_seeg/gold/features_queimadas_emissoes_gee.parquet."
       },
       {
         "gate_id": "GATE_07",
         "name": "Integracao ao EnrichmentEngine & Marts Cross-Domain",
         "status": "PASSED",
-        "criteria": "Integracao fundiaria-ESG em mart_cross_domain_esg_agro_infra_brasil (imoveis CAFIR, area total, vinculacao CNIR e score CAFIR)."
+        "criteria": "Integracao climatica-ESG em mart_cross_domain_esg_agro_infra_brasil (qtd_focos_calor_inpe, emissoes_liquidas_tco2e_seeg e score_resiliencia_climatica_fogo_gee)."
       },
       {
         "gate_id": "GATE_08",
         "name": "Exposicao Multi-Interface (4 Interfaces)",
         "status": "PASSED",
-        "criteria": "Exposicao simultanea via SDK (BrazilData.environment + shortcuts), FastAPI (/api/v1/environment/cafir/*), CLI (bdg cafir *) e MCP (bdg_*_rfb_cafir_* com wrap_untrusted_gov_data)."
+        "criteria": "Exposicao simultanea via SDK (BrazilData.environment + shortcuts), FastAPI (/api/v1/environment/queimadas/*), CLI (bdg queimadas *) e MCP (bdg_*_inpe_queimadas_* / bdg_get_seeg_emissoes_gee com wrap_untrusted_gov_data)."
       },
       {
         "gate_id": "GATE_09",
         "name": "Bateria de Testes Unitarios & Paridade Offline",
         "status": "PASSED",
-        "criteria": "Testes unitarios offline completos em tests/connectors/test_rfb_cafir.py cobrindo 4 tabelas Silver, Gold ML e paridade nas 4 interfaces."
+        "criteria": "Testes unitarios offline completos em tests/connectors/test_inpe_queimadas_seeg.py cobrindo 4 tabelas Silver, Gold ML e paridade nas 4 interfaces."
       },
       {
         "gate_id": "GATE_10",
         "name": "dbt Staging, Marts Intra-Domínio/Cross-Domain & 100% Colunas Documentadas",
         "status": "PASSED",
-        "criteria": "Modelos dbt com source.yml, stg_*, fct_imoveis_rurais_cafir_municipal, mart intra-dominio mart_cadastro_imoveis_rurais_cafir_brasil e cross-domain mart_cross_domain_esg_agro_infra_brasil aprovados no dbt test (121/121) e lint_dbt_docs.py (100% cobertura)."
+        "criteria": "Modelos dbt com source.yml, stg_*, fct_queimadas_emissoes_gee_municipal, mart intra-dominio mart_queimadas_emissoes_seeg_brasil e cross-domain mart_cross_domain_esg_agro_infra_brasil aprovados no dbt test (127/127) e lint_dbt_docs.py (100% cobertura)."
       },
       {
         "gate_id": "GATE_11",
         "name": "Teste Real de 1 Linha com API ao Vivo (Fail-Hard)",
         "status": "PASSED",
-        "criteria": "Execucao obrigatoria contra portais oficiais RFB ITR/CAFIR e INCRA CNIR (gov.br) validando HTTP 200; falha reprova o pipeline."
+        "criteria": "Execucao obrigatoria contra portais oficiais INPE Queimadas (dataserver-coids.inpe.br) e SEEG (seeg.eco.br) validando HTTP 200; falha reprova o pipeline."
       }
     ]
   },
@@ -750,6 +750,12 @@
       "phase_id": "11.5",
       "milestone": "Wave 11.5B (4/8) — Homologação do Conector rfb_cafir (4 Tabelas Silver CAFIR/CNIR, Mart Intra-Domínio, Mart Cross-Domain ESG & Paridade 4 Interfaces)",
       "summary": "Implementação completa nos 11 Gates do conector rfb_cafir (RFB Cadastro de Imóveis Rurais CAFIR / CIB / CNIR): contrato ODCS v3.1, ingestão Bronze + 4 tabelas Silver ZSTD (cafir_imoveis_rurais, cafir_vinculos_cnir_sncr, cafir_concentracao_fundiaria, cafir_resumo_municipal) + Gold ML (features_fundiario_cafir), 4 staging views + fct_imoveis_rurais_cafir_municipal + mart intra-domínio mart_cadastro_imoveis_rurais_cafir_brasil + enriquecimento da mart cross-domain mart_cross_domain_esg_agro_infra_brasil (121 testes dbt OK, 100% colunas documentadas no lint_dbt_docs.py com 548 modelos / 7.544 colunas), paridade em SDK/FastAPI/CLI/MCP, bateria offline e teste live fail-hard contra portais oficiais RFB ITR/CAFIR e INCRA CNIR."
+    },
+    {
+      "date": "2026-11-18",
+      "phase_id": "11.5",
+      "milestone": "Wave 11.5B (5/8) — Homologação do Conector inpe_queimadas_seeg (4 Tabelas Silver INPE/SEEG, Mart Intra-Domínio, Mart Cross-Domain ESG & Paridade 4 Interfaces)",
+      "summary": "Implementação completa nos 11 Gates do conector inpe_queimadas_seeg (INPE Programa Queimadas & Observatório do Clima SEEG): contrato ODCS v3.1, ingestão Bronze + 4 tabelas Silver ZSTD (inpe_focos_queimadas, seeg_emissoes_gee_setor, inpe_risco_fogo_mensal, queimadas_seeg_resumo_municipal) + Gold ML (features_queimadas_emissoes_gee), 4 staging views + fct_queimadas_emissoes_gee_municipal + mart intra-domínio mart_queimadas_emissoes_seeg_brasil + enriquecimento da mart cross-domain mart_cross_domain_esg_agro_infra_brasil (127 testes dbt OK, 100% colunas documentadas no lint_dbt_docs.py com 554 modelos / 7.623 colunas), paridade em SDK/FastAPI/CLI/MCP, bateria offline e teste live fail-hard contra dataserver-coids.inpe.br e seeg.eco.br."
     }
   ]
 }
