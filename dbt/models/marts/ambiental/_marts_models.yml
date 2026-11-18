@@ -799,3 +799,61 @@ models:
       - name: tier_marco_saneamento_2033
         description: "Classificação municipal frente ao Novo Marco Legal (UNIVERSALIZADO_META_2033, EM_CONSOLIDACAO_REGULATORIA ou DEFICIT_SANEAMENTO_CRITICO)."
         tests: [not_null]
+
+  - name: mart_desastres_defesa_civil_sedec_brasil
+    description: "Data Mart Gold municipal consolidando desastres naturais S2ID/SEDEC, decretações de emergência/calamidade, prejuízos econômicos e score de resiliência climática (CEMADEN)."
+    columns:
+      - name: id_municipio
+        description: "Código IBGE de 7 dígitos do município (STRING)."
+        tests: [not_null, unique]
+      - name: sigla_uf
+        description: "Sigla da Unidade da Federação (UF)."
+        tests: [not_null]
+      - name: nome_municipio
+        description: "Nome oficial do município."
+        tests: [not_null]
+      - name: regiao
+        description: "Macrorregião geográfica brasileira."
+        tests: [not_null]
+      - name: qtd_desastres_s2id_5a
+        description: "Total de eventos de desastres naturais registrados no S2ID nos últimos 5 anos."
+        tests: [not_null]
+      - name: qtd_ocorrencias_s2id_registradas
+        description: "Quantidade de registros FIDE/COBRADE individuais na camada Silver."
+        tests: [not_null]
+      - name: qtd_decretos_emergencia_5a
+        description: "Total de decretos de Situação de Emergência e Calamidade Pública em 5 anos."
+        tests: [not_null]
+      - name: qtd_decretos_se_5_anos
+        description: "Quantidade de decretos federais de Situação de Emergência (SE) em 5 anos."
+        tests: [not_null]
+      - name: qtd_decretos_calamidade_5_anos
+        description: "Quantidade de decretos federais de Calamidade Pública (ECP) em 5 anos."
+        tests: [not_null]
+      - name: total_afetados_5a
+        description: "População total afetada por eventos climáticos extremos em 5 anos."
+        tests: [not_null]
+      - name: prejuizos_economicos_mil_brl
+        description: "Prejuízos econômicos públicos e privados estimados no S2ID (R$ mil)."
+        tests: [not_null]
+      - name: recursos_federais_liberados_mil_brl
+        description: "Recursos federais da Defesa Civil liberados para resposta e reconstrução (R$ mil)."
+        tests: [not_null]
+      - name: qtd_pluviometros_cemaden
+        description: "Quantidade de pluviômetros automáticos CEMADEN em operação no município."
+        tests: [not_null]
+      - name: populacao_area_risco_pct
+        description: "Percentual da população municipal residente em áreas de risco mapeadas (%)."
+        tests: [not_null]
+      - name: possui_plano_contingencia_ativo
+        description: "Indicador booleano de vigência do Plano de Contingência Municipal (PLANCON)."
+        tests: [not_null]
+      - name: alertas_cemaden_12m
+        description: "Alertas geohidrológicos de risco alto emitidos pelo CEMADEN nos últimos 12 meses."
+        tests: [not_null]
+      - name: score_resiliencia_desastres_sedec
+        description: "Score sintético municipal de resiliência frente a desastres naturais e calamidades climáticas (0-100)."
+        tests: [not_null]
+      - name: tier_vulnerabilidade_climatica_s2id
+        description: "Classificação de risco municipal S2ID/CEMADEN (BAIXA_VULNERABILIDADE_DESASTRES, RISCO_HIDROCLIMATICO_MODERADO ou ALTA_RECORRENCIA_CALAMIDADES)."
+        tests: [not_null]

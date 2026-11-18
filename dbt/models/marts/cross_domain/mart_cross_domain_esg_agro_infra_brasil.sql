@@ -134,6 +134,15 @@ snis_saneamento AS (
     FROM {{ ref('mart_saneamento_basico_snis_brasil') }}
 ),
 
+sedec_desastres AS (
+    SELECT
+        id_municipio,
+        qtd_desastres_s2id_5a,
+        prejuizos_economicos_mil_brl AS prejuizos_desastres_mil_brl,
+        score_resiliencia_desastres_sedec
+    FROM {{ ref('mart_desastres_defesa_civil_sedec_brasil') }}
+),
+
 joined AS (
     SELECT
         t.id_municipio,
@@ -186,6 +195,9 @@ joined AS (
         COALESCE(sn.atendimento_agua_snis_pct, 85.0) AS atendimento_agua_snis_pct,
         COALESCE(sn.atendimento_esgoto_snis_pct, 60.0) AS atendimento_esgoto_snis_pct,
         COALESCE(sn.score_universalizacao_saneamento_snis, 65.0) AS score_universalizacao_saneamento_snis,
+        COALESCE(sd.qtd_desastres_s2id_5a, 0) AS qtd_desastres_s2id_5a,
+        COALESCE(sd.prejuizos_desastres_mil_brl, 0.0) AS prejuizos_desastres_mil_brl,
+        COALESCE(sd.score_resiliencia_desastres_sedec, 70.0) AS score_resiliencia_desastres_sedec,
         t.reference_date
     FROM terra t
     LEFT JOIN sicar s ON t.id_municipio = s.id_municipio
@@ -200,6 +212,7 @@ joined AS (
     LEFT JOIN aneel_mmgd an ON t.id_municipio = an.id_municipio
     LEFT JOIN anp_comb anp ON t.id_municipio = anp.id_municipio
     LEFT JOIN snis_saneamento sn ON t.id_municipio = sn.id_municipio
+    LEFT JOIN sedec_desastres sd ON t.id_municipio = sd.id_municipio
 ),
 
 scored AS (
