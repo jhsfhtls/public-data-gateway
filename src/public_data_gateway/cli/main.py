@@ -825,6 +825,36 @@ def build_parser() -> argparse.ArgumentParser:
     antt_rk_p.add_argument("--uf", type=str, help="Optional 2-letter state filter")
     antt_rk_p.add_argument("--json", action="store_true", help="Output in JSON format")
 
+    # SENATRAN Frota de Veículos (RENAVAM & Eletrificação) command group
+    fr_p = subparsers.add_parser("frota", help="Query SENATRAN/RENAVAM municipal vehicle fleet, EV electrification, age, and mobility rankings.")
+    fr_sub = fr_p.add_subparsers(dest="frota_action", required=True)
+
+    fr_tp_p = fr_sub.add_parser("tipos", help="Lookup active RENAVAM vehicle fleet by type, code, IBGE, UF, or city.")
+    fr_tp_p.add_argument("termo", help="Vehicle category, survey code, IBGE code, UF, or municipality name")
+    fr_tp_p.add_argument("--json", action="store_true", help="Output in JSON format")
+
+    fr_pr_p = fr_sub.add_parser("propulsao", help="Lookup SENATRAN fleet propulsion energy matrix and EV/HEV share.")
+    fr_pr_p.add_argument("termo", help="Propulsion code, energy matrix, IBGE code, UF, or municipality name")
+    fr_pr_p.add_argument("--json", action="store_true", help="Output in JSON format")
+
+    fr_id_p = fr_sub.add_parser("idade", help="Get municipal fleet average age, motorization rate, and annual renewals.")
+    fr_id_p.add_argument("id_municipio_or_name", help="7-digit IBGE code or municipality name")
+    fr_id_p.add_argument("--json", action="store_true", help="Output in JSON format")
+
+    fr_mun_p = fr_sub.add_parser("municipio", help="Get consolidated municipal RENAVAM fleet summary, trucks, and EV count.")
+    fr_mun_p.add_argument("id_municipio_or_name", help="7-digit IBGE code or municipality name")
+    fr_mun_p.add_argument("--json", action="store_true", help="Output in JSON format")
+
+    fr_ft_p = fr_sub.add_parser("features", help="Get Gold SENATRAN vehicle fleet modernization score and mobility tier.")
+    fr_ft_p.add_argument("id_municipio_or_name", help="7-digit IBGE code or municipality name")
+    fr_ft_p.add_argument("--json", action="store_true", help="Output in JSON format")
+
+    fr_rk_p = fr_sub.add_parser("ranking", help="List municipalities ranked by fleet modernization score or EV/HEV volume.")
+    fr_rk_p.add_argument("--limit", type=int, default=10, help="Max municipalities to list")
+    fr_rk_p.add_argument("--uf", type=str, help="Optional 2-letter state filter")
+    fr_rk_p.add_argument("--ev", action="store_true", help="Sort descending by electrified BEV/PHEV/HEV fleet")
+    fr_rk_p.add_argument("--json", action="store_true", help="Output in JSON format")
+
     # DataSUS CNES (Cadastro Nacional de Estabelecimentos de Saúde) command group
     cnes_p = subparsers.add_parser("cnes", help="Query DataSUS CNES health establishments, beds/ICU, equipment, and workforce analytics.")
     cnes_sub = cnes_p.add_subparsers(dest="cnes_action", required=True)
@@ -3689,6 +3719,84 @@ def main(argv: Sequence[str] | None = None) -> int:
                     for idx, r in enumerate(ranks, 1):
                         print(f"  {idx}. {r.get('nome_municipio')} ({r.get('sigla_uf')}): Score {r.get('score_infraestrutura_logistica')} | Intermodal: {r.get('score_intermodalidade_cargas')} | {r.get('classificacao_nodo_logistico')}")
                 return 0
+
+        elif args.command == "frota":
+            from public_data_gateway.connectors.geografico.senatran_frota import (
+                SenatranFrotaConnector,
+            )
+
+            fr_conn = SenatranFrotaConnector()
+            fr_action = getattr(args, "frota_action", "")
+            try:
+                if fr_action == "tipos":
+                    rows = fr_conn.get_fleet_by_type(args.termo)
+                    if getattr(args, "json", False):
+                        print(json.dumps(rows, indent=2, ensure_ascii=False, default=str))
+                    else:
+                        print(f"SENATRAN Frota por Tipo ({len(rows)}):")
+                        for r in rows:
+                            print(f"  {r.get('cod_frota_tipo')} | {r.get('nome_municipio')} ({r.get('sigla_uf')}): {r.get('tipo_veiculo')} = {r.get('qtd_veiculos_ativos')}")
+                    return 0
+
+                if fr_action == "propulsao":
+                    rows = fr_conn.get_fleet_propulsion_ev(args.termo)
+                    if getattr(args, "json", False):
+                        print(json.dumps(rows, indent=2, ensure_ascii=False, default=str))
+                    else:
+                        print(f"SENATRAN Matriz Propulsão ({len(rows)}):")
+                        for r in rows:
+                            print(f"  {r.get('cod_frota_comb')} | {r.get('nome_municipio')} ({r.get('sigla_uf')}): {r.get('matriz_propulsao')} = {r.get('qtd_veiculos')}")
+                    return 0
+
+                if fr_action == "idade":
+                    res = fr_conn.get_fleet_age_renewal(args.id_municipio_or_name)
+                    if res is None:
+                        print(f"Idade da frota não encontrada para: {args.id_municipio_or_name}", file=sys.stderr)
+                        return 1
+                    if getattr(args, "json", False):
+                        print(json.dumps(res, indent=2, ensure_ascii=False, default=str))
+                    else:
+                        print(f"SENATRAN Idade Frota ({res.get('nome_municipio')} - {res.get('sigla_uf')}): Média {res.get('idade_media_frota_anos')} anos | Motorização {res.get('taxa_motorizacao_100hab')}/100hab")
+                    return 0
+
+                if fr_action == "municipio":
+                    res = fr_conn.get_fleet_municipal_summary(args.id_municipio_or_name)
+                    if res is None:
+                        print(f"Resumo de frota SENATRAN não encontrado para: {args.id_municipio_or_name}", file=sys.stderr)
+                        return 1
+                    if getattr(args, "json", False):
+                        print(json.dumps(res, indent=2, ensure_ascii=False, default=str))
+                    else:
+                        print(f"SENATRAN Frota Município ({res.get('nome_municipio')} - {res.get('sigla_uf')}): {res.get('frota_total_veiculos')} veículos | EVs {res.get('qtd_eletrificados_bevs_hevs')}")
+                    return 0
+
+                if fr_action == "features":
+                    res = fr_conn.get_fleet_features(args.id_municipio_or_name)
+                    if res is None:
+                        print(f"Features SENATRAN Frota não encontradas para: {args.id_municipio_or_name}", file=sys.stderr)
+                        return 1
+                    if getattr(args, "json", False):
+                        print(json.dumps(res, indent=2, ensure_ascii=False, default=str))
+                    else:
+                        print(f"SENATRAN Frota Gold ({res.get('nome_municipio')} - {res.get('id_municipio')}): Score {res.get('score_modernizacao_frota_mobilidade')} | {res.get('tier_mobilidade_frota_senatran')}")
+                    return 0
+
+                if fr_action == "ranking":
+                    ranks = fr_conn.list_top_fleet_municipalities(
+                        limit=getattr(args, "limit", 10),
+                        sigla_uf=getattr(args, "uf", None),
+                        sort_by_ev=getattr(args, "ev", False),
+                    )
+                    if getattr(args, "json", False):
+                        print(json.dumps(ranks, indent=2, ensure_ascii=False, default=str))
+                    else:
+                        print(f"Ranking SENATRAN Frota ({len(ranks)}):")
+                        for idx, r in enumerate(ranks, 1):
+                            print(f"  {idx}. {r.get('nome_municipio')} ({r.get('sigla_uf')}): {r.get('score_modernizacao_frota_mobilidade')} | {r.get('tier_mobilidade_frota_senatran')}")
+                    return 0
+            except (ValueError, KeyError) as exc:
+                print(f"Erro SENATRAN Frota: {exc}", file=sys.stderr)
+                return 1
 
         elif args.command == "cnes":
             from public_data_gateway.connectors.saude.datasus_cnes.connector import (

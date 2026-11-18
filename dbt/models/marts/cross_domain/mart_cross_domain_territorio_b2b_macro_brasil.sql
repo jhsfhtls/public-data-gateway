@@ -109,6 +109,16 @@ cno_uf AS (
     GROUP BY sigla_uf
 ),
 
+frota_uf AS (
+    SELECT
+        sigla_uf,
+        SUM(frota_total_veiculos) AS qtd_veiculos_frota_uf,
+        SUM(qtd_eletrificados_bevs_hevs) AS frota_eletrificados_hibridos_uf,
+        ROUND(AVG(score_modernizacao_frota_mobilidade), 2) AS avg_score_modernizacao_frota_uf
+    FROM {{ ref('mart_frota_mobilidade_senatran_brasil') }}
+    GROUP BY sigla_uf
+),
+
 base AS (
     SELECT
         t.sigla_uf,
@@ -140,6 +150,9 @@ base AS (
         COALESCE(ag.avg_score_capilaridade_bancaria_uf, 0.0) AS avg_score_capilaridade_bancaria_uf,
         COALESCE(cn.total_obras_ativas_cno_uf, 0) AS total_obras_ativas_cno_uf,
         COALESCE(cn.area_construida_cno_uf_m2, 0.0) AS area_construida_cno_uf_m2,
+        COALESCE(fr.qtd_veiculos_frota_uf, 0) AS qtd_veiculos_frota_uf,
+        COALESCE(fr.frota_eletrificados_hibridos_uf, 0) AS frota_eletrificados_hibridos_uf,
+        COALESCE(fr.avg_score_modernizacao_frota_uf, 60.0) AS avg_score_modernizacao_frota_uf,
         COALESCE(m.ano_mes, '2025-03') AS macro_ano_mes_referencia,
         COALESCE(m.selic_meta_fim_mes_pct, 14.25) AS selic_meta_fim_mes_pct,
         COALESCE(m.ipca_acumulado_12m_pct, 5.06) AS ipca_acumulado_12m_pct,
@@ -155,6 +168,7 @@ base AS (
     LEFT JOIN estban_uf eb ON t.sigla_uf = eb.sigla_uf
     LEFT JOIN agencias_uf ag ON t.sigla_uf = ag.sigla_uf
     LEFT JOIN cno_uf cn ON t.sigla_uf = cn.sigla_uf
+    LEFT JOIN frota_uf fr ON t.sigla_uf = fr.sigla_uf
     CROSS JOIN macro_latest m
 ),
 

@@ -196,6 +196,60 @@ class GeoFacade:
             limit=limit, sigla_uf=sigla_uf
         )
 
+    @property
+    def senatran_frota_connector(self) -> Any:
+        if (
+            not hasattr(self, "_senatran_frota_connector")
+            or self._senatran_frota_connector is None
+        ):
+            from public_data_gateway.connectors.geografico.senatran_frota import (
+                SenatranFrotaConnector,
+            )
+
+            self._senatran_frota_connector = SenatranFrotaConnector(
+                settings=self._sdk.settings
+            )
+        return self._senatran_frota_connector
+
+    def get_fleet_by_type(self, termo: str) -> list[dict[str, Any]]:
+        """Lookup SENATRAN RENAVAM active vehicle fleet by category, code, IBGE, UF, or city."""
+        return self.senatran_frota_connector.get_fleet_by_type(termo)
+
+    def get_fleet_propulsion_ev(self, termo: str) -> list[dict[str, Any]]:
+        """Lookup SENATRAN municipal fleet propulsion energy matrix and EV/HEV share."""
+        return self.senatran_frota_connector.get_fleet_propulsion_ev(termo)
+
+    def get_fleet_age_renewal(
+        self, id_municipio_or_name: str
+    ) -> dict[str, Any] | None:
+        """Retrieve municipal fleet average age, motorization per 100 hab, and new licenses."""
+        return self.senatran_frota_connector.get_fleet_age_renewal(id_municipio_or_name)
+
+    def get_fleet_municipal_summary(
+        self, id_municipio_or_name: str
+    ) -> dict[str, Any] | None:
+        """Retrieve consolidated municipal RENAVAM total fleet, trucks, and EV count."""
+        return self.senatran_frota_connector.get_fleet_municipal_summary(
+            id_municipio_or_name
+        )
+
+    def get_fleet_features(
+        self, id_municipio_or_name: str
+    ) -> dict[str, Any] | None:
+        """Retrieve Gold SENATRAN vehicle fleet modernization and EV readiness features."""
+        return self.senatran_frota_connector.get_fleet_features(id_municipio_or_name)
+
+    def list_top_fleet_municipalities(
+        self,
+        limit: int = 10,
+        sigla_uf: str | None = None,
+        sort_by_ev: bool = False,
+    ) -> list[dict[str, Any]]:
+        """List municipalities ranked by fleet modernization score or EV/HEV volume."""
+        return self.senatran_frota_connector.list_top_fleet_municipalities(
+            limit=limit, sigla_uf=sigla_uf, sort_by_ev=sort_by_ev
+        )
+
 
 class ProcurementFacade:
     """Public procurement query interface powered by PNCP (Lei nº 14.133/2021)."""
@@ -3681,6 +3735,43 @@ class BrazilData:
     ) -> list[dict[str, Any]]:
         """Listar municípios líderes em score de infraestrutura logística e intermodalidade no Brasil (ANTT)."""
         return self.geo.list_top_logistics_hubs(limit=limit, sigla_uf=sigla_uf)
+
+    def get_fleet_by_type(self, termo: str) -> list[dict[str, Any]]:
+        """Consultar frota municipal ativa RENAVAM/SENATRAN por categoria veicular, UF ou município."""
+        return self.geo.get_fleet_by_type(termo)
+
+    def get_fleet_propulsion_ev(self, termo: str) -> list[dict[str, Any]]:
+        """Consultar matriz energética veicular SENATRAN e participação de eletrificados (BEV/PHEV/HEV)."""
+        return self.geo.get_fleet_propulsion_ev(termo)
+
+    def get_fleet_age_renewal(
+        self, id_municipio_or_name: str
+    ) -> dict[str, Any] | None:
+        """Consultar idade média da frota, taxa de motorização e emplacamentos anuais (SENATRAN)."""
+        return self.geo.get_fleet_age_renewal(id_municipio_or_name)
+
+    def get_fleet_municipal_summary(
+        self, id_municipio_or_name: str
+    ) -> dict[str, Any] | None:
+        """Consultar consolidado municipal da frota total RENAVAM, caminhões e veículos eletrificados."""
+        return self.geo.get_fleet_municipal_summary(id_municipio_or_name)
+
+    def get_fleet_features(
+        self, id_municipio_or_name: str
+    ) -> dict[str, Any] | None:
+        """Consultar features Gold de modernização da frota veicular e mobilidade elétrica (SENATRAN)."""
+        return self.geo.get_fleet_features(id_municipio_or_name)
+
+    def list_top_fleet_municipalities(
+        self,
+        limit: int = 10,
+        sigla_uf: str | None = None,
+        sort_by_ev: bool = False,
+    ) -> list[dict[str, Any]]:
+        """Listar municípios ranqueados por modernização da frota SENATRAN ou volume de eletrificados BEV/HEV."""
+        return self.geo.list_top_fleet_municipalities(
+            limit=limit, sigla_uf=sigla_uf, sort_by_ev=sort_by_ev
+        )
 
     def get_municipal_gdp_detail(self, id_municipio: str, year: int = 2023) -> dict[str, Any] | None:
         """Consultar contas econômicas municipais detalhadas (PIB, VAB setorial, impostos e participações) do IBGE."""

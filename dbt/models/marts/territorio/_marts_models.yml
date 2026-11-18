@@ -1107,3 +1107,61 @@ models:
         description: "Timestamp ISO-8601 UTC da geração."
         tests:
           - not_null
+
+  - name: mart_frota_mobilidade_senatran_brasil
+    description: "Data Mart Gold intra-domínio consolidando frota circulante RENAVAM SENATRAN, caminhões comerciais, eletrificação BEV/PHEV/HEV e motorização municipal."
+    columns:
+      - name: id_municipio
+        description: "Código IBGE de 7 dígitos do município (STRING)."
+        tests: [not_null, unique]
+      - name: sigla_uf
+        description: "Sigla de 2 letras da Unidade Federativa (UF)."
+        tests: [not_null]
+      - name: nome_municipio
+        description: "Nome oficial do município."
+        tests: [not_null]
+      - name: regiao
+        description: "Macrorregião geográfica do município."
+        tests: [not_null]
+      - name: frota_total_veiculos
+        description: "Frota total de veículos ativos licenciados no município (RENAVAM)."
+        tests: [not_null]
+      - name: qtd_automoveis
+        description: "Quantidade municipal de automóveis licenciados."
+        tests: [not_null]
+      - name: qtd_motocicletas
+        description: "Quantidade municipal de motocicletas e motonetas."
+        tests: [not_null]
+      - name: qtd_caminhoes_utilitarios
+        description: "Quantidade de caminhões pesados e utilitários comerciais de carga."
+        tests: [not_null]
+      - name: qtd_eletrificados_bevs_hevs
+        description: "Quantidade de veículos eletrificados (BEV, PHEV e HEV) ativos."
+        tests: [not_null]
+      - name: veiculos_novos_emplacados_ano
+        description: "Emplacamentos anuais de veículos novos no município."
+        tests: [not_null]
+      - name: participacao_eletrificados_pct
+        description: "Participação percentual de eletrificados na frota circulante (%)."
+        tests: [not_null]
+      - name: idade_media_frota_anos
+        description: "Idade média da frota circulante em anos."
+        tests: [not_null]
+      - name: participacao_frota_0a5_anos_pct
+        description: "Fatia da frota municipal com até 5 anos de fabricação (%)."
+        tests: [not_null]
+      - name: taxa_motorizacao_100hab
+        description: "Veículos ativos por 100 habitantes no município."
+        tests: [not_null]
+      - name: participacao_caminhoes_pct
+        description: "Fatia percentual de veículos pesados comerciais na frota (%)."
+        tests: [not_null]
+      - name: qtd_categorias_frota
+        description: "Quantidade de categorias RENAVAM coletadas para o município."
+        tests: [not_null]
+      - name: score_modernizacao_frota_mobilidade
+        description: "Score sintético municipal de renovação da frota, eletrificação EV e mobilidade (0-100)."
+        tests: [not_null]
+      - name: tier_mobilidade_frota_senatran
+        description: "Tier municipal de modernização da frota (POLO_MOBILIDADE_FROTA_MODERNA, FROTA_URBANA_CONSOLIDADA ou FROTA_TRANSICAO_ENVELHECIDA)."
+        tests: [not_null]

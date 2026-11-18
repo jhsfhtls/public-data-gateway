@@ -1096,6 +1096,69 @@ class MCPDispatcher:
                                 },
                             },
                             {
+                                "name": "bdg_get_senatran_frota_tipos",
+                                "description": "Lookup SENATRAN/RENAVAM active vehicle fleet by vehicle type (AUTOMOVEL, MOTOCICLETA, CAMINHAO_PESADO), IBGE code, UF, or municipality.",
+                                "inputSchema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "termo": {
+                                            "type": "string",
+                                            "description": "Vehicle category, survey code, IBGE 7-digit code, UF, or municipality name",
+                                        }
+                                    },
+                                    "required": ["termo"],
+                                },
+                            },
+                            {
+                                "name": "bdg_get_senatran_frota_propulsao_ev",
+                                "description": "Lookup SENATRAN vehicle fleet fuel matrix (Flex, Diesel) and electrified BEV/PHEV/HEV share by municipality.",
+                                "inputSchema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "termo": {
+                                            "type": "string",
+                                            "description": "Propulsion code, energy matrix, IBGE code, UF, or municipality name",
+                                        }
+                                    },
+                                    "required": ["termo"],
+                                },
+                            },
+                            {
+                                "name": "bdg_get_senatran_frota_features",
+                                "description": "Get normalized Gold SENATRAN fleet modernization score, fleet age, motorization rate, and EV transition tier.",
+                                "inputSchema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "id_municipio_or_name": {
+                                            "type": "string",
+                                            "description": "7-digit IBGE municipality code or municipality name",
+                                        }
+                                    },
+                                    "required": ["id_municipio_or_name"],
+                                },
+                            },
+                            {
+                                "name": "bdg_list_top_senatran_frota_municipalities",
+                                "description": "List Brazilian municipalities ranked by SENATRAN fleet modernization score or electrified BEV/HEV volume.",
+                                "inputSchema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "limit": {
+                                            "type": "integer",
+                                            "description": "Maximum rows (default: 10)",
+                                        },
+                                        "sigla_uf": {
+                                            "type": "string",
+                                            "description": "Optional 2-letter state filter (e.g. SP)",
+                                        },
+                                        "sort_by_ev": {
+                                            "type": "boolean",
+                                            "description": "Set true to rank municipalities by highest electrified BEV/HEV fleet count first",
+                                        },
+                                    },
+                                },
+                            },
+                            {
                                 "name": "bdg_get_cnes_establishments",
                                 "description": "Get municipal DataSUS CNES summary of active health establishments, hospitals, UBS, UPA, and SUS coverage share.",
                                 "inputSchema": {
@@ -4815,6 +4878,65 @@ class MCPDispatcher:
                     },
                 }
             wrapped = wrap_untrusted_gov_data(result, source_id="antt_malha_transporte")
+            return {
+                "jsonrpc": "2.0",
+                "id": req_id,
+                "result": {"content": [{"type": "text", "text": wrapped}], "isError": False},
+            }
+
+        if tool_name in {
+            "bdg_get_senatran_frota_tipos",
+            "bdg_get_senatran_frota_propulsao_ev",
+            "bdg_get_senatran_frota_features",
+            "bdg_list_top_senatran_frota_municipalities",
+        }:
+            from public_data_gateway.connectors.geografico.senatran_frota import (
+                SenatranFrotaConnector,
+            )
+
+            connector = SenatranFrotaConnector(settings=self.settings)
+            try:
+                if tool_name == "bdg_get_senatran_frota_tipos":
+                    result: Any = connector.get_fleet_by_type(str(args.get("termo", "")))
+                elif tool_name == "bdg_get_senatran_frota_propulsao_ev":
+                    result = connector.get_fleet_propulsion_ev(str(args.get("termo", "")))
+                elif tool_name == "bdg_get_senatran_frota_features":
+                    result = connector.get_fleet_features(
+                        str(args.get("id_municipio_or_name", ""))
+                    )
+                else:
+                    result = connector.list_top_fleet_municipalities(
+                        limit=int(args.get("limit", 10)),
+                        sigla_uf=args.get("sigla_uf"),
+                        sort_by_ev=bool(args.get("sort_by_ev", False)),
+                    )
+            except (ValueError, KeyError) as exc:
+                return {
+                    "jsonrpc": "2.0",
+                    "id": req_id,
+                    "result": {
+                        "content": [
+                            {"type": "text", "text": f"SENATRAN Frota parameter error: {exc}"}
+                        ],
+                        "isError": True,
+                    },
+                }
+
+            if not result:
+                return {
+                    "jsonrpc": "2.0",
+                    "id": req_id,
+                    "result": {
+                        "content": [
+                            {
+                                "type": "text",
+                                "text": "No SENATRAN vehicle fleet data found for the query.",
+                            }
+                        ],
+                        "isError": True,
+                    },
+                }
+            wrapped = wrap_untrusted_gov_data(result, source_id="senatran_frota")
             return {
                 "jsonrpc": "2.0",
                 "id": req_id,
