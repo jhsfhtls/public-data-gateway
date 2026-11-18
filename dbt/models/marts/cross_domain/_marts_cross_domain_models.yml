@@ -199,6 +199,15 @@ models:
       - name: avg_score_maturidade_seguros_uf
         description: "Média estadual do score de maturidade do mercado segurador e solvência SUSEP (0-100)."
         tests: [not_null]
+      - name: patentes_depositadas_inpi_uf
+        description: "Quantidade anual estadual de depósitos de patentes publicados na RPI/INPI."
+        tests: [not_null]
+      - name: registros_software_inpi_uf
+        description: "Total estadual de registros de programas de computador concedidos pelo INPI."
+        tests: [not_null]
+      - name: avg_score_inovacao_pi_uf
+        description: "Média estadual do score de intensidade de propriedade intelectual e inovação tecnológica INPI (0-100)."
+        tests: [not_null]
       - name: macro_ano_mes_referencia
         description: "Competência macroeconômica de referência (YYYY-MM)."
         tests: [not_null]

@@ -286,4 +286,62 @@ models:
         tests:
           - not_null
 
+  - name: mart_inpi_propriedade_intelectual_brasil
+    description: "Data Mart Gold intra-domínio consolidando depósitos de patentes INPI/RPI, registros de marcas, desenhos industriais, programas de computador e score de inovação tecnológica municipal."
+    columns:
+      - name: id_municipio
+        description: "Código IBGE de 7 dígitos do município (STRING)."
+        tests: [not_null, unique]
+      - name: sigla_uf
+        description: "Sigla de 2 letras da Unidade Federativa (UF)."
+        tests: [not_null]
+      - name: nome_municipio
+        description: "Nome oficial do município."
+        tests: [not_null]
+      - name: regiao
+        description: "Macrorregião geográfica brasileira."
+        tests: [not_null]
+      - name: patentes_depositadas_12m
+        description: "Quantidade anual de pedidos de patentes depositados no INPI no município."
+        tests: [not_null]
+      - name: marcas_concedidas_12m
+        description: "Total de registros ativos de marcas concedidas vinculados ao município."
+        tests: [not_null]
+      - name: registros_software_total
+        description: "Quantidade total de programas de computador registrados junto ao INPI."
+        tests: [not_null]
+      - name: contratos_tecnologia_ativos
+        description: "Quantidade de contratos ativos de transferência de tecnologia averbados no INPI."
+        tests: [not_null]
+      - name: patentes_por_100k_hab
+        description: "Densidade anual de depósitos de patentes por 100 mil habitantes."
+        tests: [not_null]
+      - name: qtd_naturezas_pi_rpi
+        description: "Quantidade de naturezas de propriedade industrial consolidadas na camada Silver RPI."
+        tests: [not_null]
+      - name: concessoes_patentes_software_12m
+        description: "Soma anual de concessões de patentes e registros de software publicados."
+        tests: [not_null]
+      - name: desenhos_industriais_vigentes
+        description: "Total de desenhos industriais vigentes vinculados ao município."
+        tests: [not_null]
+      - name: taxa_concessao_marcas_pct
+        description: "Percentual de deferimento nos pedidos de registro de marcas INPI (%)."
+        tests: [not_null]
+      - name: participacao_saas_tech_pct
+        description: "Participação percentual de registros de marcas nas classes de tecnologia Nice (%)."
+        tests: [not_null]
+      - name: ict_universidades_depositantes
+        description: "Quantidade de universidades e ICTs depositantes ativos no INPI."
+        tests: [not_null]
+      - name: indicacoes_geograficas_locais
+        description: "Quantidade de Indicações Geográficas (IG) reconhecidas no território."
+        tests: [not_null]
+      - name: score_inovacao_propriedade_intelectual
+        description: "Score sintético municipal de intensidade de propriedade intelectual e inovação tecnológica INPI (0-100)."
+        tests: [not_null]
+      - name: tier_inovacao_tecnologica_inpi
+        description: "Classificação municipal INPI (POLO_DEEP_TECH_INOVACAO_INPI, ECOSSISTEMA_PI_CONSOLIDADO ou INOVACAO_TECNOLOGICA_EMERGENTE)."
+        tests: [not_null]
+
 

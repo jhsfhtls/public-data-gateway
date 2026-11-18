@@ -769,6 +769,36 @@ def build_parser() -> argparse.ArgumentParser:
     cno_rk.add_argument("--uf", type=str, default=None, help="Optional 2-letter UF state filter")
     cno_rk.add_argument("--json", action="store_true", help="Output in JSON format")
 
+    # INPI Propriedade Intelectual (Patentes, Marcas & Software) command group
+    inpi_p = subparsers.add_parser("inpi-pi", help="Query INPI patents, trademarks, industrial designs, software registrations, and innovation rankings.")
+    inpi_sub = inpi_p.add_subparsers(dest="inpi_pi_action", required=True)
+
+    inpi_pat_p = inpi_sub.add_parser("patentes", help="Lookup INPI patent & IP filings by process code, nature, IPC/Nice, IBGE, UF, or city.")
+    inpi_pat_p.add_argument("termo", help="INPI process code, IP nature, IPC/Nice code, IBGE code, UF, or municipality name")
+    inpi_pat_p.add_argument("--json", action="store_true", help="Output in JSON format")
+
+    inpi_mrc_p = inpi_sub.add_parser("marcas", help="Lookup INPI trademark registrations and industrial designs.")
+    inpi_mrc_p.add_argument("termo", help="Trademark code, IBGE code, UF, or municipality name")
+    inpi_mrc_p.add_argument("--json", action="store_true", help="Output in JSON format")
+
+    inpi_sw_p = inpi_sub.add_parser("software", help="Get municipal INPI software registrations, ICTs, and technology transfer contracts.")
+    inpi_sw_p.add_argument("id_municipio_or_name", help="7-digit IBGE code or municipality name")
+    inpi_sw_p.add_argument("--json", action="store_true", help="Output in JSON format")
+
+    inpi_mun_p = inpi_sub.add_parser("municipio", help="Get consolidated municipal INPI patents, trademarks, software, and density per 100k.")
+    inpi_mun_p.add_argument("id_municipio_or_name", help="7-digit IBGE code or municipality name")
+    inpi_mun_p.add_argument("--json", action="store_true", help="Output in JSON format")
+
+    inpi_ft_p = inpi_sub.add_parser("features", help="Get Gold INPI intellectual-property innovation score and Deep Tech tier.")
+    inpi_ft_p.add_argument("id_municipio_or_name", help="7-digit IBGE code or municipality name")
+    inpi_ft_p.add_argument("--json", action="store_true", help="Output in JSON format")
+
+    inpi_rk_p = inpi_sub.add_parser("ranking", help="List municipalities ranked by INPI intellectual-property innovation or patent filings.")
+    inpi_rk_p.add_argument("--limit", type=int, default=10, help="Max municipalities to list")
+    inpi_rk_p.add_argument("--uf", type=str, help="Optional 2-letter state filter")
+    inpi_rk_p.add_argument("--patentes", action="store_true", help="Sort descending by annual patent filings")
+    inpi_rk_p.add_argument("--json", action="store_true", help="Output in JSON format")
+
     # Subcommand: procurement (Compras.gov.br CATMAT/CATSER & Preços)
     proc_p = subparsers.add_parser(
         "procurement", help="Query Compras.gov.br CATMAT/CATSER catalogs and procurement price benchmarks."
@@ -4019,6 +4049,84 @@ def main(argv: Sequence[str] | None = None) -> int:
                 return 1
             print(json.dumps(out, indent=2, ensure_ascii=False))
             return 0
+
+        elif args.command == "inpi-pi":
+            from public_data_gateway.connectors.empresarial.inpi_propriedade_intelectual import (
+                InpiPropriedadeIntelectualConnector,
+            )
+
+            inpi_conn = InpiPropriedadeIntelectualConnector()
+            inpi_action = getattr(args, "inpi_pi_action", "")
+            try:
+                if inpi_action == "patentes":
+                    rows = inpi_conn.get_inpi_patentes(args.termo)
+                    if getattr(args, "json", False):
+                        print(json.dumps(rows, indent=2, ensure_ascii=False, default=str))
+                    else:
+                        print(f"INPI Patentes & PI ({len(rows)}):")
+                        for r in rows:
+                            print(f"  {r.get('cod_processo_inpi')} | {r.get('nome_municipio')} ({r.get('sigla_uf')}): {r.get('natureza_ativo_pi')} | {r.get('depositos_anuais_rpi')} dep")
+                    return 0
+
+                if inpi_action == "marcas":
+                    rows = inpi_conn.get_inpi_marcas(args.termo)
+                    if getattr(args, "json", False):
+                        print(json.dumps(rows, indent=2, ensure_ascii=False, default=str))
+                    else:
+                        print(f"INPI Marcas & Desenhos ({len(rows)}):")
+                        for r in rows:
+                            print(f"  {r.get('cod_marca_inpi')} | {r.get('nome_municipio')} ({r.get('sigla_uf')}): {r.get('registros_marcas_ativos')} marcas")
+                    return 0
+
+                if inpi_action == "software":
+                    res = inpi_conn.get_inpi_software_transferencia(args.id_municipio_or_name)
+                    if res is None:
+                        print(f"Dados de software/TT INPI não encontrados para: {args.id_municipio_or_name}", file=sys.stderr)
+                        return 1
+                    if getattr(args, "json", False):
+                        print(json.dumps(res, indent=2, ensure_ascii=False, default=str))
+                    else:
+                        print(f"INPI Software & TT ({res.get('nome_municipio')} - {res.get('sigla_uf')}): {res.get('registros_programa_computador')} software | {res.get('contratos_transferencia_tecnologia')} contratos")
+                    return 0
+
+                if inpi_action == "municipio":
+                    res = inpi_conn.get_inpi_municipal_summary(args.id_municipio_or_name)
+                    if res is None:
+                        print(f"Resumo INPI não encontrado para: {args.id_municipio_or_name}", file=sys.stderr)
+                        return 1
+                    if getattr(args, "json", False):
+                        print(json.dumps(res, indent=2, ensure_ascii=False, default=str))
+                    else:
+                        print(f"INPI Município ({res.get('nome_municipio')} - {res.get('sigla_uf')}): {res.get('patentes_depositadas_12m')} patentes | {res.get('marcas_concedidas_12m')} marcas")
+                    return 0
+
+                if inpi_action == "features":
+                    res = inpi_conn.get_inpi_features(args.id_municipio_or_name)
+                    if res is None:
+                        print(f"Features INPI não encontradas para: {args.id_municipio_or_name}", file=sys.stderr)
+                        return 1
+                    if getattr(args, "json", False):
+                        print(json.dumps(res, indent=2, ensure_ascii=False, default=str))
+                    else:
+                        print(f"INPI PI Gold ({res.get('nome_municipio')} - {res.get('id_municipio')}): Score {res.get('score_inovacao_propriedade_intelectual')} | {res.get('tier_inovacao_tecnologica_inpi')}")
+                    return 0
+
+                if inpi_action == "ranking":
+                    ranks = inpi_conn.list_top_inpi_municipalities(
+                        limit=getattr(args, "limit", 10),
+                        sigla_uf=getattr(args, "uf", None),
+                        sort_by_patentes=getattr(args, "patentes", False),
+                    )
+                    if getattr(args, "json", False):
+                        print(json.dumps(ranks, indent=2, ensure_ascii=False, default=str))
+                    else:
+                        print(f"Ranking INPI Inovação & PI ({len(ranks)}):")
+                        for idx, r in enumerate(ranks, 1):
+                            print(f"  {idx}. {r.get('nome_municipio')} ({r.get('sigla_uf')}): {r.get('score_inovacao_propriedade_intelectual')} | {r.get('tier_inovacao_tecnologica_inpi')}")
+                    return 0
+            except (ValueError, KeyError) as exc:
+                print(f"Erro INPI PI: {exc}", file=sys.stderr)
+                return 1
 
         elif args.command in {"procurement", "catmat"}:
             from public_data_gateway.connectors.compras_publicas.comprasgov_catmat import (

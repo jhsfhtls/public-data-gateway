@@ -323,6 +323,51 @@ class MCPDispatcher:
                                 },
                             },
                             {
+                                "name": "bdg_get_inpi_patentes",
+                                "description": "Lookup INPI patent filings and RPI IP processes by code, IP nature, IPC/Nice class, IBGE, UF, or city.",
+                                "inputSchema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "termo": {"type": "string", "description": "INPI code, nature (e.g. PATENTE_INVECAO), IPC/Nice, IBGE, UF, or city"},
+                                    },
+                                    "required": ["termo"],
+                                },
+                            },
+                            {
+                                "name": "bdg_get_inpi_marcas",
+                                "description": "Lookup INPI active trademark registrations, industrial designs, and SaaS share by municipality or UF.",
+                                "inputSchema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "termo": {"type": "string", "description": "Trademark code, IBGE code, UF, or municipality name"},
+                                    },
+                                    "required": ["termo"],
+                                },
+                            },
+                            {
+                                "name": "bdg_get_inpi_features",
+                                "description": "Get normalized Gold INPI intellectual-property innovation score, patent density, and Deep Tech tier.",
+                                "inputSchema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "id_municipio_or_name": {"type": "string", "description": "7-digit IBGE municipality code or municipality name"},
+                                    },
+                                    "required": ["id_municipio_or_name"],
+                                },
+                            },
+                            {
+                                "name": "bdg_list_top_inpi_municipalities",
+                                "description": "List Brazilian municipalities ranked by INPI intellectual-property innovation score or annual patent filings.",
+                                "inputSchema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "limit": {"type": "integer", "description": "Maximum rows (default: 10)"},
+                                        "sigla_uf": {"type": "string", "description": "Optional 2-letter state filter (e.g. SP)"},
+                                        "sort_by_patentes": {"type": "boolean", "description": "Set true to rank municipalities by highest annual patent filings first"},
+                                    },
+                                },
+                            },
+                            {
                                 "name": "bdg_get_cvm_company",
                                 "description": "Query official CVM registration, sector, and latest financial snapshot for a publicly traded company (Tier 1).",
                                 "inputSchema": {
@@ -4401,6 +4446,67 @@ class MCPDispatcher:
             cnpj_val = args.get("cnpj") or args.get("documento") or ""
             res = suf_conn.get_tax_incentives_profile(cnpj_val)
             wrapped = wrap_untrusted_gov_data(res, source_id="suframa_pim_zfm")
+            return {
+                "jsonrpc": "2.0",
+                "id": req_id,
+                "result": {"content": [{"type": "text", "text": wrapped}], "isError": False},
+            }
+
+        if tool_name in {
+            "bdg_get_inpi_patentes",
+            "bdg_get_inpi_marcas",
+            "bdg_get_inpi_features",
+            "bdg_list_top_inpi_municipalities",
+        }:
+            from public_data_gateway.connectors.empresarial.inpi_propriedade_intelectual import (
+                InpiPropriedadeIntelectualConnector,
+            )
+
+            connector = InpiPropriedadeIntelectualConnector(settings=self.settings)
+            try:
+                if tool_name == "bdg_get_inpi_patentes":
+                    result: Any = connector.get_inpi_patentes(str(args.get("termo", "")))
+                elif tool_name == "bdg_get_inpi_marcas":
+                    result = connector.get_inpi_marcas(str(args.get("termo", "")))
+                elif tool_name == "bdg_get_inpi_features":
+                    result = connector.get_inpi_features(
+                        str(args.get("id_municipio_or_name", ""))
+                    )
+                else:
+                    result = connector.list_top_inpi_municipalities(
+                        limit=int(args.get("limit", 10)),
+                        sigla_uf=args.get("sigla_uf"),
+                        sort_by_patentes=bool(args.get("sort_by_patentes", False)),
+                    )
+            except (ValueError, KeyError) as exc:
+                return {
+                    "jsonrpc": "2.0",
+                    "id": req_id,
+                    "result": {
+                        "content": [
+                            {"type": "text", "text": f"INPI Propriedade Intelectual error: {exc}"}
+                        ],
+                        "isError": True,
+                    },
+                }
+
+            if not result:
+                return {
+                    "jsonrpc": "2.0",
+                    "id": req_id,
+                    "result": {
+                        "content": [
+                            {
+                                "type": "text",
+                                "text": "No INPI intellectual property data found for the query.",
+                            }
+                        ],
+                        "isError": True,
+                    },
+                }
+            wrapped = wrap_untrusted_gov_data(
+                result, source_id="inpi_propriedade_intelectual"
+            )
             return {
                 "jsonrpc": "2.0",
                 "id": req_id,

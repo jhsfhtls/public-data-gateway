@@ -540,6 +540,92 @@ def create_app(settings: GatewaySettings | None = None) -> FastAPI:
             limit=limit, sigla_uf=uf
         )
 
+    @app.get("/api/v1/company/inpi/patentes/{termo}")
+    async def get_inpi_patentes(termo: str) -> list[dict[str, Any]]:
+        from public_data_gateway.connectors.empresarial.inpi_propriedade_intelectual import (
+            InpiPropriedadeIntelectualConnector,
+        )
+
+        return InpiPropriedadeIntelectualConnector(settings=app_settings).get_inpi_patentes(
+            termo
+        )
+
+    @app.get("/api/v1/company/inpi/marcas/{termo}")
+    async def get_inpi_marcas(termo: str) -> list[dict[str, Any]]:
+        from public_data_gateway.connectors.empresarial.inpi_propriedade_intelectual import (
+            InpiPropriedadeIntelectualConnector,
+        )
+
+        return InpiPropriedadeIntelectualConnector(settings=app_settings).get_inpi_marcas(
+            termo
+        )
+
+    @app.get("/api/v1/company/inpi/software/{id_municipio_or_name}")
+    async def get_inpi_software(id_municipio_or_name: str) -> dict[str, Any]:
+        from public_data_gateway.connectors.empresarial.inpi_propriedade_intelectual import (
+            InpiPropriedadeIntelectualConnector,
+        )
+
+        res = InpiPropriedadeIntelectualConnector(
+            settings=app_settings
+        ).get_inpi_software_transferencia(id_municipio_or_name)
+        if not res:
+            raise HTTPException(
+                status_code=404,
+                detail=f"INPI software/technology transfer not found for '{id_municipio_or_name}'",
+            )
+        return res
+
+    @app.get("/api/v1/company/inpi/municipio/{id_municipio_or_name}")
+    async def get_inpi_municipio(id_municipio_or_name: str) -> dict[str, Any]:
+        from public_data_gateway.connectors.empresarial.inpi_propriedade_intelectual import (
+            InpiPropriedadeIntelectualConnector,
+        )
+
+        res = InpiPropriedadeIntelectualConnector(
+            settings=app_settings
+        ).get_inpi_municipal_summary(id_municipio_or_name)
+        if not res:
+            raise HTTPException(
+                status_code=404,
+                detail=f"INPI municipal summary not found for '{id_municipio_or_name}'",
+            )
+        return res
+
+    @app.get("/api/v1/company/inpi/features/{id_municipio_or_name}")
+    async def get_inpi_features(id_municipio_or_name: str) -> dict[str, Any]:
+        from public_data_gateway.connectors.empresarial.inpi_propriedade_intelectual import (
+            InpiPropriedadeIntelectualConnector,
+        )
+
+        res = InpiPropriedadeIntelectualConnector(settings=app_settings).get_inpi_features(
+            id_municipio_or_name
+        )
+        if not res:
+            raise HTTPException(
+                status_code=404,
+                detail=f"INPI Gold innovation features not found for '{id_municipio_or_name}'",
+            )
+        return res
+
+    @app.get("/api/v1/company/inpi/ranking")
+    async def get_inpi_ranking(
+        limit: int = Query(10, ge=1, le=50, description="Max municipalities to return"),
+        uf: str | None = Query(None, description="Optional 2-letter UF state filter"),
+        sort_by_patentes: bool = Query(
+            False, description="Sort descending by annual patent filings"
+        ),
+    ) -> list[dict[str, Any]]:
+        from public_data_gateway.connectors.empresarial.inpi_propriedade_intelectual import (
+            InpiPropriedadeIntelectualConnector,
+        )
+
+        return InpiPropriedadeIntelectualConnector(
+            settings=app_settings
+        ).list_top_inpi_municipalities(
+            limit=limit, sigla_uf=uf, sort_by_patentes=sort_by_patentes
+        )
+
     # 11. Capital Markets & Financial Statements (CVM DFP / ITR)
     @app.get("/api/v1/finance/cvm/cias")
     @app.get("/api/v1/cvm/cias")
