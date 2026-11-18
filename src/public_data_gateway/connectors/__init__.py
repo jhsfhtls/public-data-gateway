@@ -45,6 +45,7 @@ import public_data_gateway.connectors.empresarial.company_enrich_apollo_bdc  # n
 import public_data_gateway.connectors.empresarial.gleif_lei  # noqa: F401
 import public_data_gateway.connectors.empresarial.minha_receita  # noqa: F401
 import public_data_gateway.connectors.empresarial.receitaws  # noqa: F401
+import public_data_gateway.connectors.empresarial.rfb_cno  # noqa: F401
 import public_data_gateway.connectors.empresarial.rfb_cnpj_lakehouse  # noqa: F401
 import public_data_gateway.connectors.empresarial.rfb_simples_mei  # noqa: F401
 import public_data_gateway.connectors.empresarial.suframa_pim_zfm  # noqa: F401

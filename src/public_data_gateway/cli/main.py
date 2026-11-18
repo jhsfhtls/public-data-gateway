@@ -506,6 +506,29 @@ def build_parser() -> argparse.ArgumentParser:
     ag_rk.add_argument("--uf", type=str, default=None, help="Optional 2-letter UF state filter")
     ag_rk.add_argument("--json", action="store_true", help="Output in JSON format")
 
+    # Subcommand: cno (RFB Cadastro Nacional de Obras)
+    cno_p = subparsers.add_parser(
+        "cno",
+        help="Query RFB CNO registered civil works, built areas, responsible links, and Gold construction dynamism features.",
+    )
+    cno_sub = cno_p.add_subparsers(dest="cno_action", required=True)
+
+    for act_name, act_help in [
+        ("obras", "Query registered CNO civil works by CNO code, CNPJ, IBGE, CEP, CNAE, or name."),
+        ("areas", "Query municipal built area breakdown (m²) by destination."),
+        ("vinculos", "Query construction firm and owner links in CNO."),
+        ("municipio", "Query municipal consolidated CNO work counts and total area."),
+        ("features", "Query Gold RFB CNO civil construction dynamism features."),
+    ]:
+        sp = cno_sub.add_parser(act_name, help=act_help)
+        sp.add_argument("termo", type=str, help="CNO number, CNPJ, IBGE 7-digit code, CEP, UF, or name")
+        sp.add_argument("--json", action="store_true", help="Output in JSON format")
+
+    cno_rk = cno_sub.add_parser("ranking", help="List municipalities ranked by Gold RFB CNO construction dynamism score.")
+    cno_rk.add_argument("--limit", type=int, default=10, help="Max municipalities to list")
+    cno_rk.add_argument("--uf", type=str, default=None, help="Optional 2-letter UF state filter")
+    cno_rk.add_argument("--json", action="store_true", help="Output in JSON format")
+
     # Subcommand: procurement (Compras.gov.br CATMAT/CATSER & Preços)
     proc_p = subparsers.add_parser(
         "procurement", help="Query Compras.gov.br CATMAT/CATSER catalogs and procurement price benchmarks."
@@ -2644,6 +2667,39 @@ def main(argv: Sequence[str] | None = None) -> int:
             if not out:
                 print(
                     f"No BACEN Agencias records found for action '{ag_action}'",
+                    file=sys.stderr,
+                )
+                return 1
+            print(json.dumps(out, indent=2, ensure_ascii=False))
+            return 0
+
+        elif args.command == "cno":
+            from public_data_gateway.connectors.empresarial.rfb_cno import (
+                RfbCnoConnector,
+            )
+
+            cno_conn = RfbCnoConnector(settings=settings)
+            cno_action = getattr(args, "cno_action", None)
+            if cno_action == "obras":
+                out = cno_conn.get_works(args.termo)
+            elif cno_action == "areas":
+                out = cno_conn.get_area_breakdown(args.termo)
+            elif cno_action == "vinculos":
+                out = cno_conn.get_responsible_links(args.termo)
+            elif cno_action == "municipio":
+                out = cno_conn.get_municipal_summary(args.termo)
+            elif cno_action == "features":
+                out = cno_conn.get_cno_features(args.termo)
+            elif cno_action == "ranking":
+                out = cno_conn.list_top_municipalities(
+                    limit=args.limit, sigla_uf=args.uf
+                )
+            else:
+                out = None
+
+            if not out:
+                print(
+                    f"No RFB CNO records found for action '{cno_action}'",
                     file=sys.stderr,
                 )
                 return 1

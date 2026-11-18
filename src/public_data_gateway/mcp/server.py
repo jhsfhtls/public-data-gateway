@@ -700,6 +700,50 @@ class MCPDispatcher:
                                 },
                             },
                             {
+                                "name": "bdg_get_rfb_cno_works",
+                                "description": "Lookup registered RFB CNO civil construction works by CNO code, CNPJ, IBGE 7D, CEP, CNAE, or name (Tier 1).",
+                                "inputSchema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "termo": {"type": "string", "description": "CNO inscription, CNPJ, IBGE 7D, CEP, CNAE, UF, or name"},
+                                    },
+                                    "required": ["termo"],
+                                },
+                            },
+                            {
+                                "name": "bdg_get_rfb_cno_municipal_summary",
+                                "description": "Retrieve municipal consolidated RFB CNO work counts and built area (m²) (Tier 1).",
+                                "inputSchema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "id_municipio_or_name": {"type": "string", "description": "7-digit IBGE code or municipality name"},
+                                    },
+                                    "required": ["id_municipio_or_name"],
+                                },
+                            },
+                            {
+                                "name": "bdg_get_rfb_cno_construction_features",
+                                "description": "Retrieve Gold RFB CNO civil construction dynamism and CAPEX expansion features (Tier 1).",
+                                "inputSchema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "id_municipio_or_name": {"type": "string", "description": "7-digit IBGE code or municipality name"},
+                                    },
+                                    "required": ["id_municipio_or_name"],
+                                },
+                            },
+                            {
+                                "name": "bdg_list_top_rfb_cno_municipalities",
+                                "description": "List municipalities ranked by Gold RFB CNO construction dynamism score (Tier 1).",
+                                "inputSchema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "limit": {"type": "integer", "description": "Max municipalities to return (default: 10)"},
+                                        "sigla_uf": {"type": "string", "description": "Optional 2-letter UF state filter"},
+                                    },
+                                },
+                            },
+                            {
                                 "name": "bdg_search_catmat_materials",
                                 "description": "Search materials and catalog descriptions in Compras.gov.br CATMAT/SIASG with PDM, class, and sustainability flags (Tier 1).",
                                 "inputSchema": {
@@ -3747,6 +3791,85 @@ class MCPDispatcher:
                 sigla_uf=args.get("sigla_uf"),
             )
             wrapped = wrap_untrusted_gov_data(rows, source_id="bcb_agencia")
+            return {
+                "jsonrpc": "2.0",
+                "id": req_id,
+                "result": {"content": [{"type": "text", "text": wrapped}], "isError": False},
+            }
+
+        if tool_name == "bdg_get_rfb_cno_works":
+            from public_data_gateway.connectors.empresarial.rfb_cno import (
+                RfbCnoConnector,
+            )
+
+            cno_conn = RfbCnoConnector(settings=self.settings)
+            rows = cno_conn.get_works(str(args.get("termo", "")))
+            wrapped = wrap_untrusted_gov_data(rows, source_id="rfb_cno")
+            return {
+                "jsonrpc": "2.0",
+                "id": req_id,
+                "result": {"content": [{"type": "text", "text": wrapped}], "isError": False},
+            }
+
+        if tool_name == "bdg_get_rfb_cno_municipal_summary":
+            from public_data_gateway.connectors.empresarial.rfb_cno import (
+                RfbCnoConnector,
+            )
+
+            cno_conn = RfbCnoConnector(settings=self.settings)
+            termo = str(args.get("id_municipio_or_name", ""))
+            summary = cno_conn.get_municipal_summary(termo)
+            if not summary:
+                return {
+                    "jsonrpc": "2.0",
+                    "id": req_id,
+                    "result": {
+                        "content": [{"type": "text", "text": f"RFB CNO municipal summary not found for '{termo}'"}],
+                        "isError": True,
+                    },
+                }
+            wrapped = wrap_untrusted_gov_data(summary, source_id="rfb_cno")
+            return {
+                "jsonrpc": "2.0",
+                "id": req_id,
+                "result": {"content": [{"type": "text", "text": wrapped}], "isError": False},
+            }
+
+        if tool_name == "bdg_get_rfb_cno_construction_features":
+            from public_data_gateway.connectors.empresarial.rfb_cno import (
+                RfbCnoConnector,
+            )
+
+            cno_conn = RfbCnoConnector(settings=self.settings)
+            termo = str(args.get("id_municipio_or_name", ""))
+            feat = cno_conn.get_cno_features(termo)
+            if not feat:
+                return {
+                    "jsonrpc": "2.0",
+                    "id": req_id,
+                    "result": {
+                        "content": [{"type": "text", "text": f"RFB CNO features not found for '{termo}'"}],
+                        "isError": True,
+                    },
+                }
+            wrapped = wrap_untrusted_gov_data(feat, source_id="rfb_cno")
+            return {
+                "jsonrpc": "2.0",
+                "id": req_id,
+                "result": {"content": [{"type": "text", "text": wrapped}], "isError": False},
+            }
+
+        if tool_name == "bdg_list_top_rfb_cno_municipalities":
+            from public_data_gateway.connectors.empresarial.rfb_cno import (
+                RfbCnoConnector,
+            )
+
+            cno_conn = RfbCnoConnector(settings=self.settings)
+            rows = cno_conn.list_top_municipalities(
+                limit=int(args.get("limit", 10)),
+                sigla_uf=args.get("sigla_uf"),
+            )
+            wrapped = wrap_untrusted_gov_data(rows, source_id="rfb_cno")
             return {
                 "jsonrpc": "2.0",
                 "id": req_id,

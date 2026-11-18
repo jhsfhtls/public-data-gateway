@@ -85,6 +85,12 @@ models:
       - name: avg_score_capilaridade_bancaria_uf
         description: "Média estadual do score de capilaridade bancária presencial BACEN (10 a 99)."
         tests: [not_null]
+      - name: total_obras_ativas_cno_uf
+        description: "Quantidade agregada de obras civis ativas registradas no RFB CNO na UF."
+        tests: [not_null]
+      - name: area_construida_cno_uf_m2
+        description: "Área total construída registrada no RFB CNO na UF em metros quadrados (m²)."
+        tests: [not_null]
       - name: macro_ano_mes_referencia
         description: "Competência macroeconômica de referência (YYYY-MM)."
         tests: [not_null]
