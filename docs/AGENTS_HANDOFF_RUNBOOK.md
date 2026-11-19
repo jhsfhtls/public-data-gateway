@@ -16,19 +16,18 @@
 
 ---
 
-## 2. Mapa das 9 Waves & Status de Conclusão
+## 2. Mapa das Waves & Status de Conclusão (114/114 Fontes Homologadas)
 
-| Wave | Nome da Wave | Total Fontes | Homologadas | Status |
+| Wave / Fase | Escopo da Wave | Total Fontes | Homologadas | Status |
 | :---: | :--- | :---: | :---: | :---: |
-| **Wave 1** | Foundation & Core Financial Indicators | 4 | 4 | **100% CONCLUÍDA** |
-| **Wave 2** | Public Procurement & Anti-Corruption Governance | 8 | 8 | **100% CONCLUÍDA** |
-| **Wave 3** | Macro-Financial, Corporate Capital Markets & Treasury | 6 | 6 | **100% CONCLUÍDA** |
-| **Wave 4** | Demographics, Labor Dynamics & Territorial Geocoding | 10 | 10 | **100% CONCLUÍDA** |
-| **Wave 5** | Public Health, SUS Epidemiology & Sanitary Vigilance | 5 | 5 | **100% CONCLUÍDA** |
-| **Wave 6** | Basic, Higher & Postgraduate Education | 4 | 4 | **100% CONCLUÍDA** |
-| **Wave 7** | Agriculture, Environmental Licensing & Land Cadastre | 5 | 5 | **100% CONCLUÍDA** |
-| **Wave 8** | Real Estate, Public Deeds & Notarial Registry | 3 | 3 | **100% CONCLUÍDA** |
-| **Wave 9** | Infrastructure Logistics & Metaportals | 4 | 4 | **100% CONCLUÍDA** |
+| **Waves 1–9 (Fases 02–08)** | Fundação, Macro/Finanças, Compras Públicas, Demografia/Trabalho, Saúde, Educação, Agro/ESG, Imobiliário & Infraestrutura (`GOV_BR`) | 49 | 49 | **100% CONCLUÍDA** |
+| **Waves 10.5A–10.5D (Fases 10–10.5)** | APIs Públicas & Globais para Analytics, KYC/KYB, Clima, Geolocalização & ML — Blocos A a E (`PUBLIC_GLOBAL`) | 29 | 29 | **100% CONCLUÍDA** |
+| **Wave 11.5A** | Risco Fiscal, Dívida Ativa, Improbidade, CAPAG & Crédito Bancário (`stn_siconfi`, `pgfn_divida_ativa`, `cnj_improbidade`, `stn_capag`, `bcb_estban`, `bcb_agencia`, `rfb_cno`) | 7 | 7 | **100% CONCLUÍDA** |
+| **Wave 11.5B** | Agro, ESG, Terras, Energia & Saneamento (`ibama_fiscalizacao`, `bcb_sicor`, `ibge_agro_municipal`, `rfb_cafir`, `inpe_queimadas_seeg`, `aneel_geracao_distribuida`, `anp_combustiveis`, `mdr_snis`) | 8 | 8 | **100% CONCLUÍDA** |
+| **Wave 11.5C** | Mobilidade, Segurança Pública, Desastres, Rodovias, SIN/ONS & Previdência (`senatran_frota`, `sinesp_seguranca`, `sedec_desastres`, `prf_acidentes`, `mme_ons_energia`, `mps_inss_beneficios`) | 6 | 6 | **100% CONCLUÍDA** |
+| **Wave 11.5D** | Transparência Federal, Servidores SIAPE, Eleições TSE, BNDES, CVM Extra & ANS (`cgu_transparencia_gastos`, `cgu_servidores_federais`, `tse_eleicoes`, `bndes_operacoes`, `cvm_mercado_extra`, `ans_saude_suplementar`) | 6 | 6 | **100% CONCLUÍDA** |
+| **Wave 11.5E (+ Extensão)** | Diferenciais & Complementares (`querido_diario_okbr`, `anm_mineracao`, `susep_seguros`, `inpi_propriedade_intelectual`, `datasus_extra`, `inep_mec_extra`, `ibge_institucional`, `rfb_arrecadacao`, `cgu_beneficios_cidadao`) | 9 | 9 | **100% CONCLUÍDA** |
+| **TOTAL UNIFICADO** | **Catálogo Mestre Único (`catalog/sources_registry.yaml`: 85 `GOV_BR` + 29 `PUBLIC_GLOBAL`)** | **114** | **114** | **100% CONCLUÍDA** |
 
 ---
 
@@ -187,18 +186,14 @@ Expor o novo conector nas 4 interfaces da plataforma:
 
 ---
 
-## 4. Próximo Conector da Fila: `mte_rais`
+## 4. Busca Unificada no Catálogo (`114 Fontes`) & Fronteira Open-Core para a Fase 12
 
-- **ID do Conector:** `mte_rais`
-- **Nome Oficial:** MTE: Relação Anual de Informações Sociais (RAIS)
-- **Agência:** Ministério do Trabalho e Emprego (MTE)
-- **Framework Legal:** Lei nº 5.534/1968, Lei nº 5.878/1973, Decreto nº 76.900/1975, Portaria MTE nº 671/2021.
-- **Segmento:** `04_trabalho_renda` (Pasta de código: `src/public_data_gateway/connectors/trabalho/mte_rais/`)
-- **Tabelas Silver Previstas:**
-  1. `rais_vinculos_ativos`: Estoque anual de vínculos formais ativos por município e setor.
-  2. `rais_remuneracao_media`: Médias salariais em salários mínimos e reais nominais por escolaridade e gênero.
-  3. `rais_estabelecimentos_porte`: Estoque de empresas por faixa de funcionários (micro, pequena, média, grande).
-  4. `rais_massa_salarial_municipio`: Volume total anual da massa de rendimentos pagos por município.
-  5. `rais_rotatividade_demografia`: Faixas etárias, tempo médio no emprego e grau de instrução dos trabalhadores formais.
-- **Feature Store Gold:** `features_rais_mercado_formal_municipios_brasil.parquet`
-- **Data Mart dbt:** `mart_panorama_emprego_estrutural_rais_brasil.sql`
+- **Catálogo Mestre Único (`catalog/sources_registry.yaml`):**
+  - Todas as **114 fontes homologadas** (`85 GOV_BR` + `29 PUBLIC_GLOBAL`) residem em um único arquivo YAML e podem ser consultadas com filtros `source_origin` e busca textual insensível a acentos (`query`/`q`) nas 4 interfaces:
+    - **SDK:** `bdg.list_sources(segment_id=..., source_origin="GOV_BR", query="tributos")`
+    - **FastAPI:** `GET /api/v1/catalog?origin=GOV_BR&q=bolsa`
+    - **CLI:** `pdg catalog --origin GOV_BR --query "bolsa familia"`
+    - **MCP:** tool `bdg_list_sources` com parâmetros `segment_id`, `origin` e `query`.
+- **Fronteira Open-Core (Transição para a Fase 12):**
+  - O repositório público `public-data-gateway` encerra a **Fase 11.5** com **100% das 114 fontes homologadas nos 11 Gates**, **698 modelos dbt**, **9.390 colunas documentadas**, **8.964 testes dbt** e **815 testes pytest** (`626` offline + `189` live).
+  - A **Fase 12** (IaC Terraform/Pulumi para buckets S3/R2 produtivos, orquestração contínua 24/7 guiada por `freshness_sla_hours` / `cron_schedule_expression`, catálogo serverless MotherDuck/BigQuery produtivo e camada SaaS/Billing multi-tenant) deve ser executada em **repositório privado**, consumindo `public-data-gateway` como dependência limpa sem acoplar segredos ou infraestrutura proprietária no repositório público.

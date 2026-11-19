@@ -8,10 +8,21 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 ### Added
-- Pilot connector `ibge_localidades`: end-to-end ingestion, 5,571 municipalities, 27 UFs, 5 macro-regions, Mod-11 validation, ML territorial feature view, ODCS v3.1 contract, and exposure via `bd.geo`, REST `/api/v1/geo/ibge`, CLI `bdg geo/sync`, and MCP tools.
-- Initial repository bootstrap, repository governance checks, GitHub Actions CI/CD (`ci.yml`, `pr-lint.yml`), and PR templates.
-- Hexagonal Medallion Core (`Bronze -> Quarantine/Silver -> Gold`), ODCS v3.1 data contracts, 5-Pillar Data Observability gates, and DevSecOps hardening (CWE-1236, Zip Bomb protection).
-- Master declarative catalog (`catalog/sources_registry.yaml` + `CATALOG.md`) covering 49 official Brazilian public data sources across all 13 macrosegments (`ADR-001` & `ADR-002`), including ANA Hidroweb and Suframa PIM/ZFM.
-- Living implementation tracker (`JORNADA_IMPLEMENTACAO.md` + `state/project_progress.json`) and Architecture Decision Records (`docs/adr/`).
-- Hybrid `EnrichmentEngine` (Mod-11 check-digit gate, fuzzy municipality entity resolution, DuckDB `ASOF` point-in-time joins, cross-repo client folder isolation).
-- Unified consumption interfaces: Python SDK (`BrazilData`), FastAPI (`/api/v1`), CLI (`bdg`), and MCP Server (`bdg-mcp`).
+- **114 Homologated Medallion Connectors (Phases 00–11.5 — 11 Gates):**
+  - **85 Official Brazilian Public Data Connectors (`source_origin: GOV_BR`)** across 20 macrosegments (Geography, Macroeconomics, Public Procurement, Compliance/Sanctions, Capital Markets, Demographics, Labor, Public Finance, Education, Health, Real Estate, Infrastructure, Environment/ESG, Agriculture, Energy, Mobility/Road Safety, Disasters, Elections, Intellectual Property, and Social Benefits).
+  - **29 Public & Global Analytics/ML Connectors (`source_origin: PUBLIC_GLOBAL`)** across Blocks A–E (KYC/KYB, Financial Markets, Geospatial/Climate, Research/Global News, and Open ML enrichment).
+- **Analytics Engineering & Cross-Domain Gold Warehouse (`dbt/` + DuckDB):**
+  - **698 dbt models**, **396 dbt sources**, **9,390 documented columns** (`100%` coverage enforced by `scripts/lint_dbt_docs.py`), and **8,964 automated dbt tests**.
+  - Multi-disciplinary Gold marts (`mart_cross_domain_territorio_b2b_macro_brasil`, `mart_cross_domain_esg_agro_infra_brasil`, `mart_cross_domain_capital_humano_saude_brasil`, `feature_store_cross_domain_municipio` with DuckDB `ASOF` point-in-time joins) and 9 GTM Lifecycle marts (`S01..S09` x `P01..P10`).
+- **Open-Core Cloud Lakehouse Mirror (Phase 11):**
+  - `FreshnessSlaAuditor`, `CdcDeltaTracker` (`SHA-256` & row-count delta detection), `CloudLakehouseMirror` (S3, Cloudflare R2, local backend), and read-only `PublicWarehouseAdapter` (DuckDB, MotherDuck, BigQuery).
+- **Hexagonal Medallion Core, Governance & Multi-Interface Parity:**
+  - Single master declarative catalog (`catalog/sources_registry.yaml` + `CATALOG.md`) covering all 114 sources, living implementation tracker (`JORNADA_IMPLEMENTACAO.md` + `state/project_progress.json`), and Architecture Decision Records (`ADR-001`–`ADR-004`).
+  - Hybrid `EnrichmentEngine` (Mod-11 check-digit validation, municipality entity resolution, Client Path Shield, CWE-1236 formula sanitization, Zip Bomb protection, and OWASP LLM01 `<untrusted_gov_data>` prompt-injection wrappers).
+  - Full 4-interface parity across Python SDK (`PublicData` / `BrazilData`), FastAPI (`/api/v1`), CLI (`pdg` / `bdg`), and MCP Server (`pdg-mcp` / `bdg-mcp`).
+
+### Changed
+- Unified `catalog/sources_registry.yaml` and `catalog/public_apis_registry.yaml` into a single master catalog (`114` sources: `85 GOV_BR` + `29 PUBLIC_GLOBAL`) with `source_origin` and accent-insensitive keyword search (`query`/`q`) exposed across SDK, FastAPI, CLI, and MCP.
+
+### Removed
+- Removed split catalog file `catalog/public_apis_registry.yaml` after consolidating all 114 sources into `catalog/sources_registry.yaml`.

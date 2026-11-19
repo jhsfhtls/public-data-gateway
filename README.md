@@ -1,7 +1,7 @@
 # Public Data Gateway — Medallion Lakehouse, dbt Models & API Gateway (Python, DuckDB, dbt, FastAPI, MCP)
 
 > **Context & Architecture:**  
-> Open-source Medallion data platform (`Bronze` ➔ `Silver` ➔ `Gold` + `dbt` marts) and multi-interface gateway (**Python SDK**, **FastAPI REST**, **CLI**, and **MCP Server**) built with **Python 3.12**, **DuckDB**, **Apache Parquet (`ZSTD`)**, **SQLite (`WAL`)**, and **dbt-duckdb** over official Brazilian government datasets and complementary public/global APIs.  
+> Open-source Medallion data platform (`Bronze` ➔ `Silver` ➔ `Gold` + `dbt` marts) and multi-interface gateway (**Python SDK**, **FastAPI REST**, **CLI**, and **MCP Server**) built with **Python 3.12**, **DuckDB**, **Apache Parquet (`ZSTD`)**, **SQLite (`WAL`)**, and **dbt-duckdb** over **114 homologated public data sources** (**85 official Brazilian government connectors** `GOV_BR` across 20 macrosegments + **29 public/global analytics & ML APIs** `PUBLIC_GLOBAL` across Blocks A–E) registered in a single unified catalog ([`catalog/sources_registry.yaml`](catalog/sources_registry.yaml)).  
 > *Note on documentation:* Source registries ([`CATALOG.md`](CATALOG.md)), ADRs ([`docs/adr/`](docs/adr/)), implementation logs ([`JORNADA_IMPLEMENTACAO.md`](JORNADA_IMPLEMENTACAO.md)), and dataset column descriptions are maintained in Portuguese to align with official Brazilian public-sector schemas.
 
 ---
@@ -25,7 +25,7 @@ flowchart LR
    - Declarative `contract.yaml` policies per connector enforcing freshness, volume, schema, null thresholds, and sentinel-to-`NULL` normalization (`99`, `999`, `-1`, `"SEM INFORMACAO"`).
    - Preserves relational keys as explicit `STRING` identifiers (`id_municipio` 7D/6D crosswalks, `cnpj_14`, `cep_8`, `cnae_7`, `cbo_6`, `ncm_8`, `cpf_masked`) so leading zeros are never stripped; failed batches are routed to `quarantine/` without corrupting clean `Silver` partitions.
 3. **Analytics Engineering & Cross-Domain Marts (`dbt/` + DuckDB):**
-   - Modular dbt pipeline structured in `Staging` (`source.yml` + normalization) ➔ `Core` (`dim_*`, `fct_*`) ➔ domain and cross-domain `Gold` marts (`feature_store_cross_domain_municipio`) with point-in-time `ASOF JOIN` support.
+   - Modular dbt pipeline (**698 models**, **396 sources**, **9,390 documented columns**, and **8,964 schema/data tests**) structured in `Staging` (`source.yml` + normalization) ➔ `Core` (`dim_*`, `fct_*`) ➔ intra-domain, GTM lifecycle (`S01..S09`), and cross-domain `Gold` marts (`mart_cross_domain_territorio_b2b_macro_brasil`, `mart_cross_domain_esg_agro_infra_brasil`, `mart_cross_domain_capital_humano_saude_brasil`, `feature_store_cross_domain_municipio`) with point-in-time `ASOF JOIN` support.
    - Governed by automated schema assertions and `scripts/lint_dbt_docs.py` enforcing 100% model and column documentation coverage.
 4. **Enrichment, DevSecOps & Cloud Mirror (`src/public_data_gateway/` — [ADR-003](docs/adr/ADR-003-devsecops-lgpd-isolation.md)):**
    - **Enrichment (`enrichment/engine.py`):** Offline Mod-11 check-digit validation (`CNPJ`, `CPF`, `IBGE`), municipality/UF disambiguation, **Client Path Shield** (external outputs cannot write inside internal `data/` storage), zip-bomb expansion limits (`<= 100:1`), CSV formula-injection sanitization (`CWE-1236`), masked CPF preservation (`LGPD`), and `<untrusted_gov_data>` prompt-injection delimiters on MCP responses (`OWASP LLM01`).
@@ -55,15 +55,16 @@ pytest -m "not live"
 ### Quick Usage (`CLI`, `Python SDK`, `FastAPI`, `MCP`)
 
 ```bash
-# CLI inspection (supports pdg or bdg)
+# CLI inspection & unified accent-insensitive catalog search (supports pdg or bdg)
 pdg status
-pdg catalog --wave 1
+pdg catalog --origin GOV_BR --query "bolsa familia"
+pdg catalog --origin PUBLIC_GLOBAL --query "clima"
 pdg dict ibge_localidades
 
-# REST API (OpenAPI docs at /docs)
+# REST API (OpenAPI docs at /docs, unified catalog search at /api/v1/catalog?origin=GOV_BR&q=arrecadacao)
 uvicorn public_data_gateway.api.app:create_app --factory --reload
 
-# Stdio MCP Server
+# Stdio MCP Server (includes bdg_list_sources with origin & query filters)
 pdg-mcp
 ```
 
@@ -72,6 +73,7 @@ from public_data_gateway import PublicData
 
 gw = PublicData()
 print(gw.resolve_municipality("Manaus", uf="AM"))
+print([s["source_id"] for s in gw.list_sources(source_origin="GOV_BR", query="tributos")])
 ```
 
 ---
@@ -80,10 +82,10 @@ print(gw.resolve_municipality("Manaus", uf="AM"))
 
 | Path | Purpose |
 | :--- | :--- |
-| [`src/public_data_gateway/connectors/`](src/public_data_gateway/connectors/) | Domain connectors, `contract.yaml` policies, and per-source dbt staging models |
+| [`src/public_data_gateway/connectors/`](src/public_data_gateway/connectors/) | 114 domain connectors (`85 GOV_BR` + `29 PUBLIC_GLOBAL`), `contract.yaml` policies (`ODCS v3.1`), and per-source dbt staging models |
 | [`src/public_data_gateway/enrichment/`](src/public_data_gateway/enrichment/) | Offline check-digit validator, municipality normalizer, and guarded enrichment engine |
-| [`src/public_data_gateway/lakehouse/`](src/public_data_gateway/lakehouse/) | CDC delta tracker, freshness SLA auditor, mirror, and warehouse adapters |
+| [`src/public_data_gateway/lakehouse/`](src/public_data_gateway/lakehouse/) | CDC delta tracker, freshness SLA auditor, S3/R2/local mirror, and serverless warehouse adapters |
 | [`src/public_data_gateway/api/`](src/public_data_gateway/api/), [`cli/`](src/public_data_gateway/cli/), [`mcp/`](src/public_data_gateway/mcp/), [`sdk.py`](src/public_data_gateway/sdk.py) | Unified FastAPI, CLI (`pdg`/`bdg`), MCP stdio, and Python SDK interfaces |
-| [`dbt/`](dbt/) | DuckDB dbt configuration, `core`/`marts` SQL models, and automated tests |
-| [`catalog/`](catalog/) & [`docs/adr/`](docs/adr/) | YAML source registries and Architecture Decision Records (`ADR-001`–`ADR-004`) |
-| [`tests/`](tests/) | Offline deterministic suite (`pytest -m "not live"`) and live endpoint smoke tests (`@pytest.mark.live`) |
+| [`dbt/`](dbt/) | DuckDB dbt configuration, 698 `staging`/`core`/`marts` SQL models, 9,390 documented columns, and 8,964 automated tests |
+| [`catalog/sources_registry.yaml`](catalog/sources_registry.yaml) & [`docs/adr/`](docs/adr/) | Unified single master YAML catalog (114 sources) and Architecture Decision Records (`ADR-001`–`ADR-004`) |
+| [`tests/`](tests/) | Offline deterministic suite (`pytest -m "not live"`, 626 tests) and live endpoint suite (`@pytest.mark.live`, 189 tests) |
