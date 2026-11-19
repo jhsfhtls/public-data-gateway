@@ -55,6 +55,9 @@ class FreshnessSlaAuditor:
 
         for src in sources_data.get("sources", []):
             sid = src.get("source_id", "")
+            origin = src.get("source_origin", "GOV_BR")
+            if not include_public_apis and origin == "PUBLIC_GLOBAL":
+                continue
             if source_id and sid != source_id:
                 continue
             sla_hours = int(src.get("freshness_sla_hours", 24))
@@ -69,9 +72,10 @@ class FreshnessSlaAuditor:
 
             entries.append({
                 "id": sid,
-                "registry": "sources_registry",
+                "registry": "public_apis_registry" if origin == "PUBLIC_GLOBAL" else "sources_registry",
+                "source_origin": origin,
                 "name": src.get("name", sid),
-                "access_mode": src.get("access_mode", ""),
+                "access_mode": src.get("api_block") or src.get("access_mode", ""),
                 "update_frequency": src.get("update_frequency", ""),
                 "freshness_sla_hours": sla_hours,
                 "cron_schedule_expression": cron_expr,
@@ -79,36 +83,6 @@ class FreshnessSlaAuditor:
                 "age_hours": age_hours,
                 "freshness_status": freshness_status,
             })
-
-        if include_public_apis:
-            apis_path = self.settings.repo_root / "catalog" / "public_apis_registry.yaml"
-            apis_data = self._load_yaml(apis_path)
-            for api in apis_data.get("apis", []):
-                aid = api.get("api_id", "")
-                if source_id and aid != source_id:
-                    continue
-                sla_hours = int(api.get("freshness_sla_hours", 24))
-                cron_expr = str(api.get("cron_schedule_expression", "0 6 * * *"))
-                latest_dt = self._find_latest_parquet_mtime(aid)
-                age_hours = None
-                if latest_dt is None:
-                    freshness_status = "NEVER_SYNCED"
-                else:
-                    age_hours = round((ref_now - latest_dt).total_seconds() / 3600.0, 2)
-                    freshness_status = "HEALTHY" if age_hours <= sla_hours else "STALE"
-
-                entries.append({
-                    "id": aid,
-                    "registry": "public_apis_registry",
-                    "name": api.get("name", aid),
-                    "access_mode": api.get("block", "PUBLIC_API"),
-                    "update_frequency": api.get("update_frequency", ""),
-                    "freshness_sla_hours": sla_hours,
-                    "cron_schedule_expression": cron_expr,
-                    "last_local_sync_utc": latest_dt.isoformat() if latest_dt else None,
-                    "age_hours": age_hours,
-                    "freshness_status": freshness_status,
-                })
 
         healthy = sum(1 for e in entries if e["freshness_status"] == "HEALTHY")
         stale = sum(1 for e in entries if e["freshness_status"] == "STALE")

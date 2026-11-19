@@ -16,7 +16,7 @@ from public_data_gateway.core.http_client import ResilientHttpClient
 logger = logging.getLogger(__name__)
 
 _REPO_ROOT = Path(__file__).resolve().parents[4]
-_DEFAULT_REGISTRY_PATH = _REPO_ROOT / "catalog" / "public_apis_registry.yaml"
+_DEFAULT_REGISTRY_PATH = _REPO_ROOT / "catalog" / "sources_registry.yaml"
 _DEFAULT_USER_AGENT = "public-data-gateway/1.0 (+https://github.com/jhsfhtls/public-data-gateway)"
 
 
@@ -84,20 +84,44 @@ class PublicApiHubBase:
         block: str | None = None,
         pack_id: str | None = None,
     ) -> dict[str, Any]:
-        """Load curated Public APIs catalog optionally filtered by block or pack_id."""
+        """Load curated Public APIs catalog from unified sources_registry.yaml."""
         if not self.registry_path.is_file():
             raise FileNotFoundError(f"Public APIs registry not found at '{self.registry_path}'.")
-        payload = yaml.safe_load(self.registry_path.read_text(encoding="utf-8"))
-        apis = payload.get("apis", [])
+        payload = yaml.safe_load(self.registry_path.read_text(encoding="utf-8")) or {}
+        if "apis" in payload:
+            apis = list(payload.get("apis", []))
+        else:
+            apis = [
+                {
+                    "api_id": s["source_id"],
+                    "name": s["name"],
+                    "block": s.get("api_block", ""),
+                    "base_url": s.get("official_url", ""),
+                    "auth_type": s.get("auth_type", "NONE"),
+                    "rate_limit_rpm": s.get("rate_limit_rpm", 60),
+                    "finops_tier": s.get("finops_tier", "FREE_UNLIMITED"),
+                    "target_packs": s.get("solution_packs", []),
+                    "gateway_method": s.get("gateway_method", ""),
+                    "status": s.get("status", "HOMOLOGATED"),
+                    "notes": s.get("notes", ""),
+                    "medallion_parity": True,
+                    "connector_id": s["source_id"],
+                    "update_frequency": s.get("update_frequency", ""),
+                    "freshness_sla_hours": s.get("freshness_sla_hours", 24),
+                    "cron_schedule_expression": s.get("cron_schedule_expression", "0 6 * * *"),
+                }
+                for s in payload.get("sources", [])
+                if s.get("source_origin") == "PUBLIC_GLOBAL"
+            ]
         if block:
             clean_block = block.strip().upper()
-            apis = [a for a in apis if a.get("block", "").upper() == clean_block]
+            apis = [a for a in apis if str(a.get("block", "")).upper() == clean_block]
         if pack_id:
             clean_pack = pack_id.strip().upper()
             apis = [a for a in apis if clean_pack in a.get("target_packs", [])]
         return {
             "total": len(apis),
-            "blocks": payload.get("blocks", []),
+            "blocks": payload.get("public_api_blocks", payload.get("blocks", [])),
             "already_homologated_gov_br": payload.get("already_homologated_gov_br", []),
             "apis": apis,
         }

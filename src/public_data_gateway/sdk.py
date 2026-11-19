@@ -4193,14 +4193,18 @@ class BrazilData:
         status: str | None = None,
         product_id: str | None = None,
         pack_id: str | None = None,
+        source_origin: str | None = None,
+        query: str | None = None,
     ) -> list[SourceEntry]:
-        """List catalog sources filtered by wave, segment, status, or solution pack."""
+        """List catalog sources filtered by wave, segment, status, origin, query, or solution pack."""
         return self.catalog.list_sources(
             wave=wave,
             segment_id=segment_id,
             status=status,
             product_id=product_id,
             pack_id=pack_id,
+            source_origin=source_origin,
+            query=query,
         )
 
     def get_source(self, source_id: str) -> SourceEntry | None:

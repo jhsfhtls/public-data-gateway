@@ -21,6 +21,30 @@ def load_contract(path: Path) -> DataContract:
     if not isinstance(data, dict):
         raise ValueError(f"Invalid contract format in {path}: expected YAML mapping.")
 
+    if "contract_id" not in data and "id" in data:
+        src_block = data.get("source") if isinstance(data.get("source"), dict) else {}
+        tables = data.get("tables") if isinstance(data.get("tables"), list) else []
+        first_table = tables[0] if tables and isinstance(tables[0], dict) else {}
+        raw_cols = first_table.get("columns") if isinstance(first_table.get("columns"), list) else []
+        norm_cols = [
+            {
+                "name": c.get("name", ""),
+                "data_type": str(c.get("data_type") or c.get("type", "STRING")).upper(),
+                "required": not bool(c.get("nullable", False)),
+                "nullable": bool(c.get("nullable", False)),
+                "description": str(c.get("description", "")),
+            }
+            for c in raw_cols
+            if isinstance(c, dict) and c.get("name")
+        ]
+        data = {
+            **data,
+            "contract_id": str(data["id"]),
+            "source_id": str(src_block.get("source_id") or path.parent.name),
+            "primary_keys": list(first_table.get("primary_key") or data.get("primary_keys") or []),
+            "columns": norm_cols,
+        }
+
     return DataContract.model_validate(data)
 
 

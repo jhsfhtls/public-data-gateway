@@ -95,8 +95,16 @@ def create_app(settings: GatewaySettings | None = None) -> FastAPI:
         wave: int | None = None,
         segment: str | None = None,
         status: str | None = None,
+        origin: str | None = None,
+        q: str | None = None,
     ) -> list[SourceEntry]:
-        return catalog.list_sources(wave=wave, segment_id=segment, status=status)
+        return catalog.list_sources(
+            wave=wave,
+            segment_id=segment,
+            status=status,
+            source_origin=origin,
+            query=q,
+        )
 
     @app.get("/api/v1/catalog/{source_id}", response_model=SourceEntry)
     async def get_source(source_id: str) -> SourceEntry:

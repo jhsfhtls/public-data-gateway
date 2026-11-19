@@ -1,20 +1,20 @@
 <div align="center">
   <h2>Catálogo Mestre de Fontes Públicas & Registros Federativos Brasileiros</h2>
-  <p><i>Mapeamento Unificado de 85 Fontes Governamentais nos 13 Macrosegmentos, Ondas 1 a 6 e Chaves Canônicas</i></p>
-  <p><b>Versão:</b> 1.0.0 &nbsp;|&nbsp; <b>Última Atualização:</b> 2026-11-07 &nbsp;|&nbsp; <b>Padrões:</b> ADR-001 • ADR-002 • ADR-003 • ODCS v3.1 • LGPD</p>
+  <p><i>Mapeamento Unificado de 114 Fontes Governamentais nos 13 Macrosegmentos, Ondas 1 a 6 e Chaves Canônicas</i></p>
+  <p><b>Versão:</b> 1.0.0 &nbsp;|&nbsp; <b>Última Atualização:</b> 2026-11-18 &nbsp;|&nbsp; <b>Padrões:</b> ADR-001 • ADR-002 • ADR-003 • ODCS v3.1 • LGPD</p>
   <hr/>
 </div>
 <br/>
 
-# Catálogo Mestre de Fontes Públicas Governamentais (85 Fontes)
+# Catálogo Mestre de Fontes Públicas Governamentais (114 Fontes)
 
-Este catálogo consolida formalmente as **85 bases de dados públicas e APIs governamentais do Brasil** integradas ao `public-data-gateway`. As fontes abrangem a totalidade dos **13 macrosegmentos estruturais federativos**, organizadas em **6 Ondas Estratégicas de Implementação** ordenadas por priorização ponderada `RICE`, garantindo integridade cadastral canônica (`ADR-002`), observabilidade de 5 pilares (`ODCS v3.1`) e conformidade com a LGPD (`ADR-003`, Lei nº 13.709/2018).
+Este catálogo consolida formalmente as **114 bases de dados públicas e APIs governamentais do Brasil** integradas ao `public-data-gateway`. As fontes abrangem a totalidade dos **13 macrosegmentos estruturais federativos**, organizadas em **6 Ondas Estratégicas de Implementação** ordenadas por priorização ponderada `RICE`, garantindo integridade cadastral canônica (`ADR-002`), observabilidade de 5 pilares (`ODCS v3.1`) e conformidade com a LGPD (`ADR-003`, Lei nº 13.709/2018).
 
 ---
 
 ## 1. Visão Geral & Métricas Consolidadas
 
-- **Total de Fontes Mapeadas:** 85 fontes governamentais homologadas
+- **Total de Fontes Mapeadas:** 114 fontes governamentais homologadas
 - **Total de Macrosegmentos:** 13 macrosegmentos federativos cobertos (100% de cobertura)
 - **Ondas de Implementação:** 6 ondas estruturadas por retorno analítico e complexidade operacional
 - **Chaves Canônicas Unificadas:** 8 chaves relacionais padronizadas em `STRING` (`id_municipio` 7D, `sigla_uf`, `cnpj_14`, `cpf_masked`, `cep_8`, `cnae_7`, `cbo_6`, `ncm_8`)
@@ -24,18 +24,18 @@ Este catálogo consolida formalmente as **85 bases de dados públicas e APIs gov
 
 | Modo de Acesso | Total Fontes | % do Catálogo | Perfil Operacional |
 | :--- | :---: | :---: | :--- |
-| `FEDERATED_API` | 33 | 38.8% | APIs REST / OData síncronas de borda e baixa latência (< 300 ms) |
-| `LAKEHOUSE_BATCH` | 50 | 58.8% | Dumps colunares e volumosos em DuckDB / Parquet com streaming |
-| `BIGQUERY_FEDERATED` | 2 | 2.4% | Consultas SQL em datalake federado (Datalake Federado SQL / MapBiomas) |
+| `FEDERATED_API` | 62 | 54.4% | APIs REST / OData síncronas de borda e baixa latência (< 300 ms) |
+| `LAKEHOUSE_BATCH` | 50 | 43.9% | Dumps colunares e volumosos em DuckDB / Parquet com streaming |
+| `BIGQUERY_FEDERATED` | 2 | 1.8% | Consultas SQL em datalake federado (Datalake Federado SQL / MapBiomas) |
 
 ### 1.2. Distribuição por Classificação LGPD
 
 | Tier LGPD | Total Fontes | % do Catálogo | Base Legal & Salvaguarda |
 | :--- | :---: | :---: | :--- |
-| `PUBLIC_NON_PERSONAL` | 53 | 62.4% | LAI / Dados abertos de pessoas jurídicas ou estatísticas sem PII |
-| `PUBLIC_CORPORATE_QSA` | 12 | 14.1% | Art. 7º, §§ 3º e 4º LGPD: Cadastros empresariais com máscara CPF |
-| `ANONYMIZED_MICRODATA` | 18 | 21.2% | Art. 12 LGPD: Microdados com bloqueio de reidentificação |
-| `PUBLIC_AGENT_PEP` | 2 | 2.4% | Finalidade estrita KYC/Compliance com trilha de auditoria |
+| `PUBLIC_NON_PERSONAL` | 75 | 65.8% | LAI / Dados abertos de pessoas jurídicas ou estatísticas sem PII |
+| `PUBLIC_CORPORATE_QSA` | 18 | 15.8% | Art. 7º, §§ 3º e 4º LGPD: Cadastros empresariais com máscara CPF |
+| `ANONYMIZED_MICRODATA` | 18 | 15.8% | Art. 12 LGPD: Microdados com bloqueio de reidentificação |
+| `PUBLIC_AGENT_PEP` | 3 | 2.6% | Finalidade estrita KYC/Compliance com trilha de auditoria |
 
 ---
 
@@ -43,19 +43,19 @@ Este catálogo consolida formalmente as **85 bases de dados públicas e APIs gov
 
 | ID Segmento | Macrosegmento Governamental | Total Fontes | Ondas Cobertas | Descrição Executiva | Status |
 | :--- | :--- | :---: | :---: | :--- | :---: |
-| `01_b2b_empresarial` | **Empresarial, Cadastral & Societário B2B** | 5 | `W2` | Dados de mais de 55 milhões de CNPJs (matrizes, filiais, sócios QSA, capital social, CNAEs, situação cadastral, optantes pelo Simples Nacional e MEI). | 🟢 Ativo |
-| `02_economico_macrofinanceiro` | **Econômico, Monetário & Macrofinanceiro** | 14 | `W1, W2, W3` | Séries macroeconômicas oficiais (IPCA, Selic, IGP-M), balanços contábeis trimestrais de instituições financeiras (IFData), cotações diárias de moedas (PTAX) e dados contábeis da CVM. | 🟢 Ativo |
-| `03_demografico_censitario` | **Demográfico, Censitário & Domiciliar** | 4 | `W2, W4` | Censo Demográfico 2022 em nível de 450.000 setores censitários, características de domicílios, PNAD Contínua (renda e trabalho) e PIB municipal do IBGE. | 🟢 Ativo |
+| `01_b2b_empresarial` | **Empresarial, Cadastral & Societário B2B** | 10 | `W1, W2` | Dados de mais de 55 milhões de CNPJs (matrizes, filiais, sócios QSA, capital social, CNAEs, situação cadastral, optantes pelo Simples Nacional e MEI). | 🟢 Ativo |
+| `02_economico_macrofinanceiro` | **Econômico, Monetário & Macrofinanceiro** | 19 | `W1, W2, W3` | Séries macroeconômicas oficiais (IPCA, Selic, IGP-M), balanços contábeis trimestrais de instituições financeiras (IFData), cotações diárias de moedas (PTAX) e dados contábeis da CVM. | 🟢 Ativo |
+| `03_demografico_censitario` | **Demográfico, Censitário & Domiciliar** | 5 | `W2, W4` | Censo Demográfico 2022 em nível de 450.000 setores censitários, características de domicílios, PNAD Contínua (renda e trabalho) e PIB municipal do IBGE. | 🟢 Ativo |
 | `04_trabalho_renda` | **Trabalho, Emprego & Renda** | 4 | `W2, W4` | Fluxos mensais de contratações e demissões do Novo CAGED (salários de admissão por CBO e setor) e estoque de empregos da RAIS. | 🟢 Ativo |
-| `05_geografico_logistica` | **Geográfico, Logístico & Endereçamento** | 7 | `W1, W2, W4` | 111+ milhões de coordenadas pontuais do CNEFE/IBGE, limites territoriais vetoriais, base de logradouros/CEPs e antenas de telecomunicação da Anatel. | 🟢 Ativo |
-| `06_saude_publica` | **Saúde Pública & Epidemiologia** | 8 | `W2, W5` | Registros de óbitos (SIM), nascimentos (SINASC), internações hospitalares (SIH/SUS), estabelecimentos de saúde (CNES) e preços regulados de medicamentos (CMED/ANVISA). | 🟢 Ativo |
-| `07_educacao_capital_humano` | **Educação & Capital Humano** | 6 | `W2, W5` | Infraestrutura de escolas e matrículas (Censo Escolar), universidades e cursos (Censo Superior), notas por escola (IDEB) e microdados do ENEM. | 🟢 Ativo |
-| `08_judicial_compliance` | **Judicial, Integridade & Compliance** | 11 | `W2` | Metadados de processos de todos os 90+ tribunais do Brasil (CNJ DataJud), cadastros de inidôneos e punidos (CEIS/CNEP/CEPIM), autoridades (PEP) e certidões negativas (CNDT). | 🟢 Ativo |
+| `05_geografico_logistica` | **Geográfico, Logístico & Endereçamento** | 13 | `W1, W2, W4` | 111+ milhões de coordenadas pontuais do CNEFE/IBGE, limites territoriais vetoriais, base de logradouros/CEPs e antenas de telecomunicação da Anatel. | 🟢 Ativo |
+| `06_saude_publica` | **Saúde Pública & Epidemiologia** | 9 | `W2, W5` | Registros de óbitos (SIM), nascimentos (SINASC), internações hospitalares (SIH/SUS), estabelecimentos de saúde (CNES) e preços regulados de medicamentos (CMED/ANVISA). | 🟢 Ativo |
+| `07_educacao_capital_humano` | **Educação & Capital Humano** | 7 | `W2, W5` | Infraestrutura de escolas e matrículas (Censo Escolar), universidades e cursos (Censo Superior), notas por escola (IDEB) e microdados do ENEM. | 🟢 Ativo |
+| `08_judicial_compliance` | **Judicial, Integridade & Compliance** | 14 | `W2` | Metadados de processos de todos os 90+ tribunais do Brasil (CNJ DataJud), cadastros de inidôneos e punidos (CEIS/CNEP/CEPIM), autoridades (PEP) e certidões negativas (CNDT). | 🟢 Ativo |
 | `09_comercio_exterior` | **Comércio Exterior & Balança Comercial** | 1 | `W3` | Exportações e importações detalhadas por NCM, valor FOB, peso líquido, modal de transporte e município do exportador (Comex Stat). | 🟢 Ativo |
 | `10_compras_publicas` | **Compras Públicas, Licitações & Contratos** | 3 | `W2, W3` | Repositório unificado da Lei nº 14.133/2021 (PNCP) com editais, atas e contratos de todos os entes federados e catálogo unificado CATMAT/CATSER. | 🟢 Ativo |
-| `11_agronegocio_meio_ambiente` | **Agronegócio, Terra & Meio Ambiente** | 16 | `W2, W6` | 7+ milhões de imóveis rurais com polígonos de reserva legal e APP (SICAR/CAR), desmatamento e alertas por satélite (INPE DETER/PRODES), uso da terra (MapBiomas) e zoneamento climático (ZARC). | 🟢 Ativo |
+| `11_agronegocio_meio_ambiente` | **Agronegócio, Terra & Meio Ambiente** | 19 | `W2, W6` | 7+ milhões de imóveis rurais com polígonos de reserva legal e APP (SICAR/CAR), desmatamento e alertas por satélite (INPE DETER/PRODES), uso da terra (MapBiomas) e zoneamento climático (ZARC). | 🟢 Ativo |
 | `12_imobiliario_cartorial` | **Imobiliário, Notarial & Cartorial** | 3 | `W5` | Cadastro nacional de cartórios e produtividade (CNJ Justiça Aberta), transações registradas (ONR) e cadastros imobiliários municipais (IPTU/ITBI). | 🟢 Ativo |
-| `13_metaportais_agregadores` | **Metaportais & Hubs Agregadores** | 3 | `W1, W6` | Plataformas de facilitação técnica que unificam e padronizam centenas de fontes em protocolos únicos (Datalake Federado SQL, BrasilAPI, Dados.gov.br). | 🟢 Ativo |
+| `13_metaportais_agregadores` | **Metaportais & Hubs Agregadores** | 7 | `W1, W6` | Plataformas de facilitação técnica que unificam e padronizam centenas de fontes em protocolos únicos (Datalake Federado SQL, BrasilAPI, Dados.gov.br). | 🟢 Ativo |
 
 ---
 
@@ -63,12 +63,12 @@ Este catálogo consolida formalmente as **85 bases de dados públicas e APIs gov
 
 | Onda | Foco Estratégico & Justificativa | Total Fontes | Intervalo RICE | Modos de Acesso | Fontes Críticas | Status |
 | :---: | :--- | :---: | :---: | :--- | :--- | :---: |
-| **Wave 1** | APIs de Borda & Séries Macroeconômicas (Baixa Latência < 300ms) | 4 | 820–950 | `FEDERATED_API` | `ibge_localidades`, `brasilapi_core`, `bcb_sgs` (+1) | 🟢 100% Homologada |
-| **Wave 2** | B2B, Compras Públicas, Integridade & Compliance Cadastral | 41 | 610–920 | `FEDERATED_API, LAKEHOUSE_BATCH` | `pgfn_divida_ativa`, `ibama_fiscalizacao`, `stn_capag` (+38) | 🟢 100% Homologada |
-| **Wave 3** | Mercado de Capitais, Balanços Contábeis & Finanças Públicas | 9 | 610–910 | `FEDERATED_API, LAKEHOUSE_BATCH` | `bcb_estban`, `stn_siconfi`, `bcb_agencia` (+6) | 🟢 100% Homologada |
-| **Wave 4** | Censo Demográfico, Trabalho, Renda, Logística & Telecomunicações | 10 | 500–590 | `FEDERATED_API, LAKEHOUSE_BATCH` | `ibge_sidra`, `ibge_pib_municipal`, `ibge_censo2022` (+7) | 🟢 100% Homologada |
-| **Wave 5** | Saúde Pública, Educação, Capital Humano & Serviços Notariais | 14 | 410–480 | `FEDERATED_API, LAKEHOUSE_BATCH` | `datasus_cnes`, `datasus_sih`, `inep_censo_escolar` (+11) | 🟢 100% Homologada |
-| **Wave 6** | Meio Ambiente, Agronegócio, Monitoramento Satelital & Metaportais | 7 | 340–390 | `BIGQUERY_FEDERATED, FEDERATED_API, LAKEHOUSE_BATCH` | `datalake_federado_bq`, `inpe_terrabrasilis`, `ana_hidroweb_telemetria` (+4) | 🟢 100% Homologada |
+| **Wave 1** | APIs de Borda & Séries Macroeconômicas (Baixa Latência < 300ms) | 10 | 820–950 | `FEDERATED_API` | `ibge_localidades`, `viacep`, `minha_receita` (+7) | 🟢 100% Homologada |
+| **Wave 2** | B2B, Compras Públicas, Integridade & Compliance Cadastral | 46 | 610–920 | `FEDERATED_API, LAKEHOUSE_BATCH` | `pgfn_divida_ativa`, `ibama_fiscalizacao`, `stn_capag` (+43) | 🟢 100% Homologada |
+| **Wave 3** | Mercado de Capitais, Balanços Contábeis & Finanças Públicas | 13 | 610–930 | `FEDERATED_API, LAKEHOUSE_BATCH` | `ipeadata_odata`, `brapi_b3`, `world_bank_v2` (+10) | 🟢 100% Homologada |
+| **Wave 4** | Censo Demográfico, Trabalho, Renda, Logística & Telecomunicações | 15 | 500–920 | `FEDERATED_API, LAKEHOUSE_BATCH` | `overpass_osm`, `nominatim_osm`, `osrm_routing` (+12) | 🟢 100% Homologada |
+| **Wave 5** | Saúde Pública, Educação, Capital Humano & Serviços Notariais | 16 | 410–915 | `FEDERATED_API, LAKEHOUSE_BATCH` | `openalex_api`, `who_gho_odata`, `datasus_cnes` (+13) | 🟢 100% Homologada |
+| **Wave 6** | Meio Ambiente, Agronegócio, Monitoramento Satelital & Metaportais | 14 | 340–925 | `BIGQUERY_FEDERATED, FEDERATED_API, LAKEHOUSE_BATCH` | `open_meteo`, `nasa_power`, `aneel_anp_ckan` (+11) | 🟢 100% Homologada |
 
 ---
 
@@ -79,7 +79,13 @@ Ordenada por **Onda de Implementação (`roadmap_wave`)**, **Score RICE decresce
 | ID Fonte | Dataset / Órgão Oficial | Macrosegmento | Onda | RICE | Modo / Protocolo | Chaves Canônicas | Tier LGPD | Solution Packs | Status |
 | :--- | :--- | :--- | :---: | :---: | :--- | :--- | :--- | :--- | :---: |
 | `ibge_localidades` | [IBGE Localidades & Malha Territorial](https://servicodados.ibge.gov.br/api/docs/localidades)<br/>*Instituto Brasileiro de Geografia e Estatística (IBGE)* | Geográfico, Logístico | **W1** | 950 | `FEDERATED_API`<br/>`REST_JSON` | `id_municipio`<br/>`sigla_uf` | `PUBLIC_NON_PERSONAL` | `P01` `P02` `P03` | `HOMOLOGATED` |
+| `viacep` | [ViaCEP](https://viacep.com.br/ws/{cep}/json/)<br/>*ViaCEP Webservice Postal Brasileiro* | Geográfico, Logístico | **W1** | 935 | `FEDERATED_API`<br/>`REST_JSON` | `cep_8`<br/>`id_municipio`<br/>`sigla_uf` | `PUBLIC_NON_PERSONAL` | `P03` `P04` | `HOMOLOGATED` |
+| `minha_receita` | [Minha Receita (CNPJ Aberto)](https://minhareceita.org/api/v1/cnpj/{cnpj})<br/>*Comunidade Open Source Minha Receita (RFB)* | Empresarial, Cadastral | **W1** | 920 | `FEDERATED_API`<br/>`REST_JSON` | `cnpj_14`<br/>`id_municipio`<br/>`sigla_uf` | `PUBLIC_CORPORATE_QSA` | `P04` `P07` | `HOMOLOGATED` |
+| `opencep` | [OpenCEP](https://opencep.com/v1/{cep})<br/>*OpenCEP CDN Open Source* | Geográfico, Logístico | **W1** | 910 | `FEDERATED_API`<br/>`REST_JSON` | `cep_8`<br/>`id_municipio`<br/>`sigla_uf` | `PUBLIC_NON_PERSONAL` | `P03` `P04` | `HOMOLOGATED` |
+| `awesomeapi_fx` | [AwesomeAPI (Cambio & Cripto)](https://economia.awesomeapi.com.br/json/last/{pairs})<br/>*AwesomeAPI Economia & Câmbio Comercial* | Econômico, Monetário | **W1** | 905 | `FEDERATED_API`<br/>`REST_JSON` | *(macro)* | `PUBLIC_NON_PERSONAL` | `P05` | `HOMOLOGATED` |
+| `cnpja_open` | [CNPJa Open API](https://open.cnpja.com/office/{cnpj})<br/>*CNPJa Open API (Espelho RFB & Simples)* | Empresarial, Cadastral | **W1** | 900 | `FEDERATED_API`<br/>`REST_JSON` | `cnpj_14`<br/>`sigla_uf` | `PUBLIC_CORPORATE_QSA` | `P04` `P07` | `HOMOLOGATED` |
 | `brasilapi_core` | [BrasilAPI: CEPs, FIPE, Bancos, DDD & CNPJ de Borda](https://brasilapi.com.br/docs)<br/>*Comunidade Open Source BrasilAPI* | Metaportais | **W1** | 880 | `FEDERATED_API`<br/>`REST_JSON` | `cep_8`<br/>`cnpj_14`<br/>`sigla_uf` | `PUBLIC_NON_PERSONAL` | `P01` `P02` `P03` `P04` | `HOMOLOGATED` |
+| `receitaws` | [ReceitaWS](https://receitaws.com.br/v1/cnpj/{cnpj})<br/>*ReceitaWS Public CNPJ Gateway* | Empresarial, Cadastral | **W1** | 880 | `FEDERATED_API`<br/>`REST_JSON` | `cnpj_14`<br/>`sigla_uf` | `PUBLIC_CORPORATE_QSA` | `P04` `P07` | `HOMOLOGATED` |
 | `bcb_sgs` | [Banco Central: Sistema Gerenciador de Séries Temporais (SGS)](https://dadosabertos.bcb.gov.br/dataset/series-temporais)<br/>*Banco Central do Brasil (BACEN)* | Econômico, Monetário | **W1** | 860 | `FEDERATED_API`<br/>`REST_JSON` | *(macro)* | `PUBLIC_NON_PERSONAL` | `P01` `P02` `P05` | `HOMOLOGATED` |
 | `bcb_olinda_ptax` | [Banco Central Olinda: Cotações PTAX Moedas Diárias](https://olinda.bcb.gov.br/olinda/servico/PTAX/versao/v1/swagger-ui3)<br/>*Banco Central do Brasil (BACEN)* | Econômico, Monetário | **W1** | 820 | `FEDERATED_API`<br/>`ODATA_V4` | *(macro)* | `PUBLIC_NON_PERSONAL` | `P01` `P05` | `HOMOLOGATED` |
 | `pgfn_divida_ativa` | [PGFN: Créditos Inscritos em Dívida Ativa da União e do FGTS (Dados Abertos)](https://dadosabertos.pgfn.gov.br/)<br/>*Procuradoria-Geral da Fazenda Nacional (PGFN / Ministério da Fazenda)* | Judicial, Integridade | **W2** | 920 | `LAKEHOUSE_BATCH`<br/>`HTTP_BULK_ZIP` | `cnpj_14`<br/>`cpf_masked`<br/>`id_municipio`<br/>`sigla_uf` | `PUBLIC_CORPORATE_QSA` | `P01` `P02` `P04` `P06` `P07` `P08` `P10` | `HOMOLOGATED` |
@@ -87,6 +93,7 @@ Ordenada por **Onda de Implementação (`roadmap_wave`)**, **Score RICE decresce
 | `stn_capag` | [STN: Capacidade de Pagamento (CAPAG) Subnacional & Índice FIRJAN de Gestão Fiscal (IFGF)](https://www.tesourotransparente.gov.br/temas/estados-e-municipios/capacidade-de-pagamento-capag)<br/>*Secretaria do Tesouro Nacional (STN / Ministério da Fazenda) & FIRJAN* | Econômico, Monetário | **W2** | 915 | `FEDERATED_API`<br/>`REST_JSON` | `id_municipio`<br/>`sigla_uf` | `PUBLIC_NON_PERSONAL` | `P01` `P02` `P04` `P05` `P06` `P08` `P10` | `HOMOLOGATED` |
 | `anm_mineracao` | [ANM Mineração (SIGMINE & CFEM): Processos Minerários, Lavra & Royalties](https://www.gov.br/anm/pt-br/acesso-a-informacao/dados-abertos)<br/>*Agência Nacional de Mineração (ANM)* | Agronegócio, Terra | **W2** | 910 | `LAKEHOUSE_BATCH`<br/>`HTTP_BULK_ZIP` | `id_municipio`<br/>`sigla_uf` | `PUBLIC_NON_PERSONAL` | `P01` `P02` `P04` `P08` | `HOMOLOGATED` |
 | `bcb_sicor` | [BACEN: Sistema de Operações do Crédito Rural e do Proagro (SICOR)](https://olinda.bcb.gov.br/olinda/servico/SICOR/versao/v2/odata/)<br/>*Banco Central do Brasil (BACEN)* | Agronegócio, Terra | **W2** | 910 | `FEDERATED_API`<br/>`ODATA_V4` | `id_municipio`<br/>`sigla_uf` | `PUBLIC_NON_PERSONAL` | `P01` `P02` `P03` `P05` `P06` `P08` `P09` | `HOMOLOGATED` |
+| `camara_senado_dados_abertos` | [Camara dos Deputados & Senado Federal](https://dadosabertos.camara.leg.br/api/v2/deputados)<br/>*Câmara dos Deputados & Senado Federal (APIs Legislativas)* | Judicial, Integridade | **W2** | 910 | `FEDERATED_API`<br/>`REST_JSON` | `sigla_uf`<br/>`cpf_masked`<br/>`cnpj_14` | `PUBLIC_AGENT_PEP` | `P07` `P06` | `HOMOLOGATED` |
 | `mdr_snis` | [MDR/MCidades SNIS & SINISA: Saneamento Básico (Água, Esgoto & Resíduos)](https://www.gov.br/cidades/pt-br/acesso-a-informacao/acoes-e-programas/saneamento/snis)<br/>*Ministério das Cidades (SNIS / SINISA)* | Agronegócio, Terra | **W2** | 910 | `LAKEHOUSE_BATCH`<br/>`HTTP_BULK_ZIP` | `id_municipio`<br/>`sigla_uf` | `PUBLIC_NON_PERSONAL` | `P01` `P02` `P03` `P05` `P06` `P08` | `HOMOLOGATED` |
 | `aneel_geracao_distribuida` | [ANEEL Geração Distribuída: Empreendimentos MMGD & Transição Solar](https://dadosabertos.aneel.gov.br/dataset/relacao-de-empreendimentos-de-geracao-distribuida)<br/>*Agência Nacional de Energia Elétrica (ANEEL)* | Agronegócio, Terra | **W2** | 905 | `LAKEHOUSE_BATCH`<br/>`HTTP_BULK_ZIP` | `id_municipio`<br/>`sigla_uf` | `PUBLIC_NON_PERSONAL` | `P01` `P02` `P05` `P06` `P08` `P09` | `HOMOLOGATED` |
 | `cnj_improbidade` | [CNJ: Cadastro Nacional de Condenações por Ato de Improbidade Administrativa (CNCIAI)](https://www.cnj.jus.br/improbidade_adm/consultar_requerido.php)<br/>*Conselho Nacional de Justiça (CNJ)* | Judicial, Integridade | **W2** | 905 | `FEDERATED_API`<br/>`REST_JSON` | `cnpj_14`<br/>`cpf_masked`<br/>`id_municipio`<br/>`sigla_uf` | `PUBLIC_AGENT_PEP` | `P01` `P02` `P04` `P06` `P07` `P08` `P10` | `HOMOLOGATED` |
@@ -98,17 +105,21 @@ Ordenada por **Onda de Implementação (`roadmap_wave`)**, **Score RICE decresce
 | `bndes_operacoes` | [BNDES Transparência: Operações Diretas, Indiretas & Fomento Municipal](https://dadosabertos.bndes.gov.br/)<br/>*Banco Nacional de Desenvolvimento Econômico e Social (BNDES)* | Econômico, Monetário | **W2** | 895 | `LAKEHOUSE_BATCH`<br/>`REST_JSON` | `id_municipio`<br/>`sigla_uf` | `PUBLIC_NON_PERSONAL` | `P01` `P02` `P03` `P05` | `HOMOLOGATED` |
 | `cgu_beneficios_cidadao` | [CGU Benefícios ao Cidadão (Bolsa Família, BPC, Seguro-Defeso & Garantia-Safra)](https://portaldatransparencia.gov.br/download-de-dados/novo-bolsa-familia)<br/>*Controladoria-Geral da União (CGU) & Ministério do Desenvolvimento Social (MDS)* | Judicial, Integridade | **W2** | 895 | `LAKEHOUSE_BATCH`<br/>`HTTP_BULK_ZIP` | `id_municipio`<br/>`sigla_uf` | `ANONYMIZED_MICRODATA` | `P01` `P02` `P06` `P08` | `HOMOLOGATED` |
 | `inpe_queimadas_seeg` | [INPE Queimadas & SEEG: Focos de Calor & Emissões de Gases de Efeito Estufa](https://dataserver-coids.inpe.br/queimadas/queimadas/focos/csv/diario/Brasil/)<br/>*Instituto Nacional de Pesquisas Espaciais (INPE) / Observatório do Clima (SEEG)* | Agronegócio, Terra | **W2** | 895 | `LAKEHOUSE_BATCH`<br/>`HTTP_BULK_ZIP` | `id_municipio`<br/>`sigla_uf` | `PUBLIC_NON_PERSONAL` | `P01` `P02` `P06` `P08` `P09` | `HOMOLOGATED` |
+| `rdap_registro_br` | [RDAP Registro.br](https://rdap.registro.br/domain/{domain})<br/>*NIC.br / Registro.br (Protocolo RDAP RFC 7480)* | Judicial, Integridade | **W2** | 895 | `FEDERATED_API`<br/>`REST_JSON` | `cnpj_14` | `PUBLIC_CORPORATE_QSA` | `P04` `P07` | `HOMOLOGATED` |
 | `sinesp_seguranca` | [SINESP / FBSP Segurança Pública: Ocorrências Criminais, MVI & Risco Patrimonial](https://www.gov.br/mj/pt-br/assuntos/sua-seguranca/seguranca-publica/estatistica/dados-nacionais-1/base-de-dados-e-notas-metodologicas-dos-gestores-estaduais-sinesp-vde-2022-e-2023)<br/>*Ministério da Justiça e Segurança Pública (SENASP / SINESP) & Fórum Brasileiro de Segurança Pública (FBSP)* | Judicial, Integridade | **W2** | 895 | `LAKEHOUSE_BATCH`<br/>`HTTP_BULK_ZIP` | `id_municipio`<br/>`sigla_uf` | `PUBLIC_NON_PERSONAL` | `P01` `P03` `P04` `P05` `P07` | `HOMOLOGATED` |
 | `anp_combustiveis` | [ANP Combustíveis: Levantamento de Preços, Margens & Biocombustíveis](https://www.gov.br/anp/pt-br/assuntos/precos-e-defesa-da-concorrencia/precos/levantamento-de-precos-de-combustiveis-ultimas-semanas-pesquisadas)<br/>*Agência Nacional do Petróleo, Gás Natural e Biocombustíveis (ANP)* | Agronegócio, Terra | **W2** | 890 | `LAKEHOUSE_BATCH`<br/>`HTTP_BULK_ZIP` | `id_municipio`<br/>`sigla_uf` | `PUBLIC_NON_PERSONAL` | `P01` `P02` `P05` `P06` `P08` `P09` | `HOMOLOGATED` |
 | `datasus_extra` | [DATASUS Complementar (SIA, SINAN, SISVAN & PNS): Produção Ambulatorial, Agravos & Nutrição](https://datasus.saude.gov.br/)<br/>*Departamento de Informática do SUS (DATASUS / Ministério da Saúde)* | Saúde Pública | **W2** | 890 | `LAKEHOUSE_BATCH`<br/>`HTTP_BULK_ZIP` | `id_municipio`<br/>`sigla_uf` | `ANONYMIZED_MICRODATA` | `P01` `P05` `P06` `P08` | `HOMOLOGATED` |
+| `gleif_lei` | [GLEIF Global LEI API](https://api.gleif.org/api/v1/lei-records)<br/>*Global Legal Entity Identifier Foundation (GLEIF)* | Empresarial, Cadastral | **W2** | 890 | `FEDERATED_API`<br/>`REST_JSON` | `cnpj_14` | `PUBLIC_CORPORATE_QSA` | `P04` `P07` | `HOMOLOGATED` |
 | `ibge_institucional` | [IBGE Institucional & Social (MUNIC, ESTADIC & POF): Capacidade Gestora & Orçamentos Familiares](https://servicodados.ibge.gov.br/api/v1/pesquisas/1)<br/>*IBGE (Diretoria de Pesquisas — MUNIC, ESTADIC & POF)* | Demográfico, Censitário | **W2** | 890 | `LAKEHOUSE_BATCH`<br/>`REST_JSON` | `id_municipio`<br/>`sigla_uf` | `ANONYMIZED_MICRODATA` | `P01` `P02` `P05` `P07` | `HOMOLOGATED` |
 | `querido_diario_okbr` | [Querido Diário (OKBR): Diários Oficiais Municipais, Licitações & Atos](https://queridodiario.ok.org.br/)<br/>*Open Knowledge Brasil (OKBR) / Projeto Querido Diário* | Compras Públicas, Licitações | **W2** | 890 | `FEDERATED_API`<br/>`REST_JSON` | `id_municipio`<br/>`sigla_uf` | `PUBLIC_NON_PERSONAL` | `P01` `P03` `P04` `P07` | `HOMOLOGATED` |
 | `ans_saude_suplementar` | [ANS Saúde Suplementar: Beneficiários, Operadoras, IDSS & Sinistralidade](https://dadosabertos.ans.gov.br/FTP/PDA/)<br/>*Agência Nacional de Saúde Suplementar (ANS)* | Saúde Pública | **W2** | 885 | `LAKEHOUSE_BATCH`<br/>`HTTP_BULK_ZIP` | `id_municipio`<br/>`sigla_uf` | `ANONYMIZED_MICRODATA` | `P01` `P03` `P05` `P06` | `HOMOLOGATED` |
+| `bgpview_ip_intel` | [BGPView / IP-API](https://api.bgpview.io/ip/{ip})<br/>*IP-API / RIPEstat / BGP Routing Intelligence* | Judicial, Integridade | **W2** | 885 | `FEDERATED_API`<br/>`REST_JSON` | `sigla_uf` | `PUBLIC_NON_PERSONAL` | `P04` `P08` | `HOMOLOGATED` |
 | `inep_mec_extra` | [INEP/MEC Complementar (SAEB, PROUNI, SISU, FUNDEB & CNPq): Proficiência, Acesso & Fomento](https://www.gov.br/inep/pt-br/acesso-a-informacao/dados-abertos/microdados)<br/>*INEP / FNDE / Ministério da Educação (MEC) & CNPq* | Educação, Ciência | **W2** | 885 | `LAKEHOUSE_BATCH`<br/>`HTTP_BULK_ZIP` | `id_municipio`<br/>`sigla_uf` | `ANONYMIZED_MICRODATA` | `P01` `P03` `P07` `P09` | `HOMOLOGATED` |
 | `senatran_frota` | [SENATRAN Frota de Veículos: RENAVAM, Mobilidade & Eletrificação](https://www.gov.br/transportes/pt-br/assuntos/transito/conteudo-Senatran/estatisticas-frota-de-veiculos-senatran)<br/>*Secretaria Nacional de Trânsito (SENATRAN / Ministério dos Transportes)* | Geográfico, Logístico | **W2** | 885 | `LAKEHOUSE_BATCH`<br/>`HTTP_BULK_ZIP` | `id_municipio`<br/>`sigla_uf` | `PUBLIC_NON_PERSONAL` | `P01` `P02` `P05` `P07` | `HOMOLOGATED` |
 | `mme_ons_energia` | [MME / ONS Energia: Sistema Interligado Nacional, Balanço & Segurança Energética](https://dados.ons.org.br)<br/>*Operador Nacional do Sistema Elétrico (ONS) & Ministério de Minas e Energia (MME)* | Agronegócio, Meio Ambiente | **W2** | 880 | `LAKEHOUSE_BATCH`<br/>`HTTP_BULK_ZIP` | `id_municipio`<br/>`sigla_uf` | `PUBLIC_NON_PERSONAL` | `P02` `P05` `P06` `P08` | `HOMOLOGATED` |
 | `susep_seguros` | [SUSEP Mercado Segurador (SES): Prêmios Emitidos, Sinistralidade, Previdência & Solvência](https://www2.susep.gov.br/menuestatistica/SES/principal.aspx)<br/>*Superintendência de Seguros Privados (SUSEP / Ministério da Fazenda)* | Econômico, Monetário | **W2** | 880 | `LAKEHOUSE_BATCH`<br/>`HTTP_BULK_ZIP` | `id_municipio`<br/>`sigla_uf` | `PUBLIC_NON_PERSONAL` | `P01` `P02` `P03` `P05` | `HOMOLOGATED` |
 | `tse_eleicoes` | [TSE Dados Abertos Eleitorais: Candidaturas, Votação & Prestação de Contas](https://dadosabertos.tse.jus.br/)<br/>*Tribunal Superior Eleitoral (TSE)* | Judicial, Integridade | **W2** | 880 | `LAKEHOUSE_BATCH`<br/>`HTTP_BULK_ZIP` | `id_municipio`<br/>`sigla_uf` | `PUBLIC_NON_PERSONAL` | `P01` `P03` `P04` `P07` | `HOMOLOGATED` |
+| `company_enrich_apollo_bdc` | [CompanyEnrich / Apollo / BigDataCorp (Adaptador B2B Freemium)](https://api.companyenrich.com/companies/enrich)<br/>*Hub B2B Freemium (CompanyEnrich / Apollo / BigDataCorp)* | Empresarial, Cadastral | **W2** | 875 | `FEDERATED_API`<br/>`REST_JSON` | `cnpj_14` | `PUBLIC_CORPORATE_QSA` | `P04` `P06` | `HOMOLOGATED` |
 | `inpi_propriedade_intelectual` | [INPI Propriedade Intelectual (RPI): Patentes, Marcas, Desenhos Industriais & Software](https://www.gov.br/inpi/pt-br/acesso-a-informacao/dados-abertos)<br/>*Instituto Nacional da Propriedade Industrial (INPI / MDIC)* | B2B, Empresas, Sócios | **W2** | 875 | `LAKEHOUSE_BATCH`<br/>`HTTP_BULK_ZIP` | `id_municipio`<br/>`sigla_uf` | `PUBLIC_NON_PERSONAL` | `P01` `P02` `P03` `P07` | `HOMOLOGATED` |
 | `mps_inss_beneficios` | [MPS / INSS Benefícios: Previdência Social, BPC/LOAS & Arrecadação](https://dadosabertos.inss.gov.br)<br/>*Instituto Nacional do Seguro Social (INSS) & Ministério da Previdência Social (MPS)* | Trabalho, Emprego | **W2** | 875 | `LAKEHOUSE_BATCH`<br/>`HTTP_BULK_ZIP` | `id_municipio`<br/>`sigla_uf` | `PUBLIC_NON_PERSONAL` | `P01` `P02` `P03` `P06` | `HOMOLOGATED` |
 | `cvm_mercado_extra` | [CVM Mercado de Capitais Extra: Ofertas RCVM 160, Administradores & Agentes](https://dados.cvm.gov.br/)<br/>*Comissão de Valores Mobiliários (CVM)* | Econômico, Monetário | **W2** | 870 | `LAKEHOUSE_BATCH`<br/>`REST_JSON` | `id_municipio`<br/>`sigla_uf` | `PUBLIC_NON_PERSONAL` | `P01` `P02` `P03` `P05` | `HOMOLOGATED` |
@@ -123,15 +134,24 @@ Ordenada por **Onda de Implementação (`roadmap_wave`)**, **Score RICE decresce
 | `rfb_simples_mei` | [Receita Federal: Opção pelo Simples Nacional & MEI](https://dados.gov.br/dados/conjuntos-dados/simples-nacional)<br/>*Receita Federal do Brasil* | Empresarial, Cadastral | **W2** | 720 | `LAKEHOUSE_BATCH`<br/>`HTTP_BULK_ZIP` | `cnpj_14` | `PUBLIC_CORPORATE_QSA` | `P01` `P02` | `HOMOLOGATED` |
 | `tst_cndt` | [TST: Certidão Negativa de Débitos Trabalhistas (CNDT)](https://cndt-certidao.tst.jus.br/)<br/>*Tribunal Superior do Trabalho (TST)* | Judicial, Integridade | **W2** | 700 | `FEDERATED_API`<br/>`REST_JSON` | `cnpj_14`<br/>`cpf_masked` | `PUBLIC_CORPORATE_QSA` | `P01` `P07` | `HOMOLOGATED` |
 | `suframa_pim_zfm` | [SUFRAMA: Cadastro de Empresas Incentivadas do PIM / ZFM](https://www.gov.br/suframa/pt-br)<br/>*Superintendência da Zona Franca de Manaus (SUFRAMA)* | Empresarial, Cadastral | **W2** | 610 | `LAKEHOUSE_BATCH`<br/>`HTTP_BULK_ZIP` | `cnpj_14`<br/>`id_municipio`<br/>`sigla_uf` | `PUBLIC_NON_PERSONAL` | `P01` `P09` | `HOMOLOGATED` |
+| `ipeadata_odata` | [IPEA Data (OData v4)](https://www.ipeadata.gov.br/api/odata4/)<br/>*Instituto de Pesquisa Econômica Aplicada (IPEA OData v4)* | Econômico, Monetário | **W3** | 930 | `FEDERATED_API`<br/>`ODATA_V4` | `id_municipio`<br/>`sigla_uf` | `PUBLIC_NON_PERSONAL` | `P01` `P05` | `HOMOLOGATED` |
+| `brapi_b3` | [brapi (Cotacoes B3, Dividendos & FIIs)](https://brapi.dev/api/quote/{tickers})<br/>*Brapi Financial API (B3 / CVM / BCB)* | Econômico, Monetário | **W3** | 925 | `FEDERATED_API`<br/>`REST_JSON` | `cnpj_14` | `PUBLIC_NON_PERSONAL` | `P05` `P01` | `HOMOLOGATED` |
+| `world_bank_v2` | [World Bank Indicators API v2](https://api.worldbank.org/v2/country/{country}/indicator/{indicator})<br/>*World Bank Open Data API v2 (WDI)* | Econômico, Monetário | **W3** | 915 | `FEDERATED_API`<br/>`REST_JSON` | *(macro)* | `PUBLIC_NON_PERSONAL` | `P01` `P05` | `HOMOLOGATED` |
 | `bcb_estban` | [Banco Central: Estatística Bancária Mensal por Município (ESTBAN COSIF)](https://www.bcb.gov.br/estatisticas/estatisticabancariamunicipios)<br/>*Banco Central do Brasil (BACEN)* | Econômico, Monetário | **W3** | 910 | `LAKEHOUSE_BATCH`<br/>`HTTP_BULK_ZIP` | `id_municipio`<br/>`sigla_uf`<br/>`cnpj_14` | `PUBLIC_NON_PERSONAL` | `P01` `P02` `P03` `P05` `P06` `P08` `P10` | `HOMOLOGATED` |
 | `stn_siconfi` | [Secretaria do Tesouro Nacional: SICONFI & Finbra (Contabilidade e Gestão Fiscal)](https://apidatalake.tesouro.gov.br/docs/siconfi/)<br/>*Secretaria do Tesouro Nacional (STN)* | Econômico, Monetário | **W3** | 910 | `FEDERATED_API`<br/>`REST_JSON` | `id_municipio`<br/>`sigla_uf`<br/>`cnpj_14` | `PUBLIC_NON_PERSONAL` | `P01` `P02` `P04` `P05` `P06` `P07` `P08` `P10` | `HOMOLOGATED` |
 | `bcb_agencia` | [Banco Central: Cadastro Nacional de Agências Bancárias e Postos de Atendimento (Olinda OData)](https://olinda.bcb.gov.br/olinda/servico/Informes_Agencias/versao/v1/odata/Agencias?$top=1&$format=json)<br/>*Banco Central do Brasil (BACEN)* | Econômico, Monetário | **W3** | 905 | `FEDERATED_API`<br/>`ODATA_V4` | `cnpj_14`<br/>`id_municipio`<br/>`sigla_uf`<br/>`cep_8` | `PUBLIC_NON_PERSONAL` | `P01` `P02` `P03` `P05` `P06` `P08` `P10` | `HOMOLOGATED` |
+| `alpha_vantage` | [Alpha Vantage](https://www.alphavantage.co/query)<br/>*Alpha Vantage Global Market Data & Technical Indicators* | Econômico, Monetário | **W3** | 880 | `FEDERATED_API`<br/>`REST_JSON` | *(macro)* | `PUBLIC_NON_PERSONAL` | `P05` | `HOMOLOGATED` |
 | `cvm_dfp_itr` | [CVM: Demonstrações Financeiras Padronizadas (DFP / ITR)](https://dados.cvm.gov.br/dados/CIA_ABERTA/DOC/DFP/)<br/>*Comissão de Valores Mobiliários (CVM)* | Econômico, Monetário | **W3** | 680 | `LAKEHOUSE_BATCH`<br/>`HTTP_BULK_ZIP` | `cnpj_14` | `PUBLIC_CORPORATE_QSA` | `P01` `P05` | `HOMOLOGATED` |
 | `mdic_comexstat` | [MDIC: Comex Stat Exportações e Importações Detalhadas](https://www.gov.br/produtividade-e-comercio-exterior/pt-br/assuntos/comercio-exterior/estatisticas)<br/>*Ministério do Desenvolvimento, Indústria e Comércio Exterior (MDIC)* | Comércio Exterior | **W3** | 660 | `LAKEHOUSE_BATCH`<br/>`HTTP_BULK_ZIP` | `ncm_8`<br/>`id_municipio`<br/>`sigla_uf` | `PUBLIC_NON_PERSONAL` | `P01` `P02` | `HOMOLOGATED` |
 | `cvm_fundos` | [CVM: Informe Diário de Fundos de Investimento](https://dados.cvm.gov.br/dados/FI/DOC/INF_DIARIO/)<br/>*Comissão de Valores Mobiliários (CVM)* | Econômico, Monetário | **W3** | 650 | `LAKEHOUSE_BATCH`<br/>`HTTP_BULK_ZIP` | `cnpj_14` | `PUBLIC_NON_PERSONAL` | `P01` `P05` | `HOMOLOGATED` |
 | `bcb_ifdata` | [Banco Central: Informações Financeiras das IFs (IF.data)](https://www3.bcb.gov.br/ifdata/)<br/>*Banco Central do Brasil (BACEN)* | Econômico, Monetário | **W3** | 640 | `FEDERATED_API`<br/>`ODATA_V4` | `cnpj_14` | `PUBLIC_NON_PERSONAL` | `P01` `P05` | `HOMOLOGATED` |
 | `stn_tesouro_transparente` | [Secretaria do Tesouro Nacional: SADIPEM & Dívida Pública](https://www.tesourotransparente.gov.br/)<br/>*Secretaria do Tesouro Nacional (STN)* | Econômico, Monetário | **W3** | 630 | `FEDERATED_API`<br/>`REST_JSON` | `id_municipio`<br/>`sigla_uf` | `PUBLIC_NON_PERSONAL` | `P01` `P05` | `HOMOLOGATED` |
 | `comprasgov_catmat` | [Compras.gov.br: Catálogo Unificado de Materiais e Serviços (CATMAT/CATSER)](https://dados.gov.br/dados/conjuntos-dados/catalogo-de-materiais-e-servicos---catmat-catser)<br/>*Ministério da Gestão e Inovação em Serviços Públicos (MGI)* | Compras Públicas, Licitações | **W3** | 610 | `FEDERATED_API`<br/>`REST_JSON` | *(macro)* | `PUBLIC_NON_PERSONAL` | `P01` `P04` | `HOMOLOGATED` |
+| `overpass_osm` | [Overpass API (POIs OpenStreetMap)](https://overpass-api.de/api/interpreter)<br/>*OpenStreetMap Overpass Turbo Spatial API* | Geográfico, Logístico | **W4** | 920 | `FEDERATED_API`<br/>`REST_JSON` | `id_municipio`<br/>`sigla_uf` | `PUBLIC_NON_PERSONAL` | `P03` `P01` | `HOMOLOGATED` |
+| `nominatim_osm` | [Nominatim (OpenStreetMap)](https://nominatim.openstreetmap.org/search)<br/>*OpenStreetMap Foundation (Nominatim Geocoder)* | Geográfico, Logístico | **W4** | 915 | `FEDERATED_API`<br/>`REST_JSON` | `id_municipio`<br/>`sigla_uf`<br/>`cep_8` | `PUBLIC_NON_PERSONAL` | `P03` `P09` | `HOMOLOGATED` |
+| `osrm_routing` | [OSRM (Open Source Routing Machine)](https://router.project-osrm.org/route/v1/driving/)<br/>*Open Source Routing Machine (OSRM Project)* | Geográfico, Logístico | **W4** | 910 | `FEDERATED_API`<br/>`REST_JSON` | `id_municipio`<br/>`sigla_uf` | `PUBLIC_NON_PERSONAL` | `P03` `P09` | `HOMOLOGATED` |
+| `rest_countries` | [REST Countries v3.1](https://restcountries.com/v3.1/alpha/{code})<br/>*REST Countries ISO-3166 & Geopolitical Metadata API* | Demográfico, Censitário | **W4** | 900 | `FEDERATED_API`<br/>`REST_JSON` | *(macro)* | `PUBLIC_NON_PERSONAL` | `P01` `P05` | `HOMOLOGATED` |
+| `open_elevation` | [Open-Elevation / OpenTopoData (SRTM)](https://api.open-elevation.com/api/v1/lookup)<br/>*Open-Elevation / OpenTopoData SRTM Digital Elevation API* | Geográfico, Logístico | **W4** | 895 | `FEDERATED_API`<br/>`REST_JSON` | `id_municipio`<br/>`sigla_uf` | `PUBLIC_NON_PERSONAL` | `P03` `P09` | `HOMOLOGATED` |
 | `ibge_sidra` | [IBGE: Sistema IBGE de Recuperação Automática (SIDRA)](https://apisidra.ibge.gov.br/)<br/>*Instituto Brasileiro de Geografia e Estatística (IBGE)* | Demográfico, Censitário | **W4** | 590 | `FEDERATED_API`<br/>`REST_JSON` | `id_municipio`<br/>`sigla_uf` | `PUBLIC_NON_PERSONAL` | `P01` `P02` | `HOMOLOGATED` |
 | `ibge_pib_municipal` | [IBGE: Produto Interno Bruto dos Municípios](https://www.ibge.gov.br/estatisticas/economicas/contas-nacionais/9088-produto-interno-bruto-dos-municipios.html)<br/>*Instituto Brasileiro de Geografia e Estatística (IBGE)* | Demográfico, Censitário | **W4** | 580 | `LAKEHOUSE_BATCH`<br/>`HTTP_BULK_ZIP` | `id_municipio`<br/>`sigla_uf` | `PUBLIC_NON_PERSONAL` | `P01` `P02` | `HOMOLOGATED` |
 | `ibge_censo2022` | [IBGE: Microdados do Censo Demográfico 2022](https://censo2022.ibge.gov.br/)<br/>*Instituto Brasileiro de Geografia e Estatística (IBGE)* | Demográfico, Censitário | **W4** | 570 | `LAKEHOUSE_BATCH`<br/>`HTTP_BULK_ZIP` | `id_municipio`<br/>`sigla_uf` | `ANONYMIZED_MICRODATA` | `P01` `P02` `P03` | `HOMOLOGATED` |
@@ -142,6 +162,8 @@ Ordenada por **Onda de Implementação (`roadmap_wave`)**, **Score RICE decresce
 | `ibge_malhas` | [IBGE: Malhas Territoriais Vetoriais (Municípios e UFs)](https://www.ibge.gov.br/geociencias/organizacao-do-territorio/malhas-territoriais.html)<br/>*Instituto Brasileiro de Geografia e Estatística (IBGE)* | Geográfico, Logístico | **W4** | 540 | `LAKEHOUSE_BATCH`<br/>`OGC_WFS_SHP` | `id_municipio`<br/>`sigla_uf` | `PUBLIC_NON_PERSONAL` | `P01` `P03` | `HOMOLOGATED` |
 | `anatel_mosaico` | [ANATEL: Sistema Mosaico de Estações e Cobertura de Telecomunicações](https://sistemas.anatel.gov.br/mosaico/)<br/>*Agência Nacional de Telecomunicações (ANATEL)* | Geográfico, Logístico | **W4** | 510 | `FEDERATED_API`<br/>`REST_JSON` | `id_municipio`<br/>`sigla_uf` | `PUBLIC_NON_PERSONAL` | `P01` `P09` | `HOMOLOGATED` |
 | `antt_malha_transporte` | [ANTT: Malha de Transporte Rodoviário e Ferroviário de Cargas](https://dados.antt.gov.br/)<br/>*Agência Nacional de Transportes Terrestres (ANTT)* | Geográfico, Logístico | **W4** | 500 | `FEDERATED_API`<br/>`REST_JSON` | `id_municipio`<br/>`sigla_uf` | `PUBLIC_NON_PERSONAL` | `P01` `P03` `P09` | `HOMOLOGATED` |
+| `openalex_api` | [OpenAlex Scientific Graph API](https://api.openalex.org/works)<br/>*OpenAlex Global Scientific Knowledge Graph (OurResearch)* | Educação | **W5** | 915 | `FEDERATED_API`<br/>`REST_JSON` | `id_municipio`<br/>`sigla_uf` | `PUBLIC_NON_PERSONAL` | `P02` `P06` | `HOMOLOGATED` |
+| `who_gho_odata` | [Observatorio da OMS (WHO GHO)](https://ghoapi.azureedge.net/api/{indicator})<br/>*World Health Organization (WHO Global Health Observatory OData)* | Saúde Pública | **W5** | 900 | `FEDERATED_API`<br/>`ODATA_V4` | *(macro)* | `PUBLIC_NON_PERSONAL` | `P01` `P06` | `HOMOLOGATED` |
 | `datasus_cnes` | [DataSUS: Cadastro Nacional de Estabelecimentos de Saúde (CNES)](https://cnes.datasus.gov.br/)<br/>*Ministério da Saúde / DataSUS* | Saúde Pública | **W5** | 480 | `LAKEHOUSE_BATCH`<br/>`FTP_DBC` | `cnpj_14`<br/>`id_municipio`<br/>`sigla_uf`<br/>`cep_8` | `PUBLIC_NON_PERSONAL` | `P01` `P02` | `HOMOLOGATED` |
 | `datasus_sih` | [DataSUS: Sistema de Informações Hospitalares (SIH/SUS)](https://datasus.saude.gov.br/transferencia-de-arquivos/)<br/>*Ministério da Saúde / DataSUS* | Saúde Pública | **W5** | 470 | `LAKEHOUSE_BATCH`<br/>`FTP_DBC` | `id_municipio`<br/>`sigla_uf` | `ANONYMIZED_MICRODATA` | `P01` `P02` | `HOMOLOGATED` |
 | `inep_censo_escolar` | [INEP: Microdados do Censo Escolar da Educação Básica](https://www.gov.br/inep/pt-br/acesso-a-informacao/dados-abertos/microdados/censo-escolar)<br/>*Instituto Nacional de Estudos e Pesquisas Educacionais Anísio Teixeira (INEP)* | Educação | **W5** | 470 | `LAKEHOUSE_BATCH`<br/>`HTTP_BULK_ZIP` | `id_municipio`<br/>`sigla_uf`<br/>`cep_8` | `ANONYMIZED_MICRODATA` | `P01` `P02` | `HOMOLOGATED` |
@@ -156,6 +178,13 @@ Ordenada por **Onda de Implementação (`roadmap_wave`)**, **Score RICE decresce
 | `opendatasus_vigilancia` | [OpenDataSUS: Notificações de Síndromes e Vigilância Epidemiológica](https://opendatasus.saude.gov.br/)<br/>*Ministério da Saúde* | Saúde Pública | **W5** | 440 | `FEDERATED_API`<br/>`REST_JSON` | `id_municipio`<br/>`sigla_uf` | `ANONYMIZED_MICRODATA` | `P01` `P02` | `HOMOLOGATED` |
 | `capitais_iptu_itbi` | [Capitais: Cadastros Imobiliários Municipais (IPTU / ITBI)](https://dados.gov.br/)<br/>*Prefeituras Municipais das Capitais* | Imobiliário, Notarial | **W5** | 430 | `FEDERATED_API`<br/>`REST_JSON` | `cep_8`<br/>`id_municipio`<br/>`sigla_uf` | `PUBLIC_NON_PERSONAL` | `P01` `P03` | `HOMOLOGATED` |
 | `capes_sucupira` | [CAPES: Plataforma Sucupira (Pós-Graduação Stricto Sensu)](https://dadosabertos.capes.gov.br/)<br/>*Coordenação de Aperfeiçoamento de Pessoal de Nível Superior (CAPES)* | Educação | **W5** | 410 | `FEDERATED_API`<br/>`REST_JSON` | `id_municipio`<br/>`sigla_uf` | `PUBLIC_NON_PERSONAL` | `P01` `P02` | `HOMOLOGATED` |
+| `open_meteo` | [Open-Meteo Historical & Forecast](https://api.open-meteo.com/v1/forecast)<br/>*Open-Meteo Global Weather & ERA5 Reanalysis API* | Agronegócio, Terra | **W6** | 925 | `FEDERATED_API`<br/>`REST_JSON` | `id_municipio`<br/>`sigla_uf` | `PUBLIC_NON_PERSONAL` | `P01` `P09` | `HOMOLOGATED` |
+| `nasa_power` | [NASA POWER API](https://power.larc.nasa.gov/api/temporal/daily/point)<br/>*NASA Langley Research Center (POWER Agroclimatology API)* | Agronegócio, Terra | **W6** | 920 | `FEDERATED_API`<br/>`REST_JSON` | `id_municipio`<br/>`sigla_uf` | `PUBLIC_NON_PERSONAL` | `P09` `P01` | `HOMOLOGATED` |
+| `aneel_anp_ckan` | [ANEEL & ANP (CKAN DataStore)](https://dadosabertos.aneel.gov.br/api/3/action/datastore_search)<br/>*ANEEL & ANP Catálogos CKAN Dados Abertos* | Agronegócio, Terra | **W6** | 900 | `FEDERATED_API`<br/>`REST_JSON` | `id_municipio`<br/>`sigla_uf`<br/>`cnpj_14` | `PUBLIC_NON_PERSONAL` | `P09` `P01` | `HOMOLOGATED` |
+| `gdelt_doc_api` | [GDELT Project Doc 2.0 API](https://api.gdeltproject.org/api/v2/doc/doc)<br/>*GDELT Project 2.0 Global Knowledge Graph & DOC API* | Metaportais | **W6** | 895 | `FEDERATED_API`<br/>`REST_JSON` | `sigla_uf` | `PUBLIC_NON_PERSONAL` | `P02` `P07` | `HOMOLOGATED` |
+| `huggingface_inference` | [Hugging Face Inference API](https://router.huggingface.co/hf-inference/models/{model})<br/>*Hugging Face Serverless Inference & Hub API* | Metaportais | **W6** | 885 | `FEDERATED_API`<br/>`REST_JSON` | *(macro)* | `PUBLIC_NON_PERSONAL` | `P02` | `HOMOLOGATED` |
+| `upgini_adapter` | [Upgini Public Feature Enrichment](https://pypi.org/project/upgini/)<br/>*Upgini Automated Feature Enrichment & Open Search Catalog* | Metaportais | **W6** | 875 | `FEDERATED_API`<br/>`REST_JSON` | `id_municipio`<br/>`sigla_uf`<br/>`cnpj_14` | `PUBLIC_NON_PERSONAL` | `P01` `P09` | `HOMOLOGATED` |
+| `nasa_youtube_open_ml` | [NASA Open APIs & YouTube Data (NLP / Visao)](https://api.nasa.gov/planetary/apod)<br/>*NASA Open APIs (APOD/Earth) & Public Multimodal Benchmarks* | Metaportais | **W6** | 870 | `FEDERATED_API`<br/>`REST_JSON` | *(macro)* | `PUBLIC_NON_PERSONAL` | `P02` | `HOMOLOGATED` |
 | `datalake_federado_bq` | [PDG: Datalake Público Federado & Catálogo Nacional SQL (DuckDB / BigQuery)](https://www.gov.br/conecta/catalogo/)<br/>*Infraestrutura Nacional de Dados (IND / GOV.BR) & PDG* | Metaportais | **W6** | 390 | `BIGQUERY_FEDERATED`<br/>`BIGQUERY_SQL` | `id_municipio`<br/>`sigla_uf`<br/>`cnpj_14`<br/>`cep_8` | `PUBLIC_NON_PERSONAL` | `P01` `P02` `P03` `P04` `P05` `P06` | `HOMOLOGATED` |
 | `inpe_terrabrasilis` | [INPE: Plataforma TerraBrasilis (DETER & PRODES)](http://terrabrasilis.dpi.inpe.br/)<br/>*Instituto Nacional de Pesquisas Espaciais (INPE)* | Agronegócio, Terra | **W6** | 390 | `FEDERATED_API`<br/>`REST_JSON` | `id_municipio`<br/>`sigla_uf` | `PUBLIC_NON_PERSONAL` | `P01` `P06` `P09` | `HOMOLOGATED` |
 | `ana_hidroweb_telemetria` | [ANA: Rede Hidrometeorológica Nacional (HidroWeb)](https://www.snirh.gov.br/hidroweb/)<br/>*Agência Nacional de Águas e Saneamento Básico (ANA)* | Agronegócio, Terra | **W6** | 380 | `FEDERATED_API`<br/>`REST_JSON` | `id_municipio`<br/>`sigla_uf` | `PUBLIC_NON_PERSONAL` | `P01` `P09` | `HOMOLOGATED` |
@@ -198,7 +227,7 @@ Em conformidade com a Lei Federal nº 13.709/2018 (LGPD) e o **ADR-003**, todo d
 
 ## 7. Catálogo Unificado — APIs Públicas & Globais (Analytics, KYC/KYB, Espacial & ML)
 
-Complemento integrado ao catálogo mestre com **29 APIs públicas e globais curadas** (fonte: `catalog/public_apis_registry.yaml`), auditadas contra:
+Seção integrada do catálogo mestre unificado com **29 APIs públicas e globais curadas** (`source_origin: PUBLIC_GLOBAL` em `catalog/sources_registry.yaml`), auditadas contra:
 
 - **Conecta GOV.BR** (https://www.gov.br/conecta/catalogo/): Auditoria de APIs governamentais brasileiras disponiveis para integracao
 - **Public APIs Directory** (https://github.com/public-apis/public-apis): Descoberta curada de APIs publicas globais para Analytics e Machine Learning
@@ -264,12 +293,18 @@ Normalizacao ISO-3166 de paises, grafo cientifico aberto (OpenAlex) e monitorame
 
 ## 8. Matriz de Freshness, SLA & Agendamento Cron (Phase 11)
 
-Todas as **85 fontes governamentais** possuem metas explícitas de `freshness_sla_hours` e `cron_schedule_expression` para orquestração de mirror/CDC em nuvem:
+Todas as **114 fontes homologadas no catálogo unificado** possuem metas explícitas de `freshness_sla_hours` e `cron_schedule_expression` para orquestração de mirror/CDC em nuvem:
 
 | ID Fonte | Frequência Oficial | SLA Freshness (h) | Expressão Cron (UTC) | Modo de Acesso |
 | :--- | :--- | :---: | :--- | :--- |
 | `ibge_localidades` | Eventual (Criação de novos municípios) | `720h` | `0 3 1 * *` | `FEDERATED_API` |
+| `viacep` | Semanal (DNE/Correios) | `168h` | `0 4 * * 1` | `FEDERATED_API` |
+| `minha_receita` | Diária (Sincronização RFB) | `24h` | `0 5 * * *` | `FEDERATED_API` |
+| `opencep` | Semanal (DNE/Correios) | `168h` | `0 4 * * 1` | `FEDERATED_API` |
+| `awesomeapi_fx` | Horária (Câmbio Spot) | `1h` | `0 * * * *` | `FEDERATED_API` |
+| `cnpja_open` | Tempo Real (Sob demanda) | `1h` | `0 * * * *` | `FEDERATED_API` |
 | `brasilapi_core` | Tempo Real (< 150 ms) | `1h` | `0 * * * *` | `FEDERATED_API` |
+| `receitaws` | Tempo Real (Sob demanda) | `1h` | `0 * * * *` | `FEDERATED_API` |
 | `bcb_sgs` | Diária / Mensal | `24h` | `0 6 * * *` | `FEDERATED_API` |
 | `bcb_olinda_ptax` | Diária (Tempo Real) | `24h` | `0 6 * * *` | `FEDERATED_API` |
 | `pgfn_divida_ativa` | Trimestral | `2160h` | `0 3 15 */3 *` | `LAKEHOUSE_BATCH` |
@@ -277,6 +312,7 @@ Todas as **85 fontes governamentais** possuem metas explícitas de `freshness_sl
 | `stn_capag` | Anual / Quadrimestral | `720h` | `0 5 15 * *` | `FEDERATED_API` |
 | `anm_mineracao` | Semanal (SIGMINE/SIGBM) / Mensal (CFEM) | `168h` | `0 6 * * 1` | `LAKEHOUSE_BATCH` |
 | `bcb_sicor` | Mensal (Olinda OData SICOR BACEN) | `720h` | `0 5 12 * *` | `FEDERATED_API` |
+| `camara_senado_dados_abertos` | Diária (Tramitação Legislativa) | `24h` | `0 7 * * *` | `FEDERATED_API` |
 | `mdr_snis` | Anual (Série Histórica SNIS/SINISA Água, Esgoto, RSU e Drenagem) | `720h` | `0 5 1 * *` | `LAKEHOUSE_BATCH` |
 | `aneel_geracao_distribuida` | Semanal (Empreendimentos MMGD SIGA/SISGD) | `168h` | `0 4 * * 1` | `LAKEHOUSE_BATCH` |
 | `cnj_improbidade` | Diária / Semanal | `168h` | `0 4 * * 1` | `FEDERATED_API` |
@@ -288,17 +324,21 @@ Todas as **85 fontes governamentais** possuem metas explícitas de `freshness_sl
 | `bndes_operacoes` | Trimestral (Carteira de Crédito Direta FINEM, Automático & FGI) | `720h` | `0 6 15 * *` | `LAKEHOUSE_BATCH` |
 | `cgu_beneficios_cidadao` | Mensal (Folha Novo Bolsa Família, BPC & Seguro-Defeso) | `720h` | `0 5 18 * *` | `LAKEHOUSE_BATCH` |
 | `inpe_queimadas_seeg` | Diária (Focos INPE) / Anual (Inventário GEE SEEG) | `24h` | `0 3 * * *` | `LAKEHOUSE_BATCH` |
+| `rdap_registro_br` | Tempo Real (WHOIS/RDAP) | `1h` | `0 * * * *` | `FEDERATED_API` |
 | `sinesp_seguranca` | Anual (SINESP VDE & Anuário FBSP) / Mensal (Série Estatística) | `720h` | `0 6 10 * *` | `LAKEHOUSE_BATCH` |
 | `anp_combustiveis` | Semanal (LPC Preços) / Mensal (Vendas Derivados & PMQC) | `168h` | `0 5 * * 1` | `LAKEHOUSE_BATCH` |
 | `datasus_extra` | Mensal (SIA/SISVAN) / Semanal (SINAN) / Periódica (PNS) | `720h` | `0 4 12 * *` | `LAKEHOUSE_BATCH` |
+| `gleif_lei` | Diária (Golden Copy LEI) | `24h` | `0 6 * * *` | `FEDERATED_API` |
 | `ibge_institucional` | Anual / Bienal (MUNIC & ESTADIC) / Quinquenal (POF) | `720h` | `0 5 18 * *` | `LAKEHOUSE_BATCH` |
 | `querido_diario_okbr` | Diária / Semanal (Coleta & Indexação NLP de Diários Oficiais) | `168h` | `0 9 * * *` | `FEDERATED_API` |
 | `ans_saude_suplementar` | Mensal (SIB Beneficiários) & Trimestral (DIOPS & IDSS) | `720h` | `0 8 10 * *` | `LAKEHOUSE_BATCH` |
+| `bgpview_ip_intel` | Diária (BGP Routing) | `24h` | `0 6 * * *` | `FEDERATED_API` |
 | `inep_mec_extra` | Bienal (SAEB) / Semestral (PROUNI/SISU) / Mensal (FUNDEB/CNPq) | `720h` | `0 5 18 * *` | `LAKEHOUSE_BATCH` |
 | `senatran_frota` | Mensal (Frota Circulante por Município, Tipo & Combustível RENAVAM) | `720h` | `0 5 5 * *` | `LAKEHOUSE_BATCH` |
 | `mme_ons_energia` | Diária (Operação SIN / Carga & EAR) / Mensal (Capacidade Instalada) | `168h` | `0 5 * * 1` | `LAKEHOUSE_BATCH` |
 | `susep_seguros` | Mensal (SES Prêmios, Sinistros & VGBL/PGBL) / Trimestral (Solvência) | `720h` | `0 8 15 * *` | `LAKEHOUSE_BATCH` |
 | `tse_eleicoes` | Bienal / Contínua (Ciclos Eleitorais & DivulgaCandContas) | `720h` | `0 6 1 * *` | `LAKEHOUSE_BATCH` |
+| `company_enrich_apollo_bdc` | Semanal (B2B Firmographics) | `168h` | `0 4 * * 1` | `FEDERATED_API` |
 | `inpi_propriedade_intelectual` | Semanal (Revista da Propriedade Industrial - RPI) / Mensal (Dados Abertos) | `168h` | `0 7 * * 2` | `LAKEHOUSE_BATCH` |
 | `mps_inss_beneficios` | Mensal (BEPS / Síntese Municipal de Benefícios Emitidos e Concedidos) | `720h` | `0 6 10 * *` | `LAKEHOUSE_BATCH` |
 | `cvm_mercado_extra` | Mensal (Ofertas RCVM 160, Administradores FII & Assessores CVM) | `720h` | `0 7 5 * *` | `LAKEHOUSE_BATCH` |
@@ -313,15 +353,24 @@ Todas as **85 fontes governamentais** possuem metas explícitas de `freshness_sl
 | `rfb_simples_mei` | Mensal | `720h` | `0 2 15 * *` | `LAKEHOUSE_BATCH` |
 | `tst_cndt` | Sob demanda / Diária | `24h` | `0 6 * * *` | `FEDERATED_API` |
 | `suframa_pim_zfm` | Mensal | `720h` | `0 3 5 * *` | `LAKEHOUSE_BATCH` |
+| `ipeadata_odata` | Diária / Mensal (Séries IPEA) | `24h` | `0 7 * * *` | `FEDERATED_API` |
+| `brapi_b3` | Diária (Pregão B3) | `24h` | `0 20 * * 1-5` | `FEDERATED_API` |
+| `world_bank_v2` | Trimestral / Anual (Indicadores WDI) | `2160h` | `0 2 1 */3 *` | `FEDERATED_API` |
 | `bcb_estban` | Mensal | `720h` | `0 6 20 * *` | `LAKEHOUSE_BATCH` |
 | `stn_siconfi` | Mensal / Bimestral (RREO) / Quadrimestral (RGF) / Anual (DCA) | `720h` | `0 4 10 * *` | `FEDERATED_API` |
 | `bcb_agencia` | Mensal | `720h` | `0 6 10 * *` | `FEDERATED_API` |
+| `alpha_vantage` | Diária (Mercados Globais) | `24h` | `0 21 * * 1-5` | `FEDERATED_API` |
 | `cvm_dfp_itr` | Trimestral / Anual | `2160h` | `0 3 15 */3 *` | `LAKEHOUSE_BATCH` |
 | `mdic_comexstat` | Mensal | `720h` | `0 3 5 * *` | `LAKEHOUSE_BATCH` |
 | `cvm_fundos` | Diária | `24h` | `0 7 * * 1-5` | `LAKEHOUSE_BATCH` |
 | `bcb_ifdata` | Trimestral | `2160h` | `0 2 1 */3 *` | `FEDERATED_API` |
 | `stn_tesouro_transparente` | Mensal | `720h` | `0 3 5 * *` | `FEDERATED_API` |
 | `comprasgov_catmat` | Semanal | `168h` | `0 4 * * 1` | `FEDERATED_API` |
+| `overpass_osm` | Diária (POIs OSM) | `24h` | `0 5 * * *` | `FEDERATED_API` |
+| `nominatim_osm` | Diária (OSM Planet) | `24h` | `0 5 * * *` | `FEDERATED_API` |
+| `osrm_routing` | Semanal (Malha Viária) | `168h` | `0 4 * * 1` | `FEDERATED_API` |
+| `rest_countries` | Anual (ISO-3166 Países) | `8760h` | `0 2 1 1 *` | `FEDERATED_API` |
+| `open_elevation` | Anual (Modelo SRTM) | `8760h` | `0 2 1 1 *` | `FEDERATED_API` |
 | `ibge_sidra` | Mensal / Variável | `720h` | `0 3 5 * *` | `FEDERATED_API` |
 | `ibge_pib_municipal` | Anual (defasagem 2 anos) | `8760h` | `0 2 15 1 *` | `LAKEHOUSE_BATCH` |
 | `ibge_censo2022` | Decenal | `87600h` | `0 2 1 1 *` | `LAKEHOUSE_BATCH` |
@@ -332,6 +381,8 @@ Todas as **85 fontes governamentais** possuem metas explícitas de `freshness_sl
 | `ibge_malhas` | Anual | `8760h` | `0 2 15 1 *` | `LAKEHOUSE_BATCH` |
 | `anatel_mosaico` | Mensal | `720h` | `0 3 5 * *` | `FEDERATED_API` |
 | `antt_malha_transporte` | Trimestral | `2160h` | `0 2 1 */3 *` | `FEDERATED_API` |
+| `openalex_api` | Diária (Grafo Científico) | `24h` | `0 6 * * *` | `FEDERATED_API` |
+| `who_gho_odata` | Anual (Observatório Global OMS) | `8760h` | `0 2 15 1 *` | `FEDERATED_API` |
 | `datasus_cnes` | Mensal | `720h` | `0 3 5 * *` | `LAKEHOUSE_BATCH` |
 | `datasus_sih` | Mensal | `720h` | `0 3 5 * *` | `LAKEHOUSE_BATCH` |
 | `inep_censo_escolar` | Anual | `8760h` | `0 2 15 1 *` | `LAKEHOUSE_BATCH` |
@@ -346,6 +397,13 @@ Todas as **85 fontes governamentais** possuem metas explícitas de `freshness_sl
 | `opendatasus_vigilancia` | Semanal | `168h` | `0 4 * * 1` | `FEDERATED_API` |
 | `capitais_iptu_itbi` | Anual / Mensal | `720h` | `0 3 5 * *` | `FEDERATED_API` |
 | `capes_sucupira` | Anual | `8760h` | `0 2 15 1 *` | `FEDERATED_API` |
+| `open_meteo` | Horária (Previsão & Clima) | `1h` | `0 * * * *` | `FEDERATED_API` |
+| `nasa_power` | Diária (Agroclimatologia) | `24h` | `0 8 * * *` | `FEDERATED_API` |
+| `aneel_anp_ckan` | Mensal (Regulatório Energia) | `720h` | `0 3 5 * *` | `FEDERATED_API` |
+| `gdelt_doc_api` | Horária (Eventos & Sentimento) | `1h` | `0 * * * *` | `FEDERATED_API` |
+| `huggingface_inference` | Sob demanda (Modelos ML) | `24h` | `0 6 * * *` | `FEDERATED_API` |
+| `upgini_adapter` | Semanal (Feature Store) | `168h` | `0 4 * * 1` | `FEDERATED_API` |
+| `nasa_youtube_open_ml` | Semanal (Datasets ML) | `168h` | `0 4 * * 1` | `FEDERATED_API` |
 | `datalake_federado_bq` | Contínua | `6h` | `0 */6 * * *` | `BIGQUERY_FEDERATED` |
 | `inpe_terrabrasilis` | Diária (DETER) / Anual (PRODES) | `24h` | `0 6 * * *` | `FEDERATED_API` |
 | `ana_hidroweb_telemetria` | Diária (Telemetria horária) | `24h` | `0 6 * * *` | `FEDERATED_API` |
@@ -358,7 +416,7 @@ Todas as **85 fontes governamentais** possuem metas explícitas de `freshness_sl
 
 ## 9. Instruções de Manutenção & Verificação de Integridade
 
-O arquivo `CATALOG.md` é gerado de forma **100% determinística** a partir de `catalog/sources_registry.yaml` e `catalog/public_apis_registry.yaml`.
+O arquivo `CATALOG.md` é gerado de forma **100% determinística** a partir da Fonte Única da Verdade `catalog/sources_registry.yaml`.
 
 ```powershell
 # 1. Verificar se CATALOG.md está em sincronia com os registries (exit 0/1)

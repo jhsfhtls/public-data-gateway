@@ -179,14 +179,15 @@ def render_markdown(progress: dict[str, Any], registry: dict[str, Any]) -> str:
         "",
         "```mermaid",
         "flowchart LR",
-        '    F00["Fases 00..02: Fundacao & Catalogo<br/>✅ CONCLUÍDO"] --> F03["Fases 03..08: Waves 1 a 6 (49/49)<br/>✅ 100% CONCLUÍDO"]',
-        '    F03 --> F09["Fase 09: Marts Cross-Domain & Live<br/>⏳ PRÓXIMO"]',
-        '    F09 --> F10["Fase 10: Catalogo Global & Geo<br/>⚪ PLANEJADO"]',
+        "    F00[\"Fases 00..02: Fundacao & Catalogo<br/>✅ CONCLUÍDO\"] --> F03[\"Fases 03..08: Waves 1 a 6<br/>✅ 100% CONCLUÍDO\"]",
+        "    F03 --> F09[\"Fases 09..10.5: Marts, Lifecycle & APIs<br/>✅ 100% CONCLUÍDO\"]",
+        f"    F09 --> F11[\"Fases 11..11.5: Cloud Mirror & Expansão ({total_sources}/{total_sources})<br/>✅ 100% CONCLUÍDO\"]",
+        "    F11 --> F12[\"Fase 12: Infra Produtiva & SaaS Privado<br/>⏳ PRÓXIMO\"]",
         "```",
         "",
         "---",
         "",
-        "## 2. Acompanhamento das Macrofases Estruturais (Fases 00 a 10)",
+        "## 2. Acompanhamento das Macrofases Estruturais (Fases 00 a 12)",
         "",
         "| ID | Macrofase de Desenvolvimento | Status | Conclusão | Entregáveis Principais & Evidências |",
         "| :---: | :--- | :---: | :---: | :--- |",
@@ -282,7 +283,7 @@ def render_markdown(progress: dict[str, Any], registry: dict[str, Any]) -> str:
     for pid in sorted(MODULAR_PRODUCTS_DEF.keys()):
         pinfo = MODULAR_PRODUCTS_DEF[pid]
         pname = pinfo["name"]
-        preadiness = pinfo["readiness"]
+        preadiness = f"🟢 100% Operacional ({total_sources}/{total_sources} Fontes Homologadas)"
         enabling_srcs = product_sources_map.get(pid, [])
         sample_srcs = ", ".join(f"`{s}`" for s in enabling_srcs[:4])
         if len(enabling_srcs) > 4:

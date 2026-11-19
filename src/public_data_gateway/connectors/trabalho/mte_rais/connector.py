@@ -26,7 +26,7 @@ import pyarrow.parquet as pq
 import yaml
 
 from public_data_gateway.core.config import GatewaySettings
-from public_data_gateway.core.connector import BaseConnector
+from public_data_gateway.core.connector import BaseConnector, register_connector
 from public_data_gateway.core.models import DataContract
 
 logger = logging.getLogger(__name__)
@@ -600,3 +600,6 @@ class MTERaisConnector(BaseConnector):
         return sorted(
             rows, key=lambda row: row["score_formalizacao_trabalho_municipio"], reverse=True
         )[:limit]
+
+
+register_connector('mte_rais', MTERaisConnector)

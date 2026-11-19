@@ -1,6 +1,6 @@
 {
   "schema_version": "1.0.0",
-  "last_updated": "2026-11-18T22:48:00.000000",
+  "last_updated": "2026-11-18T23:55:00.000000",
   "project_name": "public-data-gateway",
   "architecture": "Hexagonal Medallion Lakehouse (Bronze -> Silver -> Gold / Feature Store)",
   "governance_standards": [
@@ -900,6 +900,12 @@
       "phase_id": "11.5",
       "milestone": "Wave 11.5E Extensão (5/5 — CONCLUSÃO 100% DA FASE 11.5) — Homologação do Conector cgu_beneficios_cidadao (4 Tabelas Silver Bolsa Família/BPC/Defeso/Safra, Mart Intra-Domínio, Mart Cross-Domain Território & Paridade 4 Interfaces)",
       "summary": "Fechamento integral de todas as ondas da Fase 11.5 (11.5A a 11.5E, 85 fontes homologadas no catálogo) com a implementação completa nos 11 Gates da extensão cgu_beneficios_cidadao (CGU Benefícios ao Cidadão — Novo Bolsa Família, BPC/LOAS, Seguro-Defeso & Garantia-Safra): contrato ODCS v3.1 (ODCS-BR-CGU-BENEFICIOS-CIDADAO-001), ingestão Bronze + 4 tabelas Silver ZSTD (cgu_bolsa_familia_pagamentos, cgu_bpc_loas_beneficios, cgu_seguro_defeso_safra, cgu_beneficios_resumo_municipal) + Gold ML (features_cgu_beneficios_cidadao_brasil), 4 staging views + fct_cgu_beneficios_cidadao_municipal + mart intra-domínio mart_cgu_beneficios_cidadao_brasil + enriquecimento da mart cross-domain mart_cross_domain_territorio_b2b_macro_brasil (2.372 testes dbt OK na linhagem, 100% colunas documentadas no lint_dbt_docs.py com 698 modelos / 9.390 colunas / 396 fontes), paridade em SDK/FastAPI/CLI/MCP, bateria offline e teste live fail-hard contra Portal da Transparência CGU e MDS Dados Abertos."
+    },
+    {
+      "date": "2026-11-18",
+      "phase_id": "11.5",
+      "milestone": "Unificação do Catálogo Mestre (114 Fontes em sources_registry.yaml) & Busca Unificada nas 4 Interfaces",
+      "summary": "Consolidação de catalog/sources_registry.yaml e catalog/public_apis_registry.yaml em um único catálogo mestre (catalog/sources_registry.yaml com 114 fontes homologadas: 85 GOV_BR + 29 PUBLIC_GLOBAL), exposição de filtros source_origin e busca textual insensível a acentos (query/q) nas 4 interfaces (SDK list_sources, FastAPI /api/v1/catalog, CLI pdg catalog --origin --query e MCP bdg_list_sources), registro de 114/114 conectores no _CONNECTOR_REGISTRY, normalização de contratos ODCS v3.1.0 multi-table em load_contract() (114/114 contratos validados) e inclusão das 6 capitais inéditas (2111300, 2408102, 2704302, 5002704, 3205309, 1721000) na suíte live global."
     }
   ]
 }
