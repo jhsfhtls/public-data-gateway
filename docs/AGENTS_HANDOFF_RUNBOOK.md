@@ -10,9 +10,9 @@
 - **Repositório:** `public-data-gateway` (Open Source Medallion Platform)
 - **Python Virtual Environment:** `.\.venv\Scripts\python.exe` (Nunca use Python/pip global)
 - **Branch Canônica:** `main` (protegida por hooks de lint, branch naming, conventional commits e secrets scan)
-- **Total de Conectores no Catálogo:** **49 fontes oficiais brasileiras + 29 APIs Públicas & Globais** (`CATALOG.md`)
-- **Status Atual:** **Fases 00–10 concluídas** (49/49 fontes Gov BR homologadas + Gold Cross-Domain + Lifecycle S01..S09 + Hub 29 APIs Públicas)
-- **Próxima Etapa:** **Fase 10.5** — Elevar todas as 29 APIs da Fase 10 ao padrão completo **11-Gates / Medallion** (`BaseConnector`, `contract.yaml`, `staging` -> `intradomínio` -> `cross_domain`, testes `live` e paridade SDK/FastAPI/CLI/MCP), conforme [ADR-004](adr/ADR-004-connector-medallion-parity-policy.md).
+- **Total de Conectores no Catálogo Unificado (`catalog/sources_registry.yaml`):** **114 fontes homologadas** (**85 fontes oficiais brasileiras `GOV_BR` + 29 APIs Públicas & Globais `PUBLIC_GLOBAL`** em `CATALOG.md`)
+- **Status Atual:** **Fases 00–11.5 concluídas (100%)** (114/114 conectores homologados nos 11 Gates + 698 modelos dbt + 8.964 testes dbt + Gold Cross-Domain + Lifecycle S01..S09 + Cloud Lakehouse Mirror)
+- **Próxima Etapa:** **Fase 12** — Infraestrutura Produtiva, Orquestração 24/7 & Camada SaaS em Repositório Privado (Fronteira Open Core), conforme [ADR-004](adr/ADR-004-connector-medallion-parity-policy.md).
 
 ---
 

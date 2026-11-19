@@ -33,7 +33,14 @@ from public_data_gateway.core.config import GatewaySettings
 @pytest.mark.live
 @pytest.mark.parametrize(
     ("cep", "expected_uf"),
-    [("01001000", "SP"), ("20040020", "RJ"), ("70040010", "DF")],
+    [
+        ("01001000", "SP"),
+        ("20040020", "RJ"),
+        ("70040010", "DF"),
+        ("65010000", "MA"),
+        ("59010000", "RN"),
+        ("79002070", "MS"),
+    ],
 )
 def test_live_rotation_brasilapi_cep(tmp_path, cep: str, expected_uf: str) -> None:
     settings = GatewaySettings(data_dir=tmp_path / "data")
@@ -47,7 +54,20 @@ def test_live_rotation_brasilapi_cep(tmp_path, cep: str, expected_uf: str) -> No
 
 
 @pytest.mark.live
-@pytest.mark.parametrize("id_municipio", ["3550308", "3304557", "5300108"])
+@pytest.mark.parametrize(
+    "id_municipio",
+    [
+        "3550308",
+        "3304557",
+        "5300108",
+        "2111300",
+        "2408102",
+        "2704302",
+        "5002704",
+        "3205309",
+        "1721000",
+    ],
+)
 def test_live_rotation_ibge_localidades(tmp_path, id_municipio: str) -> None:
     settings = GatewaySettings(data_dir=tmp_path / "data")
     loc = IBGELocalidadesConnector(settings=settings)

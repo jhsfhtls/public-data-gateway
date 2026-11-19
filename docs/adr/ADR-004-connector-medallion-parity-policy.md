@@ -7,7 +7,7 @@
 ## Decisao
 Fica estabelecido que **nenhuma API** deve permanecer apenas como cliente HTTP sincrono isolado. Toda API homologada deve possuir:
 
-1. **Catalogo:** Entrada validada no catalogo mestre (`sources_registry.yaml` / `public_apis_registry.yaml`) e documentacao sincronizada (`CATALOG.md` / `CATALOG_PUBLIC_APIS.md`).
+1. **Catalogo:** Entrada validada no catalogo mestre unificado (`catalog/sources_registry.yaml`, com `source_origin: GOV_BR` ou `PUBLIC_GLOBAL`) e documentacao sincronizada (`CATALOG.md`).
 2. **Conector & ODCS v3.1:** Implementacao via `BaseConnector` + `contract.yaml` + isolamento `data/<connector_id>/{bronze,silver,gold,quarantine}/`.
 3. **dbt Completo:**
    - `staging`: `source.yml` + `stg_*` com 100% de cobertura no `lint_dbt_docs.py`.

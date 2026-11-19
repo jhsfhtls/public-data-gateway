@@ -12,6 +12,7 @@ class SourceEntry(BaseModel):
     model_config = ConfigDict(extra="ignore")
 
     source_id: str
+    source_origin: str = "GOV_BR"
     name: str
     agency: str
     official_url: str
@@ -22,6 +23,8 @@ class SourceEntry(BaseModel):
     auth_type: str = "none"
     canonical_keys: list[str] = Field(default_factory=list)
     update_frequency: str = "daily"
+    freshness_sla_hours: int = 24
+    cron_schedule_expression: str = "0 6 * * *"
     estimated_volume: str = ""
     lgpd_tier: str = "public"
     ml_feature_domains: list[str] = Field(default_factory=list)
@@ -32,6 +35,11 @@ class SourceEntry(BaseModel):
     rice_score: float = 0.0
     roadmap_wave: int = 1
     status: str = "planned"
+    api_block: str | None = None
+    rate_limit_rpm: int | None = None
+    finops_tier: str | None = None
+    gateway_method: str | None = None
+    notes: str = ""
 
 
 class QualityRule(BaseModel):

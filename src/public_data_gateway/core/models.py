@@ -12,6 +12,7 @@ class SourceEntry(BaseModel):
     model_config = ConfigDict(extra="ignore")
 
     source_id: str
+    source_origin: str = "GOV_BR"
     name: str
     agency: str
     official_url: str
@@ -34,6 +35,11 @@ class SourceEntry(BaseModel):
     rice_score: float = 0.0
     roadmap_wave: int = 1
     status: str = "planned"
+    api_block: str | None = None
+    rate_limit_rpm: int | None = None
+    finops_tier: str | None = None
+    gateway_method: str | None = None
+    notes: str = ""
 
 
 class QualityRule(BaseModel):

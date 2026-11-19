@@ -68,13 +68,21 @@ class MCPDispatcher:
                         "tools": [
                             {
                                 "name": "bdg_list_sources",
-                                "description": "List Brazilian public datasets available in the catalog (Tier 1).",
+                                "description": "List and search all 114 Brazilian public datasets and global APIs available in the unified catalog (Tier 1).",
                                 "inputSchema": {
                                     "type": "object",
                                     "properties": {
                                         "wave": {"type": "integer"},
                                         "segment": {"type": "string"},
                                         "status": {"type": "string"},
+                                        "origin": {
+                                            "type": "string",
+                                            "description": "Optional filter: GOV_BR (85 sources) or PUBLIC_GLOBAL (29 APIs)",
+                                        },
+                                        "query": {
+                                            "type": "string",
+                                            "description": "Optional keyword search across source_id, name, agency, segment, features, or keys",
+                                        },
                                     },
                                 },
                             },
@@ -4392,6 +4400,8 @@ class MCPDispatcher:
                 wave=args.get("wave"),
                 segment_id=args.get("segment"),
                 status=args.get("status"),
+                source_origin=args.get("origin"),
+                query=args.get("query"),
             )
             raw = [s.model_dump() for s in sources]
             wrapped = wrap_untrusted_gov_data(raw, source_id="bdg_catalog")

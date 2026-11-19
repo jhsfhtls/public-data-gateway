@@ -1,62 +1,83 @@
-schema_version: 1.0.0
-updated_at: '2026-11-07'
+schema_version: 1.1.0
+updated_at: '2026-11-18'
+catalog_scope: UNIFIED_GOV_BR_AND_GLOBAL_PUBLIC_APIS
+discovery_references:
+- name: Conecta GOV.BR
+  url: https://www.gov.br/conecta/catalogo/
+  purpose: Auditoria de APIs governamentais brasileiras disponiveis para integracao
+- name: Public APIs Directory
+  url: https://github.com/public-apis/public-apis
+  purpose: Descoberta curada de APIs publicas globais para Analytics e Machine Learning
+public_api_blocks:
+- block_id: BLOCO_1_KYC_GEO
+  name: Enriquecimento Cadastral, Geolocalizacao, KYC/KYB & Antifraude
+  description: Gateways de fallback em cascata para CNPJ/CEP, geocodificacao, idade de dominio, LEI global e inteligencia de IP/ASN.
+- block_id: BLOCO_2_MERCADO_REGULATORIO
+  name: Inteligencia de Mercado, Regulatorias, Economia & Governo
+  description: Cotacoes B3/FIIs, cambio em tempo real, OData IPEA, CKAN ANEEL/ANP, Legislativo (Camara/Senado) e series globais (World Bank/OMS).
+- block_id: BLOCO_3_ESPACIAL_CLIMA_ML
+  name: Feature Engineering Espacial, Mobilidade, Clima & ML
+  description: POIs em raio espacial (Overpass/OSM), matriz de rotas viarias (OSRM), clima/radiacao (Open-Meteo, NASA POWER), altitude (SRTM), inferencia NLP e feature stores.
+- block_id: BLOCO_4_GLOBAL_PESQUISA
+  name: Dados Globais, Demografia, Pesquisa & Sentimento
+  description: Normalizacao ISO-3166 de paises, grafo cientifico aberto (OpenAlex) e monitoramento global de noticias/sentimento (GDELT).
+already_homologated_gov_br:
+- brasilapi_core
+- cgu_ceis_cnep
+- cgu_pep
+- ibge_localidades
+- ibge_censo2022
+- ibge_pib_municipal
+- ibge_sidra
+- ibge_cnefe
+- ibge_malhas
+- ibge_pnad_continua
+- bcb_sgs
+- bcb_olinda_ptax
+- bcb_ifdata
+- pncp_contratacoes
+- cvm_dfp_itr
+- cvm_fundos
 segments:
 - segment_id: 01_b2b_empresarial
   name: Empresarial, Cadastral & Societário B2B
-  description: Dados de mais de 55 milhões de CNPJs (matrizes, filiais, sócios QSA,
-    capital social, CNAEs, situação cadastral, optantes pelo Simples Nacional e MEI).
+  description: Dados de mais de 55 milhões de CNPJs (matrizes, filiais, sócios QSA, capital social, CNAEs, situação cadastral, optantes pelo Simples Nacional e MEI).
 - segment_id: 02_economico_macrofinanceiro
   name: Econômico, Monetário & Macrofinanceiro
-  description: Séries macroeconômicas oficiais (IPCA, Selic, IGP-M), balanços contábeis
-    trimestrais de instituições financeiras (IFData), cotações diárias de moedas (PTAX)
-    e dados contábeis da CVM.
+  description: Séries macroeconômicas oficiais (IPCA, Selic, IGP-M), balanços contábeis trimestrais de instituições financeiras (IFData), cotações diárias de moedas (PTAX) e dados contábeis da CVM.
 - segment_id: 03_demografico_censitario
   name: Demográfico, Censitário & Domiciliar
-  description: Censo Demográfico 2022 em nível de 450.000 setores censitários, características
-    de domicílios, PNAD Contínua (renda e trabalho) e PIB municipal do IBGE.
+  description: Censo Demográfico 2022 em nível de 450.000 setores censitários, características de domicílios, PNAD Contínua (renda e trabalho) e PIB municipal do IBGE.
 - segment_id: 04_trabalho_renda
   name: Trabalho, Emprego & Renda
-  description: Fluxos mensais de contratações e demissões do Novo CAGED (salários
-    de admissão por CBO e setor) e estoque de empregos da RAIS.
+  description: Fluxos mensais de contratações e demissões do Novo CAGED (salários de admissão por CBO e setor) e estoque de empregos da RAIS.
 - segment_id: 05_geografico_logistica
   name: Geográfico, Logístico & Endereçamento
-  description: 111+ milhões de coordenadas pontuais do CNEFE/IBGE, limites territoriais
-    vetoriais, base de logradouros/CEPs e antenas de telecomunicação da Anatel.
+  description: 111+ milhões de coordenadas pontuais do CNEFE/IBGE, limites territoriais vetoriais, base de logradouros/CEPs e antenas de telecomunicação da Anatel.
 - segment_id: 06_saude_publica
   name: Saúde Pública & Epidemiologia
-  description: Registros de óbitos (SIM), nascimentos (SINASC), internações hospitalares
-    (SIH/SUS), estabelecimentos de saúde (CNES) e preços regulados de medicamentos
-    (CMED/ANVISA).
+  description: Registros de óbitos (SIM), nascimentos (SINASC), internações hospitalares (SIH/SUS), estabelecimentos de saúde (CNES) e preços regulados de medicamentos (CMED/ANVISA).
 - segment_id: 07_educacao_capital_humano
   name: Educação & Capital Humano
-  description: Infraestrutura de escolas e matrículas (Censo Escolar), universidades
-    e cursos (Censo Superior), notas por escola (IDEB) e microdados do ENEM.
+  description: Infraestrutura de escolas e matrículas (Censo Escolar), universidades e cursos (Censo Superior), notas por escola (IDEB) e microdados do ENEM.
 - segment_id: 08_judicial_compliance
   name: Judicial, Integridade & Compliance
-  description: Metadados de processos de todos os 90+ tribunais do Brasil (CNJ DataJud),
-    cadastros de inidôneos e punidos (CEIS/CNEP/CEPIM), autoridades (PEP) e certidões
-    negativas (CNDT).
+  description: Metadados de processos de todos os 90+ tribunais do Brasil (CNJ DataJud), cadastros de inidôneos e punidos (CEIS/CNEP/CEPIM), autoridades (PEP) e certidões negativas (CNDT).
 - segment_id: 09_comercio_exterior
   name: Comércio Exterior & Balança Comercial
-  description: Exportações e importações detalhadas por NCM, valor FOB, peso líquido,
-    modal de transporte e município do exportador (Comex Stat).
+  description: Exportações e importações detalhadas por NCM, valor FOB, peso líquido, modal de transporte e município do exportador (Comex Stat).
 - segment_id: 10_compras_publicas
   name: Compras Públicas, Licitações & Contratos
-  description: Repositório unificado da Lei nº 14.133/2021 (PNCP) com editais, atas
-    e contratos de todos os entes federados e catálogo unificado CATMAT/CATSER.
+  description: Repositório unificado da Lei nº 14.133/2021 (PNCP) com editais, atas e contratos de todos os entes federados e catálogo unificado CATMAT/CATSER.
 - segment_id: 11_agronegocio_meio_ambiente
   name: Agronegócio, Terra & Meio Ambiente
-  description: 7+ milhões de imóveis rurais com polígonos de reserva legal e APP (SICAR/CAR),
-    desmatamento e alertas por satélite (INPE DETER/PRODES), uso da terra (MapBiomas)
-    e zoneamento climático (ZARC).
+  description: 7+ milhões de imóveis rurais com polígonos de reserva legal e APP (SICAR/CAR), desmatamento e alertas por satélite (INPE DETER/PRODES), uso da terra (MapBiomas) e zoneamento climático (ZARC).
 - segment_id: 12_imobiliario_cartorial
   name: Imobiliário, Notarial & Cartorial
-  description: Cadastro nacional de cartórios e produtividade (CNJ Justiça Aberta),
-    transações registradas (ONR) e cadastros imobiliários municipais (IPTU/ITBI).
+  description: Cadastro nacional de cartórios e produtividade (CNJ Justiça Aberta), transações registradas (ONR) e cadastros imobiliários municipais (IPTU/ITBI).
 - segment_id: 13_metaportais_agregadores
   name: Metaportais & Hubs Agregadores
-  description: Plataformas de facilitação técnica que unificam e padronizam centenas
-    de fontes em protocolos únicos (Datalake Federado SQL, BrasilAPI, Dados.gov.br).
+  description: Plataformas de facilitação técnica que unificam e padronizam centenas de fontes em protocolos únicos (Datalake Federado SQL, BrasilAPI, Dados.gov.br).
 sources:
 - source_id: ibge_localidades
   name: IBGE Localidades & Malha Territorial
@@ -85,6 +106,7 @@ sources:
   status: HOMOLOGATED
   freshness_sla_hours: 720
   cron_schedule_expression: 0 3 1 * *
+  source_origin: GOV_BR
 - source_id: brasilapi_core
   name: 'BrasilAPI: CEPs, FIPE, Bancos, DDD & CNPJ de Borda'
   agency: Comunidade Open Source BrasilAPI
@@ -114,6 +136,7 @@ sources:
   status: HOMOLOGATED
   freshness_sla_hours: 1
   cron_schedule_expression: 0 * * * *
+  source_origin: GOV_BR
 - source_id: bcb_sgs
   name: 'Banco Central: Sistema Gerenciador de Séries Temporais (SGS)'
   agency: Banco Central do Brasil (BACEN)
@@ -139,6 +162,7 @@ sources:
   status: HOMOLOGATED
   freshness_sla_hours: 24
   cron_schedule_expression: 0 6 * * *
+  source_origin: GOV_BR
 - source_id: bcb_olinda_ptax
   name: 'Banco Central Olinda: Cotações PTAX Moedas Diárias'
   agency: Banco Central do Brasil (BACEN)
@@ -163,6 +187,7 @@ sources:
   status: HOMOLOGATED
   freshness_sla_hours: 24
   cron_schedule_expression: 0 6 * * *
+  source_origin: GOV_BR
 - source_id: rfb_cnpj_lakehouse
   name: 'Receita Federal: Cadastro Nacional da Pessoa Jurídica (CNPJ & QSA)'
   agency: Receita Federal do Brasil
@@ -195,6 +220,7 @@ sources:
   status: HOMOLOGATED
   freshness_sla_hours: 720
   cron_schedule_expression: 0 2 15 * *
+  source_origin: GOV_BR
 - source_id: pncp_contratacoes
   name: 'PNCP: Portal Nacional de Contratações Públicas (Lei 14.133)'
   agency: Governo Federal / PNCP
@@ -223,6 +249,7 @@ sources:
   status: HOMOLOGATED
   freshness_sla_hours: 1
   cron_schedule_expression: 0 * * * *
+  source_origin: GOV_BR
 - source_id: cnj_datajud
   name: 'CNJ: Base Nacional do Poder Judiciário (DataJud)'
   agency: Conselho Nacional de Justiça (CNJ)
@@ -250,6 +277,7 @@ sources:
   status: HOMOLOGATED
   freshness_sla_hours: 24
   cron_schedule_expression: 0 6 * * *
+  source_origin: GOV_BR
 - source_id: cgu_ceis_cnep
   name: 'CGU: Cadastros de Empresas Inidôneas, Suspensas e Punidas (CEIS/CNEP)'
   agency: Controladoria-Geral da União (CGU)
@@ -277,6 +305,7 @@ sources:
   status: HOMOLOGATED
   freshness_sla_hours: 24
   cron_schedule_expression: 0 6 * * *
+  source_origin: GOV_BR
 - source_id: cgu_pep
   name: 'CGU: Cadastro de Pessoas Expostas Politicamente (PEP)'
   agency: Controladoria-Geral da União (CGU)
@@ -303,6 +332,7 @@ sources:
   status: HOMOLOGATED
   freshness_sla_hours: 24
   cron_schedule_expression: 0 6 * * *
+  source_origin: GOV_BR
 - source_id: rfb_simples_mei
   name: 'Receita Federal: Opção pelo Simples Nacional & MEI'
   agency: Receita Federal do Brasil
@@ -328,6 +358,7 @@ sources:
   status: HOMOLOGATED
   freshness_sla_hours: 720
   cron_schedule_expression: 0 2 15 * *
+  source_origin: GOV_BR
 - source_id: tst_cndt
   name: 'TST: Certidão Negativa de Débitos Trabalhistas (CNDT)'
   agency: Tribunal Superior do Trabalho (TST)
@@ -354,6 +385,7 @@ sources:
   status: HOMOLOGATED
   freshness_sla_hours: 24
   cron_schedule_expression: 0 6 * * *
+  source_origin: GOV_BR
 - source_id: suframa_pim_zfm
   name: 'SUFRAMA: Cadastro de Empresas Incentivadas do PIM / ZFM'
   agency: Superintendência da Zona Franca de Manaus (SUFRAMA)
@@ -381,6 +413,7 @@ sources:
   status: HOMOLOGATED
   freshness_sla_hours: 720
   cron_schedule_expression: 0 3 5 * *
+  source_origin: GOV_BR
 - source_id: cvm_dfp_itr
   name: 'CVM: Demonstrações Financeiras Padronizadas (DFP / ITR)'
   agency: Comissão de Valores Mobiliários (CVM)
@@ -406,6 +439,7 @@ sources:
   status: HOMOLOGATED
   freshness_sla_hours: 2160
   cron_schedule_expression: 0 3 15 */3 *
+  source_origin: GOV_BR
 - source_id: mdic_comexstat
   name: 'MDIC: Comex Stat Exportações e Importações Detalhadas'
   agency: Ministério do Desenvolvimento, Indústria e Comércio Exterior (MDIC)
@@ -433,6 +467,7 @@ sources:
   status: HOMOLOGATED
   freshness_sla_hours: 720
   cron_schedule_expression: 0 3 5 * *
+  source_origin: GOV_BR
 - source_id: cvm_fundos
   name: 'CVM: Informe Diário de Fundos de Investimento'
   agency: Comissão de Valores Mobiliários (CVM)
@@ -458,6 +493,7 @@ sources:
   status: HOMOLOGATED
   freshness_sla_hours: 24
   cron_schedule_expression: 0 7 * * 1-5
+  source_origin: GOV_BR
 - source_id: bcb_ifdata
   name: 'Banco Central: Informações Financeiras das IFs (IF.data)'
   agency: Banco Central do Brasil (BACEN)
@@ -483,6 +519,7 @@ sources:
   status: HOMOLOGATED
   freshness_sla_hours: 2160
   cron_schedule_expression: 0 2 1 */3 *
+  source_origin: GOV_BR
 - source_id: stn_tesouro_transparente
   name: 'Secretaria do Tesouro Nacional: SADIPEM & Dívida Pública'
   agency: Secretaria do Tesouro Nacional (STN)
@@ -509,6 +546,7 @@ sources:
   status: HOMOLOGATED
   freshness_sla_hours: 720
   cron_schedule_expression: 0 3 5 * *
+  source_origin: GOV_BR
 - source_id: comprasgov_catmat
   name: 'Compras.gov.br: Catálogo Unificado de Materiais e Serviços (CATMAT/CATSER)'
   agency: Ministério da Gestão e Inovação em Serviços Públicos (MGI)
@@ -533,6 +571,7 @@ sources:
   status: HOMOLOGATED
   freshness_sla_hours: 168
   cron_schedule_expression: 0 4 * * 1
+  source_origin: GOV_BR
 - source_id: ibge_sidra
   name: 'IBGE: Sistema IBGE de Recuperação Automática (SIDRA)'
   agency: Instituto Brasileiro de Geografia e Estatística (IBGE)
@@ -559,6 +598,7 @@ sources:
   status: HOMOLOGATED
   freshness_sla_hours: 720
   cron_schedule_expression: 0 3 5 * *
+  source_origin: GOV_BR
 - source_id: ibge_pib_municipal
   name: 'IBGE: Produto Interno Bruto dos Municípios'
   agency: Instituto Brasileiro de Geografia e Estatística (IBGE)
@@ -585,6 +625,7 @@ sources:
   status: HOMOLOGATED
   freshness_sla_hours: 8760
   cron_schedule_expression: 0 2 15 1 *
+  source_origin: GOV_BR
 - source_id: ibge_censo2022
   name: 'IBGE: Microdados do Censo Demográfico 2022'
   agency: Instituto Brasileiro de Geografia e Estatística (IBGE)
@@ -612,6 +653,7 @@ sources:
   status: HOMOLOGATED
   freshness_sla_hours: 87600
   cron_schedule_expression: 0 2 1 1 *
+  source_origin: GOV_BR
 - source_id: mte_novo_caged
   name: 'MTE: Microdados do Novo CAGED'
   agency: Ministério do Trabalho e Emprego (MTE)
@@ -641,6 +683,7 @@ sources:
   status: HOMOLOGATED
   freshness_sla_hours: 720
   cron_schedule_expression: 0 3 5 * *
+  source_origin: GOV_BR
 - source_id: ibge_pnad_continua
   name: 'IBGE: Pesquisa Nacional por Amostra de Domicílios Contínua (PNAD Contínua)'
   agency: Instituto Brasileiro de Geografia e Estatística (IBGE)
@@ -666,6 +709,7 @@ sources:
   status: HOMOLOGATED
   freshness_sla_hours: 2160
   cron_schedule_expression: 0 2 1 */3 *
+  source_origin: GOV_BR
 - source_id: ibge_cnefe
   name: 'IBGE: Cadastro Nacional de Endereços para Fins Estatísticos (CNEFE)'
   agency: Instituto Brasileiro de Geografia e Estatística (IBGE)
@@ -693,6 +737,7 @@ sources:
   status: HOMOLOGATED
   freshness_sla_hours: 87600
   cron_schedule_expression: 0 2 1 1 *
+  source_origin: GOV_BR
 - source_id: mte_rais
   name: 'MTE: Relação Anual de Informações Sociais (RAIS)'
   agency: Ministério do Trabalho e Emprego (MTE)
@@ -721,6 +766,7 @@ sources:
   status: HOMOLOGATED
   freshness_sla_hours: 8760
   cron_schedule_expression: 0 2 15 1 *
+  source_origin: GOV_BR
 - source_id: ibge_malhas
   name: 'IBGE: Malhas Territoriais Vetoriais (Municípios e UFs)'
   agency: Instituto Brasileiro de Geografia e Estatística (IBGE)
@@ -747,6 +793,7 @@ sources:
   status: HOMOLOGATED
   freshness_sla_hours: 8760
   cron_schedule_expression: 0 2 15 1 *
+  source_origin: GOV_BR
 - source_id: anatel_mosaico
   name: 'ANATEL: Sistema Mosaico de Estações e Cobertura de Telecomunicações'
   agency: Agência Nacional de Telecomunicações (ANATEL)
@@ -773,6 +820,7 @@ sources:
   status: HOMOLOGATED
   freshness_sla_hours: 720
   cron_schedule_expression: 0 3 5 * *
+  source_origin: GOV_BR
 - source_id: antt_malha_transporte
   name: 'ANTT: Malha de Transporte Rodoviário e Ferroviário de Cargas'
   agency: Agência Nacional de Transportes Terrestres (ANTT)
@@ -800,6 +848,7 @@ sources:
   status: HOMOLOGATED
   freshness_sla_hours: 2160
   cron_schedule_expression: 0 2 1 */3 *
+  source_origin: GOV_BR
 - source_id: datasus_cnes
   name: 'DataSUS: Cadastro Nacional de Estabelecimentos de Saúde (CNES)'
   agency: Ministério da Saúde / DataSUS
@@ -828,6 +877,7 @@ sources:
   status: HOMOLOGATED
   freshness_sla_hours: 720
   cron_schedule_expression: 0 3 5 * *
+  source_origin: GOV_BR
 - source_id: datasus_sih
   name: 'DataSUS: Sistema de Informações Hospitalares (SIH/SUS)'
   agency: Ministério da Saúde / DataSUS
@@ -854,6 +904,7 @@ sources:
   status: HOMOLOGATED
   freshness_sla_hours: 720
   cron_schedule_expression: 0 3 5 * *
+  source_origin: GOV_BR
 - source_id: inep_censo_escolar
   name: 'INEP: Microdados do Censo Escolar da Educação Básica'
   agency: Instituto Nacional de Estudos e Pesquisas Educacionais Anísio Teixeira (INEP)
@@ -881,6 +932,7 @@ sources:
   status: HOMOLOGATED
   freshness_sla_hours: 8760
   cron_schedule_expression: 0 2 15 1 *
+  source_origin: GOV_BR
 - source_id: datasus_sim
   name: 'DataSUS: Sistema de Informações sobre Mortalidade (SIM)'
   agency: Ministério da Saúde / DataSUS
@@ -907,6 +959,7 @@ sources:
   status: HOMOLOGATED
   freshness_sla_hours: 8760
   cron_schedule_expression: 0 2 15 1 *
+  source_origin: GOV_BR
 - source_id: inep_censo_superior
   name: 'INEP: Microdados do Censo da Educação Superior'
   agency: Instituto Nacional de Estudos e Pesquisas Educacionais Anísio Teixeira (INEP)
@@ -934,6 +987,7 @@ sources:
   status: HOMOLOGATED
   freshness_sla_hours: 8760
   cron_schedule_expression: 0 2 15 1 *
+  source_origin: GOV_BR
 - source_id: cnj_justica_aberta
   name: 'CNJ: Justiça Aberta (Cadastro e Produtividade de Cartórios)'
   agency: Conselho Nacional de Justiça (CNJ)
@@ -960,6 +1014,7 @@ sources:
   status: HOMOLOGATED
   freshness_sla_hours: 4320
   cron_schedule_expression: 0 2 1 1,7 *
+  source_origin: GOV_BR
 - source_id: datasus_sinasc
   name: 'DataSUS: Sistema de Informações sobre Nascidos Vivos (SINASC)'
   agency: Ministério da Saúde / DataSUS
@@ -986,6 +1041,7 @@ sources:
   status: HOMOLOGATED
   freshness_sla_hours: 8760
   cron_schedule_expression: 0 2 15 1 *
+  source_origin: GOV_BR
 - source_id: anvisa_cmed
   name: 'ANVISA: Câmara de Regulação do Mercado de Medicamentos (CMED)'
   agency: Agência Nacional de Vigilância Sanitária (ANVISA)
@@ -1011,6 +1067,7 @@ sources:
   status: HOMOLOGATED
   freshness_sla_hours: 720
   cron_schedule_expression: 0 3 5 * *
+  source_origin: GOV_BR
 - source_id: inep_ideb
   name: 'INEP: Índice de Desenvolvimento da Educação Básica (IDEB)'
   agency: Instituto Nacional de Estudos e Pesquisas Educacionais Anísio Teixeira (INEP)
@@ -1037,6 +1094,7 @@ sources:
   status: HOMOLOGATED
   freshness_sla_hours: 17520
   cron_schedule_expression: 0 2 1 1 *
+  source_origin: GOV_BR
 - source_id: onr_registro_imoveis
   name: 'ONR: Sistema de Registro Eletrônico de Imóveis (SREI)'
   agency: Operador Nacional do Registro de Imóveis Eletrônico (ONR)
@@ -1063,6 +1121,7 @@ sources:
   status: HOMOLOGATED
   freshness_sla_hours: 720
   cron_schedule_expression: 0 3 5 * *
+  source_origin: GOV_BR
 - source_id: opendatasus_vigilancia
   name: 'OpenDataSUS: Notificações de Síndromes e Vigilância Epidemiológica'
   agency: Ministério da Saúde
@@ -1089,6 +1148,7 @@ sources:
   status: HOMOLOGATED
   freshness_sla_hours: 168
   cron_schedule_expression: 0 4 * * 1
+  source_origin: GOV_BR
 - source_id: inep_enem
   name: 'INEP: Microdados do Exame Nacional do Ensino Médio (ENEM)'
   agency: Instituto Nacional de Estudos e Pesquisas Educacionais Anísio Teixeira (INEP)
@@ -1115,6 +1175,7 @@ sources:
   status: HOMOLOGATED
   freshness_sla_hours: 8760
   cron_schedule_expression: 0 2 15 1 *
+  source_origin: GOV_BR
 - source_id: capitais_iptu_itbi
   name: 'Capitais: Cadastros Imobiliários Municipais (IPTU / ITBI)'
   agency: Prefeituras Municipais das Capitais
@@ -1142,6 +1203,7 @@ sources:
   status: HOMOLOGATED
   freshness_sla_hours: 720
   cron_schedule_expression: 0 3 5 * *
+  source_origin: GOV_BR
 - source_id: capes_sucupira
   name: 'CAPES: Plataforma Sucupira (Pós-Graduação Stricto Sensu)'
   agency: Coordenação de Aperfeiçoamento de Pessoal de Nível Superior (CAPES)
@@ -1168,6 +1230,7 @@ sources:
   status: HOMOLOGATED
   freshness_sla_hours: 8760
   cron_schedule_expression: 0 2 15 1 *
+  source_origin: GOV_BR
 - source_id: inpe_terrabrasilis
   name: 'INPE: Plataforma TerraBrasilis (DETER & PRODES)'
   agency: Instituto Nacional de Pesquisas Espaciais (INPE)
@@ -1195,6 +1258,7 @@ sources:
   status: HOMOLOGATED
   freshness_sla_hours: 24
   cron_schedule_expression: 0 6 * * *
+  source_origin: GOV_BR
 - source_id: datalake_federado_bq
   name: 'PDG: Datalake Público Federado & Catálogo Nacional SQL (DuckDB / BigQuery)'
   agency: Infraestrutura Nacional de Dados (IND / GOV.BR) & PDG
@@ -1227,6 +1291,7 @@ sources:
   status: HOMOLOGATED
   freshness_sla_hours: 6
   cron_schedule_expression: 0 */6 * * *
+  source_origin: GOV_BR
 - source_id: ana_hidroweb_telemetria
   name: 'ANA: Rede Hidrometeorológica Nacional (HidroWeb)'
   agency: Agência Nacional de Águas e Saneamento Básico (ANA)
@@ -1253,6 +1318,7 @@ sources:
   status: HOMOLOGATED
   freshness_sla_hours: 24
   cron_schedule_expression: 0 6 * * *
+  source_origin: GOV_BR
 - source_id: mapbiomas_cobertura
   name: 'MapBiomas: Cobertura e Uso da Terra no Brasil (1985-2024)'
   agency: Projeto MapBiomas
@@ -1280,6 +1346,7 @@ sources:
   status: HOMOLOGATED
   freshness_sla_hours: 8760
   cron_schedule_expression: 0 2 15 1 *
+  source_origin: GOV_BR
 - source_id: sfb_sicar
   name: 'SFB: Sistema Nacional de Cadastro Ambiental Rural (SICAR)'
   agency: Serviço Florestal Brasileiro (SFB) / MMA
@@ -1307,6 +1374,7 @@ sources:
   status: HOMOLOGATED
   freshness_sla_hours: 4320
   cron_schedule_expression: 0 2 1 1,7 *
+  source_origin: GOV_BR
 - source_id: mapa_zarc
   name: 'MAPA: Zoneamento Agrícola de Risco Climático (ZARC)'
   agency: Ministério da Agricultura e Pecuária (MAPA) / Embrapa
@@ -1333,6 +1401,7 @@ sources:
   status: HOMOLOGATED
   freshness_sla_hours: 8760
   cron_schedule_expression: 0 2 15 1 *
+  source_origin: GOV_BR
 - source_id: dadosgov_ckan
   name: 'Dados.gov.br: Portal Brasileiro de Dados Abertos (Catálogo CKAN)'
   agency: Governo Federal (Dados.gov.br)
@@ -1357,6 +1426,7 @@ sources:
   status: HOMOLOGATED
   freshness_sla_hours: 6
   cron_schedule_expression: 0 */6 * * *
+  source_origin: GOV_BR
 - source_id: stn_siconfi
   name: 'Secretaria do Tesouro Nacional: SICONFI & Finbra (Contabilidade e Gestão Fiscal)'
   agency: Secretaria do Tesouro Nacional (STN)
@@ -1391,6 +1461,7 @@ sources:
   status: HOMOLOGATED
   freshness_sla_hours: 720
   cron_schedule_expression: 0 4 10 * *
+  source_origin: GOV_BR
 - source_id: pgfn_divida_ativa
   name: 'PGFN: Créditos Inscritos em Dívida Ativa da União e do FGTS (Dados Abertos)'
   agency: Procuradoria-Geral da Fazenda Nacional (PGFN / Ministério da Fazenda)
@@ -1425,6 +1496,7 @@ sources:
   status: HOMOLOGATED
   freshness_sla_hours: 2160
   cron_schedule_expression: 0 3 15 */3 *
+  source_origin: GOV_BR
 - source_id: cnj_improbidade
   name: 'CNJ: Cadastro Nacional de Condenações por Ato de Improbidade Administrativa (CNCIAI)'
   agency: Conselho Nacional de Justiça (CNJ)
@@ -1459,6 +1531,7 @@ sources:
   status: HOMOLOGATED
   freshness_sla_hours: 168
   cron_schedule_expression: 0 4 * * 1
+  source_origin: GOV_BR
 - source_id: stn_capag
   name: 'STN: Capacidade de Pagamento (CAPAG) Subnacional & Índice FIRJAN de Gestão Fiscal (IFGF)'
   agency: Secretaria do Tesouro Nacional (STN / Ministério da Fazenda) & FIRJAN
@@ -1491,6 +1564,7 @@ sources:
   status: HOMOLOGATED
   freshness_sla_hours: 720
   cron_schedule_expression: 0 5 15 * *
+  source_origin: GOV_BR
 - source_id: bcb_estban
   name: 'Banco Central: Estatística Bancária Mensal por Município (ESTBAN COSIF)'
   agency: Banco Central do Brasil (BACEN)
@@ -1524,6 +1598,7 @@ sources:
   status: HOMOLOGATED
   freshness_sla_hours: 720
   cron_schedule_expression: 0 6 20 * *
+  source_origin: GOV_BR
 - source_id: bcb_agencia
   name: 'Banco Central: Cadastro Nacional de Agências Bancárias e Postos de Atendimento (Olinda OData)'
   agency: Banco Central do Brasil (BACEN)
@@ -1558,6 +1633,7 @@ sources:
   status: HOMOLOGATED
   freshness_sla_hours: 720
   cron_schedule_expression: 0 6 10 * *
+  source_origin: GOV_BR
 - source_id: rfb_cno
   name: 'Receita Federal: Cadastro Nacional de Obras (CNO — Construção Civil & Infraestrutura)'
   agency: Secretaria Especial da Receita Federal do Brasil (RFB)
@@ -1595,6 +1671,7 @@ sources:
   status: HOMOLOGATED
   freshness_sla_hours: 720
   cron_schedule_expression: 0 5 18 * *
+  source_origin: GOV_BR
 - source_id: ibama_fiscalizacao
   name: 'IBAMA: Autos de Infração, Termos de Embargo & Fiscalização Ambiental (SIFISC)'
   agency: Instituto Brasileiro do Meio Ambiente e dos Recursos Naturais Renováveis (IBAMA)
@@ -1629,6 +1706,7 @@ sources:
   status: HOMOLOGATED
   freshness_sla_hours: 168
   cron_schedule_expression: 0 4 * * 1
+  source_origin: GOV_BR
 - source_id: bcb_sicor
   name: 'BACEN: Sistema de Operações do Crédito Rural e do Proagro (SICOR)'
   agency: Banco Central do Brasil (BACEN)
@@ -1661,6 +1739,7 @@ sources:
   status: HOMOLOGATED
   freshness_sla_hours: 720
   cron_schedule_expression: 0 5 12 * *
+  source_origin: GOV_BR
 - source_id: ibge_agro_municipal
   name: 'IBGE: Produção Agrícola, Pecuária & Silvicultura Municipal (PAM / PPM / PEVS)'
   agency: Instituto Brasileiro de Geografia e Estatística (IBGE)
@@ -1692,6 +1771,7 @@ sources:
   status: HOMOLOGATED
   freshness_sla_hours: 8760
   cron_schedule_expression: 0 6 15 9 *
+  source_origin: GOV_BR
 - source_id: rfb_cafir
   name: 'Receita Federal: Cadastro de Imóveis Rurais (CAFIR / CIB / CNIR)'
   agency: Secretaria Especial da Receita Federal do Brasil (RFB) / INCRA
@@ -1726,6 +1806,7 @@ sources:
   status: HOMOLOGATED
   freshness_sla_hours: 720
   cron_schedule_expression: 0 4 20 * *
+  source_origin: GOV_BR
 - source_id: inpe_queimadas_seeg
   name: 'INPE Queimadas & SEEG: Focos de Calor & Emissões de Gases de Efeito Estufa'
   agency: Instituto Nacional de Pesquisas Espaciais (INPE) / Observatório do Clima (SEEG)
@@ -1756,6 +1837,7 @@ sources:
   status: HOMOLOGATED
   freshness_sla_hours: 24
   cron_schedule_expression: 0 3 * * *
+  source_origin: GOV_BR
 - source_id: aneel_geracao_distribuida
   name: 'ANEEL Geração Distribuída: Empreendimentos MMGD & Transição Solar'
   agency: Agência Nacional de Energia Elétrica (ANEEL)
@@ -1787,6 +1869,7 @@ sources:
   status: HOMOLOGATED
   freshness_sla_hours: 168
   cron_schedule_expression: 0 4 * * 1
+  source_origin: GOV_BR
 - source_id: anp_combustiveis
   name: 'ANP Combustíveis: Levantamento de Preços, Margens & Biocombustíveis'
   agency: Agência Nacional do Petróleo, Gás Natural e Biocombustíveis (ANP)
@@ -1818,6 +1901,7 @@ sources:
   status: HOMOLOGATED
   freshness_sla_hours: 168
   cron_schedule_expression: 0 5 * * 1
+  source_origin: GOV_BR
 - source_id: mdr_snis
   name: 'MDR/MCidades SNIS & SINISA: Saneamento Básico (Água, Esgoto & Resíduos)'
   agency: Ministério das Cidades (SNIS / SINISA)
@@ -1849,6 +1933,7 @@ sources:
   status: HOMOLOGATED
   freshness_sla_hours: 720
   cron_schedule_expression: 0 5 1 * *
+  source_origin: GOV_BR
 - source_id: senatran_frota
   name: 'SENATRAN Frota de Veículos: RENAVAM, Mobilidade & Eletrificação'
   agency: Secretaria Nacional de Trânsito (SENATRAN / Ministério dos Transportes)
@@ -1878,6 +1963,7 @@ sources:
   status: HOMOLOGATED
   freshness_sla_hours: 720
   cron_schedule_expression: 0 5 5 * *
+  source_origin: GOV_BR
 - source_id: sinesp_seguranca
   name: 'SINESP / FBSP Segurança Pública: Ocorrências Criminais, MVI & Risco Patrimonial'
   agency: Ministério da Justiça e Segurança Pública (SENASP / SINESP) & Fórum Brasileiro de Segurança Pública (FBSP)
@@ -1908,6 +1994,7 @@ sources:
   status: HOMOLOGATED
   freshness_sla_hours: 720
   cron_schedule_expression: 0 6 10 * *
+  source_origin: GOV_BR
 - source_id: sedec_desastres
   name: 'SEDEC / S2ID & CEMADEN: Desastres Naturais, Decretações & Alertas'
   agency: Secretaria Nacional de Proteção e Defesa Civil (SEDEC / MIDR) & CEMADEN (MCTI)
@@ -1937,6 +2024,7 @@ sources:
   status: HOMOLOGATED
   freshness_sla_hours: 720
   cron_schedule_expression: 0 7 12 * *
+  source_origin: GOV_BR
 - source_id: prf_acidentes
   name: 'PRF Dados Abertos: Sinistros Rodoviários, Letalidade & Corredores Logísticos'
   agency: Polícia Rodoviária Federal (PRF / Ministério da Justiça e Segurança Pública)
@@ -1966,6 +2054,7 @@ sources:
   status: HOMOLOGATED
   freshness_sla_hours: 720
   cron_schedule_expression: 0 6 15 * *
+  source_origin: GOV_BR
 - source_id: mme_ons_energia
   name: 'MME / ONS Energia: Sistema Interligado Nacional, Balanço & Segurança Energética'
   agency: Operador Nacional do Sistema Elétrico (ONS) & Ministério de Minas e Energia (MME)
@@ -1995,6 +2084,7 @@ sources:
   status: HOMOLOGATED
   freshness_sla_hours: 168
   cron_schedule_expression: 0 5 * * 1
+  source_origin: GOV_BR
 - source_id: mps_inss_beneficios
   name: 'MPS / INSS Benefícios: Previdência Social, BPC/LOAS & Arrecadação'
   agency: Instituto Nacional do Seguro Social (INSS) & Ministério da Previdência Social (MPS)
@@ -2024,6 +2114,7 @@ sources:
   status: HOMOLOGATED
   freshness_sla_hours: 720
   cron_schedule_expression: 0 6 10 * *
+  source_origin: GOV_BR
 - source_id: cgu_transparencia_gastos
   name: 'CGU Portal da Transparência: Gastos Diretos, Transferências & Convênios'
   agency: Controladoria-Geral da União (CGU) / Portal da Transparência do Governo Federal
@@ -2053,6 +2144,7 @@ sources:
   status: HOMOLOGATED
   freshness_sla_hours: 168
   cron_schedule_expression: 0 4 * * *
+  source_origin: GOV_BR
 - source_id: cgu_servidores_federais
   name: 'CGU / SIAPE Servidores Federais: Funcionalismo, Folha & Acúmulos'
   agency: Controladoria-Geral da União (CGU) & Ministério da Gestão e da Inovação (MGI / SIAPE)
@@ -2082,6 +2174,7 @@ sources:
   status: HOMOLOGATED
   freshness_sla_hours: 720
   cron_schedule_expression: 0 5 10 * *
+  source_origin: GOV_BR
 - source_id: tse_eleicoes
   name: 'TSE Dados Abertos Eleitorais: Candidaturas, Votação & Prestação de Contas'
   agency: Tribunal Superior Eleitoral (TSE)
@@ -2111,6 +2204,7 @@ sources:
   status: HOMOLOGATED
   freshness_sla_hours: 720
   cron_schedule_expression: 0 6 1 * *
+  source_origin: GOV_BR
 - source_id: bndes_operacoes
   name: 'BNDES Transparência: Operações Diretas, Indiretas & Fomento Municipal'
   agency: Banco Nacional de Desenvolvimento Econômico e Social (BNDES)
@@ -2140,6 +2234,7 @@ sources:
   status: HOMOLOGATED
   freshness_sla_hours: 720
   cron_schedule_expression: 0 6 15 * *
+  source_origin: GOV_BR
 - source_id: cvm_mercado_extra
   name: 'CVM Mercado de Capitais Extra: Ofertas RCVM 160, Administradores & Agentes'
   agency: Comissão de Valores Mobiliários (CVM)
@@ -2169,6 +2264,7 @@ sources:
   status: HOMOLOGATED
   freshness_sla_hours: 720
   cron_schedule_expression: 0 7 5 * *
+  source_origin: GOV_BR
 - source_id: ans_saude_suplementar
   name: 'ANS Saúde Suplementar: Beneficiários, Operadoras, IDSS & Sinistralidade'
   agency: Agência Nacional de Saúde Suplementar (ANS)
@@ -2198,6 +2294,7 @@ sources:
   status: HOMOLOGATED
   freshness_sla_hours: 720
   cron_schedule_expression: 0 8 10 * *
+  source_origin: GOV_BR
 - source_id: querido_diario_okbr
   name: 'Querido Diário (OKBR): Diários Oficiais Municipais, Licitações & Atos'
   agency: Open Knowledge Brasil (OKBR) / Projeto Querido Diário
@@ -2227,8 +2324,9 @@ sources:
   status: HOMOLOGATED
   freshness_sla_hours: 168
   cron_schedule_expression: 0 9 * * *
+  source_origin: GOV_BR
 - source_id: anm_mineracao
-  name: "ANM Mineração (SIGMINE & CFEM): Processos Minerários, Lavra & Royalties"
+  name: 'ANM Mineração (SIGMINE & CFEM): Processos Minerários, Lavra & Royalties'
   agency: Agência Nacional de Mineração (ANM)
   official_url: https://www.gov.br/anm/pt-br/acesso-a-informacao/dados-abertos
   segment_id: 11_agronegocio_meio_ambiente
@@ -2256,8 +2354,9 @@ sources:
   status: HOMOLOGATED
   freshness_sla_hours: 168
   cron_schedule_expression: 0 6 * * 1
+  source_origin: GOV_BR
 - source_id: susep_seguros
-  name: "SUSEP Mercado Segurador (SES): Prêmios Emitidos, Sinistralidade, Previdência & Solvência"
+  name: 'SUSEP Mercado Segurador (SES): Prêmios Emitidos, Sinistralidade, Previdência & Solvência'
   agency: Superintendência de Seguros Privados (SUSEP / Ministério da Fazenda)
   official_url: https://www2.susep.gov.br/menuestatistica/SES/principal.aspx
   segment_id: 02_economico_macrofinanceiro
@@ -2285,8 +2384,9 @@ sources:
   status: HOMOLOGATED
   freshness_sla_hours: 720
   cron_schedule_expression: 0 8 15 * *
+  source_origin: GOV_BR
 - source_id: inpi_propriedade_intelectual
-  name: "INPI Propriedade Intelectual (RPI): Patentes, Marcas, Desenhos Industriais & Software"
+  name: 'INPI Propriedade Intelectual (RPI): Patentes, Marcas, Desenhos Industriais & Software'
   agency: Instituto Nacional da Propriedade Industrial (INPI / MDIC)
   official_url: https://www.gov.br/inpi/pt-br/acesso-a-informacao/dados-abertos
   segment_id: 01_b2b_empresarial
@@ -2314,8 +2414,9 @@ sources:
   status: HOMOLOGATED
   freshness_sla_hours: 168
   cron_schedule_expression: 0 7 * * 2
+  source_origin: GOV_BR
 - source_id: datasus_extra
-  name: "DATASUS Complementar (SIA, SINAN, SISVAN & PNS): Produção Ambulatorial, Agravos & Nutrição"
+  name: 'DATASUS Complementar (SIA, SINAN, SISVAN & PNS): Produção Ambulatorial, Agravos & Nutrição'
   agency: Departamento de Informática do SUS (DATASUS / Ministério da Saúde)
   official_url: https://datasus.saude.gov.br/
   segment_id: 06_saude_publica
@@ -2343,8 +2444,9 @@ sources:
   status: HOMOLOGATED
   freshness_sla_hours: 720
   cron_schedule_expression: 0 4 12 * *
+  source_origin: GOV_BR
 - source_id: inep_mec_extra
-  name: "INEP/MEC Complementar (SAEB, PROUNI, SISU, FUNDEB & CNPq): Proficiência, Acesso & Fomento"
+  name: 'INEP/MEC Complementar (SAEB, PROUNI, SISU, FUNDEB & CNPq): Proficiência, Acesso & Fomento'
   agency: INEP / FNDE / Ministério da Educação (MEC) & CNPq
   official_url: https://www.gov.br/inep/pt-br/acesso-a-informacao/dados-abertos/microdados
   segment_id: 07_educacao_capital_humano
@@ -2372,8 +2474,9 @@ sources:
   status: HOMOLOGATED
   freshness_sla_hours: 720
   cron_schedule_expression: 0 5 18 * *
+  source_origin: GOV_BR
 - source_id: ibge_institucional
-  name: "IBGE Institucional & Social (MUNIC, ESTADIC & POF): Capacidade Gestora & Orçamentos Familiares"
+  name: 'IBGE Institucional & Social (MUNIC, ESTADIC & POF): Capacidade Gestora & Orçamentos Familiares'
   agency: IBGE (Diretoria de Pesquisas — MUNIC, ESTADIC & POF)
   official_url: https://servicodados.ibge.gov.br/api/v1/pesquisas/1
   segment_id: 03_demografico_censitario
@@ -2401,8 +2504,9 @@ sources:
   status: HOMOLOGATED
   freshness_sla_hours: 720
   cron_schedule_expression: 0 5 18 * *
+  source_origin: GOV_BR
 - source_id: rfb_arrecadacao
-  name: "RFB Arrecadação Tributária & Fiscal (IRPJ, CSLL, IPI, PIS/COFINS & Dívida Ativa)"
+  name: RFB Arrecadação Tributária & Fiscal (IRPJ, CSLL, IPI, PIS/COFINS & Dívida Ativa)
   agency: Receita Federal do Brasil (RFB) & PGFN
   official_url: https://www.gov.br/receitafederal/pt-br/acesso-a-informacao/dados-abertos/receitadata/arrecadacao/arrecadacao-por-estado
   segment_id: 02_economico_macrofinanceiro
@@ -2430,8 +2534,9 @@ sources:
   status: HOMOLOGATED
   freshness_sla_hours: 720
   cron_schedule_expression: 0 5 18 * *
+  source_origin: GOV_BR
 - source_id: cgu_beneficios_cidadao
-  name: "CGU Benefícios ao Cidadão (Bolsa Família, BPC, Seguro-Defeso & Garantia-Safra)"
+  name: CGU Benefícios ao Cidadão (Bolsa Família, BPC, Seguro-Defeso & Garantia-Safra)
   agency: Controladoria-Geral da União (CGU) & Ministério do Desenvolvimento Social (MDS)
   official_url: https://portaldatransparencia.gov.br/download-de-dados/novo-bolsa-familia
   segment_id: 08_judicial_compliance
@@ -2459,3 +2564,915 @@ sources:
   status: HOMOLOGATED
   freshness_sla_hours: 720
   cron_schedule_expression: 0 5 18 * *
+  source_origin: GOV_BR
+- source_id: minha_receita
+  source_origin: PUBLIC_GLOBAL
+  name: Minha Receita (CNPJ Aberto)
+  agency: Comunidade Open Source Minha Receita (RFB)
+  official_url: https://minhareceita.org/api/v1/cnpj/{cnpj}
+  segment_id: 01_b2b_empresarial
+  segment_name: Empresarial, Cadastral & Societário B2B
+  access_mode: FEDERATED_API
+  protocol: REST_JSON
+  auth_type: NONE
+  canonical_keys:
+  - cnpj_14
+  - id_municipio
+  - sigla_uf
+  update_frequency: Diária (Sincronização RFB)
+  estimated_volume: ~55 milhões de CNPJs consultáveis sob demanda (<200ms)
+  lgpd_tier: PUBLIC_CORPORATE_QSA
+  ml_feature_domains:
+  - cnpj_enrichment
+  - qsa_governance
+  solution_packs:
+  - P04
+  - P07
+  rice_score: 920
+  roadmap_wave: 1
+  status: HOMOLOGATED
+  freshness_sla_hours: 24
+  cron_schedule_expression: 0 5 * * *
+  api_block: BLOCO_1_KYC_GEO
+  rate_limit_rpm: 60
+  finops_tier: FREE_UNLIMITED
+  gateway_method: enrich_cnpj_cascade
+  notes: Camada primaria de baixa latencia para CNPJ, QSA, Simples/MEI e CNAEs.
+- source_id: cnpja_open
+  source_origin: PUBLIC_GLOBAL
+  name: CNPJa Open API
+  agency: CNPJa Open API (Espelho RFB & Simples)
+  official_url: https://open.cnpja.com/office/{cnpj}
+  segment_id: 01_b2b_empresarial
+  segment_name: Empresarial, Cadastral & Societário B2B
+  access_mode: FEDERATED_API
+  protocol: REST_JSON
+  auth_type: NONE
+  canonical_keys:
+  - cnpj_14
+  - sigla_uf
+  update_frequency: Tempo Real (Sob demanda)
+  estimated_volume: ~55 milhões de estabelecimentos empresariais (cache/cascata)
+  lgpd_tier: PUBLIC_CORPORATE_QSA
+  ml_feature_domains:
+  - cnpj_cascade_fallback
+  - tax_regime_kyb
+  solution_packs:
+  - P04
+  - P07
+  rice_score: 900
+  roadmap_wave: 1
+  status: HOMOLOGATED
+  freshness_sla_hours: 1
+  cron_schedule_expression: 0 * * * *
+  api_block: BLOCO_1_KYC_GEO
+  rate_limit_rpm: 5
+  finops_tier: FREE_TIER
+  gateway_method: enrich_cnpj_cascade
+  notes: Segundo fallback em cascata para QSA, regime tributario e inscricoes estaduais.
+- source_id: receitaws
+  source_origin: PUBLIC_GLOBAL
+  name: ReceitaWS
+  agency: ReceitaWS Public CNPJ Gateway
+  official_url: https://receitaws.com.br/v1/cnpj/{cnpj}
+  segment_id: 01_b2b_empresarial
+  segment_name: Empresarial, Cadastral & Societário B2B
+  access_mode: FEDERATED_API
+  protocol: REST_JSON
+  auth_type: NONE
+  canonical_keys:
+  - cnpj_14
+  - sigla_uf
+  update_frequency: Tempo Real (Sob demanda)
+  estimated_volume: ~55 milhões de CNPJs (camada pública de contingência)
+  lgpd_tier: PUBLIC_CORPORATE_QSA
+  ml_feature_domains:
+  - cnpj_cascade_tier3
+  - cnae_lookup
+  solution_packs:
+  - P04
+  - P07
+  rice_score: 880
+  roadmap_wave: 1
+  status: HOMOLOGATED
+  freshness_sla_hours: 1
+  cron_schedule_expression: 0 * * * *
+  api_block: BLOCO_1_KYC_GEO
+  rate_limit_rpm: 3
+  finops_tier: FREEMIUM
+  gateway_method: enrich_cnpj_cascade
+  notes: Fallback final da cascata CNPJ (3 req/min na camada gratuita).
+- source_id: viacep
+  source_origin: PUBLIC_GLOBAL
+  name: ViaCEP
+  agency: ViaCEP Webservice Postal Brasileiro
+  official_url: https://viacep.com.br/ws/{cep}/json/
+  segment_id: 05_geografico_logistica
+  segment_name: Geográfico, Logístico & Endereçamento
+  access_mode: FEDERATED_API
+  protocol: REST_JSON
+  auth_type: NONE
+  canonical_keys:
+  - cep_8
+  - id_municipio
+  - sigla_uf
+  update_frequency: Semanal (DNE/Correios)
+  estimated_volume: ~1,2 milhão de faixas de CEP e logradouros com código IBGE 7D
+  lgpd_tier: PUBLIC_NON_PERSONAL
+  ml_feature_domains:
+  - postal_geocoding
+  - ibge_crosswalk
+  solution_packs:
+  - P03
+  - P04
+  rice_score: 935
+  roadmap_wave: 1
+  status: HOMOLOGATED
+  freshness_sla_hours: 168
+  cron_schedule_expression: 0 4 * * 1
+  api_block: BLOCO_1_KYC_GEO
+  rate_limit_rpm: 120
+  finops_tier: FREE_UNLIMITED
+  gateway_method: lookup_cep_cascade
+  notes: Baixa latencia (50-80ms) com codigo IBGE, logradouro, bairro e suporte a busca reversa.
+- source_id: opencep
+  source_origin: PUBLIC_GLOBAL
+  name: OpenCEP
+  agency: OpenCEP CDN Open Source
+  official_url: https://opencep.com/v1/{cep}
+  segment_id: 05_geografico_logistica
+  segment_name: Geográfico, Logístico & Endereçamento
+  access_mode: FEDERATED_API
+  protocol: REST_JSON
+  auth_type: NONE
+  canonical_keys:
+  - cep_8
+  - id_municipio
+  - sigla_uf
+  update_frequency: Semanal (DNE/Correios)
+  estimated_volume: ~1,2 milhão de CEPs servidos via CDN estática de baixa latência
+  lgpd_tier: PUBLIC_NON_PERSONAL
+  ml_feature_domains:
+  - cep_edge_cache
+  - address_normalization
+  solution_packs:
+  - P03
+  - P04
+  rice_score: 910
+  roadmap_wave: 1
+  status: HOMOLOGATED
+  freshness_sla_hours: 168
+  cron_schedule_expression: 0 4 * * 1
+  api_block: BLOCO_1_KYC_GEO
+  rate_limit_rpm: 120
+  finops_tier: FREE_UNLIMITED
+  gateway_method: lookup_cep_cascade
+  notes: Fallback rapido para consulta de CEP e codigo IBGE municipal.
+- source_id: nominatim_osm
+  source_origin: PUBLIC_GLOBAL
+  name: Nominatim (OpenStreetMap)
+  agency: OpenStreetMap Foundation (Nominatim Geocoder)
+  official_url: https://nominatim.openstreetmap.org/search
+  segment_id: 05_geografico_logistica
+  segment_name: Geográfico, Logístico & Endereçamento
+  access_mode: FEDERATED_API
+  protocol: REST_JSON
+  auth_type: NONE
+  canonical_keys:
+  - id_municipio
+  - sigla_uf
+  - cep_8
+  update_frequency: Diária (OSM Planet)
+  estimated_volume: Base global OpenStreetMap com cobertura integral dos 5.570 municípios
+  lgpd_tier: PUBLIC_NON_PERSONAL
+  ml_feature_domains:
+  - forward_reverse_geocoding
+  - spatial_bounding_box
+  solution_packs:
+  - P03
+  - P09
+  rice_score: 915
+  roadmap_wave: 4
+  status: HOMOLOGATED
+  freshness_sla_hours: 24
+  cron_schedule_expression: 0 5 * * *
+  api_block: BLOCO_1_KYC_GEO
+  rate_limit_rpm: 60
+  finops_tier: FREE_UNLIMITED
+  gateway_method: geocode_nominatim
+  notes: Geocodificacao direta e reversa aberta (exige User-Agent identificador, 1 req/s).
+- source_id: rdap_registro_br
+  source_origin: PUBLIC_GLOBAL
+  name: RDAP Registro.br
+  agency: NIC.br / Registro.br (Protocolo RDAP RFC 7480)
+  official_url: https://rdap.registro.br/domain/{domain}
+  segment_id: 08_judicial_compliance
+  segment_name: Judicial, Integridade & Compliance
+  access_mode: FEDERATED_API
+  protocol: REST_JSON
+  auth_type: NONE
+  canonical_keys:
+  - cnpj_14
+  update_frequency: Tempo Real (WHOIS/RDAP)
+  estimated_volume: ~5,4 milhões de domínios .br com titularidade CNPJ/CPF e ciclo de vida
+  lgpd_tier: PUBLIC_CORPORATE_QSA
+  ml_feature_domains:
+  - domain_age_kyb
+  - antifraud_dns_ownership
+  solution_packs:
+  - P04
+  - P07
+  rice_score: 895
+  roadmap_wave: 2
+  status: HOMOLOGATED
+  freshness_sla_hours: 1
+  cron_schedule_expression: 0 * * * *
+  api_block: BLOCO_1_KYC_GEO
+  rate_limit_rpm: 60
+  finops_tier: FREE_UNLIMITED
+  gateway_method: lookup_rdap_registro_br
+  notes: Substituto JSON do WHOIS para idade de dominio .br, titularidade e DNS antifraude.
+- source_id: gleif_lei
+  source_origin: PUBLIC_GLOBAL
+  name: GLEIF Global LEI API
+  agency: Global Legal Entity Identifier Foundation (GLEIF)
+  official_url: https://api.gleif.org/api/v1/lei-records
+  segment_id: 01_b2b_empresarial
+  segment_name: Empresarial, Cadastral & Societário B2B
+  access_mode: FEDERATED_API
+  protocol: REST_JSON
+  auth_type: NONE
+  canonical_keys:
+  - cnpj_14
+  update_frequency: Diária (Golden Copy LEI)
+  estimated_volume: ~2,6 milhões de entidades legais globais (LEI) e árvores societárias
+  lgpd_tier: PUBLIC_CORPORATE_QSA
+  ml_feature_domains:
+  - global_holding_hierarchy
+  - cross_border_kyb
+  solution_packs:
+  - P04
+  - P07
+  rice_score: 890
+  roadmap_wave: 2
+  status: HOMOLOGATED
+  freshness_sla_hours: 24
+  cron_schedule_expression: 0 6 * * *
+  api_block: BLOCO_1_KYC_GEO
+  rate_limit_rpm: 60
+  finops_tier: FREE_UNLIMITED
+  gateway_method: lookup_gleif_lei
+  notes: Validacao global de entidades juridicas (LEI) e arvore de holdings controladoras.
+- source_id: bgpview_ip_intel
+  source_origin: PUBLIC_GLOBAL
+  name: BGPView / IP-API
+  agency: IP-API / RIPEstat / BGP Routing Intelligence
+  official_url: https://api.bgpview.io/ip/{ip}
+  segment_id: 08_judicial_compliance
+  segment_name: Judicial, Integridade & Compliance
+  access_mode: FEDERATED_API
+  protocol: REST_JSON
+  auth_type: NONE
+  canonical_keys:
+  - sigla_uf
+  update_frequency: Diária (BGP Routing)
+  estimated_volume: Tabelas globais BGP/ASN IPv4/IPv6 e reputação de rede para antifraude
+  lgpd_tier: PUBLIC_NON_PERSONAL
+  ml_feature_domains:
+  - asn_geolocation
+  - datacenter_proxy_detection
+  solution_packs:
+  - P04
+  - P08
+  rice_score: 885
+  roadmap_wave: 2
+  status: HOMOLOGATED
+  freshness_sla_hours: 24
+  cron_schedule_expression: 0 6 * * *
+  api_block: BLOCO_1_KYC_GEO
+  rate_limit_rpm: 45
+  finops_tier: FREE_TIER
+  gateway_method: lookup_ip_intel
+  notes: Enriquecimento de IP com ASN, prefixo, pais e deteccao de datacenter/hosting.
+- source_id: company_enrich_apollo_bdc
+  source_origin: PUBLIC_GLOBAL
+  name: CompanyEnrich / Apollo / BigDataCorp (Adaptador B2B Freemium)
+  agency: Hub B2B Freemium (CompanyEnrich / Apollo / BigDataCorp)
+  official_url: https://api.companyenrich.com/companies/enrich
+  segment_id: 01_b2b_empresarial
+  segment_name: Empresarial, Cadastral & Societário B2B
+  access_mode: FEDERATED_API
+  protocol: REST_JSON
+  auth_type: OPTIONAL_KEY
+  canonical_keys:
+  - cnpj_14
+  update_frequency: Semanal (B2B Firmographics)
+  estimated_volume: Perfis firmográficos B2B, sinais digitais e metadados corporativos
+  lgpd_tier: PUBLIC_CORPORATE_QSA
+  ml_feature_domains:
+  - b2b_tech_stack_signals
+  - abm_firmographics
+  solution_packs:
+  - P04
+  - P06
+  rice_score: 875
+  roadmap_wave: 2
+  status: HOMOLOGATED
+  freshness_sla_hours: 168
+  cron_schedule_expression: 0 4 * * 1
+  api_block: BLOCO_1_KYC_GEO
+  rate_limit_rpm: 30
+  finops_tier: FREEMIUM
+  gateway_method: lookup_b2b_domain_profile
+  notes: Adaptador opcional ativado via variaveis de ambiente (COMPANY_ENRICH_API_KEY / APOLLO_API_KEY).
+- source_id: brapi_b3
+  source_origin: PUBLIC_GLOBAL
+  name: brapi (Cotacoes B3, Dividendos & FIIs)
+  agency: Brapi Financial API (B3 / CVM / BCB)
+  official_url: https://brapi.dev/api/quote/{tickers}
+  segment_id: 02_economico_macrofinanceiro
+  segment_name: Econômico, Monetário & Macrofinanceiro
+  access_mode: FEDERATED_API
+  protocol: REST_JSON
+  auth_type: OPTIONAL_KEY
+  canonical_keys:
+  - cnpj_14
+  update_frequency: Diária (Pregão B3)
+  estimated_volume: ~500 ativos listados na B3 (ações, FIIs, ETFs, BDRs, dividendos e Selic)
+  lgpd_tier: PUBLIC_NON_PERSONAL
+  ml_feature_domains:
+  - b3_equities_fiis
+  - dividend_yield_valuation
+  solution_packs:
+  - P05
+  - P01
+  rice_score: 925
+  roadmap_wave: 3
+  status: HOMOLOGATED
+  freshness_sla_hours: 24
+  cron_schedule_expression: 0 20 * * 1-5
+  api_block: BLOCO_2_MERCADO_REGULATORIO
+  rate_limit_rpm: 60
+  finops_tier: FREEMIUM
+  gateway_method: fetch_brapi_quote
+  notes: Cotacoes B3, dividendos, FIIs e indicadores fundamentalistas em JSON (BRAPI_TOKEN opcional).
+- source_id: awesomeapi_fx
+  source_origin: PUBLIC_GLOBAL
+  name: AwesomeAPI (Cambio & Cripto)
+  agency: AwesomeAPI Economia & Câmbio Comercial
+  official_url: https://economia.awesomeapi.com.br/json/last/{pairs}
+  segment_id: 02_economico_macrofinanceiro
+  segment_name: Econômico, Monetário & Macrofinanceiro
+  access_mode: FEDERATED_API
+  protocol: REST_JSON
+  auth_type: NONE
+  canonical_keys: []
+  update_frequency: Horária (Câmbio Spot)
+  estimated_volume: Cotações intraday e fechamento de +150 pares cambiais (USD, EUR, CNY, BTC)
+  lgpd_tier: PUBLIC_NON_PERSONAL
+  ml_feature_domains:
+  - fx_spot_volatility
+  - currency_deflation
+  solution_packs:
+  - P05
+  rice_score: 905
+  roadmap_wave: 1
+  status: HOMOLOGATED
+  freshness_sla_hours: 1
+  cron_schedule_expression: 0 * * * *
+  api_block: BLOCO_2_MERCADO_REGULATORIO
+  rate_limit_rpm: 60
+  finops_tier: FREE_UNLIMITED
+  gateway_method: fetch_awesomeapi_rates
+  notes: Cotacoes em tempo real e fechamentos de moedas internacionais e criptomoedas.
+- source_id: ipeadata_odata
+  source_origin: PUBLIC_GLOBAL
+  name: IPEA Data (OData v4)
+  agency: Instituto de Pesquisa Econômica Aplicada (IPEA OData v4)
+  official_url: https://www.ipeadata.gov.br/api/odata4/
+  segment_id: 02_economico_macrofinanceiro
+  segment_name: Econômico, Monetário & Macrofinanceiro
+  access_mode: FEDERATED_API
+  protocol: ODATA_V4
+  auth_type: NONE
+  canonical_keys:
+  - id_municipio
+  - sigla_uf
+  update_frequency: Diária / Mensal (Séries IPEA)
+  estimated_volume: +8.000 séries históricas macroeconômicas, regionais e sociais (1900–presente)
+  lgpd_tier: PUBLIC_NON_PERSONAL
+  ml_feature_domains:
+  - macro_regional_series
+  - long_term_socioeconomic_indicators
+  solution_packs:
+  - P01
+  - P05
+  rice_score: 930
+  roadmap_wave: 3
+  status: HOMOLOGATED
+  freshness_sla_hours: 24
+  cron_schedule_expression: 0 7 * * *
+  api_block: BLOCO_2_MERCADO_REGULATORIO
+  rate_limit_rpm: 60
+  finops_tier: FREE_UNLIMITED
+  gateway_method: fetch_ipeadata_series
+  notes: Milhares de series historicas macroeconomicas, sociais e de financas regionais em OData v4.
+- source_id: aneel_anp_ckan
+  source_origin: PUBLIC_GLOBAL
+  name: ANEEL & ANP (CKAN DataStore)
+  agency: ANEEL & ANP Catálogos CKAN Dados Abertos
+  official_url: https://dadosabertos.aneel.gov.br/api/3/action/datastore_search
+  segment_id: 11_agronegocio_meio_ambiente
+  segment_name: Agronegócio, Terra & Meio Ambiente
+  access_mode: FEDERATED_API
+  protocol: REST_JSON
+  auth_type: NONE
+  canonical_keys:
+  - id_municipio
+  - sigla_uf
+  - cnpj_14
+  update_frequency: Mensal (Regulatório Energia)
+  estimated_volume: Centenas de datasets regulatórios do setor elétrico (ANEEL) e óleo/gás (ANP)
+  lgpd_tier: PUBLIC_NON_PERSONAL
+  ml_feature_domains:
+  - energy_tariffs_generation
+  - fuel_market_regulation
+  solution_packs:
+  - P09
+  - P01
+  rice_score: 900
+  roadmap_wave: 6
+  status: HOMOLOGATED
+  freshness_sla_hours: 720
+  cron_schedule_expression: 0 3 5 * *
+  api_block: BLOCO_2_MERCADO_REGULATORIO
+  rate_limit_rpm: 60
+  finops_tier: FREE_UNLIMITED
+  gateway_method: query_ckan_datastore
+  notes: Consultas SQL/JSON em tarifas eletricas, geracao distribuida (ANEEL) e combustiveis (ANP).
+- source_id: camara_senado_dados_abertos
+  source_origin: PUBLIC_GLOBAL
+  name: Camara dos Deputados & Senado Federal
+  agency: Câmara dos Deputados & Senado Federal (APIs Legislativas)
+  official_url: https://dadosabertos.camara.leg.br/api/v2/deputados
+  segment_id: 08_judicial_compliance
+  segment_name: Judicial, Integridade & Compliance
+  access_mode: FEDERATED_API
+  protocol: REST_JSON
+  auth_type: NONE
+  canonical_keys:
+  - sigla_uf
+  - cpf_masked
+  - cnpj_14
+  update_frequency: Diária (Tramitação Legislativa)
+  estimated_volume: Proposições legislativas, votações nominais, parlamentares e cotas (CEAP)
+  lgpd_tier: PUBLIC_AGENT_PEP
+  ml_feature_domains:
+  - legislative_regulatory_risk
+  - parliamentary_spending_pep
+  solution_packs:
+  - P07
+  - P06
+  rice_score: 910
+  roadmap_wave: 2
+  status: HOMOLOGATED
+  freshness_sla_hours: 24
+  cron_schedule_expression: 0 7 * * *
+  api_block: BLOCO_2_MERCADO_REGULATORIO
+  rate_limit_rpm: 60
+  finops_tier: FREE_UNLIMITED
+  gateway_method: fetch_camara_deputados
+  notes: Cota parlamentar (com CNPJ do fornecedor), proposicoes legislativas e votacoes.
+- source_id: world_bank_v2
+  source_origin: PUBLIC_GLOBAL
+  name: World Bank Indicators API v2
+  agency: World Bank Open Data API v2 (WDI)
+  official_url: https://api.worldbank.org/v2/country/{country}/indicator/{indicator}
+  segment_id: 02_economico_macrofinanceiro
+  segment_name: Econômico, Monetário & Macrofinanceiro
+  access_mode: FEDERATED_API
+  protocol: REST_JSON
+  auth_type: NONE
+  canonical_keys: []
+  update_frequency: Trimestral / Anual (Indicadores WDI)
+  estimated_volume: +16.000 indicadores de desenvolvimento global (WDI) para 217 países
+  lgpd_tier: PUBLIC_NON_PERSONAL
+  ml_feature_domains:
+  - international_macro_benchmarks
+  - sovereign_esg_indicators
+  solution_packs:
+  - P01
+  - P05
+  rice_score: 915
+  roadmap_wave: 3
+  status: HOMOLOGATED
+  freshness_sla_hours: 2160
+  cron_schedule_expression: 0 2 1 */3 *
+  api_block: BLOCO_2_MERCADO_REGULATORIO
+  rate_limit_rpm: 60
+  finops_tier: FREE_UNLIMITED
+  gateway_method: fetch_world_bank_indicator
+  notes: Cerca de 16 mil indicadores macroeconomicos, demograficos e sociais globais.
+- source_id: who_gho_odata
+  source_origin: PUBLIC_GLOBAL
+  name: Observatorio da OMS (WHO GHO)
+  agency: World Health Organization (WHO Global Health Observatory OData)
+  official_url: https://ghoapi.azureedge.net/api/{indicator}
+  segment_id: 06_saude_publica
+  segment_name: Saúde Pública & Epidemiologia
+  access_mode: FEDERATED_API
+  protocol: ODATA_V4
+  auth_type: NONE
+  canonical_keys: []
+  update_frequency: Anual (Observatório Global OMS)
+  estimated_volume: +2.000 indicadores globais de saúde pública, mortalidade e cobertura sanitária
+  lgpd_tier: PUBLIC_NON_PERSONAL
+  ml_feature_domains:
+  - global_epidemiology_benchmarks
+  - health_system_outcomes
+  solution_packs:
+  - P01
+  - P06
+  rice_score: 900
+  roadmap_wave: 5
+  status: HOMOLOGATED
+  freshness_sla_hours: 8760
+  cron_schedule_expression: 0 2 15 1 *
+  api_block: BLOCO_2_MERCADO_REGULATORIO
+  rate_limit_rpm: 60
+  finops_tier: FREE_UNLIMITED
+  gateway_method: fetch_who_gho_indicator
+  notes: Series temporais globais de indicadores sanitarios e epidemiologicos da OMS.
+- source_id: overpass_osm
+  source_origin: PUBLIC_GLOBAL
+  name: Overpass API (POIs OpenStreetMap)
+  agency: OpenStreetMap Overpass Turbo Spatial API
+  official_url: https://overpass-api.de/api/interpreter
+  segment_id: 05_geografico_logistica
+  segment_name: Geográfico, Logístico & Endereçamento
+  access_mode: FEDERATED_API
+  protocol: REST_JSON
+  auth_type: NONE
+  canonical_keys:
+  - id_municipio
+  - sigla_uf
+  update_frequency: Diária (POIs OSM)
+  estimated_volume: Milhões de POIs georreferenciados (hospitais, escolas, bancos, varejo, rodovias)
+  lgpd_tier: PUBLIC_NON_PERSONAL
+  ml_feature_domains:
+  - urban_poi_density
+  - commercial_catchment_radius
+  solution_packs:
+  - P03
+  - P01
+  rice_score: 920
+  roadmap_wave: 4
+  status: HOMOLOGATED
+  freshness_sla_hours: 24
+  cron_schedule_expression: 0 5 * * *
+  api_block: BLOCO_3_ESPACIAL_CLIMA_ML
+  rate_limit_rpm: 30
+  finops_tier: FREE_UNLIMITED
+  gateway_method: count_osm_pois_radius
+  notes: Contagem espacial de POIs (escolas, farmacias, bancos, paradas) em raio de coordenada.
+- source_id: osrm_routing
+  source_origin: PUBLIC_GLOBAL
+  name: OSRM (Open Source Routing Machine)
+  agency: Open Source Routing Machine (OSRM Project)
+  official_url: https://router.project-osrm.org/route/v1/driving/
+  segment_id: 05_geografico_logistica
+  segment_name: Geográfico, Logístico & Endereçamento
+  access_mode: FEDERATED_API
+  protocol: REST_JSON
+  auth_type: NONE
+  canonical_keys:
+  - id_municipio
+  - sigla_uf
+  update_frequency: Semanal (Malha Viária)
+  estimated_volume: Malha viária roteável nacional para cálculo de distância e tempo logístico
+  lgpd_tier: PUBLIC_NON_PERSONAL
+  ml_feature_domains:
+  - road_network_travel_time
+  - logistics_isochrone_impedance
+  solution_packs:
+  - P03
+  - P09
+  rice_score: 910
+  roadmap_wave: 4
+  status: HOMOLOGATED
+  freshness_sla_hours: 168
+  cron_schedule_expression: 0 4 * * 1
+  api_block: BLOCO_3_ESPACIAL_CLIMA_ML
+  rate_limit_rpm: 60
+  finops_tier: FREE_UNLIMITED
+  gateway_method: compute_osrm_route
+  notes: Distancia viaria real (km) e tempo de deslocamento entre coordenadas (supera Haversine).
+- source_id: open_meteo
+  source_origin: PUBLIC_GLOBAL
+  name: Open-Meteo Historical & Forecast
+  agency: Open-Meteo Global Weather & ERA5 Reanalysis API
+  official_url: https://api.open-meteo.com/v1/forecast
+  segment_id: 11_agronegocio_meio_ambiente
+  segment_name: Agronegócio, Terra & Meio Ambiente
+  access_mode: FEDERATED_API
+  protocol: REST_JSON
+  auth_type: NONE
+  canonical_keys:
+  - id_municipio
+  - sigla_uf
+  update_frequency: Horária (Previsão & Clima)
+  estimated_volume: Séries meteorológicas horárias/diárias ERA5 (80+ anos) para 5.570 municípios
+  lgpd_tier: PUBLIC_NON_PERSONAL
+  ml_feature_domains:
+  - era5_historical_weather
+  - agro_hydrometeorology
+  solution_packs:
+  - P01
+  - P09
+  rice_score: 925
+  roadmap_wave: 6
+  status: HOMOLOGATED
+  freshness_sla_hours: 1
+  cron_schedule_expression: 0 * * * *
+  api_block: BLOCO_3_ESPACIAL_CLIMA_ML
+  rate_limit_rpm: 60
+  finops_tier: FREE_UNLIMITED
+  gateway_method: fetch_open_meteo_forecast
+  notes: Variaveis exogenas de clima horarias e historicas para modelos de previsao de demanda.
+- source_id: nasa_power
+  source_origin: PUBLIC_GLOBAL
+  name: NASA POWER API
+  agency: NASA Langley Research Center (POWER Agroclimatology API)
+  official_url: https://power.larc.nasa.gov/api/temporal/daily/point
+  segment_id: 11_agronegocio_meio_ambiente
+  segment_name: Agronegócio, Terra & Meio Ambiente
+  access_mode: FEDERATED_API
+  protocol: REST_JSON
+  auth_type: NONE
+  canonical_keys:
+  - id_municipio
+  - sigla_uf
+  update_frequency: Diária (Agroclimatologia)
+  estimated_volume: Grade satelital global de radiação solar, vento e balanço hídrico (1981–presente)
+  lgpd_tier: PUBLIC_NON_PERSONAL
+  ml_feature_domains:
+  - solar_irradiance_ghi
+  - evapotranspiration_agrometeo
+  solution_packs:
+  - P09
+  - P01
+  rice_score: 920
+  roadmap_wave: 6
+  status: HOMOLOGATED
+  freshness_sla_hours: 24
+  cron_schedule_expression: 0 8 * * *
+  api_block: BLOCO_3_ESPACIAL_CLIMA_ML
+  rate_limit_rpm: 60
+  finops_tier: FREE_UNLIMITED
+  gateway_method: fetch_nasa_power_daily
+  notes: Radiacao solar, precipitacao, umidade e temperatura para modelos de agro e energia.
+- source_id: open_elevation
+  source_origin: PUBLIC_GLOBAL
+  name: Open-Elevation / OpenTopoData (SRTM)
+  agency: Open-Elevation / OpenTopoData SRTM Digital Elevation API
+  official_url: https://api.open-elevation.com/api/v1/lookup
+  segment_id: 05_geografico_logistica
+  segment_name: Geográfico, Logístico & Endereçamento
+  access_mode: FEDERATED_API
+  protocol: REST_JSON
+  auth_type: NONE
+  canonical_keys:
+  - id_municipio
+  - sigla_uf
+  update_frequency: Anual (Modelo SRTM)
+  estimated_volume: Modelo digital de elevação SRTM/ASTER (30m–90m) para coordenadas brasileiras
+  lgpd_tier: PUBLIC_NON_PERSONAL
+  ml_feature_domains:
+  - topographic_altitude_srtm
+  - flood_slope_susceptibility
+  solution_packs:
+  - P03
+  - P09
+  rice_score: 895
+  roadmap_wave: 4
+  status: HOMOLOGATED
+  freshness_sla_hours: 8760
+  cron_schedule_expression: 0 2 1 1 *
+  api_block: BLOCO_3_ESPACIAL_CLIMA_ML
+  rate_limit_rpm: 60
+  finops_tier: FREE_UNLIMITED
+  gateway_method: fetch_elevation
+  notes: Altitude exata do terreno por lat/lon para risco de alagamento, logistica e engenharia.
+- source_id: huggingface_inference
+  source_origin: PUBLIC_GLOBAL
+  name: Hugging Face Inference API
+  agency: Hugging Face Serverless Inference & Hub API
+  official_url: https://router.huggingface.co/hf-inference/models/{model}
+  segment_id: 13_metaportais_agregadores
+  segment_name: Metaportais & Hubs Agregadores
+  access_mode: FEDERATED_API
+  protocol: REST_JSON
+  auth_type: OPTIONAL_KEY
+  canonical_keys: []
+  update_frequency: Sob demanda (Modelos ML)
+  estimated_volume: Catálogo e inferência de modelos NLP/Embeddings em português (BERTimbau, BGE)
+  lgpd_tier: PUBLIC_NON_PERSONAL
+  ml_feature_domains:
+  - ptbr_nlp_embeddings
+  - legal_text_classification
+  solution_packs:
+  - P02
+  rice_score: 885
+  roadmap_wave: 6
+  status: HOMOLOGATED
+  freshness_sla_hours: 24
+  cron_schedule_expression: 0 6 * * *
+  api_block: BLOCO_3_ESPACIAL_CLIMA_ML
+  rate_limit_rpm: 30
+  finops_tier: FREEMIUM
+  gateway_method: run_hf_inference
+  notes: Embeddings, NER e analise de sentimento via HTTP sem gerenciar GPUs (HF_TOKEN).
+- source_id: alpha_vantage
+  source_origin: PUBLIC_GLOBAL
+  name: Alpha Vantage
+  agency: Alpha Vantage Global Market Data & Technical Indicators
+  official_url: https://www.alphavantage.co/query
+  segment_id: 02_economico_macrofinanceiro
+  segment_name: Econômico, Monetário & Macrofinanceiro
+  access_mode: FEDERATED_API
+  protocol: REST_JSON
+  auth_type: API_KEY
+  canonical_keys: []
+  update_frequency: Diária (Mercados Globais)
+  estimated_volume: Séries diárias OHLCV de bolsas globais, ADRs brasileiros (EWZ, PBR, VALE) e commodities
+  lgpd_tier: PUBLIC_NON_PERSONAL
+  ml_feature_domains:
+  - global_equities_fx_ohlcv
+  - macro_commodities_series
+  solution_packs:
+  - P05
+  rice_score: 880
+  roadmap_wave: 3
+  status: HOMOLOGATED
+  freshness_sla_hours: 24
+  cron_schedule_expression: 0 21 * * 1-5
+  api_block: BLOCO_3_ESPACIAL_CLIMA_ML
+  rate_limit_rpm: 5
+  finops_tier: FREEMIUM
+  gateway_method: fetch_alpha_vantage_daily
+  notes: Series temporais financeiras e indicadores tecnicos (ALPHA_VANTAGE_API_KEY).
+- source_id: nasa_youtube_open_ml
+  source_origin: PUBLIC_GLOBAL
+  name: NASA Open APIs & YouTube Data (NLP / Visao)
+  agency: NASA Open APIs (APOD/Earth) & Public Multimodal Benchmarks
+  official_url: https://api.nasa.gov/planetary/apod
+  segment_id: 13_metaportais_agregadores
+  segment_name: Metaportais & Hubs Agregadores
+  access_mode: FEDERATED_API
+  protocol: REST_JSON
+  auth_type: OPTIONAL_KEY
+  canonical_keys: []
+  update_frequency: Semanal (Datasets ML)
+  estimated_volume: Acervo público multimodal de observação terrestre e metadados para pipelines ML
+  lgpd_tier: PUBLIC_NON_PERSONAL
+  ml_feature_domains:
+  - multimodal_benchmark_metadata
+  - earth_observation_catalog
+  solution_packs:
+  - P02
+  rice_score: 870
+  roadmap_wave: 6
+  status: HOMOLOGATED
+  freshness_sla_hours: 168
+  cron_schedule_expression: 0 4 * * 1
+  api_block: BLOCO_3_ESPACIAL_CLIMA_ML
+  rate_limit_rpm: 60
+  finops_tier: FREEMIUM
+  gateway_method: fetch_nasa_apod
+  notes: Imagens astronomicas/satelite (DEMO_KEY padrao) e datasets de NLP.
+- source_id: upgini_adapter
+  source_origin: PUBLIC_GLOBAL
+  name: Upgini Public Feature Enrichment
+  agency: Upgini Automated Feature Enrichment & Open Search Catalog
+  official_url: https://pypi.org/project/upgini/
+  segment_id: 13_metaportais_agregadores
+  segment_name: Metaportais & Hubs Agregadores
+  access_mode: FEDERATED_API
+  protocol: REST_JSON
+  auth_type: NONE
+  canonical_keys:
+  - id_municipio
+  - sigla_uf
+  - cnpj_14
+  update_frequency: Semanal (Feature Store)
+  estimated_volume: Catálogo de features tabulares externas para enriquecimento supervisionado de ML
+  lgpd_tier: PUBLIC_NON_PERSONAL
+  ml_feature_domains:
+  - automated_feature_discovery
+  - tabular_ml_enrichment
+  solution_packs:
+  - P01
+  - P09
+  rice_score: 875
+  roadmap_wave: 6
+  status: HOMOLOGATED
+  freshness_sla_hours: 168
+  cron_schedule_expression: 0 4 * * 1
+  api_block: BLOCO_3_ESPACIAL_CLIMA_ML
+  rate_limit_rpm: 60
+  finops_tier: FREE_TIER
+  gateway_method: describe_upgini_features
+  notes: Catalogo de features publicas automatizadas integravel a pipelines tabular ML.
+- source_id: rest_countries
+  source_origin: PUBLIC_GLOBAL
+  name: REST Countries v3.1
+  agency: REST Countries ISO-3166 & Geopolitical Metadata API
+  official_url: https://restcountries.com/v3.1/alpha/{code}
+  segment_id: 03_demografico_censitario
+  segment_name: Demográfico, Censitário & Domiciliar
+  access_mode: FEDERATED_API
+  protocol: REST_JSON
+  auth_type: NONE
+  canonical_keys: []
+  update_frequency: Anual (ISO-3166 Países)
+  estimated_volume: 250 países e territórios com códigos ISO-3166, moedas, fronteiras e demografia
+  lgpd_tier: PUBLIC_NON_PERSONAL
+  ml_feature_domains:
+  - iso3166_country_crosswalk
+  - bilateral_trade_demographics
+  solution_packs:
+  - P01
+  - P05
+  rice_score: 900
+  roadmap_wave: 4
+  status: HOMOLOGATED
+  freshness_sla_hours: 8760
+  cron_schedule_expression: 0 2 1 1 *
+  api_block: BLOCO_4_GLOBAL_PESQUISA
+  rate_limit_rpm: 60
+  finops_tier: FREE_UNLIMITED
+  gateway_method: lookup_country
+  notes: Normalizacao ISO-3166 (Alpha-2/3), DDI, moedas, idiomas, fronteiras e populacao.
+- source_id: openalex_api
+  source_origin: PUBLIC_GLOBAL
+  name: OpenAlex Scientific Graph API
+  agency: OpenAlex Global Scientific Knowledge Graph (OurResearch)
+  official_url: https://api.openalex.org/works
+  segment_id: 07_educacao_capital_humano
+  segment_name: Educação & Capital Humano
+  access_mode: FEDERATED_API
+  protocol: REST_JSON
+  auth_type: NONE
+  canonical_keys:
+  - id_municipio
+  - sigla_uf
+  update_frequency: Diária (Grafo Científico)
+  estimated_volume: +250 milhões de artigos científicos, instituições brasileiras (ROR) e citações
+  lgpd_tier: PUBLIC_NON_PERSONAL
+  ml_feature_domains:
+  - scientific_publications_ror
+  - academic_innovation_graph
+  solution_packs:
+  - P02
+  - P06
+  rice_score: 915
+  roadmap_wave: 5
+  status: HOMOLOGATED
+  freshness_sla_hours: 24
+  cron_schedule_expression: 0 6 * * *
+  api_block: BLOCO_4_GLOBAL_PESQUISA
+  rate_limit_rpm: 60
+  finops_tier: FREE_UNLIMITED
+  gateway_method: search_openalex_works
+  notes: Catalogo cientifico aberto com artigos, autores, conceitos e ROR IDs para NLP/grafos.
+- source_id: gdelt_doc_api
+  source_origin: PUBLIC_GLOBAL
+  name: GDELT Project Doc 2.0 API
+  agency: GDELT Project 2.0 Global Knowledge Graph & DOC API
+  official_url: https://api.gdeltproject.org/api/v2/doc/doc
+  segment_id: 13_metaportais_agregadores
+  segment_name: Metaportais & Hubs Agregadores
+  access_mode: FEDERATED_API
+  protocol: REST_JSON
+  auth_type: NONE
+  canonical_keys:
+  - sigla_uf
+  update_frequency: Horária (Eventos & Sentimento)
+  estimated_volume: Monitoramento global contínuo de notícias, eventos e tom midiático em +100 idiomas
+  lgpd_tier: PUBLIC_NON_PERSONAL
+  ml_feature_domains:
+  - realtime_news_sentiment
+  - geopolitical_risk_events
+  solution_packs:
+  - P02
+  - P07
+  rice_score: 895
+  roadmap_wave: 6
+  status: HOMOLOGATED
+  freshness_sla_hours: 1
+  cron_schedule_expression: 0 * * * *
+  api_block: BLOCO_4_GLOBAL_PESQUISA
+  rate_limit_rpm: 60
+  finops_tier: FREE_UNLIMITED
+  gateway_method: query_gdelt_doc
+  notes: Monitoramento global de noticias, volume de mencoes e score de sentimento quase em tempo real.

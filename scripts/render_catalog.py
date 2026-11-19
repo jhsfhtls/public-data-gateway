@@ -29,7 +29,8 @@ VALID_PROTOCOLS = {
     "OGC_WFS_SHP",
     "BIGQUERY_SQL",
 }
-VALID_AUTH_TYPES = {"NONE", "PUBLIC_KEY", "ENV_TOKEN", "GCP_ADC"}
+VALID_AUTH_TYPES = {"NONE", "PUBLIC_KEY", "ENV_TOKEN", "GCP_ADC", "OPTIONAL_KEY", "API_KEY"}
+VALID_SOURCE_ORIGINS = {"GOV_BR", "PUBLIC_GLOBAL"}
 VALID_CANONICAL_KEYS = {
     "id_municipio",
     "sigla_uf",
@@ -140,6 +141,9 @@ def validate_registry(data: dict[str, Any]) -> None:
 
         if src.get("auth_type") not in VALID_AUTH_TYPES:
             raise ValueError(f"Source '{sid}' invalid auth_type: '{src.get('auth_type')}'")
+
+        if src.get("source_origin", "GOV_BR") not in VALID_SOURCE_ORIGINS:
+            raise ValueError(f"Source '{sid}' invalid source_origin: '{src.get('source_origin')}'")
 
         if src.get("lgpd_tier") not in VALID_LGPD_TIERS:
             raise ValueError(f"Source '{sid}' invalid lgpd_tier: '{src.get('lgpd_tier')}'")
@@ -358,26 +362,24 @@ def render_markdown(data: dict[str, Any]) -> str:
     for tier, base, rule, examples in LGPD_TIERS_INFO:
         lines.append(f"| `{tier}` | {base} | {rule} | {examples} |")
 
-    public_apis_path = REPO_ROOT / "catalog" / "public_apis_registry.yaml"
-    if public_apis_path.is_file():
-        pub_data = yaml.safe_load(public_apis_path.read_text(encoding="utf-8")) or {}
-        pub_blocks = pub_data.get("blocks", [])
-        pub_apis = pub_data.get("apis", [])
-        pub_refs = pub_data.get("discovery_references", [])
+    pub_blocks = data.get("public_api_blocks", [])
+    pub_apis = [s for s in sources if s.get("source_origin") == "PUBLIC_GLOBAL"]
+    pub_refs = data.get("discovery_references", [])
+    if pub_apis:
         lines.extend([
             "",
             "---",
             "",
             "## 7. Catálogo Unificado — APIs Públicas & Globais (Analytics, KYC/KYB, Espacial & ML)",
             "",
-            f"Complemento integrado ao catálogo mestre com **{len(pub_apis)} APIs públicas e globais curadas** "
-            f"(fonte: `catalog/public_apis_registry.yaml`), auditadas contra:",
+            f"Seção integrada do catálogo mestre unificado com **{len(pub_apis)} APIs públicas e globais curadas** "
+            f"(`source_origin: PUBLIC_GLOBAL` em `catalog/sources_registry.yaml`), auditadas contra:",
             "",
         ])
         for ref in pub_refs:
             lines.append(f"- **{ref['name']}** ({ref['url']}): {ref['purpose']}")
         for block in pub_blocks:
-            block_apis = [a for a in pub_apis if a.get("block") == block["block_id"]]
+            block_apis = [a for a in pub_apis if a.get("api_block") == block["block_id"]]
             lines.extend([
                 "",
                 f"### {block['name']} (`{block['block_id']}`)",
@@ -388,11 +390,11 @@ def render_markdown(data: dict[str, Any]) -> str:
                 "| :--- | :--- | :--- | ---: | :--- | :--- | :--- | :--- |",
             ])
             for api in block_apis:
-                packs_str = ", ".join(api.get("target_packs", []))
+                packs_str = ", ".join(api.get("solution_packs", []))
                 lines.append(
-                    f"| `{api['api_id']}` | {api['name']} | `{api['auth_type']}` | "
-                    f"{api['rate_limit_rpm']} | `{api['finops_tier']}` | {packs_str} | "
-                    f"`{api['gateway_method']}` | `{api['status']}` |"
+                    f"| `{api['source_id']}` | {api['name']} | `{api['auth_type']}` | "
+                    f"{api.get('rate_limit_rpm', 60)} | `{api.get('finops_tier', 'FREE_UNLIMITED')}` | {packs_str} | "
+                    f"`{api.get('gateway_method', '')}` | `{api['status']}` |"
                 )
 
     lines.extend([
@@ -401,7 +403,7 @@ def render_markdown(data: dict[str, Any]) -> str:
         "",
         "## 8. Matriz de Freshness, SLA & Agendamento Cron (Phase 11)",
         "",
-        f"Todas as **{total_sources} fontes governamentais** possuem metas explícitas de `freshness_sla_hours` e `cron_schedule_expression` para orquestração de mirror/CDC em nuvem:",
+        f"Todas as **{total_sources} fontes homologadas no catálogo unificado** possuem metas explícitas de `freshness_sla_hours` e `cron_schedule_expression` para orquestração de mirror/CDC em nuvem:",
         "",
         "| ID Fonte | Frequência Oficial | SLA Freshness (h) | Expressão Cron (UTC) | Modo de Acesso |",
         "| :--- | :--- | :---: | :--- | :--- |",
@@ -418,7 +420,7 @@ def render_markdown(data: dict[str, Any]) -> str:
         "",
         "## 9. Instruções de Manutenção & Verificação de Integridade",
         "",
-        "O arquivo `CATALOG.md` é gerado de forma **100% determinística** a partir de `catalog/sources_registry.yaml` e `catalog/public_apis_registry.yaml`.",
+        "O arquivo `CATALOG.md` é gerado de forma **100% determinística** a partir da Fonte Única da Verdade `catalog/sources_registry.yaml`.",
         "",
         "```powershell",
         "# 1. Verificar se CATALOG.md está em sincronia com os registries (exit 0/1)",

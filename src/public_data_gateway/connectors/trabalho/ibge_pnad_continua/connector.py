@@ -21,6 +21,7 @@ from brazil_data_gateway.core.config import GatewaySettings
 from brazil_data_gateway.core.models import DataContract
 from brazil_data_gateway.core.normalizer import CanonicalNormalizer
 from brazil_data_gateway.core.storage import HybridStorageEngine
+from public_data_gateway.core.connector import register_connector
 
 logger = logging.getLogger(__name__)
 
@@ -490,3 +491,6 @@ class IBGEPnadContinuaConnector:
             records, key=lambda x: float(x.get("rendimento_medio_real_habitual_reais", 0.0)), reverse=True
         )
         return sorted_records[:limit]
+
+
+register_connector('ibge_pnad_continua', IBGEPnadContinuaConnector)

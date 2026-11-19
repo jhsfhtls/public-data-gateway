@@ -26,10 +26,12 @@ def build_parser() -> argparse.ArgumentParser:
     subparsers.add_parser("status", help="Show gateway status, directories, and storage stats.")
 
     # Subcommand: catalog
-    cat_parser = subparsers.add_parser("catalog", help="List registered data sources from the catalog.")
-    cat_parser.add_argument("--wave", type=int, help="Filter by roadmap wave (1, 2, 3)")
+    cat_parser = subparsers.add_parser("catalog", help="List registered data sources from the unified catalog.")
+    cat_parser.add_argument("--wave", type=int, help="Filter by roadmap wave (1..6)")
     cat_parser.add_argument("--segment", type=str, help="Filter by segment ID")
-    cat_parser.add_argument("--status", type=str, help="Filter by status (production, planned, etc.)")
+    cat_parser.add_argument("--status", type=str, help="Filter by status (HOMOLOGATED, etc.)")
+    cat_parser.add_argument("--origin", type=str, help="Filter by source origin (GOV_BR or PUBLIC_GLOBAL)")
+    cat_parser.add_argument("--query", "-q", type=str, help="Search sources by keyword across id, name, agency, domain, or keys")
     cat_parser.add_argument("--json", action="store_true", help="Output in JSON format")
 
     # Subcommand: schema
@@ -2520,7 +2522,11 @@ def main(argv: Sequence[str] | None = None) -> int:
 
         if args.command == "catalog":
             sources = catalog.list_sources(
-                wave=args.wave, segment_id=args.segment, status=args.status
+                wave=args.wave,
+                segment_id=args.segment,
+                status=args.status,
+                source_origin=getattr(args, "origin", None),
+                query=getattr(args, "query", None),
             )
             if args.json:
                 data = [s.model_dump() for s in sources]

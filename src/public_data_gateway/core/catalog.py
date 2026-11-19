@@ -1,5 +1,6 @@
 """Catalog registry loader and query interface for official Brazilian data sources."""
 
+import unicodedata
 from pathlib import Path
 from typing import Any
 
@@ -7,6 +8,11 @@ import yaml
 
 from public_data_gateway.core.config import GatewaySettings
 from public_data_gateway.core.models import SourceEntry
+
+
+def _norm_search(text: str) -> str:
+    decomposed = unicodedata.normalize("NFKD", text.strip().lower())
+    return "".join(ch for ch in decomposed if not unicodedata.combining(ch))
 
 
 class CatalogRegistry:
@@ -58,6 +64,8 @@ class CatalogRegistry:
         status: str | None = None,
         product_id: str | None = None,
         pack_id: str | None = None,
+        source_origin: str | None = None,
+        query: str | None = None,
     ) -> list[SourceEntry]:
         """Query sources with filtering, ordered by roadmap_wave (asc) and rice_score (desc)."""
         filtered = list(self._sources.values())
@@ -68,9 +76,35 @@ class CatalogRegistry:
             filtered = [s for s in filtered if s.segment_id.lower() == segment_id.lower()]
         if status is not None:
             filtered = [s for s in filtered if s.status.lower() == status.lower()]
+        if source_origin is not None:
+            clean_origin = source_origin.strip().upper()
+            filtered = [s for s in filtered if s.source_origin.upper() == clean_origin]
         target_pack = pack_id or product_id
         if target_pack is not None:
             filtered = [s for s in filtered if target_pack in s.solution_packs]
+        if query is not None and query.strip():
+            q = _norm_search(query)
+            filtered = [
+                s
+                for s in filtered
+                if q
+                in _norm_search(
+                    " ".join(
+                        [
+                            s.source_id,
+                            s.name,
+                            s.agency,
+                            s.segment_id,
+                            s.segment_name,
+                            s.api_block or "",
+                            s.gateway_method or "",
+                            s.notes,
+                            " ".join(s.ml_feature_domains),
+                            " ".join(s.canonical_keys),
+                        ]
+                    )
+                )
+            ]
 
         # Sort: roadmap_wave ascending, rice_score descending
         filtered.sort(key=lambda s: (s.roadmap_wave, -s.rice_score))
